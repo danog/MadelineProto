@@ -11,6 +11,7 @@ import re
 from datetime import datetime
 import sys
 import io
+import configparser
 
 current_module = sys.modules[__name__]
 
@@ -106,9 +107,20 @@ class TL:
                 f = io.BytesIO(bstring)
                 dict = self.deserialize(f, type=tl_element.type)
 
+    def serialize(self, type=None, subtype=None):
+        pass
 
-    def deserialize(self, bytes_io, type=None, subtype=None):
-        assert isinstance(bytes_io, io.BytesIO)
+    def deserialize(self, string, type=None, subtype=None):
+
+        if isinstance(string, io.BytesIO):
+            bytes_io = string
+        elif isinstance(string, bytes):
+            bytes_io = io.BytesIO(string)
+        else:
+            raise Exception("Bad input type, use bytes string or BytesIO object")
+
+        # Built-in bare types
+
         if type == 'int':
             x = struct.unpack('<i', bytes_io.read(4))[0]
         elif type == '#':
@@ -145,8 +157,9 @@ class TL:
             count = int.from_bytes(bytes_io.read(4), 'little')
             x = [self.deserialize(bytes_io, type=subtype) for i in range(count)]
         else:
-            # Detect what type
-            i = struct.unpack('<i', bytes_io.read(4))[0]
+            # Boxed types
+
+            i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
             try:
                 tl_elem = self.obj_dict_id[i]
             except:
@@ -164,9 +177,13 @@ class TL:
 
 
 class Session:
-    def __init__(self, IP_adress, port):
+    def __init__(self, credentials):
+        config = configparser.ConfigParser()
+        config.read(credentials)
         self.sock = socket.socket()
-        self.sock.connect((IP_adress, port))
+        self.sock.connect((config['App data']['ip_adress'], config['App data'].getint('port')))
+        self.api_id = config['App data'].getint('api_id')
+        self.api_hash = config['App data']['api_hash']
         self.auth_key_id = b'\x00\x00\x00\x00\x00\x00\x00\x00'
         self.number = 0
         self.TL = TL()

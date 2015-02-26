@@ -54,4 +54,5 @@ docs/_build/
 target/
 
 # testing apps
-testing.py
+credentials
+rsa.pub
