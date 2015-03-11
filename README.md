@@ -29,7 +29,7 @@ Config example for "credentials" file:
 [App data]
 api_id: 12345
 api_hash: 1234567890abcdef1234567890abcdef
-ip_adress: 112.134.156.178
+ip_address: 112.134.156.178
 port: 443
 ```
 rsa.pub contains your RSA key.
