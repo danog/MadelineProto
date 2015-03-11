@@ -39,35 +39,58 @@ class TlConstructor:
                 param['subtype'] = None
             self.params.append(param)
 
+class TlMethod:
+    def __init__(self, json_dict):
+        self.id = int(json_dict['id'])
+        self.type = json_dict['type']
+        self.method = json_dict['method']
+        self.params = json_dict['params']
+
+
 
 class TL:
     def __init__(self):
         with open("TL_schema.JSON", 'r') as f:
            TL_dict = json.load(f)
 
+        # Read constructors
+
         self.constructors = TL_dict['constructors']
         self.constructor_id = {}
         self.constructor_type = {}
-
-        # Read constructors
-
         for elem in self.constructors:
             z = TlConstructor(elem)
             self.constructor_id[z.id] = z
             self.constructor_type[z.type] = z
 
+        self.methods = TL_dict['methods']
+        self.method_id = {}
+        self.method_name = {}
+        for elem in self.methods:
+            z = TlMethod(elem)
+            self.method_id[z.id] = z
+            self.method_name[z.method] = z
 
-    def deserialize(self, byte_string, type_=None, subtype=None):
+    def method_call(self, method, **kwargs):
+        z = io.BytesIO()
+        tl_method = self.method_name[method]
+        z.write(struct.pack('<i', tl_method.id))
+        for param in tl_method.params:
+            self.serialize(bytes_io=z, value=kwargs[param['name']], type_=param['type'])
+        return z.getvalue()
 
-        if isinstance(byte_string, io.BytesIO):
-            bytes_io = byte_string
-        elif isinstance(byte_string, bytes):
-            bytes_io = io.BytesIO(byte_string)
-        else:
-            raise TypeError("Bad input type, use bytes string or BytesIO object")
+    def serialize(self, bytes_io, type_, value):
+        if  type_ == "int":
+            assert isinstance(value, int)
+            bytes_io.write(struct.pack('<i', value))
+        if  type_ == "int128":
+            assert isinstance(value, bytes)
+            bytes_io.write(struct.pack('<16s', value))
+
+    def deserialize(self, bytes_io, type_=None, subtype=None):
+        assert isinstance(bytes_io, io.BytesIO)
 
         # Built-in bare types
-
         if type_ == 'int':
             x = struct.unpack('<i', bytes_io.read(4))[0]
         elif type_ == '#':

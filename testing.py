@@ -10,14 +10,13 @@ config.read('credentials')
 ip = config['App data']['ip_address']
 port = config['App data'].getint('port')
 
+TL=mtproto.TL()
 
 Session = mtproto.Session(ip, port)
-nonce = os.urandom(16)
-tosend = b'\x78\x97\x46\x60' + nonce
-Session.send_message(tosend)
-z = Session.recv_message()
-TL=mtproto.TL()
-x = TL.deserialize(io.BytesIO(z))
+a = TL.method_call('req_pq', nonce=os.urandom(16))
+Session.send_message(a)
+b = Session.recv_message()
+x = TL.deserialize(io.BytesIO(b))
 
 PQ = int.from_bytes(x['pq'], 'big')
 [p, q] = prime.primefactors(PQ)
