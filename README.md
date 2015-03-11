@@ -1,11 +1,23 @@
+[![Join the chat at https://gitter.im/griganton/telepy](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/griganton/telepy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # About this repo
 This is Telegram API for python. 
 Main aim is to implement MTProto protocol Telegram API on pure Python (not wrapped CLI)
-We'll try to make it work on Python 2 as well as 3.
 
+### Future plan
+1. [ ] We'll try to make it work on Python 2 as well as 3.
+2. [ ] Follow up the same functionality of CLI API.
+  1. [ ] Serialize/Deserialize
+  2. [ ] Send and receive PQ authorization with server  [doc] (https://core.telegram.org/mtproto/samples-auth_key)
+  3. [ ] Send and receive service messages with server like logging in to server [doc] (https://core.telegram.org/mtproto/service_messages)
+
+### Useful start points to join
 Detailed description of API and protocol can be found here:
-https://core.telegram.org/api
-https://core.telegram.org/mtproto
+* https://core.telegram.org/api
+* https://core.telegram.org/mtproto
+
+API registration is needed to be done by yourself at http://my.telegram.org
+Follow Structure - Credentials for provide it your API information.
 
 # Structure
 
@@ -49,7 +61,7 @@ Now it makes steps from https://core.telegram.org/mtproto/samples-auth_key:
 - sends PQ request to server
 - parses the result
 - factorizes PQ
- 
+
 ## prime.py
 prime.py is used in PQ factorization. It has been copied from https://stackoverflow.com/questions/4643647/fast-prime-factorization-module
 
