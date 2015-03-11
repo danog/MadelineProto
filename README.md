@@ -5,11 +5,11 @@ This is Telegram API for python.
 Main aim is to implement MTProto protocol Telegram API on pure Python (not wrapped CLI)
 
 ### Future plan
-1. [ ] We'll try to make it work on Python 2 as well as 3.
-2. [ ] Follow up the same functionality of CLI API.
-  1. [ ] Serialize/Deserialize
-  2. [ ] Send and receive PQ authorization with server  [doc] (https://core.telegram.org/mtproto/samples-auth_key)
-  3. [ ] Send and receive service messages with server like logging in to server [doc] (https://core.telegram.org/mtproto/service_messages)
+- [ ] We'll try to make it work on Python 2 as well as 3.
+- [ ] Follow up the same functionality of CLI API.
+  - [ ] Serialize/Deserialize
+  - [ ] Send and receive PQ authorization with server  [doc] (https://core.telegram.org/mtproto/samples-auth_key)
+  - [ ] Send and receive service messages with server like logging in to server [doc] (https://core.telegram.org/mtproto/service_messages)
 
 ### Useful start points to join
 Detailed description of API and protocol can be found here:
