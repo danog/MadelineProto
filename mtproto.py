@@ -24,36 +24,38 @@ def vis(bs):
     print(" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
 
 
+class TlConstructor:
+    def __init__(self, json_dict):
+        self.id = int(json_dict['id'])
+        self.type = json_dict['type']
+        self.predicate = json_dict['predicate']
+        self.params = []
+        # case of vector
+        for param in json_dict['params']:
+            if param['type'] == "Vector<long>":
+                param['type'] = "Vector t"
+                param['subtype'] = "long"
+            else:
+                param['subtype'] = None
+            self.params.append(param)
+
+
 class TL:
     def __init__(self):
         with open("TL_schema.JSON", 'r') as f:
-            TL_dict = json.load(f)
+           TL_dict = json.load(f)
 
-        self.methods = TL_dict['methods']
         self.constructors = TL_dict['constructors']
-
-        self.func_dict_id = {}
-        self.func_dict_name = {}
-        self.obj_dict_id = {}
-        self.obj_dict_name = {}
+        self.constructor_id = {}
+        self.constructor_type = {}
 
         # Read constructors
 
         for elem in self.constructors:
-            z = TlElement(elem)
-            self.func_dict_id = {}
+            z = TlConstructor(elem)
+            self.constructor_id[z.id] = z
+            self.constructor_type[z.type] = z
 
-    def serialize(self, type_, data):
-        # 1. Type constructor ID
-        # 2. type costructor params
-
-        # Bare types
-        if type_ == 'string':
-            assert isinstance(data, str)
-            struct.pack("<L", len(data))
-        if type_ == 'int':
-            assert isinstance(data, str)
-            struct.pack("<L", len(data))
 
     def deserialize(self, byte_string, type_=None, subtype=None):
 
@@ -103,19 +105,17 @@ class TL:
             x = [self.deserialize(bytes_io, type_=subtype) for i in range(count)]
         else:
             # Boxed types
-
             i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
             try:
-                tl_elem = self.obj_dict_id[i]
+                tl_elem = self.constructor_id[i]
             except:
                 raise Exception("Could not extract type: %s" % type_)
-            base_boxed_types = ["Vector", "Int", "Long", "Double", "String", "Int128", "Int256"]
-            if tl_elem.result in base_boxed_types:
-                x = self.deserialize(bytes_io, type_=tl_elem.name, subtype=subtype)
-
+            base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
+            if tl_elem.type in base_boxed_types:
+                x = self.deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
             else:  # other types
                 x = {}
-                for arg in tl_elem.args:
+                for arg in tl_elem.params:
                     x[arg['name']] = self.deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
         return x
 

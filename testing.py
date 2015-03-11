@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Sep  1 16:24:47 2014
-
-@author: agrigoryev
-
-"""
-
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import socket
 import mtproto
 import os
-import time
-import math
 import prime
 import io
+import configparser
+
+config = configparser.ConfigParser()
+config.read('credentials')
+ip = config['App data']['ip_address']
+port = config['App data'].getint('port')
 
 
-Session = mtproto.Session('credentials')
+Session = mtproto.Session(ip, port)
 nonce = os.urandom(16)
 tosend = b'\x78\x97\x46\x60' + nonce
 Session.send_message(tosend)
