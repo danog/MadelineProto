@@ -174,14 +174,12 @@ class Session:
         """
         Reading socket and receiving message from server. Check the CRC32 and
         """
-        packet_length_data = self.sock.recv(4)
+        packet_length_data = self.sock.recv(4) # reads how many bytes to read
+
         if len(packet_length_data) > 0:  # if we have smth. in the socket
             packet_length = struct.unpack("<L", packet_length_data)[0]
-            packet = self.sock.recv(packet_length - 4)
-            self.number = struct.unpack("<L", packet[0:4])[0]
-            auth_key_id = struct.unpack("<8s", packet[4:12])[0]
-            message_id = struct.unpack("<8s", packet[12:20])[0]
-            message_length = struct.unpack("<I", packet[20:24])[0]
+            packet = self.sock.recv(packet_length - 4)  # read the rest of bytes from socket
+            (self.number, auth_key_id, message_id, message_length)= struct.unpack("<L8s8sI", packet[0:24])
             data = packet[24:24+message_length]
             crc = packet[-4:]
 
