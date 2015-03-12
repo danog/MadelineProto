@@ -3,13 +3,18 @@
 Created on Tue Sep  2 19:26:15 2014
 
 @author: agrigoryev
+@author: Sammy Pfeiffer
 """
-from binascii import crc32
+from binascii import crc32 as originalcrc32
+def crc32(data):
+    return originalcrc32(data) & 0xffffffff
 from datetime import datetime
+from time import time
 import io
 import json
 import socket
 import struct
+
 
 
 def vis(bs):
@@ -17,6 +22,7 @@ def vis(bs):
     Function to visualize byte streams. Split into bytes, print to console.
     :param bs: BYTE STRING
     """
+    bs = bytearray(bs)
     symbols_in_one_line = 8
     n = len(bs) // symbols_in_one_line
     for i in range(n):
@@ -108,12 +114,14 @@ def serialize_param(bytes_io, type_, value):
     elif type_ == 'string' or 'bytes':
         l = len(value)
         if l < 254: # short string format
-            bytes_io.write(int.to_bytes(l, 1, 'little')) # 1 byte of string
+            bytes_io.write(struct.pack('<b', l))  # 1 byte of string
+            #bytes_io.write(int.to_bytes(l, 1, 'little')) # 1 byte of string
             bytes_io.write(value)   # string
-            bytes_io.write(b'\x00'*((-l-1) % 4)) # padding bytes
+            bytes_io.write(b'\x00'*((-l-1) % 4))  # padding bytes
         else:
             bytes_io.write(b'\xfe')  # byte 254
-            bytes_io.write(int.to_bytes(l, 3, 'little')) # 3 bytes of string
+            bytes_io.write(struct.pack('<i', l))  # 3 bytes of string
+            #bytes_io.write(int.to_bytes(l, 3, 'little')) # 3 bytes of string
             bytes_io.write(value) # string
             bytes_io.write(b'\x00'*(-l % 4))  # padding bytes
 
@@ -131,11 +139,11 @@ def deserialize(bytes_io, type_=None, subtype=None):
     elif type_ == 'int128': x = bytes_io.read(16)
     elif type_ == 'int256': x = bytes_io.read(32)
     elif type_ == 'string' or type_ == 'bytes':
-        l = int.from_bytes(bytes_io.read(1), 'little')
+        l = struct.unpack('<b', bytes_io.read(1))[0]
         assert l <= 254
         if l == 254:
             # We have a long string
-            long_len = int.from_bytes(bytes_io.read(3), 'little')
+            long_len = struct.unpack('<l', bytes_io.read(3))[0]
             x = bytes_io.read(long_len)
             bytes_io.read(-long_len % 4)  # skip padding bytes
         else:
@@ -145,7 +153,8 @@ def deserialize(bytes_io, type_=None, subtype=None):
         assert isinstance(x, bytes)
     elif type_ == 'vector':
         assert subtype is not None
-        count = int.from_bytes(bytes_io.read(4), 'little')
+        count = struct.unpack('<l', bytes_io.read(4))[0]
+        print("count is: " + str(count))
         x = [deserialize(bytes_io, type_=subtype) for i in range(count)]
     else:
         # Boxed types
@@ -185,7 +194,11 @@ class Session:
         # Basic instructions: https://core.telegram.org/mtproto/description#unencrypted-message
 
         # Message id: https://core.telegram.org/mtproto/description#message-identifier-msg-id
-        msg_id = int(datetime.utcnow().timestamp()*2**30)*4
+        # http://stackoverflow.com/questions/8777753/converting-datetime-date-to-utc-timestamp-in-python
+        # to make it work in py2 and py3 (py3 has the timestamp() method but py2 doesnt)
+        curr_timestamp = (datetime.utcfromtimestamp(time()) - datetime(1970, 1, 1)).total_seconds()
+        msg_id = int(curr_timestamp*2**30)*4
+        #msg_id = int(datetime.utcnow().timestamp()*2**30)*4
 
         return (b'\x00\x00\x00\x00\x00\x00\x00\x00' +
                 struct.pack('<Q', msg_id) +
@@ -226,17 +239,35 @@ class Session:
             (self.number, auth_key_id, message_id, message_length)= struct.unpack("<L8s8sI", packet[0:24])
             data = packet[24:24+message_length]
             crc = packet[-4:]
+            # print("crc is: " + str(crc))
+            # print("type of crc: " + str(type(crc)))
+            # print("crc.__repr__(): " + crc.__repr__())
+            # print("struct.unpack('<L', crc): (next line)")
+            # print(struct.unpack('<L', crc))
+            # print("crc32(packet_length_data + packet[0:-4]): " + str(crc32(packet_length_data + packet[0:-4])))
+            # print("crc32(packet_length_data + packet[0:-4]).__repr__(): " + crc32(packet_length_data + packet[0:-4]).__repr__())
 
             # Checking the CRC32 correctness of received data
-            if crc32(packet_length_data + packet[0:-4]).to_bytes(4, 'little') == crc:
+            if crc32(packet_length_data + packet[0:-4]) == struct.unpack('<L', crc)[0]:
                 print('<<')
                 vis(data)  # Received message visualisation to console
                 return data
+            else:
+                print("CRC32 was not correct!")
+        else:
+            print("Nothing in the socket!")
 
     def method_call(self, method, **kwargs):
         z=io.BytesIO()
         serialize_method(z, method, **kwargs)
-        self.send_message(z.getvalue())
+        # z.getvalue() on py2.7 returns str, which means bytes
+        # on py3.4 returns bytes
+        # bytearray is closer to the same data type to be shared
+        z_val = bytearray(z.getvalue())
+        # print("z_val: " + z_val.__repr__())
+        # print("z_val type: " + str(type(z_val)))
+        # print("len of z_val: " + str(len(z_val)))
+        self.send_message(z_val)
         server_answer = self.recv_message()
         if server_answer is not None:
             return deserialize(io.BytesIO(server_answer))
