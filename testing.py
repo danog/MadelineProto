@@ -21,7 +21,8 @@ PQ_bytes = x['pq']
 
 PQ = int.from_bytes(PQ_bytes, 'big')
 [p, q] = prime.primefactors(PQ)
-if p > q: (p, q) = (q, p) # swap values in way p<q
+if p > q: (p, q) = (q, p)
+assert p*q == PQ and p < q
 
 print("PQ = %d\np = %d, q = %d" % (PQ, p, q))
 
@@ -32,7 +33,7 @@ Q_bytes = int.to_bytes(q, q.bit_length()//8+1, 'big')
 f = open('rsa.pub', 'r')
 key = RSA.importKey(f.read())
 
-z= io.BytesIO()
+z = io.BytesIO()
 
 new_nonce = os.urandom(32)
 
@@ -59,3 +60,15 @@ z = Session.method_call('req_DH_params',
                         encrypted_data=encrypted_data)
 
 print(z)
+
+# # used for serialization and SHA testing (passed)
+# z = io.BytesIO()
+# mtproto.serialize_obj(z, 'p_q_inner_data',
+#                       pq=b"\x17\xED\x48\x94\x1A\x08\xF9\x81",
+#                       p=b"\x49\x4C\x55\x3B",
+#                       q=b"\x53\x91\x10\x73",
+#                       nonce=b"\x3E\x05\x49\x82\x8C\xCA\x27\xE9\x66\xB3\x01\xA4\x8F\xEC\xE2\xFC",
+#                       server_nonce=b"\xA5\xCF\x4D\x33\xF4\xA1\x1E\xA8\x77\xBA\x4A\xA5\x73\x90\x73\x30",
+#                       new_nonce=b"\x31\x1C\x85\xDB\x23\x4A\xA2\x64\x0A\xFC\x4A\x76\xA7\x35\xCF\x5B\x1F\x0F\xD6\x8B\xD1\x7F\xA1\x81\xE1\x22\x9A\xD8\x67\xCC\x02\x4D")
+# x=z.getvalue()
+# print(SHA.new(x).hexdigest())
