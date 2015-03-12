@@ -49,8 +49,8 @@ class TlMethod:
 
 
 class TL:
-    def __init__(self):
-        with open("TL_schema.JSON", 'r') as f:
+    def __init__(self, filename):
+        with open(filename, 'r') as f:
            TL_dict = json.load(f)
 
         # Read constructors
@@ -71,79 +71,75 @@ class TL:
             self.method_id[z.id] = z
             self.method_name[z.method] = z
 
-    def method_call(self, method, **kwargs):
-        z = io.BytesIO()
-        tl_method = self.method_name[method]
-        z.write(struct.pack('<i', tl_method.id))
-        for param in tl_method.params:
-            self.serialize(bytes_io=z, value=kwargs[param['name']], type_=param['type'])
-        return z.getvalue()
 
-    def serialize(self, bytes_io, type_, value):
-        if  type_ == "int":
-            assert isinstance(value, int)
-            bytes_io.write(struct.pack('<i', value))
-        if  type_ == "int128":
-            assert isinstance(value, bytes)
-            bytes_io.write(struct.pack('<16s', value))
+## Loading TL_schema
+tl = TL("TL_schema.JSON")
 
-    def deserialize(self, bytes_io, type_=None, subtype=None):
-        assert isinstance(bytes_io, io.BytesIO)
+def serialize(bytes_io, type_, value):
+    if  type_ == "int":
+        assert isinstance(value, int)
+        bytes_io.write(struct.pack('<i', value))
+    if  type_ == "int128":
+        assert isinstance(value, bytes)
+        bytes_io.write(struct.pack('<16s', value))
 
-        # Built-in bare types
-        if type_ == 'int':
-            x = struct.unpack('<i', bytes_io.read(4))[0]
-        elif type_ == '#':
-            x = struct.unpack('<I', bytes_io.read(4))[0]
-        elif type_ == 'long':
-            x = struct.unpack('<q', bytes_io.read(8))[0]
-        elif type_ == 'double':
-            x = struct.unpack('<d', bytes_io.read(8))[0]
-        elif type_ == 'int128':
-            t = struct.unpack('<16s', bytes_io.read(16))[0]
-            x = int.from_bytes(t, 'little')
-        elif type_ == 'int256':
-            t = struct.unpack('<32s', bytes_io.read(32))[0]
-            x = int.from_bytes(t, 'little')
-        elif type_ == 'bytes':
-            l = int.from_bytes(bytes_io.read(1), 'little')
+def deserialize(bytes_io, type_=None, subtype=None):
+    assert isinstance(bytes_io, io.BytesIO)
+
+    # Built-in bare types
+    if type_ == 'int':
+        x = struct.unpack('<i', bytes_io.read(4))[0]
+    elif type_ == '#':
+        x = struct.unpack('<I', bytes_io.read(4))[0]
+    elif type_ == 'long':
+        x = struct.unpack('<q', bytes_io.read(8))[0]
+    elif type_ == 'double':
+        x = struct.unpack('<d', bytes_io.read(8))[0]
+    elif type_ == 'int128':
+        t = struct.unpack('<16s', bytes_io.read(16))[0]
+        x = int.from_bytes(t, 'little')
+    elif type_ == 'int256':
+        t = struct.unpack('<32s', bytes_io.read(32))[0]
+        x = int.from_bytes(t, 'little')
+    elif type_ == 'bytes':
+        l = int.from_bytes(bytes_io.read(1), 'little')
+        x = bytes_io.read(l)
+        bytes_io.read(-(l+1) % 4)  # skip padding bytes
+    elif type_ == 'string':
+        l = int.from_bytes(bytes_io.read(1), 'little')
+        assert l <=254
+        if l == 254:
+            # We have a long string
+            long_len = int.from_bytes(bytes_io.read(3), 'little')
+            x = bytes_io.read(long_len)
+            bytes_io.read(-long_len % 4)  # skip padding bytes
+        else:
+            # We have a short string
             x = bytes_io.read(l)
             bytes_io.read(-(l+1) % 4)  # skip padding bytes
-        elif type_ == 'string':
-            l = int.from_bytes(bytes_io.read(1), 'little')
-            assert l <=254
-            if l == 254:
-                # We have a long string
-                long_len = int.from_bytes(bytes_io.read(3), 'little')
-                x = bytes_io.read(long_len)
-                bytes_io.read(-long_len % 4)  # skip padding bytes
-            else:
-                # We have a short string
-                x = bytes_io.read(l)
-                bytes_io.read(-(l+1) % 4)  # skip padding bytes
-            assert isinstance(x, bytes)
-        elif type_ == 'vector':
-            assert subtype is not None
-            count = int.from_bytes(bytes_io.read(4), 'little')
-            x = [self.deserialize(bytes_io, type_=subtype) for i in range(count)]
-        else:
-            # Boxed types
-            i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
-            try:
-                tl_elem = self.constructor_id[i]
-            except:
-                raise Exception("Could not extract type: %s" % type_)
-            base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
-            if tl_elem.type in base_boxed_types:
-                x = self.deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
-            else:  # other types
-                x = {}
-                for arg in tl_elem.params:
-                    x[arg['name']] = self.deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
-        return x
-
+        assert isinstance(x, bytes)
+    elif type_ == 'vector':
+        assert subtype is not None
+        count = int.from_bytes(bytes_io.read(4), 'little')
+        x = [deserialize(bytes_io, type_=subtype) for i in range(count)]
+    else:
+        # Boxed types
+        i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
+        try:
+            tl_elem = tl.constructor_id[i]
+        except:
+            raise Exception("Could not extract type: %s" % type_)
+        base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
+        if tl_elem.type in base_boxed_types:
+            x = deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
+        else:  # other types
+            x = {}
+            for arg in tl_elem.params:
+                x[arg['name']] = deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
+    return x
 
 class Session:
+    """ Manages TCP Transport. encryption and message frames """
     def __init__(self, ip, port):
         # creating socket
         self.sock = socket.socket()
@@ -211,3 +207,19 @@ class Session:
                 print('<<')
                 vis(data)  # Received message visualisation to console
                 return data
+
+    def method_call(self, method, **kwargs):
+        z = io.BytesIO()
+        tl_method = tl.method_name[method]
+        z.write(struct.pack('<i', tl_method.id))
+        for param in tl_method.params:
+            serialize(bytes_io=z, value=kwargs[param['name']], type_=param['type'])
+        self.send_message(z.getvalue())
+        server_answer = self.recv_message()
+        return deserialize(io.BytesIO(server_answer))
+
+class Telegram:
+    global tl
+    def connect(self, ip, port):
+        self.session = Session(ip, port)
+
