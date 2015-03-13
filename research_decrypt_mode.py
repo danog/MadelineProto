@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-# Inspiration: http://passingcuriosity.com/2009/aes-encryption-in-python-with-m2crypto/
-# sudo apt-get install swig
-# sudo pip install M2Crypto
+# THIS MODULE HAS ALL THE CONVERSIONS WE NEED! (I think)
+from Crypto.Util import number
 def vis(bs):
     """
     Function to visualize byte streams. Split into bytes, print to console.
@@ -15,6 +14,41 @@ def vis(bs):
     if not len(bs) % symbols_in_one_line == 0:
         print(str((i+1)*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
 
+def hex_string_to_str_bytes(val):
+    """Given a String like
+    tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253"
+    Convert it to it's byte representation, stored in py2 in a str, like:
+    tmp_aes_key_hex = '\xf0\x11(\x08\x87\xc7\xbb\x01\xdf\x0f\xc4\xe1x0\xe0\xb9\x1f\xbb\x8b\xe4\xb2&|\xb9\x85\xae%\xf3;RrS'
+    """
+    return val.decode("hex")
+
+def str_bytes_to_hex_string(val):
+    """Given a str_bytes (so str())  like
+    tmp_aes_key_hex = '\xf0\x11(\x08\x87\xc7\xbb\x01\xdf\x0f\xc4\xe1x0\xe0\xb9\x1f\xbb\x8b\xe4\xb2&|\xb9\x85\xae%\xf3;RrS'
+    Convert it back to it's uppercase string representation, like:
+    tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253" """
+    return val.encode("hex").upper()
+
+def hex_string_to_long(val):
+    """Given a String like
+    tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253"
+    Convert it to int, which is actually long"""
+    return int(val, 16)
+
+def long_to_hex_string(val):
+    """Given a long like:
+
+    Convert it to hex_string like:
+
+    from: http://stackoverflow.com/questions/4358285/is-there-a-faster-way-to-convert-an-arbitrary-large-integer-to-a-big-endian-seque/4358429#4358429
+    """
+    # number.long_to_bytes(val)
+    # number.bytes_to_long()
+    # number.tobytes()
+    # number.bstr()
+    return
+
+
 # Got from https://core.telegram.org/mtproto/samples-auth_key#conversion-of-encrypted-answer-into-answer
 # They say they use AES 256 IGE
 # Infinite Garble Extension (IGE) is a block cipher mode. (http://www.links.org/files/openssl-ige.pdf)
@@ -22,15 +56,59 @@ encrypted_answer_str = "28A92FE20173B347A8BB324B5FAB2667C9A8BBCE6468D5B509A4CBDD
 tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253"
 tmp_aes_iv_str = "3212D579EE35452ED23E0D0C92841AA7D31B2E9BDEF2151E80D15860311C85DB"
 answer_str = "BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733002000000FE000100C71CAEB9C6B1C9048E6C522F70F13F73980D40238E3E21C14934D037563D930F48198A0AA7C14058229493D22530F4DBFA336F6E0AC925139543AED44CCE7C3720FD51F69458705AC68CD4FE6B6B13ABDC9746512969328454F18FAF8C595F642477FE96BB2A941D5BCD1D4AC8CC49880708FA9B378E3C4F3A9060BEE67CF9A4A4A695811051907E162753B56B0F6B410DBA74D8A84B2A14B3144E0EF1284754FD17ED950D5965B4B9DD46582DB1178D169C6BC465B0D6FF9CA3928FEF5B9AE4E418FC15E83EBEA0F87FA9FF5EED70050DED2849F47BF959D956850CE929851F0D8115F635B105EE2E4E15D04B2454BF6F4FADF034B10403119CD8E3B92FCC5BFE000100262AABA621CC4DF587DC94CF8252258C0B9337DFB47545A49CDD5C9B8EAE7236C6CADC40B24E88590F1CC2CC762EBF1CF11DCC0B393CAAD6CEE4EE5848001C73ACBB1D127E4CB93072AA3D1C8151B6FB6AA6124B7CD782EAF981BDCFCE9D7A00E423BD9D194E8AF78EF6501F415522E44522281C79D906DDB79C72E9C63D83FB2A940FF779DFB5F2FD786FB4AD71C9F08CF48758E534E9815F634F1E3A80A5E1C2AF210C5AB762755AD4B2126DFA61A77FA9DA967D65DFD0AFB5CDF26C4D4E1A88B180F4E0D0B45BA1484F95CB2712B50BF3F5968D9D55C99C0FB9FB67BFF56D7D4481B634514FBA3488C4CDA2FC0659990E8E868B28632875A9AA703BCDCE8FCB7AE551"
-# Convert them to strings
-# http://stackoverflow.com/questions/5649407/hexadecimal-string-to-byte-array-in-python
-encrypted_answer = encrypted_answer_str.decode("hex") # int(encrypted_answer_str, 16) for py3
-tmp_aes_key = tmp_aes_key_str.decode("hex")
-tmp_aes_iv = tmp_aes_iv_str.decode("hex")
-answer = answer_str.decode("hex")
+print("encrypted_answer_str:")
+print(encrypted_answer_str)
+print("tmp_aes_key_str:")
+print(tmp_aes_key_str)
+print("tmp_aes_iv_str:")
+print(tmp_aes_iv_str)
+print("answer_str:")
+print(answer_str)
 
-print("len(encrypted_answer): " + str(len(encrypted_answer)))
-print("len(answer): " + str(len(answer)))
+# Convert them to bytes (strings in py2 anyways)
+# http://stackoverflow.com/questions/5649407/hexadecimal-string-to-byte-array-in-python
+encrypted_answer_hex = encrypted_answer_str.decode("hex") # int(encrypted_answer_str, 16) for py3
+tmp_aes_key_hex = tmp_aes_key_str.decode("hex")
+tmp_aes_iv_hex = tmp_aes_iv_str.decode("hex")
+answer_hex = answer_str.decode("hex")
+print("encrypted_answer_hex:")
+print(encrypted_answer_hex.__repr__())
+print("tmp_aes_key_hex:")
+print(tmp_aes_key_hex.__repr__())
+print("tmp_aes_iv_hex:")
+print(tmp_aes_iv_hex.__repr__())
+print("answer_hex:")
+print(answer_hex.__repr__())
+# Re-convert them to string
+encrypted_answer_hex_to_str = encrypted_answer_hex.encode("hex").upper() # int(encrypted_answer_str, 16) for py3
+tmp_aes_key_hex_to_str = tmp_aes_key_hex.encode("hex").upper()
+tmp_aes_iv_hex_to_str = tmp_aes_iv_hex.encode("hex").upper()
+answer_hex_to_str = answer_hex.encode("hex").upper()
+print("encrypted_answer_hex_to_str:")
+print(encrypted_answer_hex_to_str)
+print("tmp_aes_key_hex_to_str:")
+print(tmp_aes_key_hex_to_str)
+print("tmp_aes_iv_hex_to_str:")
+print(tmp_aes_iv_hex_to_str)
+print("answer_hex_to_str:")
+print(answer_hex_to_str)
+
+
+# Check if they are the same
+if encrypted_answer_hex_to_str == encrypted_answer_str:
+    print("encrypted_answer_hex_to_str == encrypted_answer_str")
+else:
+    print("encrypted_answer_hex_to_str != encrypted_answer_str")
+
+encrypted_answer = int(encrypted_answer_str, 16) # int(encrypted_answer_str, 16) for py3
+tmp_aes_key = int(tmp_aes_key_str, 16)
+tmp_aes_iv = int(tmp_aes_iv_str, 16)
+answer = int(answer_str, 16)
+print("longtohexstring")
+print(long_to_hex_string(tmp_aes_key))
+
+# print("len(encrypted_answer): " + str(len(encrypted_answer)))
+# print("len(answer): " + str(len(answer)))
 
 # Got from testing.py
 # encrypted_answer = 'L\xd7\xddI\x0b\xc3\xeay\xf1\x07]\x93\x7fY\x0cmVAX\x03\xeb\n}\x99\xd6\x99\xaa\xba\x05\x9d\xaaB\xe2\x97\xb3\xf2\xf8\xd8\x9f\xa6\x13\x177a\xb45A\x0f}\xb3\x99\xa3D?L\x94\xa3\xbcG\xe8\xf2\x14 \xb9.\x8b\xa0\xf1\xa5\xf1\x18\x9aZ2\x8f\xae\x05\xd9\x84H\xa3&\xad\x84\x82w\x9e\xe8\xba\x8a\x87QT\xdd\x12\x8c\x86\xde\xd8\x7fLM\xb9\x81H;JX\x85\x14\x1af!\xb20\xea)\xa8>(\xa9\xce5,\x96\x14\xd7P\x0c\xb3\x02\x9a\x16\xfc\x94\xacT\xa0\xd4\x82\xe5S1\xf4\xe1\x8cB\xad\x89\xc3C\xa6\rt)\xfa\x0b\xfe3\t\xdd\x02\xbe\xecP\xd6\xd7p\xf6\xf3\xb5\xdf6\xfc\x90l\xaa\x06\x8a\xc0XO\x96>\x85\x18\xebN\x08\x13x\xc0\x1ah\xbd\xedO\x99T\xfd\xed\x87C}\x89!\x99Oz\xfe\x927z~ &"\x0e/\x01N\x13\xfa\xd1\x96\x87\x0f\x83\x98d\x12X\xa7\x8c\xa8\x1c/\xbc\xab\xb2:\x07\xa6\x14\xfa\xe3\xd2\x8cG\xd6\x84\xe4[\x8f\x9e\x8f\xbb\x9c\x8a\x80\xbd\xcf\xaf!\xf7E\x1b\x1f\x91\x18\xc2\x8eBE\xfb\x84\xb6\xc5e5Q\xfd\xb8\xcb\xbc\xb4\x9f\xb7\x92\xfe\xae\xda,\xfaA\x94\x7fq\x1e\xd1\x05\xe8=\x9d#,\xe6\xb7y1\xe6\xc7!\xa0\x0bx\xd1\xb3\xad9\xc4\xdd\x99Y\xca\r\x07+\x903\x1e?\x1d_\x8b\xb0M\xff\x14\xc3:\x95\xa8\xee\xc1\xb5\xff\xfb1\x95\xe1\xcaT\xe4D\xcf\xd2%\x11\xeb@`Att\xbe\x11\xfc/\x05\x9a\xd2\x15\r\xb6\x9d\x88\xae\xa8\xd1q\xe5\x9b\x05A\x8d[\xbf\xaaN\x1b\xee\xbf#4\x1c\xd5\xa4\x1f\x0fo\xaf\xd0\x00g\xc1\x9a\x82\x00\x8c_\xd4\xac!{K\xca\x89x\xde\xf9\x8d\x19\xec\x12\x8epY\xdb\x9f\x98\xe6\x88\xe7\xc1\x92\x90\x17\x80\x03Ry\xf1n\x97e\xe2\x8c\xe9\x8c\xd6<\xba2:\x9f\x06g\x05\xaa#\xf4\xca1\x16o\xb5\x8b\xcd\xfe\x814h\xac\xcd\x0e\xd0\x1c\x0c\xc71\x11\xbe\xa5\xb3#\xcfh\x07)\x91\xc7\xc8iy!\x03\xc8\xf0\xb2\x02\xf3\xc7\xdf\xafXm\xf5\xaf\xdd\xc8\xeb\xb3n7\xe34\xa7R\x8c\xaf\xa3\xb7y\xe7\x12\x0f\x0c\xc2\xa8v\x12E\xc3u\xc8Y\x1fh.\xcf\x01\xae\x8c\x00"v\x99V\xad>\xaf\x08)\x83V*\x9b\xad\xc0\x9c\x94\xa5D[\x08s\x88\xd1\xcb\xf6\xf8j\xa1c\xc1yb\xda\x12\xa1~\xf6\xd1"\x14\x11a\x02\xc1\xd3\xf5'
@@ -72,9 +150,9 @@ from Crypto.Cipher import AES
 #         final byte[] Message) throws Exception {
 def ige(key, iv, message, blocksize=16):#32):
     """given a key, ive and message, decrypt it. blocksize is the default one used in the javascript implementation"""
-    print("len(key): " + str(len(key)))
-    print("len(iv): " + str(len(iv)))
-    print("len(message): " + str(len(message)))
+    # print("len(key): " + str(len(key)))
+    # print("len(iv): " + str(len(iv)))
+    # print("len(message): " + str(len(message)))
     # key = bytearray(key)
     # iv = bytearray(iv)
     # message = bytearray(message)
@@ -114,7 +192,7 @@ def ige(key, iv, message, blocksize=16):#32):
         #return sum([a, b]) & 0xFFFFFFFF
 
     for i in range(0, len(message), blocksize):
-        print("i: " + str(i))
+        #print("i: " + str(i))
 #         x = java.util.Arrays.copyOfRange(Message, i, i + blocksize);
         x = message[i:i+blocksize]
         #print(" x: " + x.__repr__())
@@ -151,7 +229,8 @@ def ige(key, iv, message, blocksize=16):#32):
     return decrypted
 # }
 
-result = ige(tmp_aes_key, tmp_aes_iv, encrypted_answer)
+#result = ige(tmp_aes_key, tmp_aes_iv, encrypted_answer)
+result = ige(tmp_aes_key_hex, tmp_aes_iv_hex, encrypted_answer_hex)
 print("result:")
 print(result)
 vis(result)
@@ -163,6 +242,10 @@ else:
     print("len(answer):" + str(len(answer)))
 
 vis(encrypted_answer)
+
+# Inspiration: http://passingcuriosity.com/2009/aes-encryption-in-python-with-m2crypto/
+# sudo apt-get install swig
+# sudo pip install M2Crypto
 # This DOES NOT work. openssl wrapper m2crypto does not have IGE available
 # from base64 import b64encode, b64decode
 # from M2Crypto.EVP import Cipher
