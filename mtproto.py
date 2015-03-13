@@ -2,7 +2,7 @@
 """
 Created on Tue Sep  2 19:26:15 2014
 
-@author: agrigoryev
+@author: Anton Grigoryev
 @author: Sammy Pfeiffer
 """
 from binascii import crc32 as originalcrc32
@@ -11,11 +11,10 @@ def crc32(data):
 from datetime import datetime
 from time import time
 import io
+import os.path
 import json
 import socket
 import struct
-
-
 
 def vis(bs):
     """
@@ -27,7 +26,8 @@ def vis(bs):
     n = len(bs) // symbols_in_one_line
     for i in range(n):
         print(str(i*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[i*symbols_in_one_line:(i+1)*symbols_in_one_line]])) # for every 8 symbols line
-    print(" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
+    if not len(bs) % symbols_in_one_line == 0:
+        print(str((i+1)*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
 
 
 class TlConstructor:
@@ -77,8 +77,8 @@ class TL:
             self.method_name[z.method] = z
 
 
-## Loading TL_schema
-tl = TL("TL_schema.JSON")
+## Loading TL_schema (should be placed in the same directory as mtproto.py
+tl = TL(os.path.join(os.path.dirname(__file__), "TL_schema.JSON"))
 
 
 def serialize_obj(bytes_io, type_, **kwargs):
@@ -140,10 +140,10 @@ def deserialize(bytes_io, type_=None, subtype=None):
     elif type_ == 'int256': x = bytes_io.read(32)
     elif type_ == 'string' or type_ == 'bytes':
         l = struct.unpack('<b', bytes_io.read(1))[0]
-        assert l <= 254
+        assert l <= 254  # In general, 0xFF byte is not allowed here
         if l == 254:
             # We have a long string
-            long_len = struct.unpack('<l', bytes_io.read(3))[0]
+            long_len = struct.unpack('<i', bytes_io.read(3))[0]
             x = bytes_io.read(long_len)
             bytes_io.read(-long_len % 4)  # skip padding bytes
         else:
