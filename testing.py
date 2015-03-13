@@ -4,6 +4,7 @@ import os
 import io
 import prime
 import struct
+from Crypto.Cipher import AES
 # Deal with py2 and py3 differences
 try:
     import configparser
@@ -75,11 +76,23 @@ z = Session.method_call('req_DH_params',
                         encrypted_data=encrypted_data)
 
 encrypted_answer = z['encrypted_answer']
+print("encrypted_answer:")
+print(encrypted_answer.__repr__())
 tmp_aes_key = SHA.new(new_nonce + server_nonce).digest() + SHA.new(server_nonce + new_nonce).digest()[0:12]
 tmp_aes_iv = SHA.new(server_nonce + new_nonce).digest()[12:20] + SHA.new(new_nonce + new_nonce).digest() + new_nonce[0:4]
 
 print("\ntmp_aes_key:")
 mtproto.vis(tmp_aes_key)
+print(tmp_aes_key.__repr__())
 
 print("\ntmp_aes_iv:")
 mtproto.vis(tmp_aes_iv)
+print(tmp_aes_iv.__repr__())
+
+# From using research_decrypt_mode.py I got to unencrypt the answer
+crypting_object = AES.new(tmp_aes_key, AES.MODE_ECB, tmp_aes_iv) # encrypter thing
+decrypted_answer = crypting_object.decrypt(encrypted_answer)
+print("decrypted_answer: ")
+print(decrypted_answer.__repr__())
+mtproto.vis(decrypted_answer)
+
