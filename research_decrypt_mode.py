@@ -52,3 +52,6 @@ print("\n\nModes " + str(working_modenames) + " (" + str(working_modes) + ") suc
 #
 # Trying mode: AES.MODE_PGP(4)
 # Exception: MODE_PGP is not supported anymore
+#
+# Modes ['AES.MODE_ECB'] ([1]) succesfully unencrypted the answer!
+
