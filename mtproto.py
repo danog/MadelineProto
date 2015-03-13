@@ -120,7 +120,7 @@ def serialize_param(bytes_io, type_, value):
             bytes_io.write(b'\x00'*((-l-1) % 4))  # padding bytes
         else:
             bytes_io.write(b'\xfe')  # byte 254
-            bytes_io.write(struct.pack('<i', l))  # 3 bytes of string
+            bytes_io.write(struct.pack('<i', l)[:3])  # 3 bytes of string
             #bytes_io.write(int.to_bytes(l, 3, 'little')) # 3 bytes of string
             bytes_io.write(value) # string
             bytes_io.write(b'\x00'*(-l % 4))  # padding bytes
@@ -219,24 +219,31 @@ class Session:
         :param message: byte string to send
         """
 
-        print('>>')
-        vis(message)  # Sending message visualisation to console
+
         data = self.header_unencrypted(message) + message
         step1 = struct.pack('<LL', len(data)+12, self.number) + data
         step2 = step1 + struct.pack('<L', crc32(step1))
         self.sock.send(step2)
         self.number += 1
+        # Sending message visualisation to console
+        print('>>')
+        vis(step2)
 
     def recv_message(self):
         """
-        Reading socket and receiving message from server. Check the CRC32 and
+        Reading socket and receiving message from server. Check the CRC32.
         """
-        packet_length_data = self.sock.recv(4) # reads how many bytes to read
+        packet_length_data = self.sock.recv(4)  # reads how many bytes to read
 
         if len(packet_length_data) > 0:  # if we have smth. in the socket
             packet_length = struct.unpack("<L", packet_length_data)[0]
             packet = self.sock.recv(packet_length - 4)  # read the rest of bytes from socket
-            (self.number, auth_key_id, message_id, message_length)= struct.unpack("<L8s8sI", packet[0:24])
+
+            # Received message visualisation to console
+            print('<<')
+            vis(packet_length_data+packet)
+
+            (x, auth_key_id, message_id, message_length)= struct.unpack("<L8s8sI", packet[0:24])
             data = packet[24:24+message_length]
             crc = packet[-4:]
             # print("crc is: " + str(crc))
@@ -249,13 +256,12 @@ class Session:
 
             # Checking the CRC32 correctness of received data
             if crc32(packet_length_data + packet[0:-4]) == struct.unpack('<L', crc)[0]:
-                print('<<')
-                vis(data)  # Received message visualisation to console
+
                 return data
             else:
-                print("CRC32 was not correct!")
+                raise Exception("CRC32 was not correct!")
         else:
-            print("Nothing in the socket!")
+            raise Exception("Nothing in the socket!")
 
     def method_call(self, method, **kwargs):
         z=io.BytesIO()
@@ -269,7 +275,4 @@ class Session:
         # print("len of z_val: " + str(len(z_val)))
         self.send_message(z_val)
         server_answer = self.recv_message()
-        if server_answer is not None:
-            return deserialize(io.BytesIO(server_answer))
-        else:
-            raise Exception("Server not answered")
+        return deserialize(io.BytesIO(server_answer))

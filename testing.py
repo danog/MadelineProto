@@ -66,7 +66,7 @@ to_encrypt = sha_digest + data + random_bytes
 encrypted_data = key.encrypt(to_encrypt, 0)[0]
 
 z = Session.method_call('req_DH_params',
-                        nonce=client_nonce,
+                        nonce=client_nonce, # 16 bytes
                         server_nonce=server_nonce,
                         p=P_bytes,
                         q=Q_bytes,

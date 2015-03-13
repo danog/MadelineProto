@@ -25,3 +25,4 @@ if SHA.new(x).digest() == b'\xDB\x76\x1C\x27\x71\x8A\x23\x05\x04\x4F\x71\xF2\xAD
     print("Test passed successfully")
 else:
     print("Test not passed")
+
