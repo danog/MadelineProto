@@ -21,6 +21,8 @@ Follow Structure - Credentials for provide it your API information.
 
 # Structure
 
+- tests 
+ - Serialization and SHA.py
 - mtproto.py 
 - testing.py
 - prime.py
