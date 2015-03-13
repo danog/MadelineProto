@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
 import mtproto
-import os, io
+import os
+import io
 import prime
-import configparser
+import struct
+# Deal with py2 and py3 differences
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
 
 config = configparser.ConfigParser()
-config.read('credentials')
-ip = config['App data']['ip_address']
-port = config['App data'].getint('port')
+# Check if credentials is correctly loaded (when it doesn't read anything it returns [])
+if not config.read('credentials'):
+    print("File 'credentials' seems to not exist.")
+    exit(-1)
+ip = config.get('App data', 'ip_address')
+port = config.getint('App data', 'port')
 
 Session = mtproto.Session(ip, port)
 client_nonce = os.urandom(16)
@@ -19,16 +28,21 @@ server_nonce = x['server_nonce']
 public_key_fingerprint = x['server_public_key_fingerprints'][0]
 PQ_bytes = x['pq']
 
-PQ = int.from_bytes(PQ_bytes, 'big')
+# doing len(PQ_bytes) I saw it was 8 bytes, so we unpack with Q
+# as in the docs: https://docs.python.org/2/library/struct.html
+PQ = struct.unpack('>q', PQ_bytes)[0]
 [p, q] = prime.primefactors(PQ)
 if p > q: (p, q) = (q, p)
 assert p*q == PQ and p < q
 
 print("PQ = %d\np = %d, q = %d" % (PQ, p, q))
 
-
-P_bytes = int.to_bytes(p, p.bit_length()//8+1, 'big')
-Q_bytes = int.to_bytes(q, q.bit_length()//8+1, 'big')
+P_bytes = struct.pack('>i', p)
+Q_bytes = struct.pack('>i', q)
+# print("p.bit_length()//8+1: " + str(p.bit_length()//8+1)) # 4
+# print("q.bit_length()//8+1: " + str(q.bit_length()//8+1)) # 4
+# P_bytes = int.to_bytes(p, p.bit_length()//8+1, 'big')
+# Q_bytes = int.to_bytes(q, q.bit_length()//8+1, 'big')
 
 f = open('rsa.pub', 'r')
 key = RSA.importKey(f.read())
