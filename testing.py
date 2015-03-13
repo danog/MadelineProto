@@ -11,6 +11,7 @@ except ImportError:
     import ConfigParser as configparser
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import AES
 
 config = configparser.ConfigParser()
 # Check if credentials is correctly loaded (when it doesn't read anything it returns [])
@@ -73,5 +74,12 @@ z = Session.method_call('req_DH_params',
                         public_key_fingerprint=public_key_fingerprint,
                         encrypted_data=encrypted_data)
 
-print(z)
+encrypted_answer = z['encrypted_answer']
+tmp_aes_key = SHA.new(new_nonce + server_nonce).digest() + SHA.new(server_nonce + new_nonce).digest()[0:12]
+tmp_aes_iv = SHA.new(server_nonce + new_nonce).digest()[12:20] + SHA.new(new_nonce + new_nonce).digest() + new_nonce[0:4]
 
+print("\ntmp_aes_key:")
+mtproto.vis(tmp_aes_key)
+
+print("\ntmp_aes_iv:")
+mtproto.vis(tmp_aes_iv)

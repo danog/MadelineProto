@@ -139,11 +139,11 @@ def deserialize(bytes_io, type_=None, subtype=None):
     elif type_ == 'int128': x = bytes_io.read(16)
     elif type_ == 'int256': x = bytes_io.read(32)
     elif type_ == 'string' or type_ == 'bytes':
-        l = struct.unpack('<b', bytes_io.read(1))[0]
+        l = struct.unpack('<B', bytes_io.read(1))[0]
         assert l <= 254  # In general, 0xFF byte is not allowed here
         if l == 254:
             # We have a long string
-            long_len = struct.unpack('<i', bytes_io.read(3))[0]
+            long_len = struct.unpack('<I', bytes_io.read(3)+b'\x00')[0]
             x = bytes_io.read(long_len)
             bytes_io.read(-long_len % 4)  # skip padding bytes
         else:
