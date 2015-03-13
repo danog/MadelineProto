@@ -22,7 +22,7 @@ Follow Structure - Credentials for provide it your API information.
 # Structure
 
 - tests 
- - SHA and serialization.py
+ - Serialization and SHA.py
 - mtproto.py 
 - testing.py
 - prime.py
