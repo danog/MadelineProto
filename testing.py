@@ -89,10 +89,10 @@ print("\ntmp_aes_iv:")
 mtproto.vis(tmp_aes_iv)
 print(tmp_aes_iv.__repr__())
 
-# From using research_decrypt_mode.py I got to unencrypt the answer
-crypting_object = AES.new(tmp_aes_key, AES.MODE_ECB, tmp_aes_iv) # encrypter thing
-decrypted_answer = crypting_object.decrypt(encrypted_answer)
-print("decrypted_answer: ")
+
+from ige import ige
+decrypted_answer = ige(encrypted_answer, tmp_aes_key, tmp_aes_iv)
+print("decrypted_answer is:")
 print(decrypted_answer.__repr__())
-mtproto.vis(decrypted_answer)
+mtproto.vis(decrypted_answer[20:]) # To start off BA0D89 ...
 
