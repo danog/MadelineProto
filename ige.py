@@ -133,8 +133,13 @@ if __name__ == "__main__":
         print("\n\nanswer_str is in decrypt_ans_hex_str!")
         idx = decrypt_ans_hex_str.index(answer_str)
         print(decrypt_ans_hex_str[:idx], end="")
-        print(GREENOK + decrypt_ans_hex_str[idx:len(answer_str)] + ENDC, end="")
-        print(decrypt_ans_hex_str[len(answer_str):])
+        print(GREENOK + decrypt_ans_hex_str[idx:idx+len(answer_str)] + ENDC, end="")
+        print(decrypt_ans_hex_str[idx+len(answer_str):])
+        print("There are " + str(idx/2) + " bytes at the start that are not part of the answer")
+        print("Plus " + str(len(decrypt_ans_hex_str[len(answer_str)+idx:]) / 2) + " at the end not forming part")
+        print("answer_str is: " + str(len(answer_str) / 2) + " bytes")
+        print("decrypt_ans_hex_str is: " + str(len(decrypt_ans_hex_str) / 2) + " bytes")
+        print("In total: " + str( (len(decrypt_ans_hex_str) - len(answer_str)) / 2) + " bytes that do not pertain")
     else:
         print("answer_str is not in decrypt_ans_hex_str :(")
 
