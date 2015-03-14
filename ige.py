@@ -143,3 +143,10 @@ if __name__ == "__main__":
     else:
         print("answer_str is not in decrypt_ans_hex_str :(")
 
+
+    print("This is because the header (SHA1(answer)) is included and is 20 bytes long.")
+    print("And in the end there are 0 to 15 bytes random to fill up the gap.")
+    print("This means that we can safely ignore the starting 20bytes and all the extra bytes in the end")
+    # answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;
+    # This... divisible by 16 is because of the blocksize of AES-256-ECB (yay!)
+
