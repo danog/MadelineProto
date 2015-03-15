@@ -51,10 +51,15 @@ def xor_strings(a, b):     # xor two strings of different lengths
     else:
         return bytes(x ^ y for x, y in zip(a, b))
 
-def ige(message, key, iv):
-    """given a key, given an iv, and message, decrypt it."""
-
-
+def ige(message, key, iv, operation="decrypt"):
+    """Given a key, given an iv, and message
+     do whatever operation asked in the operation field.
+     Operation will be checked for: "decrypt" and "encrypt" strings.
+     Returns the message encrypted/decrypted.
+     message must be a multiple by 16 bytes (for division in 16 byte blocks)
+     key must be 32 byte
+     iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
+     needed for IGE)"""
     if type(message) == long:
         message = number.long_to_bytes(message)
     if type(key) == long:
@@ -62,33 +67,49 @@ def ige(message, key, iv):
     if type(iv) == long:
         iv = number.long_to_bytes(iv)
 
+    if len(key) != 32:
+        raise ValueError("key must be 32 bytes long (was " +
+                         str(len(key)) + " bytes)")
+    if len(iv) != 32:
+        raise ValueError("iv must be 32 bytes long (was " +
+                         str(len(iv)) + " bytes)")
+
     cipher = AES.new(key, AES.MODE_ECB, iv)
     blocksize = cipher.block_size
+    if len(message) % blocksize != 0:
+        raise ValueError("message must be a multiple of 16 bytes (try adding " +
+                        str(16 - len(message) % 16) + " bytes of padding)")
 
-    prev_x = iv[0:blocksize]
-    prev_y = iv[blocksize:] # len should be > 0
+    ivp = iv[0:blocksize]
+    ivp2 = iv[blocksize:]
 
-    decrypted = None
+    ciphered = None
 
     for i in range(0, len(message), blocksize):
-        x = message[i:i+blocksize]
-        y = xor_strings(cipher.decrypt(xor_strings(x, prev_y)), prev_x)
-
-        prev_x = x
-        prev_y = y
-
-#         decrypted = sumBytes(decrypted, y);
-        if decrypted is None:
-            decrypted = y
+        indata = message[i:i+blocksize]
+        if operation == "decrypt":
+            outdata = xor_strings(cipher.decrypt(xor_strings(indata, ivp2)), ivp)
+            ivp = indata
+            ivp2 = outdata
+        elif operation == "encrypt":
+            outdata = xor_strings(cipher.encrypt(xor_strings(indata, ivp)), ivp2)
+            ivp = outdata
+            ivp2 = indata
         else:
-            decrypted_ba = bytearray(decrypted)
-            decrypted_ba.extend(y)
-            if version_info >= (3, 4, 0):
-                decrypted = bytes(decrypted_ba)
-            else:
-                decrypted = str(decrypted_ba)
+            raise ValueError("operation must be either 'decrypt' or 'encrypt'")
 
-    return decrypted
+        if ciphered is None:
+            ciphered = outdata
+        else:
+            ciphered_ba = bytearray(ciphered)
+            ciphered_ba.extend(outdata)
+            if version_info >= (3, 4, 0):
+                ciphered = bytes(ciphered_ba)
+            else:
+                ciphered = str(ciphered_ba)
+
+    return ciphered
+
 
 if __name__ == "__main__":
     encrypted_answer_str = "28A92FE20173B347A8BB324B5FAB2667C9A8BBCE6468D5B509A4CBDDC186240AC912CF7006AF8926DE606A2E74C0493CAA57741E6C82451F54D3E068F5CCC49B4444124B9666FFB405AAB564A3D01E67F6E912867C8D20D9882707DC330B17B4E0DD57CB53BFAAFA9EF5BE76AE6C1B9B6C51E2D6502A47C883095C46C81E3BE25F62427B585488BB3BF239213BF48EB8FE34C9A026CC8413934043974DB03556633038392CECB51F94824E140B98637730A4BE79A8F9DAFA39BAE81E1095849EA4C83467C92A3A17D997817C8A7AC61C3FF414DA37B7D66E949C0AEC858F048224210FCC61F11C3A910B431CCBD104CCCC8DC6D29D4A5D133BE639A4C32BBFF153E63ACA3AC52F2E4709B8AE01844B142C1EE89D075D64F69A399FEB04E656FE3675A6F8F412078F3D0B58DA15311C1A9F8E53B3CD6BB5572C294904B726D0BE337E2E21977DA26DD6E33270251C2CA29DFCC70227F0755F84CFDA9AC4B8DD5F84F1D1EB36BA45CDDC70444D8C213E4BD8F63B8AB95A2D0B4180DC91283DC063ACFB92D6A4E407CDE7C8C69689F77A007441D4A6A8384B666502D9B77FC68B5B43CC607E60A146223E110FCB43BC3C942EF981930CDC4A1D310C0B64D5E55D308D863251AB90502C3E46CC599E886A927CDA963B9EB16CE62603B68529EE98F9F5206419E03FB458EC4BD9454AA8F6BA777573CC54B328895B1DF25EAD9FB4CD5198EE022B2B81F388D281D5E5BC580107CA01A50665C32B552715F335FD76264FAD00DDD5AE45B94832AC79CE7C511D194BC42B70EFA850BB15C2012C5215CABFE97CE66B8D8734D0EE759A638AF013"
