@@ -42,14 +42,21 @@ def hex_string_to_long(val):
     Convert it to int, which is actually long"""
     return int(val, 16)
 
-def xor_strings(a, b):     # xor two strings of different lengths
-    if version_info <= (3, 4, 0):
+def xor_stuff(a, b):
+    """XOR applied to every element of a with every element of b.
+    Depending on python version and depeding on input some arrangements need to be done."""
+    if version_info < (3, 4, 0):
         if len(a) > len(b):
             return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
         else:
             return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
     else:
-        return bytes(x ^ y for x, y in zip(a, b))
+        if type(a) == str and type(b) == bytes:# cipher.encrypt returns string
+            return bytes(ord(x) ^ y for x, y in zip(a, b))
+        elif type(a) == bytes and type(b) == str:
+            return bytes(x ^ ord(y) for x, y in zip(a, b))
+        else:
+            return bytes(x ^ y for x, y in zip(a, b))
 
 def ige(message, key, iv, operation="decrypt"):
     """Given a key, given an iv, and message
@@ -88,11 +95,15 @@ def ige(message, key, iv, operation="decrypt"):
     for i in range(0, len(message), blocksize):
         indata = message[i:i+blocksize]
         if operation == "decrypt":
-            outdata = xor_strings(cipher.decrypt(xor_strings(indata, ivp2)), ivp)
+            xored = xor_stuff(indata, ivp2)
+            decrypt_xored = cipher.decrypt(xored)
+            outdata = xor_stuff(decrypt_xored, ivp)
             ivp = indata
             ivp2 = outdata
         elif operation == "encrypt":
-            outdata = xor_strings(cipher.encrypt(xor_strings(indata, ivp)), ivp2)
+            xored = xor_stuff(indata, ivp)
+            encrypt_xored = cipher.encrypt(xored)
+            outdata = xor_stuff(encrypt_xored, ivp2)
             ivp = outdata
             ivp2 = indata
         else:

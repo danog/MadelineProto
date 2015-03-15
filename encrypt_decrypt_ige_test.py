@@ -16,7 +16,7 @@ from ige import ige
 # message must be a multiple of 16 in size
 msg_to_encrypt = "This is a secret message"
 padding_needed = 16 - len(msg_to_encrypt) % 16
-msg_to_encrypt_padded = msg_to_encrypt + b'0' * padding_needed
+msg_to_encrypt_padded = msg_to_encrypt + str(0) * padding_needed
 print("Encrypting: '" + str(msg_to_encrypt) + "'")
 print("With padding: '" + str(msg_to_encrypt_padded) + "'")
 # 32 bytes long key
