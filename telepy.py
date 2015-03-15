@@ -24,18 +24,75 @@ class telepyShell(cmd.Cmd):
     return line
 
   #detailed commands
+  def do_msg(self, arg): pass
+  def do_fwd(self, arg): pass
+  def do_chat_with_peer(self, arg): pass
+  def do_add_contact(self, arg): pass
+  def do_rename_contact(self, arg): pass
+  def do_mark_read(self, arg): pass
+  def do_delete_msg(self, arg): pass
+  def do_restore_msg(self, arg): pass
+
+  def do_send_photo(self, arg): pass
+  def do_send_video(self, arg): pass
+  def do_send_text(self, arg): pass
+
+  def do_load_photo(self, arg): pass
+  def do_load_video(self, arg): pass
+  def do_load_video_thumb(self, arg): pass
+  def do_load_audio(self, arg): pass
+  def do_load_document(self, arg): pass
+  def do_load_document_thumb(self, arg): pass
+
+  def do_view_photo(self, arg): pass
+  def do_view_video(self, arg): pass
+  def do_view_video_thumb(self, arg): pass
+  def do_view_audio(self, arg): pass
+  def do_view_document(self, arg): pass
+  def do_view_document_thumb(self, arg): pass
+
+  def do_fwd_media(self, arg): pass
+  def do_set_profile_photo(self, arg): pass
+
   def do_chat_info(self, arg):
     arg=arg.split()
     if len(arg) is 1:
       print ('chat_info called with ', arg[0])
-
   def do_chat_add_user(self,arg):
     print(arg)
+  def do_chat_del_user(self,arg): pass
+  def do_chat_rename(self,arg):
+    arg=arg.split()
 
+  def do_create_group_chat(self,arg): pass
+  def do_chat_set_photo(self,arg): pass
+
+  def do_search(self,arg): pass
+  def do_global_search(self,arg): pass
+
+  def do_create_secret_chat(self,arg): pass
+  def do_visualize_key(self,arg): pass
+  def do_set_ttl(self,arg): pass
+  def do_accept_secret_chat(self,arg): pass
+
+  def do_user_info(self,arg): pass
+  def do_history(self,arg): pass
+  def do_dialog_list(self,arg): pass
+  def do_contact_list(self,arg): pass
+  def do_suggested_contacts(self,arg): pass
+  def do_stats(self,arg): pass
+
+  def do_export_card(self,arg): pass
+  def do_import_card(self,arg): pass
+
+  def do_quit_force(self,arg):
+    return True
   def do_quit(self, arg):
+    #TODO:safely end queries
     return True
 if args.command is None:
   telepyShell().cmdloop()
+
 # chat_info <chat> -
 # chat_add_user <chat> <user> -
 # chat_del_user <chat> <user> -
