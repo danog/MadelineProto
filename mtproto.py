@@ -104,7 +104,6 @@ def serialize_method(bytes_io, type_, **kwargs):
 
 
 def serialize_param(bytes_io, type_, value):
-    print("type(value): " + str(type(value)))
     if type_ == "int":
         assert isinstance(value, int)
         bytes_io.write(struct.pack('<i', value))
@@ -176,11 +175,11 @@ def deserialize(bytes_io, type_=None, subtype=None):
 
 class Session:
     """ Manages TCP Transport. encryption and message frames """
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, auth_key_id=None):
         # creating socket
         self.sock = socket.socket()
         self.sock.connect((ip, port))
-        self.auth_key_id = None
+        self.auth_key_id = auth_key_id
         self.number = 0
 
     def __del__(self):

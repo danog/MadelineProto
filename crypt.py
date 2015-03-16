@@ -40,12 +40,12 @@ class IGE:
          key must be 32 byte
          iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
          needed for IGE)"""
+        blocksize = self.cipher.block_size
 
         if len(message) % blocksize != 0:
             raise ValueError("message must be a multiple of 16 bytes (try adding " +
                             str(16 - len(message) % 16) + " bytes of padding)")
 
-        blocksize = self.cipher.block_size
         ivp = self.iv[0:blocksize]
         ivp2 = self.iv[blocksize:]
 
