@@ -2,7 +2,7 @@
 # This file tests the AES 256 IGE cipher
 # working in Python 2.7 and Python 3.4 (other versions untested)
 # as it's needed for the implementation of Telegram API
-from ige import ige
+from crypt import ige
 
 # AES 256 IGE is using AES ECB internally, it implies (extract from PyCrypto.cipher.AES):
 #   key : byte string

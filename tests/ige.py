@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-# Author: Sammy Pfeiffer
-# This file implements the AES 256 IGE cipher
-# working in Python 2.7 and Python 3.4 (other versions untested)
-# as it's needed for the implementation of Telegram API
-# It's based on PyCryto
-from __future__ import print_function
-from Crypto.Util import number
-from Crypto.Cipher import AES
-from sys import version_info
 if version_info >= (3, 4, 0):
     from binascii import hexlify
     long = int
@@ -40,85 +30,6 @@ def hex_string_to_long(val):
     tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253"
     Convert it to int, which is actually long"""
     return int(val, 16)
-
-def xor_stuff(a, b):
-    """XOR applied to every element of a with every element of b.
-    Depending on python version and depeding on input some arrangements need to be done."""
-    if version_info < (3, 4, 0):
-        if len(a) > len(b):
-            return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
-        else:
-            return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
-    else:
-        if type(a) == str and type(b) == bytes:# cipher.encrypt returns string
-            return bytes(ord(x) ^ y for x, y in zip(a, b))
-        elif type(a) == bytes and type(b) == str:
-            return bytes(x ^ ord(y) for x, y in zip(a, b))
-        else:
-            return bytes(x ^ y for x, y in zip(a, b))
-
-def ige(message, key, iv, operation="decrypt"):
-    """Given a key, given an iv, and message
-     do whatever operation asked in the operation field.
-     Operation will be checked for: "decrypt" and "encrypt" strings.
-     Returns the message encrypted/decrypted.
-     message must be a multiple by 16 bytes (for division in 16 byte blocks)
-     key must be 32 byte
-     iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
-     needed for IGE)"""
-    if type(message) == long:
-        message = number.long_to_bytes(message)
-    if type(key) == long:
-        key = number.long_to_bytes(key)
-    if type(iv) == long:
-        iv = number.long_to_bytes(iv)
-
-    if len(key) != 32:
-        raise ValueError("key must be 32 bytes long (was " +
-                         str(len(key)) + " bytes)")
-    if len(iv) != 32:
-        raise ValueError("iv must be 32 bytes long (was " +
-                         str(len(iv)) + " bytes)")
-
-    cipher = AES.new(key, AES.MODE_ECB, iv)
-    blocksize = cipher.block_size
-    if len(message) % blocksize != 0:
-        raise ValueError("message must be a multiple of 16 bytes (try adding " +
-                        str(16 - len(message) % 16) + " bytes of padding)")
-
-    ivp = iv[0:blocksize]
-    ivp2 = iv[blocksize:]
-
-    ciphered = None
-
-    for i in range(0, len(message), blocksize):
-        indata = message[i:i+blocksize]
-        if operation == "decrypt":
-            xored = xor_stuff(indata, ivp2)
-            decrypt_xored = cipher.decrypt(xored)
-            outdata = xor_stuff(decrypt_xored, ivp)
-            ivp = indata
-            ivp2 = outdata
-        elif operation == "encrypt":
-            xored = xor_stuff(indata, ivp)
-            encrypt_xored = cipher.encrypt(xored)
-            outdata = xor_stuff(encrypt_xored, ivp2)
-            ivp = outdata
-            ivp2 = indata
-        else:
-            raise ValueError("operation must be either 'decrypt' or 'encrypt'")
-
-        if ciphered is None:
-            ciphered = outdata
-        else:
-            ciphered_ba = bytearray(ciphered)
-            ciphered_ba.extend(outdata)
-            if version_info >= (3, 4, 0):
-                ciphered = bytes(ciphered_ba)
-            else:
-                ciphered = str(ciphered_ba)
-
-    return ciphered
 
 
 if __name__ == "__main__":

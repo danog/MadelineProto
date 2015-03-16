@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import mtproto
 import os
 import io
-import prime
 import struct
-from Crypto.Cipher import AES
 # Deal with py2 and py3 differences
 try:
     import configparser
@@ -12,7 +9,12 @@ except ImportError:
     import ConfigParser as configparser
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import AES
+
+# local modules
+import crypt
+import mtproto
+import prime
+
 
 config = configparser.ConfigParser()
 # Check if credentials is correctly loaded (when it doesn't read anything it returns [])
@@ -89,9 +91,7 @@ print("\ntmp_aes_iv:")
 mtproto.vis(tmp_aes_iv)
 print(tmp_aes_iv.__repr__())
 
-
-from ige import ige
-decrypted_answer = ige(encrypted_answer, tmp_aes_key, tmp_aes_iv)
+decrypted_answer = crypt.ige(encrypted_answer, tmp_aes_key, tmp_aes_iv)
 print("decrypted_answer is:")
 print(decrypted_answer.__repr__())
 mtproto.vis(decrypted_answer[20:]) # To start off BA0D89 ...
