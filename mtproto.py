@@ -6,6 +6,10 @@ Created on Tue Sep  2 19:26:15 2014
 @author: Sammy Pfeiffer
 """
 from binascii import crc32 as originalcrc32
+MIN_SUPPORTED_PY3_VERSION = (3, 2, 0)
+from sys import version_info
+if version_info >= MIN_SUPPORTED_PY3_VERSION: #py3 has no long
+    long = int
 def crc32(data):
     return originalcrc32(data) & 0xffffffff
 from datetime import datetime

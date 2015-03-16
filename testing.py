@@ -6,7 +6,7 @@ import prime
 import struct
 from Crypto.Cipher import AES
 # Deal with py2 and py3 differences
-try:
+try: # this only works in py2.7
     import configparser
 except ImportError:
     import ConfigParser as configparser
