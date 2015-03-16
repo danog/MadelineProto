@@ -1,4 +1,15 @@
-if version_info >= (3, 4, 0):
+# -*- coding: utf-8 -*-
+# Author: Sammy Pfeiffer
+# This file implements the AES 256 IGE cipher
+# working in Python 2.7 and Python 3.4 (other versions untested)
+# as it's needed for the implementation of Telegram API
+# It's based on PyCryto
+from __future__ import print_function
+from Crypto.Util import number
+from Crypto.Cipher import AES
+MIN_SUPPORTED_PY3_VERSION = (3, 2, 0)
+from sys import version_info
+if version_info >= MIN_SUPPORTED_PY3_VERSION:
     from binascii import hexlify
     long = int
 
@@ -21,7 +32,7 @@ def str_bytes_to_hex_string(val):
     tmp_aes_key_hex = '\xf0\x11(\x08\x87\xc7\xbb\x01\xdf\x0f\xc4\xe1x0\xe0\xb9\x1f\xbb\x8b\xe4\xb2&|\xb9\x85\xae%\xf3;RrS'
     Convert it back to it's uppercase string representation, like:
     tmp_aes_key_str = "F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253" """
-    if version_info >= (3, 4, 0):
+    if version_info >= MIN_SUPPORTED_PY3_VERSION:
         return str(hexlify(val).upper())
     return val.encode("hex").upper()
 
@@ -31,6 +42,85 @@ def hex_string_to_long(val):
     Convert it to int, which is actually long"""
     return int(val, 16)
 
+def xor_stuff(a, b):
+    """XOR applied to every element of a with every element of b.
+    Depending on python version and depeding on input some arrangements need to be done."""
+    if version_info < MIN_SUPPORTED_PY3_VERSION:
+        if len(a) > len(b):
+            return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
+        else:
+            return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
+    else:
+        if type(a) == str and type(b) == bytes:# cipher.encrypt returns string
+            return bytes(ord(x) ^ y for x, y in zip(a, b))
+        elif type(a) == bytes and type(b) == str:
+            return bytes(x ^ ord(y) for x, y in zip(a, b))
+        else:
+            return bytes(x ^ y for x, y in zip(a, b))
+
+def ige(message, key, iv, operation="decrypt"):
+    """Given a key, given an iv, and message
+     do whatever operation asked in the operation field.
+     Operation will be checked for: "decrypt" and "encrypt" strings.
+     Returns the message encrypted/decrypted.
+     message must be a multiple by 16 bytes (for division in 16 byte blocks)
+     key must be 32 byte
+     iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
+     needed for IGE)"""
+    if type(message) == long:
+        message = number.long_to_bytes(message)
+    if type(key) == long:
+        key = number.long_to_bytes(key)
+    if type(iv) == long:
+        iv = number.long_to_bytes(iv)
+
+    if len(key) != 32:
+        raise ValueError("key must be 32 bytes long (was " +
+                         str(len(key)) + " bytes)")
+    if len(iv) != 32:
+        raise ValueError("iv must be 32 bytes long (was " +
+                         str(len(iv)) + " bytes)")
+
+    cipher = AES.new(key, AES.MODE_ECB, iv)
+    blocksize = cipher.block_size
+    if len(message) % blocksize != 0:
+        raise ValueError("message must be a multiple of 16 bytes (try adding " +
+                        str(16 - len(message) % 16) + " bytes of padding)")
+
+    ivp = iv[0:blocksize]
+    ivp2 = iv[blocksize:]
+
+    ciphered = None
+
+    for i in range(0, len(message), blocksize):
+        indata = message[i:i+blocksize]
+        if operation == "decrypt":
+            xored = xor_stuff(indata, ivp2)
+            decrypt_xored = cipher.decrypt(xored)
+            outdata = xor_stuff(decrypt_xored, ivp)
+            ivp = indata
+            ivp2 = outdata
+        elif operation == "encrypt":
+            xored = xor_stuff(indata, ivp)
+            encrypt_xored = cipher.encrypt(xored)
+            outdata = xor_stuff(encrypt_xored, ivp2)
+            ivp = outdata
+            ivp2 = indata
+        else:
+            raise ValueError("operation must be either 'decrypt' or 'encrypt'")
+
+        if ciphered is None:
+            ciphered = outdata
+        else:
+            ciphered_ba = bytearray(ciphered)
+            ciphered_ba.extend(outdata)
+            if version_info >= MIN_SUPPORTED_PY3_VERSION:
+                ciphered = bytes(ciphered_ba)
+            else:
+                ciphered = str(ciphered_ba)
+
+    return ciphered
+
 
 if __name__ == "__main__":
     # Example data from https://core.telegram.org/mtproto/samples-auth_key#conversion-of-encrypted-answer-into-answer
@@ -39,7 +129,7 @@ if __name__ == "__main__":
     tmp_aes_iv_str = "3212D579EE35452ED23E0D0C92841AA7D31B2E9BDEF2151E80D15860311C85DB"
     answer_str = "BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733002000000FE000100C71CAEB9C6B1C9048E6C522F70F13F73980D40238E3E21C14934D037563D930F48198A0AA7C14058229493D22530F4DBFA336F6E0AC925139543AED44CCE7C3720FD51F69458705AC68CD4FE6B6B13ABDC9746512969328454F18FAF8C595F642477FE96BB2A941D5BCD1D4AC8CC49880708FA9B378E3C4F3A9060BEE67CF9A4A4A695811051907E162753B56B0F6B410DBA74D8A84B2A14B3144E0EF1284754FD17ED950D5965B4B9DD46582DB1178D169C6BC465B0D6FF9CA3928FEF5B9AE4E418FC15E83EBEA0F87FA9FF5EED70050DED2849F47BF959D956850CE929851F0D8115F635B105EE2E4E15D04B2454BF6F4FADF034B10403119CD8E3B92FCC5BFE000100262AABA621CC4DF587DC94CF8252258C0B9337DFB47545A49CDD5C9B8EAE7236C6CADC40B24E88590F1CC2CC762EBF1CF11DCC0B393CAAD6CEE4EE5848001C73ACBB1D127E4CB93072AA3D1C8151B6FB6AA6124B7CD782EAF981BDCFCE9D7A00E423BD9D194E8AF78EF6501F415522E44522281C79D906DDB79C72E9C63D83FB2A940FF779DFB5F2FD786FB4AD71C9F08CF48758E534E9815F634F1E3A80A5E1C2AF210C5AB762755AD4B2126DFA61A77FA9DA967D65DFD0AFB5CDF26C4D4E1A88B180F4E0D0B45BA1484F95CB2712B50BF3F5968D9D55C99C0FB9FB67BFF56D7D4481B634514FBA3488C4CDA2FC0659990E8E868B28632875A9AA703BCDCE8FCB7AE551"
 
-    if version_info < (3, 4, 0):
+    if version_info < MIN_SUPPORTED_PY3_VERSION:
         # Crypto.Cipher.AES needs it's parameters to be 32byte str
         # So we can either give 'str' type like this ONLY WORKS ON PYTHON2.7
         encrypted_answer_hex = encrypted_answer_str.decode("hex")
@@ -59,7 +149,7 @@ if __name__ == "__main__":
     print("decrypted_answer using int version of input: ")
     print(decrypted_answer_in_int)
 
-    if version_info < (3, 4, 0):
+    if version_info < MIN_SUPPORTED_PY3_VERSION:
         if decrypted_answer_in_str == decrypted_answer_in_int:
             print("\nBoth str input and int input give the same result")
         else:

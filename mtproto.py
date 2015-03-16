@@ -6,6 +6,10 @@ Created on Tue Sep  2 19:26:15 2014
 @author: Sammy Pfeiffer
 """
 from binascii import crc32 as originalcrc32
+MIN_SUPPORTED_PY3_VERSION = (3, 2, 0)
+from sys import version_info
+if version_info >= MIN_SUPPORTED_PY3_VERSION: #py3 has no long
+    long = int
 def crc32(data):
     return originalcrc32(data) & 0xffffffff
 from datetime import datetime
@@ -102,11 +106,12 @@ def serialize_method(bytes_io, type_, **kwargs):
 
 
 def serialize_param(bytes_io, type_, value):
+    print("type(value): " + str(type(value)))
     if type_ == "int":
         assert isinstance(value, int)
         bytes_io.write(struct.pack('<i', value))
     elif type_ == "long":
-        assert isinstance(value, int)
+        assert (isinstance(value, long) or isinstance(value, int)) # Py2 can be both
         bytes_io.write(struct.pack('<q', value))
     elif type_ in ["int128", "int256"]:
         assert isinstance(value, bytes)
