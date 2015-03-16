@@ -27,10 +27,10 @@ print("With key for AES 256 ECB: '" + str(aes_key) + "'")
 # Initialization Vector must be 32 bytes
 aes_iv =  b'01234567890123456789012345678901'
 print("And initialization vector: '" + str(aes_iv) + "'")
-encrypted_msg = ige(msg_to_encrypt_padded, aes_key, aes_iv, operation="encrypt")
+encrypted_msg = _ige(msg_to_encrypt_padded, aes_key, aes_iv, operation="encrypt")
 print("\nEncrypted msg: '" + str(encrypted_msg) + "'")
 print("In hex: " + encrypted_msg.__repr__())
-decrypted_msg = ige(encrypted_msg, aes_key, aes_iv, operation="decrypt")
+decrypted_msg = _ige(encrypted_msg, aes_key, aes_iv, operation="decrypt")
 print("\nDecrypted msg: '" + str(decrypted_msg) + "'")
 print("In hex: " + decrypted_msg.__repr__())
 
@@ -44,7 +44,7 @@ msg_not_multiple_of_16 = "6bytes"
 print("Trying to encrypt: '" + msg_not_multiple_of_16 +
       "' of size: " + str(len(msg_not_multiple_of_16)))
 try:
-    encrypted_msg = ige(msg_not_multiple_of_16, aes_key, aes_iv, operation="encrypt")
+    encrypted_msg = _ige(msg_not_multiple_of_16, aes_key, aes_iv, operation="encrypt")
 except ValueError as ve:
     print("  Correctly got ValueError: '" + str(ve) + "'")
 
@@ -52,7 +52,7 @@ except ValueError as ve:
 aes_key_not_32_bytes = b'0123456789'
 print("Trying to use key: '" + str(aes_key_not_32_bytes) + "'")
 try:
-    encrypted_msg = ige(msg_to_encrypt_padded, aes_key_not_32_bytes, aes_iv, operation="encrypt")
+    encrypted_msg = _ige(msg_to_encrypt_padded, aes_key_not_32_bytes, aes_iv, operation="encrypt")
 except ValueError as ve:
     print("  Correctly got ValueError: '" + str(ve) + "'")
 
@@ -60,7 +60,7 @@ except ValueError as ve:
 iv_key_not_32_bytes = b'0123456789'
 print("Trying to use iv: '" + str(iv_key_not_32_bytes) + "'")
 try:
-    encrypted_msg = ige(msg_to_encrypt_padded, aes_key, iv_key_not_32_bytes, operation="encrypt")
+    encrypted_msg = _ige(msg_to_encrypt_padded, aes_key, iv_key_not_32_bytes, operation="encrypt")
 except ValueError as ve:
     print("  Correctly got ValueError: '" + str(ve) + "'")
 

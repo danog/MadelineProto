@@ -18,6 +18,7 @@ def primesbelow(N):
 
 smallprimeset = set(primesbelow(100000))
 _smallprimeset = 100000
+
 def isprime(n, precision=7):
     # http://en.wikipedia.org/wiki/Miller-Rabin_primality_test#Algorithm_and_running_time
     if n == 1 or n % 2 == 0:

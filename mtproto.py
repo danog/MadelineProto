@@ -7,9 +7,7 @@ Created on Tue Sep  2 19:26:15 2014
 """
 from binascii import crc32 as originalcrc32
 MIN_SUPPORTED_PY3_VERSION = (3, 2, 0)
-from sys import version_info
-if version_info >= MIN_SUPPORTED_PY3_VERSION: #py3 has no long
-    long = int
+import numbers
 def crc32(data):
     return originalcrc32(data) & 0xffffffff
 from datetime import datetime
@@ -111,7 +109,7 @@ def serialize_param(bytes_io, type_, value):
         assert isinstance(value, int)
         bytes_io.write(struct.pack('<i', value))
     elif type_ == "long":
-        assert (isinstance(value, long) or isinstance(value, int)) # Py2 can be both
+        assert isinstance(value, numbers.Real)
         bytes_io.write(struct.pack('<q', value))
     elif type_ in ["int128", "int256"]:
         assert isinstance(value, bytes)
@@ -120,13 +118,11 @@ def serialize_param(bytes_io, type_, value):
         l = len(value)
         if l < 254: # short string format
             bytes_io.write(struct.pack('<b', l))  # 1 byte of string
-            #bytes_io.write(int.to_bytes(l, 1, 'little')) # 1 byte of string
             bytes_io.write(value)   # string
             bytes_io.write(b'\x00'*((-l-1) % 4))  # padding bytes
         else:
             bytes_io.write(b'\xfe')  # byte 254
             bytes_io.write(struct.pack('<i', l)[:3])  # 3 bytes of string
-            #bytes_io.write(int.to_bytes(l, 3, 'little')) # 3 bytes of string
             bytes_io.write(value) # string
             bytes_io.write(b'\x00'*(-l % 4))  # padding bytes
 
@@ -176,6 +172,7 @@ def deserialize(bytes_io, type_=None, subtype=None):
             for arg in tl_elem.params:
                 x[arg['name']] = deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
     return x
+
 
 class Session:
     """ Manages TCP Transport. encryption and message frames """

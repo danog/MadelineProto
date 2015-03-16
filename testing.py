@@ -43,10 +43,6 @@ print("PQ = %d\np = %d, q = %d" % (PQ, p, q))
 
 P_bytes = struct.pack('>i', p)
 Q_bytes = struct.pack('>i', q)
-# print("p.bit_length()//8+1: " + str(p.bit_length()//8+1)) # 4
-# print("q.bit_length()//8+1: " + str(q.bit_length()//8+1)) # 4
-# P_bytes = int.to_bytes(p, p.bit_length()//8+1, 'big')
-# Q_bytes = int.to_bytes(q, q.bit_length()//8+1, 'big')
 
 f = open('rsa.pub', 'r')
 key = RSA.importKey(f.read())
@@ -78,8 +74,6 @@ z = Session.method_call('req_DH_params',
                         encrypted_data=encrypted_data)
 
 encrypted_answer = z['encrypted_answer']
-print("encrypted_answer:")
-print(encrypted_answer.__repr__())
 tmp_aes_key = SHA.new(new_nonce + server_nonce).digest() + SHA.new(server_nonce + new_nonce).digest()[0:12]
 tmp_aes_iv = SHA.new(server_nonce + new_nonce).digest()[12:20] + SHA.new(new_nonce + new_nonce).digest() + new_nonce[0:4]
 
@@ -91,8 +85,11 @@ print("\ntmp_aes_iv:")
 mtproto.vis(tmp_aes_iv)
 print(tmp_aes_iv.__repr__())
 
-decrypted_answer = crypt.ige(encrypted_answer, tmp_aes_key, tmp_aes_iv)
-print("decrypted_answer is:")
-print(decrypted_answer.__repr__())
-mtproto.vis(decrypted_answer[20:]) # To start off BA0D89 ...
+crypter = crypt.IGE(tmp_aes_key, tmp_aes_iv)
+
+answer_with_hash = crypter.decrypt(encrypted_answer)
+
+answer_hash = answer_with_hash[:20]
+answer = answer_with_hash[20:]
+mtproto.vis(answer) # To start off BA0D89 ...
 
