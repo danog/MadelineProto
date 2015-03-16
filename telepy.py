@@ -17,10 +17,11 @@ class telepyShell(cmd.Cmd):
   intro='Welcome to telepy interactive shell. Type help or ? for help.\n'
   prompt='>'
   def precmd(self, line):
-    # if len(line) < 1 : return None
-    # lines = line.split()
-    # cmd_name = lines[0].lower()
-    return line
+    # convert first word(command name) to lower and return it as line
+    line = line.lstrip()
+    blank_pos = line.find(' ')
+    if blank_pos < 0: return line.lower()
+    return line[:blank_pos].lower() + ' ' + line[blank_pos+1:]
   def completedefault(self, *ignored):
     print(ignored)
   def complete(self, text, state):
