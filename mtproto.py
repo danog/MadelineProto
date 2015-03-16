@@ -102,11 +102,12 @@ def serialize_method(bytes_io, type_, **kwargs):
 
 
 def serialize_param(bytes_io, type_, value):
+    print("type(value): " + str(type(value)))
     if type_ == "int":
         assert isinstance(value, int)
         bytes_io.write(struct.pack('<i', value))
     elif type_ == "long":
-        assert isinstance(value, int)
+        assert (isinstance(value, long) or isinstance(value, int)) # Py2 can be both
         bytes_io.write(struct.pack('<q', value))
     elif type_ in ["int128", "int256"]:
         assert isinstance(value, bytes)
