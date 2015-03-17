@@ -11,11 +11,31 @@ parser.add_argument('args', nargs='*')
 #parser.add_argument
 args = parser.parse_args()
 
-print(args)
-
 class telepyShell(cmd.Cmd):
   intro='Welcome to telepy interactive shell. Type help or ? for help.\n'
   prompt='>'
+  def preloop(self):
+    try: # this only works in py2.7
+      import configparser
+    except ImportError:
+      import ConfigParser as configparser
+    # import io, struct, mtproto, prime, crypt
+    #
+    # from Crypto.Hash import SHA
+    # from Crypto.PublicKey import RSA
+
+    # config = configparser.ConfigParser()
+    # Check if credentials is correctly loaded (when it doesn't read anything it returns [])
+    # if not config.read('credentials'):
+    #   print("File 'credentials' seems to not exist.")
+    #   exit(-1)
+    # ip = config.get('App data', 'ip_address')
+    # port = config.getint('App data', 'port')
+    # self._session = mtproto.Session(ip, port)
+    # client_nonce = os.urandom(16)
+    # x = self._session.method_call('req_pq', nonce=client_nonce)
+
+
   def precmd(self, line):
     # convert first word(command name) to lower and return it as line
     line = line.lstrip()
@@ -25,7 +45,7 @@ class telepyShell(cmd.Cmd):
   def completedefault(self, *ignored):
     print(ignored)
   def complete(self, text, state):
-    super().complete(text, state)
+    self.super().complete(text, state)
     print('completing')
 
   def do_shell(self, line):
