@@ -27,7 +27,8 @@ def _ige(message, key, iv, operation="decrypt"):
      key must be 32 byte
      iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
      needed for IGE)"""
-
+    if not isinstance(message, str):
+        message = str(message)
     if len(key) != 32:
         raise ValueError("key must be 32 bytes long (was " +
                          str(len(key)) + " bytes)")

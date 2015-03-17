@@ -6,12 +6,9 @@ Created on Tue Sep  2 19:26:15 2014
 @author: Sammy Pfeiffer
 """
 from binascii import crc32 as originalcrc32
-import numbers
-from datetime import datetime
 from time import time
 import io
 import os.path
-import json
 import socket
 import struct
 
@@ -46,64 +43,52 @@ def vis(bs):
 
 class Session:
     """ Manages TCP Transport. encryption and message frames """
-    def __init__(self, ip, port, auth_key=None):
+    def __init__(self, ip, port, auth_key=None, server_salt=None):
         # creating socket
         self.sock = socket.socket()
         self.sock.connect((ip, port))
         self.number = 0
-
-        if auth_key is None:
-            self.create_auth_key()
-        else:
-            self.auth_key = auth_key
+        self.timedelta = 0
+        self.session_id = os.urandom(8)
+        self.auth_key = auth_key
+        self.auth_key_id = SHA.new(self.auth_key).digest()[-8:] if self.auth_key else None
 
     def __del__(self):
         # closing socket when session object is deleted
         self.sock.close()
 
-    @staticmethod
-    def header_unencrypted(message):
-        """
-        Creating header for the unencrypted message:
-        :param message: byte string to send
-        """
-        # Basic instructions: https://core.telegram.org/mtproto/description#unencrypted-message
-
-        # Message id: https://core.telegram.org/mtproto/description#message-identifier-msg-id
-        # http://stackoverflow.com/questions/8777753/converting-datetime-date-to-utc-timestamp-in-python
-        # to make it work in py2 and py3 (py3 has the timestamp() method but py2 doesnt)
-        #curr_timestamp = (datetime.utcfromtimestamp(time()) - datetime(1970, 1, 1)).total_seconds()
-
-        msg_id = int(time()*2**30)*4
-
-        #msg_id = int(datetime.utcnow().timestamp()*2**30)*4
-
-        return (b'\x00\x00\x00\x00\x00\x00\x00\x00' +
-                struct.pack('<Q', msg_id) +
-                struct.pack('<I', len(message)))
-
-    # TCP Transport
-
-    # Instructions may be found here: https://core.telegram.org/mtproto#tcp-transport
-    # If a payload (packet) needs to be transmitted from server to client or from client to server,
-    # it is encapsulated as follows: 4 length bytes are added at the front (to include the length,
-    # the sequence number, and CRC32; always divisible by 4) and 4 bytes with the packet sequence number
-    # within this TCP connection (the first packet sent is numbered 0, the next one 1, etc.),
-    # and 4 CRC32 bytes at the end (length, sequence number, and payload together).
-
-    def send_message(self, message):
+    def send_message(self, message_data):
         """
         Forming the message frame and sending message to server
         :param message: byte string to send
         """
-        data = self.header_unencrypted(message) + message
-        step1 = struct.pack('<II', len(data)+12, self.number) + data
+
+        message_id = struct.pack('<Q', int(time()*2**30)*4)
+
+        if self.auth_key is None or self.server_salt is None:
+            # Unencrypted data send
+            message = (b'\x00\x00\x00\x00\x00\x00\x00\x00' +
+                       message_id +
+                       struct.pack('<I', len(message_data)) +
+                       message_data)
+        else:
+            # Encrypted data send
+            encrypted_data = (self.server_salt +
+                              self.session_id +
+                              message_id +
+                              struct.pack('<II', self.number, len(message_data)) +
+                              message_data)
+            message_key = SHA.new(encrypted_data).digest()[-16:]
+            padding = b"\x00" * (-len(encrypted_data) % 16)
+            aes_key, aes_iv = self.aes_calculate(message_key)
+
+            message = (self.auth_key_id + message_key +
+                       crypt.ige_encrypt(encrypted_data+padding, aes_key, aes_iv))
+
+        step1 = struct.pack('<II', len(message)+12, self.number) + message
         step2 = step1 + struct.pack('<I', crc32(step1))
         self.sock.send(step2)
         self.number += 1
-        # Sending message visualisation to console
-        #        print('>>')
-        #        vis(step2)
 
     def recv_message(self):
         """
@@ -111,30 +96,42 @@ class Session:
         """
         packet_length_data = self.sock.recv(4)  # reads how many bytes to read
 
-        if len(packet_length_data) > 0:  # if we have smth. in the socket
-            packet_length = struct.unpack("<I", packet_length_data)[0]
-            packet = self.sock.recv(packet_length - 4)  # read the rest of bytes from socket
-            (x, auth_key_id, message_id, message_length)= struct.unpack("<I8s8sI", packet[0:24])
-            data = packet[24:24+message_length]
-            crc = packet[-4:]
-            # Checking the CRC32 correctness of received data
-            if crc32(packet_length_data + packet[0:-4]) == struct.unpack('<I', crc)[0]:
-                return data
-            else:
-                raise Exception("CRC32 was not correct!")
-        else:
+        if len(packet_length_data) < 4:
             raise Exception("Nothing in the socket!")
+        packet_length = struct.unpack("<I", packet_length_data)[0]
+        packet = self.sock.recv(packet_length - 4)  # read the rest of bytes from socket
+
+        # check the CRC32
+        if not crc32(packet_length_data + packet[0:-4]) == struct.unpack('<I', packet[-4:])[0]:
+            raise Exception("CRC32 was not correct!")
+        x = struct.unpack("<I", packet[:4])
+        auth_key_id = packet[4:12]
+        if auth_key_id == b'\x00\x00\x00\x00\x00\x00\x00\x00':
+            # No encryption - Plain text
+            (message_id, message_length) = struct.unpack("<8sI", packet[12:24])
+            data = packet[24:24+message_length]
+        elif auth_key_id == self.auth_key_id:
+            print("WOW! Encrypted data!")
+            message_key = packet[12:28]
+            encrypted_data = packet[28:-4]
+            aes_key, aes_iv = self.aes_calculate(message_key, direction="from server")
+            decrypted_data = crypt.ige_decrypt(encrypted_data, aes_key, aes_iv)
+            vis(decrypted_data)
+            assert decrypted_data[0:8] == self.server_salt
+            assert decrypted_data[8:16] == self.session_id
+            message_id = decrypted_data[16:24]
+            seq_no = struct.unpack("<I", decrypted_data[24:28])[0]
+            message_data_length = struct.unpack("<I", decrypted_data[28:32])[0]
+            data = decrypted_data[32:32+message_data_length]
+        else:
+            raise Exception("Got unknown auth_key id")
+        return data
+
 
     def method_call(self, method, **kwargs):
-        z=io.BytesIO()
+        z = io.BytesIO()
         TL.serialize_method(z, method, **kwargs)
-        # z.getvalue() on py2.7 returns str, which means bytes
-        # on py3.4 returns bytes
-        # bytearray is closer to the same data type to be shared
         z_val = bytearray(z.getvalue())
-        # print("z_val: " + z_val.__repr__())
-        # print("z_val type: " + str(type(z_val)))
-        # print("len of z_val: " + str(len(z_val)))
         self.send_message(z_val)
         server_answer = self.recv_message()
         return TL.deserialize(io.BytesIO(server_answer))
@@ -151,9 +148,8 @@ class Session:
         public_key_fingerprint = ResPQ['server_public_key_fingerprints'][0]
 
         pq_bytes = ResPQ['pq']
+        pq = bytes_to_long(pq_bytes)
 
-        # TODO: from_bytes here
-        pq = struct.unpack('>q', pq_bytes)[0]
         [p, q] = prime.primefactors(pq)
         if p > q: (p, q) = (q, p)
         assert p*q == pq and p < q
@@ -243,7 +239,6 @@ class Session:
         auth_key = pow(g_a, b, dh_prime)
         auth_key_str = long_to_bytes(auth_key)
         auth_key_sha = SHA.new(auth_key_str).digest()
-        auth_key_hash = auth_key_sha[-8:]
         auth_key_aux_hash = auth_key_sha[:8]
 
         new_nonce_hash1 = SHA.new(new_nonce+b'\x01'+auth_key_aux_hash).digest()[-16:]
@@ -257,6 +252,7 @@ class Session:
 
         self.server_salt = strxor(new_nonce[0:8], server_nonce[0:8])
         self.auth_key = auth_key_str
+        self.auth_key_id = auth_key_sha[-8:]
         print("Auth key generated")
 
     def aes_calculate(self, msg_key, direction="to server"):

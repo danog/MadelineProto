@@ -20,3 +20,10 @@ ip = config.get('App data', 'ip_address')
 port = config.getint('App data', 'port')
 
 Session = mtproto.Session(ip, port)
+Session.create_auth_key()
+
+i = 0
+while True:
+    f = Session.method_call('ping', ping_id=i)
+    print(f)
+    i += 1

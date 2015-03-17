@@ -3,7 +3,7 @@ import os
 import struct
 import json
 import io
-import numbers
+from numbers import Number
 
 class TlConstructor:
     def __init__(self, json_dict):
@@ -78,10 +78,11 @@ def serialize_method(bytes_io, type_, **kwargs):
 
 def serialize_param(bytes_io, type_, value):
     if type_ == "int":
-        assert isinstance(value, int)
+        assert isinstance(value, Number)
+        assert value.bit_length() <= 32
         bytes_io.write(struct.pack('<i', value))
     elif type_ == "long":
-        assert isinstance(value, numbers.Real)
+        assert isinstance(value, Number)
         bytes_io.write(struct.pack('<q', value))
     elif type_ in ["int128", "int256"]:
         assert isinstance(value, bytes)
