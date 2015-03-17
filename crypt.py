@@ -27,8 +27,7 @@ def _ige(message, key, iv, operation="decrypt"):
      key must be 32 byte
      iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
      needed for IGE)"""
-    if not isinstance(message, str):
-        message = str(message)
+    message = bytes(message)
     if len(key) != 32:
         raise ValueError("key must be 32 bytes long (was " +
                          str(len(key)) + " bytes)")
@@ -46,7 +45,7 @@ def _ige(message, key, iv, operation="decrypt"):
     ivp = iv[0:blocksize]
     ivp2 = iv[blocksize:]
 
-    ciphered = bytearray()
+    ciphered = bytes()
 
     for i in range(0, len(message), blocksize):
         indata = message[i:i+blocksize]
@@ -64,5 +63,5 @@ def _ige(message, key, iv, operation="decrypt"):
             ivp2 = indata
         else:
             raise ValueError("operation must be either 'decrypt' or 'encrypt'")
-        ciphered.extend(outdata)
+        ciphered += outdata
     return ciphered

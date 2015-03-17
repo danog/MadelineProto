@@ -79,7 +79,8 @@ class Session:
                               struct.pack('<II', self.number, len(message_data)) +
                               message_data)
             message_key = SHA.new(encrypted_data).digest()[-16:]
-            padding = b"\x00" * (-len(encrypted_data) % 16)
+            padding = os.urandom((-len(encrypted_data)) % 16)
+            print(len(encrypted_data+padding))
             aes_key, aes_iv = self.aes_calculate(message_key)
 
             message = (self.auth_key_id + message_key +
@@ -131,7 +132,7 @@ class Session:
     def method_call(self, method, **kwargs):
         z = io.BytesIO()
         TL.serialize_method(z, method, **kwargs)
-        z_val = bytearray(z.getvalue())
+        z_val = z.getvalue()
         self.send_message(z_val)
         server_answer = self.recv_message()
         return TL.deserialize(io.BytesIO(server_answer))

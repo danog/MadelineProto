@@ -22,8 +22,4 @@ port = config.getint('App data', 'port')
 Session = mtproto.Session(ip, port)
 Session.create_auth_key()
 
-i = 0
-while True:
-    f = Session.method_call('ping', ping_id=i)
-    print(f)
-    i += 1
+future_salts = Session.method_call('get_future_salts', num=3)
