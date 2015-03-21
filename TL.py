@@ -19,6 +19,8 @@ class TlConstructor:
             else:
                 param['subtype'] = None
             self.params.append(param)
+    def __str__(self):
+        return '{%s %s=[%s]}'%(self.type, self.id, ','.join(self.params))
 
 class TlMethod:
     def __init__(self, json_dict):
@@ -50,11 +52,12 @@ class TL:
             z = TlMethod(elem)
             self.method_id[z.id] = z
             self.method_name[z.method] = z
-
+    def __str__(self):
+      return 'constructor id:' + str(self.constructor_id) + ', constructor type:' + str(self.constructor_type) + 'method id:' + str(self.method_id) + ', method name:' + str(self.method_name)
 
 ## Loading TL_schema (should be placed in the same directory as mtproto.py
 tl = TL(os.path.join(os.path.dirname(__file__), "TL_schema.JSON"))
-
+print(tl)
 
 def serialize_obj(bytes_io, type_, **kwargs):
     try:
@@ -125,7 +128,7 @@ def deserialize(bytes_io, type_=None, subtype=None):
             x = bytes_io.read(l)
             bytes_io.read(-(l+1) % 4)  # skip padding bytes
         assert isinstance(x, bytes)
-    elif type_ == 'vector':
+    elif type(type_) is str and type_.startswith('Vector<'):
         assert subtype is not None
         count = struct.unpack('<l', bytes_io.read(4))[0]
         x = [deserialize(bytes_io, type_=subtype) for i in range(count)]
@@ -136,7 +139,10 @@ def deserialize(bytes_io, type_=None, subtype=None):
             tl_elem = tl.constructor_id[i]
         except KeyError:
             raise Exception("Could not extract type: %s" % type_)
+        print('received TL element type:', tl_elem.type, ', parameter:', tl_elem.params)
         base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
+        # list of non-duplicating other data types from TL_schema.json. useful reference: https://core.telegram.org/mtproto/TL-dependent
+        #, 'Vector<long>', 'ResPQ', 'bytes', 'P_Q_inner_data', 'Server_DH_Params', 'Server_DH_inner_Data', 'Client_DH_Inner_Data', 'Set_client_DH_params_answer', 'Object','RpcResult','RpcError','RpcDropAnswer','FutureSalt','vector<future_salt>','DestroySessionRes','NewSession','vector<%Message>','MessageContainer','Message','MessageCopy','MsgsAck','BadMsgNotification','MsgResendReq',''MsgsStateReq','MsgsAllInfo','MsgDetailedInfo','BlindAuthKeyInner','DestroySessionRes','HttpWait', 'Pong','BindAuthKeyInner']
         if tl_elem.type in base_boxed_types:
             x = deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
         else:  # other types
