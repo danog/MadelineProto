@@ -23,3 +23,9 @@ class File():
   def open(self):
     '''tries to open with os default viewer'''
     call(('cmd /c start "" "'+ self._path +'"')if os.name is 'nt' else ('open' if platform.startswith('darwin') else 'xdg-open', self._path))
+
+  def remove(self):
+    ''' try to remove the file '''
+    try:
+      os.remove(self._path)
+    except FileNotFoundError: pass
