@@ -1,6 +1,6 @@
 import os, cmd
 
-class telepyShell(cmd.Cmd):
+class TelepyShell(cmd.Cmd):
   intro='Welcome to telepy interactive shell. Type help or ? for help.\n'
   prompt='>'
 

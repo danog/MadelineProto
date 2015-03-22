@@ -1,7 +1,7 @@
 #CLI like interface
 
 import argparse, getopt, os, io, struct, mtproto
-from classes.shell import telepyShell
+from classes.shell import TelepyShell
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser('telepy',description='Python implementation of telegram API.')
@@ -14,4 +14,4 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   if args.command is None:
-    telepyShell().cmdloop()
+    TelepyShell().cmdloop()
