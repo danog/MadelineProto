@@ -16,6 +16,12 @@ class TlConstructor:
             if param['type'] == "Vector<long>":
                 param['type'] = "Vector t"
                 param['subtype'] = "long"
+            elif param['type'] == "vector<%Message>":
+                param['type'] = "vector"
+                param['subtype'] = "message"
+            elif param['type'] == "vector<future_salt>":
+                param['type'] = "vector"
+                param['subtype'] = "future_salt"
             else:
                 param['subtype'] = None
             self.params.append(param)
@@ -56,7 +62,8 @@ class TL:
 tl = TL(os.path.join(os.path.dirname(__file__), "TL_schema.JSON"))
 
 
-def serialize_obj(bytes_io, type_, **kwargs):
+def serialize_obj(type_, **kwargs):
+    bytes_io = io.BytesIO()
     try:
         tl_constructor = tl.constructor_type[type_]
     except KeyError:
@@ -64,9 +71,11 @@ def serialize_obj(bytes_io, type_, **kwargs):
     bytes_io.write(struct.pack('<i', tl_constructor.id))
     for arg in tl_constructor.params:
         serialize_param(bytes_io, type_=arg['type'],  value=kwargs[arg['name']])
+    return bytes_io.getvalue()
 
 
-def serialize_method(bytes_io, type_, **kwargs):
+def serialize_method(type_, **kwargs):
+    bytes_io = io.BytesIO()
     try:
         tl_method = tl.method_name[type_]
     except KeyError:
@@ -74,6 +83,7 @@ def serialize_method(bytes_io, type_, **kwargs):
     bytes_io.write(struct.pack('<i', tl_method.id))
     for arg in tl_method.params:
         serialize_param(bytes_io, type_=arg['type'], value=kwargs[arg['name']])
+    return bytes_io.getvalue()
 
 
 def serialize_param(bytes_io, type_, value):
@@ -130,12 +140,18 @@ def deserialize(bytes_io, type_=None, subtype=None):
         count = struct.unpack('<l', bytes_io.read(4))[0]
         x = [deserialize(bytes_io, type_=subtype) for i in range(count)]
     else:
-        # Boxed types
-        i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
+        # known types
         try:
-            tl_elem = tl.constructor_id[i]
+        # Bare types
+            tl_elem = tl.constructor_type[type_]
         except KeyError:
-            raise Exception("Could not extract type: %s" % type_)
+            # Boxed types
+            i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
+            try:
+                tl_elem = tl.constructor_id[i]
+            except KeyError:
+                # Unknown type
+                raise Exception("Could not extract type: %s" % type_)
         base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
         if tl_elem.type in base_boxed_types:
             x = deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)

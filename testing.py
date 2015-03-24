@@ -23,3 +23,4 @@ Session = mtproto.Session(ip, port)
 Session.create_auth_key()
 
 future_salts = Session.method_call('get_future_salts', num=3)
+print(future_salts)

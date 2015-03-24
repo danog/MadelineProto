@@ -128,12 +128,8 @@ class Session:
             raise Exception("Got unknown auth_key id")
         return data
 
-
     def method_call(self, method, **kwargs):
-        z = io.BytesIO()
-        TL.serialize_method(z, method, **kwargs)
-        z_val = z.getvalue()
-        self.send_message(z_val)
+        self.send_message(TL.serialize_method(method, **kwargs))
         server_answer = self.recv_message()
         return TL.deserialize(io.BytesIO(server_answer))
 
@@ -161,18 +157,14 @@ class Session:
         f = open(os.path.join(os.path.dirname(__file__), "rsa.pub"))
         key = RSA.importKey(f.read())
 
-        z = io.BytesIO()
-
         new_nonce = os.urandom(32)
-
-        TL.serialize_obj(z, 'p_q_inner_data',
-                         pq=pq_bytes,
-                         p=p_bytes,
-                         q=q_bytes,
-                         nonce=nonce,
-                         server_nonce=server_nonce,
-                         new_nonce=new_nonce)
-        data = z.getvalue()
+        data = TL.serialize_obj('p_q_inner_data',
+                                pq=pq_bytes,
+                                p=p_bytes,
+                                q=q_bytes,
+                                nonce=nonce,
+                                server_nonce=server_nonce,
+                                new_nonce=new_nonce)
 
         sha_digest = SHA.new(data).digest()
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
@@ -180,17 +172,17 @@ class Session:
         encrypted_data = key.encrypt(to_encrypt, 0)[0]
 
         print("Starting Diffie Hellman key exchange")
-        server_DH_params = self.method_call('req_DH_params',
-                                            nonce=nonce, # 16 bytes
+        server_dh_params = self.method_call('req_DH_params',
+                                            nonce=nonce,
                                             server_nonce=server_nonce,
                                             p=p_bytes,
                                             q=q_bytes,
                                             public_key_fingerprint=public_key_fingerprint,
                                             encrypted_data=encrypted_data)
-        assert nonce == server_DH_params['nonce']
-        assert server_nonce == server_DH_params['server_nonce']
+        assert nonce == server_dh_params['nonce']
+        assert server_nonce == server_dh_params['server_nonce']
 
-        encrypted_answer = server_DH_params['encrypted_answer']
+        encrypted_answer = server_dh_params['encrypted_answer']
 
         tmp_aes_key = SHA.new(new_nonce + server_nonce).digest() + SHA.new(server_nonce + new_nonce).digest()[0:12]
         tmp_aes_iv = SHA.new(server_nonce + new_nonce).digest()[12:20] + SHA.new(new_nonce + new_nonce).digest() + new_nonce[0:4]
@@ -213,6 +205,7 @@ class Session:
 
         dh_prime = bytes_to_long(dh_prime_str)
         g_a = bytes_to_long(g_a_str)
+
         assert prime.isprime(dh_prime)
         retry_id = 0
         b_str = os.urandom(256)
@@ -221,21 +214,19 @@ class Session:
 
         g_b_str = long_to_bytes(g_b)
 
-        z = io.BytesIO()
-        TL.serialize_obj(z, 'client_DH_inner_data',
-                              nonce=nonce,
-                              server_nonce=server_nonce,
-                              retry_id=retry_id,
-                              g_b=g_b_str)
-        data = z.getvalue()
+        data = TL.serialize_obj('client_DH_inner_data',
+                                nonce=nonce,
+                                server_nonce=server_nonce,
+                                retry_id=retry_id,
+                                g_b=g_b_str)
         data_with_sha = SHA.new(data).digest()+data
         data_with_sha_padded = data_with_sha + os.urandom(-len(data_with_sha) % 16)
         encrypted_data = crypt.ige_encrypt(data_with_sha_padded, tmp_aes_key, tmp_aes_iv)
 
         Set_client_DH_params_answer = self.method_call('set_client_DH_params',
-                                                           nonce=nonce,
-                                                           server_nonce=server_nonce,
-                                                           encrypted_data=encrypted_data)
+                                                       nonce=nonce,
+                                                       server_nonce=server_nonce,
+                                                       encrypted_data=encrypted_data)
 
         auth_key = pow(g_a, b, dh_prime)
         auth_key_str = long_to_bytes(auth_key)
