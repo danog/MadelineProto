@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import time
 import io
 import struct
 # Deal with py2 and py3 differences
@@ -22,7 +21,6 @@ port = config.getint('App data', 'port')
 
 Session = mtproto.Session(ip, port)
 
-# print("start create")
 Session.create_auth_key()
 
 future_salts = Session.method_call('get_future_salts', num=3)
