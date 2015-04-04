@@ -60,3 +60,7 @@ target/
 # testing apps
 credentials
 rsa.pub
+
+# emacs auto-saving files
+\#*#
+.#*#

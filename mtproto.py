@@ -52,6 +52,9 @@ class Session:
         self.session_id = os.urandom(8)
         self.auth_key = auth_key
         self.auth_key_id = SHA.new(self.auth_key).digest()[-8:] if self.auth_key else None
+        self.sock.settimeout(5.0)
+        self.MAX_RETRY = 5;
+        self.AUTH_MAX_RETRY = 5;
 
     def __del__(self):
         # closing socket when session object is deleted
@@ -129,9 +132,14 @@ class Session:
         return data
 
     def method_call(self, method, **kwargs):
-        self.send_message(TL.serialize_method(method, **kwargs))
-        server_answer = self.recv_message()
-        return TL.deserialize(io.BytesIO(server_answer))
+        for i in range(1, self.MAX_RETRY):
+            try:
+                self.send_message(TL.serialize_method(method, **kwargs))
+                server_answer = self.recv_message()
+            except socket.timeout:
+                print("Retry call method")
+                continue
+            return TL.deserialize(io.BytesIO(server_answer))
 
     def create_auth_key(self):
 
@@ -223,29 +231,42 @@ class Session:
         data_with_sha_padded = data_with_sha + os.urandom(-len(data_with_sha) % 16)
         encrypted_data = crypt.ige_encrypt(data_with_sha_padded, tmp_aes_key, tmp_aes_iv)
 
-        Set_client_DH_params_answer = self.method_call('set_client_DH_params',
+        for i in range(1, self.AUTH_MAX_RETRY): # retry when dh_gen_retry or dh_gen_fail
+            Set_client_DH_params_answer = self.method_call('set_client_DH_params',
                                                        nonce=nonce,
                                                        server_nonce=server_nonce,
                                                        encrypted_data=encrypted_data)
 
-        auth_key = pow(g_a, b, dh_prime)
-        auth_key_str = long_to_bytes(auth_key)
-        auth_key_sha = SHA.new(auth_key_str).digest()
-        auth_key_aux_hash = auth_key_sha[:8]
+            # print Set_client_DH_params_answer
+            auth_key = pow(g_a, b, dh_prime)
+            auth_key_str = long_to_bytes(auth_key)
+            auth_key_sha = SHA.new(auth_key_str).digest()
+            auth_key_aux_hash = auth_key_sha[:8]
 
-        new_nonce_hash1 = SHA.new(new_nonce+b'\x01'+auth_key_aux_hash).digest()[-16:]
-        new_nonce_hash2 = SHA.new(new_nonce+b'\x02'+auth_key_aux_hash).digest()[-16:]
-        new_nonce_hash3 = SHA.new(new_nonce+b'\x03'+auth_key_aux_hash).digest()[-16:]
+            new_nonce_hash1 = SHA.new(new_nonce+b'\x01'+auth_key_aux_hash).digest()[-16:]
+            new_nonce_hash2 = SHA.new(new_nonce+b'\x02'+auth_key_aux_hash).digest()[-16:]
+            new_nonce_hash3 = SHA.new(new_nonce+b'\x03'+auth_key_aux_hash).digest()[-16:]
 
-        assert Set_client_DH_params_answer['nonce'] == nonce
-        assert Set_client_DH_params_answer['server_nonce'] == server_nonce
-        assert Set_client_DH_params_answer['new_nonce_hash1'] == new_nonce_hash1
-        print("Diffie Hellman key exchange processed successfully")
+            assert Set_client_DH_params_answer['nonce'] == nonce
+            assert Set_client_DH_params_answer['server_nonce'] == server_nonce
 
-        self.server_salt = strxor(new_nonce[0:8], server_nonce[0:8])
-        self.auth_key = auth_key_str
-        self.auth_key_id = auth_key_sha[-8:]
-        print("Auth key generated")
+            if Set_client_DH_params_answer['name'] == 'dh_gen_ok':
+                assert Set_client_DH_params_answer['new_nonce_hash1'] == new_nonce_hash1
+                print("Diffie Hellman key exchange processed successfully")
+
+                self.server_salt = strxor(new_nonce[0:8], server_nonce[0:8])
+                self.auth_key = auth_key_str
+                self.auth_key_id = auth_key_sha[-8:]
+                print("Auth key generated")
+                return "Auth Ok"
+            elif Set_client_DH_params_answer['name'] == 'dh_gen_retry':
+                assert Set_client_DH_params_answer['new_nonce_hash2'] == new_nonce_hash2
+                print ("Retry Auth")
+            elif Set_client_DH_params_answer['name'] == 'dh_gen_fail':
+                assert Set_client_DH_params_answer['new_nonce_hash3'] == new_nonce_hash3
+                print("Auth Failed")
+                raise Exception("Auth Failed")
+            else: raise Exception("Response Error")
 
     def aes_calculate(self, msg_key, direction="to server"):
         x = 0 if direction == "to server" else 8
