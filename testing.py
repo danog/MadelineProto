@@ -20,6 +20,7 @@ ip = config.get('App data', 'ip_address')
 port = config.getint('App data', 'port')
 
 Session = mtproto.Session(ip, port)
+
 Session.create_auth_key()
 
 future_salts = Session.method_call('get_future_salts', num=3)

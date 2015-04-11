@@ -152,11 +152,13 @@ def deserialize(bytes_io, type_=None, subtype=None):
             except KeyError:
                 # Unknown type
                 raise Exception("Could not extract type: %s" % type_)
+
         base_boxed_types = ["Vector t", "Int", "Long", "Double", "String", "Int128", "Int256"]
         if tl_elem.type in base_boxed_types:
             x = deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
         else:  # other types
             x = {}
+            x[u'name'] = tl_elem.predicate
             for arg in tl_elem.params:
                 x[arg['name']] = deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
     return x
