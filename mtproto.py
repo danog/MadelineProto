@@ -66,7 +66,7 @@ class Session:
         :param message: byte string to send
         """
 
-        message_id = struct.pack('<Q', int(time()*2**30)*4)
+        message_id = struct.pack('<Q', int((time()+self.timedelta)*2**30)*4)
 
         if self.auth_key is None or self.server_salt is None:
             # Unencrypted data send
