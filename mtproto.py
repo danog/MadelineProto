@@ -115,12 +115,10 @@ class Session:
             (message_id, message_length) = struct.unpack("<8sI", packet[12:24])
             data = packet[24:24+message_length]
         elif auth_key_id == self.auth_key_id:
-            print("WOW! Encrypted data!")
             message_key = packet[12:28]
             encrypted_data = packet[28:-4]
             aes_key, aes_iv = self.aes_calculate(message_key, direction="from server")
             decrypted_data = crypt.ige_decrypt(encrypted_data, aes_key, aes_iv)
-            vis(decrypted_data)
             assert decrypted_data[0:8] == self.server_salt
             assert decrypted_data[8:16] == self.session_id
             message_id = decrypted_data[16:24]
@@ -250,7 +248,7 @@ class Session:
             assert Set_client_DH_params_answer['nonce'] == nonce
             assert Set_client_DH_params_answer['server_nonce'] == server_nonce
 
-            if Set_client_DH_params_answer['name'] == 'dh_gen_ok':
+            if Set_client_DH_params_answer.name == 'dh_gen_ok':
                 assert Set_client_DH_params_answer['new_nonce_hash1'] == new_nonce_hash1
                 print("Diffie Hellman key exchange processed successfully")
 
@@ -259,10 +257,10 @@ class Session:
                 self.auth_key_id = auth_key_sha[-8:]
                 print("Auth key generated")
                 return "Auth Ok"
-            elif Set_client_DH_params_answer['name'] == 'dh_gen_retry':
+            elif Set_client_DH_params_answer.name == 'dh_gen_retry':
                 assert Set_client_DH_params_answer['new_nonce_hash2'] == new_nonce_hash2
                 print ("Retry Auth")
-            elif Set_client_DH_params_answer['name'] == 'dh_gen_fail':
+            elif Set_client_DH_params_answer.name == 'dh_gen_fail':
                 assert Set_client_DH_params_answer['new_nonce_hash3'] == new_nonce_hash3
                 print("Auth Failed")
                 raise Exception("Auth Failed")

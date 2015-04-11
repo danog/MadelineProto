@@ -34,6 +34,10 @@ class TlMethod:
         self.params = json_dict['params']
 
 
+class TLObject(dict):
+    def __init__(self, tl_elem):
+        self.name = tl_elem.predicate
+
 class TL:
     def __init__(self, filename):
         with open(filename, 'r') as f:
@@ -157,8 +161,9 @@ def deserialize(bytes_io, type_=None, subtype=None):
         if tl_elem.type in base_boxed_types:
             x = deserialize(bytes_io, type_=tl_elem.predicate, subtype=subtype)
         else:  # other types
-            x = {}
-            x[u'name'] = tl_elem.predicate
+            x = TLObject(tl_elem)
             for arg in tl_elem.params:
                 x[arg['name']] = deserialize(bytes_io, type_=arg['type'], subtype=arg['subtype'])
     return x
+
+
