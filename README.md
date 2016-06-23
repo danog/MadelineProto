@@ -10,4 +10,4 @@ The name of this project is inspired by [this person](https://s-media-cache-ak0.
 
 I use PHP and I think that's absolutely fucking stupid.
 
-- Kenny
+~ Kenny
