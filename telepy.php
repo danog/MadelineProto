@@ -1,7 +1,6 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
 require_once ('libpy2php.php');
-require_once ('argparse.php');
 require_once ('mtproto.php');
 require_once ('classes/shell.php');
 

@@ -1,7 +1,6 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
 require_once ('libpy2php.php');
-require_once ('random.php');
 function everynth($array, $n) {
 	$result = array();
     $i = -1;
@@ -15,6 +14,7 @@ function everynth($array, $n) {
     }
     return $result;
 }
+
 function primesbelow($N) {
     $correction = (($N % 6) > 1);
     $N = [0 => $N, 1 => ($N - 1), 2 => ($N + 4), 3 => ($N + 3), 4 => ($N + 2), 5 => ($N + 1) ][($N % 6) ];
@@ -23,8 +23,8 @@ function primesbelow($N) {
     foreach (pyjslib_range(((pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
         if ($sieve[$i]) {
             $k = ((3 * $i) + 1) | 1;
-            everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k) = ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1));
-            everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k) = ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1));
+            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1))));
+            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k), ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1))));
         }
     }
     return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
