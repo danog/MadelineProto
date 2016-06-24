@@ -43,8 +43,7 @@ function isprime($n, $precision = 7) {
     $d = ($n - 1);
     $s = 0;
     while ((($d % 2) == 0)) {
-        $d
-        //= 2;
+        $d = floor($d /2);
         $s+= 1;
     }
     foreach (pyjslib_range($precision) as $repeat) {
@@ -112,8 +111,7 @@ function primefactors($n, $sort = false) {
         }
         while ((($n % $checker) == 0)) {
             $factors[] = $checker;
-            $n
-            //= $checker;
+            $n = floor($n / $checker);
             $limit = (pyjslib_int(pow($n, 0.5)) + 1);
             if (($checker > $limit)) {
                 break;
@@ -130,8 +128,7 @@ function primefactors($n, $sort = false) {
         }
         $factor = pollard_brent($n);
         $factors->extend(primefactors($factor));
-        $n
-        //= $factor;
+        $n = floor($n / $factor);
         
     }
     if ($sort) {

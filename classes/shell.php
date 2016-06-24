@@ -18,7 +18,7 @@ class TelepyShell extends Cmd {
         }
         return array_slice($line, null, $blank_pos)->lower() . ' ' . array_slice($line, ($blank_pos + 1), null);
     }
-    function completedefault( . . . $ignored) {
+    function completedefault(...$ignored) {
         pyjslib_printnl($ignored);
     }
     function complete($text, $state) {
