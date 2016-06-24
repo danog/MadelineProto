@@ -6,4 +6,8 @@ This is a WIP.
 
 The name of this project is inspired by [this person](https://s-media-cache-ak0.pinimg.com/736x/f0/a1/70/f0a170718baeb0e3817c612d96f5d1cf.jpg), due to the obvious signs of madness this project has in common with her.
 
-BTW, I use PHP and I think that's absolutely fucking stupid.
+---
+
+I use PHP and I think that's absolutely fucking stupid.
+
+~ Kenny
