@@ -14,7 +14,15 @@ function everynth($array, $n) {
     }
     return $result;
 }
-
+function array_merge_ignore_keys($array1, $array2) {
+	if(count($array1) == count($array2)) {
+		$i = -1;
+		foreach ($array1 as $key => $val){
+			$array1[$key] = $array2[$i++];
+		}
+	} else return null;
+	return $array1;
+}
 function primesbelow($N) {
     $correction = (($N % 6) > 1);
     $N = [0 => $N, 1 => ($N - 1), 2 => ($N + 4), 3 => ($N + 3), 4 => ($N + 2), 5 => ($N + 1) ][($N % 6) ];
@@ -23,8 +31,8 @@ function primesbelow($N) {
     foreach (pyjslib_range(((pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
         if ($sieve[$i]) {
             $k = ((3 * $i) + 1) | 1;
-            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1))));
-            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k), ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1))));
+            $sieve = array_merge($sieve, array_merge_ignore_keys(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1))));
+            $sieve = array_merge($sieve, array_merge_ignore_keys(everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k), ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1))));
         }
     }
     return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
