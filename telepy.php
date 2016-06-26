@@ -6,13 +6,24 @@ require_once ('classes/shell.php');
 
 
 
-if (($__name__ == '__main__')) {
-    $parser = py2php_kwargs_function_call('argparse::ArgumentParser', ['telepy'], ["description" => 'Python implementation of telegram API.']);
-    py2php_kwargs_method_call($parser, 'add_argument', ['command'], ["nargs" => '?', "choices" => (['cmd', 'dialog_list', 'contact_list'] + array_map(function($sub) { return "chat_" . $sub; }, ['info', 'add_user', 'add_user_to_chat', 'del_user', 'set_photo', 'rename'])
-    ) ]);
-    py2php_kwargs_method_call($parser, 'add_argument', ['args'], ["nargs" => '*']);
-    $args = $parser->parse_args();
-    if (($args->command == null)) {
+if (!debug_backtrace()) {
+    $clidata = [];
+    $clidata["description"] = 'MadelineProto: PHP implementation of telegram API. Translated from telepy by Daniil Gentili.';
+    $clidata['args']['commands'] = array_merge(['cmd', 'dialog_list', 'contact_list'], array_map(function($sub) { return "chat_" . $sub; }, ['info', 'add_user', 'add_user_to_chat', 'del_user', 'set_photo', 'rename']));
+    $clidata['args']['flags'] = "h";
+    $clidata["help"] = $clidata["description"] . PHP_EOL . PHP_EOL . "Flags: ";
+    foreach (str_split($clidata['args']['flags']) as $flag) {
+        $clidata["help"] .= "-" . $flag . ", ";
+    }
+    $clidata["help"] .= PHP_EOL . "Commands: ";
+    foreach ($clidata['args']['commands'] as $command) {
+        $clidata["help"] .= $command . ", ";
+    }
+    $clidata["help"] .= PHP_EOL;
+    if(isset(getopt($clidata['args']['flags'])["h"])) {
+        die($clidata["help"]);
+    }
+    if ($argc == 1) {
         $newTelePyShell = new TelepyShell();
         $newTelePyShell->cmdloop();
     }

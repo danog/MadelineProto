@@ -2,12 +2,12 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
 require_once ('libpy2php.php');
 require_once ('os.php');
-class TelepyShell extends Cmd {
+class TelepyShell {
     public $intro = 'Welcome to telepy interactive shell. Type help or ? for help.
 ';
     public $prompt = '>';
     function preloop() {
-        require_once ('classes.telepy.php');
+        require_once ('classes/telepy.php');
         $this->_telepy = new Telepy();
     }
     function precmd($line) {
