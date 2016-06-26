@@ -91,7 +91,7 @@ function _global_error_handler($errno, $errstr, $errfile, $errline ) {
 /***
  * This exception handler callback will be called for any exceptions that the application code does not catch.
  */
-function _global_exception_handler( Exception $e ) {
+function _global_exception_handler( $e ) {
     $msg = sprintf( "\nUncaught Exception. code: %s, message: %s\n%s : %s\n\nStack Trace:\n%s\n", $e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString() );
     while( ( $e = $e->getPrevious() ) ) {
         $msg .= sprintf( "\nPrevious Exception. code: %s, message: %s\n%s : %s\n\nStack Trace:\n%s\n", $e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString() );

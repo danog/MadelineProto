@@ -18,19 +18,56 @@ function everynth($array, $n) {
 function primesbelow($N) {
     $correction = (($N % 6) > 1);
     $N = [0 => $N, 1 => ($N - 1), 2 => ($N + 4), 3 => ($N + 3), 4 => ($N + 2), 5 => ($N + 1) ][($N % 6) ];
-    $sieve = ([true] * ($N / 3));
+    $sieve = array_fill(0, floor($N / 3), true);
     $sieve[0] = false;
-    foreach (pyjslib_range(((pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
+    foreach (pyjslib_range((floor(pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
         if ($sieve[$i]) {
             $k = ((3 * $i) + 1) | 1;
-            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1))));
-            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k), ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1))));
+            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), (array_fill(0, floor(((floor($N / 6) - floor(($k * $k) / 6)) - 1) / $k) + 1, false))));
+            $sieve = array_merge(
+                $sieve, array_merge(
+                    everynth(
+                        array_splice(
+                            $sieve, floor(
+                                (
+                                    $k*$k + 4*$k - 2*$k*($i%2)
+                                ) / 3
+                            )
+                        ), 2*$k
+                    ), 
+                    (
+                        array_fill(
+                            0,
+                            (
+                                floor(
+                                    (
+                                        (
+                                            floor(
+                                                $N / 6
+                                            ) - floor(
+                                                (
+                                                    (
+                                                        ($k * $k) + (4 * $k)
+                                                    ) - (
+                                                        (2 * $k) * ($i % 2)
+                                                    )
+                                                ) / 6
+                                            )
+                                        ) - 1
+                                    ) / $k
+                                ) + 1
+                            ),
+                            false
+                        )
+                    )
+                )
+            );
         }
     }
     return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
     
 }
-$smallprimeset = set(primesbelow(100000));
+$smallprimeset = array_unique(primesbelow(100000));
 $_smallprimeset = 100000;
 function isprime($n, $precision = 7) {
     if (($n == 1) || (($n % 2) == 0)) {
@@ -175,5 +212,5 @@ function gcd($a, $b) {
     return $a;
 }
 function lcm($a, $b) {
-    return (abs(($a * $b)) / gcd($a, $b));
+    return floor(abs(($a * $b)) / gcd($a, $b));
 }
