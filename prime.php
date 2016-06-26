@@ -31,8 +31,6 @@ function primesbelow($N) {
     foreach (pyjslib_range((floor(pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
         if ($sieve[$i]) {
             $k = ((3 * $i) + 1) | 1;
-<<<<<<< HEAD
-            $sieve = array_merge($sieve, array_merge(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), (array_fill(0, floor(((floor($N / 6) - floor(($k * $k) / 6)) - 1) / $k) + 1, false))));
             $sieve = array_merge(
                 $sieve, array_merge(
                     everynth(
@@ -71,10 +69,6 @@ function primesbelow($N) {
                     )
                 )
             );
-=======
-            $sieve = array_merge($sieve, array_merge_ignore_keys(everynth(array_splice($sieve, floor($k*$k / 3)), 2*$k), ([false] * ((((($N / 6) - (($k * $k) / 6)) - 1) / $k) + 1))));
-            $sieve = array_merge($sieve, array_merge_ignore_keys(everynth(array_splice($sieve, floor((k*k + 4*k - 2*k*(i%2)) / 3)), 2*$k), ([false] * ((((($N / 6) - (((($k * $k) + (4 * $k)) - ((2 * $k) * ($i % 2))) / 6)) - 1) / $k) + 1))));
->>>>>>> 3b4b6d5362ad99cd9cb9e2d11b22cbf32fe2cccf
         }
     }
     return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
