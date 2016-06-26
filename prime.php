@@ -147,6 +147,7 @@ function pollard_brent($n) {
 }
 $smallprimes = primesbelow(10000);
 function primefactors($n, $sort = false) {
+    global $smallprimes;
     $factors = [];
     $limit = (pyjslib_int(pow($n, 0.5)) + 1);
     foreach ($smallprimes as $checker) {
