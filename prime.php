@@ -72,7 +72,6 @@ function primesbelow($N) {
         }
     }
     return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
-    
 }
 $smallprimeset = array_unique(primesbelow(100000));
 $_smallprimeset = 100000;
