@@ -65,9 +65,7 @@ class Session:
         Forming the message frame and sending message to server
         :param message: byte string to send
         """
-
         message_id = struct.pack('<Q', int((time()+self.timedelta)*2**30)*4)
-	print message_data
         if self.auth_key is None or self.server_salt is None:
             # Unencrypted data send
             message = (b'\x00\x00\x00\x00\x00\x00\x00\x00' +
@@ -91,6 +89,7 @@ class Session:
 
         step1 = struct.pack('<II', len(message)+12, self.number) + message
         step2 = step1 + struct.pack('<I', crc32(step1))
+	print ":".join("{:02x}".format(ord(c)) for c in step2)
         self.sock.send(step2)
         self.number += 1
 
@@ -142,11 +141,12 @@ class Session:
     def create_auth_key(self):
 
         nonce = os.urandom(16)
+        #nonce = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
         print("Requesting pq")
 
         ResPQ = self.method_call('req_pq', nonce=nonce)
         server_nonce = ResPQ['server_nonce']
-
+	exit()
         # TODO: selecting RSA public key based on this fingerprint
         public_key_fingerprint = ResPQ['server_public_key_fingerprints'][0]
 
