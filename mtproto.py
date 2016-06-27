@@ -67,7 +67,7 @@ class Session:
         """
 
         message_id = struct.pack('<Q', int((time()+self.timedelta)*2**30)*4)
-
+	print message_data
         if self.auth_key is None or self.server_salt is None:
             # Unencrypted data send
             message = (b'\x00\x00\x00\x00\x00\x00\x00\x00' +
