@@ -89,7 +89,6 @@ class Session:
 
         step1 = struct.pack('<II', len(message)+12, self.number) + message
         step2 = step1 + struct.pack('<I', crc32(step1))
-	print "".join("{:02x}".format(ord(c)) for c in struct.pack('<I', crc32(message_data)))
         self.sock.send(step2)
         self.number += 1
 
@@ -103,11 +102,11 @@ class Session:
             raise Exception("Nothing in the socket!")
         packet_length = struct.unpack("<I", packet_length_data)[0]
         packet = self.sock.recv(packet_length - 4)  # read the rest of bytes from socket
-
         # check the CRC32
         if not crc32(packet_length_data + packet[0:-4]) == struct.unpack('<I', packet[-4:])[0]:
             raise Exception("CRC32 was not correct!")
         x = struct.unpack("<I", packet[:4])
+        print x[0]
         auth_key_id = packet[4:12]
         if auth_key_id == b'\x00\x00\x00\x00\x00\x00\x00\x00':
             # No encryption - Plain text
@@ -141,7 +140,6 @@ class Session:
     def create_auth_key(self):
 
         nonce = os.urandom(16)
-        nonce = "a"
         print("Requesting pq")
 
         ResPQ = self.method_call('req_pq', nonce=nonce)
