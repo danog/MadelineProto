@@ -117,8 +117,8 @@ def deserialize(bytes_io, type_=None, subtype=None):
     """
     :type bytes_io: io.BytesIO object
     """
+    print type_
     assert isinstance(bytes_io, io.BytesIO)
-
     # Built-in bare types
     if   type_ == 'int':    x = struct.unpack('<i', bytes_io.read(4))[0]
     elif type_ == '#':      x = struct.unpack('<I', bytes_io.read(4))[0]

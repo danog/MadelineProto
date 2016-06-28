@@ -106,12 +106,11 @@ class Session:
         if not crc32(packet_length_data + packet[0:-4]) == struct.unpack('<I', packet[-4:])[0]:
             raise Exception("CRC32 was not correct!")
         x = struct.unpack("<I", packet[:4])
-        print x[0]
         auth_key_id = packet[4:12]
         if auth_key_id == b'\x00\x00\x00\x00\x00\x00\x00\x00':
             # No encryption - Plain text
             (message_id, message_length) = struct.unpack("<8sI", packet[12:24])
-            print struct.unpack("<8sI", packet[12:24])
+
             data = packet[24:24+message_length]
         elif auth_key_id == self.auth_key_id:
             message_key = packet[12:28]
