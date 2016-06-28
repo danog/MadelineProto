@@ -89,7 +89,7 @@ class Session:
 
         step1 = struct.pack('<II', len(message)+12, self.number) + message
         step2 = step1 + struct.pack('<I', crc32(step1))
-	print ":".join("{:02x}".format(ord(c)) for c in step2)
+	print "".join("{:02x}".format(ord(c)) for c in struct.pack('<I', crc32(message_data)))
         self.sock.send(step2)
         self.number += 1
 
@@ -141,7 +141,7 @@ class Session:
     def create_auth_key(self):
 
         nonce = os.urandom(16)
-        #nonce = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        nonce = "a"
         print("Requesting pq")
 
         ResPQ = self.method_call('req_pq', nonce=nonce)
