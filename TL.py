@@ -136,7 +136,6 @@ def deserialize(bytes_io, type_=None, subtype=None):
         else:
             # We have a short string
             x = bytes_io.read(l)
-            print(-(l+1))
             bytes_io.read(-(l+1) % 4)  # skip padding bytes
         assert isinstance(x, bytes)
     elif type_ == 'vector':
@@ -152,7 +151,6 @@ def deserialize(bytes_io, type_=None, subtype=None):
             # Boxed types
             i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
             print type_
-            print i
             try:
                 tl_elem = tl.constructor_id[i]
             except KeyError:
