@@ -18,8 +18,9 @@
 *  Comments, Questions? Contact the author at cody [at] wshost [dot] net
 */
 
-class AES {
-        // The number of 32-bit words comprising the plaintext and columns comrising the state matrix of an AES cipher.
+class AES
+{
+    // The number of 32-bit words comprising the plaintext and columns comrising the state matrix of an AES cipher.
         private static $Nb = 4;
         // The number of 32-bit words comprising the cipher key in this AES cipher.
         private $Nk;
@@ -27,7 +28,7 @@ class AES {
         private $Nr;
 
         // The S-Box substitution table.
-        private static $sBox = array(
+        private static $sBox = [
                 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
                 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
                 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
@@ -59,11 +60,11 @@ class AES {
                 0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
                 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
                 0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
-                0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
-        );
+                0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
+        ];
 
         // The inverse S-Box substitution table.
-        private static $invSBox = array(
+        private static $invSBox = [
                 0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38,
                 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
                 0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
@@ -95,11 +96,11 @@ class AES {
                 0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0,
                 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
                 0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26,
-                0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
-        );
+                0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d,
+        ];
 
         // Log table based on 0xe5
-        private static $ltable = array(
+        private static $ltable = [
                 0x00, 0xff, 0xc8, 0x08, 0x91, 0x10, 0xd0, 0x36,
                 0x5a, 0x3e, 0xd8, 0x43, 0x99, 0x77, 0xfe, 0x18,
                 0x23, 0x20, 0x07, 0x70, 0xa1, 0x6c, 0x0c, 0x7f,
@@ -131,11 +132,11 @@ class AES {
                 0x22, 0x88, 0x94, 0xce, 0x19, 0x01, 0x71, 0x4c,
                 0xa5, 0xe3, 0xc5, 0x31, 0xbb, 0xcc, 0x1f, 0x2d,
                 0x3b, 0x52, 0x6f, 0xf6, 0x2e, 0x89, 0xf7, 0xc0,
-                0x68, 0x1b, 0x64, 0x04, 0x06, 0xbf, 0x83, 0x38
-        );
+                0x68, 0x1b, 0x64, 0x04, 0x06, 0xbf, 0x83, 0x38,
+        ];
 
         // Inverse log table
-        private static $atable = array(
+        private static $atable = [
                 0x01, 0xe5, 0x4c, 0xb5, 0xfb, 0x9f, 0xfc, 0x12,
                 0x03, 0x34, 0xd4, 0xc4, 0x16, 0xba, 0x1f, 0x36,
                 0x05, 0x5c, 0x67, 0x57, 0x3a, 0xd5, 0x21, 0x5a,
@@ -167,8 +168,8 @@ class AES {
                 0x1e, 0xd3, 0x49, 0xe9, 0x9c, 0xc8, 0xc6, 0xc7,
                 0x22, 0x6e, 0xdb, 0x20, 0xbf, 0x43, 0x51, 0x52,
                 0x66, 0xb2, 0x76, 0x60, 0xda, 0xc5, 0xf3, 0xf6,
-                0xaa, 0xcd, 0x9a, 0xa0, 0x75, 0x54, 0x0e, 0x01
-        );
+                0xaa, 0xcd, 0x9a, 0xa0, 0x75, 0x54, 0x0e, 0x01,
+        ];
 
         // The key schedule in this AES cipher.
         private $w;
@@ -179,91 +180,99 @@ class AES {
 
 
         /** constructs an AES cipher using a specific key.
-        */
-        public function __construct($z) {
-               $this->Nk = strlen($z)/4;
-               $this->Nr = $this->Nk + self::$Nb + 2;
+         */
+        public function __construct($z)
+        {
+            $this->Nk = strlen($z) / 4;
+            $this->Nr = $this->Nk + self::$Nb + 2;
 
-               if ($this->Nk != 4 && $this->Nk != 6 && $this->Nk != 8)
-                    die("Key is " . ($this->Nk*32) . " bits long. *not* 128, 192, or 256.");
+            if ($this->Nk != 4 && $this->Nk != 6 && $this->Nk != 8) {
+                die('Key is '.($this->Nk * 32).' bits long. *not* 128, 192, or 256.');
+            }
 
-               $this->Nr = $this->Nk+self::$Nb+2;
-               $this->w = array(); // Nb*(Nr+1) 32-bit words
-               $this->s = array(array());  // 2-D array of Nb colums and 4 rows
+            $this->Nr = $this->Nk + self::$Nb + 2;
+            $this->w = []; // Nb*(Nr+1) 32-bit words
+               $this->s = [[]];  // 2-D array of Nb colums and 4 rows
 
                $this->KeyExpansion($z); // places expanded key in w
         }
 
         /** Encrypts an aribtrary length String.
-        *   @params plaintext string
-        *   @returns ciphertext string
-        *   Whenever possible you should stream your plaintext through the
-        *   encryptBlock() function directly, as the amount of time required
-        *   to encrypt is linear to the size of the ciphertext.
-        **/
-        public function encrypt($x) {
-                $t = ""; // 16-byte block
-                $y = ""; // returned cipher text;
+         *   @params plaintext string
+         *   @returns ciphertext string
+         *   Whenever possible you should stream your plaintext through the
+         *   encryptBlock() function directly, as the amount of time required
+         *   to encrypt is linear to the size of the ciphertext.
+         **/
+        public function encrypt($x)
+        {
+            $t = ''; // 16-byte block
+                $y = ''; // returned cipher text;
 
                 // put a 16-byte block into t
                 $xsize = strlen($x);
-                for ($i=0; $i<$xsize; $i+=16) {
-                        for ($j=0; $j<16; $j++) {
-                                if (($i+$j)<$xsize) {
-                                        $t[$j] = $x[$i+$j];
-                                }
-                                else
-                                        $t[$j] = chr(0);
-                        }
-
-                        $y .= $this->encryptBlock($t);
+            for ($i = 0; $i < $xsize; $i += 16) {
+                for ($j = 0; $j < 16; $j++) {
+                    if (($i + $j) < $xsize) {
+                        $t[$j] = $x[$i + $j];
+                    } else {
+                        $t[$j] = chr(0);
+                    }
                 }
-                return $y;
+
+                $y .= $this->encryptBlock($t);
+            }
+
+            return $y;
         }
 
         /** Decrypts an aribtrary length String.
-        *   @params ciphertext string
-        *   @returns plaintext string
-        *   Whenever possible you should stream your ciphertext through the
-        *   decryptBlock() function directly, as the amount of time required
-        *   to decrypt is linear to the size of the ciphertext.
-        **/
-        public function decrypt($y) {
-                $t = ""; // 16-byte block
-                $x = ""; // returned plain text;
+         *   @params ciphertext string
+         *   @returns plaintext string
+         *   Whenever possible you should stream your ciphertext through the
+         *   decryptBlock() function directly, as the amount of time required
+         *   to decrypt is linear to the size of the ciphertext.
+         **/
+        public function decrypt($y)
+        {
+            $t = ''; // 16-byte block
+                $x = ''; // returned plain text;
 
                 // put a 16-byte block into t
                 $ysize = strlen($y);
-                for ($i=0; $i<$ysize; $i+=16) {
-                        for ($j=0; $j<16; $j++) {
-                                if (($i+$j)<$ysize)
-                                        $t[$j] = $y[$i+$j];
-                                else
-                                        $t[$j] = chr(0);
-                        }
-                        $x .= $this->decryptBlock($t);
+            for ($i = 0; $i < $ysize; $i += 16) {
+                for ($j = 0; $j < 16; $j++) {
+                    if (($i + $j) < $ysize) {
+                        $t[$j] = $y[$i + $j];
+                    } else {
+                        $t[$j] = chr(0);
+                    }
                 }
-                return $x;
+                $x .= $this->decryptBlock($t);
+            }
+
+            return $x;
         }
 
         /** Encrypts the 16-byte plain text.
-        *   @params 16-byte plaintext string
-        *   @returns 16-byte ciphertext string
-        **/
-        public function encryptBlock($x) {
-                $y = ""; // 16-byte string
+         *   @params 16-byte plaintext string
+         *   @returns 16-byte ciphertext string
+         **/
+        public function encryptBlock($x)
+        {
+            $y = ''; // 16-byte string
 
                 // place input x into the initial state matrix in column order
-                for ($i=0; $i<4*self::$Nb; $i++) {
-                        // we want integerger division for the second index
-                        $this->s[$i%4][($i-$i%self::$Nb)/self::$Nb] = ord($x[$i]);
+                for ($i = 0; $i < 4 * self::$Nb; $i++) {
+                    // we want integerger division for the second index
+                        $this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb] = ord($x[$i]);
                 }
 
                 // add round key
                 $this->addRoundKey(0);
 
-                for ($i=1; $i<$this->Nr; $i++) {
-                        // substitute bytes
+            for ($i = 1; $i < $this->Nr; $i++) {
+                // substitute bytes
                         $this->subBytes();
 
                         // shift rows
@@ -274,7 +283,7 @@ class AES {
 
                         // add round key
                         $this->addRoundKey($i);
-                }
+            }
 
                 // substitute bytes
                 $this->subBytes();
@@ -286,27 +295,31 @@ class AES {
                 $this->addRoundKey($i);
 
                 // place state matrix s into y in column order
-                for ($i=0; $i<4*self::$Nb; $i++)
-                       $y .= chr($this->s[$i%4][($i-$i%self::$Nb)/self::$Nb]);
-                return $y;
+                for ($i = 0; $i < 4 * self::$Nb; $i++) {
+                    $y .= chr($this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb]);
+                }
+
+            return $y;
         }
 
         /** Decrypts the 16-byte cipher text.
-        *   @params 16-byte ciphertext string
-        *   @returns 16-byte plaintext string
-        **/
-        public function decryptBlock($y) {
-                $x = ""; // 16-byte string
+         *   @params 16-byte ciphertext string
+         *   @returns 16-byte plaintext string
+         **/
+        public function decryptBlock($y)
+        {
+            $x = ''; // 16-byte string
 
                 // place input y into the initial state matrix in column order
-                for ($i=0; $i<4*self::$Nb; $i++)
-                        $this->s[$i%4][($i-$i%self::$Nb)/self::$Nb] = ord($y[$i]);
+                for ($i = 0; $i < 4 * self::$Nb; $i++) {
+                    $this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb] = ord($y[$i]);
+                }
 
                 // add round key
                 $this->addRoundKey($this->Nr);
 
-                for ($i=$this->Nr-1; $i>0; $i--) {
-                        // inverse shift rows
+            for ($i = $this->Nr - 1; $i > 0; $i--) {
+                // inverse shift rows
                         $this->invShiftRows();
 
                         // inverse sub bytes
@@ -317,7 +330,7 @@ class AES {
 
                         // inverse mix columns
                         $this->invMixColumns();
-                }
+            }
 
                 // inverse shift rows
                 $this->invShiftRows();
@@ -329,25 +342,27 @@ class AES {
                 $this->addRoundKey($i);
 
                 // place state matrix s into x in column order
-                for ($i=0; $i<4*self::$Nb; $i++) {
-                       // Used to remove filled null characters.
-                       $x .= ($this->s[$i%4][($i-$i%self::$Nb)/self::$Nb] == chr(0) ? "" : chr($this->s[$i%4][($i-$i%self::$Nb)/self::$Nb]));
+                for ($i = 0; $i < 4 * self::$Nb; $i++) {
+                    // Used to remove filled null characters.
+                       $x .= ($this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb] == chr(0) ? '' : chr($this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb]));
                 }
 
-                return $x;
+            return $x;
         }
 
-        public function __destruct() {
-                unset($this->w);
-                unset($this->s);
-        }
+    public function __destruct()
+    {
+        unset($this->w);
+        unset($this->s);
+    }
 
         /** makes a big key out of a small one
-        *   @returns void
-        **/
-        private function KeyExpansion($z) {
-                // Rcon is the round constant
-                static $Rcon = array(
+         *   @returns void
+         **/
+        private function KeyExpansion($z)
+        {
+            // Rcon is the round constant
+                static $Rcon = [
                         0x00000000,
                         0x01000000,
                         0x02000000,
@@ -364,191 +379,215 @@ class AES {
                         0xab000000,
                         0x4d000000,
                         0x9a000000,
-                        0x2f000000
-                );
+                        0x2f000000,
+                ];
 
-                $temp = 0; // temporary 32-bit word
+            $temp = 0; // temporary 32-bit word
 
                 // the first Nk words of w are the cipher key z
-                for ($i=0; $i<$this->Nk; $i++) {
-                        $this->w[$i] = 0;
+                for ($i = 0; $i < $this->Nk; $i++) {
+                    $this->w[$i] = 0;
                         // fill an entire word of expanded key w
                         // by pushing 4 bytes into the w[i] word
-                        $this->w[$i] = ord($z[4*$i]); // add a byte in
+                        $this->w[$i] = ord($z[4 * $i]); // add a byte in
                         $this->w[$i] <<= 8; // make room for the next byte
-                        $this->w[$i] += ord($z[4*$i+1]);
-                        $this->w[$i] <<= 8;
-                        $this->w[$i] += ord($z[4*$i+2]);
-                        $this->w[$i] <<= 8;
-                        $this->w[$i] += ord($z[4*$i+3]);
+                        $this->w[$i] += ord($z[4 * $i + 1]);
+                    $this->w[$i] <<= 8;
+                    $this->w[$i] += ord($z[4 * $i + 2]);
+                    $this->w[$i] <<= 8;
+                    $this->w[$i] += ord($z[4 * $i + 3]);
                 }
 
 
-                for (; $i<self::$Nb*($this->Nr+1); $i++) {
-                        $temp = $this->w[$i-1];
+            for (; $i < self::$Nb * ($this->Nr + 1); $i++) {
+                $temp = $this->w[$i - 1];
 
-                        if ($i%$this->Nk == 0)
-                                $temp = $this->subWord($this->rotWord($temp)) ^ $Rcon[$i/$this->Nk];
-                        else if ($this->Nk > 6 && $i%$this->Nk == 4)
-                                $temp = $this->subWord($temp);
-
-                        $this->w[$i] = $this->w[$i-$this->Nk] ^ $temp;
-
-               	       self::make32BitWord($this->w[$i]);
+                if ($i % $this->Nk == 0) {
+                    $temp = $this->subWord($this->rotWord($temp)) ^ $Rcon[$i / $this->Nk];
+                } elseif ($this->Nk > 6 && $i % $this->Nk == 4) {
+                    $temp = $this->subWord($temp);
                 }
+
+                $this->w[$i] = $this->w[$i - $this->Nk] ^ $temp;
+
+                self::make32BitWord($this->w[$i]);
+            }
         }
 
         /** adds the key schedule for a round to a state matrix.
-        *   @returns void
-        **/
-        private function addRoundKey($round) {
-                $temp = "";
+         *   @returns void
+         **/
+        private function addRoundKey($round)
+        {
+            $temp = '';
 
-                for ($i=0; $i<4; $i++) {
-                        for ($j=0; $j<self::$Nb; $j++) {
-                                // place the i-th byte of the j-th word from expanded key w into temp
-                                $temp = $this->w[$round*self::$Nb+$j] >> (3-$i)*8;
+            for ($i = 0; $i < 4; $i++) {
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    // place the i-th byte of the j-th word from expanded key w into temp
+                                $temp = $this->w[$round * self::$Nb + $j] >> (3 - $i) * 8;
                                 // Cast temp from a 32-bit word into an 8-bit byte.
                                 $temp %= 256;
                                 // Can't do unsigned shifts, so we need to make this temp positive
                                 $temp = ($temp < 0 ? (256 + $temp) : $temp);
 
-                                $this->s[$i][$j] ^= $temp; // xor temp with the byte at location (i,j) of the state
-                        }
+                    $this->s[$i][$j] ^= $temp; // xor temp with the byte at location (i,j) of the state
                 }
+            }
         }
 
         /** unmixes each column of a state matrix.
-        *   @returns void
-        **/
-        private function invMixColumns() {
-                $s0 = $s1 = $s2 = $s3= '';
+         *   @returns void
+         **/
+        private function invMixColumns()
+        {
+            $s0 = $s1 = $s2 = $s3 = '';
 
                 // There are Nb columns
-                for ($i=0; $i<self::$Nb; $i++) {
-                        $s0 = $this->s[0][$i]; $s1 = $this->s[1][$i]; $s2 = $this->s[2][$i]; $s3 = $this->s[3][$i];
+                for ($i = 0; $i < self::$Nb; $i++) {
+                    $s0 = $this->s[0][$i];
+                    $s1 = $this->s[1][$i];
+                    $s2 = $this->s[2][$i];
+                    $s3 = $this->s[3][$i];
 
-                        $this->s[0][$i] = $this->mult(0x0e, $s0) ^ $this->mult(0x0b, $s1) ^ $this->mult(0x0d, $s2) ^ $this->mult(0x09, $s3);
-                        $this->s[1][$i] = $this->mult(0x09, $s0) ^ $this->mult(0x0e, $s1) ^ $this->mult(0x0b, $s2) ^ $this->mult(0x0d, $s3);
-                        $this->s[2][$i] = $this->mult(0x0d, $s0) ^ $this->mult(0x09, $s1) ^ $this->mult(0x0e, $s2) ^ $this->mult(0x0b, $s3);
-                        $this->s[3][$i] = $this->mult(0x0b, $s0) ^ $this->mult(0x0d, $s1) ^ $this->mult(0x09, $s2) ^ $this->mult(0x0e, $s3);
-
+                    $this->s[0][$i] = $this->mult(0x0e, $s0) ^ $this->mult(0x0b, $s1) ^ $this->mult(0x0d, $s2) ^ $this->mult(0x09, $s3);
+                    $this->s[1][$i] = $this->mult(0x09, $s0) ^ $this->mult(0x0e, $s1) ^ $this->mult(0x0b, $s2) ^ $this->mult(0x0d, $s3);
+                    $this->s[2][$i] = $this->mult(0x0d, $s0) ^ $this->mult(0x09, $s1) ^ $this->mult(0x0e, $s2) ^ $this->mult(0x0b, $s3);
+                    $this->s[3][$i] = $this->mult(0x0b, $s0) ^ $this->mult(0x0d, $s1) ^ $this->mult(0x09, $s2) ^ $this->mult(0x0e, $s3);
                 }
         }
 
         /** applies an inverse cyclic shift to the last 3 rows of a state matrix.
-        *   @returns void
-        **/
-        private function invShiftRows() {
-                $temp = "";
-                for ($i=1; $i<4; $i++) {
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $temp[($i+$j)%self::$Nb] = $this->s[$i][$j];
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $this->s[$i][$j] = $temp[$j];
+         *   @returns void
+         **/
+        private function invShiftRows()
+        {
+            $temp = '';
+            for ($i = 1; $i < 4; $i++) {
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $temp[($i + $j) % self::$Nb] = $this->s[$i][$j];
                 }
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $this->s[$i][$j] = $temp[$j];
+                }
+            }
         }
 
         /** applies inverse S-Box substitution to each byte of a state matrix.
-        *   @returns void
-        **/
-        private function invSubBytes() {
-                for ($i=0; $i<4; $i++)
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $this->s[$i][$j] = self::$invSBox[$this->s[$i][$j]];
+         *   @returns void
+         **/
+        private function invSubBytes()
+        {
+            for ($i = 0; $i < 4; $i++) {
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $this->s[$i][$j] = self::$invSBox[$this->s[$i][$j]];
+                }
+            }
         }
 
         /** mixes each column of a state matrix.
-        *   @returns void
-        **/
-        private function mixColumns() {
-                $s0 = $s1 = $s2 = $s3= '';
+         *   @returns void
+         **/
+        private function mixColumns()
+        {
+            $s0 = $s1 = $s2 = $s3 = '';
 
                 // There are Nb columns
-                for ($i=0; $i<self::$Nb; $i++) {
-                        $s0 = $this->s[0][$i]; $s1 = $this->s[1][$i]; $s2 = $this->s[2][$i]; $s3 = $this->s[3][$i];
+                for ($i = 0; $i < self::$Nb; $i++) {
+                    $s0 = $this->s[0][$i];
+                    $s1 = $this->s[1][$i];
+                    $s2 = $this->s[2][$i];
+                    $s3 = $this->s[3][$i];
 
-                        $this->s[0][$i] = $this->mult(0x02, $s0) ^ $this->mult(0x03, $s1) ^ $this->mult(0x01, $s2) ^ $this->mult(0x01, $s3);
-                        $this->s[1][$i] = $this->mult(0x01, $s0) ^ $this->mult(0x02, $s1) ^ $this->mult(0x03, $s2) ^ $this->mult(0x01, $s3);
-                        $this->s[2][$i] = $this->mult(0x01, $s0) ^ $this->mult(0x01, $s1) ^ $this->mult(0x02, $s2) ^ $this->mult(0x03, $s3);
-                        $this->s[3][$i] = $this->mult(0x03, $s0) ^ $this->mult(0x01, $s1) ^ $this->mult(0x01, $s2) ^ $this->mult(0x02, $s3);
+                    $this->s[0][$i] = $this->mult(0x02, $s0) ^ $this->mult(0x03, $s1) ^ $this->mult(0x01, $s2) ^ $this->mult(0x01, $s3);
+                    $this->s[1][$i] = $this->mult(0x01, $s0) ^ $this->mult(0x02, $s1) ^ $this->mult(0x03, $s2) ^ $this->mult(0x01, $s3);
+                    $this->s[2][$i] = $this->mult(0x01, $s0) ^ $this->mult(0x01, $s1) ^ $this->mult(0x02, $s2) ^ $this->mult(0x03, $s3);
+                    $this->s[3][$i] = $this->mult(0x03, $s0) ^ $this->mult(0x01, $s1) ^ $this->mult(0x01, $s2) ^ $this->mult(0x02, $s3);
                 }
         }
 
         /** applies a cyclic shift to the last 3 rows of a state matrix.
-        *   @returns void
-        **/
-        private function shiftRows() {
-                $temp = "";
-                for ($i=1; $i<4; $i++) {
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $temp[$j] = $this->s[$i][($j+$i)%self::$Nb];
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $this->s[$i][$j] = $temp[$j];
+         *   @returns void
+         **/
+        private function shiftRows()
+        {
+            $temp = '';
+            for ($i = 1; $i < 4; $i++) {
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $temp[$j] = $this->s[$i][($j + $i) % self::$Nb];
                 }
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $this->s[$i][$j] = $temp[$j];
+                }
+            }
         }
-        /** applies S-Box substitution to each byte of a state matrix.
-        *   @returns void
-        **/
-        private function subBytes() {
 
-                for ($i=0; $i<4; $i++) {
-                        for ($j=0; $j<self::$Nb; $j++)
-                                $this->s[$i][$j] = self::$sBox[$this->s[$i][$j]];
+        /** applies S-Box substitution to each byte of a state matrix.
+         *   @returns void
+         **/
+        private function subBytes()
+        {
+            for ($i = 0; $i < 4; $i++) {
+                for ($j = 0; $j < self::$Nb; $j++) {
+                    $this->s[$i][$j] = self::$sBox[$this->s[$i][$j]];
                 }
+            }
         }
 
         /** multiplies two polynomials a(x), b(x) in GF(2^8) modulo the irreducible polynomial m(x) = x^8+x^4+x^3+x+1
-        *   @returns 8-bit value
-        **/
-        private static function mult($a, $b) {
-                $sum = self::$ltable[$a] + self::$ltable[$b];
-                $sum %= 255;
+         *   @returns 8-bit value
+         **/
+        private static function mult($a, $b)
+        {
+            $sum = self::$ltable[$a] + self::$ltable[$b];
+            $sum %= 255;
                 // Get the antilog
                 $sum = self::$atable[$sum];
-                return ($a == 0 ? 0 : ($b == 0 ? 0 : $sum));
+
+            return $a == 0 ? 0 : ($b == 0 ? 0 : $sum);
         }
 
         /** applies a cyclic permutation to a 4-byte word.
-        *   @returns 32-bit int
-        **/
-        private static function rotWord($w) {
-                $temp = $w >> 24; // put the first 8-bits into temp
+         *   @returns 32-bit int
+         **/
+        private static function rotWord($w)
+        {
+            $temp = $w >> 24; // put the first 8-bits into temp
                 $w <<= 8; // make room for temp to fill the lower end of the word
                 self::make32BitWord($w);
                 // Can't do unsigned shifts, so we need to make this temp positive
                 $temp = ($temp < 0 ? (256 + $temp) : $temp);
-                $w += $temp;
+            $w += $temp;
 
-                return $w;
+            return $w;
         }
 
         /** applies S-box substitution to each byte of a 4-byte word.
-        *   @returns 32-bit int
-        **/
-        private static function subWord($w) {
-                $temp = 0;
+         *   @returns 32-bit int
+         **/
+        private static function subWord($w)
+        {
+            $temp = 0;
                 // loop through 4 bytes of a word
-                for ($i=0; $i<4; $i++) {
-                        $temp = $w >> 24; // put the first 8-bits into temp
+                for ($i = 0; $i < 4; $i++) {
+                    $temp = $w >> 24; // put the first 8-bits into temp
                         // Can't do unsigned shifts, so we need to make this temp positive
                         $temp = ($temp < 0 ? (256 + $temp) : $temp);
-                        $w <<= 8; // make room for the substituted byte in w;
+                    $w <<= 8; // make room for the substituted byte in w;
                         self::make32BitWord($w);
-                        $w += self::$sBox[$temp]; // add the substituted byte back
+                    $w += self::$sBox[$temp]; // add the substituted byte back
                 }
 
-                self::make32BitWord($w);
+            self::make32BitWord($w);
 
-                return $w;
+            return $w;
         }
 
         /** reduces a 64-bit word to a 32-bit word
-        *   @returns void
-        **/
-        private static function make32BitWord(&$w) {
-                // Reduce this 64-bit word to 32-bits on 64-bit machines
-	       $w &= 0x00000000FFFFFFFF;
+         *   @returns void
+         **/
+        private static function make32BitWord(&$w)
+        {
+            // Reduce this 64-bit word to 32-bits on 64-bit machines
+           $w &= 0x00000000FFFFFFFF;
         }
 }
-?>

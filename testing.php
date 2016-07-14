@@ -1,8 +1,9 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
-require_once ('libpy2php.php');
-require_once ('os.php');
-require_once ('mtproto.php');
+
+set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
+require_once 'libpy2php.php';
+require_once 'os.php';
+require_once 'mtproto.php';
 $config = parse_ini_file('credentials', true);
 if (!($config)) {
     pyjslib_printnl('File \'credentials\' seems to not exist.');
