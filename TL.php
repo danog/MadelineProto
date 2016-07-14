@@ -92,7 +92,6 @@ class TL {
         return fread_all($bytes_io);
     }
     function serialize_param($bytes_io, $type_, $value) {
-        var_dump("here", $value, $type_);
         if (($type_ == 'int')) {
             assert(is_numeric($value));
             assert(strlen(decbin($value)) <= 32);
@@ -102,7 +101,7 @@ class TL {
             fwrite($bytes_io, $this->struct->pack('<q', $value));
         } else if (in_array($type_, ['int128', 'int256'])) {
             assert(is_string($value));
-            fwrite($bytes_io,  $value);
+            fwrite($bytes_io, $value);
         } else if ($type_ == 'string' || $type_ == 'bytes') {
             $l = len($value);
             if (($l < 254)) {
