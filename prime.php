@@ -1,31 +1,39 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
-require_once ('libpy2php.php');
-function everynth($array, $n) {
-	$result = array();
+
+set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
+require_once 'libpy2php.php';
+function everynth($array, $n)
+{
+    $result = [];
     $i = -1;
-    foreach($array as $key => $value) {
-	    if ($i++ == $n) {
+    foreach ($array as $key => $value) {
+        if ($i++ == $n) {
             $i = 0;
-	    }
-        if($i == 0) {
-       	    $result[$key] = $value;
+        }
+        if ($i == 0) {
+            $result[$key] = $value;
         }
     }
+
     return $result;
 }
-function array_merge_ignore_keys($array1, $array2) {
-	if(count($array1) == count($array2)) {
-		$i = -1;
-		foreach ($array1 as $key => $val){
-			$array1[$key] = $array2[$i++];
-		}
-	} else return null;
-	return $array1;
+function array_merge_ignore_keys($array1, $array2)
+{
+    if (count($array1) == count($array2)) {
+        $i = -1;
+        foreach ($array1 as $key => $val) {
+            $array1[$key] = $array2[$i++];
+        }
+    } else {
+        return;
+    }
+
+    return $array1;
 }
-function primesbelow($N) {
+function primesbelow($N)
+{
     $correction = (($N % 6) > 1);
-    $N = [0 => $N, 1 => ($N - 1), 2 => ($N + 4), 3 => ($N + 3), 4 => ($N + 2), 5 => ($N + 1) ][($N % 6) ];
+    $N = [0 => $N, 1 => ($N - 1), 2 => ($N + 4), 3 => ($N + 3), 4 => ($N + 2), 5 => ($N + 1)][($N % 6)];
     $sieve = array_fill(0, floor($N / 3), true);
     $sieve[0] = false;
     foreach (pyjslib_range((floor(pyjslib_int(pow($N, 0.5)) / 3) + 1)) as $i) {
@@ -37,11 +45,11 @@ function primesbelow($N) {
                         array_splice(
                             $sieve, floor(
                                 (
-                                    $k*$k + 4*$k - 2*$k*($i%2)
+                                    $k * $k + 4 * $k - 2 * $k * ($i % 2)
                                 ) / 3
                             )
-                        ), 2*$k
-                    ), 
+                        ), 2 * $k
+                    ),
                     (
                         array_fill(
                             0,
@@ -71,23 +79,29 @@ function primesbelow($N) {
             );
         }
     }
-    return ([2, 3] + array_map(function ($i, $sieve) { if($sieve[$i]) return (3 * $i + 1) | 1; }, pyjslib_range(1, (($N / 3) - $correction)), $sieve));
+
+    return [2, 3] + array_map(function ($i, $sieve) {
+        if ($sieve[$i]) {
+            return (3 * $i + 1) | 1;
+        }
+    }, pyjslib_range(1, (($N / 3) - $correction)), $sieve);
 }
 $smallprimeset = array_unique(primesbelow(100000));
 $_smallprimeset = 100000;
-function isprime($n, $precision = 7) {
+function isprime($n, $precision = 7)
+{
     if (($n == 1) || (($n % 2) == 0)) {
         return false;
-    } else if (($n < 1)) {
+    } elseif (($n < 1)) {
         throw new $ValueError('Out of bounds, first argument must be > 0');
-    } else if (($n < $_smallprimeset)) {
+    } elseif (($n < $_smallprimeset)) {
         return in_array($n, $smallprimeset);
     }
     $d = ($n - 1);
     $s = 0;
     while ((($d % 2) == 0)) {
-        $d = floor($d /2);
-        $s+= 1;
+        $d = floor($d / 2);
+        $s += 1;
     }
     foreach (pyjslib_range($precision) as $repeat) {
         $a = random::randrange(2, ($n - 2));
@@ -105,16 +119,18 @@ function isprime($n, $precision = 7) {
             }
         }
     }
+
     return true;
 }
-function pollard_brent($n) {
+function pollard_brent($n)
+{
     if ((($n % 2) == 0)) {
         return 2;
     }
     if ((($n % 3) == 0)) {
         return 3;
     }
-    list($y, $c, $m) = [random::randint(1, ($n - 1)), random::randint(1, ($n - 1)), random::randint(1, ($n - 1)) ];
+    list($y, $c, $m) = [random::randint(1, ($n - 1)), random::randint(1, ($n - 1)), random::randint(1, ($n - 1))];
     list($g, $r, $q) = [1, 1, 1];
     while (($g == 1)) {
         $x = $y;
@@ -129,9 +145,9 @@ function pollard_brent($n) {
                 $q = (($q * abs(($x - $y))) % $n);
             }
             $g = gcd($q, $n);
-            $k+= $m;
+            $k += $m;
         }
-        $r*= 2;
+        $r *= 2;
     }
     if (($g == $n)) {
         while (true) {
@@ -142,10 +158,12 @@ function pollard_brent($n) {
             }
         }
     }
+
     return $g;
 }
 $smallprimes = primesbelow(10000);
-function primefactors($n, $sort = false) {
+function primefactors($n, $sort = false)
+{
     global $smallprimes;
     $factors = [];
     $limit = (pyjslib_int(pow($n, 0.5)) + 1);
@@ -173,51 +191,56 @@ function primefactors($n, $sort = false) {
         $factor = pollard_brent($n);
         $factors->extend(primefactors($factor));
         $n = floor($n / $factor);
-        
     }
     if ($sort) {
         $factors->sort();
     }
+
     return $factors;
 }
-function factorization($n) {
+function factorization($n)
+{
     $factors = [];
     foreach (primefactors($n) as $p1) {
         try {
-            $factors[$p1]+= 1;
-        }
-        catch(KeyError $e) {
+            $factors[$p1] += 1;
+        } catch (KeyError $e) {
             $factors[$p1] = 1;
         }
     }
+
     return $factors;
 }
 $totients = [];
-function totient($n) {
+function totient($n)
+{
     if (($n == 0)) {
         return 1;
     }
     try {
         return $totients[$n];
-    }
-    catch(KeyError $e) {
+    } catch (KeyError $e) {
     }
     $tot = 1;
     foreach (factorization($n)->items() as list($p, $exp)) {
-        $tot*= (($p - 1) * pow($p, ($exp - 1)));
+        $tot *= (($p - 1) * pow($p, ($exp - 1)));
     }
     $totients[$n] = $tot;
+
     return $tot;
 }
-function gcd($a, $b) {
+function gcd($a, $b)
+{
     if (($a == $b)) {
         return $a;
     }
     while (($b > 0)) {
-        list($a, $b) = [$b, ($a % $b) ];
+        list($a, $b) = [$b, ($a % $b)];
     }
+
     return $a;
 }
-function lcm($a, $b) {
+function lcm($a, $b)
+{
     return floor(abs(($a * $b)) / gcd($a, $b));
 }

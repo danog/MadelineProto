@@ -1,31 +1,36 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
-require_once ('libpy2php.php');
-require_once ('os_path.php');
-require_once ('crypt.php');
-require_once ('prime.php');
-require_once ('TL.php');
-require_once ('Struct.php');
+
+set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
+require_once 'libpy2php.php';
+require_once 'os_path.php';
+require_once 'crypt.php';
+require_once 'prime.php';
+require_once 'TL.php';
+require_once 'Struct.php';
 
 /**
  * Function to get hex crc32
- * :param data: Data to encode
+ * :param data: Data to encode.
  */
-function newcrc32($data) {
-    return hexdec(hash("crc32b", $data));
+function newcrc32($data)
+{
+    return hexdec(hash('crc32b', $data));
 }
 
 /**
  * Function to dump the hex version of a string.
- * :param what: What to dump
+ * :param what: What to dump.
  */
-function hex_dump($what) { var_dump(bin2hex($what)); };
+function hex_dump($what)
+{
+    var_dump(bin2hex($what));
+}
     /**
      * len.
      *
      * Get the length of a string or of an array
      *
-     * @param   $input          String or array to parse
+     * @param   $input String or array to parse
      *
      * @return int with the length
      **/
@@ -40,22 +45,27 @@ function hex_dump($what) { var_dump(bin2hex($what)); };
 
 /**
  * Function to visualize byte streams. Split into bytes, print to console.
- * :param bs: BYTE STRING
+ * :param bs: BYTE STRING.
  */
-function vis($bs) {
+function vis($bs)
+{
     $bs = str_split($bs);
     $symbols_in_one_line = 8;
     $n = floor(len($bs) / $symbols_in_one_line);
     $i = 0;
     foreach (pyjslib_range($n) as $i) {
-        echo $i * $symbols_in_one_line . ' | ' . join(' ', 
-            array_map(function($el) { return bin2hex($el); }, array_slice($bs,$i*$symbols_in_one_line, ($i+1)*$symbols_in_one_line))
-        ) . PHP_EOL;
+        echo $i * $symbols_in_one_line.' | '.implode(' ',
+            array_map(function ($el) {
+                return bin2hex($el);
+            }, array_slice($bs, $i * $symbols_in_one_line, ($i + 1) * $symbols_in_one_line))
+        ).PHP_EOL;
     }
     if (!(len($bs) % $symbols_in_one_line == 0)) {
-        echo ($i + 1) * $symbols_in_one_line . ' | ' . join(' ',
-            array_map(function($el) { return bin2hex($el); }, array_slice($bs, ($i+1)*$symbols_in_one_line))
-        ) . PHP_EOL;
+        echo($i + 1) * $symbols_in_one_line.' | '.implode(' ',
+            array_map(function ($el) {
+                return bin2hex($el);
+            }, array_slice($bs, ($i + 1) * $symbols_in_one_line))
+        ).PHP_EOL;
     }
 }
 /**
@@ -63,7 +73,8 @@ function vis($bs) {
  * Convert a byte string to a long integer.
  * This is (essentially) the inverse of long_to_bytes().
  */
-function bytes_to_long($s) {
+function bytes_to_long($s)
+{
     $acc = 0;
     $length = strlen($s);
     if (($length % 4)) {
@@ -71,24 +82,29 @@ function bytes_to_long($s) {
         $s = (($b('') * $extra) + $s);
         $length = ($length + $extra);
     }
-    foreach( pyjslib_range(0, $length, 4) as $i ) {
+    foreach (pyjslib_range(0, $length, 4) as $i) {
         $acc = ($acc << 32 + $this->struct->unpack('I', array_slice($s, $i, ($i + 4) - $i))[0]);
     }
+
     return $acc;
 }
 
-function fread_all($handle) {
+function fread_all($handle)
+{
     $pos = ftell($handle);
     fseek($handle, 0);
-    $content = fread($handle, fstat($handle)["size"]);
+    $content = fread($handle, fstat($handle)['size']);
     fseek($handle, $pos);
+
     return $content;
 }
-function fopen_and_write($filename, $mode, $data) {
-	$handle = fopen($filename, $mode);
-	fwrite($handle, $data);
-	rewind($handle);
-	return $handle;
+function fopen_and_write($filename, $mode, $data)
+{
+    $handle = fopen($filename, $mode);
+    fwrite($handle, $data);
+    rewind($handle);
+
+    return $handle;
 }
 /**
  * long_to_bytes(n:long, blocksize:int) : string
@@ -97,14 +113,15 @@ function fopen_and_write($filename, $mode, $data) {
  * byte string with binary zeros so that the length is a multiple of
  * blocksize.
  */
-function long_to_bytes($n,$blocksize=0) {
+function long_to_bytes($n, $blocksize = 0)
+{
     $s = $b('');
     $n = long($n);
     while (($n > 0)) {
         $s = ($this->struct->pack('I', $n & 4294967295) + $s);
         $n = $n >> 32;
     }
-    foreach( pyjslib_range(strlen($s)) as $i ) {
+    foreach (pyjslib_range(strlen($s)) as $i) {
         if (($s[$i] != $b('')[0])) {
             break;
         }
@@ -113,24 +130,31 @@ function long_to_bytes($n,$blocksize=0) {
     if (($blocksize > 0) && (strlen($s) % $blocksize)) {
         $s = ((($blocksize - (strlen($s) % $blocksize)) * $b('')) + $s);
     }
+
     return $s;
 }
-function string2bin($string) {
+function string2bin($string)
+{
     $res = null;
-    foreach(explode('\\', $string) as $s) {
-        if($s != null && $s[0] == "x") {
+    foreach (explode('\\', $string) as $s) {
+        if ($s != null && $s[0] == 'x') {
             $res .= hex2bin(substr($s, 1));
         }
     }
+
     return $res;
 }
 /**
- * Manages TCP Transport. encryption and message frames
+ * Manages TCP Transport. encryption and message frames.
  */
-class Session {
-    function __construct($ip, $port, $auth_key = null, $server_salt = null) {
-        $this->sock = fsockopen("tcp://".$ip.":".$port);
-        if(!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) throw new Exception("Couldn't connect to socket.");
+class Session
+{
+    public function __construct($ip, $port, $auth_key = null, $server_salt = null)
+    {
+        $this->sock = fsockopen('tcp://'.$ip.':'.$port);
+        if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+            throw new Exception("Couldn't connect to socket.");
+        }
         $this->number = 0;
         $this->timedelta = 0;
         $this->session_id = random_bytes(8);
@@ -141,59 +165,65 @@ class Session {
         $this->AUTH_MAX_RETRY = 5;
         $this->struct = new \danog\PHP\Struct();
         try {
-            $this->tl = new TL("https://core.telegram.org/schema/mtproto-json");
-        } catch(Exception $e){
-            $this->tl = new TL(__DIR__ . '/TL_schema.JSON');
+            $this->tl = new TL('https://core.telegram.org/schema/mtproto-json');
+        } catch (Exception $e) {
+            $this->tl = new TL(__DIR__.'/TL_schema.JSON');
         }
     }
-    function __destruct() {
+
+    public function __destruct()
+    {
         fclose($this->sock);
     }
+
     /**
      * Forming the message frame and sending message to server
-     * :param message: byte string to send
+     * :param message: byte string to send.
      */
-    function send_message($message_data) {
-        $message_id = $this->struct->pack('<Q', (int)((time() + $this->timedelta) * pow(2, 30)) * 4);
+    public function send_message($message_data)
+    {
+        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
 
         if (($this->auth_key == null) || ($this->server_salt == null)) {
-            $message = string2bin('\x00\x00\x00\x00\x00\x00\x00\x00') . $message_id . $this->struct->pack('<I', strlen($message_data)) . $message_data;
+            $message = string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
             $encrypted_data =
-                $this->server_salt . $this->session_id . $message_id . $this->struct->pack('<II', $this->number, strlen($message_data)) . $message_data;
+                $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16, null);
             $padding = random_bytes((-strlen($encrypted_data) % 16));
-            echo strlen($encrypted_data . $padding) . PHP_EOL;
+            echo strlen($encrypted_data.$padding).PHP_EOL;
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->auth_key_id . $message_key . crypt::ige_encrypt($encrypted_data . $padding, $aes_key, $aes_iv);
+            $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
-        $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number) . $message;
-        $step2 = $step1 . $this->struct->pack('<I', newcrc32($step1));
+        $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
+        $step2 = $step1.$this->struct->pack('<I', newcrc32($step1));
         fwrite($this->sock, $step2);
         $this->number += 1;
     }
+
     /**
      * Reading socket and receiving message from server. Check the CRC32.
      */
-    function recv_message() {
+    public function recv_message()
+    {
         $packet_length_data = fread($this->sock, 4);
         if (len($packet_length_data) < 4) {
             throw new Exception('Nothing in the socket!');
         }
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[1];
         $packet = fread($this->sock, ($packet_length - 4));
-        if (!(newcrc32($packet_length_data . substr($packet, 0, -4 - 0)) == $this->struct->unpack('<I', substr($packet, -4, null))[1])) {
+        if (!(newcrc32($packet_length_data.substr($packet, 0, -4 - 0)) == $this->struct->unpack('<I', substr($packet, -4, null))[1])) {
             throw new Exception('CRC32 was not correct!');
         }
         $x = $this->struct->unpack('<I', substr($packet, null, 4));
         $auth_key_id = substr($packet, 4, 12 - 4);
         if ($auth_key_id == string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-	        list($message_id, $message_length) = struct.unpack("<8sI", substr($packet, 12, 24));
+            list($message_id, $message_length) = struct.unpack('<8sI', substr($packet, 12, 24));
             $data = substr($packet, 24, (24 + $message_length) - 24);
-        } else if ($auth_key_id == $this->auth_key_id) {
+        } elseif ($auth_key_id == $this->auth_key_id) {
             $message_key = substr($packet, 12, 28 - 12);
             $encrypted_data = substr($packet, 28, -4 - 28);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key,'from server');
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             assert((substr($decrypted_data, 0, 8 - 0) == $this->server_salt));
             assert((substr($decrypted_data, 8, 16 - 8) == $this->session_id));
@@ -204,27 +234,32 @@ class Session {
         } else {
             throw new Exception('Got unknown auth_key id');
         }
+
         return $data;
     }
-    function method_call($method, $kwargs) {
+
+    public function method_call($method, $kwargs)
+    {
         foreach (range(1, $this->MAX_RETRY) as $i) {
             try {
                 //var_dump(py2php_kwargs_function_call('serialize_method', [$method], $kwargs));
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
-            }
-            catch(Exception $e) {
-                echo $e->getMessage() . PHP_EOL;
+            } catch (Exception $e) {
+                echo $e->getMessage().PHP_EOL;
                 pyjslib_printnl('Retry call method');
                 continue;
             }
-            return $this->tl->deserialize(fopen_and_write("php://memory", "rw+b", $server_answer));
+
+            return $this->tl->deserialize(fopen_and_write('php://memory', 'rw+b', $server_answer));
         }
     }
-    function create_auth_key() {
+
+    public function create_auth_key()
+    {
         $nonce = random_bytes(16);
         pyjslib_printnl('Requesting pq');
-        $ResPQ = $this->method_call('req_pq', ["nonce" => $nonce]);
+        $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
@@ -237,16 +272,16 @@ class Session {
         pyjslib_printnl(sprintf('Factorization %d = %d * %d', [$pq, $p, $q]));
         $p_bytes = long_to_bytes($p);
         $q_bytes = long_to_bytes($q);
-        $f = pyjslib_open(__DIR__ . '/rsa.pub');
+        $f = pyjslib_open(__DIR__.'/rsa.pub');
         $key = RSA::importKey($f->read());
         $new_nonce = random_bytes(32);
-        $data = py2php_kwargs_function_call('serialize_obj', ['p_q_inner_data'], ["pq" => $pq_bytes, "p" => $p_bytes, "q" => $q_bytes, "nonce" => $nonce, "server_nonce" => $server_nonce, "new_nonce" => $new_nonce]);
+        $data = py2php_kwargs_function_call('serialize_obj', ['p_q_inner_data'], ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha($data, true);
         $random_bytes = random_bytes(((255 - strlen($data)) - strlen($sha_digest)));
         $to_encrypt = (($sha_digest + $data) + $random_bytes);
         $encrypted_data = $key->encrypt($to_encrypt, 0) [0];
         pyjslib_printnl('Starting Diffie Hellman key exchange');
-        $server_dh_params = $this->method_call('req_DH_params', ["nonce" => $nonce, "server_nonce" => $server_nonce, "p" => $p_bytes, "q" => $q_bytes, "public_key_fingerprint" => $public_key_fingerprint, "encrypted_data" => $encrypted_data]);
+        $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
         assert(($nonce == $server_dh_params['nonce']));
         assert(($server_nonce == $server_dh_params['server_nonce']));
         $encrypted_answer = $server_dh_params['encrypted_answer'];
@@ -272,19 +307,19 @@ class Session {
         $b = new bytes_to_long($b_str);
         $g_b = pow($g, $b, $dh_prime);
         $g_b_str = new long_to_bytes($g_b);
-        $data = py2php_kwargs_function_call('serialize_obj', ['client_DH_inner_data'], ["nonce" => $nonce, "server_nonce" => $server_nonce, "retry_id" => $retry_id, "g_b" => $g_b_str]);
+        $data = py2php_kwargs_function_call('serialize_obj', ['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = (sha1($data, true) + $data);
         $data_with_sha_padded = ($data_with_sha + random_bytes((-strlen($data_with_sha) % 16)));
         $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
-            $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ["nonce" => $nonce, "server_nonce" => $server_nonce, "encrypted_data" => $encrypted_data]);
+            $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = pow($g_a, $b, $dh_prime);
             $auth_key_str = new long_to_bytes($auth_key);
             $auth_key_sha = sha1($auth_key_str, true);
             $auth_key_aux_hash = array_slice($auth_key_sha, null, 8);
-            $new_nonce_hash1 = array_slice(sha1($new_nonce . '' . $auth_key_aux_hash, true), -16, null);
-            $new_nonce_hash2 = array_slice(sha1($new_nonce . '' . $auth_key_aux_hash, true), -16, null);
-            $new_nonce_hash3 = array_slice(sha1($new_nonce . '' . $auth_key_aux_hash, true), -16, null);
+            $new_nonce_hash1 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
+            $new_nonce_hash2 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
+            $new_nonce_hash3 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
             assert(($Set_client_DH_params_answer['nonce'] == $nonce));
             assert(($Set_client_DH_params_answer['server_nonce'] == $server_nonce));
             if (($Set_client_DH_params_answer->name == 'dh_gen_ok')) {
@@ -294,11 +329,12 @@ class Session {
                 $this->auth_key = $auth_key_str;
                 $this->auth_key_id = array_slice($auth_key_sha, -8, null);
                 pyjslib_printnl('Auth key generated');
+
                 return 'Auth Ok';
-            } else if (($Set_client_DH_params_answer->name == 'dh_gen_retry')) {
+            } elseif (($Set_client_DH_params_answer->name == 'dh_gen_retry')) {
                 assert(($Set_client_DH_params_answer['new_nonce_hash2'] == $new_nonce_hash2));
                 pyjslib_printnl('Retry Auth');
-            } else if (($Set_client_DH_params_answer->name == 'dh_gen_fail')) {
+            } elseif (($Set_client_DH_params_answer->name == 'dh_gen_fail')) {
                 assert(($Set_client_DH_params_answer['new_nonce_hash3'] == $new_nonce_hash3));
                 pyjslib_printnl('Auth Failed');
                 throw new Exception('Auth Failed');
@@ -307,7 +343,9 @@ class Session {
             }
         }
     }
-    function aes_calculate($msg_key, $direction = 'to server') {
+
+    public function aes_calculate($msg_key, $direction = 'to server')
+    {
         $x = ($direction == 'to server') ? 0 : 8;
         $sha1_a = sha1(($msg_key + array_slice($this->auth_key, $x, ($x + 32) - $x)), true);
         $sha1_b = sha1(((array_slice($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)) + $msg_key) + array_slice($this->auth_key, (48 + $x), (64 + $x) - (48 + $x))), true);
@@ -315,6 +353,7 @@ class Session {
         $sha1_d = sha1(($msg_key + array_slice($this->auth_key, ($x + 96), ($x + 128) - ($x + 96))))->digest();
         $aes_key = ((array_slice($sha1_a, 0, 8 - 0) + array_slice($sha1_b, 8, 20 - 8)) + array_slice($sha1_c, 4, 16 - 4));
         $aes_iv = (((array_slice($sha1_a, 8, 20 - 8) + array_slice($sha1_b, 0, 8 - 0)) + array_slice($sha1_c, 16, 20 - 16)) + array_slice($sha1_d, 0, 8 - 0));
+
         return [$aes_key, $aes_iv];
     }
 }

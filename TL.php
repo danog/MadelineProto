@@ -1,11 +1,14 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libpy2php');
-require_once ('libpy2php.php');
+
+set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
+require_once 'libpy2php.php';
 $__author__ = 'agrigoryev';
-require_once ('os.php');
-class TlConstructor {
-    function __construct($json_dict) {
-        $this->id = (int)$json_dict['id'];
+require_once 'os.php';
+class TlConstructor
+{
+    public function __construct($json_dict)
+    {
+        $this->id = (int) $json_dict['id'];
         $this->type = $json_dict['type'];
         $this->predicate = $json_dict['predicate'];
         $this->params = [];
@@ -13,10 +16,10 @@ class TlConstructor {
             if (($param['type'] == 'Vector<long>')) {
                 $param['type'] = 'Vector t';
                 $param['subtype'] = 'long';
-            } else if (($param['type'] == 'vector<%Message>')) {
+            } elseif (($param['type'] == 'vector<%Message>')) {
                 $param['type'] = 'vector';
                 $param['subtype'] = 'message';
-            } else if (($param['type'] == 'vector<future_salt>')) {
+            } elseif (($param['type'] == 'vector<future_salt>')) {
                 $param['type'] = 'vector';
                 $param['subtype'] = 'future_salt';
             } else {
@@ -26,22 +29,28 @@ class TlConstructor {
         }
     }
 }
-class TlMethod {
-    function __construct($json_dict) {
-        $this->id = (int)$json_dict['id'];
+class TlMethod
+{
+    public function __construct($json_dict)
+    {
+        $this->id = (int) $json_dict['id'];
         $this->type = $json_dict['type'];
         $this->method = $json_dict['method'];
         $this->params = $json_dict['params'];
     }
 }
-class TLObject extends ArrayObject {
-    function __construct($tl_elem) {
+class TLObject extends ArrayObject
+{
+    public function __construct($tl_elem)
+    {
         parent::__construct();
         $this->name = $tl_elem->predicate;
     }
 }
-class TL {
-    function __construct($filename) {
+class TL
+{
+    public function __construct($filename)
+    {
         $TL_dict = json_decode(file_get_contents($filename), true);
         $this->constructors = $TL_dict['constructors'];
         $this->constructor_id = [];
@@ -61,83 +70,89 @@ class TL {
         }
         $this->struct = new \danog\PHP\Struct();
     }
-    function serialize_obj($type_, $kwargs) {
-        $bytes_io = fopen("php://memory", "rw+b");
-        if(isset($this->constructor_type[$type_])) {
+
+    public function serialize_obj($type_, $kwargs)
+    {
+        $bytes_io = fopen('php://memory', 'rw+b');
+        if (isset($this->constructor_type[$type_])) {
             $tl_constructor = $this->constructor_type[$type_];
-        }
-        else
-        {
+        } else {
             throw new Exception(sprintf('Could not extract type: %s', $type_));
         }
         fwrite($bytes_io, $this->struct->pack('<i', $tl_constructor->id));
         foreach ($tl_constructor->params as $arg) {
             $this->serialize_param($bytes_io, $arg['type'], $kwargs[$arg['name']]);
         }
+
         return fread_all($bytes_io);
     }
-    function serialize_method($type_, $kwargs) {
-        $bytes_io = fopen("php://memory", "rw+b");
-        if(isset($this->method_name[$type_])) {
+
+    public function serialize_method($type_, $kwargs)
+    {
+        $bytes_io = fopen('php://memory', 'rw+b');
+        if (isset($this->method_name[$type_])) {
             $tl_method = $this->method_name[$type_];
-        }
-        else
-        {
+        } else {
             throw new Exception(sprintf('Could not extract type: %s', $type_));
         }
         fwrite($bytes_io, $this->struct->pack('<i', $tl_method->id));
         foreach ($tl_method->params as $arg) {
             $this->serialize_param($bytes_io, $arg['type'], $kwargs[$arg['name']]);
         }
+
         return fread_all($bytes_io);
     }
-    function serialize_param($bytes_io, $type_, $value) {
+
+    public function serialize_param($bytes_io, $type_, $value)
+    {
         if (($type_ == 'int')) {
             assert(is_numeric($value));
             assert(strlen(decbin($value)) <= 32);
             fwrite($bytes_io, $this->struct->pack('<i', $value));
-        } else if (($type_ == 'long')) {
+        } elseif (($type_ == 'long')) {
             assert(is_numeric($value));
             fwrite($bytes_io, $this->struct->pack('<q', $value));
-        } else if (in_array($type_, ['int128', 'int256'])) {
+        } elseif (in_array($type_, ['int128', 'int256'])) {
             assert(is_string($value));
             fwrite($bytes_io, $value);
-        } else if ($type_ == 'string' || $type_ == 'bytes') {
+        } elseif ($type_ == 'string' || $type_ == 'bytes') {
             $l = len($value);
             if (($l < 254)) {
                 fwrite($bytes_io, $this->struct->pack('<b', $l));
                 fwrite($bytes_io, $value);
-                fwrite($bytes_io, pack("@".((-$l - 1) % 4)));
+                fwrite($bytes_io, pack('@'.((-$l - 1) % 4)));
             } else {
                 fwrite($bytes_io, string2bin('\xfe'));
                 fwrite($bytes_io, substr($this->struct->pack('<i', $l), null, 3));
                 fwrite($bytes_io, $value);
-                fwrite($bytes_io, pack("@".(-$l % 4)));
+                fwrite($bytes_io, pack('@'.(-$l % 4)));
             }
         }
     }
+
     /**
-    * :type bytes_io: io.BytesIO object
-    */
-    function deserialize(&$bytes_io, $type_ = null, $subtype = null) {
+     * :type bytes_io: io.BytesIO object.
+     */
+    public function deserialize(&$bytes_io, $type_ = null, $subtype = null)
+    {
         assert(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream');
         if (($type_ == 'int')) {
             $x = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
-        } else if (($type_ == '#')) {
+        } elseif (($type_ == '#')) {
             $x = $this->struct->unpack('<I', fread($bytes_io, 4)) [0];
-        } else if (($type_ == 'long')) {
+        } elseif (($type_ == 'long')) {
             $x = $this->struct->unpack('<q', fread($bytes_io, 8)) [0];
-        } else if (($type_ == 'double')) {
+        } elseif (($type_ == 'double')) {
             $x = $this->struct->unpack('<d', fread($bytes_io, 8)) [0];
-        } else if (($type_ == 'int128')) {
+        } elseif (($type_ == 'int128')) {
             $x = fread($bytes_io, 16);
-        } else if (($type_ == 'int256')) {
+        } elseif (($type_ == 'int256')) {
             $x = fread($bytes_io, 32);
-        } else if (($type_ == 'string') || ($type_ == 'bytes')) {
+        } elseif (($type_ == 'string') || ($type_ == 'bytes')) {
             $l = $this->struct->unpack('<C', fread($bytes_io, 1)) [0];
             assert($l <= 254);
             if (($l == 254)) {
-                $long_len = $this->struct->unpack('<I', fread($bytes_io, 3) . string2bin('\x00')) [0];
+                $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
                 $x = fread($bytes_io, $long_len);
                 fread($bytes_io, (-$long_len % 4));
             } else {
@@ -145,19 +160,19 @@ class TL {
                 fread($bytes_io, (($l + 1) % 4));
             }
             assert(is_string($x));
-        } else if (($type_ == 'vector')) {
+        } elseif (($type_ == 'vector')) {
             assert($subtype != null);
             $count = $this->struct->unpack('<l', substr($bytes_io, 4)) [0];
             $x = [];
-            foreach( pyjslib_range($count) as $i ) {
+            foreach (pyjslib_range($count) as $i) {
                 $x[] = deserialize($bytes_io, $subtype);
             }
         } else {
-            if(isset($this->constructor_type[$type_])) {
+            if (isset($this->constructor_type[$type_])) {
                 $tl_elem = $this->constructor_type[$type_];
             } else {
                 $i = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
-                if(isset($this->constructor_id[$i])) {
+                if (isset($this->constructor_id[$i])) {
                     $tl_elem = $this->constructor_id[$i];
                 } else {
                     throw new Exception(sprintf('Could not extract type: %s', $type_));
@@ -174,6 +189,7 @@ class TL {
                 }
             }
         }
+
         return $x;
     }
 }
