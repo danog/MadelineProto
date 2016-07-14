@@ -40,7 +40,6 @@ def vis(bs):
     if not len(bs) % symbols_in_one_line == 0:
         print(str((i+1)*symbols_in_one_line)+" | "+" ".join(["%02X" % b for b in bs[(i+1)*symbols_in_one_line:]])+"\n") # for last line
 
-vis(b'ddd')
 class Session:
     """ Manages TCP Transport. encryption and message frames """
     def __init__(self, ip, port, auth_key=None, server_salt=None):

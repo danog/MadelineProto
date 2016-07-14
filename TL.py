@@ -101,7 +101,7 @@ def serialize_param(bytes_io, type_, value):
     elif type_ in ["int128", "int256"]:
         assert isinstance(value, bytes)
         bytes_io.write(value)
-    elif type_ == 'string' or 'bytes':
+    elif type_ == 'string' or type_ == 'bytes':
         l = len(value)
         if l < 254: # short string format
             bytes_io.write(struct.pack('<b', l))  # 1 byte of string
