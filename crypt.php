@@ -2,7 +2,7 @@
 
 set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
 require_once 'libpy2php.php';
-require_once 'AES.class.php';
+require_once 'aes256.php';
 class crypt
 {
     public function ige_encrypt($message, $key, $iv)

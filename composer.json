@@ -1,0 +1,16 @@
+{
+    "name": "danog/madelineproto",
+    "description": "PHP implementation of telegram's MTProto protocol.",
+    "type": "project",
+    "require": {
+        "danog/phpstruct": "^0.4.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        }
+    ],
+    "minimum-stability": "stable"
+}
