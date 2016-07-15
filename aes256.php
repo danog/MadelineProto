@@ -14,7 +14,8 @@ class TelegramEncryption
   $this->iv = $iv;
   $this->cipherText = $cipherText;
   $this->plainText = $plainText;
-  $this->debug = $debug; }
+  $this->debug = $debug;
+}
 public function IGE256Decrypt()
 {
 
@@ -35,8 +36,9 @@ for ($i=0; $i < strlen($message); $i += $blockSize)
   $yXOR = $this->exor($x, $yPrev);
   $this->debugLog("yPrev: " . _c($yPrev) . "\n");
   $this->debugLog("yXOR: " . _c($yXOR) . "\n");
-  $yFinal = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);                    $yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
-$this->debugLog("yFinal: " . _c($yFinal) . “\n");
+  $yFinal = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);
+$yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
+$this->debugLog("yFinal: " . _c($yFinal) . "\n");
 
 $y = $this->exor($yFinal, $xPrev);
 $this->debugLog("xPrev: " . _c($xPrev) . "\n");
@@ -66,16 +68,17 @@ for ($i=0; $i < strlen($message); $i += $blockSize)
 {
 
 $x = substr($message, $i, $blockSize);
-$this->debugLog("x: " . _c($x) . “\n");
+$this->debugLog("x: " . _c($x) . "\n");
 
 $yXOR = $this->exor($x, $yPrev);
 $this->debugLog("yPrev: " . _c($yPrev) . "\n");
 $this->debugLog("yXOR: " . _c($yXOR) . "\n");
-$yFinal = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);             $yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
-$this->debugLog("yFinal: " . _c($yFinal) . “\n");
+$yFinal = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);
+$yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
+$this->debugLog("yFinal: " . _c($yFinal) . "\n");
 $y = $this->exor($yFinal, $xPrev);
-$this->debugLog("xPrev: " . _c($xPrev) . “\n");
-$this->debugLog("y: " . _c($y) . “\n");
+$this->debugLog("xPrev: " . _c($xPrev) . "\n");
+$this->debugLog("y: " . _c($y) . "\n");
 
 $xPrev = $x;
 $yPrev = $y;
@@ -96,10 +99,10 @@ public function exor($array1, $array2)
 {
    $len = (strlen($array1) <= strlen($array2)) ? strlen($array2) : strlen($array1);
 
-$array1 = str_pad($array1, $len, “\x00");
-$array2 = str_pad($array2, $len, “\x00");
+$array1 = str_pad($array1, $len, "\x00");
+$array2 = str_pad($array2, $len, "\x00");
 
-$res = ‘';
+$res = '';
 for ($i=0; $i < $len; $i++)
 {
    $res .= $array1[$i] ^ $array2[$i];
@@ -107,6 +110,9 @@ for ($i=0; $i < $len; $i++)
 return $res;
 }
 
-function _c($binary) { return sprintf(“[%s]", chunk_split(bin2hex($binary), 4, ' ')); }
+function _c($binary) {
+	return sprintf("[%s]", chunk_split(bin2hex($binary), 4," ")
+);
+}
 
 }

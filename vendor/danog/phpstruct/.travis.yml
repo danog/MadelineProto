@@ -1,0 +1,9 @@
+language: php
+php:
+  - '7.0'
+  - nightly
+
+before_script:
+  - composer update --dev
+script:
+  - phpunit --bootstrap lib/danog/PHP/Struct.php tests/danog/PHP/StructTest.php --verbose

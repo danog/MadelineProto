@@ -1,0 +1,25 @@
+{
+    "name": "danog/phpstruct",
+    "type": "library",
+    "description": "PHP implementation of python's struct module.",
+    "license": "MIT",
+    "homepage": "https://daniil.it/phpstruct",
+    "keywords": ["pack", "unpack", "byte", "bytes", "python", "struct"],
+    "authors": [
+        {
+            "name": "danog",
+            "email": "daniil@daniil.it"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.4.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "danog\\PHP\\": "lib/"
+        }
+    }
+}

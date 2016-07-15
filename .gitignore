@@ -64,5 +64,4 @@ rsa.pub
 # emacs auto-saving files
 \#*#
 .#*#
-/vendor/
 *.swp
