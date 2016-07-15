@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "0.4.1",
+            "version": "0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
-                "reference": "c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca"
+                "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca",
-                "reference": "c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca",
+                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/da3d4f5a111823bc5518af054c41f32cce0f221e",
+                "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-07-15 10:56:16"
+            "time": "2016-07-15 13:07:47"
         },
         {
             "name": "phpseclib/phpseclib",

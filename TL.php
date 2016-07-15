@@ -171,7 +171,9 @@ class TL
             if (isset($this->constructor_type[$type_])) {
                 $tl_elem = $this->constructor_type[$type_];
             } else {
-                $i = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
+                $Idata = fread($bytes_io, 4);
+                $i = $this->struct->unpack('<i', $Idata) [0];
+                var_dump(ftell($bytes_io));
                 if (isset($this->constructor_id[$i])) {
                     $tl_elem = $this->constructor_id[$i];
                 } else {

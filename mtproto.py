@@ -143,7 +143,7 @@ class Session:
 
         ResPQ = self.method_call('req_pq', nonce=nonce)
         server_nonce = ResPQ['server_nonce']
-	exit()
+        exit()
         # TODO: selecting RSA public key based on this fingerprint
         public_key_fingerprint = ResPQ['server_public_key_fingerprints'][0]
 

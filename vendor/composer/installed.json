@@ -1,55 +1,5 @@
 [
     {
-        "name": "danog/phpstruct",
-        "version": "0.4.1",
-        "version_normalized": "0.4.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/danog/PHPStruct.git",
-            "reference": "c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/danog/PHPStruct/zipball/c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca",
-            "reference": "c45742bcbc6e1bbf6bdca7b92b65a6b9624853ca",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.6.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "5.4.*"
-        },
-        "time": "2016-07-15 10:56:16",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "danog\\PHP\\": "lib/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "danog",
-                "email": "daniil@daniil.it"
-            }
-        ],
-        "description": "PHP implementation of python's struct module.",
-        "homepage": "https://daniil.it/phpstruct",
-        "keywords": [
-            "byte",
-            "bytes",
-            "pack",
-            "python",
-            "struct",
-            "unpack"
-        ]
-    },
-    {
         "name": "phpseclib/phpseclib",
         "version": "2.0.2",
         "version_normalized": "2.0.2.0",
@@ -141,6 +91,56 @@
             "twofish",
             "x.509",
             "x509"
+        ]
+    },
+    {
+        "name": "danog/phpstruct",
+        "version": "0.4.2",
+        "version_normalized": "0.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/danog/PHPStruct.git",
+            "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/danog/PHPStruct/zipball/da3d4f5a111823bc5518af054c41f32cce0f221e",
+            "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "5.4.*"
+        },
+        "time": "2016-07-15 13:07:47",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "danog\\PHP\\": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "danog",
+                "email": "daniil@daniil.it"
+            }
+        ],
+        "description": "PHP implementation of python's struct module.",
+        "homepage": "https://daniil.it/phpstruct",
+        "keywords": [
+            "byte",
+            "bytes",
+            "pack",
+            "python",
+            "struct",
+            "unpack"
         ]
     }
 ]

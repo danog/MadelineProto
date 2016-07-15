@@ -4,6 +4,7 @@ import struct
 import json
 import io
 from numbers import Number
+from binascii import hexlify
 
 class TlConstructor:
     def __init__(self, json_dict):
@@ -149,8 +150,9 @@ def deserialize(bytes_io, type_=None, subtype=None):
             tl_elem = tl.constructor_type[type_]
         except KeyError:
             # Boxed types
-            i = struct.unpack('<i', bytes_io.read(4))[0]  # read type ID
-            print type_
+            Idata = bytes_io.read(4)
+            i = struct.unpack('<i', Idata)[0]  # read type ID
+            print(hexlify(bytes_io.getvalue()))
             try:
                 tl_elem = tl.constructor_id[i]
             except KeyError:
