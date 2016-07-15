@@ -7,6 +7,7 @@ require_once 'crypt.php';
 require_once 'prime.php';
 require_once 'TL.php';
 require_once 'Struct.php';
+require_once 'vendor/autoload.php';
 
 /**
  * Function to get hex crc32

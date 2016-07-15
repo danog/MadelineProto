@@ -3,7 +3,8 @@
     "description": "PHP implementation of telegram's MTProto protocol.",
     "type": "project",
     "require": {
-        "danog/phpstruct": "^0.4.0"
+        "danog/phpstruct": "^0.4.0",
+        "phpseclib/phpseclib": "^2.0"
     },
     "license": "MIT",
     "authors": [
