@@ -6,7 +6,6 @@ require_once 'os_path.php';
 require_once 'crypt.php';
 require_once 'prime.php';
 require_once 'TL.php';
-require_once 'Struct.php';
 require_once 'vendor/autoload.php';
 
 /**
@@ -22,9 +21,11 @@ function newcrc32($data)
  * Function to dump the hex version of a string.
  * :param what: What to dump.
  */
-function hex_dump($what)
+function hex_dump(...$what)
 {
-    var_dump(bin2hex($what));
+    foreach($what as $w){
+        var_dump(bin2hex($w));
+    }
 }
     /**
      * len.
@@ -127,7 +128,7 @@ function long_to_bytes($n, $blocksize = 0)
             break;
         }
     }
-    $s = array_slice($s, $i, null);
+    $s = array_slice($s, $i);
     if (($blocksize > 0) && (strlen($s) % $blocksize)) {
         $s = ((($blocksize - (strlen($s) % $blocksize)) * $b('')) + $s);
     }
@@ -160,7 +161,7 @@ class Session
         $this->timedelta = 0;
         $this->session_id = random_bytes(8);
         $this->auth_key = $auth_key;
-        $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8, null) : null;
+        $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
         stream_set_timeout($this->sock, 5);
         $this->MAX_RETRY = 5;
         $this->AUTH_MAX_RETRY = 5;
@@ -190,7 +191,7 @@ class Session
         } else {
             $encrypted_data =
                 $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
-            $message_key = substr(sha1($encrypted_data, true), -16, null);
+            $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = random_bytes((-strlen($encrypted_data) % 16));
             echo strlen($encrypted_data.$padding).PHP_EOL;
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
@@ -211,15 +212,15 @@ class Session
         if (len($packet_length_data) < 4) {
             throw new Exception('Nothing in the socket!');
         }
-        $packet_length = $this->struct->unpack('<I', $packet_length_data)[1];
+        $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
         $packet = fread($this->sock, ($packet_length - 4));
-        if (!(newcrc32($packet_length_data.substr($packet, 0, -4 - 0)) == $this->struct->unpack('<I', substr($packet, -4, null))[1])) {
+        if (!(newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
         }
-        $x = $this->struct->unpack('<I', substr($packet, null, 4));
-        $auth_key_id = substr($packet, 4, 12 - 4);
+        $x = $this->struct->unpack('<I', substr($packet, 0, 4));
+        $auth_key_id = substr($packet, 4, 8);
         if ($auth_key_id == string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = struct.unpack('<8sI', substr($packet, 12, 24));
+            list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
             $data = substr($packet, 24, (24 + $message_length) - 24);
         } elseif ($auth_key_id == $this->auth_key_id) {
             $message_key = substr($packet, 12, 28 - 12);
@@ -251,7 +252,6 @@ class Session
                 pyjslib_printnl('Retry call method');
                 continue;
             }
-
             return $this->tl->deserialize(fopen_and_write('php://memory', 'rw+b', $server_answer));
         }
     }
@@ -289,8 +289,8 @@ class Session
         $tmp_aes_key = (sha1(($new_nonce + $server_nonce), true) + array_slice(sha1(($server_nonce + $new_nonce), true), 0, 12 - 0));
         $tmp_aes_iv = ((array_slice(sha1(($server_nonce + $new_nonce), true), 12, 20 - 12) + sha1(($new_nonce + $new_nonce), true)) + array_slice($new_nonce, 0, 4 - 0));
         $answer_with_hash = crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
-        $answer_hash = array_slice($answer_with_hash, null, 20);
-        $answer = array_slice($answer_with_hash, 20, null);
+        $answer_hash = array_slice($answer_with_hash, 0, 20);
+        $answer = array_slice($answer_with_hash, 20);
         $server_DH_inner_data = deserialize(io::BytesIO($answer));
         assert(($nonce == $server_DH_inner_data['nonce']));
         assert(($server_nonce == $server_DH_inner_data['server_nonce']));
@@ -317,10 +317,10 @@ class Session
             $auth_key = pow($g_a, $b, $dh_prime);
             $auth_key_str = new long_to_bytes($auth_key);
             $auth_key_sha = sha1($auth_key_str, true);
-            $auth_key_aux_hash = array_slice($auth_key_sha, null, 8);
-            $new_nonce_hash1 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
-            $new_nonce_hash2 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
-            $new_nonce_hash3 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16, null);
+            $auth_key_aux_hash = array_slice($auth_key_sha, 0, 8);
+            $new_nonce_hash1 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            $new_nonce_hash2 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            $new_nonce_hash3 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
             assert(($Set_client_DH_params_answer['nonce'] == $nonce));
             assert(($Set_client_DH_params_answer['server_nonce'] == $server_nonce));
             if (($Set_client_DH_params_answer->name == 'dh_gen_ok')) {
@@ -328,7 +328,7 @@ class Session
                 pyjslib_printnl('Diffie Hellman key exchange processed successfully');
                 $this->server_salt = new strxor(array_slice($new_nonce, 0, 8 - 0), array_slice($server_nonce, 0, 8 - 0));
                 $this->auth_key = $auth_key_str;
-                $this->auth_key_id = array_slice($auth_key_sha, -8, null);
+                $this->auth_key_id = array_slice($auth_key_sha, -8);
                 pyjslib_printnl('Auth key generated');
 
                 return 'Auth Ok';

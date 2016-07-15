@@ -123,7 +123,7 @@ class TL
                 fwrite($bytes_io, pack('@'.((-$l - 1) % 4)));
             } else {
                 fwrite($bytes_io, string2bin('\xfe'));
-                fwrite($bytes_io, substr($this->struct->pack('<i', $l), null, 3));
+                fwrite($bytes_io, substr($this->struct->pack('<i', $l), 0, 3));
                 fwrite($bytes_io, $value);
                 fwrite($bytes_io, pack('@'.(-$l % 4)));
             }
@@ -133,7 +133,7 @@ class TL
     /**
      * :type bytes_io: io.BytesIO object.
      */
-    public function deserialize(&$bytes_io, $type_ = null, $subtype = null)
+    public function deserialize($bytes_io, $type_ = null, $subtype = null)
     {
         assert(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream');
         if (($type_ == 'int')) {
@@ -149,7 +149,7 @@ class TL
         } elseif (($type_ == 'int256')) {
             $x = fread($bytes_io, 32);
         } elseif (($type_ == 'string') || ($type_ == 'bytes')) {
-            $l = $this->struct->unpack('<C', fread($bytes_io, 1)) [0];
+            $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
             assert($l <= 254);
             if (($l == 254)) {
                 $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
@@ -162,10 +162,10 @@ class TL
             assert(is_string($x));
         } elseif (($type_ == 'vector')) {
             assert($subtype != null);
-            $count = $this->struct->unpack('<l', substr($bytes_io, 4)) [0];
+            $count = $this->struct->unpack('<l', fread($bytes_io, 4)) [0];
             $x = [];
             foreach (pyjslib_range($count) as $i) {
-                $x[] = deserialize($bytes_io, $subtype);
+                $x[] = $this->deserialize($bytes_io, $subtype);
             }
         } else {
             if (isset($this->constructor_type[$type_])) {
@@ -181,11 +181,11 @@ class TL
 
             $base_boxed_types = ['Vector t', 'Int', 'Long', 'Double', 'String', 'Int128', 'Int256'];
             if (in_array($tl_elem->type, $base_boxed_types)) {
-                $x = deserialize($bytes_io, $tl_elem->predicate, $subtype);
+                $x = $this->deserialize($bytes_io, $tl_elem->predicate, $subtype);
             } else {
                 $x = new TLObject($tl_elem);
                 foreach ($tl_elem->params as $arg) {
-                    $x[$arg['name']] = deserialize($bytes_io, $arg['type'], $arg['subtype']);
+                    $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
                 }
             }
         }

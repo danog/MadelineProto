@@ -109,7 +109,7 @@ class Session:
         if auth_key_id == b'\x00\x00\x00\x00\x00\x00\x00\x00':
             # No encryption - Plain text
             (message_id, message_length) = struct.unpack("<8sI", packet[12:24])
-
+            print(len(packet[12:24]))
             data = packet[24:24+message_length]
         elif auth_key_id == self.auth_key_id:
             message_key = packet[12:28]
