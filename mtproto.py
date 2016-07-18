@@ -145,8 +145,9 @@ class Session:
         public_key_fingerprint = ResPQ['server_public_key_fingerprints'][0]
 
         pq_bytes = ResPQ['pq']
-        vis(pq_bytes)
         pq = bytes_to_long(pq_bytes)
+        print(prime.primefactors(2118588165281151121))
+        exit()
         [p, q] = prime.primefactors(pq)
         if p > q: (p, q) = (q, p)
         assert p*q == pq and p < q

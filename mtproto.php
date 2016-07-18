@@ -174,6 +174,7 @@ class Session
         $this->MAX_RETRY = 5;
         $this->AUTH_MAX_RETRY = 5;
         $this->struct = new \danog\PHP\Struct();
+        $this->PrimeModule = new PrimeModule();
         try {
             $this->tl = new TL('https://core.telegram.org/schema/mtproto-json');
         } catch (Exception $e) {
@@ -273,7 +274,8 @@ class Session
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
         $pq = bytes_to_long($pq_bytes);
-        list($p, $q) = primefactors($pq);
+        var_dump($this->PrimeModule->primefactors($pq));
+        list($p, $q) = $this->PrimeModule->primefactors($pq);
         if ($p > $q) {
             list($p, $q) = [$q, $p];
         }
@@ -310,7 +312,7 @@ class Session
         pyjslib_printnl(sprintf('Server-client time delta = %.1f s', $this->timedelta));
         $dh_prime = new bytes_to_long($dh_prime_str);
         $g_a = new bytes_to_long($g_a_str);
-        assert(prime::isprime($dh_prime));
+        assert($this->PrimeModule->isprime($dh_prime));
         $retry_id = 0;
         $b_str = random_bytes(256);
         $b = new bytes_to_long($b_str);

@@ -14,7 +14,6 @@ def primesbelow(N):
             k = (3 * i + 1) | 1
             sieve[k*k // 3::2*k] = [False] * ((N//6 - (k*k)//6 - 1)//k + 1)
             sieve[(k*k + 4*k - 2*k*(i%2)) // 3::2*k] = [False] * ((N // 6 - (k*k + 4*k - 2*k*(i%2))//6 - 1) // k + 1)
-    exit()
     return [2, 3] + [(3 * i + 1) | 1 for i in range(1, N//3 - correction) if sieve[i]]
 
 smallprimeset = set(primesbelow(100000))
@@ -94,11 +93,11 @@ def primefactors(n, sort=False):
             if checker > limit: break
 
     if n < 2: return factors
-
     while n > 1:
         if isprime(n):
             factors.append(n)
             break
+        print(pollard_brent(n))
         factor = pollard_brent(n) # trial division did not fully factor, switch to pollard-brent
         factors.extend(primefactors(factor)) # recurse to factor the not necessarily prime factor returned by pollard-brent
         n //= factor
