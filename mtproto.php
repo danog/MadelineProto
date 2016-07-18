@@ -7,7 +7,7 @@ require_once 'crypt.php';
 require_once 'prime.php';
 require_once 'TL.php';
 require_once 'vendor/autoload.php';
-
+$struct = new \danog\PHP\Struct();
 /**
  * Function to get hex crc32
  * :param data: Data to encode.
@@ -27,23 +27,22 @@ function hex_dump(...$what)
         var_dump(bin2hex($w));
     }
 }
-    /**
-     * len.
-     *
-     * Get the length of a string or of an array
-     *
-     * @param   $input String or array to parse
-     *
-     * @return int with the length
-     **/
-    function len($input)
-    {
-        if (is_array($input)) {
-            return count($input);
-        }
-
-        return strlen($input);
+/**
+ * len.
+ *
+ * Get the length of a string or of an array
+ *
+ * @param   $input String or array to parse
+ *
+ * @return int with the length
+ **/
+function len($input)
+{
+    if (is_array($input)) {
+	    return count($input);
     }
+    return strlen($input);
+}
 
 /**
  * Function to visualize byte streams. Split into bytes, print to console.
@@ -62,7 +61,7 @@ function vis($bs)
             }, array_slice($bs, $i * $symbols_in_one_line, ($i + 1) * $symbols_in_one_line))
         ).PHP_EOL;
     }
-    if (!(len($bs) % $symbols_in_one_line == 0)) {
+    if (len($bs) % $symbols_in_one_line != 0) {
         echo($i + 1) * $symbols_in_one_line.' | '.implode(' ',
             array_map(function ($el) {
                 return bin2hex($el);
@@ -71,24 +70,13 @@ function vis($bs)
     }
 }
 /**
- * bytes_to_long(string) : long
- * Convert a byte string to a long integer.
- * This is (essentially) the inverse of long_to_bytes().
+ * posmod(numeric,numeric) : numeric
+ * Works just like the % (modulus) operator, only returns always a postive number
  */
-function bytes_to_long($s)
-{
-    $acc = 0;
-    $length = strlen($s);
-    if (($length % 4)) {
-        $extra = (4 - ($length % 4));
-        $s = (($b('') * $extra) + $s);
-        $length = ($length + $extra);
-    }
-    foreach (pyjslib_range(0, $length, 4) as $i) {
-        $acc = ($acc << 32 + $this->struct->unpack('I', array_slice($s, $i, ($i + 4) - $i))[0]);
-    }
-
-    return $acc;
+function posmod($a, $b) {
+    $resto = $a % $b;
+    if($resto < 0) $resto += abs($b);
+    return $resto;
 }
 
 function fread_all($handle)
@@ -117,29 +105,49 @@ function fopen_and_write($filename, $mode, $data)
  */
 function long_to_bytes($n, $blocksize = 0)
 {
-    $s = $b('');
+    $s = null;
     $n = long($n);
     while (($n > 0)) {
-        $s = ($this->struct->pack('I', $n & 4294967295) + $s);
+        $s = $GLOBALS["struct"]->pack('I', $n & 4294967295) . $s;
         $n = $n >> 32;
     }
     foreach (pyjslib_range(strlen($s)) as $i) {
-        if (($s[$i] != $b('')[0])) {
+        if (($s[$i] != string2bin('\000')[0])) {
             break;
         }
     }
-    $s = array_slice($s, $i);
-    if (($blocksize > 0) && (strlen($s) % $blocksize)) {
-        $s = ((($blocksize - (strlen($s) % $blocksize)) * $b('')) + $s);
+    $s = substr($s, $i);
+    if ($blocksize > 0 && strlen($s) % $blocksize) {
+        $s = pack("@" . $blocksize - (strlen($s) % $blocksize)) . $s;
     }
 
     return $s;
+}
+/**
+ * bytes_to_long(string) : long
+ * Convert a byte string to a long integer.
+ * This is (essentially) the inverse of long_to_bytes().
+ */
+function bytes_to_long($s)
+{
+    //return $GLOBALS["struct"]->unpack('>Q', $s)[0];
+    $acc = 0;
+    $length = strlen($s);
+    if ($length % 4) {
+        $extra = (4 - ($length % 4));
+        $s = pack("@" . $extra) . $s;
+        $length += $extra;
+    }
+    foreach (pyjslib_range(0, $length, 4) as $i) {
+        $acc = ($acc << 32) + $GLOBALS["struct"]->unpack('>I', substr($s, $i, 4))[0];
+    }
+    return $acc;
 }
 function string2bin($string)
 {
     $res = null;
     foreach (explode('\\', $string) as $s) {
-        if ($s != null && $s[0] == 'x') {
+        if ($s != null && strlen($s) == 3) {
             $res .= hex2bin(substr($s, 1));
         }
     }
@@ -192,7 +200,7 @@ class Session
             $encrypted_data =
                 $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = random_bytes((-strlen($encrypted_data) % 16));
+            $padding = random_bytes(posmod(-strlen($encrypted_data), 16));
             echo strlen($encrypted_data.$padding).PHP_EOL;
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
@@ -266,7 +274,7 @@ class Session
         $pq_bytes = $ResPQ['pq'];
         $pq = bytes_to_long($pq_bytes);
         list($p, $q) = primefactors($pq);
-        if (($p > $q)) {
+        if ($p > $q) {
             list($p, $q) = [$q, $p];
         }
         assert((($p * $q) == $pq) && ($p < $q));
@@ -310,7 +318,7 @@ class Session
         $g_b_str = new long_to_bytes($g_b);
         $data = py2php_kwargs_function_call('serialize_obj', ['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = (sha1($data, true) + $data);
-        $data_with_sha_padded = ($data_with_sha + random_bytes((-strlen($data_with_sha) % 16)));
+        $data_with_sha_padded = ($data_with_sha + random_bytes(posmod(-strlen($data_with_sha), 16)));
         $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);

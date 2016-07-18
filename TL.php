@@ -105,28 +105,37 @@ class TL
 
     public function serialize_param($bytes_io, $type_, $value)
     {
-        if (($type_ == 'int')) {
-            assert(is_numeric($value));
-            assert(strlen(decbin($value)) <= 32);
-            fwrite($bytes_io, $this->struct->pack('<i', $value));
-        } elseif (($type_ == 'long')) {
-            assert(is_numeric($value));
-            fwrite($bytes_io, $this->struct->pack('<q', $value));
-        } elseif (in_array($type_, ['int128', 'int256'])) {
-            assert(is_string($value));
-            fwrite($bytes_io, $value);
-        } elseif ($type_ == 'string' || $type_ == 'bytes') {
-            $l = len($value);
-            if (($l < 254)) {
-                fwrite($bytes_io, $this->struct->pack('<b', $l));
+        switch ($type_) {
+            case 'int':
+                assert(is_int($value));
+                assert(strlen(decbin($value)) <= 32);
+                fwrite($bytes_io, $this->struct->pack('<i', $value));
+                break;
+            case 'long':
+                assert(is_long($value));
+                fwrite($bytes_io, $this->struct->pack('<q', $value));
+                break;
+            case 'int128':
+            case 'int256':
+                assert(is_string($value));
                 fwrite($bytes_io, $value);
-                fwrite($bytes_io, pack('@'.((-$l - 1) % 4)));
-            } else {
-                fwrite($bytes_io, string2bin('\xfe'));
-                fwrite($bytes_io, substr($this->struct->pack('<i', $l), 0, 3));
-                fwrite($bytes_io, $value);
-                fwrite($bytes_io, pack('@'.(-$l % 4)));
-            }
+                break;
+            case 'string':
+            case 'bytes':
+                $l = len($value);
+                if (($l < 254)) {
+                    fwrite($bytes_io, $this->struct->pack('<b', $l));
+                    fwrite($bytes_io, $value);
+                    fwrite($bytes_io, pack('@'.posmod((-$l - 1), 4)));
+                } else {
+                    fwrite($bytes_io, string2bin('\xfe'));
+                    fwrite($bytes_io, substr($this->struct->pack('<i', $l), 0, 3));
+                    fwrite($bytes_io, $value);
+                    fwrite($bytes_io, pack('@'.posmod(-$l, 4)));
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -136,60 +145,70 @@ class TL
     public function deserialize($bytes_io, $type_ = null, $subtype = null)
     {
         assert(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream');
-        if (($type_ == 'int')) {
-            $x = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
-        } elseif (($type_ == '#')) {
-            $x = $this->struct->unpack('<I', fread($bytes_io, 4)) [0];
-        } elseif (($type_ == 'long')) {
-            $x = $this->struct->unpack('<q', fread($bytes_io, 8)) [0];
-        } elseif (($type_ == 'double')) {
-            $x = $this->struct->unpack('<d', fread($bytes_io, 8)) [0];
-        } elseif (($type_ == 'int128')) {
-            $x = fread($bytes_io, 16);
-        } elseif (($type_ == 'int256')) {
-            $x = fread($bytes_io, 32);
-        } elseif (($type_ == 'string') || ($type_ == 'bytes')) {
-            $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
-            assert($l <= 254);
-            if (($l == 254)) {
-                $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
-                $x = fread($bytes_io, $long_len);
-                fread($bytes_io, (-$long_len % 4));
-            } else {
-                $x = fread($bytes_io, $l);
-                fread($bytes_io, (($l + 1) % 4));
-            }
-            assert(is_string($x));
-        } elseif (($type_ == 'vector')) {
-            assert($subtype != null);
-            $count = $this->struct->unpack('<l', fread($bytes_io, 4)) [0];
-            $x = [];
-            foreach (pyjslib_range($count) as $i) {
-                $x[] = $this->deserialize($bytes_io, $subtype);
-            }
-        } else {
-            if (isset($this->constructor_type[$type_])) {
-                $tl_elem = $this->constructor_type[$type_];
-            } else {
-                $Idata = fread($bytes_io, 4);
-                $i = $this->struct->unpack('<i', $Idata) [0];
-                var_dump(ftell($bytes_io));
-                if (isset($this->constructor_id[$i])) {
-                    $tl_elem = $this->constructor_id[$i];
+        switch ($type_) {
+            case 'int':
+                $x = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
+                break;
+            case '#':
+                $x = $this->struct->unpack('<I', fread($bytes_io, 4)) [0];
+                break;
+            case 'long':
+                $x = $this->struct->unpack('<q', fread($bytes_io, 8)) [0];
+                break;
+            case 'double':
+                $x = $this->struct->unpack('<d', fread($bytes_io, 8)) [0];
+                break;
+            case 'int128':
+                $x = fread($bytes_io, 16);
+                break;
+            case 'int256':
+                $x = fread($bytes_io, 32);
+                break;
+            case 'string':
+            case 'bytes':
+                $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
+                assert($l <= 254);
+                if (($l == 254)) {
+                    $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
+                    $x = fread($bytes_io, $long_len);
+                    fread($bytes_io, posmod(-$long_len, 4));
                 } else {
-                    throw new Exception(sprintf('Could not extract type: %s', $type_));
+                    $x = fread($bytes_io, $l);
+                    fread($bytes_io, posmod(-($l + 1), 4));
                 }
-            }
+                assert(is_string($x));
+                break;
+            case 'vector':
+                assert($subtype != null);
+                $count = $this->struct->unpack('<l', fread($bytes_io, 4)) [0];
+                $x = [];
+                foreach (pyjslib_range($count) as $i) {
+                    $x[] = $this->deserialize($bytes_io, $subtype);
+                }
+                break;
+            default:
+                if (isset($this->constructor_type[$type_])) {
+                    $tl_elem = $this->constructor_type[$type_];
+                } else {
+                    $Idata = fread($bytes_io, 4);
+                    $i = $this->struct->unpack('<i', $Idata) [0];
+                    if (isset($this->constructor_id[$i])) {
+                        $tl_elem = $this->constructor_id[$i];
+                    } else {
+                        throw new Exception(sprintf('Could not extract type: %s', $type_));
+                    }
+                }
 
-            $base_boxed_types = ['Vector t', 'Int', 'Long', 'Double', 'String', 'Int128', 'Int256'];
-            if (in_array($tl_elem->type, $base_boxed_types)) {
-                $x = $this->deserialize($bytes_io, $tl_elem->predicate, $subtype);
-            } else {
-                $x = new TLObject($tl_elem);
-                foreach ($tl_elem->params as $arg) {
-                    $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
+                $base_boxed_types = ['Vector t', 'Int', 'Long', 'Double', 'String', 'Int128', 'Int256'];
+                if (in_array($tl_elem->type, $base_boxed_types)) {
+                    $x = $this->deserialize($bytes_io, $tl_elem->predicate, $subtype);
+                } else {
+                    $x = new TLObject($tl_elem);
+                    foreach ($tl_elem->params as $arg) {
+                        $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
+                    }
                 }
-            }
+                break;
         }
 
         return $x;

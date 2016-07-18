@@ -5,7 +5,7 @@ require_once 'libpy2php.php';
 require_once 'os.php';
 require_once 'mtproto.php';
 $config = parse_ini_file('credentials', true);
-if (!($config)) {
+if (!$config) {
     pyjslib_printnl('File \'credentials\' seems to not exist.');
     $exit(-1);
 }

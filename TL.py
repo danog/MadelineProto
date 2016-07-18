@@ -152,7 +152,6 @@ def deserialize(bytes_io, type_=None, subtype=None):
             # Boxed types
             Idata = bytes_io.read(4)
             i = struct.unpack('<i', Idata)[0]  # read type ID
-            print(hexlify(bytes_io.getvalue()))
             try:
                 tl_elem = tl.constructor_id[i]
             except KeyError:

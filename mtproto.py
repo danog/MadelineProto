@@ -80,7 +80,6 @@ class Session:
                               message_data)
             message_key = SHA.new(encrypted_data).digest()[-16:]
             padding = os.urandom((-len(encrypted_data)) % 16)
-            print(len(encrypted_data+padding))
             aes_key, aes_iv = self.aes_calculate(message_key)
 
             message = (self.auth_key_id + message_key +
@@ -109,7 +108,6 @@ class Session:
         if auth_key_id == b'\x00\x00\x00\x00\x00\x00\x00\x00':
             # No encryption - Plain text
             (message_id, message_length) = struct.unpack("<8sI", packet[12:24])
-            print(len(packet[12:24]))
             data = packet[24:24+message_length]
         elif auth_key_id == self.auth_key_id:
             message_key = packet[12:28]
@@ -143,13 +141,12 @@ class Session:
 
         ResPQ = self.method_call('req_pq', nonce=nonce)
         server_nonce = ResPQ['server_nonce']
-        exit()
         # TODO: selecting RSA public key based on this fingerprint
         public_key_fingerprint = ResPQ['server_public_key_fingerprints'][0]
 
         pq_bytes = ResPQ['pq']
+        vis(pq_bytes)
         pq = bytes_to_long(pq_bytes)
-
         [p, q] = prime.primefactors(pq)
         if p > q: (p, q) = (q, p)
         assert p*q == pq and p < q
