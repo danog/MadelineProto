@@ -275,8 +275,8 @@ class Session
         $pq_bytes = $ResPQ['pq'];
         $pq = bytes_to_long($pq_bytes);
         var_dump($this->PrimeModule->pollard_brent(2118588165281151121));
-
-        var_dump($this->PrimeModule->primefactors(2118588165281151121));die;
+//$this->PrimeModule->primefactors(1724114033281923457)
+        var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));die;
         list($p, $q) = $this->PrimeModule->primefactors($pq);
         if ($p > $q) {
             list($p, $q) = [$q, $p];
