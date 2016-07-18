@@ -12,7 +12,7 @@ class PrimeModule {
         $res = [];
         for ($i = 2; $i <= $N; $i++)
         {
-            if($i % 2 != 1) continue;
+            if($i % 2 != 1 && $i != 2) continue;
             $d = 3;
             $x = sqrt($i);
             while ($i % $d != 0 && $d < $x) $d += 2;
@@ -68,24 +68,24 @@ class PrimeModule {
         while (($g == 1)) {
             $x = $y;
             foreach (pyjslib_range($r) as $i) {
-                $y = ((pow($y, 2, $n) + $c) % $n);
+                $y = ((posmod(pow($y, 2), $n) + $c) % $n);
             }
             $k = 0;
             while (($k < $r) && ($g == 1)) {
                 $ys = $y;
                 foreach (pyjslib_range(min($m, ($r - $k))) as $i) {
-                    $y = ((pow($y, 2, $n) + $c) % $n);
+                    $y = ((posmod(pow($y, 2), $n) + $c) % $n);
                     $q = (($q * abs(($x - $y))) % $n);
                 }
-                $g = gcd($q, $n);
+                $g = $this->gcd($q, $n);
                 $k += $m;
             }
             $r *= 2;
         }
         if (($g == $n)) {
             while (true) {
-                $ys = ((pow($ys, 2, $n) + $c) % $n);
-                $g = gcd(abs(($x - $ys)), $n);
+                $ys = ((posmod(pow($ys, 2), $n) + $c) % $n);
+                $g = $this->gcd(abs(($x - $ys)), $n);
                 if (($g > 1)) {
                     break;
                 }
@@ -172,7 +172,7 @@ class PrimeModule {
     }
     function lcm($a, $b)
     {
-        return floor(abs(($a * $b)) / gcd($a, $b));
+        return floor(abs(($a * $b)) / $this->gcd($a, $b));
     }
 
 }

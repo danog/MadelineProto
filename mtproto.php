@@ -274,7 +274,9 @@ class Session
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
         $pq = bytes_to_long($pq_bytes);
-        var_dump($this->PrimeModule->primefactors($pq));
+        var_dump($this->PrimeModule->pollard_brent(2118588165281151121));
+
+        var_dump($this->PrimeModule->primefactors(2118588165281151121));die;
         list($p, $q) = $this->PrimeModule->primefactors($pq);
         if ($p > $q) {
             list($p, $q) = [$q, $p];

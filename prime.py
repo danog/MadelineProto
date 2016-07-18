@@ -97,7 +97,6 @@ def primefactors(n, sort=False):
         if isprime(n):
             factors.append(n)
             break
-        print(pollard_brent(n))
         factor = pollard_brent(n) # trial division did not fully factor, switch to pollard-brent
         factors.extend(primefactors(factor)) # recurse to factor the not necessarily prime factor returned by pollard-brent
         n //= factor
