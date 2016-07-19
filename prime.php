@@ -2,26 +2,36 @@
 
 set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
 require_once 'libpy2php.php';
-class PrimeModule {
-    function __construct() {
+class PrimeModule
+{
+    public function __construct()
+    {
         $this->smallprimeset = array_unique($this->primesbelow(100000));
         $this->_smallprimeset = 100000;
         $this->smallprimes = $this->primesbelow(10000);
     }
-    function primesbelow($N) {
+
+    public function primesbelow($N)
+    {
         $res = [];
-        for ($i = 2; $i <= $N; $i++)
-        {
-            if($i % 2 != 1 && $i != 2) continue;
+        for ($i = 2; $i <= $N; $i++) {
+            if ($i % 2 != 1 && $i != 2) {
+                continue;
+            }
             $d = 3;
             $x = sqrt($i);
-            while ($i % $d != 0 && $d < $x) $d += 2;
-            if((($i % $d == 0 && $i != $d) * 1) == 0) $res[] = $i;
+            while ($i % $d != 0 && $d < $x) {
+                $d += 2;
+            }
+            if ((($i % $d == 0 && $i != $d) * 1) == 0) {
+                $res[] = $i;
+            }
         }
+
         return $res;
     }
 
-    function isprime($n, $precision = 7)
+    public function isprime($n, $precision = 7)
     {
         if (($n == 1) || (($n % 2) == 0)) {
             return false;
@@ -55,7 +65,8 @@ class PrimeModule {
 
         return true;
     }
-    function pollard_brent($n)
+
+    public function pollard_brent($n)
     {
         if ((($n % 2) == 0)) {
             return 2;
@@ -94,10 +105,11 @@ class PrimeModule {
 
         return $g;
     }
-    function primefactors($n, $sort = false)
+
+    public function primefactors($n, $sort = false)
     {
         $factors = [];
-        $limit = ((int)(pow($n, 0.5)) + 1);
+        $limit = ((int) (pow($n, 0.5)) + 1);
         foreach ($this->smallprimes as $checker) {
             if (($checker > $limit)) {
                 break;
@@ -105,7 +117,7 @@ class PrimeModule {
             while (($n % $checker) == 0) {
                 $factors[] = $checker;
                 $n = floor($n / $checker);
-                $limit = ((int)(pow($n, 0.5)) + 1);
+                $limit = ((int) (pow($n, 0.5)) + 1);
                 if (($checker > $limit)) {
                     break;
                 }
@@ -129,11 +141,12 @@ class PrimeModule {
 
         return $factors;
     }
-    function factorization($n)
+
+    public function factorization($n)
     {
         $factors = [];
         foreach (primefactors($n) as $p1) {
-            if(isset($factors[$p1])) {
+            if (isset($factors[$p1])) {
                 $factors[$p1] += 1;
             } else {
                 $factors[$p1] = 1;
@@ -142,13 +155,14 @@ class PrimeModule {
 
         return $factors;
     }
-    function totient($n)
+
+    public function totient($n)
     {
         $totients = [];
         if (($n == 0)) {
             return 1;
         }
-        if(isset($totients[$n])) {
+        if (isset($totients[$n])) {
             return $totients[$n];
         }
         $tot = 1;
@@ -159,7 +173,8 @@ class PrimeModule {
 
         return $tot;
     }
-    function gcd($a, $b)
+
+    public function gcd($a, $b)
     {
         if (($a == $b)) {
             return $a;
@@ -170,10 +185,12 @@ class PrimeModule {
 
         return $a;
     }
-    function lcm($a, $b)
+
+    public function lcm($a, $b)
     {
         return floor(abs(($a * $b)) / $this->gcd($a, $b));
     }
+
 /*
 function pqPrimeLeemon ($what) {
   $minBits = 64;
@@ -248,5 +265,4 @@ function pqPrimeLeemon ($what) {
 
   return [bytesFromLeemonBigInt(P), bytesFromLeemonBigInt(Q), it]
 }*/
-
 }

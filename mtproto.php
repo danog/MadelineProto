@@ -23,7 +23,7 @@ function newcrc32($data)
  */
 function hex_dump(...$what)
 {
-    foreach($what as $w){
+    foreach ($what as $w) {
         var_dump(bin2hex($w));
     }
 }
@@ -39,8 +39,9 @@ function hex_dump(...$what)
 function len($input)
 {
     if (is_array($input)) {
-	    return count($input);
+        return count($input);
     }
+
     return strlen($input);
 }
 
@@ -71,11 +72,15 @@ function vis($bs)
 }
 /**
  * posmod(numeric,numeric) : numeric
- * Works just like the % (modulus) operator, only returns always a postive number
+ * Works just like the % (modulus) operator, only returns always a postive number.
  */
-function posmod($a, $b) {
+function posmod($a, $b)
+{
     $resto = $a % $b;
-    if($resto < 0) $resto += abs($b);
+    if ($resto < 0) {
+        $resto += abs($b);
+    }
+
     return $resto;
 }
 
@@ -108,7 +113,7 @@ function long_to_bytes($n, $blocksize = 0)
     $s = null;
     $n = long($n);
     while (($n > 0)) {
-        $s = $GLOBALS["struct"]->pack('I', $n & 4294967295) . $s;
+        $s = $GLOBALS['struct']->pack('I', $n & 4294967295).$s;
         $n = $n >> 32;
     }
     foreach (pyjslib_range(strlen($s)) as $i) {
@@ -118,7 +123,7 @@ function long_to_bytes($n, $blocksize = 0)
     }
     $s = substr($s, $i);
     if ($blocksize > 0 && strlen($s) % $blocksize) {
-        $s = pack("@" . $blocksize - (strlen($s) % $blocksize)) . $s;
+        $s = pack('@'.$blocksize - (strlen($s) % $blocksize)).$s;
     }
 
     return $s;
@@ -135,12 +140,13 @@ function bytes_to_long($s)
     $length = strlen($s);
     if ($length % 4) {
         $extra = (4 - ($length % 4));
-        $s = pack("@" . $extra) . $s;
+        $s = pack('@'.$extra).$s;
         $length += $extra;
     }
     foreach (pyjslib_range(0, $length, 4) as $i) {
-        $acc = ($acc << 32) + $GLOBALS["struct"]->unpack('>I', substr($s, $i, 4))[0];
+        $acc = ($acc << 32) + $GLOBALS['struct']->unpack('>I', substr($s, $i, 4))[0];
     }
+
     return $acc;
 }
 function string2bin($string)
@@ -261,6 +267,7 @@ class Session
                 pyjslib_printnl('Retry call method');
                 continue;
             }
+
             return $this->tl->deserialize(fopen_and_write('php://memory', 'rw+b', $server_answer));
         }
     }
@@ -276,7 +283,8 @@ class Session
         $pq = bytes_to_long($pq_bytes);
         var_dump($this->PrimeModule->pollard_brent(2118588165281151121));
 //$this->PrimeModule->primefactors(1724114033281923457)
-        var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));die;
+        var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));
+        die;
         list($p, $q) = $this->PrimeModule->primefactors($pq);
         if ($p > $q) {
             list($p, $q) = [$q, $p];
