@@ -112,7 +112,7 @@ class TL
                 fwrite($bytes_io, $this->struct->pack('<i', $value));
                 break;
             case 'long':
-                assert(is_long($value));
+                assert(is_int($value));
                 fwrite($bytes_io, $this->struct->pack('<q', $value));
                 break;
             case 'int128':
