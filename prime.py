@@ -7,11 +7,14 @@ def primesbelow(N):
     #""" Input N>=6, Returns a list of primes, 2 <= p < N """
     correction = N % 6 > 1
     N = {0:N, 1:N-1, 2:N+4, 3:N+3, 4:N+2, 5:N+1}[N%6]
+    print(N)
     sieve = [True] * (N // 3)
     sieve[0] = False
     for i in range(int(N ** .5) // 3 + 1):
         if sieve[i]:
             k = (3 * i + 1) | 1
+            print(len(sieve[k*k // 3::2*k]))
+            print(((N // 6 - (k*k)//6 - 1)//k +1))
             sieve[k*k // 3::2*k] = [False] * ((N//6 - (k*k)//6 - 1)//k + 1)
             sieve[(k*k + 4*k - 2*k*(i%2)) // 3::2*k] = [False] * ((N // 6 - (k*k + 4*k - 2*k*(i%2))//6 - 1) // k + 1)
     return [2, 3] + [(3 * i + 1) | 1 for i in range(1, N//3 - correction) if sieve[i]]

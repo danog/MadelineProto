@@ -8,9 +8,40 @@ class PrimeModule
     {
         $this->smallprimeset = array_unique($this->primesbelow(100000));
         $this->_smallprimeset = 100000;
+        $this->primesbelowtwo(10000);
         $this->smallprimes = $this->primesbelow(10000);
     }
-
+    /*
+def primesbelow(N):
+    # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
+    #""" Input N>=6, Returns a list of primes, 2 <= p < N """
+    correction = N % 6 > 1
+    N = {0:N, 1:N-1, 2:N+4, 3:N+3, 4:N+2, 5:N+1}[N%6]
+    sieve = [True] * (N // 3)
+    sieve[0] = False
+    for i in range(int(N ** .5) // 3 + 1):
+        if sieve[i]:
+            k = (3 * i + 1) | 1
+            print(len(sieve[k*k // 3::2*k]))
+            print(((N // 6 - (k*k)//6 - 1)//k +1))
+            sieve[k*k // 3::2*k] = [False] * ((N//6 - (k*k)//6 - 1)//k + 1)
+            sieve[(k*k + 4*k - 2*k*(i%2)) // 3::2*k] = [False] * ((N // 6 - (k*k + 4*k - 2*k*(i%2))//6 - 1) // k + 1)
+    return [2, 3] + [(3 * i + 1) | 1 for i in range(1, N//3 - correction) if sieve[i]]
+    */
+    public function primesbelowtwo($N) {
+        $correction = posmod($N, 6) > 1;
+        $N = [$N, $N - 1, $N + 4, $N + 3, $N + 2, $N + 1][$N%6];
+        $sieve = array_fill(0, floor($N/3), true);
+        $sieve[0] = false;
+        foreach (range(0, floor(floor(pow($N, 0.5)) / 3) + 1) as $i) {
+            if($sieve[$i]) {
+                $k = (3 * $i + 1) | 1;
+                array_walk($sieve, function (&$val, $key, $range) { if(in_array($key, $range)) $val = false; }, pyjslib_range(floor(($k*$k) / 3), count($sieve), 2*$k));
+                array_walk($sieve, function (&$val, $key, $range) { if(in_array($key, $range)) $val = false; }, pyjslib_range(floor((($k*$k) + (4*$k) - (2*$k*posmod($i, 2))) / 3), count($sieve), 2*$k));
+            }
+        }
+        var_dump($sieve);
+    }
     public function primesbelow($N)
     {
         $res = [];
