@@ -146,8 +146,8 @@ class Session:
 
         pq_bytes = ResPQ['pq']
         pq = bytes_to_long(pq_bytes)
-        print(prime.pollard_brent(2118588165281151121))
-        print(prime.primefactors(2118588165281151121))
+        # print(prime.pollard_brent(2118588165281151121))
+        print(prime.primefactors(1724114033281923457))
         exit()
         [p, q] = prime.primefactors(pq)
         if p > q: (p, q) = (q, p)

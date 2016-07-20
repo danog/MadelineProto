@@ -2,45 +2,24 @@
 
 set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
 require_once 'libpy2php.php';
+
+
+
+function big_rand($start, $stop) {
+    $len = $stop - $start;
+    $rand  = null;
+    while( !( isset( $rand[$len-1] ) ) ) {
+        $rand   .= mt_rand( );
+    }
+    return substr( $rand , 0 , $len );
+}
 class PrimeModule
 {
     public function __construct()
     {
         $this->smallprimeset = array_unique($this->primesbelow(100000));
         $this->_smallprimeset = 100000;
-        $this->primesbelowtwo(10000);
         $this->smallprimes = $this->primesbelow(10000);
-    }
-    /*
-def primesbelow(N):
-    # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
-    #""" Input N>=6, Returns a list of primes, 2 <= p < N """
-    correction = N % 6 > 1
-    N = {0:N, 1:N-1, 2:N+4, 3:N+3, 4:N+2, 5:N+1}[N%6]
-    sieve = [True] * (N // 3)
-    sieve[0] = False
-    for i in range(int(N ** .5) // 3 + 1):
-        if sieve[i]:
-            k = (3 * i + 1) | 1
-            print(len(sieve[k*k // 3::2*k]))
-            print(((N // 6 - (k*k)//6 - 1)//k +1))
-            sieve[k*k // 3::2*k] = [False] * ((N//6 - (k*k)//6 - 1)//k + 1)
-            sieve[(k*k + 4*k - 2*k*(i%2)) // 3::2*k] = [False] * ((N // 6 - (k*k + 4*k - 2*k*(i%2))//6 - 1) // k + 1)
-    return [2, 3] + [(3 * i + 1) | 1 for i in range(1, N//3 - correction) if sieve[i]]
-    */
-    public function primesbelowtwo($N) {
-        $correction = posmod($N, 6) > 1;
-        $N = [$N, $N - 1, $N + 4, $N + 3, $N + 2, $N + 1][$N%6];
-        $sieve = array_fill(0, floor($N/3), true);
-        $sieve[0] = false;
-        foreach (range(0, floor(floor(pow($N, 0.5)) / 3) + 1) as $i) {
-            if($sieve[$i]) {
-                $k = (3 * $i + 1) | 1;
-                array_walk($sieve, function (&$val, $key, $range) { if(in_array($key, $range)) $val = false; }, pyjslib_range(floor(($k*$k) / 3), count($sieve), 2*$k));
-                array_walk($sieve, function (&$val, $key, $range) { if(in_array($key, $range)) $val = false; }, pyjslib_range(floor((($k*$k) + (4*$k) - (2*$k*posmod($i, 2))) / 3), count($sieve), 2*$k));
-            }
-        }
-        var_dump($sieve);
     }
     public function primesbelow($N)
     {
@@ -75,23 +54,25 @@ def primesbelow(N):
         $s = 0;
         while (($d % 2) == 0) {
             $d = floor($d / 2);
-            $s += 1;
+            $s++;
         }
+        $break = false;
         foreach (pyjslib_range($precision) as $repeat) {
             $a = rand(2, ($n - 2));
             $x = posmod(pow($a, $d), $n);
             if (($x == 1) || ($x == ($n - 1))) {
                 continue;
             }
-            foreach (pyjslib_range(($s - 1)) as $r) {
+            foreach (pyjslib_range($s - 1) as $r) {
                 $x = posmod(pow($x, 2), $n);
                 if (($x == 1)) {
                     return false;
                 }
                 if (($x == ($n - 1))) {
-                    break;
+                    $break = true;
                 }
             }
+            if(!$break) return false;
         }
 
         return true;
@@ -105,19 +86,20 @@ def primesbelow(N):
         if ((($n % 3) == 0)) {
             return 3;
         }
-        list($y, $c, $m) = [rand(1, ($n - 1)), rand(1, ($n - 1)), rand(1, ($n - 1))];
+        var_dump(big_rand(1, ($n - 1)));
+        list($y, $c, $m) = [big_rand(1, ($n - 1)), big_rand(1, ($n - 1)), big_rand(1, ($n - 1))];
         list($g, $r, $q) = [1, 1, 1];
-        while (($g == 1)) {
+        while ($g == 1) {
             $x = $y;
             foreach (pyjslib_range($r) as $i) {
-                $y = ((posmod(pow($y, 2), $n) + $c) % $n);
+                $y = posmod((posmod(pow($y, 2), $n) + $c), $n);
             }
             $k = 0;
             while (($k < $r) && ($g == 1)) {
                 $ys = $y;
                 foreach (pyjslib_range(min($m, ($r - $k))) as $i) {
-                    $y = ((posmod(pow($y, 2), $n) + $c) % $n);
-                    $q = (($q * abs(($x - $y))) % $n);
+                    $y = posmod((posmod(pow($y, 2), $n) + $c), $n);
+                    $q = posmod(($q * abs($x - $y)), $n);
                 }
                 $g = $this->gcd($q, $n);
                 $k += $m;
@@ -126,9 +108,9 @@ def primesbelow(N):
         }
         if (($g == $n)) {
             while (true) {
-                $ys = ((posmod(pow($ys, 2), $n) + $c) % $n);
-                $g = $this->gcd(abs(($x - $ys)), $n);
-                if (($g > 1)) {
+                $ys = posmod((posmod(pow($ys, 2), $n) + $c), $n);
+                $g = $this->gcd(abs($x - $ys), $n);
+                if ($g > 1) {
                     break;
                 }
             }
@@ -154,10 +136,10 @@ def primesbelow(N):
                 }
             }
         }
-        if (($n < 2)) {
+        if ($n < 2) {
             return $factors;
         }
-        while (($n > 1)) {
+        while ($n > 1) {
             if ($this->isprime($n)) {
                 $factors[] = $n;
                 break;
@@ -211,7 +193,7 @@ def primesbelow(N):
             return $a;
         }
         while (($b > 0)) {
-            list($a, $b) = [$b, ($a % $b)];
+            list($a, $b) = [$b, posmod($a, $b)];
         }
 
         return $a;
