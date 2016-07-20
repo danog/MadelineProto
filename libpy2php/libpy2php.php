@@ -135,8 +135,12 @@ function pyjslib_range($start, $stop = null, $step = 1)
 
         return array_reverse($arr, false);
     }
-    $arr = range($start, $stop, $step);
-    array_pop($arr);
+    if($step > 1 && $step > ($start - $stop)) {
+        $arr = [ $start ];
+    } else {
+        $arr = range($start, $stop, $step);
+        array_pop($arr);
+    }
 
     return $arr;
 }
