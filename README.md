@@ -6,6 +6,6 @@ PHP implementation of MTProto, converted from [telepy](https://github.com/grigan
 
 This is a WIP.
 
-This project requires PHP 7. 
+This project requires PHP 7 and a 64 bit machine. 
 
 The name of this project is inspired by [this person](https://s-media-cache-ak0.pinimg.com/736x/f0/a1/70/f0a170718baeb0e3817c612d96f5d1cf.jpg).

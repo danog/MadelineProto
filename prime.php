@@ -5,14 +5,6 @@ require_once 'libpy2php.php';
 
 
 
-function big_rand($start, $stop) {
-    $len = $stop - $start;
-    $rand  = null;
-    while( !( isset( $rand[$len-1] ) ) ) {
-        $rand   .= mt_rand( );
-    }
-    return substr( $rand , 0 , $len );
-}
 class PrimeModule
 {
     public function __construct()
@@ -86,8 +78,11 @@ class PrimeModule
         if ((($n % 3) == 0)) {
             return 3;
         }
-        var_dump(big_rand(1, ($n - 1)));
-        list($y, $c, $m) = [big_rand(1, ($n - 1)), big_rand(1, ($n - 1)), big_rand(1, ($n - 1))];
+        $big = new \phpseclib\Math\BigInteger();
+        $max = new \phpseclib\Math\BigInteger($n - 1);
+
+        $min = new \phpseclib\Math\BigInteger(1);
+        list($y, $c, $m) = [(int)$big->random($min, $max)->toString(), (int)$big->random($min, $max)->toString(), (int)$big->random($min, $max)->toString()];
         list($g, $r, $q) = [1, 1, 1];
         while ($g == 1) {
             $x = $y;
