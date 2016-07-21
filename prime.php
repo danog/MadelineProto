@@ -117,6 +117,7 @@ class PrimeModule
     public function primefactors($n, $sort = false)
     {
         $factors = [];
+        if($n->compare(PHP_INT_MAX) === -1)
         var_dump((int)$n->toString());
         $limit = ((int) (pow($n, 0.5)) + 1);
         foreach ($this->smallprimes as $checker) {
