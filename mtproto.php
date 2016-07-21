@@ -281,7 +281,9 @@ class Session
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
         $pq = bytes_to_long($pq_bytes);
-        //var_dump($this->PrimeModule->pollard_brent(2118588165281151121));
+        $opq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
+        var_dump($pq, $opq->toString()); die;
+        var_dump($this->PrimeModule->pollard_brent(15));
         var_dump($this->PrimeModule->primefactors(1724114033281923457));
         var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));
         die;
