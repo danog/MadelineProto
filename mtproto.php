@@ -111,15 +111,21 @@ function fopen_and_write($filename, $mode, $data)
 function long_to_bytes($n, $blocksize = 0)
 {
     $s = null;
-    $n = long($n);
-    while (($n > 0)) {
+    $n = (float)$n;
+    while ($n > 0) {
         $s = $GLOBALS['struct']->pack('I', $n & 4294967295).$s;
         $n = $n >> 32;
     }
+    $break = false;
     foreach (pyjslib_range(strlen($s)) as $i) {
-        if (($s[$i] != string2bin('\000')[0])) {
+        if ($s[$i] != string2bin('\000')[0]) {
+            $break = true;
             break;
         }
+    }
+    if(!$break) {
+        $s = string2bin('\000');
+        $i = 0;
     }
     $s = substr($s, $i);
     if ($blocksize > 0 && strlen($s) % $blocksize) {
@@ -135,7 +141,6 @@ function long_to_bytes($n, $blocksize = 0)
  */
 function bytes_to_long($s)
 {
-    //return $GLOBALS["struct"]->unpack('>Q', $s)[0];
     $acc = 0;
     $length = strlen($s);
     if ($length % 4) {
@@ -199,7 +204,8 @@ class Session
      */
     public function send_message($message_data)
     {
-        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+        $message_id = long_to_bytes((int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+        //$message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
 
         if (($this->auth_key == null) || ($this->server_salt == null)) {
             $message = string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
@@ -213,6 +219,7 @@ class Session
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
+        var_dump(newcrc32($step1));
         $step2 = $step1.$this->struct->pack('<I', newcrc32($step1));
         fwrite($this->sock, $step2);
         $this->number += 1;
@@ -263,8 +270,7 @@ class Session
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
-                echo $e->getMessage().PHP_EOL;
-                pyjslib_printnl('Retry call method');
+                echo "An error occurred while calling method " . $method . ": " . $e->getMessage().PHP_EOL."Stack trace:" . $e->getTraceAsString() . PHP_EOL. "Retrying to call method...".PHP_EOL.PHP_EOL;
                 continue;
             }
 
