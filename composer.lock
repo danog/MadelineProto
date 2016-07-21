@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "10a2667e949d27caf8db1d1f80da893c",
-    "content-hash": "ce2989792712ad6054f6a3c9fca3f5b5",
+    "hash": "a75dfba16d66cb4ae9913439bbdb796b",
+    "content-hash": "a6860b86164e69555776b8ab636fcbfb",
     "packages": [
         {
             "name": "danog/phpstruct",
