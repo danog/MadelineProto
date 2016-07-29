@@ -13,6 +13,7 @@ class PrimeModule
         $this->_smallprimeset = 100000;
         $this->smallprimes = $this->primesbelow(10000);
     }
+
     public function primesbelow($N)
     {
         $res = [];
@@ -64,7 +65,9 @@ class PrimeModule
                     $break = true;
                 }
             }
-            if(!$break) return false;
+            if (!$break) {
+                return false;
+            }
         }
 
         return true;
@@ -82,7 +85,7 @@ class PrimeModule
         $max = new \phpseclib\Math\BigInteger($n - 1);
 
         $min = new \phpseclib\Math\BigInteger(1);
-        list($y, $c, $m) = [(int)$big->random($min, $max)->toString(), (int)$big->random($min, $max)->toString(), (int)$big->random($min, $max)->toString()];
+        list($y, $c, $m) = [(int) $big->random($min, $max)->toString(), (int) $big->random($min, $max)->toString(), (int) $big->random($min, $max)->toString()];
         list($g, $r, $q) = [1, 1, 1];
         while ($g == 1) {
             $x = $y;
@@ -117,8 +120,9 @@ class PrimeModule
     public function primefactors($n, $sort = false)
     {
         $factors = [];
-        if($n->compare(PHP_INT_MAX) === -1)
-        var_dump((int)$n->toString());
+        if ($n->compare(PHP_INT_MAX) === -1) {
+            var_dump((int) $n->toString());
+        }
         $limit = ((int) (pow($n, 0.5)) + 1);
         foreach ($this->smallprimes as $checker) {
             if (($checker > $limit)) {

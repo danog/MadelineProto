@@ -111,7 +111,7 @@ function fopen_and_write($filename, $mode, $data)
 function long_to_bytes($n, $blocksize = 0)
 {
     $s = null;
-    $n = (float)$n;
+    $n = (float) $n;
     while ($n > 0) {
         $s = $GLOBALS['struct']->pack('I', $n & 4294967295).$s;
         $n = $n >> 32;
@@ -123,7 +123,7 @@ function long_to_bytes($n, $blocksize = 0)
             break;
         }
     }
-    if(!$break) {
+    if (!$break) {
         $s = string2bin('\000');
         $i = 0;
     }
@@ -270,7 +270,7 @@ class Session
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
-                echo "An error occurred while calling method " . $method . ": " . $e->getMessage().PHP_EOL."Stack trace:" . $e->getTraceAsString() . PHP_EOL. "Retrying to call method...".PHP_EOL.PHP_EOL;
+                echo 'An error occurred while calling method '.$method.': '.$e->getMessage().PHP_EOL.'Stack trace:'.$e->getTraceAsString().PHP_EOL.'Retrying to call method...'.PHP_EOL.PHP_EOL;
                 continue;
             }
 
@@ -288,7 +288,8 @@ class Session
         $pq_bytes = $ResPQ['pq'];
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
 
-        var_dump($this->PrimeModule->primefactors($pq));die;
+        var_dump($this->PrimeModule->primefactors($pq));
+        die;
         var_dump($this->PrimeModule->pollard_brent(15));
         var_dump($this->PrimeModule->primefactors(1724114033281923457));
         var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));
