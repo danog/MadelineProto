@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a75dfba16d66cb4ae9913439bbdb796b",
-    "content-hash": "a6860b86164e69555776b8ab636fcbfb",
+    "hash": "f60c705a31a0dc3e563a1cb78ce2bef9",
+    "content-hash": "018ac32ece19a237770fd6102396f9b3",
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "0.4.2",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
-                "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e"
+                "reference": "ac1d7a0b1eb54d5b10dca553be816c8fb0881e47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/da3d4f5a111823bc5518af054c41f32cce0f221e",
-                "reference": "da3d4f5a111823bc5518af054c41f32cce0f221e",
+                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/ac1d7a0b1eb54d5b10dca553be816c8fb0881e47",
+                "reference": "ac1d7a0b1eb54d5b10dca553be816c8fb0881e47",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-07-15 13:07:47"
+            "time": "2016-07-29 15:13:54"
         },
         {
             "name": "phpseclib/phpseclib",
