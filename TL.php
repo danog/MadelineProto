@@ -68,7 +68,7 @@ class TL
             $this->method_id[$z->id] = $z;
             $this->method_name[$z->method] = $z;
         }
-        $this->struct = new \danog\PHP\Struct();
+        $this->struct = new \danog\PHP\StructClass();
     }
 
     public function serialize_obj($type_, $kwargs)

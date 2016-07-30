@@ -7,7 +7,7 @@ require_once 'crypt.php';
 require_once 'prime.php';
 require_once 'TL.php';
 require_once 'vendor/autoload.php';
-$struct = new \danog\PHP\Struct();
+$struct = new \danog\PHP\StructClass();
 /**
  * Function to get hex crc32
  * :param data: Data to encode.
@@ -101,59 +101,6 @@ function fopen_and_write($filename, $mode, $data)
 
     return $handle;
 }
-/**
- * long_to_bytes(n:long, blocksize:int) : string
- * Convert a long integer to a byte string.
- * If optional blocksize is given and greater than zero, pad the front of the
- * byte string with binary zeros so that the length is a multiple of
- * blocksize.
- */
-function long_to_bytes($n, $blocksize = 0)
-{
-    $s = null;
-    $n = (float) $n;
-    while ($n > 0) {
-        $s = $GLOBALS['struct']->pack('I', $n & 4294967295).$s;
-        $n = $n >> 32;
-    }
-    $break = false;
-    foreach (pyjslib_range(strlen($s)) as $i) {
-        if ($s[$i] != string2bin('\000')[0]) {
-            $break = true;
-            break;
-        }
-    }
-    if (!$break) {
-        $s = string2bin('\000');
-        $i = 0;
-    }
-    $s = substr($s, $i);
-    if ($blocksize > 0 && strlen($s) % $blocksize) {
-        $s = pack('@'.$blocksize - (strlen($s) % $blocksize)).$s;
-    }
-
-    return $s;
-}
-/**
- * bytes_to_long(string) : long
- * Convert a byte string to a long integer.
- * This is (essentially) the inverse of long_to_bytes().
- */
-function bytes_to_long($s)
-{
-    $acc = 0;
-    $length = strlen($s);
-    if ($length % 4) {
-        $extra = (4 - ($length % 4));
-        $s = pack('@'.$extra).$s;
-        $length += $extra;
-    }
-    foreach (pyjslib_range(0, $length, 4) as $i) {
-        $acc = ($acc << 32) + $GLOBALS['struct']->unpack('>I', substr($s, $i, 4))[0];
-    }
-
-    return $acc;
-}
 function string2bin($string)
 {
     $res = null;
@@ -204,8 +151,7 @@ class Session
      */
     public function send_message($message_data)
     {
-        $message_id = long_to_bytes((int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-        //$message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
 
         if (($this->auth_key == null) || ($this->server_salt == null)) {
             $message = string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
@@ -219,7 +165,6 @@ class Session
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
-        var_dump(newcrc32($step1));
         $step2 = $step1.$this->struct->pack('<I', newcrc32($step1));
         fwrite($this->sock, $step2);
         $this->number += 1;
@@ -266,7 +211,6 @@ class Session
     {
         foreach (range(1, $this->MAX_RETRY) as $i) {
             try {
-                //var_dump(py2php_kwargs_function_call('serialize_method', [$method], $kwargs));
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
@@ -287,7 +231,6 @@ class Session
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
-
         var_dump($this->PrimeModule->primefactors($pq));
         die;
         var_dump($this->PrimeModule->pollard_brent(15));
@@ -300,9 +243,9 @@ class Session
         }
         assert((($p * $q) == $pq) && ($p < $q));
         pyjslib_printnl(sprintf('Factorization %d = %d * %d', [$pq, $p, $q]));
-        $p_bytes = long_to_bytes($p);
-        $q_bytes = long_to_bytes($q);
-        $f = pyjslib_open(__DIR__.'/rsa.pub');
+        $p_bytes = $this->struct->pack('>Q', $p);
+        $q_bytes = $this->struct->pack('>Q', $q);
+        $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = RSA::importKey($f->read());
         $new_nonce = random_bytes(32);
         $data = py2php_kwargs_function_call('serialize_obj', ['p_q_inner_data'], ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);

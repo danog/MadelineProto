@@ -120,12 +120,9 @@ class PrimeModule
     public function primefactors($n, $sort = false)
     {
         $factors = [];
-        if ($n->compare(PHP_INT_MAX) === -1) {
-            var_dump((int) $n->toString());
-        }
-        $limit = ((int) (pow($n, 0.5)) + 1);
+        $limit = $n->root()->add(1);
         foreach ($this->smallprimes as $checker) {
-            if (($checker > $limit)) {
+            if (($limit < $checker)) {
                 break;
             }
             while (($n % $checker) == 0) {
