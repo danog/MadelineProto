@@ -146,9 +146,8 @@ class Session:
 
         pq_bytes = ResPQ['pq']
         pq = bytes_to_long(pq_bytes)
-        print(prime.pollard_brent(15))
-        exit()
         print(prime.primefactors(1724114033281923457))
+        exit()
         [p, q] = prime.primefactors(pq)
         if p > q: (p, q) = (q, p)
         assert p*q == pq and p < q

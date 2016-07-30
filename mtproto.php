@@ -230,6 +230,7 @@ class Session
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
+        
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         var_dump($this->PrimeModule->primefactors($pq));
         die;

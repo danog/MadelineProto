@@ -1733,6 +1733,37 @@ class BigInteger
                 break;
         }
     }
+
+    /**
+     * Return the minimum BigInteger between two BigIntegers.
+     *
+     *
+     * @param \phpseclib\Math\BigInteger $a
+     * @param \phpseclib\Math\BigInteger $b
+     * @return \phpseclib\Math\BigInteger
+     * @access public
+     */
+    function min($a, $b) {
+        if($a->compare($b) == "1") {
+            return $b;
+        }
+        return $a;
+    }
+    /**
+     * Return the maximum BigInteger between two BigIntegers.
+     *
+     *
+     * @param \phpseclib\Math\BigInteger $a
+     * @param \phpseclib\Math\BigInteger $b
+     * @return \phpseclib\Math\BigInteger
+     * @access public
+     */
+    function max($a, $b) {
+        if($a->compare($b) == "1") {
+            return $a;
+        }
+        return $b;
+    }
     /**
      * Divides a BigInteger by a regular integer
      *

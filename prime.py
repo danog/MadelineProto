@@ -14,14 +14,7 @@ def primesbelow(N):
             k = (3 * i + 1) | 1
             sieve[k*k // 3::2*k] = [False] * ((N//6 - (k*k)//6 - 1)//k + 1)
             sieve[(k*k + 4*k - 2*k*(i%2)) // 3::2*k] = [False] * ((N // 6 - (k*k + 4*k - 2*k*(i%2))//6 - 1) // k + 1)
-    result = []
-    
-    for i in range(1, N//3 - correction):
-        if sieve[i]:
-            result.append((3 * i + 1) | 1)
-    return [2, 3] + result
-
-smallprimes = primesbelow(10000) # might seem low, but 1000*1000 = 1000000, so this will fully factor every composite < 1000000
+    return [2, 3] + [(3 * i + 1) | 1 for i in range(1, N//3 - correction) if sieve[i]]
 
 smallprimeset = set(primesbelow(100000))
 _smallprimeset = 100000
@@ -47,12 +40,12 @@ def isprime(n, precision=7):
         x = pow(a, d, n)
 
         if x == 1 or x == n - 1: continue
+
         for r in range(s - 1):
             x = pow(x, 2, n)
             if x == 1: return False
             if x == n - 1: break
-        else: 
-            return False
+        else: return False
 
     return True
 
@@ -61,19 +54,24 @@ def pollard_brent(n):
     if n % 2 == 0: return 2
     if n % 3 == 0: return 3
 
-    y, c, m = random.randint(1, n-1), random.randint(1, n-1), random.randint(1, n-1)
+    y, c, m = 87552211475113995, 330422027228888537, 226866727920975483
+    #random.randint(1, n-1), random.randint(1, n-1), random.randint(1, n-1)
+
     g, r, q = 1, 1, 1
     while g == 1:
         x = y
         for i in range(r):
             y = (pow(y, 2, n) + c) % n
+            print(y)
 
         k = 0
         while k < r and g==1:
             ys = y
+            print(min(m, r-k))
             for i in range(min(m, r-k)):
                 y = (pow(y, 2, n) + c) % n
                 q = q * abs(x-y) % n
+            exit()
             g = gcd(q, n)
             k += m
         r *= 2
@@ -86,7 +84,7 @@ def pollard_brent(n):
 
     return g
 
-
+smallprimes = primesbelow(10000) # might seem low, but 1000*1000 = 1000000, so this will fully factor every composite < 1000000
 def primefactors(n, sort=False):
     factors = []
 
@@ -100,15 +98,17 @@ def primefactors(n, sort=False):
             if checker > limit: break
 
     if n < 2: return factors
+
     while n > 1:
         if isprime(n):
             factors.append(n)
             break
-        print(pollard_brent(n))
         factor = pollard_brent(n) # trial division did not fully factor, switch to pollard-brent
         factors.extend(primefactors(factor)) # recurse to factor the not necessarily prime factor returned by pollard-brent
         n //= factor
+
     if sort: factors.sort()
+
     return factors
 
 def factorization(n):

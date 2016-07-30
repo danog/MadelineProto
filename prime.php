@@ -75,40 +75,47 @@ class PrimeModule
 
     public function pollard_brent($n)
     {
-        if ((($n % 2) == 0)) {
+        $zero = new \phpseclib\Math\BigInteger(0);
+        $one = new \phpseclib\Math\BigInteger(1);
+        $two = new \phpseclib\Math\BigInteger(2);
+        $three = new \phpseclib\Math\BigInteger(3);
+        if ($n->powMod($one, $two)->toString() == "0") {
             return 2;
         }
-        if ((($n % 3) == 0)) {
+        if ($n->powMod($one, $three)->toString() == "0") {
             return 3;
         }
         $big = new \phpseclib\Math\BigInteger();
-        $max = new \phpseclib\Math\BigInteger($n - 1);
-
-        $min = new \phpseclib\Math\BigInteger(1);
-        list($y, $c, $m) = [(int) $big->random($min, $max)->toString(), (int) $big->random($min, $max)->toString(), (int) $big->random($min, $max)->toString()];
-        list($g, $r, $q) = [1, 1, 1];
-        while ($g == 1) {
+        $max = $n->subtract($one);
+        list($y, $c, $m) = [new \phpseclib\Math\BigInteger(87552211475113995), new \phpseclib\Math\BigInteger(330422027228888537), new \phpseclib\Math\BigInteger(226866727920975483)];
+        //[$big->random($one, $max), $big->random($one, $max), $big->random($one, $max)];
+        list($g, $r, $q) = [$one, $one, $one];
+        while ($g->equals($one)) {
             $x = $y;
-            foreach (pyjslib_range($r) as $i) {
-                $y = posmod((posmod(pow($y, 2), $n) + $c), $n);
+            $range = $r;
+            while (!$range->equals($zero)) {
+                $y = $y->powMod($two, $n)->add($c)->powMod($one, $n);
+                $range = $range->subtract($one);
             }
-            $k = 0;
-            while (($k < $r) && ($g == 1)) {
+            $k = $zero;
+            while ($k->compare($r) == -1 && $g->equals($one)) {
                 $ys = $y;
-                foreach (pyjslib_range(min($m, ($r - $k))) as $i) {
-                    $y = posmod((posmod(pow($y, 2), $n) + $c), $n);
-                    $q = posmod(($q * abs($x - $y)), $n);
+                $range = $big->min($m, $r->subtract($k));
+                while (!$range->equals($zero)) {
+                    $y = $y->powMod($two, $n)->add($c)->powMod($one, $n);
+                    $q = $q->multiply($x->subtract($y)->abs())->powMod($one, $n);
+                    $range = $range->subtract($one);
                 }
-                $g = $this->gcd($q, $n);
-                $k += $m;
+                $g = $q->gcd($n);
+                $k = $k->add($m);
             }
-            $r *= 2;
+            $r = $r->multiply($two);
         }
-        if (($g == $n)) {
+        if ($g->equals($n)) {
             while (true) {
-                $ys = posmod((posmod(pow($ys, 2), $n) + $c), $n);
-                $g = $this->gcd(abs($x - $ys), $n);
-                if ($g > 1) {
+                $ys = $ys->powMod($two, $n)->add($c)->powMod($one, $n);
+                $g = $x->subtract($ys)->abs()->gcd($n);
+                if ($g->compare($one) == 1) {
                     break;
                 }
             }
@@ -120,25 +127,29 @@ class PrimeModule
     public function primefactors($n, $sort = false)
     {
         $factors = [];
-        $limit = $n->root()->add(1);
+        $n = new \phpseclib\Math\BigInteger(1724114033281923457);
+        $one = new \phpseclib\Math\BigInteger(1);
+        $two = new \phpseclib\Math\BigInteger(2);
+        $limit = $n->root()->add($one);
         foreach ($this->smallprimes as $checker) {
-            if (($limit < $checker)) {
+            $checker = new \phpseclib\Math\BigInteger($checker);
+            if ($limit->compare($checker) == -1) {
                 break;
             }
-            while (($n % $checker) == 0) {
+            while ($n->modPow($one, $checker)->toString() == "0") {
                 $factors[] = $checker;
-                $n = floor($n / $checker);
-                $limit = ((int) (pow($n, 0.5)) + 1);
-                if (($checker > $limit)) {
+                $n = $n->divide($checker)[0];
+                $limit = $n->root()->add($one);
+                if ($limit->compare($checker) == -1) {
                     break;
                 }
             }
         }
-        if ($n < 2) {
+        if ($n->compare($two) == -1) {
             return $factors;
         }
-        while ($n > 1) {
-            if ($this->isprime($n)) {
+        while ($n->compare($two) == 1) {
+            if ($n->isprime()) {
                 $factors[] = $n;
                 break;
             }
