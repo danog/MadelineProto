@@ -79,10 +79,10 @@ class PrimeModule
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $three = new \phpseclib\Math\BigInteger(3);
-        if ($n->powMod($one, $two)->toString() == "0") {
+        if ($n->powMod($one, $two)->toString() == '0') {
             return 2;
         }
-        if ($n->powMod($one, $three)->toString() == "0") {
+        if ($n->powMod($one, $three)->toString() == '0') {
             return 3;
         }
         $big = new \phpseclib\Math\BigInteger();
@@ -136,7 +136,7 @@ class PrimeModule
             if ($limit->compare($checker) == -1) {
                 break;
             }
-            while ($n->modPow($one, $checker)->toString() == "0") {
+            while ($n->modPow($one, $checker)->toString() == '0') {
                 $factors[] = $checker;
                 $n = $n->divide($checker)[0];
                 $limit = $n->root()->add($one);
