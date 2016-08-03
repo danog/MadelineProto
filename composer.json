@@ -4,7 +4,9 @@
     "type": "project",
     "require": {
         "danog/phpstruct": "^1.1",
-        "phpseclib/phpseclib": "^2.0"
+        "phpseclib/phpseclib": "^2.0",
+        "paragonie/constant_time_encoding": "^2.0",
+        "paragonie/random_compat": "^2.0"
     },
     "license": "MIT",
     "authors": [

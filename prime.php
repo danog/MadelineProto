@@ -93,24 +93,25 @@ class PrimeModule
         while ($g->equals($one)) {
             $x = $y;
             $params = ["y" => $y, "two" => $two, "c" => $c, "one" => $one, "n" => $n];
-            $r->foreach(function ($i, $params) {
+            $r->loopforeach(function ($i, $params) {
                 $params["y"] = $params["y"]->powMod($params["two"], $params["n"])->add($params["c"])->powMod($params["one"], $params["n"]);
             }, $params);
-            each($params, EXTR_OVERWRITE);
+            each($params);
             $k = $zero;
             while ($k->compare($r) == -1 && $g->equals($one)) {
                 $ys = $y;
                 $params = ["x" => $x, "y" => $y, "two" => $two, "c" => $c, "one" => $one, "n" => $n, "q" => $q];
-                $m->min($r->subtract($k))->foreach(function ($i, $params) {
+                $m->min($r->subtract($k))->loopforeach(function ($i, $params) {
                     $params["y"] = $params["y"]->powMod($params["two"], $params["n"])->add($params["c"])->powMod($params["one"], $params["n"]);
                     $params["q"] = $params["q"]->multiply($params["x"]->subtract($params["y"])->abs())->powMod($params["one"], $params["n"]);
                 }, $params);
-                each($params, EXTR_OVERWRITE);
+                each($params);
                 $g = $q->gcd($n);
                 $k = $k->add($m);
             }
             $r = $r->multiply($two);
         }
+        die;
         if ($g->equals($n)) {
             while (true) {
                 $ys = $ys->powMod($two, $n)->add($c)->powMod($one, $n);

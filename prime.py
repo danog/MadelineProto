@@ -67,7 +67,6 @@ def pollard_brent(n):
         k = 0
         while k < r and g==1:
             ys = y
-            print(min(m, r-k))
             for i in range(min(m, r-k)):
                 y = (pow(y, 2, n) + c) % n
                 q = q * abs(x-y) % n
