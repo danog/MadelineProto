@@ -62,7 +62,7 @@ def pollard_brent(n):
         x = y
         for i in range(r):
             y = (pow(y, 2, n) + c) % n
-            print(y)
+            print(i)
 
         k = 0
         while k < r and g==1:
@@ -71,7 +71,7 @@ def pollard_brent(n):
             for i in range(min(m, r-k)):
                 y = (pow(y, 2, n) + c) % n
                 q = q * abs(x-y) % n
-            exit()
+
             g = gcd(q, n)
             k += m
         r *= 2
