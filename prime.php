@@ -92,18 +92,18 @@ class PrimeModule
         list($g, $r, $q) = [$one, $one, $one];
         while ($g->equals($one)) {
             $x = $y;
-            $params = ["y" => $y, "two" => $two, "c" => $c, "one" => $one, "n" => $n];
+            $params = ['y' => $y, 'two' => $two, 'c' => $c, 'one' => $one, 'n' => $n];
             $r->loopforeach(function ($i, $params) {
-                $params["y"] = $params["y"]->powMod($params["two"], $params["n"])->add($params["c"])->powMod($params["one"], $params["n"]);
+                $params['y'] = $params['y']->powMod($params['two'], $params['n'])->add($params['c'])->powMod($params['one'], $params['n']);
             }, $params);
             each($params);
             $k = $zero;
             while ($k->compare($r) == -1 && $g->equals($one)) {
                 $ys = $y;
-                $params = ["x" => $x, "y" => $y, "two" => $two, "c" => $c, "one" => $one, "n" => $n, "q" => $q];
+                $params = ['x' => $x, 'y' => $y, 'two' => $two, 'c' => $c, 'one' => $one, 'n' => $n, 'q' => $q];
                 $m->min($r->subtract($k))->loopforeach(function ($i, $params) {
-                    $params["y"] = $params["y"]->powMod($params["two"], $params["n"])->add($params["c"])->powMod($params["one"], $params["n"]);
-                    $params["q"] = $params["q"]->multiply($params["x"]->subtract($params["y"])->abs())->powMod($params["one"], $params["n"]);
+                    $params['y'] = $params['y']->powMod($params['two'], $params['n'])->add($params['c'])->powMod($params['one'], $params['n']);
+                    $params['q'] = $params['q']->multiply($params['x']->subtract($params['y'])->abs())->powMod($params['one'], $params['n']);
                 }, $params);
                 each($params);
                 $g = $q->gcd($n);
