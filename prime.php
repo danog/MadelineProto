@@ -73,52 +73,54 @@ class PrimeModule
         return true;
     }
     // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
-    public function factorization($num) {
+    public function factorization($pq) {
         $zero = new \phpseclib\Math\BigInteger(0);
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $three = new \phpseclib\Math\BigInteger(3);
 
-        $prime = new \phpseclib\Math\BigInteger();
-
-        for ($i = 0; $i < 3; $i++) {
-            $q = new \phpseclib\Math\BigInteger((random_int(0, 128) & 15) + 17);
-            $x = new \phpseclib\Math\BigInteger(random_int(0, 1000000000) + 1);
-            $y = $x;
-            $lim = 1 << ($i + 18);
-            for ($j = 1; $j < $lim; $j++) {
-                $a = $x;
-                $b = $x;
-                $c = $q;
-                while (!$b->equals($zero)) {
-                    if (b.repr[0] & 1) {
-                        c.addEquals(a);
-                        if (c.gt(num)) {
-                            c = c.subtract(num);
+        $p = new \phpseclib\Math\BigInteger();
+        $q = new \phpseclib\Math\BigInteger();
+	while (!$pq->equals($p->multiply($q))) {
+            for ($i = 0; $i < 3; $i++) {
+                $q = new \phpseclib\Math\BigInteger((random_int(0, 128) & 15) + 17);
+                $x = new \phpseclib\Math\BigInteger(random_int(0, 1000000000) + 1);
+                $y = $x;
+                $lim = 1 << ($i + 18);
+                for ($j = 1; $j < $lim; $j++) {
+                    $a = $x;
+                    $b = $x;
+                    $c = $q;
+                    while (!$b->equals($zero)) {
+                        if ($b->powMod($one, $two)->equals($zero)) {
+                           $c = $c->add($a);
+                           if ($c->compare($pq) > 0) {
+                                $c = $c->subtract($pq);
+                           }
                         }
+                        $a = $a->add($a);
+                        if ($a->compare($pq) > 0) {
+                            $a = $a->subtract($pq);
+                        }
+                        $b = $b->rightShift(1);
                     }
-                    a.addEquals(a);
-                    if (a.gt(num)) {
-                        a = a.subtract(num);
+                    $x = $c;
+                    $z = ($y->compare($x) > 0) ? $y->subtract($x) : $x->subtract($y);
+                    $p = $z->gcd($pq);
+                    if (!$p->equals($one)) {
+                       break;
                     }
-                    b = b.shiftRight(1);
+                    if (($j & ($j - 1)) === 0) {
+                        $y = $x;
+                    }
                 }
-                $x = $c;
-                $z = $y.gt(x) ? y.subtract(x) : x.subtract(y);
-                $prime = z.gcd(num, a, b);
-                if (!prime.eql(BigInteger.One())) {
+                if (prime.gt(BigInteger.One())) {
                     break;
                 }
-                if ((j & (j - 1)) === 0) {
-                    $y = $x;
-                }
             }
-            if (prime.gt(BigInteger.One())) {
-                break;
-            }
+            $q = $pq->divide(prime)[0];
         }
-        $cofactor = num.divide(prime)[0];
-        $_pq = cofactor.gt(prime) ? [prime, cofactor] : [cofactor, prime];
+        $_pq = ($q->compare($p) > 0) ? [$p, $q] : [$q, $p];
         return _$pq;
     }
     public function pollard_brent($n)
@@ -177,6 +179,7 @@ class PrimeModule
     {
         $factors = [];
         $n = new \phpseclib\Math\BigInteger(1724114033281923457);
+var_dump($this->factorization($n));
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $limit = $n->root()->add($one);
