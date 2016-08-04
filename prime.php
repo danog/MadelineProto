@@ -73,7 +73,7 @@ class PrimeModule
         return true;
     }
     // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
-    public function factorization($pq) {
+    public function getpq($pq) {
         $zero = new \phpseclib\Math\BigInteger(0);
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
@@ -121,7 +121,7 @@ class PrimeModule
             $q = $pq->divide(prime)[0];
         }
         $_pq = ($q->compare($p) > 0) ? [$p, $q] : [$q, $p];
-        return _$pq;
+        return $_pq;
     }
     public function pollard_brent($n)
     {
@@ -179,7 +179,7 @@ class PrimeModule
     {
         $factors = [];
         $n = new \phpseclib\Math\BigInteger(1724114033281923457);
-var_dump($this->factorization($n));
+var_dump($this->getpq($n));
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $limit = $n->root()->add($one);
