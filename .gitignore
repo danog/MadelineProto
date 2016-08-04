@@ -56,10 +56,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# testing apps
-credentials
-rsa.pub
-
 # emacs auto-saving files
 \#*#
 .#*#
