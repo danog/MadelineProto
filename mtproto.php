@@ -19,6 +19,7 @@ function newcrc32($data)
 
 /**
  * Function to dump the hex version of a string.
+ *
  * @param $what What to dump.
  */
 function hex_dump(...$what)

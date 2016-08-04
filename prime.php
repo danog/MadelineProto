@@ -72,8 +72,10 @@ class PrimeModule
 
         return true;
     }
+
     // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
-    public function getpq($pq) {
+    public function getpq($pq)
+    {
         $zero = new \phpseclib\Math\BigInteger(0);
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
@@ -81,7 +83,7 @@ class PrimeModule
 
         $p = new \phpseclib\Math\BigInteger();
         $q = new \phpseclib\Math\BigInteger();
-	while (!$pq->equals($p->multiply($q))) {
+        while (!$pq->equals($p->multiply($q))) {
             for ($i = 0; $i < 3; $i++) {
                 $q = new \phpseclib\Math\BigInteger((random_int(0, 128) & 15) + 17);
                 $x = new \phpseclib\Math\BigInteger(random_int(0, 1000000000) + 1);
@@ -93,10 +95,10 @@ class PrimeModule
                     $c = $q;
                     while (!$b->equals($zero)) {
                         if ($b->powMod($one, $two)->equals($zero)) {
-                           $c = $c->add($a);
-                           if ($c->compare($pq) > 0) {
+                            $c = $c->add($a);
+                            if ($c->compare($pq) > 0) {
                                 $c = $c->subtract($pq);
-                           }
+                            }
                         }
                         $a = $a->add($a);
                         if ($a->compare($pq) > 0) {
@@ -108,7 +110,7 @@ class PrimeModule
                     $z = ($y->compare($x) > 0) ? $y->subtract($x) : $x->subtract($y);
                     $p = $z->gcd($pq);
                     if (!$p->equals($one)) {
-                       break;
+                        break;
                     }
                     if (($j & ($j - 1)) === 0) {
                         $y = $x;
@@ -121,8 +123,10 @@ class PrimeModule
             $q = $pq->divide(prime)[0];
         }
         $_pq = ($q->compare($p) > 0) ? [$p, $q] : [$q, $p];
+
         return $_pq;
     }
+
     public function pollard_brent($n)
     {
         $zero = new \phpseclib\Math\BigInteger(0);
@@ -179,7 +183,7 @@ class PrimeModule
     {
         $factors = [];
         $n = new \phpseclib\Math\BigInteger(1724114033281923457);
-var_dump($this->getpq($n));
+        var_dump($this->getpq($n));
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $limit = $n->root()->add($one);
@@ -264,5 +268,4 @@ var_dump($this->getpq($n));
     {
         return floor(abs(($a * $b)) / $this->gcd($a, $b));
     }
-
 }
