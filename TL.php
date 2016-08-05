@@ -107,12 +107,12 @@ class TL
     {
         switch ($type_) {
             case 'int':
-                assert(is_int($value));
+                assert(is_numeric($value));
                 assert(strlen(decbin($value)) <= 32);
                 fwrite($bytes_io, $this->struct->pack('<i', $value));
                 break;
             case 'long':
-                assert(is_int($value));
+                assert(is_numeric($value));
                 fwrite($bytes_io, $this->struct->pack('<q', $value));
                 break;
             case 'int128':
@@ -122,8 +122,8 @@ class TL
                 break;
             case 'string':
             case 'bytes':
-                $l = len($value);
-                if (($l < 254)) {
+                $l = strlen($value);
+                if ($l < 254) {
                     fwrite($bytes_io, $this->struct->pack('<b', $l));
                     fwrite($bytes_io, $value);
                     fwrite($bytes_io, pack('@'.posmod((-$l - 1), 4)));
@@ -168,7 +168,7 @@ class TL
             case 'bytes':
                 $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
                 assert($l <= 254);
-                if (($l == 254)) {
+                if ($l == 254) {
                     $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
                     $x = fread($bytes_io, $long_len);
                     fread($bytes_io, posmod(-$long_len, 4));
@@ -210,7 +210,6 @@ class TL
                 }
                 break;
         }
-
         return $x;
     }
 }
