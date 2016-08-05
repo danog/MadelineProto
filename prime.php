@@ -72,6 +72,7 @@ class PrimeModule
 
         return true;
     }
+
     // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
     public function getpq($pq)
     {
@@ -175,37 +176,41 @@ class PrimeModule
 
     public function primefactors($pq, $sort = false)
     {
-        if(function_exists('shell_exec')) {
+        if (function_exists('shell_exec')) {
             // Use the python version.
-            $res = explode(" ", shell_exec("python getpq.py " . $pq));
-            if(count($res) == 2) return $res;
+            $res = explode(' ', shell_exec('python getpq.py '.$pq));
+            if (count($res) == 2) {
+                return $res;
+            }
         }
         // Else do factorization with wolfram alpha :)))))
-        $query = "Do prime factorization of " . $pq;
+        $query = 'Do prime factorization of '.$pq;
         $params = [
-            "async" => true,
-            "banners" => "raw",
-            "debuggingdata" => false,
-            "format" => "moutput",
-            "formattimeout" => 8,
-            "input" => $query,
-            "output" => "JSON",
-            "proxycode" => json_decode(file_get_contents("http://www.wolframalpha.com/api/v1/code"), true)["code"]   
+            'async'         => true,
+            'banners'       => 'raw',
+            'debuggingdata' => false,
+            'format'        => 'moutput',
+            'formattimeout' => 8,
+            'input'         => $query,
+            'output'        => 'JSON',
+            'proxycode'     => json_decode(file_get_contents('http://www.wolframalpha.com/api/v1/code'), true)['code'],
         ];
-        $url = "https://www.wolframalpha.com/input/json.jsp?" . http_build_query($params);
+        $url = 'https://www.wolframalpha.com/input/json.jsp?'.http_build_query($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Referer: https://www.wolframalpha.com/input/?i=".urlencode($query)));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Referer: https://www.wolframalpha.com/input/?i='.urlencode($query)]);
         curl_setopt($ch, CURLOPT_URL, $url);
-        $res = json_decode(curl_exec ($ch), true);
+        $res = json_decode(curl_exec($ch), true);
         curl_close($ch);
-        foreach($res["queryresult"]["pods"] as $cur) {
-            if($cur["id"] == "Divisors") {
-                $res = explode(", ", preg_replace(array("/{\d+, /", "/, \d+}$/"), "", $cur["subpods"][0]["moutput"]));
+        foreach ($res['queryresult']['pods'] as $cur) {
+            if ($cur['id'] == 'Divisors') {
+                $res = explode(', ', preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
                 break;
             }
         }
-        if(count($res) == 2) return $res;
+        if (count($res) == 2) {
+            return $res;
+        }
 
 
         $factors = [];
