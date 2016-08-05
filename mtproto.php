@@ -126,7 +126,7 @@ class Session
         }
         $this->number = 0;
         $this->timedelta = 0;
-        $this->session_id = random_bytes(8);
+        $this->session_id = \phpseclib\Crypt\Random::string(8);
         $this->auth_key = $auth_key;
         $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
         stream_set_timeout($this->sock, 5);
@@ -160,7 +160,7 @@ class Session
             $encrypted_data =
                 $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = random_bytes(posmod(-strlen($encrypted_data), 16));
+            $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
             echo strlen($encrypted_data.$padding).PHP_EOL;
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
@@ -225,7 +225,7 @@ class Session
 
     public function create_auth_key()
     {
-        $nonce = random_bytes(16);
+        $nonce = \phpseclib\Crypt\Random::string(16);
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
@@ -233,28 +233,25 @@ class Session
         $pq_bytes = $ResPQ['pq'];
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
-        var_dump($this->PrimeModule->primefactors($pq));
-        die;
-        var_dump($this->PrimeModule->pollard_brent(15));
-        var_dump($this->PrimeModule->primefactors(1724114033281923457));
-        var_dump($this->PrimeModule->primefactors(378221), $this->PrimeModule->primefactors(15));
-        die;
         list($p, $q) = $this->PrimeModule->primefactors($pq);
-        if ($p > $q) {
+        $p = new \phpseclib\Math\BigInteger($p);
+        $q = new \phpseclib\Math\BigInteger($q);
+        if ($p->compare($q) > 0) {
             list($p, $q) = [$q, $p];
         }
-        assert((($p * $q) == $pq) && ($p < $q));
-        pyjslib_printnl(sprintf('Factorization %d = %d * %d', [$pq, $p, $q]));
-        $p_bytes = $this->struct->pack('>Q', $p);
-        $q_bytes = $this->struct->pack('>Q', $q);
+        assert(($pq->equals($p->multiply($q))) && ($p < $q));
+        pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
+        $p_bytes = $this->struct->pack('>Q', (string)$p);
+        $q_bytes = $this->struct->pack('>Q', (string)$q);
         $f = file_get_contents(__DIR__.'/rsa.pub');
-        $key = RSA::importKey($f->read());
-        $new_nonce = random_bytes(32);
-        $data = py2php_kwargs_function_call('serialize_obj', ['p_q_inner_data'], ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
-        $sha_digest = sha($data, true);
-        $random_bytes = random_bytes(((255 - strlen($data)) - strlen($sha_digest)));
-        $to_encrypt = (($sha_digest + $data) + $random_bytes);
-        $encrypted_data = $key->encrypt($to_encrypt, 0) [0];
+        $key = new \phpseclib\Crypt\RSA();
+        $key->load($f);
+        $new_nonce = \phpseclib\Crypt\Random::string(32);
+        $data = $this->tl->serialize_obj("p_q_inner_data", ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
+        $sha_digest = sha1($data, true);
+        $random_bytes = \phpseclib\Crypt\Random::string(((255 - strlen($data)) - strlen($sha_digest)));
+        $to_encrypt = $sha_digest . $data . $random_bytes;
+        $encrypted_data = $key->_raw_encrypt($to_encrypt);
         pyjslib_printnl('Starting Diffie Hellman key exchange');
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
         assert(($nonce == $server_dh_params['nonce']));
@@ -278,13 +275,13 @@ class Session
         $g_a = new bytes_to_long($g_a_str);
         assert($this->PrimeModule->isprime($dh_prime));
         $retry_id = 0;
-        $b_str = random_bytes(256);
+        $b_str = \phpseclib\Crypt\Random::string(256);
         $b = new bytes_to_long($b_str);
         $g_b = pow($g, $b, $dh_prime);
         $g_b_str = new long_to_bytes($g_b);
         $data = py2php_kwargs_function_call('serialize_obj', ['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = (sha1($data, true) + $data);
-        $data_with_sha_padded = ($data_with_sha + random_bytes(posmod(-strlen($data_with_sha), 16)));
+        $data_with_sha_padded = ($data_with_sha + \phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16)));
         $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);

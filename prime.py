@@ -62,7 +62,6 @@ def pollard_brent(n):
         x = y
         for i in range(r):
             y = (pow(y, 2, n) + c) % n
-            print(i)
 
         k = 0
         while k < r and g==1:

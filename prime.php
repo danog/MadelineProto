@@ -72,18 +72,12 @@ class PrimeModule
 
         return true;
     }
-
     // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
     public function getpq($pq)
     {
-        $zero = new \phpseclib\Math\BigInteger(0);
-        $one = new \phpseclib\Math\BigInteger(1);
-        $two = new \phpseclib\Math\BigInteger(2);
-        $three = new \phpseclib\Math\BigInteger(3);
-
-        $p = new \phpseclib\Math\BigInteger();
-        $q = new \phpseclib\Math\BigInteger();
-        while (!$pq->equals($p->multiply($q))) {
+        $p = 0;
+        $q = 0;
+        while ($pq != $p * $q && $p != 0) {
             for ($i = 0; $i < 3; $i++) {
                 $q = new \phpseclib\Math\BigInteger((random_int(0, 128) & 15) + 17);
                 $x = new \phpseclib\Math\BigInteger(random_int(0, 1000000000) + 1);
@@ -179,11 +173,42 @@ class PrimeModule
         return $g;
     }
 
-    public function primefactors($n, $sort = false)
+    public function primefactors($pq, $sort = false)
     {
+        if(function_exists('shell_exec')) {
+            // Use the python version.
+            $res = explode(" ", shell_exec("python getpq.py " . $pq));
+            if(count($res) == 2) return $res;
+        }
+        // Else do factorization with wolfram alpha :)))))
+        $query = "Do prime factorization of " . $pq;
+        $params = [
+            "async" => true,
+            "banners" => "raw",
+            "debuggingdata" => false,
+            "format" => "moutput",
+            "formattimeout" => 8,
+            "input" => $query,
+            "output" => "JSON",
+            "proxycode" => json_decode(file_get_contents("http://www.wolframalpha.com/api/v1/code"), true)["code"]   
+        ];
+        $url = "https://www.wolframalpha.com/input/json.jsp?" . http_build_query($params);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Referer: https://www.wolframalpha.com/input/?i=".urlencode($query)));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $res = json_decode(curl_exec ($ch), true);
+        curl_close($ch);
+        foreach($res["queryresult"]["pods"] as $cur) {
+            if($cur["id"] == "Divisors") {
+                $res = explode(", ", preg_replace(array("/{\d+, /", "/, \d+}$/"), "", $cur["subpods"][0]["moutput"]));
+                break;
+            }
+        }
+        if(count($res) == 2) return $res;
+
+
         $factors = [];
-        $n = new \phpseclib\Math\BigInteger(1724114033281923457);
-        var_dump($this->getpq($n));
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
         $limit = $n->root()->add($one);
