@@ -6,6 +6,7 @@ Created on Tue Sep  2 19:26:15 2014
 @author: Sammy Pfeiffer
 """
 from binascii import crc32 as originalcrc32
+from binascii import hexlify
 from time import time
 import io
 import os.path
@@ -125,6 +126,7 @@ class Session:
         return data
 
     def method_call(self, method, **kwargs):
+        #print(kwargs)
         for i in range(1, self.MAX_RETRY):
             try:
                 self.send_message(TL.serialize_method(method, **kwargs))
@@ -169,7 +171,6 @@ class Session:
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
         to_encrypt = sha_digest + data + random_bytes
         encrypted_data = key.encrypt(to_encrypt, 0)[0]
-
         print("Starting Diffie Hellman key exchange")
         server_dh_params = self.method_call('req_DH_params',
                                             nonce=nonce,

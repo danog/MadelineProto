@@ -187,6 +187,7 @@ class Session
         }
         $x = $this->struct->unpack('<I', substr($packet, 0, 4));
         $auth_key_id = substr($packet, 4, 8);
+        hex_dump($packet);
         if ($auth_key_id == string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
             $data = substr($packet, 24, (24 + $message_length) - 24);
@@ -210,6 +211,7 @@ class Session
 
     public function method_call($method, $kwargs)
     {
+        //var_dump($kwargs);
         foreach (range(1, $this->MAX_RETRY) as $i) {
             try {
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
@@ -230,6 +232,7 @@ class Session
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
+        var_dump($public_key_fingerprint);
         $pq_bytes = $ResPQ['pq'];
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
@@ -273,7 +276,7 @@ class Session
         pyjslib_printnl(sprintf('Server-client time delta = %.1f s', $this->timedelta));
         $dh_prime = $this->struct->unpack('>Q', $dh_prime_str);
         $g_a = $this->struct->unpack('>Q', $g_a_str);
-        assert($this->PrimeModule->isPrime($dh_prime));
+        assert($this->PrimeModule->isprime($dh_prime));
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
         $b = $this->struct->unpack('>Q', $b_str);
