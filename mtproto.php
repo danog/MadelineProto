@@ -254,60 +254,60 @@ class Session
         $encrypted_data = $key->_raw_encrypt($to_encrypt);
         pyjslib_printnl('Starting Diffie Hellman key exchange');
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
-        assert(($nonce == $server_dh_params['nonce']));
-        assert(($server_nonce == $server_dh_params['server_nonce']));
+        assert($nonce == $server_dh_params['nonce']);
+        assert($server_nonce == $server_dh_params['server_nonce']);
         $encrypted_answer = $server_dh_params['encrypted_answer'];
-        $tmp_aes_key = (sha1(($new_nonce + $server_nonce), true) + array_slice(sha1(($server_nonce + $new_nonce), true), 0, 12 - 0));
-        $tmp_aes_iv = ((array_slice(sha1(($server_nonce + $new_nonce), true), 12, 20 - 12) + sha1(($new_nonce + $new_nonce), true)) + array_slice($new_nonce, 0, 4 - 0));
+        $tmp_aes_key = sha1($new_nonce . $server_nonce, true) . substr(sha1($server_nonce . $new_nonce, true), 0, 12);
+        $tmp_aes_iv = substr(sha1($server_nonce . $new_nonce, true), 12, 8) . sha1($new_nonce . $new_nonce, true) . substr($new_nonce, 0, 4);
         $answer_with_hash = crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
-        $answer_hash = array_slice($answer_with_hash, 0, 20);
-        $answer = array_slice($answer_with_hash, 20);
-        $server_DH_inner_data = deserialize(io::BytesIO($answer));
-        assert(($nonce == $server_DH_inner_data['nonce']));
-        assert(($server_nonce == $server_DH_inner_data['server_nonce']));
+        $answer_hash = substr($answer_with_hash, 0, 20);
+        $answer = substr($answer_with_hash, 20);
+        $server_DH_inner_data = deserialize(fopen_and_write('php://memory', 'rw+b', $answer));
+        assert($nonce == $server_DH_inner_data['nonce']);
+        assert($server_nonce == $server_DH_inner_data['server_nonce']);
         $dh_prime_str = $server_DH_inner_data['dh_prime'];
         $g = $server_DH_inner_data['g'];
         $g_a_str = $server_DH_inner_data['g_a'];
         $server_time = $server_DH_inner_data['server_time'];
         $this->timedelta = ($server_time - time());
         pyjslib_printnl(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-        $dh_prime = new bytes_to_long($dh_prime_str);
-        $g_a = new bytes_to_long($g_a_str);
-        assert($this->PrimeModule->isprime($dh_prime));
+        $dh_prime = $this->struct->unpack(">Q", $dh_prime_str);
+        $g_a = $this->struct->unpack(">Q", $g_a_str);
+        assert($this->PrimeModule->isPrime($dh_prime));
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
-        $b = new bytes_to_long($b_str);
+        $b = $this->struct->unpack(">Q", ($b_str);
         $g_b = pow($g, $b, $dh_prime);
-        $g_b_str = new long_to_bytes($g_b);
-        $data = py2php_kwargs_function_call('serialize_obj', ['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
-        $data_with_sha = (sha1($data, true) + $data);
-        $data_with_sha_padded = ($data_with_sha + \phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16)));
+        $g_b_str = $this->struct->pack(">Q", ($g_b);
+        $data = serialize_obj(['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
+        $data_with_sha = sha1($data, true) . $data;
+        $data_with_sha_padded = $data_with_sha . \phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
         $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = pow($g_a, $b, $dh_prime);
-            $auth_key_str = new long_to_bytes($auth_key);
+            $auth_key_str = $this->struct->pack(">Q", ($auth_key);
             $auth_key_sha = sha1($auth_key_str, true);
-            $auth_key_aux_hash = array_slice($auth_key_sha, 0, 8);
-            $new_nonce_hash1 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
-            $new_nonce_hash2 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
-            $new_nonce_hash3 = array_slice(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
-            assert(($Set_client_DH_params_answer['nonce'] == $nonce));
-            assert(($Set_client_DH_params_answer['server_nonce'] == $server_nonce));
-            if (($Set_client_DH_params_answer->name == 'dh_gen_ok')) {
-                assert(($Set_client_DH_params_answer['new_nonce_hash1'] == $new_nonce_hash1));
+            $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
+            $new_nonce_hash1 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            $new_nonce_hash2 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            $new_nonce_hash3 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            assert($Set_client_DH_params_answer['nonce'] == $nonce);
+            assert($Set_client_DH_params_answer['server_nonce'] == $server_nonce);
+            if ($Set_client_DH_params_answer->name == 'dh_gen_ok') {
+                assert($Set_client_DH_params_answer['new_nonce_hash1'] == $new_nonce_hash1);
                 pyjslib_printnl('Diffie Hellman key exchange processed successfully');
-                $this->server_salt = new strxor(array_slice($new_nonce, 0, 8 - 0), array_slice($server_nonce, 0, 8 - 0));
+                $this->server_salt = new strxor(substr($new_nonce, 0, 8 - 0), substr($server_nonce, 0, 8 - 0));
                 $this->auth_key = $auth_key_str;
-                $this->auth_key_id = array_slice($auth_key_sha, -8);
+                $this->auth_key_id = substr($auth_key_sha, -8);
                 pyjslib_printnl('Auth key generated');
 
                 return 'Auth Ok';
             } elseif (($Set_client_DH_params_answer->name == 'dh_gen_retry')) {
-                assert(($Set_client_DH_params_answer['new_nonce_hash2'] == $new_nonce_hash2));
+                assert($Set_client_DH_params_answer['new_nonce_hash2'] == $new_nonce_hash2);
                 pyjslib_printnl('Retry Auth');
             } elseif (($Set_client_DH_params_answer->name == 'dh_gen_fail')) {
-                assert(($Set_client_DH_params_answer['new_nonce_hash3'] == $new_nonce_hash3));
+                assert($Set_client_DH_params_answer['new_nonce_hash3'] == $new_nonce_hash3);
                 pyjslib_printnl('Auth Failed');
                 throw new Exception('Auth Failed');
             } else {
@@ -319,12 +319,12 @@ class Session
     public function aes_calculate($msg_key, $direction = 'to server')
     {
         $x = ($direction == 'to server') ? 0 : 8;
-        $sha1_a = sha1(($msg_key + array_slice($this->auth_key, $x, ($x + 32) - $x)), true);
-        $sha1_b = sha1(((array_slice($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)) + $msg_key) + array_slice($this->auth_key, (48 + $x), (64 + $x) - (48 + $x))), true);
-        $sha1_c = sha1((array_slice($this->auth_key, ($x + 64), ($x + 96) - ($x + 64)) + $msg_key))->digest();
-        $sha1_d = sha1(($msg_key + array_slice($this->auth_key, ($x + 96), ($x + 128) - ($x + 96))))->digest();
-        $aes_key = ((array_slice($sha1_a, 0, 8 - 0) + array_slice($sha1_b, 8, 20 - 8)) + array_slice($sha1_c, 4, 16 - 4));
-        $aes_iv = (((array_slice($sha1_a, 8, 20 - 8) + array_slice($sha1_b, 0, 8 - 0)) + array_slice($sha1_c, 16, 20 - 16)) + array_slice($sha1_d, 0, 8 - 0));
+        $sha1_a = sha1($msg_key . substr($this->auth_key, $x, ($x + 32) - $x)), true);
+        $sha1_b = sha1(substr($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)) . $msg_key . substr($this->auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
+        $sha1_c = sha1(substr($this->auth_key, ($x + 64), ($x + 96) - ($x + 64)) . $msg_key, true);
+        $sha1_d = sha1($msg_key . substr($this->auth_key, ($x + 96), ($x + 128) - ($x + 96)), true);
+        $aes_key = substr($sha1_a, 0, 8 - 0) . substr($sha1_b, 8, 20 - 8)) . substr($sha1_c, 4, 16 - 4;
+        $aes_iv = substr($sha1_a, 8, 20 - 8) . substr($sha1_b, 0, 8 - 0) . substr($sha1_c, 16, 20 - 16) . substr($sha1_d, 0, 8 - 0);
 
         return [$aes_key, $aes_iv];
     }

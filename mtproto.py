@@ -169,7 +169,6 @@ class Session:
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
         to_encrypt = sha_digest + data + random_bytes
         encrypted_data = key.encrypt(to_encrypt, 0)[0]
-        len(encrypted_data)
 
         print("Starting Diffie Hellman key exchange")
         server_dh_params = self.method_call('req_DH_params',
