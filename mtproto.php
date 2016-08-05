@@ -241,24 +241,24 @@ class Session
         }
         assert(($pq->equals($p->multiply($q))) && ($p < $q));
         pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
-        $p_bytes = $this->struct->pack('>Q', (string)$p);
-        $q_bytes = $this->struct->pack('>Q', (string)$q);
+        $p_bytes = $this->struct->pack('>Q', (string) $p);
+        $q_bytes = $this->struct->pack('>Q', (string) $q);
         $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = new \phpseclib\Crypt\RSA();
         $key->load($f);
         $new_nonce = \phpseclib\Crypt\Random::string(32);
-        $data = $this->tl->serialize_obj("p_q_inner_data", ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
+        $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha1($data, true);
         $random_bytes = \phpseclib\Crypt\Random::string(((255 - strlen($data)) - strlen($sha_digest)));
-        $to_encrypt = $sha_digest . $data . $random_bytes;
+        $to_encrypt = $sha_digest.$data.$random_bytes;
         $encrypted_data = $key->_raw_encrypt($to_encrypt);
         pyjslib_printnl('Starting Diffie Hellman key exchange');
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
         assert($nonce == $server_dh_params['nonce']);
         assert($server_nonce == $server_dh_params['server_nonce']);
         $encrypted_answer = $server_dh_params['encrypted_answer'];
-        $tmp_aes_key = sha1($new_nonce . $server_nonce, true) . substr(sha1($server_nonce . $new_nonce, true), 0, 12);
-        $tmp_aes_iv = substr(sha1($server_nonce . $new_nonce, true), 12, 8) . sha1($new_nonce . $new_nonce, true) . substr($new_nonce, 0, 4);
+        $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
+        $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
         $answer_with_hash = crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
         $answer_hash = substr($answer_with_hash, 0, 20);
         $answer = substr($answer_with_hash, 20);
@@ -271,22 +271,22 @@ class Session
         $server_time = $server_DH_inner_data['server_time'];
         $this->timedelta = ($server_time - time());
         pyjslib_printnl(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-        $dh_prime = $this->struct->unpack(">Q", $dh_prime_str);
-        $g_a = $this->struct->unpack(">Q", $g_a_str);
+        $dh_prime = $this->struct->unpack('>Q', $dh_prime_str);
+        $g_a = $this->struct->unpack('>Q', $g_a_str);
         assert($this->PrimeModule->isPrime($dh_prime));
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
-        $b = $this->struct->unpack(">Q", $b_str);
+        $b = $this->struct->unpack('>Q', $b_str);
         $g_b = pow($g, $b, $dh_prime);
-        $g_b_str = $this->struct->pack(">Q", $g_b);
+        $g_b_str = $this->struct->pack('>Q', $g_b);
         $data = serialize_obj(['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
-        $data_with_sha = sha1($data, true) . $data;
-        $data_with_sha_padded = $data_with_sha . \phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
+        $data_with_sha = sha1($data, true).$data;
+        $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
         $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = pow($g_a, $b, $dh_prime);
-            $auth_key_str = $this->struct->pack(">Q", $auth_key);
+            $auth_key_str = $this->struct->pack('>Q', $auth_key);
             $auth_key_sha = sha1($auth_key_str, true);
             $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
             $new_nonce_hash1 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
@@ -319,12 +319,12 @@ class Session
     public function aes_calculate($msg_key, $direction = 'to server')
     {
         $x = ($direction == 'to server') ? 0 : 8;
-        $sha1_a = sha1($msg_key . substr($this->auth_key, $x, ($x + 32) - $x), true);
-        $sha1_b = sha1(substr($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)) . $msg_key . substr($this->auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
-        $sha1_c = sha1(substr($this->auth_key, ($x + 64), ($x + 96) - ($x + 64)) . $msg_key, true);
-        $sha1_d = sha1($msg_key . substr($this->auth_key, ($x + 96), ($x + 128) - ($x + 96)), true);
-        $aes_key = substr($sha1_a, 0, 8 - 0) . substr($sha1_b, 8, 20 - 8) . substr($sha1_c, 4, 16 - 4);
-        $aes_iv = substr($sha1_a, 8, 20 - 8) . substr($sha1_b, 0, 8 - 0) . substr($sha1_c, 16, 20 - 16) . substr($sha1_d, 0, 8 - 0);
+        $sha1_a = sha1($msg_key.substr($this->auth_key, $x, ($x + 32) - $x), true);
+        $sha1_b = sha1(substr($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($this->auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
+        $sha1_c = sha1(substr($this->auth_key, ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
+        $sha1_d = sha1($msg_key.substr($this->auth_key, ($x + 96), ($x + 128) - ($x + 96)), true);
+        $aes_key = substr($sha1_a, 0, 8 - 0).substr($sha1_b, 8, 20 - 8).substr($sha1_c, 4, 16 - 4);
+        $aes_iv = substr($sha1_a, 8, 20 - 8).substr($sha1_b, 0, 8 - 0).substr($sha1_c, 16, 20 - 16).substr($sha1_d, 0, 8 - 0);
 
         return [$aes_key, $aes_iv];
     }
