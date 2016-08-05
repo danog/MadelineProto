@@ -276,9 +276,9 @@ class Session
         assert($this->PrimeModule->isPrime($dh_prime));
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
-        $b = $this->struct->unpack(">Q", ($b_str);
+        $b = $this->struct->unpack(">Q", $b_str);
         $g_b = pow($g, $b, $dh_prime);
-        $g_b_str = $this->struct->pack(">Q", ($g_b);
+        $g_b_str = $this->struct->pack(">Q", $g_b);
         $data = serialize_obj(['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = sha1($data, true) . $data;
         $data_with_sha_padded = $data_with_sha . \phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
