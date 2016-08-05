@@ -286,7 +286,7 @@ class Session
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = pow($g_a, $b, $dh_prime);
-            $auth_key_str = $this->struct->pack(">Q", ($auth_key);
+            $auth_key_str = $this->struct->pack(">Q", $auth_key);
             $auth_key_sha = sha1($auth_key_str, true);
             $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
             $new_nonce_hash1 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
