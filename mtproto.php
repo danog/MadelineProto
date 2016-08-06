@@ -181,13 +181,13 @@ class Session
             throw new Exception('Nothing in the socket!');
         }
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+        var_dump($packet_length);
         $packet = fread($this->sock, ($packet_length - 4));
         if (!(newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
         }
         $x = $this->struct->unpack('<I', substr($packet, 0, 4));
         $auth_key_id = substr($packet, 4, 8);
-        hex_dump($packet);
         if ($auth_key_id == string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
             $data = substr($packet, 24, (24 + $message_length) - 24);
@@ -238,6 +238,7 @@ class Session
         $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = new \phpseclib\Crypt\RSA();
         $key->load($f);
+
         $nonce = \phpseclib\Crypt\Random::string(16);
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
@@ -247,7 +248,6 @@ class Session
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
-        var_dump(new \phpseclib\Math\BigInteger($public_key_fingerprint), $key->getPublicKeyFingerprint('sha1'));
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         list($p, $q) = $this->PrimeModule->primefactors($pq);

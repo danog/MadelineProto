@@ -73,37 +73,36 @@ class TL
 
     public function serialize_obj($type_, $kwargs)
     {
-        $bytes_io = fopen('php://memory', 'rw+b');
+        $bytes_io = '';
         if (isset($this->constructor_type[$type_])) {
             $tl_constructor = $this->constructor_type[$type_];
         } else {
             throw new Exception(sprintf('Could not extract type: %s', $type_));
         }
-        fwrite($bytes_io, $this->struct->pack('<i', $tl_constructor->id));
+        $bytes_io .= $this->struct->pack('<i', $tl_constructor->id);
         foreach ($tl_constructor->params as $arg) {
-            $this->serialize_param($bytes_io, $arg['type'], $kwargs[$arg['name']]);
+            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
         }
 
-        return fread_all($bytes_io);
+        return $bytes_io;
     }
 
     public function serialize_method($type_, $kwargs)
     {
-        $bytes_io = fopen('php://memory', 'rw+b');
+        $bytes_io = '';
         if (isset($this->method_name[$type_])) {
             $tl_method = $this->method_name[$type_];
         } else {
             throw new Exception(sprintf('Could not extract type: %s', $type_));
         }
-        fwrite($bytes_io, $this->struct->pack('<i', $tl_method->id));
+        $bytes_io .= $this->struct->pack('<i', $tl_method->id);
         foreach ($tl_method->params as $arg) {
-            $this->serialize_param($bytes_io, $arg['type'], $kwargs[$arg['name']]);
+            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
         }
-
-        return fread_all($bytes_io);
+        return $bytes_io;
     }
 
-    public function serialize_param($bytes_io, $type_, $value)
+    public function serialize_param($type_, $value)
     {
         switch ($type_) {
             case 'int':
@@ -113,33 +112,34 @@ class TL
                 if (!(strlen(decbin($value)) <= 32)) {
                     throw new Exception('Given value is too long.');
                 }
-                fwrite($bytes_io, $this->struct->pack('<i', $value));
+                return $this->struct->pack('<i', $value);
                 break;
             case 'long':
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
-                fwrite($bytes_io, $this->struct->pack('<q', $value));
+                return $this->struct->pack('<q', $value);
                 break;
             case 'int128':
             case 'int256':
                 if (!is_string($value)) {
                     throw new Exception("serialize_param: given value isn't a string");
                 }
-                fwrite($bytes_io, $value);
+                return $value;
                 break;
             case 'string':
             case 'bytes':
                 $l = strlen($value);
+                $concat = '';
                 if ($l < 254) {
-                    fwrite($bytes_io, $this->struct->pack('<b', $l));
-                    fwrite($bytes_io, $value);
-                    fwrite($bytes_io, pack('@'.posmod((-$l - 1), 4)));
+                    $concat .= $this->struct->pack('<b', $l);
+                    $concat .= $value;
+                    $concat .= pack('@'.posmod((-$l - 1), 4));
                 } else {
-                    fwrite($bytes_io, string2bin('\xfe'));
-                    fwrite($bytes_io, substr($this->struct->pack('<i', $l), 0, 3));
-                    fwrite($bytes_io, $value);
-                    fwrite($bytes_io, pack('@'.posmod(-$l, 4)));
+                    $concat .= string2bin('\xfe');
+                    $concat .= substr($this->struct->pack('<i', $l), 0, 3);
+                    $concat .= $value;
+                    $concat .= pack('@'.posmod(-$l, 4));
                 }
                 break;
             default:

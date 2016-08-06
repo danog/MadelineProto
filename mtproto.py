@@ -157,6 +157,7 @@ class Session:
         q_bytes = long_to_bytes(q)
         f = open(os.path.join(os.path.dirname(__file__), "rsa.pub"))
         key = RSA.importKey(f.read())
+        print(key.exportKey('OpenSSH'))
 
         new_nonce = os.urandom(32)
         data = TL.serialize_obj('p_q_inner_data',
@@ -166,10 +167,8 @@ class Session:
                                 nonce=nonce,
                                 server_nonce=server_nonce,
                                 new_nonce=new_nonce)
-        print(len(data), len(p_bytes))
         sha_digest = SHA.new(data).digest()
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
-        print(len(sha_digest), len(data), len(random_bytes))
         to_encrypt = sha_digest + data + random_bytes
         encrypted_data = key.encrypt(to_encrypt, 0)[0]
         print("Starting Diffie Hellman key exchange", len(to_encrypt))
