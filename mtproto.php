@@ -247,7 +247,7 @@ class Session
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
-var_dump(new \phpseclib\Math\BigInteger($public_key_fingerprint), $key->getPublicKeyFingerprint('sha1'));
+        var_dump(new \phpseclib\Math\BigInteger($public_key_fingerprint), $key->getPublicKeyFingerprint('sha1'));
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         list($p, $q) = $this->PrimeModule->primefactors($pq);
