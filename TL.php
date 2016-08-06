@@ -107,17 +107,25 @@ class TL
     {
         switch ($type_) {
             case 'int':
-                if(!is_numeric($value)) throw new Exception("serialize_param: given value isn't numeric");
-                if(!(strlen(decbin($value)) <= 32)) throw new Exception("Given value is too long.");
+                if (!is_numeric($value)) {
+                    throw new Exception("serialize_param: given value isn't numeric");
+                }
+                if (!(strlen(decbin($value)) <= 32)) {
+                    throw new Exception('Given value is too long.');
+                }
                 fwrite($bytes_io, $this->struct->pack('<i', $value));
                 break;
             case 'long':
-                if(!is_numeric($value)) throw new Exception("serialize_param: given value isn't numeric");
+                if (!is_numeric($value)) {
+                    throw new Exception("serialize_param: given value isn't numeric");
+                }
                 fwrite($bytes_io, $this->struct->pack('<q', $value));
                 break;
             case 'int128':
             case 'int256':
-                if(!is_string($value)) throw new Exception("serialize_param: given value isn't a string");
+                if (!is_string($value)) {
+                    throw new Exception("serialize_param: given value isn't a string");
+                }
                 fwrite($bytes_io, $value);
                 break;
             case 'string':
@@ -144,7 +152,9 @@ class TL
      */
     public function deserialize($bytes_io, $type_ = null, $subtype = null)
     {
-        if(!(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream')) throw new Exception("An invalid bytes_io handle provided.");
+        if (!(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream')) {
+            throw new Exception('An invalid bytes_io handle provided.');
+        }
         switch ($type_) {
             case 'int':
                 $x = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
@@ -167,7 +177,9 @@ class TL
             case 'string':
             case 'bytes':
                 $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
-                if($l > 254) throw new Exception("Length is too big");;
+                if ($l > 254) {
+                    throw new Exception('Length is too big');
+                }
                 if ($l == 254) {
                     $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).string2bin('\x00')) [0];
                     $x = fread($bytes_io, $long_len);
@@ -176,10 +188,14 @@ class TL
                     $x = fread($bytes_io, $l);
                     fread($bytes_io, posmod(-($l + 1), 4));
                 }
-                if(!is_string($x)) throw new Exception("deserialize: generated value isn't a string");
+                if (!is_string($x)) {
+                    throw new Exception("deserialize: generated value isn't a string");
+                }
                 break;
             case 'vector':
-                if($subtype == null) throw new Exception("deserialize: subtype isn't null");;
+                if ($subtype == null) {
+                    throw new Exception("deserialize: subtype isn't null");
+                }
                 $count = $this->struct->unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];
                 foreach (pyjslib_range($count) as $i) {
