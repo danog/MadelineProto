@@ -183,7 +183,8 @@ class PrimeModule
                 if (count($res) == 2) {
                     return $res;
                 }
-            } catch (ErrorException $e) { ; };
+            } catch (ErrorException $e) {
+            }
         }
         // Else do factorization with wolfram alpha :)))))
         $query = 'Do prime factorization of '.$pq;

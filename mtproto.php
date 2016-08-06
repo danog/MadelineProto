@@ -231,7 +231,7 @@ class Session
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
-        $public_key_fingerprint = (int)$ResPQ['server_public_key_fingerprints'][0];
+        $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
