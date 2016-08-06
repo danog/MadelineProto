@@ -235,6 +235,9 @@ class Session
 
     public function create_auth_key()
     {
+        $f = file_get_contents(__DIR__.'/rsa.pub');
+        $key = new \phpseclib\Crypt\RSA();
+        $key->load($f);
         $nonce = \phpseclib\Crypt\Random::string(16);
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
@@ -244,6 +247,7 @@ class Session
         $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
+var_dump(new \phpseclib\Math\BigInteger($public_key_fingerprint), $key->getPublicKeyFingerprint('sha1'));
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         list($p, $q) = $this->PrimeModule->primefactors($pq);
@@ -258,9 +262,6 @@ class Session
         pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
         $p_bytes = $this->struct->pack('>Q', (string) $p);
         $q_bytes = $this->struct->pack('>Q', (string) $q);
-        $f = file_get_contents(__DIR__.'/rsa.pub');
-        $key = new \phpseclib\Crypt\RSA();
-        $key->load($f);
         $new_nonce = \phpseclib\Crypt\Random::string(32);
         $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha1($data, true);

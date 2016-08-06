@@ -996,6 +996,10 @@ class RSA
                 $hash = new Hash('sha256');
                 $base = Base64::encode($hash->hash($RSAPublicKey));
                 return substr($base, 0, strlen($base) - 1);
+            case 'sha1':
+                $hash = new Hash('sha1');
+                $base = Base64::encode($hash->hash($RSAPublicKey));
+                return substr($base, 0, strlen($base) - 1);
             case 'md5':
                 return substr(chunk_split(md5($RSAPublicKey), 2, ':'), 0, -1);
             default:
