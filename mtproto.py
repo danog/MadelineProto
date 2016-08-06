@@ -166,12 +166,13 @@ class Session:
                                 nonce=nonce,
                                 server_nonce=server_nonce,
                                 new_nonce=new_nonce)
-
+        print(len(data), len(p_bytes))
         sha_digest = SHA.new(data).digest()
         random_bytes = os.urandom(255-len(data)-len(sha_digest))
+        print(len(sha_digest), len(data), len(random_bytes))
         to_encrypt = sha_digest + data + random_bytes
         encrypted_data = key.encrypt(to_encrypt, 0)[0]
-        print("Starting Diffie Hellman key exchange")
+        print("Starting Diffie Hellman key exchange", len(to_encrypt))
         server_dh_params = self.method_call('req_DH_params',
                                             nonce=nonce,
                                             server_nonce=server_nonce,

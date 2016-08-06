@@ -231,8 +231,7 @@ class Session
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
-        $public_key_fingerprint = $ResPQ['server_public_key_fingerprints'][0];
-        var_dump($public_key_fingerprint);
+        $public_key_fingerprint = (int)$ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
 
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
@@ -244,8 +243,8 @@ class Session
         }
         assert(($pq->equals($p->multiply($q))) && ($p < $q));
         pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
-        $p_bytes = $this->struct->pack('>Q', (string) $p);
-        $q_bytes = $this->struct->pack('>Q', (string) $q);
+        $p_bytes = $this->struct->pack('>I', (string) $p);
+        $q_bytes = $this->struct->pack('>I', (string) $q);
         $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = new \phpseclib\Crypt\RSA();
         $key->load($f);

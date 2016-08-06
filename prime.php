@@ -177,11 +177,13 @@ class PrimeModule
     public function primefactors($pq, $sort = false)
     {
         if (function_exists('shell_exec')) {
-            // Use the python version.
-            $res = explode(' ', shell_exec('python getpq.py '.$pq));
-            if (count($res) == 2) {
-                return $res;
-            }
+            try {
+                // Use the python version.
+                $res = explode(' ', shell_exec('python getpq.py '.$pq));
+                if (count($res) == 2) {
+                    return $res;
+                }
+            } catch (ErrorException $e) { ; };
         }
         // Else do factorization with wolfram alpha :)))))
         $query = 'Do prime factorization of '.$pq;
