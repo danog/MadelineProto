@@ -1,7 +1,9 @@
 <?php
+
 namespace danog\MadelineProto;
 
-class Exception extends \Exception {
+class Exception extends \Exception
+{
     public function __construct($message, $code = 0, Exception $previous = null)
     {
         // some code

@@ -5,25 +5,27 @@ require_once 'libpy2php.php';
 require_once 'os_path.php';
 
 namespace danog\MadelineProto;
+
 /**
  * Manages encryption and message frames.
  */
-class Session extends Tools
+class mtproto extends Tools
 {
     public $settings = [];
+
     public function __construct($settings)
     {
         // Set default settings
-        $default_settings = ["ip" => "149.154.167.50", "port" => "443", "protocol" => "tcp", "auth_key" => null, "server_salt" => null, "api_id" => 25628, "api_hash" => "1fe17cda7d355166cdaa71f04122873c", "tl_schema" => 'https://core.telegram.org/schema/mtproto-json', "rsa_pub" => __DIR__.'/rsa.pub'];
+        $default_settings = ['ip' => '149.154.167.50', 'port' => '443', 'protocol' => 'tcp', 'auth_key' => null, 'server_salt' => null, 'api_id' => 25628, 'api_hash' => '1fe17cda7d355166cdaa71f04122873c', 'tl_schema' => 'https://core.telegram.org/schema/mtproto-json', 'rsa_pub' => __DIR__.'/rsa.pub'];
         foreach ($default_settings as $key => $param) {
-            if(!isset($settings[$key])) {
+            if (!isset($settings[$key])) {
                 $settings[$key] = $param;
             }
         }
         $this->settings = $settings;
 
         // Connect to servers
-        $this->sock = new Connection($this->settings["ip_address"], $this->settings["ip_address"], $this->settings["protocol"]);
+        $this->sock = new Connection($this->settings['ip_address'], $this->settings['ip_address'], $this->settings['protocol']);
 
         // Istantiate struct class
         $this->struct = new \danog\PHP\Struct();
@@ -31,18 +33,20 @@ class Session extends Tools
         $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
         try {
-            $this->tl = new TL($this->settings["tl_schema"]);
+            $this->tl = new TL($this->settings['tl_schema']);
         } catch (Exception $e) {
             $this->tl = new TL(__DIR__.'/TL_schema.JSON');
         }
         // Load rsa key
-        $this->settings["rsa_content"] = file_get_contents($this->rsa_pub);
+        $this->settings['rsa_content'] = file_get_contents($this->rsa_pub);
 
         // Set some defaults
         $this->number = 0;
         $this->timedelta = 0;
         $this->session_id = \phpseclib\Crypt\Random::string(8);
-        if(isset($this->settings["auth_key"])) $this->auth_key = $this->settings["auth_key"];
+        if (isset($this->settings['auth_key'])) {
+            $this->auth_key = $this->settings['auth_key'];
+        }
         $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
         $this->MAX_RETRY = 5;
         $this->AUTH_MAX_RETRY = 5;
@@ -52,11 +56,13 @@ class Session extends Tools
     {
         unset($this->sock);
     }
+
     /**
-    * Function to get hex crc32
-    * @param $data Data to encode.
-    */
-    function newcrc32($data)
+     * Function to get hex crc32.
+     *
+     * @param $data Data to encode.
+     */
+    public function newcrc32($data)
     {
         return hexdec(hash('crc32b', $data));
     }
@@ -152,7 +158,7 @@ class Session extends Tools
     {
         // Load the RSA key
         $key = new \phpseclib\Crypt\RSA();
-        $key->load($settings["rsa_content"]);
+        $key->load($settings['rsa_content']);
 
         // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
@@ -165,7 +171,7 @@ class Session extends Tools
         $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
         var_dump(
-            (int)$this->struct->unpack("<q", substr(sha1($this->tl->serialize_param('bytes', $key->modulus->toBytes()) . $this->tl->serialize_param('bytes', $key->exponent->toBytes()), true), -8))[0], 
+            (int) $this->struct->unpack('<q', substr(sha1($this->tl->serialize_param('bytes', $key->modulus->toBytes()).$this->tl->serialize_param('bytes', $key->exponent->toBytes()), true), -8))[0],
             $public_key_fingerprint
             );
 
@@ -183,7 +189,7 @@ class Session extends Tools
 
 
         pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
-        
+
         $p_bytes = $this->struct->pack('>Q', (string) $p);
         $q_bytes = $this->struct->pack('>Q', (string) $q);
         $new_nonce = \phpseclib\Crypt\Random::string(32);

@@ -1,9 +1,13 @@
 <?php
+
 namespace danog\MadelineProto;
 
-class API {
+class API
+{
     public $session;
-    public function __construct($login, $params = []) {
+
+    public function __construct($login, $params = [])
+    {
         $this->session = new Session($params);
         $this->session->create_auth_key();
         $future_salts = $this->session->method_call('get_future_salts', 3);
@@ -14,7 +18,9 @@ class API {
     {
         unset($this->session);
     }
-    public function __call($name, $arguments) {
+
+    public function __call($name, $arguments)
+    {
         return $session->method_call($name, $arguments);
     }
 }

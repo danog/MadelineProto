@@ -3,15 +3,15 @@
 namespace danog\MadelineProto;
 
 /**
- * Some tools
+ * Some tools.
  */
-class Tools {
-
+class tools
+{
     /**
-    * posmod(numeric,numeric) : numeric
-    * Works just like the % (modulus) operator, only returns always a postive number.
-    */
-    function posmod($a, $b)
+     * posmod(numeric,numeric) : numeric
+     * Works just like the % (modulus) operator, only returns always a postive number.
+     */
+    public function posmod($a, $b)
     {
         $resto = $a % $b;
         if ($resto < 0) {
@@ -21,7 +21,7 @@ class Tools {
         return $resto;
     }
 
-    function fread_all($handle)
+    public function fread_all($handle)
     {
         $pos = ftell($handle);
         fseek($handle, 0);
@@ -30,7 +30,8 @@ class Tools {
 
         return $content;
     }
-    function fopen_and_write($filename, $mode, $data)
+
+    public function fopen_and_write($filename, $mode, $data)
     {
         $handle = fopen($filename, $mode);
         fwrite($handle, $data);
@@ -38,7 +39,8 @@ class Tools {
 
         return $handle;
     }
-    function string2bin($string)
+
+    public function string2bin($string)
     {
         $res = null;
         foreach (explode('\\', $string) as $s) {

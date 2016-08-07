@@ -4,7 +4,9 @@ set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_S
 require_once 'libpy2php.php';
 
 require_once 'os.php';
+
 namespace danog\MadelineProto;
+
 class TlConstructor
 {
     public function __construct($json_dict)
@@ -100,6 +102,7 @@ class TL
         foreach ($tl_method->params as $arg) {
             $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
         }
+
         return $bytes_io;
     }
 
@@ -113,12 +116,14 @@ class TL
                 if (!(strlen(decbin($value)) <= 32)) {
                     throw new Exception('Given value is too long.');
                 }
+
                 return $this->struct->pack('<i', $value);
                 break;
             case 'long':
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
+
                 return $this->struct->pack('<q', $value);
                 break;
             case 'int128':
@@ -126,6 +131,7 @@ class TL
                 if (!is_string($value)) {
                     throw new Exception("serialize_param: given value isn't a string");
                 }
+
                 return $value;
                 break;
             case 'string':
@@ -142,6 +148,7 @@ class TL
                     $concat .= $value;
                     $concat .= pack('@'.posmod(-$l, 4));
                 }
+
                 return $concat;
                 break;
             default:
