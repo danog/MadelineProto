@@ -3,147 +3,62 @@
 set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
 require_once 'libpy2php.php';
 require_once 'os_path.php';
-require_once 'crypt.php';
-require_once 'prime.php';
-require_once 'TL.php';
-require_once 'vendor/autoload.php';
-$struct = new \danog\PHP\StructClass();
+
+namespace danog\MadelineProto;
 /**
- * Function to get hex crc32
- * :param data: Data to encode.
+ * Manages encryption and message frames.
  */
-function newcrc32($data)
+class Session extends Tools
 {
-    return hexdec(hash('crc32b', $data));
-}
-
-/**
- * Function to dump the hex version of a string.
- *
- * @param $what What to dump.
- */
-function hex_dump(...$what)
-{
-    foreach ($what as $w) {
-        var_dump(bin2hex($w));
-    }
-}
-/**
- * len.
- *
- * Get the length of a string or of an array
- *
- * @param   $input String or array to parse
- *
- * @return int with the length
- **/
-function len($input)
-{
-    if (is_array($input)) {
-        return count($input);
-    }
-
-    return strlen($input);
-}
-
-/**
- * Function to visualize byte streams. Split into bytes, print to console.
- * :param bs: BYTE STRING.
- */
-function vis($bs)
-{
-    $bs = str_split($bs);
-    $symbols_in_one_line = 8;
-    $n = floor(len($bs) / $symbols_in_one_line);
-    $i = 0;
-    foreach (pyjslib_range($n) as $i) {
-        echo $i * $symbols_in_one_line.' | '.implode(' ',
-            array_map(function ($el) {
-                return bin2hex($el);
-            }, array_slice($bs, $i * $symbols_in_one_line, ($i + 1) * $symbols_in_one_line))
-        ).PHP_EOL;
-    }
-    if (len($bs) % $symbols_in_one_line != 0) {
-        echo($i + 1) * $symbols_in_one_line.' | '.implode(' ',
-            array_map(function ($el) {
-                return bin2hex($el);
-            }, array_slice($bs, ($i + 1) * $symbols_in_one_line))
-        ).PHP_EOL;
-    }
-}
-/**
- * posmod(numeric,numeric) : numeric
- * Works just like the % (modulus) operator, only returns always a postive number.
- */
-function posmod($a, $b)
-{
-    $resto = $a % $b;
-    if ($resto < 0) {
-        $resto += abs($b);
-    }
-
-    return $resto;
-}
-
-function fread_all($handle)
-{
-    $pos = ftell($handle);
-    fseek($handle, 0);
-    $content = fread($handle, fstat($handle)['size']);
-    fseek($handle, $pos);
-
-    return $content;
-}
-function fopen_and_write($filename, $mode, $data)
-{
-    $handle = fopen($filename, $mode);
-    fwrite($handle, $data);
-    rewind($handle);
-
-    return $handle;
-}
-function string2bin($string)
-{
-    $res = null;
-    foreach (explode('\\', $string) as $s) {
-        if ($s != null && strlen($s) == 3) {
-            $res .= hex2bin(substr($s, 1));
-        }
-    }
-
-    return $res;
-}
-/**
- * Manages TCP Transport. encryption and message frames.
- */
-class Session
-{
-    public function __construct($ip, $port, $auth_key = null, $server_salt = null)
+    public $settings = [];
+    public function __construct($settings)
     {
-        $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-        if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
-            throw new Exception("Couldn't connect to socket.");
+        // Set default settings
+        $default_settings = ["ip" => "149.154.167.50", "port" => "443", "protocol" => "tcp", "auth_key" => null, "server_salt" => null, "api_id" => 25628, "api_hash" => "1fe17cda7d355166cdaa71f04122873c", "tl_schema" => 'https://core.telegram.org/schema/mtproto-json', "rsa_pub" => __DIR__.'/rsa.pub'];
+        foreach ($default_settings as $key => $param) {
+            if(!isset($settings[$key])) {
+                $settings[$key] = $param;
+            }
         }
-        $this->number = 0;
-        $this->timedelta = 0;
-        $this->session_id = \phpseclib\Crypt\Random::string(8);
-        $this->auth_key = $auth_key;
-        $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
-        stream_set_timeout($this->sock, 5);
-        $this->MAX_RETRY = 5;
-        $this->AUTH_MAX_RETRY = 5;
+        $this->settings = $settings;
+
+        // Connect to servers
+        $this->sock = new Connection($this->settings["ip_address"], $this->settings["ip_address"], $this->settings["protocol"]);
+
+        // Istantiate struct class
         $this->struct = new \danog\PHP\Struct();
+        // Istantiate prime class
         $this->PrimeModule = new PrimeModule();
+        // Istantiate TL class
         try {
-            $this->tl = new TL('https://core.telegram.org/schema/mtproto-json');
+            $this->tl = new TL($this->settings["tl_schema"]);
         } catch (Exception $e) {
             $this->tl = new TL(__DIR__.'/TL_schema.JSON');
         }
+        // Load rsa key
+        $this->settings["rsa_content"] = file_get_contents($this->rsa_pub);
+
+        // Set some defaults
+        $this->number = 0;
+        $this->timedelta = 0;
+        $this->session_id = \phpseclib\Crypt\Random::string(8);
+        if(isset($this->settings["auth_key"])) $this->auth_key = $this->settings["auth_key"];
+        $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
+        $this->MAX_RETRY = 5;
+        $this->AUTH_MAX_RETRY = 5;
     }
 
     public function __destruct()
     {
-        fclose($this->sock);
+        unset($this->sock);
+    }
+    /**
+    * Function to get hex crc32
+    * @param $data Data to encode.
+    */
+    function newcrc32($data)
+    {
+        return hexdec(hash('crc32b', $data));
     }
 
     /**
@@ -166,7 +81,7 @@ class Session
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
-        $step2 = $step1.$this->struct->pack('<I', newcrc32($step1));
+        $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
         fwrite($this->sock, $step2);
         $this->number += 1;
     }
@@ -177,13 +92,13 @@ class Session
     public function recv_message()
     {
         $packet_length_data = fread($this->sock, 4);
-        if (len($packet_length_data) < 4) {
+        if (strlen($packet_length_data) < 4) {
             throw new Exception('Nothing in the socket!');
         }
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
         var_dump($packet_length);
         $packet = fread($this->sock, ($packet_length - 4));
-        if (!(newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
+        if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
         }
         $x = $this->struct->unpack('<I', substr($packet, 0, 4));
@@ -236,9 +151,8 @@ class Session
     public function create_auth_key()
     {
         // Load the RSA key
-        $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = new \phpseclib\Crypt\RSA();
-        $key->load($f);
+        $key->load($settings["rsa_content"]);
 
         // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
