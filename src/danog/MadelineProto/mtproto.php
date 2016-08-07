@@ -9,7 +9,7 @@ namespace danog\MadelineProto;
 /**
  * Manages encryption and message frames.
  */
-class Session extends Tools
+class mtproto extends Tools
 {
     public $settings = [];
 
