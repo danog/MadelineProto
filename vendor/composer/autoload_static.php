@@ -40,6 +40,10 @@ class ComposerStaticInitbd69ed7fd0aebb6b1ba64b36dad1b458
             array (
                 0 => __DIR__ . '/..' . '/danog/phpstruct/lib',
             ),
+            'danog\\MadelineProto\\' => 
+            array (
+                0 => __DIR__ . '/../..' . '/src',
+            ),
         ),
     );
 

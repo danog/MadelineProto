@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'danog\\PHP\\' => array($vendorDir . '/danog/phpstruct/lib'),
+    'danog\\MadelineProto\\' => array($baseDir . '/src'),
 );
