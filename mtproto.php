@@ -235,20 +235,27 @@ class Session
 
     public function create_auth_key()
     {
+        // Load the RSA key
         $f = file_get_contents(__DIR__.'/rsa.pub');
         $key = new \phpseclib\Crypt\RSA();
         $key->load($f);
 
+        // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
         pyjslib_printnl('Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
+        $server_nonce = $ResPQ['server_nonce'];
         if ($ResPQ['nonce'] !== $nonce) {
             throw new Exception('Handshake: wrong nonce');
         }
-        $server_nonce = $ResPQ['server_nonce'];
         $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
+        var_dump(
+            (int)$this->struct->unpack("<q", substr(sha1($this->tl->serialize_param('bytes', $key->modulus->toBytes()) . $this->tl->serialize_param('bytes', $key->exponent->toBytes()), true), -8))[0], 
+            $public_key_fingerprint
+            );
 
+        // Compute p and q
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         list($p, $q) = $this->PrimeModule->primefactors($pq);
         $p = new \phpseclib\Math\BigInteger($p);
@@ -259,7 +266,10 @@ class Session
         if (!(($pq->equals($p->multiply($q))) && ($p < $q))) {
             throw new Exception("Handshake: couldn't compute p or q.");
         }
+
+
         pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
+        
         $p_bytes = $this->struct->pack('>Q', (string) $p);
         $q_bytes = $this->struct->pack('>Q', (string) $q);
         $new_nonce = \phpseclib\Crypt\Random::string(32);

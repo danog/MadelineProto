@@ -131,7 +131,7 @@ class TL
             case 'bytes':
                 $l = strlen($value);
                 $concat = '';
-                if ($l < 254) {
+                if ($l <= 253) {
                     $concat .= $this->struct->pack('<b', $l);
                     $concat .= $value;
                     $concat .= pack('@'.posmod((-$l - 1), 4));
@@ -141,6 +141,7 @@ class TL
                     $concat .= $value;
                     $concat .= pack('@'.posmod(-$l, 4));
                 }
+                return $concat;
                 break;
             default:
                 break;

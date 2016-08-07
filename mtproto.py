@@ -141,6 +141,9 @@ class Session:
         nonce = os.urandom(16)
         print("Requesting pq")
 
+        f = open(os.path.join(os.path.dirname(__file__), "rsa.pub"))
+        key = RSA.importKey(f.read())
+        print(getattr(key.key, 'n') . getattr(key.key, 'e'))
         ResPQ = self.method_call('req_pq', nonce=nonce)
         server_nonce = ResPQ['server_nonce']
         # TODO: selecting RSA public key based on this fingerprint
@@ -155,9 +158,6 @@ class Session:
         print("Factorization %d = %d * %d" % (pq, p, q))
         p_bytes = long_to_bytes(p)
         q_bytes = long_to_bytes(q)
-        f = open(os.path.join(os.path.dirname(__file__), "rsa.pub"))
-        key = RSA.importKey(f.read())
-        print(key.exportKey('OpenSSH'))
 
         new_nonce = os.urandom(32)
         data = TL.serialize_obj('p_q_inner_data',
