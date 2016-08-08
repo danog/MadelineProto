@@ -2,7 +2,7 @@
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
 
 
-PHP implementation of MTProto, converted from [telepy](https://github.com/griganton/telepy) using [py2php](https://github.com/dan-da/py2php).  
+PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
 This is a WIP.
 
