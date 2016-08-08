@@ -1,6 +1,7 @@
 # MadelineProto
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
 
+Licensed under AGPLv3.
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 

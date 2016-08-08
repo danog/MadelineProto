@@ -1,31 +1,36 @@
 <?php
-
-set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).DIRECTORY_SEPARATOR.'libpy2php');
-require_once 'libpy2php.php';
-require_once 'os_path.php';
-
+/*
+Copyright 2016 Daniil Gentili
+(https://daniil.it)
+This file is part of MadelineProto.
+MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+The PWRTelegram API is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Affero General Public License for more details.
+You should have received a copy of the GNU General Public License along with the MadelineProto.
+If not, see <http://www.gnu.org/licenses/>.
+*/
 namespace danog\MadelineProto;
-
 /**
  * Manages encryption and message frames.
  */
-class mtproto extends Tools
+class Session extends Tools
 {
     public $settings = [];
 
     public function __construct($settings)
     {
+        
         // Set default settings
         $default_settings = [
-            'ip'          => '149.154.167.50',
-            'port'        => '443',
-            'protocol'    => 'tcp',
-            'auth_key'    => null,
-            'server_salt' => null,
-            'api_id'      => 25628,
-            'api_hash'    => '1fe17cda7d355166cdaa71f04122873c',
-            'tl_schema'   => 'https://core.telegram.org/schema/mtproto-json',
-            'rsa_key'     => '-----BEGIN RSA PUBLIC KEY-----
+            'auth_key'      => null,
+            'server_salt'   => null,
+            'ip_address'    => '149.154.167.50',
+            'port'          => '443',
+            'protocol'      => 'tcp',
+            'api_id'        => 25628,
+            'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
+            'tl_schema'     => 'https://core.telegram.org/schema/mtproto-json',
+            'rsa_key'       => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
 an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
@@ -33,6 +38,9 @@ Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
+            'logging'       => 1,
+            'logging_param' => '/tmp/MadelineProto.log',
+            'logging'       => 3
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -42,7 +50,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->settings = $settings;
 
         // Connect to servers
-        $this->sock = new Connection($this->settings['ip_address'], $this->settings['ip_address'], $this->settings['protocol']);
+        $this->sock = new Connection($this->settings['ip_address'], $this->settings['port'], $this->settings['protocol']);
 
         // Load rsa key
         $this->key = new RSA($settings['rsa_key']);
@@ -52,14 +60,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
         try {
-            $this->tl = new TL($this->settings['tl_schema']);
+            $this->tl = new TL\TL($this->settings['tl_schema']);
         } catch (Exception $e) {
-            $this->tl = new TL(__DIR__.'/TL_schema.JSON');
+            $this->tl = new TL\TL(__DIR__.'/TL_schema.JSON');
         }
-        // Load rsa key
-        $this->settings['rsa_content'] = file_get_contents($this->rsa_pub);
-
+        // Istantiate logging class 
+        $this->log = new Logging($this->settings["logging"], $this->settings["logging_param"]);
         // Set some defaults
+        $this->auth_key = $this->settings["auth_key"];
         $this->number = 0;
         $this->timedelta = 0;
         $this->session_id = \phpseclib\Crypt\Random::string(8);
@@ -95,19 +103,19 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
 
         if (($this->auth_key == null) || ($this->server_salt == null)) {
-            $message = string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
+            $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
             $encrypted_data =
                 $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
-            echo strlen($encrypted_data.$padding).PHP_EOL;
+            $this->log->log(strlen($encrypted_data.$padding));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
         $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
-        fwrite($this->sock, $step2);
+        $this->sock->write($step2);
         $this->number += 1;
     }
 
@@ -116,19 +124,18 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function recv_message()
     {
-        $packet_length_data = fread($this->sock, 4);
+        $packet_length_data = $this->sock->read(4);
         if (strlen($packet_length_data) < 4) {
             throw new Exception('Nothing in the socket!');
         }
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-        var_dump($packet_length);
-        $packet = fread($this->sock, ($packet_length - 4));
+        $packet = $this->sock->read($packet_length - 4);
         if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
         }
         $x = $this->struct->unpack('<I', substr($packet, 0, 4));
         $auth_key_id = substr($packet, 4, 8);
-        if ($auth_key_id == string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+        if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
             $data = substr($packet, 24, (24 + $message_length) - 24);
         } elseif ($auth_key_id == $this->auth_key_id) {
@@ -161,38 +168,39 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
-                echo 'An error occurred while calling method '.$method.': '.$e->getMessage().PHP_EOL.'Stack trace:'.$e->getTraceAsString().PHP_EOL.'Retrying to call method...'.PHP_EOL.PHP_EOL;
+                $this->log->log(PHP_EOL.'An error occurred while calling method '.$method.': '.$e->getMessage().PHP_EOL.'Stack trace:'.$e->getTraceAsString().PHP_EOL.'Retrying to call method...'.PHP_EOL);
                 continue;
             }
             if ($server_answer == null) {
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
 
-            return $this->tl->deserialize(fopen_and_write('php://memory', 'rw+b', $server_answer));
+            return $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
         }
         throw new Exception('An error occurred while calling method '.$method.'.');
     }
 
     public function create_auth_key()
     {
-        // Load the RSA key
-        $key = new \phpseclib\Crypt\RSA();
-        $key->load($settings['rsa_content']);
 
         // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
-        pyjslib_printnl('Requesting pq');
+        $this->log->log('Handshake: Requesting pq');
         $ResPQ = $this->method_call('req_pq', ['nonce' => $nonce]);
         $server_nonce = $ResPQ['server_nonce'];
         if ($ResPQ['nonce'] !== $nonce) {
             throw new Exception('Handshake: wrong nonce');
         }
-        $public_key_fingerprint = (int) $ResPQ['server_public_key_fingerprints'][0];
         $pq_bytes = $ResPQ['pq'];
-        var_dump(
-            (int) $this->struct->unpack('<q', substr(sha1($this->tl->serialize_param('bytes', $key->modulus->toBytes()).$this->tl->serialize_param('bytes', $key->exponent->toBytes()), true), -8))[0],
-            $public_key_fingerprint
-            );
+        foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
+            if($curfp === $this->key->fp_float) {
+                $public_key_fingerprint = $curfp;
+                break;
+            }
+        }
+        if(!isset($public_key_fingerprint)) {
+            throw new Exception("Handshake: couldn't find our key in the server_public_key_fingerprints vector.");
+        }
 
         // Compute p and q
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
@@ -207,7 +215,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
 
 
-        pyjslib_printnl(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
+        $this->log->log(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
 
         $p_bytes = $this->struct->pack('>Q', (string) $p);
         $q_bytes = $this->struct->pack('>Q', (string) $q);
@@ -216,8 +224,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $sha_digest = sha1($data, true);
         $random_bytes = \phpseclib\Crypt\Random::string(255 - strlen($data) - strlen($sha_digest));
         $to_encrypt = $sha_digest.$data.$random_bytes;
-        $encrypted_data = $key->_raw_encrypt($to_encrypt);
-        pyjslib_printnl('Starting Diffie Hellman key exchange');
+        $encrypted_data = $this->key->encrypt($to_encrypt);
+        $this->log->log('Starting Diffie Hellman key exchange');
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
         if ($nonce != $server_dh_params['nonce']) {
             throw new Exception('Handshake: wrong nonce.');
@@ -231,7 +239,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $answer_with_hash = crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
         $answer_hash = substr($answer_with_hash, 0, 20);
         $answer = substr($answer_with_hash, 20);
-        $server_DH_inner_data = deserialize(fopen_and_write('php://memory', 'rw+b', $answer));
+        $server_DH_inner_data = deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
         if ($nonce != $server_DH_inner_data['nonce']) {
             throw new Exception('Handshake: wrong nonce');
         }
@@ -243,7 +251,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $g_a_str = $server_DH_inner_data['g_a'];
         $server_time = $server_DH_inner_data['server_time'];
         $this->timedelta = ($server_time - time());
-        pyjslib_printnl(sprintf('Server-client time delta = %.1f s', $this->timedelta));
+        $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
         $dh_prime = $this->struct->unpack('>Q', $dh_prime_str);
         $g_a = $this->struct->unpack('>Q', $g_a_str);
         if (!$this->PrimeModule->isprime($dh_prime)) {
@@ -277,23 +285,23 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
                     throw new Exception('Handshake: wrong new_nonce_hash1');
                 }
-                pyjslib_printnl('Diffie Hellman key exchange processed successfully');
+                $this->log->log('Diffie Hellman key exchange processed successfully');
                 $this->server_salt = new strxor(substr($new_nonce, 0, 8 - 0), substr($server_nonce, 0, 8 - 0));
                 $this->auth_key = $auth_key_str;
                 $this->auth_key_id = substr($auth_key_sha, -8);
-                pyjslib_printnl('Auth key generated');
+                $this->log->log('Auth key generated');
 
                 return 'Auth Ok';
             } elseif ($Set_client_DH_params_answer->name == 'dh_gen_retry') {
                 if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                     throw new Exception('Handshake: wrong new_nonce_hash_2');
                 }
-                pyjslib_printnl('Retry Auth');
+                $this->log->log('Retry Auth');
             } elseif ($Set_client_DH_params_answer->name == 'dh_gen_fail') {
                 if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                     throw new Exception('Handshake: wrong new_nonce_hash_3');
                 }
-                pyjslib_printnl('Auth Failed');
+                $this->log->log('Auth Failed');
                 throw new Exception('Auth Failed');
             } else {
                 throw new Exception('Response Error');

@@ -6,4 +6,4 @@ if (!$config) {
     pyjslib_printnl("File 'credentials' seems to not exist.");
     exit(-1);
 }
-$MadelineProto = new \danog\MadelineProto\API('393888288264', $config);
+$MadelineProto = new \danog\MadelineProto\API($config);

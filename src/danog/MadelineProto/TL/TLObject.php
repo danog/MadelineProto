@@ -9,29 +9,12 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
-namespace danog\MadelineProto;
-class API extends Exception
+namespace danog\MadelineProto\TL;
+class TLObject extends \ArrayObject
 {
-    public $session;
-
-    public function __construct($params = [])
+    public function __construct($tl_elem)
     {
-        set_error_handler([$this, 'ExceptionErrorHandler']);
-        $this->session = new Session($params);
-        $this->session->create_auth_key();
-        $future_salts = $this->session->method_call('get_future_salts', 3);
-        Logging::log($future_salts, 3);
-    }
-
-    public function __destruct()
-    {
-        unset($this->session);
-        restore_error_handler();
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $session->method_call($name, $arguments);
+        parent::__construct();
+        $this->name = $tl_elem->predicate;
     }
 }
