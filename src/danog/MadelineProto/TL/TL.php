@@ -70,6 +70,7 @@ class TL
                 $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$argcount++]);
             }
         }
+
         return $bytes_io;
     }
 

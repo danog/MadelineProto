@@ -133,7 +133,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
         $packet = $this->sock->read($packet_length - 4);
         if ($packet_length == 4) {
-            throw new Exception("Server response error: " . $this->struct->unpack('<I', $packet)[0]);
+            throw new Exception('Server response error: '.$this->struct->unpack('<I', $packet)[0]);
         }
         if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
@@ -237,7 +237,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         // req_DH_params
         $this->log->log('Starting Diffie Hellman key exchange');
-        
+
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
 
         if ($nonce != $server_dh_params['nonce']) {
