@@ -9,7 +9,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
+
 class RSA extends TL\TL
 {
     public $key; // phpseclib\Crypt\RSA class
@@ -25,13 +27,14 @@ class RSA extends TL\TL
         $this->n = $this->key->modulus;
         $this->e = $this->key->exponent;
 
-        $this->fp = new \phpseclib\Math\BigInteger(strrev(substr(sha1($this->serialize_param('bytes', $this->n->toBytes()) . $this->serialize_param('bytes', $this->e->toBytes()), true), -8)), -256);
+        $this->fp = new \phpseclib\Math\BigInteger(strrev(substr(sha1($this->serialize_param('bytes', $this->n->toBytes()).$this->serialize_param('bytes', $this->e->toBytes()), true), -8)), -256);
         $this->fp_float = (float) $this->fp->toString();
     }
 
     public function encrypt($data)
     {
         $bigintdata = new \phpseclib\Math\BigInteger($data, 256);
+
         return $bigintdata->powMod($this->e, $this->n)->toBytes();
     }
 }

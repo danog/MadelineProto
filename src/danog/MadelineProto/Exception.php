@@ -9,7 +9,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
+
 class Exception extends \Exception
 {
     public function __construct($message, $code = 0, Exception $previous = null)
@@ -21,6 +23,7 @@ class Exception extends \Exception
         // make sure everything is assigned properly
         parent::__construct($message, $code, $previous);
     }
+
     /**
      * ExceptionErrorHandler.
      *
@@ -32,6 +35,6 @@ class Exception extends \Exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
         }
-        throw new Exception($errstr.' on line '.$errline.' of file '.$errfile, $errno);
+        throw new self($errstr.' on line '.$errline.' of file '.$errfile, $errno);
     }
 }

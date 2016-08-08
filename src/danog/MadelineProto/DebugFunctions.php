@@ -9,14 +9,16 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
-class DebugFunctions {
+class DebugFunctions
+{
     /**
-    * Function to dump the hex version of a string.
-    *
-    * @param $what What to dump.
-    */
+     * Function to dump the hex version of a string.
+     *
+     * @param $what What to dump.
+     */
     public static function hex_dump(...$what)
     {
         foreach ($what as $w) {
@@ -25,9 +27,9 @@ class DebugFunctions {
     }
 
     /**
-    * Function to visualize byte streams. Split into bytes, print to console.
-    * :param bs: BYTE STRING.
-    */
+     * Function to visualize byte streams. Split into bytes, print to console.
+     * :param bs: BYTE STRING.
+     */
     public static function vis($bs)
     {
         $bs = str_split($bs);

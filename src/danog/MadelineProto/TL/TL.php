@@ -9,7 +9,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\TL;
+
 class TL
 {
     public function __construct($filename)
@@ -39,7 +41,7 @@ class TL
         if (isset($this->constructor_type[$type_])) {
             $tl_constructor = $this->constructor_type[$type_];
         } else {
-            throw new Exception('Could not extract type: ' . $type_);
+            throw new Exception('Could not extract type: '.$type_);
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_constructor->id);
         foreach ($tl_constructor->params as $arg) {
@@ -55,7 +57,7 @@ class TL
         if (isset($this->method_name[$type_])) {
             $tl_method = $this->method_name[$type_];
         } else {
-            throw new Exception('Could not extract type: ' . $type_);
+            throw new Exception('Could not extract type: '.$type_);
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_method->id);
         foreach ($tl_method->params as $arg) {
@@ -179,7 +181,7 @@ class TL
                     if (isset($this->constructor_id[$i])) {
                         $tl_elem = $this->constructor_id[$i];
                     } else {
-                        throw new Exception('Could not extract type: ' . $type_);
+                        throw new Exception('Could not extract type: '.$type_);
                     }
                 }
 

@@ -12,23 +12,30 @@ If not, see <http://www.gnu.org/licenses/>.
 /*
  * Logging class
  */
+
 namespace danog\MadelineProto;
-class Logging {
+
+class Logging
+{
     public $mode = null;
     public $optional = null;
+
     /*
-     * Constructor function 
+     * Constructor function
      * Accepts various logging modes:
      * 0 - No logging
      * 1 - Log to the default logging destination
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public function __construct($mode, $optional = null){
-        $this->mode = (string)$mode;
+    public function __construct($mode, $optional = null)
+    {
+        $this->mode = (string) $mode;
         $this->optional = $optional;
     }
-    public function __invoke(...$params){
+
+    public function __invoke(...$params)
+    {
         foreach ($params as $param) {
             switch ($this->mode) {
                 case '1':
@@ -38,15 +45,17 @@ class Logging {
                     error_log($param, 3, $this->optional);
                     break;
                 case '3':
-                    echo $param . PHP_EOL;
+                    echo $param.PHP_EOL;
                     break;
                 default:
                     break;
             }
         }
     }
-    public function log(...$params) {
-        if($this->mode == null) {
+
+    public function log(...$params)
+    {
+        if ($this->mode == null) {
             $mode = array_pop($params);
         } else {
             $mode = $this->mode;
@@ -60,7 +69,7 @@ class Logging {
                     error_log($param, 3, $this->optional);
                     break;
                 case '3':
-                    echo $param . PHP_EOL;
+                    echo $param.PHP_EOL;
                     break;
                 default:
                     break;

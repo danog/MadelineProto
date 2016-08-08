@@ -9,7 +9,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
+
 /**
  * Manages encryption and message frames.
  */
@@ -19,7 +21,7 @@ class Session extends Tools
 
     public function __construct($settings)
     {
-        
+
         // Set default settings
         $default_settings = [
             'auth_key'      => null,
@@ -40,7 +42,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
             'logging'       => 1,
             'logging_param' => '/tmp/MadelineProto.log',
-            'logging'       => 3
+            'logging'       => 3,
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -64,10 +66,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         } catch (Exception $e) {
             $this->tl = new TL\TL(__DIR__.'/TL_schema.JSON');
         }
-        // Istantiate logging class 
-        $this->log = new Logging($this->settings["logging"], $this->settings["logging_param"]);
+        // Istantiate logging class
+        $this->log = new Logging($this->settings['logging'], $this->settings['logging_param']);
         // Set some defaults
-        $this->auth_key = $this->settings["auth_key"];
+        $this->auth_key = $this->settings['auth_key'];
         $this->number = 0;
         $this->timedelta = 0;
         $this->session_id = \phpseclib\Crypt\Random::string(8);
@@ -193,12 +195,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $pq_bytes = $ResPQ['pq'];
         foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
-            if($curfp === $this->key->fp_float) {
+            if ($curfp === $this->key->fp_float) {
                 $public_key_fingerprint = $curfp;
                 break;
             }
         }
-        if(!isset($public_key_fingerprint)) {
+        if (!isset($public_key_fingerprint)) {
             throw new Exception("Handshake: couldn't find our key in the server_public_key_fingerprints vector.");
         }
 

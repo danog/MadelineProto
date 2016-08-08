@@ -11,6 +11,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 namespace danog\MadelineProto;
+
 /**
  * Some tools.
  */
@@ -60,6 +61,7 @@ class Tools
 
         return $res;
     }
+
     // taken from mochikit: range( [start,] stop[, step] )
     public static function range($start, $stop = null, $step = 1)
     {
