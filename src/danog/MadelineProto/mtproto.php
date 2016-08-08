@@ -17,22 +17,22 @@ class mtproto extends Tools
     {
         // Set default settings
         $default_settings = [
-            'ip' => '149.154.167.50',
-            'port' => '443',
-            'protocol' => 'tcp',
-            'auth_key' => null,
+            'ip'          => '149.154.167.50',
+            'port'        => '443',
+            'protocol'    => 'tcp',
+            'auth_key'    => null,
             'server_salt' => null,
-            'api_id' => 25628,
-            'api_hash' => '1fe17cda7d355166cdaa71f04122873c',
-            'tl_schema' => 'https://core.telegram.org/schema/mtproto-json',
-            'rsa_key' => '-----BEGIN RSA PUBLIC KEY-----
+            'api_id'      => 25628,
+            'api_hash'    => '1fe17cda7d355166cdaa71f04122873c',
+            'tl_schema'   => 'https://core.telegram.org/schema/mtproto-json',
+            'rsa_key'     => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
 an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
 Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----'
+-----END RSA PUBLIC KEY-----',
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -45,7 +45,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->sock = new Connection($this->settings['ip_address'], $this->settings['ip_address'], $this->settings['protocol']);
 
         // Load rsa key
-        $this->key = new RSA($settings["rsa_key"]);
+        $this->key = new RSA($settings['rsa_key']);
         // Istantiate struct class
         $this->struct = new \danog\PHP\Struct();
         // Istantiate prime class
