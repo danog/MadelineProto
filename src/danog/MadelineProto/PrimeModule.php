@@ -224,27 +224,24 @@ class PrimeModule
 
 
         $factors = [];
-        $one = new \phpseclib\Math\BigInteger(1);
-        $two = new \phpseclib\Math\BigInteger(2);
-        $limit = $n->root()->add($one);
+        $limit = sqrt($n) + 1;
         foreach ($this->smallprimes as $checker) {
-            $checker = new \phpseclib\Math\BigInteger($checker);
-            if ($limit->compare($checker) == -1) {
+            if ($checker > $limit) {
                 break;
             }
-            while ($n->modPow($one, $checker)->toString() == '0') {
+            do {
                 $factors[] = $checker;
-                $n = $n->divide($checker)[0];
-                $limit = $n->root()->add($one);
-                if ($limit->compare($checker) == -1) {
+                $n = intval($n / $checker);
+                $limit = sqrt($n) + 1;
+                if ($checker > $limit) {
                     break;
                 }
-            }
+            } while (Tools::posmod($n, $checker) == 0);
         }
-        if ($n->compare($two) == -1) {
+        if ($n < 2) {
             return $factors;
         }
-        while ($n->compare($two) == 1) {
+        while ($n > 1) {
             if ($n->isprime()) {
                 $factors[] = $n;
                 break;
