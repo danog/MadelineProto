@@ -219,14 +219,19 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         $this->log->log(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
 
+        // Serialize object for req_DH_params
         $p_bytes = $this->struct->pack('>Q', (string) $p);
         $q_bytes = $this->struct->pack('>Q', (string) $q);
         $new_nonce = \phpseclib\Crypt\Random::string(32);
         $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha1($data, true);
+
+        // Encrypt serialized object
         $random_bytes = \phpseclib\Crypt\Random::string(255 - strlen($data) - strlen($sha_digest));
         $to_encrypt = $sha_digest.$data.$random_bytes;
         $encrypted_data = $this->key->encrypt($to_encrypt);
+
+        // req_DH_params
         $this->log->log('Starting Diffie Hellman key exchange');
         $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
         if ($nonce != $server_dh_params['nonce']) {

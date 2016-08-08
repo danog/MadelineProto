@@ -143,7 +143,6 @@ class Session:
 
         f = open(os.path.join(os.path.dirname(__file__), "rsa.pub"))
         key = RSA.importKey(f.read())
-        print(getattr(key.key, 'n') . getattr(key.key, 'e'))
         ResPQ = self.method_call('req_pq', nonce=nonce)
         server_nonce = ResPQ['server_nonce']
         # TODO: selecting RSA public key based on this fingerprint
