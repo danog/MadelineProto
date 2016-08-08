@@ -60,10 +60,16 @@ class TL
             throw new Exception('Could not extract type: '.$type_);
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_method->id);
-        foreach ($tl_method->params as $arg) {
-            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
+        if (count(array_filter(array_keys($kwargs), 'is_string')) > 0) {
+            foreach ($tl_method->params as $arg) {
+                $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
+            }
+        } else {
+            $argcount = 0;
+            foreach ($tl_method->params as $arg) {
+                $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$argcount++]);
+            }
         }
-
         return $bytes_io;
     }
 
