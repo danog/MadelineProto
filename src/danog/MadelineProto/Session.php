@@ -132,14 +132,15 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
         $packet = $this->sock->read($packet_length - 4);
-        if ($packet_length == 4) {
-            throw new Exception('Server response error: '.$this->struct->unpack('<I', $packet)[0]);
-        }
         if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
             throw new Exception('CRC32 was not correct!');
         }
         $x = $this->struct->unpack('<I', substr($packet, 0, 4));
-        $auth_key_id = substr($packet, 4, 8);
+        $payload = substr($packet, 4, strlen($packet) - 8);
+        if (strlen($payload) == 4) {
+            throw new Exception('Server response error: '.$this->struct->unpack('<I', $payload)[0]);
+        }
+        $auth_key_id = substr($payload, 0, 8);
         if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
             $data = substr($packet, 24, (24 + $message_length) - 24);
@@ -224,8 +225,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->log->log(sprintf('Factorization %s = %s * %s', $pq, $p, $q));
 
         // Serialize object for req_DH_params
-        $p_bytes = $this->struct->pack('>Q', (string) $p);
-        $q_bytes = $this->struct->pack('>Q', (string) $q);
+        $p_bytes = $this->struct->pack('>I', (string) $p);
+        $q_bytes = $this->struct->pack('>I', (string) $q);
         $new_nonce = \phpseclib\Crypt\Random::string(32);
         $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha1($data, true);
