@@ -1,6 +1,7 @@
 # MadelineProto
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
-[![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)
+[![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
+
 Licensed under AGPLv3.
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).

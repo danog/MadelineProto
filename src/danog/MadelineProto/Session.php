@@ -28,7 +28,7 @@ class Session extends Tools
             'server_salt'   => null,
             'ip_address'    => '149.154.167.50',
             'port'          => '443',
-            'protocol'      => 'tcp',
+            'protocol'      => 'tcp_full',
             'api_id'        => 25628,
             'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
             'tl_schema'     => [
@@ -105,23 +105,28 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data)
     {
-        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-
-        if (($this->auth_key == null) || ($this->server_salt == null)) {
-            $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
-        } else {
-            $encrypted_data =
-                $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
-            $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
-            $this->log->log(strlen($encrypted_data.$padding));
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+        switch ($this->settings["protocol"]) {
+            case 'tcp_full':
+                $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+                if (($this->auth_key == null) || ($this->server_salt == null)) {
+                    $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
+                } else {
+                    $encrypted_data =
+                        $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
+                    $message_key = substr(sha1($encrypted_data, true), -16);
+                    $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
+                    $this->log->log(strlen($encrypted_data.$padding));
+                    list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
+                    $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                }
+                $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
+                $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
+                $this->sock->write($step2);
+                $this->number += 1;
+                break;
+            default:
+                break;
         }
-        $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
-        $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
-        $this->sock->write($step2);
-        $this->number += 1;
     }
 
     /**
@@ -129,42 +134,47 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function recv_message()
     {
-        $packet_length_data = $this->sock->read(4);
-        if (strlen($packet_length_data) < 4) {
-            throw new Exception('Nothing in the socket!');
-        }
-        $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-        $packet = $this->sock->read($packet_length - 4);
-        if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
-            throw new Exception('CRC32 was not correct!');
-        }
-        $x = $this->struct->unpack('<I', substr($packet, 0, 4));
-        $payload = substr($packet, 4, strlen($packet) - 8);
-        if (strlen($payload) == 4) {
-            throw new Exception('Server response error: '.$this->struct->unpack('<I', $payload)[0]);
-        }
-        $auth_key_id = substr($payload, 0, 8);
-        if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
-            $data = substr($packet, 24, (24 + $message_length) - 24);
-        } elseif ($auth_key_id == $this->auth_key_id) {
-            $message_key = substr($packet, 12, 28 - 12);
-            $encrypted_data = substr($packet, 28, -4 - 28);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-            $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-            if (substr($decrypted_data, 0, 8) != $this->server_salt) {
-                throw new Exception('Server salt does not match.');
-            }
-            if (substr($decrypted_data, 8, 8) != $this->session_id) {
-                throw new Exception('Session id does not match.');
-            }
-            $message_id = substr($decrypted_data, 16, 24 - 16);
-            $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 28 - 24)) [0];
-            $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 32 - 28)) [0];
-            $data = substr($decrypted_data, 32, (32 + $message_data_length) - 32);
-        } else {
-            DebugFunctions::hex_dump($packet);
-            throw new Exception('Got unknown auth_key id');
+        switch ($this->settings["protocol"]) {
+            case 'tcp_full':
+                $packet_length_data = $this->sock->read(4);
+                if (strlen($packet_length_data) < 4) {
+                    throw new Exception('Nothing in the socket!');
+                }
+                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+                $packet = $this->sock->read($packet_length - 4);
+                if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
+                    throw new Exception('CRC32 was not correct!');
+                }
+                $x = $this->struct->unpack('<I', substr($packet, 0, 4));
+                $payload = substr($packet, 4, strlen($packet) - 8);
+                if (strlen($payload) == 4) {
+                    throw new Exception('Server response error: '.$this->struct->unpack('<I', $payload)[0]);
+                }
+                $auth_key_id = substr($payload, 0, 8);
+                if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+                    list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
+                    $data = substr($packet, 24, $message_length);
+                } elseif ($auth_key_id == $this->auth_key_id) {
+                    $message_key = substr($packet, 12, 28 - 12);
+                    $encrypted_data = substr($packet, 28, -4 - 28);
+                    list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
+                    $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+                    if (substr($decrypted_data, 0, 8) != $this->server_salt) {
+                        throw new Exception('Server salt does not match.');
+                    }
+                    if (substr($decrypted_data, 8, 8) != $this->session_id) {
+                        throw new Exception('Session id does not match.');
+                    }
+                    $message_id = substr($decrypted_data, 16, 24 - 16);
+                    $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 28 - 24)) [0];
+                    $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 32 - 28)) [0];
+                    $data = substr($decrypted_data, 32, (32 + $message_data_length) - 32);
+                } else {
+                    throw new Exception('Got unknown auth_key id');
+                }
+                break;
+            default:
+                break;
         }
 
         return $data;
@@ -178,7 +188,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
-                $this->log->log(PHP_EOL.'An error occurred while calling method '.$method.': '.$e->getMessage().PHP_EOL.'Stack trace:'.$e->getTraceAsString().PHP_EOL.'Retrying to call method...'.PHP_EOL);
+                $this->log->log(PHP_EOL.'An error occurred while calling method '.$method.': '.$e->getMessage().' on line '.$e->getLine().' of file '.$e->getFile().PHP_EOL.'Retrying to call method...'.PHP_EOL);
                 continue;
             }
             if ($server_answer == null) {

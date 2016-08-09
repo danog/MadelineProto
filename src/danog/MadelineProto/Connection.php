@@ -20,12 +20,37 @@ class Connection
     public $sock = null;
     public $protocol = null;
 
-    public function __construct($ip, $port, $protocol = 'tcp')
+    public function __construct($ip, $port, $protocol = 'tcp_full')
     {
-        switch ($protocol) {
-            case 'tcp':
+        // Can use:
+        /*
+        - tcp_full
+        - tcp_abridged
+        - tcp_intermediate
+        - http
+        - https
+        - udp
+        */
+        $this->protocol = $protocol;
+        switch ($this->protocol) {
+            case 'tcp_abridged':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                $this->protocol = 'tcp';
+                stream_set_timeout($this->sock, 5);
+                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                    throw new Exception("Connection: couldn't connect to socket.");
+                }
+                $this->write(Tools::string2bin('\xef'));
+                break;
+            case 'tcp_intermediate':
+                $this->sock = fsockopen('tcp://'.$ip.':'.$port);
+                stream_set_timeout($this->sock, 5);
+                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                    throw new Exception("Connection: couldn't connect to socket.");
+                }
+                $this->write(Tools::string2bin('\xeeeeeeee'));
+                break;
+            case 'tcp_full':
+                $this->sock = fsockopen('tcp://'.$ip.':'.$port);
                 stream_set_timeout($this->sock, 5);
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
@@ -40,7 +65,9 @@ class Connection
     public function __destruct()
     {
         switch ($this->protocol) {
-            case 'tcp':
+            case 'tcp_abridged':
+            case 'tcp_intermediate':
+            case 'tcp_full':
                 fclose($this->sock);
                 break;
             default:
@@ -55,11 +82,12 @@ class Connection
             $what = substr($what, 0, $length);
         }
         switch ($this->protocol) {
-            case 'tcp':
+            case 'tcp_abridged':
+            case 'tcp_intermediate':
+            case 'tcp_full':
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-
                 return fwrite($this->sock, $what);
                 break;
             default:
@@ -71,7 +99,9 @@ class Connection
     public function read($length)
     {
         switch ($this->protocol) {
-            case 'tcp':
+            case 'tcp_abridged':
+            case 'tcp_intermediate':
+            case 'tcp_full':
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -82,9 +112,5 @@ class Connection
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
         }
-    }
-
-    public function read_message()
-    {
     }
 }

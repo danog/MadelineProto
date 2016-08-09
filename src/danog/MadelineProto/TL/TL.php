@@ -16,9 +16,13 @@ class TL
 {
     public function __construct($filename)
     {
-        $TL_dict = [];
-        foreach ($filename as $file) {
-            $TL_dict = array_replace(json_decode(file_get_contents($file), true), $TL_dict);
+        if(is_array($filename)) {
+            $TL_dict = [];
+            foreach ($filename as $file) {
+                $TL_dict = array_replace(json_decode(file_get_contents($file), true), $TL_dict);
+            }
+        } else {
+            $TL_dict = json_decode(file_get_contents($file), true);
         }
         $this->constructors = $TL_dict['constructors'];
         $this->constructor_id = [];
