@@ -83,8 +83,8 @@ class Connection
                 break;
         }
     }
+
     public function read_message()
     {
-        
     }
 }

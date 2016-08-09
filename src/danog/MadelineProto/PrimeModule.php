@@ -221,7 +221,7 @@ class PrimeModule
         if (count($res) == 2) {
             return $res;
         }
-        $n = (int)$n->toString();
+        $n = (int) $n->toString();
         $factors = [];
         $limit = sqrt($n) + 1;
         foreach ($this->smallprimes as $checker) {
