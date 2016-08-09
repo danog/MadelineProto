@@ -31,7 +31,10 @@ class Session extends Tools
             'protocol'      => 'tcp',
             'api_id'        => 25628,
             'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
-            'tl_schema'     => 'https://core.telegram.org/schema/mtproto-json',
+            'tl_schema'     => [
+                'https://core.telegram.org/schema/mtproto-json',
+                __DIR__.'/telegram_layer55.json',
+            ],
             'rsa_key'       => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS

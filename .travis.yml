@@ -1,0 +1,18 @@
+sudo: required
+dist: trusty
+group: edge
+language: php
+php:
+  - '7.0'
+  - nightly
+  - hhvm
+  - '5.6'
+addons:
+  apt:
+    packages:
+    - python3
+
+before_script:
+  - composer update --dev
+script:
+  - ./testing.php

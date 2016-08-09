@@ -53,17 +53,17 @@ class PrimeModule
         $d = ($n - 1);
         $s = 0;
         while (($d % 2) == 0) {
-            $d = floor($d / 2);
+            $d = intval($d / 2);
             $s++;
         }
         $break = false;
-        foreach (pyjslib_range($precision) as $repeat) {
+        foreach (Tools::range($precision) as $repeat) {
             $a = rand(2, ($n - 2));
             $x = posmod(pow($a, $d), $n);
             if (($x == 1) || ($x == ($n - 1))) {
                 continue;
             }
-            foreach (pyjslib_range($s - 1) as $r) {
+            foreach (Tools::range($s - 1) as $r) {
                 $x = posmod(pow($x, 2), $n);
                 if (($x == 1)) {
                     return false;
@@ -221,8 +221,7 @@ class PrimeModule
         if (count($res) == 2) {
             return $res;
         }
-
-
+        $n = (int)$n->toString();
         $factors = [];
         $limit = sqrt($n) + 1;
         foreach ($this->smallprimes as $checker) {
@@ -242,13 +241,13 @@ class PrimeModule
             return $factors;
         }
         while ($n > 1) {
-            if ($n->isprime()) {
+            if ($this->isprime($n)) {
                 $factors[] = $n;
                 break;
             }
             $factor = $this->pollard_brent($n);
             $factors[] = $this->primefactors($factor);
-            $n = floor($n / $factor);
+            $n = intval($n / $factor);
         }
         if ($sort) {
             $factors = sort($factors);
@@ -303,6 +302,6 @@ class PrimeModule
 
     public function lcm($a, $b)
     {
-        return floor(abs(($a * $b)) / $this->gcd($a, $b));
+        return intval(abs(($a * $b)) / $this->gcd($a, $b));
     }
 }
