@@ -105,7 +105,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data)
     {
-        switch ($this->settings["protocol"]) {
+        switch ($this->settings['protocol']) {
             case 'tcp_full':
                 $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
                 if (($this->auth_key == null) || ($this->server_salt == null)) {
@@ -134,7 +134,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function recv_message()
     {
-        switch ($this->settings["protocol"]) {
+        switch ($this->settings['protocol']) {
             case 'tcp_full':
                 $packet_length_data = $this->sock->read(4);
                 if (strlen($packet_length_data) < 4) {

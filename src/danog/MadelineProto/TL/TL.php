@@ -16,7 +16,7 @@ class TL
 {
     public function __construct($filename)
     {
-        if(is_array($filename)) {
+        if (is_array($filename)) {
             $TL_dict = [];
             foreach ($filename as $file) {
                 $TL_dict = array_replace(json_decode(file_get_contents($file), true), $TL_dict);

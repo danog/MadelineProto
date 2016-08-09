@@ -88,6 +88,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+
                 return fwrite($this->sock, $what);
                 break;
             default:
