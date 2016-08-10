@@ -28,7 +28,7 @@ class Session extends Tools
             'server_salt'   => null,
             'ip_address'    => '149.154.167.50',
             'port'          => '443',
-            'protocol'      => 'tcp_intermediate',
+            'protocol'      => 'tcp_abridged',
             'api_id'        => 25628,
             'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
             'tl_schema'     => [
@@ -150,7 +150,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Nothing in the socket!');
                 }
                 $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-                var_dump($packet_length);
                 $packet = $this->sock->read($packet_length - 4);
                 if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
                     throw new Exception('CRC32 was not correct!');
@@ -179,7 +178,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     $packet_length_data = $this->sock->read(3);
                     $packet_length = $this->struct->unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
-
                 $packet = $this->sock->read($packet_length);
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
@@ -194,7 +192,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $data = fread($payload, $message_length);
         } elseif ($auth_key_id == $this->auth_key_id) {
             $message_key = fread($payload, 16);
-            $encrypted_data = fread($payload, fstat($payload)['size'] - ftell($payload));
+            $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             if (substr($decrypted_data, 0, 8) != $this->server_salt) {
@@ -246,7 +244,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($ResPQ['nonce'] !== $nonce) {
             throw new Exception('Handshake: wrong nonce');
         }
-        $pq_bytes = $ResPQ['pq'];
         foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
             if ($curfp === $this->key->fp_float) {
                 $public_key_fingerprint = $curfp;
@@ -256,7 +253,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if (!isset($public_key_fingerprint)) {
             throw new Exception("Handshake: couldn't find our key in the server_public_key_fingerprints vector.");
         }
-
+        $pq_bytes = $ResPQ['pq'];
         // Compute p and q
         $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
         list($p, $q) = $this->PrimeModule->primefactors($pq);
@@ -266,7 +263,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             list($p, $q) = [$q, $p];
         }
         if (!(($pq->equals($p->multiply($q))) && ($p < $q))) {
-            throw new Exception("Handshake: couldn't compute p or q.");
+            throw new Exception("Handshake: couldn't compute p and q.");
         }
 
 
@@ -275,6 +272,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Serialize object for req_DH_params
         $p_bytes = $this->struct->pack('>I', (string) $p);
         $q_bytes = $this->struct->pack('>I', (string) $q);
+
         $new_nonce = \phpseclib\Crypt\Random::string(32);
         $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         $sha_digest = sha1($data, true);
@@ -287,7 +285,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // req_DH_params
         $this->log->log('Starting Diffie Hellman key exchange');
 
-        $server_dh_params = $this->method_call('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $public_key_fingerprint, 'encrypted_data' => $encrypted_data]);
+        $server_dh_params = $this->method_call('req_DH_params', 
+            ['nonce' => $nonce,
+            'server_nonce' => $server_nonce,
+            'p' => $p_bytes,
+            'q' => $q_bytes,
+            'public_key_fingerprint' => $public_key_fingerprint,
+            'encrypted_data' => $encrypted_data]);
 
         if ($nonce != $server_dh_params['nonce']) {
             throw new Exception('Handshake: wrong nonce.');
