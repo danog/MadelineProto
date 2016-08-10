@@ -47,7 +47,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->write(Tools::string2bin('\xeeeeeeee'));
+                $this->write(Tools::string2bin('\xee\xee\xee\xee'));
                 break;
             case 'tcp_full':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);

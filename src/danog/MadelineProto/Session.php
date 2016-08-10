@@ -4,7 +4,7 @@ Copyright 2016 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-The PWRTelegram API is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
@@ -28,7 +28,7 @@ class Session extends Tools
             'server_salt'   => null,
             'ip_address'    => '149.154.167.50',
             'port'          => '443',
-            'protocol'      => 'tcp_full',
+            'protocol'      => 'tcp_intermediate',
             'api_id'        => 25628,
             'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
             'tl_schema'     => [
@@ -64,11 +64,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Istantiate prime class
         $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
-        try {
-            $this->tl = new TL\TL($this->settings['tl_schema']);
-        } catch (Exception $e) {
-            $this->tl = new TL\TL(__DIR__.'/TL_schema.JSON');
-        }
+        $this->tl = new TL\TL($this->settings['tl_schema']);
         // Istantiate logging class
         $this->log = new Logging($this->settings['logging'], $this->settings['logging_param']);
         // Set some defaults
@@ -105,8 +101,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data)
     {
-        switch ($this->settings['protocol']) {
-            case 'tcp_full':
+        
                 $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
                 if (($this->auth_key == null) || ($this->server_salt == null)) {
                     $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
@@ -119,10 +114,25 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
                     $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 }
+        switch ($this->settings['protocol']) {
+            case 'tcp_full':
                 $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
                 $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
                 $this->sock->write($step2);
                 $this->number += 1;
+                break;
+            case 'tcp_intermediate':
+                $step1 = $this->struct->pack('<I', strlen($message) + 4).$message;
+                $this->sock->write($step1);
+                break;
+            case 'tcp_abridged':
+                $len = strlen($message) / 4;
+                if ($len < 127) {
+                    $step1 = chr($len).$message;
+                } else {
+                    $step1 = chr(127) . substr($this->struct->pack("<I", $len), 0, 3) . $message;
+                }
+                $this->sock->write($step1);
                 break;
             default:
                 break;
@@ -141,22 +151,51 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Nothing in the socket!');
                 }
                 $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+                var_dump($packet_length);
                 $packet = $this->sock->read($packet_length - 4);
                 if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $x = $this->struct->unpack('<I', substr($packet, 0, 4));
-                $payload = substr($packet, 4, strlen($packet) - 8);
-                if (strlen($payload) == 4) {
-                    throw new Exception('Server response error: '.$this->struct->unpack('<I', $payload)[0]);
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 8));
+                break;
+            case 'tcp_intermediate':
+                $packet_length_data = $this->sock->read(4);
+                if (strlen($packet_length_data) < 4) {
+                    throw new Exception('Nothing in the socket!');
                 }
-                $auth_key_id = substr($payload, 0, 8);
+                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+                $packet = $this->sock->read($packet_length - 4);
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                break;
+            case 'tcp_abridged':
+                $packet_length_data = $this->sock->read(1);
+                if (strlen($packet_length_data) < 1) {
+                    throw new Exception('Nothing in the socket!');
+                }
+                $packet_length = ord($packet_length_data);
+                if ($packet_length < 127) {
+                    $packet_length <<= 2;
+                } else {
+                    $packet_length_data = $this->sock->read(3);
+                    $packet_length = $this->struct->unpack("<I", $packet_length_data . pack("x"))[0] << 2;
+                }
+                    
+                $packet = $this->sock->read($packet_length);
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                break;
+        }
+
+            if (fstat($payload)["size"] == 4) {
+                throw new Exception('Server response error: '.$this->struct->unpack('<I', fread($payload, 4))[0]);
+            }
+                $auth_key_id = fread($payload, 8);
                 if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-                    list($message_id, $message_length) = $this->struct->unpack('<8sI', substr($packet, 12, 12));
-                    $data = substr($packet, 24, $message_length);
+                    list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
+                    $data = fread($payload, $message_length);
                 } elseif ($auth_key_id == $this->auth_key_id) {
-                    $message_key = substr($packet, 12, 28 - 12);
-                    $encrypted_data = substr($packet, 28, -4 - 28);
+                    $message_key = fread($payload, 16);
+                    $encrypted_data = fread($payload, fstat($payload)["size"] - ftell($payload));
                     list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
                     $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
                     if (substr($decrypted_data, 0, 8) != $this->server_salt) {
@@ -165,17 +204,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     if (substr($decrypted_data, 8, 8) != $this->session_id) {
                         throw new Exception('Session id does not match.');
                     }
-                    $message_id = substr($decrypted_data, 16, 24 - 16);
-                    $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 28 - 24)) [0];
-                    $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 32 - 28)) [0];
-                    $data = substr($decrypted_data, 32, (32 + $message_data_length) - 32);
+                    $message_id = substr($decrypted_data, 16, 8);
+                    $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
+                    $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
+                    $data = substr($decrypted_data, 32, $message_data_length);
                 } else {
                     throw new Exception('Got unknown auth_key id');
                 }
-                break;
-            default:
-                break;
-        }
+        
 
         return $data;
     }
