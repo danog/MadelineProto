@@ -98,7 +98,6 @@ class TL
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
-
                 return \danog\PHP\Struct::pack('<q', $value);
                 break;
             case 'int128':

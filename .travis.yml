@@ -12,7 +12,5 @@ addons:
     packages:
     - python3
 
-before_script:
-  - composer update --dev
 script:
   - ./testing.php

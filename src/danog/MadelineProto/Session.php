@@ -184,7 +184,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
 
         if (fstat($payload)['size'] == 4) {
-            throw new Exception('Server response error: '.$this->struct->unpack('<I', fread($payload, 4))[0]);
+            throw new Exception('Server response error: '.abs($this->struct->unpack('<i', fread($payload, 4))[0]));
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
@@ -286,12 +286,15 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->log->log('Starting Diffie Hellman key exchange');
 
         $server_dh_params = $this->method_call('req_DH_params', 
-            ['nonce' => $nonce,
-            'server_nonce' => $server_nonce,
-            'p' => $p_bytes,
-            'q' => $q_bytes,
-            'public_key_fingerprint' => $public_key_fingerprint,
-            'encrypted_data' => $encrypted_data]);
+            [
+                'nonce' => $nonce,
+                'server_nonce' => $server_nonce,
+                'p' => $p_bytes,
+                'q' => $q_bytes,
+                'public_key_fingerprint' => $public_key_fingerprint,
+                'encrypted_data' => $encrypted_data
+            ]
+        );
 
         if ($nonce != $server_dh_params['nonce']) {
             throw new Exception('Handshake: wrong nonce.');
