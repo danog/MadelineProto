@@ -285,14 +285,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // req_DH_params
         $this->log->log('Starting Diffie Hellman key exchange');
 
-        $server_dh_params = $this->method_call('req_DH_params', 
+        $server_dh_params = $this->method_call('req_DH_params',
             [
-                'nonce' => $nonce,
-                'server_nonce' => $server_nonce,
-                'p' => $p_bytes,
-                'q' => $q_bytes,
+                'nonce'                  => $nonce,
+                'server_nonce'           => $server_nonce,
+                'p'                      => $p_bytes,
+                'q'                      => $q_bytes,
                 'public_key_fingerprint' => $public_key_fingerprint,
-                'encrypted_data' => $encrypted_data
+                'encrypted_data'         => $encrypted_data,
             ]
         );
 

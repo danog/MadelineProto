@@ -98,6 +98,7 @@ class TL
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
+
                 return \danog\PHP\Struct::pack('<q', $value);
                 break;
             case 'int128':
@@ -105,6 +106,7 @@ class TL
                 if (!is_string($value)) {
                     throw new Exception("serialize_param: given value isn't a string");
                 }
+
                 return $value;
                 break;
             case 'string':
@@ -121,6 +123,7 @@ class TL
                     $concat .= $value;
                     $concat .= pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
                 }
+
                 return $concat;
                 break;
             default:
