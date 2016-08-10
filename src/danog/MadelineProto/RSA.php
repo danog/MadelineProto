@@ -23,7 +23,7 @@ class RSA extends TL\TL
     public function __construct($key)
     {
         $this->key = new \phpseclib\Crypt\RSA();
-        $this->key->load($key);
+        $this->key->loadKey($key);
         $this->n = $this->key->modulus;
         $this->e = $this->key->exponent;
 

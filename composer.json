@@ -9,7 +9,7 @@
     "require": {
         "danog/phpstruct": "^1.1",
         "phpseclib/phpseclib": "^2.0",
-        "paragonie/constant_time_encoding": "^2.0",
+        "paragonie/constant_time_encoding": "^1|^2",
         "paragonie/random_compat": "^2.0",
         "php": ">=5.6.0"
     },

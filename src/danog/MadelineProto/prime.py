@@ -54,8 +54,7 @@ def pollard_brent(n):
     if n % 2 == 0: return 2
     if n % 3 == 0: return 3
 
-    y, c, m = 87552211475113995, 330422027228888537, 226866727920975483
-    #random.randint(1, n-1), random.randint(1, n-1), random.randint(1, n-1)
+    y, c, m = random.randint(1, n-1), random.randint(1, n-1), random.randint(1, n-1)
 
     g, r, q = 1, 1, 1
     while g == 1:

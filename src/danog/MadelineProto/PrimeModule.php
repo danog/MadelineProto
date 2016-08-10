@@ -131,50 +131,42 @@ class PrimeModule
 
     public function pollard_brent($n)
     {
-        $zero = new \phpseclib\Math\BigInteger(0);
-        $one = new \phpseclib\Math\BigInteger(1);
-        $two = new \phpseclib\Math\BigInteger(2);
-        $three = new \phpseclib\Math\BigInteger(3);
-        if ($n->powMod($one, $two)->toString() == '0') {
+        $zero = new \phpseclib\Math\BigInteger(1);
+        if (Tools::posmod($n, 2) == 0) {
             return 2;
         }
-        if ($n->powMod($one, $three)->toString() == '0') {
+        if (Tools::posmod($n, 3) == 0) {
             return 3;
         }
+        $max = new \phpseclib\Math\BigInteger($n - 1);
         $big = new \phpseclib\Math\BigInteger();
-        $max = $n->subtract($one);
-        list($y, $c, $m) = [new \phpseclib\Math\BigInteger(87552211475113995), new \phpseclib\Math\BigInteger(330422027228888537), new \phpseclib\Math\BigInteger(226866727920975483)];
-        //[$big->random($one, $max), $big->random($one, $max), $big->random($one, $max)];
-        list($g, $r, $q) = [$one, $one, $one];
-        while ($g->equals($one)) {
+        list($y, $c, $m) = [(int)$big->random($zero, $max)->toString(), (int)$big->random($zero, $max)->toString(), (int)$big->random($zero, $max)->toString()];
+        list($g, $r, $q) = [1, 1, 1];
+        do {
             $x = $y;
-            $params = ['y' => $y, 'two' => $two, 'c' => $c, 'one' => $one, 'n' => $n];
-            $r->loopforeach(function ($i, $params) {
-                $params['y'] = $params['y']->powMod($params['two'], $params['n'])->add($params['c'])->powMod($params['one'], $params['n']);
-            }, $params);
-            each($params);
-            $k = $zero;
-            while ($k->compare($r) == -1 && $g->equals($one)) {
+            $i = 0;
+            do {
+                $i++;
+                $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
+            } while ($i < $r);
+            $k = 0;
+            do {
                 $ys = $y;
-                $params = ['x' => $x, 'y' => $y, 'two' => $two, 'c' => $c, 'one' => $one, 'n' => $n, 'q' => $q];
-                $m->min($r->subtract($k))->loopforeach(function ($i, $params) {
-                    $params['y'] = $params['y']->powMod($params['two'], $params['n'])->add($params['c'])->powMod($params['one'], $params['n']);
-                    $params['q'] = $params['q']->multiply($params['x']->subtract($params['y'])->abs())->powMod($params['one'], $params['n']);
-                }, $params);
-                each($params);
-                $g = $q->gcd($n);
-                $k = $k->add($m);
-            }
-            $r = $r->multiply($two);
-        }
-        die;
-        if ($g->equals($n)) {
+                do {
+                    $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
+                    $q = Tools::posmod($q * abs($x - $y), $n);
+                } while(min($m, $r - $k));
+                $g = $this->gcd($q, $n);
+                $k += $m;
+            } while ($k < $r and $g == 1);
+            $r *= 2;
+        } while ($g == 1);
+
+        if ($g == $n) {
             while (true) {
-                $ys = $ys->powMod($two, $n)->add($c)->powMod($one, $n);
-                $g = $x->subtract($ys)->abs()->gcd($n);
-                if ($g->compare($one) == 1) {
-                    break;
-                }
+                $ys = Tools::posmod(Tools::posmod(pow($ys, 2), $n) + $c, $n);
+                $g = $this->gcd(abs($x - $ys), $n);
+                if ($g > 1) break;
             }
         }
 
@@ -186,11 +178,11 @@ class PrimeModule
         if (function_exists('shell_exec')) {
             try {
                 // Use the python version.
-                $res = explode(' ', shell_exec('python '.__DIR__.'/getpq.py '.$pq));
+                $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.(string)$pq));
                 if (count($res) == 2) {
                     return $res;
                 }
-            } catch (ErrorException $e) {
+            } catch (Exception $e) {
             }
         }
         // Else do factorization with wolfram alpha :)))))
@@ -221,7 +213,10 @@ class PrimeModule
         if (count($res) == 2) {
             return $res;
         }
-        $n = (int) $n->toString();
+        if(is_object($pq)) {
+            $n = $pq->toString();
+        } else $n = $pq;
+        $n = (int) $n;
         $factors = [];
         $limit = sqrt($n) + 1;
         foreach ($this->smallprimes as $checker) {

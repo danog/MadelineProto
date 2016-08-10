@@ -262,7 +262,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($p->compare($q) > 0) {
             list($p, $q) = [$q, $p];
         }
-        if (!(($pq->equals($p->multiply($q))) && ($p < $q))) {
+        var_dump($p, $q);
+        if (!($pq->equals($p->multiply($q)) && $p->compare($q) < 0)) {
             throw new Exception("Handshake: couldn't compute p and q.");
         }
 
