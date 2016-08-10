@@ -101,19 +101,18 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data)
     {
-        
-                $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-                if (($this->auth_key == null) || ($this->server_salt == null)) {
-                    $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
-                } else {
-                    $encrypted_data =
+        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+        if (($this->auth_key == null) || ($this->server_salt == null)) {
+            $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
+        } else {
+            $encrypted_data =
                         $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
-                    $message_key = substr(sha1($encrypted_data, true), -16);
-                    $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
-                    $this->log->log(strlen($encrypted_data.$padding));
-                    list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-                    $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-                }
+            $message_key = substr(sha1($encrypted_data, true), -16);
+            $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
+            $this->log->log(strlen($encrypted_data.$padding));
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
+            $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+        }
         switch ($this->settings['protocol']) {
             case 'tcp_full':
                 $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
@@ -130,7 +129,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 if ($len < 127) {
                     $step1 = chr($len).$message;
                 } else {
-                    $step1 = chr(127) . substr($this->struct->pack("<I", $len), 0, 3) . $message;
+                    $step1 = chr(127).substr($this->struct->pack('<I', $len), 0, 3).$message;
                 }
                 $this->sock->write($step1);
                 break;
@@ -178,40 +177,40 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     $packet_length <<= 2;
                 } else {
                     $packet_length_data = $this->sock->read(3);
-                    $packet_length = $this->struct->unpack("<I", $packet_length_data . pack("x"))[0] << 2;
+                    $packet_length = $this->struct->unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
-                    
+
                 $packet = $this->sock->read($packet_length);
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
         }
 
-            if (fstat($payload)["size"] == 4) {
-                throw new Exception('Server response error: '.$this->struct->unpack('<I', fread($payload, 4))[0]);
+        if (fstat($payload)['size'] == 4) {
+            throw new Exception('Server response error: '.$this->struct->unpack('<I', fread($payload, 4))[0]);
+        }
+        $auth_key_id = fread($payload, 8);
+        if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+            list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
+            $data = fread($payload, $message_length);
+        } elseif ($auth_key_id == $this->auth_key_id) {
+            $message_key = fread($payload, 16);
+            $encrypted_data = fread($payload, fstat($payload)['size'] - ftell($payload));
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
+            $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+            if (substr($decrypted_data, 0, 8) != $this->server_salt) {
+                throw new Exception('Server salt does not match.');
             }
-                $auth_key_id = fread($payload, 8);
-                if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-                    list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
-                    $data = fread($payload, $message_length);
-                } elseif ($auth_key_id == $this->auth_key_id) {
-                    $message_key = fread($payload, 16);
-                    $encrypted_data = fread($payload, fstat($payload)["size"] - ftell($payload));
-                    list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-                    $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-                    if (substr($decrypted_data, 0, 8) != $this->server_salt) {
-                        throw new Exception('Server salt does not match.');
-                    }
-                    if (substr($decrypted_data, 8, 8) != $this->session_id) {
-                        throw new Exception('Session id does not match.');
-                    }
-                    $message_id = substr($decrypted_data, 16, 8);
-                    $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
-                    $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
-                    $data = substr($decrypted_data, 32, $message_data_length);
-                } else {
-                    throw new Exception('Got unknown auth_key id');
-                }
-        
+            if (substr($decrypted_data, 8, 8) != $this->session_id) {
+                throw new Exception('Session id does not match.');
+            }
+            $message_id = substr($decrypted_data, 16, 8);
+            $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
+            $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
+            $data = substr($decrypted_data, 32, $message_data_length);
+        } else {
+            throw new Exception('Got unknown auth_key id');
+        }
+
 
         return $data;
     }
