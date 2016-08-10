@@ -140,7 +140,7 @@ class PrimeModule
         }
         $max = new \phpseclib\Math\BigInteger($n - 1);
         $big = new \phpseclib\Math\BigInteger();
-        list($y, $c, $m) = [(int)$big->random($zero, $max)->toString(), (int)$big->random($zero, $max)->toString(), (int)$big->random($zero, $max)->toString()];
+        list($y, $c, $m) = [(int) $big->random($zero, $max)->toString(), (int) $big->random($zero, $max)->toString(), (int) $big->random($zero, $max)->toString()];
         list($g, $r, $q) = [1, 1, 1];
         do {
             $x = $y;
@@ -155,7 +155,7 @@ class PrimeModule
                 do {
                     $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
                     $q = Tools::posmod($q * abs($x - $y), $n);
-                } while(min($m, $r - $k));
+                } while (min($m, $r - $k));
                 $g = $this->gcd($q, $n);
                 $k += $m;
             } while ($k < $r and $g == 1);
@@ -166,7 +166,9 @@ class PrimeModule
             while (true) {
                 $ys = Tools::posmod(Tools::posmod(pow($ys, 2), $n) + $c, $n);
                 $g = $this->gcd(abs($x - $ys), $n);
-                if ($g > 1) break;
+                if ($g > 1) {
+                    break;
+                }
             }
         }
 
@@ -178,7 +180,7 @@ class PrimeModule
         if (function_exists('shell_exec')) {
             try {
                 // Use the python version.
-                $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.(string)$pq));
+                $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.(string) $pq));
                 if (count($res) == 2) {
                     return $res;
                 }
@@ -213,9 +215,11 @@ class PrimeModule
         if (count($res) == 2) {
             return $res;
         }
-        if(is_object($pq)) {
+        if (is_object($pq)) {
             $n = $pq->toString();
-        } else $n = $pq;
+        } else {
+            $n = $pq;
+        }
         $n = (int) $n;
         $factors = [];
         $limit = sqrt($n) + 1;
