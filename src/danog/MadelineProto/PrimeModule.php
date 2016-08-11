@@ -152,10 +152,12 @@ class PrimeModule
             $k = 0;
             do {
                 $ys = $y;
+                $i = 0;
                 do {
+                    $i++;
                     $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
                     $q = Tools::posmod($q * abs($x - $y), $n);
-                } while (min($m, $r - $k));
+                } while ($i < min($m, $r - $k));
                 $g = $this->gcd($q, $n);
                 $k += $m;
             } while ($k < $r and $g == 1);
@@ -272,7 +274,7 @@ class PrimeModule
     public function totient($n)
     {
         $totients = [];
-        if (($n == 0)) {
+        if ($n == 0) {
             return 1;
         }
         if (isset($totients[$n])) {
@@ -289,11 +291,11 @@ class PrimeModule
 
     public function gcd($a, $b)
     {
-        if (($a == $b)) {
+        if ($a == $b) {
             return $a;
         }
-        while (($b > 0)) {
-            list($a, $b) = [$b, posmod($a, $b)];
+        while ($b > 0) {
+            list($a, $b) = [$b, Tools::posmod($a, $b)];
         }
 
         return $a;
