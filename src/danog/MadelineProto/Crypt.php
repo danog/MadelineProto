@@ -16,12 +16,12 @@ class Crypt
 {
     public static function ige_encrypt($message, $key, $iv)
     {
-        return Crypt::_ige($message, $key, $iv, 'encrypt');
+        return self::_ige($message, $key, $iv, 'encrypt');
     }
 
     public static function ige_decrypt($message, $key, $iv)
     {
-        return Crypt::_ige($message, $key, $iv, 'decrypt');
+        return self::_ige($message, $key, $iv, 'decrypt');
     }
 
     /**
@@ -73,5 +73,4 @@ class Crypt
 
         return $ciphered;
     }
-    
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace danog\MadelineProto;
+
 // by https://github.com/mgp25
 class TelegramEncryption
 {
@@ -7,7 +9,7 @@ class TelegramEncryption
     public $iv;
     public $debug;
     public $rijndael;
-    
+
     public function __construct($key, $iv, $debug = false)
     {
         $this->key = $key;
@@ -30,7 +32,7 @@ class TelegramEncryption
 
         for ($i = 0; $i < strlen($message); $i += $blockSize) {
             $x = substr($message, $i, $blockSize);
-            
+
             $this->debugLog('x: '.$this->_c($x)."\n");
 
             $yXOR = $this->exor($x, $yPrev);
