@@ -1,28 +1,27 @@
 <?php
-
+namespace danog\MadelineProto;
 // by https://github.com/mgp25
 class TelegramEncryption
 {
     public $key;
     public $iv;
-    public $cipherText;
-    public $plainText;
     public $debug;
-
-    public function __construct($key, $iv, $cipherText = null, $plainText = null, $debug = false)
+    public $rijndael;
+    
+    public function __construct($key, $iv, $debug = false)
     {
         $this->key = $key;
         $this->iv = $iv;
-        $this->cipherText = $cipherText;
-        $this->plainText = $plainText;
         $this->debug = $debug;
+        $this->rijndael = new \phpseclib\Crypt\Rijndael(\phpseclib\Crypt\Rijndael::MODE_ECB);
+        $this->rijndael->setKeyLength(128);
+        $this->rijndael->setKey($this->key);
     }
 
-    public function IGE256Decrypt()
+    public function decrypt($message = null)
     {
         $key = $this->key;
-        $message = $this->cipherText;
-        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+        $blockSize = $this->rijndael->block_size;
 
         $xPrev = substr($this->iv, 0, $blockSize);
         $yPrev = substr($this->iv, $blockSize, strlen($this->iv));
@@ -31,34 +30,35 @@ class TelegramEncryption
 
         for ($i = 0; $i < strlen($message); $i += $blockSize) {
             $x = substr($message, $i, $blockSize);
-            $this->debugLog('x: '._c($x)."\n");
+            
+            $this->debugLog('x: '.$this->_c($x)."\n");
 
             $yXOR = $this->exor($x, $yPrev);
-            $this->debugLog('yPrev: '._c($yPrev)."\n");
-            $this->debugLog('yXOR: '._c($yXOR)."\n");
-            $yFinal = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);
+            $this->debugLog('yPrev: '.$this->_c($yPrev)."\n");
+            $this->debugLog('yXOR: '.$this->_c($yXOR)."\n");
+            $yFinal = $this->rijndael->encrypt($yXOR);
             $yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
-            $this->debugLog('yFinal: '._c($yFinal)."\n");
+            $this->debugLog('yFinal: '.$this->_c($yFinal)."\n");
 
             $y = $this->exor($yFinal, $xPrev);
-            $this->debugLog('xPrev: '._c($xPrev)."\n");
-            $this->debugLog('y: '._c($y)."\n");
+            $this->debugLog('xPrev: '.$this->_c($xPrev)."\n");
+            $this->debugLog('y: '.$this->_c($y)."\n");
 
             $xPrev = $x;
             $yPrev = $y;
             $decrypted .= $y;
 
-            $this->debugLog('Currently Decrypted: '._c($decrypted)."\n\n");
+            $this->debugLog('Currently Decrypted: '.$this->_c($decrypted)."\n\n");
         }
 
         return $decrypted;
     }
 
-    public function IGE256Encrypt()
+    public function encrypt()
     {
         $key = $this->key;
         $message = $this->plainText;
-        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+        $blockSize = $this->rijndael->block_size;
 
         $xPrev = substr($this->iv, $blockSize, strlen($this->iv));
         $yPrev = substr($this->iv, 0, $blockSize);
@@ -67,23 +67,23 @@ class TelegramEncryption
 
         for ($i = 0; $i < strlen($message); $i += $blockSize) {
             $x = substr($message, $i, $blockSize);
-            $this->debugLog('x: '._c($x)."\n");
+            $this->debugLog('x: '.$this->_c($x)."\n");
 
             $yXOR = $this->exor($x, $yPrev);
-            $this->debugLog('yPrev: '._c($yPrev)."\n");
-            $this->debugLog('yXOR: '._c($yXOR)."\n");
-            $yFinal = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $yXOR, MCRYPT_MODE_ECB);
+            $this->debugLog('yPrev: '.$this->_c($yPrev)."\n");
+            $this->debugLog('yXOR: '.$this->_c($yXOR)."\n");
+            $yFinal = $this->rijndael->encrypt($yXOR);
             $yFinal = str_pad($yFinal, strlen($xPrev), "\x00");
-            $this->debugLog('yFinal: '._c($yFinal)."\n");
+            $this->debugLog('yFinal: '.$this->_c($yFinal)."\n");
             $y = $this->exor($yFinal, $xPrev);
-            $this->debugLog('xPrev: '._c($xPrev)."\n");
-            $this->debugLog('y: '._c($y)."\n");
+            $this->debugLog('xPrev: '.$this->_c($xPrev)."\n");
+            $this->debugLog('y: '.$this->_c($y)."\n");
 
             $xPrev = $x;
             $yPrev = $y;
 
             $encrypted .= $y;
-            $this->debugLog('Currently encrypted: '._c($encrypted)."\n\n");
+            $this->debugLog('Currently encrypted: '.$this->_c($encrypted)."\n\n");
         }
 
         return $encrypted;
@@ -113,7 +113,6 @@ class TelegramEncryption
 
     public function _c($binary)
     {
-        return sprintf('[%s]', chunk_split(bin2hex($binary), 4, ' ')
-);
+        return sprintf('[%s]', chunk_split(bin2hex($binary), 4, ' '));
     }
 }

@@ -111,7 +111,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
             $this->log->log(strlen($encrypted_data.$padding));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->auth_key_id.$message_key.crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            $message = $this->auth_key_id.$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         switch ($this->settings['protocol']) {
             case 'tcp_full':
@@ -194,7 +194,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-            $decrypted_data = crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+            $decrypted_data = Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             if (substr($decrypted_data, 0, 8) != $this->server_salt) {
                 throw new Exception('Server salt does not match.');
             }
@@ -305,10 +305,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $encrypted_answer = $server_dh_params['encrypted_answer'];
         $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
         $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
-        $answer_with_hash = crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+        $answer_with_hash = Crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+        var_dump($answer_with_hash);
         $answer_hash = substr($answer_with_hash, 0, 20);
         $answer = substr($answer_with_hash, 20);
-        $server_DH_inner_data = deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
+        $server_DH_inner_data = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
         if ($nonce != $server_DH_inner_data['nonce']) {
             throw new Exception('Handshake: wrong nonce');
         }
@@ -334,7 +335,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $data = serialize_obj(['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = sha1($data, true).$data;
         $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
-        $encrypted_data = crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
+        $encrypted_data = Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
         foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = pow($g_a, $b, $dh_prime);

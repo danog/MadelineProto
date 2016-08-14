@@ -14,14 +14,14 @@ namespace danog\MadelineProto;
 
 class Crypt
 {
-    public function ige_encrypt($message, $key, $iv)
+    public static function ige_encrypt($message, $key, $iv)
     {
-        return _ige($message, $key, $iv, 'encrypt');
+        return Crypt::_ige($message, $key, $iv, 'encrypt');
     }
 
-    public function ige_decrypt($message, $key, $iv)
+    public static function ige_decrypt($message, $key, $iv)
     {
-        return _ige($message, $key, $iv, 'decrypt');
+        return Crypt::_ige($message, $key, $iv, 'decrypt');
     }
 
     /**
@@ -34,44 +34,44 @@ class Crypt
      * iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
      * needed for IGE).
      */
-    public function _ige($message, $key, $iv, $operation = 'decrypt')
+    public static function _ige($message, $key, $iv, $operation = 'decrypt')
     {
-        $message = str_split($message);
-        if ((len($key) != 32)) {
+        if (strlen($key) != 32) {
             throw new Exception('key must be 32 bytes long (was '.len($key).' bytes)');
         }
-        if ((len($iv) != 32)) {
+        if (strlen($iv) != 32) {
             throw new Exception('iv must be 32 bytes long (was '.len($iv).' bytes)');
         }
-        $cipher = new AES($key);
-        $cipher = $cipher->encrypt($iv);
+        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_ECB);
+        $cipher->setKey($key);
         $blocksize = $cipher->block_size;
-        if ((len($message) % $blocksize) != 0) {
-            throw new Exception('message must be a multiple of 16 bytes (try adding '.(16 - (count($message) % 16)).' bytes of padding)');
+        if ((strlen($message) % $blocksize) != 0) {
+            throw new Exception('message must be a multiple of 16 bytes (try adding '.(16 - (strlen($message) % 16)).' bytes of padding)');
         }
-        $ivp = substr($iv, 0, $blocksize - 0);
-        $ivp2 = substr($iv, $blocksize, null);
-        $ciphered = null;
-        foreach (pyjslib_range(0, len($message), $blocksize) as $i) {
-            $indata = substr($message, $i, ($i + $blocksize) - $i);
-            if (($operation == 'decrypt')) {
-                $xored = strxor($indata, $ivp2);
+        $ivp = substr($iv, 0, $blocksize);
+        $ivp2 = substr($iv, $blocksize);
+        $ciphered = '';
+        foreach (Tools::range(0, strlen($message), $blocksize) as $i) {
+            $indata = substr($message, $i, $blocksize);
+            if ($operation == 'decrypt') {
+                $xored = $indata ^ $ivp2;
                 $decrypt_xored = $cipher->decrypt($xored);
-                $outdata = strxor($decrypt_xored, $ivp);
+                $outdata = $decrypt_xored ^ $ivp;
                 $ivp = $indata;
                 $ivp2 = $outdata;
-            } elseif (($operation == 'encrypt')) {
-                $xored = strxor($indata, $ivp);
+            } elseif ($operation == 'encrypt') {
+                $xored = $indata ^ $ivp;
                 $encrypt_xored = $cipher->encrypt($xored);
-                $outdata = strxor($encrypt_xored, $ivp2);
+                $outdata = $encrypt_xored ^ $ivp2;
                 $ivp = $outdata;
                 $ivp2 = $indata;
             } else {
-                throw new Exception('operation must be either \'decrypt\' or \'encrypt\'');
+                throw new Exception('Crypt: operation must be either \'decrypt\' or \'encrypt\'');
             }
             $ciphered .= $outdata;
         }
 
         return $ciphered;
     }
+    
 }
