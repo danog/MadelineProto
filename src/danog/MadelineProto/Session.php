@@ -245,7 +245,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             throw new Exception('Handshake: wrong nonce');
         }
         foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
-            if ($curfp === $this->key->fp_float) {
+            $curfp_biginteger = new \phpseclib\Math\BigInteger($curfp);
+            if ($this->key->fp->equals($curfp_biginteger)) {
                 $public_key_fingerprint = $curfp;
                 break;
             }
@@ -284,7 +285,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         // req_DH_params
         $this->log->log('Starting Diffie Hellman key exchange');
-
         $server_dh_params = $this->method_call('req_DH_params',
             [
                 'nonce'                  => $nonce,

@@ -98,7 +98,6 @@ class TL
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
-
                 return \danog\PHP\Struct::pack('<q', $value);
                 break;
             case 'int128':
@@ -167,10 +166,16 @@ class TL
                 if ($l == 254) {
                     $long_len = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 3).\danog\MadelineProto\Tools::string2bin('\x00')) [0];
                     $x = fread($bytes_io, $long_len);
-                    fread($bytes_io, \danog\MadelineProto\Tools::posmod(-$long_len, 4));
+                    $resto = \danog\MadelineProto\Tools::posmod(-$long_len, 4);
+                    if ($resto > 0) {
+                        fread($bytes_io, $resto);
+                    }
                 } else {
                     $x = fread($bytes_io, $l);
-                    fread($bytes_io, \danog\MadelineProto\Tools::posmod(-($l + 1), 4));
+                    $resto = \danog\MadelineProto\Tools::posmod(-($l + 1), 4);
+                    if ($resto > 0) {
+                        fread($bytes_io, $resto);
+                    }
                 }
                 if (!is_string($x)) {
                     throw new Exception("deserialize: generated value isn't a string");

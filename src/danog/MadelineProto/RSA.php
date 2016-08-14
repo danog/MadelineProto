@@ -18,7 +18,7 @@ class RSA extends TL\TL
     public $n; // phpseclib\Math\BigInteger class
     public $e; // phpseclib\Math\BigInteger class
     public $fp; // phpseclib\Math\BigInteger class
-    public $fp_float; // float
+    public $fp_bytes; // bytes
 
     public function __construct($key)
     {
@@ -27,8 +27,8 @@ class RSA extends TL\TL
         $this->n = $this->key->modulus;
         $this->e = $this->key->exponent;
 
-        $this->fp = new \phpseclib\Math\BigInteger(strrev(substr(sha1($this->serialize_param('bytes', $this->n->toBytes()).$this->serialize_param('bytes', $this->e->toBytes()), true), -8)), -256);
-        $this->fp_float = (float) $this->fp->toString();
+        $this->fp_bytes = substr(sha1($this->serialize_param('bytes', $this->n->toBytes()).$this->serialize_param('bytes', $this->e->toBytes()), true), -8);
+        $this->fp = new \phpseclib\Math\BigInteger(strrev($this->fp_bytes), -256);
     }
 
     public function encrypt($data)

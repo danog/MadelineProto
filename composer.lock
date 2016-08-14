@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
-                "reference": "ac1d7a0b1eb54d5b10dca553be816c8fb0881e47"
+                "reference": "635b6a57a903b976c56c1283d00ee26b8a1b175d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/ac1d7a0b1eb54d5b10dca553be816c8fb0881e47",
-                "reference": "ac1d7a0b1eb54d5b10dca553be816c8fb0881e47",
+                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/635b6a57a903b976c56c1283d00ee26b8a1b175d",
+                "reference": "635b6a57a903b976c56c1283d00ee26b8a1b175d",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-07-29 15:13:54"
+            "time": "2016-08-14 17:51:55"
         },
         {
             "name": "paragonie/constant_time_encoding",
