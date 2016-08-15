@@ -28,7 +28,7 @@ class Session extends Tools
             'server_salt'   => null,
             'ip_address'    => '149.154.167.50',
             'port'          => '443',
-            'protocol'      => 'tcp_abridged',
+            'protocol'      => 'tcp_full',
             'api_id'        => 25628,
             'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
             'tl_schema'     => [
@@ -109,7 +109,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                         $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
-            $this->log->log(strlen($encrypted_data.$padding));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->auth_key_id.$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
@@ -121,7 +120,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->number += 1;
                 break;
             case 'tcp_intermediate':
-                $step1 = $this->struct->pack('<I', strlen($message) + 4).$message;
+                $step1 = $this->struct->pack('<I', strlen($message)).$message;
                 $this->sock->write($step1);
                 break;
             case 'tcp_abridged':
@@ -155,7 +154,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('CRC32 was not correct!');
                 }
                 $x = $this->struct->unpack('<I', substr($packet, 0, 4));
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 8));
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
                 break;
             case 'tcp_intermediate':
                 $packet_length_data = $this->sock->read(4);
@@ -163,7 +162,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Nothing in the socket!');
                 }
                 $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-                $packet = $this->sock->read($packet_length - 4);
+                $packet = $this->sock->read($packet_length);
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
             case 'tcp_abridged':

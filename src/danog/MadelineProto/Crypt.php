@@ -37,10 +37,10 @@ class Crypt
     public static function _ige($message, $key, $iv, $operation = 'decrypt')
     {
         if (strlen($key) != 32) {
-            throw new Exception('key must be 32 bytes long (was '.len($key).' bytes)');
+            throw new Exception('key must be 32 bytes long (was '.strlen($key).' bytes)');
         }
         if (strlen($iv) != 32) {
-            throw new Exception('iv must be 32 bytes long (was '.len($iv).' bytes)');
+            throw new Exception('iv must be 32 bytes long (was '.strlen($iv).' bytes)');
         }
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_ECB);
         $cipher->setKey($key);
