@@ -21,8 +21,8 @@ class API extends Exception
         set_error_handler([$this, 'ExceptionErrorHandler']);
         $this->session = new Session($params);
         $this->session->create_auth_key();
-        $future_salts = $this->session->method_call('get_future_salts', 3);
-        Logging::log($future_salts, 3);
+        $future_salts = $this->get_future_salts(3);
+        $this->session->log->log($future_salts);
     }
 
     public function __destruct()
@@ -33,6 +33,6 @@ class API extends Exception
 
     public function __call($name, $arguments)
     {
-        return $session->method_call($name, $arguments);
+        return $this->session->method_call($name, $arguments);
     }
 }

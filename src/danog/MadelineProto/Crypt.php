@@ -44,6 +44,7 @@ class Crypt
         }
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_ECB);
         $cipher->setKey($key);
+        $cipher->paddable = false;
         $blocksize = $cipher->block_size;
         if ((strlen($message) % $blocksize) != 0) {
             throw new Exception('message must be a multiple of 16 bytes (try adding '.(16 - (strlen($message) % 16)).' bytes of padding)');

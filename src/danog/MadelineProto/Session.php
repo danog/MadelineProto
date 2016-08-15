@@ -108,7 +108,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $encrypted_data =
                         $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = \phpseclib\Crypt\Random::string(posmod(-strlen($encrypted_data), 16));
+            $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             $this->log->log(strlen($encrypted_data.$padding));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->auth_key_id.$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
@@ -306,7 +306,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
         $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
         $answer_with_hash = Crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
-        var_dump($answer_with_hash);
         $answer_hash = substr($answer_with_hash, 0, 20);
         $answer = substr($answer_with_hash, 20);
         $server_DH_inner_data = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
@@ -317,29 +316,29 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             throw new Exception('Handshake: wrong server nonce');
         }
         $dh_prime_str = $server_DH_inner_data['dh_prime'];
-        $g = $server_DH_inner_data['g'];
+        $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
         $g_a_str = $server_DH_inner_data['g_a'];
         $server_time = $server_DH_inner_data['server_time'];
         $this->timedelta = ($server_time - time());
         $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-        $dh_prime = $this->struct->unpack('>Q', $dh_prime_str);
-        $g_a = $this->struct->unpack('>Q', $g_a_str);
-        if (!$this->PrimeModule->isprime($dh_prime)) {
+        $dh_prime = new \phpseclib\Math\BigInteger($dh_prime_str, 256);
+        $g_a = new \phpseclib\Math\BigInteger($g_a_str, 256);
+        if (!$dh_prime->isPrime()) {
             throw new Exception("Handshake: dh_prime isn't a prime.");
         }
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
-        $b = $this->struct->unpack('>Q', $b_str);
-        $g_b = pow($g, $b, $dh_prime);
-        $g_b_str = $this->struct->pack('>Q', $g_b);
-        $data = serialize_obj(['client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
+        $b =  new \phpseclib\Math\BigInteger($b_str, 256);
+        $g_b = $g->powMod($b, $dh_prime);
+        $g_b_str = $g_b->toBytes();
+        $data = $this->tl->serialize_obj('client_DH_inner_data', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
         $data_with_sha = sha1($data, true).$data;
-        $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(posmod(-strlen($data_with_sha), 16));
+        $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(Tools::posmod(-strlen($data_with_sha), 16));
         $encrypted_data = Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
-        foreach (pyjslib_range(1, $this->AUTH_MAX_RETRY) as $i) {
+        foreach (Tools::range(1, $this->AUTH_MAX_RETRY) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
-            $auth_key = pow($g_a, $b, $dh_prime);
-            $auth_key_str = $this->struct->pack('>Q', $auth_key);
+            $auth_key = $g_a->powMod($b, $dh_prime);
+            $auth_key_str = $auth_key->toBytes();
             $auth_key_sha = sha1($auth_key_str, true);
             $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
             $new_nonce_hash1 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
@@ -356,7 +355,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Handshake: wrong new_nonce_hash1');
                 }
                 $this->log->log('Diffie Hellman key exchange processed successfully');
-                $this->server_salt = new strxor(substr($new_nonce, 0, 8 - 0), substr($server_nonce, 0, 8 - 0));
+                $this->server_salt = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
                 $this->auth_key = $auth_key_str;
                 $this->auth_key_id = substr($auth_key_sha, -8);
                 $this->log->log('Auth key generated');
