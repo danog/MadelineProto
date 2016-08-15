@@ -328,7 +328,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $retry_id = 0;
         $b_str = \phpseclib\Crypt\Random::string(256);
-        $b =  new \phpseclib\Math\BigInteger($b_str, 256);
+        $b = new \phpseclib\Math\BigInteger($b_str, 256);
         $g_b = $g->powMod($b, $dh_prime);
         $g_b_str = $g_b->toBytes();
         $data = $this->tl->serialize_obj('client_DH_inner_data', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);

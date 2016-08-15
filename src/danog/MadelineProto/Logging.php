@@ -61,9 +61,9 @@ class Logging
             $mode = $this->mode;
         }
         foreach ($params as $param) {
-        if (!is_string($param)) {
-            $param = var_export($param, true);
-        }
+            if (!is_string($param)) {
+                $param = var_export($param, true);
+            }
             switch ($mode) {
                 case '1':
                     error_log($param);
