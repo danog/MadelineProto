@@ -24,13 +24,13 @@ class Session extends Tools
         // Set default settings
         $default_settings = [
             'authorization' => [
-                'auth_key'      => null,
-                'auth_key_id'   => null,
-                'temp_auth_key' => null,
-                'temp_auth_key_expires_in' => 86400, 
-                'server_salt'   => null,
-                'session_id'    => \phpseclib\Crypt\Random::string(8),
-                'rsa_key'       => '-----BEGIN RSA PUBLIC KEY-----
+                'auth_key'                 => null,
+                'auth_key_id'              => null,
+                'temp_auth_key'            => null,
+                'temp_auth_key_expires_in' => 86400,
+                'server_salt'              => null,
+                'session_id'               => \phpseclib\Crypt\Random::string(8),
+                'rsa_key'                  => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
 an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
@@ -38,7 +38,7 @@ Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
-                'message_ids_limit' => 5
+                'message_ids_limit' => 5,
             ],
             'connection' => [
                 'ip_address'    => '149.154.167.50',
@@ -57,14 +57,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ],
             ],
             'logging'       => [
-                'logging' => 1,
+                'logging'       => 1,
                 'logging_param' => '/tmp/MadelineProto.log',
                 'logging'       => 3,
             ],
             'max_tries'         => [
-                'query'    => 5,
-                'authorization' => 5
-            ]
+                'query'         => 5,
+                'authorization' => 5,
+            ],
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -91,8 +91,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
         // Istantiate logging class
         $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
-        
-        $this->connection_seq_no = 0; 
+
+        $this->connection_seq_no = 0;
         $this->seq_no = 0;
         $this->timedelta = 0; // time delta
         $this->message_ids = [];
@@ -108,23 +108,25 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         unset($this->sock);
     }
 
-    public function add_check_message_ids($new_message_id) {
+    public function add_check_message_ids($new_message_id)
+    {
         if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
-            throw new Exception("Given message id is too old.");
+            throw new Exception('Given message id is too old.');
         }
         if (((int) ((time() + $this->timedelta + 30) * pow(2, 30)) * 4) < $new_message_id) {
-            throw new Exception("Given message id is too new.");
+            throw new Exception('Given message id is too new.');
         }
         foreach ($this->message_ids as $message_id) {
             if ($new_message_id <= $message_id) {
-                throw new Exception("Given message id is lower than or equal than the current limit (".$message_id.").");
+                throw new Exception('Given message id is lower than or equal than the current limit ('.$message_id.').');
             }
         }
         $this->message_ids[] = $new_message_id;
-        if (count($this->message_ids) > $this->settings["authorization"]["message_ids_limit"]) {
+        if (count($this->message_ids) > $this->settings['authorization']['message_ids_limit']) {
             array_shift($this->message_ids);
         }
     }
+
     /**
      * Function to get hex crc32.
      *
@@ -260,6 +262,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         } else {
             throw new Exception('Got unknown auth_key id');
         }
+
         return $data;
     }
 
@@ -327,7 +330,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($expires_in == -1) {
             $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         } else {
-            $data = $this->tl->serialize_obj('p_q_inner_data_temp', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, "expires_in" => $expires_in]);
+            $data = $this->tl->serialize_obj('p_q_inner_data_temp', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in]);
         }
         $sha_digest = sha1($data, true);
 
@@ -413,7 +416,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $auth_key_id = substr($auth_key_sha, -8);
                 $this->log->log('Auth key generated');
 
-                return ["auth_key" => $auth_key, "auth_key_id" => $auth_key_id, "server_salt", $server_salt];
+                return ['auth_key' => $auth_key, 'auth_key_id' => $auth_key_id, 'server_salt', $server_salt];
             } elseif ($Set_client_DH_params_answer['_'] == 'dh_gen_retry') {
                 if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                     throw new Exception('Handshake: wrong new_nonce_hash_2');

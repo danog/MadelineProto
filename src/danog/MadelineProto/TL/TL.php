@@ -130,13 +130,19 @@ class TL
                 break;
         }
     }
-    public function deserialize($bytes_io, $type_ = null, $subtype = null) {
+
+    public function deserialize($bytes_io, $type_ = null, $subtype = null)
+    {
         return $this->deserialize_length($bytes_io, $type_, $subtype);
     }
-    public function get_length($bytes_io, $type_ = null, $subtype = null) {
+
+    public function get_length($bytes_io, $type_ = null, $subtype = null)
+    {
         $this->deserialize_length($bytes_io, $type_, $subtype);
+
         return ftell($bytes_io);
     }
+
     /**
      * :type bytes_io: io.BytesIO object.
      */
@@ -215,7 +221,7 @@ class TL
                 if (in_array($tl_elem->type, $base_boxed_types)) {
                     $x = $this->deserialize_length($bytes_io, $tl_elem->predicate, $subtype);
                 } else {
-                    $x = [ "_" => $tl_elem->predicate ];
+                    $x = ['_' => $tl_elem->predicate];
                     foreach ($tl_elem->params as $arg) {
                         $x[$arg['name']] = $this->deserialize_length($bytes_io, $arg['type'], $arg['subtype']);
                     }
