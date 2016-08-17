@@ -20,7 +20,6 @@ class API
     {
         set_error_handler([$this, 'ExceptionErrorHandler']);
         $this->session = new Session($params);
-        $this->session->create_auth_key();
         $future_salts = $this->get_future_salts(3);
         $this->session->log->log($future_salts);
     }

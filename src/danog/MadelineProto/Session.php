@@ -19,23 +19,18 @@ class Session extends Tools
 {
     public $settings = [];
 
-    public function __construct($settings)
+    public function __construct($settings = [])
     {
-
         // Set default settings
         $default_settings = [
-            'auth_key'      => null,
-            'server_salt'   => null,
-            'ip_address'    => '149.154.167.50',
-            'port'          => '443',
-            'protocol'      => 'tcp_full',
-            'api_id'        => 25628,
-            'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
-            'tl_schema'     => [
-                'https://core.telegram.org/schema/mtproto-json',
-                __DIR__.'/telegram_layer55.json',
-            ],
-            'rsa_key'       => '-----BEGIN RSA PUBLIC KEY-----
+            'authorization' => [
+                'auth_key'      => null,
+                'auth_key_id'   => null,
+                'temp_auth_key' => null,
+                'temp_auth_key_expires_in' => 86400, 
+                'server_salt'   => null,
+                'session_id'    => \phpseclib\Crypt\Random::string(8),
+                'rsa_key'       => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
 an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
@@ -43,41 +38,69 @@ Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
-            'logging'       => 1,
-            'logging_param' => '/tmp/MadelineProto.log',
-            'logging'       => 3,
+                'message_ids_limit' => 5
+            ],
+            'connection' => [
+                'ip_address'    => '149.154.167.50',
+                'port'          => '443',
+                'protocol'      => 'tcp_full',
+            ],
+            'app_info' => [
+                'api_id'        => 25628,
+                'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
+            ],
+            'tl_schema'     => [
+                'layer'         => 55,
+                'src'           => [
+                    __DIR__.'/TL_mtproto_v1.json',
+                    __DIR__.'/TL_telegram_v55.json',
+                ],
+            ],
+            'logging'       => [
+                'logging' => 1,
+                'logging_param' => '/tmp/MadelineProto.log',
+                'logging'       => 3,
+            ],
+            'max_tries'         => [
+                'query'    => 5,
+                'authorization' => 5
+            ]
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
                 $settings[$key] = $param;
             }
+            foreach ($param as $subkey => $subparam) {
+                if (!isset($settings[$key][$subkey])) {
+                    $settings[$key][$subkey] = $subparam;
+                }
+            }
         }
         $this->settings = $settings;
 
         // Connect to servers
-        $this->sock = new Connection($this->settings['ip_address'], $this->settings['port'], $this->settings['protocol']);
+        $this->sock = new Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
 
         // Load rsa key
-        $this->key = new RSA($settings['rsa_key']);
+        $this->key = new RSA($settings['authorization']['rsa_key']);
         // Istantiate struct class
         $this->struct = new \danog\PHP\Struct();
         // Istantiate prime class
         $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
-        $this->tl = new TL\TL($this->settings['tl_schema']);
+        $this->tl = new TL\TL($this->settings['tl_schema']['src']);
         // Istantiate logging class
-        $this->log = new Logging($this->settings['logging'], $this->settings['logging_param']);
-        // Set some defaults
-        $this->auth_key = $this->settings['auth_key'];
-        $this->number = 0;
-        $this->timedelta = 0;
-        $this->session_id = \phpseclib\Crypt\Random::string(8);
-        if (isset($this->settings['auth_key'])) {
-            $this->auth_key = $this->settings['auth_key'];
+        $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
+        
+        $this->connection_seq_no = 0; 
+        $this->seq_no = 0;
+        $this->timedelta = 0; // time delta
+        $this->message_ids = [];
+
+        if (($this->settings['authorization']['auth_key'] == null) || ($this->settings['authorization']['server_salt'] == null)) {
+            $auth_res = $this->create_auth_key(-1);
+            $temp_auth_res = $this->create_auth_key($this->settings['authorization']['temp_auth_key_expires_in']);
         }
-        $this->auth_key_id = $this->auth_key ? substr(sha1($this->auth_key, true), -8) : null;
-        $this->MAX_RETRY = 5;
-        $this->AUTH_MAX_RETRY = 5;
     }
 
     public function __destruct()
@@ -85,6 +108,23 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         unset($this->sock);
     }
 
+    public function add_check_message_ids($new_message_id) {
+        if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
+            throw new Exception("Given message id is too old.");
+        }
+        if (((int) ((time() + $this->timedelta + 30) * pow(2, 30)) * 4) < $new_message_id) {
+            throw new Exception("Given message id is too new.");
+        }
+        foreach ($this->message_ids as $message_id) {
+            if ($new_message_id <= $message_id) {
+                throw new Exception("Given message id is lower than or equal than the current limit (".$message_id.").");
+            }
+        }
+        $this->message_ids[] = $new_message_id;
+        if (count($this->message_ids) > $this->settings["authorization"]["message_ids_limit"]) {
+            array_shift($this->message_ids);
+        }
+    }
     /**
      * Function to get hex crc32.
      *
@@ -102,22 +142,22 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function send_message($message_data)
     {
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-        if (($this->auth_key == null) || ($this->server_salt == null)) {
+        if (($this->settings['authorization']['auth_key'] == null) || ($this->settings['authorization']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
-            $encrypted_data =
-                        $this->server_salt.$this->session_id.$message_id.$this->struct->pack('<II', $this->number, strlen($message_data)).$message_data;
+            $encrypted_data = $this->server_salt.$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->auth_key_id.$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            $message = $this->settings['authorization']['auth_key_id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            $this->seq_no++;
         }
-        switch ($this->settings['protocol']) {
+        switch ($this->settings['connection']['protocol']) {
             case 'tcp_full':
-                $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->number).$message;
+                $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->connection_seq_no).$message;
                 $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
                 $this->sock->write($step2);
-                $this->number += 1;
+                $this->connection_seq_no++;
                 break;
             case 'tcp_intermediate':
                 $step1 = $this->struct->pack('<I', strlen($message)).$message;
@@ -142,7 +182,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function recv_message()
     {
-        switch ($this->settings['protocol']) {
+        switch ($this->settings['connection']['protocol']) {
             case 'tcp_full':
                 $packet_length_data = $this->sock->read(4);
                 if (strlen($packet_length_data) < 4) {
@@ -153,7 +193,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
                     throw new Exception('CRC32 was not correct!');
                 }
-                $x = $this->struct->unpack('<I', substr($packet, 0, 4));
+                $connection_seq_no = $this->struct->unpack('<I', substr($packet, 0, 4))[0];
+                if ($connection_seq_no != $this->connection_seq_no - 1) {
+                    throw new Exception('Connection seq_no mismatch');
+                }
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
                 break;
             case 'tcp_intermediate':
@@ -188,34 +231,41 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
+            $this->add_check_message_ids($message_id);
             $data = fread($payload, $message_length);
-        } elseif ($auth_key_id == $this->auth_key_id) {
+        } elseif ($auth_key_id == $this->settings['authorization']['auth_key_id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-            $decrypted_data = Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-            if (substr($decrypted_data, 0, 8) != $this->server_salt) {
-                throw new Exception('Server salt does not match.');
+            $decrypted_data = Tools::fopen_and_write('php://memory', 'rw+b', Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv));
+            $server_salt = fread($decrypted_data, 8);
+            $session_id = fread($decrypted_data, 8);
+            if ($server_salt != $this->settings['authorization']['server_salt']) {
+                throw new Exception('Server salt mismatch.');
             }
-            if (substr($decrypted_data, 8, 8) != $this->session_id) {
-                throw new Exception('Session id does not match.');
+            if ($session_id != $this->settings['authorization']['session_id']) {
+                throw new Exception('Session id mismatch.');
             }
-            $message_id = substr($decrypted_data, 16, 8);
-            $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
-            $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
-            $data = substr($decrypted_data, 32, $message_data_length);
+            $message_id = fread($decrypted_data, 8);
+            $this->add_check_message_ids($message_id);
+            $seq_no = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
+            if ($seq_no != $this->seq_no) {
+                throw new Exception('Seq_no mismatch');
+            }
+            $message_data_length = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
+            $data = fread($decrypted_data, $message_data_length);
+            if ($message_key != substr(sha1(stream_get_contents($decrypted_data, 0, ftell($message_data_length)), true), -16)) {
+                throw new Exception('msg_key mismatch');
+            }
         } else {
             throw new Exception('Got unknown auth_key id');
         }
-
-
         return $data;
     }
 
     public function method_call($method, $kwargs)
     {
-        //var_dump($kwargs);
-        foreach (range(1, $this->MAX_RETRY) as $i) {
+        foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
@@ -232,7 +282,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         throw new Exception('An error occurred while calling method '.$method.'.');
     }
 
-    public function create_auth_key()
+    public function create_auth_key($expires_in = -1)
     {
 
         // Make pq request
@@ -274,7 +324,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $q_bytes = $this->struct->pack('>I', (string) $q);
 
         $new_nonce = \phpseclib\Crypt\Random::string(32);
-        $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
+        if ($expires_in == -1) {
+            $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
+        } else {
+            $data = $this->tl->serialize_obj('p_q_inner_data_temp', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, "expires_in" => $expires_in]);
+        }
         $sha_digest = sha1($data, true);
 
         // Encrypt serialized object
@@ -334,7 +388,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $data_with_sha = sha1($data, true).$data;
         $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(Tools::posmod(-strlen($data_with_sha), 16));
         $encrypted_data = Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
-        foreach (Tools::range(1, $this->AUTH_MAX_RETRY) as $i) {
+        foreach (Tools::range(1, $this->settings['max_tries']['authorization']) as $i) {
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
             $auth_key = $g_a->powMod($b, $dh_prime);
             $auth_key_str = $auth_key->toBytes();
@@ -349,23 +403,23 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($Set_client_DH_params_answer['server_nonce'] != $server_nonce) {
                 throw new Exception('Handshake: wrong server nonce');
             }
-            if ($Set_client_DH_params_answer->name == 'dh_gen_ok') {
+            if ($Set_client_DH_params_answer['_'] == 'dh_gen_ok') {
                 if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
                     throw new Exception('Handshake: wrong new_nonce_hash1');
                 }
                 $this->log->log('Diffie Hellman key exchange processed successfully');
-                $this->server_salt = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
-                $this->auth_key = $auth_key_str;
-                $this->auth_key_id = substr($auth_key_sha, -8);
+                $server_salt = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
+                $auth_key = $auth_key_str;
+                $auth_key_id = substr($auth_key_sha, -8);
                 $this->log->log('Auth key generated');
 
-                return 'Auth Ok';
-            } elseif ($Set_client_DH_params_answer->name == 'dh_gen_retry') {
+                return ["auth_key" => $auth_key, "auth_key_id" => $auth_key_id, "server_salt", $server_salt];
+            } elseif ($Set_client_DH_params_answer['_'] == 'dh_gen_retry') {
                 if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                     throw new Exception('Handshake: wrong new_nonce_hash_2');
                 }
                 $this->log->log('Retry Auth');
-            } elseif ($Set_client_DH_params_answer->name == 'dh_gen_fail') {
+            } elseif ($Set_client_DH_params_answer['_'] == 'dh_gen_fail') {
                 if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                     throw new Exception('Handshake: wrong new_nonce_hash_3');
                 }
@@ -375,15 +429,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 throw new Exception('Response Error');
             }
         }
+        throw new Exception('Auth Failed');
     }
 
     public function aes_calculate($msg_key, $direction = 'to server')
     {
         $x = ($direction == 'to server') ? 0 : 8;
-        $sha1_a = sha1($msg_key.substr($this->auth_key, $x, ($x + 32) - $x), true);
-        $sha1_b = sha1(substr($this->auth_key, ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($this->auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
-        $sha1_c = sha1(substr($this->auth_key, ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
-        $sha1_d = sha1($msg_key.substr($this->auth_key, ($x + 96), ($x + 128) - ($x + 96)), true);
+        $sha1_a = sha1($msg_key.substr($this->settings['authorization']['auth_key'], $x, ($x + 32) - $x), true);
+        $sha1_b = sha1(substr($this->settings['authorization']['auth_key'], ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($this->settings['authorization']['auth_key'], (48 + $x), (64 + $x) - (48 + $x)), true);
+        $sha1_c = sha1(substr($this->settings['authorization']['auth_key'], ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
+        $sha1_d = sha1($msg_key.substr($this->settings['authorization']['auth_key'], ($x + 96), ($x + 128) - ($x + 96)), true);
         $aes_key = substr($sha1_a, 0, 8 - 0).substr($sha1_b, 8, 20 - 8).substr($sha1_c, 4, 16 - 4);
         $aes_iv = substr($sha1_a, 8, 20 - 8).substr($sha1_b, 0, 8 - 0).substr($sha1_c, 16, 20 - 16).substr($sha1_d, 0, 8 - 0);
 
