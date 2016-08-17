@@ -25,10 +25,8 @@ class Session extends Tools
         $default_settings = [
             'authorization' => [
                 'auth_key'                 => null,
-                'auth_key_id'              => null,
                 'temp_auth_key'            => null,
-                'temp_auth_key_expires_in' => 86400,
-                'server_salt'              => null,
+                'default_temp_auth_key_expires_in' => 86400,
                 'session_id'               => \phpseclib\Crypt\Random::string(8),
                 'rsa_key'                  => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
@@ -92,14 +90,17 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Istantiate logging class
         $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
 
-        $this->connection_seq_no = 0;
-        $this->seq_no = 0;
+        $this->connection_seq_no = -1;
+        $this->seq_no = -1;
         $this->timedelta = 0; // time delta
         $this->message_ids = [];
 
-        if (($this->settings['authorization']['auth_key'] == null) || ($this->settings['authorization']['server_salt'] == null)) {
-            $auth_res = $this->create_auth_key(-1);
-            $temp_auth_res = $this->create_auth_key($this->settings['authorization']['temp_auth_key_expires_in']);
+        if ($this->settings['authorization']['temp_auth_key'] == null || $this->settings['authorization']['auth_key'] == null) {
+            if ($this->settings['authorization']['auth_key'] == null) {
+                $this->settings['authorization']['auth_key'] = $this->create_auth_key(-1);
+            }
+            $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
+            
         }
     }
 
@@ -144,22 +145,22 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function send_message($message_data)
     {
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-        if (($this->settings['authorization']['auth_key'] == null) || ($this->settings['authorization']['server_salt'] == null)) {
+        if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
-            $encrypted_data = $this->server_salt.$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->seq_no, strlen($message_data)).$message_data;
+            $this->seq_no++;
+            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->settings['authorization']['auth_key_id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-            $this->seq_no++;
+            $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
         switch ($this->settings['connection']['protocol']) {
             case 'tcp_full':
+                $this->connection_seq_no++;
                 $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->connection_seq_no).$message;
                 $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
                 $this->sock->write($step2);
-                $this->connection_seq_no++;
                 break;
             case 'tcp_intermediate':
                 $step1 = $this->struct->pack('<I', strlen($message)).$message;
@@ -196,7 +197,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('CRC32 was not correct!');
                 }
                 $connection_seq_no = $this->struct->unpack('<I', substr($packet, 0, 4))[0];
-                if ($connection_seq_no != $this->connection_seq_no - 1) {
+                if ($connection_seq_no != $this->connection_seq_no) {
                     throw new Exception('Connection seq_no mismatch');
                 }
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
@@ -235,28 +236,29 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
             $this->add_check_message_ids($message_id);
             $data = fread($payload, $message_length);
-        } elseif ($auth_key_id == $this->settings['authorization']['auth_key_id']) {
+        } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = Tools::fopen_and_write('php://memory', 'rw+b', Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv));
             $server_salt = fread($decrypted_data, 8);
             $session_id = fread($decrypted_data, 8);
-            if ($server_salt != $this->settings['authorization']['server_salt']) {
+            if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
                 throw new Exception('Server salt mismatch.');
             }
             if ($session_id != $this->settings['authorization']['session_id']) {
                 throw new Exception('Session id mismatch.');
             }
-            $message_id = fread($decrypted_data, 8);
+            $message_id = $this->struct->unpack('<Q', fread($decrypted_data, 8))[0];
             $this->add_check_message_ids($message_id);
             $seq_no = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
+            var_dump($seq_no, $this->seq_no);
             if ($seq_no != $this->seq_no) {
                 throw new Exception('Seq_no mismatch');
             }
             $message_data_length = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
             $data = fread($decrypted_data, $message_data_length);
-            if ($message_key != substr(sha1(stream_get_contents($decrypted_data, 0, ftell($message_data_length)), true), -16)) {
+            if ($message_key != substr(sha1(stream_get_contents($decrypted_data, 0, ftell($decrypted_data)), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
         } else {
@@ -327,7 +329,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $q_bytes = $this->struct->pack('>I', (string) $q);
 
         $new_nonce = \phpseclib\Crypt\Random::string(32);
-        if ($expires_in == -1) {
+        if ($expires_in < 0) {
             $data = $this->tl->serialize_obj('p_q_inner_data', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce]);
         } else {
             $data = $this->tl->serialize_obj('p_q_inner_data_temp', ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in]);
@@ -351,55 +353,123 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'encrypted_data'         => $encrypted_data,
             ]
         );
-
+        // Check nonce and server_nonce
         if ($nonce != $server_dh_params['nonce']) {
             throw new Exception('Handshake: wrong nonce.');
         }
         if ($server_nonce != $server_dh_params['server_nonce']) {
             throw new Exception('Handshake: wrong server nonce.');
         }
+        if (isset($server_dh_params["new_nonce_hash"]) && substr(sha1($new_nonce), -32) != $server_dh_params["new_nonce_hash"]) {
+            throw new Exception('Handshake: wrong new nonce hash.');
+        }
+
+        // Get key and iv and decrypt answer
         $encrypted_answer = $server_dh_params['encrypted_answer'];
         $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
         $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
         $answer_with_hash = Crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+
+        // Separate answer and hash
         $answer_hash = substr($answer_with_hash, 0, 20);
         $answer = substr($answer_with_hash, 20);
+
+        // Deserialize
         $server_DH_inner_data = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
+
+        // Time delta
+        $server_time = $server_DH_inner_data['server_time'];
+        $this->timedelta = ($server_time - time());
+        $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
+        
+        // Do some checks
+        $server_DH_inner_data_length = $this->tl->get_length(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
+        if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
+            throw new Exception('Handshake: answer_hash mismatch.');
+        }
         if ($nonce != $server_DH_inner_data['nonce']) {
             throw new Exception('Handshake: wrong nonce');
         }
         if ($server_nonce != $server_DH_inner_data['server_nonce']) {
             throw new Exception('Handshake: wrong server nonce');
         }
-        $dh_prime_str = $server_DH_inner_data['dh_prime'];
         $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
-        $g_a_str = $server_DH_inner_data['g_a'];
-        $server_time = $server_DH_inner_data['server_time'];
-        $this->timedelta = ($server_time - time());
-        $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-        $dh_prime = new \phpseclib\Math\BigInteger($dh_prime_str, 256);
-        $g_a = new \phpseclib\Math\BigInteger($g_a_str, 256);
+        $g_a = new \phpseclib\Math\BigInteger($server_DH_inner_data['g_a'], 256);
+        $dh_prime = new \phpseclib\Math\BigInteger($server_DH_inner_data['dh_prime'], 256);
+
+        // Define some needed numbers for BigInteger
+        $one = new \phpseclib\Math\BigInteger(1);
+        $two = new \phpseclib\Math\BigInteger(2);
+        $twoe2047 = new \phpseclib\Math\BigInteger("16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328"); 
+        $twoe2048 = new \phpseclib\Math\BigInteger("32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656"); 
+
+        // Check validity of dh_prime
         if (!$dh_prime->isPrime()) {
-            throw new Exception("Handshake: dh_prime isn't a prime.");
+            throw new Exception("Handshake: dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
         }
-        $retry_id = 0;
-        $b_str = \phpseclib\Crypt\Random::string(256);
-        $b = new \phpseclib\Math\BigInteger($b_str, 256);
-        $g_b = $g->powMod($b, $dh_prime);
-        $g_b_str = $g_b->toBytes();
-        $data = $this->tl->serialize_obj('client_DH_inner_data', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
-        $data_with_sha = sha1($data, true).$data;
-        $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(Tools::posmod(-strlen($data_with_sha), 16));
-        $encrypted_data = Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
-        foreach (Tools::range(1, $this->settings['max_tries']['authorization']) as $i) {
+        /*
+        // Almost always fails
+        if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
+            throw new Exception("Handshake: dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
+        }
+        */
+        // 2^2047 < dh_prime < 2^2048
+        if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
+        || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
+        ) {
+            throw new Exception("Handshake: g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
+        }
+
+        // Check validity of g
+        // 1 < g < dh_prime - 1
+        if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
+        || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
+        ) {
+            throw new Exception("Handshake: g is invalid (1 < g < dh_prime - 1 is false).");
+        }
+
+        // Check validity of g_a
+        // 1 < g_a < dh_prime - 1
+        if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
+        || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
+        ) {
+            throw new Exception("Handshake: g_a is invalid (1 < g_a < dh_prime - 1 is false).");
+        }
+
+        foreach (Tools::range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
+            $b = new \phpseclib\Math\BigInteger(\phpseclib\Crypt\Random::string(256), 256);
+            $g_b = $g->powMod($b, $dh_prime);
+
+            // Check validity of g_b
+            // 1 < g_b < dh_prime - 1
+            if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
+            || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
+            ) {
+                throw new Exception("Handshake: g_b is invalid (1 < g_b < dh_prime - 1 is false).");
+            }
+
+            $g_b_str = $g_b->toBytes();
+
+            // serialize client_DH_inner_data
+            $data = $this->tl->serialize_obj('client_DH_inner_data', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str]);
+            $data_with_sha = sha1($data, true).$data;
+            $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(Tools::posmod(-strlen($data_with_sha), 16));
+
+            // encrypt client_DH_inner_data
+            $encrypted_data = Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
+
+            // Send set_client_DH_params query
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
+            
+            // Generate auth_key
             $auth_key = $g_a->powMod($b, $dh_prime);
             $auth_key_str = $auth_key->toBytes();
             $auth_key_sha = sha1($auth_key_str, true);
             $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
-            $new_nonce_hash1 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
-            $new_nonce_hash2 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
-            $new_nonce_hash3 = substr(sha1($new_nonce.''.$auth_key_aux_hash, true), -16);
+            $new_nonce_hash1 = substr(sha1($new_nonce.chr(1).$auth_key_aux_hash, true), -16);
+            $new_nonce_hash2 = substr(sha1($new_nonce.chr(2).$auth_key_aux_hash, true), -16);
+            $new_nonce_hash3 = substr(sha1($new_nonce.chr(3).$auth_key_aux_hash, true), -16);
+
             if ($Set_client_DH_params_answer['nonce'] != $nonce) {
                 throw new Exception('Handshake: wrong nonce.');
             }
@@ -411,17 +481,22 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Handshake: wrong new_nonce_hash1');
                 }
                 $this->log->log('Diffie Hellman key exchange processed successfully');
-                $server_salt = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
-                $auth_key = $auth_key_str;
-                $auth_key_id = substr($auth_key_sha, -8);
-                $this->log->log('Auth key generated');
 
-                return ['auth_key' => $auth_key, 'auth_key_id' => $auth_key_id, 'server_salt', $server_salt];
+                $res_authorization = [ "server_salt" => substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0) ];
+                $res_authorization["auth_key"] = $auth_key_str;
+                $res_authorization["id"] = substr($auth_key_sha, -8);
+                if ($expires_in < 0) {
+                    $res_authorization["expires_in"] = $expires_in;
+                }
+                $this->log->log('Auth key generated');
+                $this->timedelta = 0;
+
+                return $res_authorization;
             } elseif ($Set_client_DH_params_answer['_'] == 'dh_gen_retry') {
                 if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                     throw new Exception('Handshake: wrong new_nonce_hash_2');
                 }
-                $this->log->log('Retry Auth');
+                $this->log->log('Retrying Auth');
             } elseif ($Set_client_DH_params_answer['_'] == 'dh_gen_fail') {
                 if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                     throw new Exception('Handshake: wrong new_nonce_hash_3');
@@ -438,10 +513,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function aes_calculate($msg_key, $direction = 'to server')
     {
         $x = ($direction == 'to server') ? 0 : 8;
-        $sha1_a = sha1($msg_key.substr($this->settings['authorization']['auth_key'], $x, ($x + 32) - $x), true);
-        $sha1_b = sha1(substr($this->settings['authorization']['auth_key'], ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($this->settings['authorization']['auth_key'], (48 + $x), (64 + $x) - (48 + $x)), true);
-        $sha1_c = sha1(substr($this->settings['authorization']['auth_key'], ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
-        $sha1_d = sha1($msg_key.substr($this->settings['authorization']['auth_key'], ($x + 96), ($x + 128) - ($x + 96)), true);
+        $sha1_a = sha1($msg_key.substr($this->settings['authorization']['temp_auth_key']['auth_key'], $x, ($x + 32) - $x), true);
+        $sha1_b = sha1(substr($this->settings['authorization']['temp_auth_key']['auth_key'], ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($this->settings['authorization']['temp_auth_key']['auth_key'], (48 + $x), (64 + $x) - (48 + $x)), true);
+        $sha1_c = sha1(substr($this->settings['authorization']['temp_auth_key']['auth_key'], ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
+        $sha1_d = sha1($msg_key.substr($this->settings['authorization']['temp_auth_key']['auth_key'], ($x + 96), ($x + 128) - ($x + 96)), true);
         $aes_key = substr($sha1_a, 0, 8 - 0).substr($sha1_b, 8, 20 - 8).substr($sha1_c, 4, 16 - 4);
         $aes_iv = substr($sha1_a, 8, 20 - 8).substr($sha1_b, 0, 8 - 0).substr($sha1_c, 16, 20 - 16).substr($sha1_d, 0, 8 - 0);
 

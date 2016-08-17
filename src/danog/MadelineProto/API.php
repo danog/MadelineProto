@@ -12,13 +12,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class API
+class API 
 {
     public $session;
 
     public function __construct($params = [])
     {
-        set_error_handler([$this, 'ExceptionErrorHandler']);
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new Session($params);
         $future_salts = $this->get_future_salts(3);
         $this->session->log->log($future_salts);

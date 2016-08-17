@@ -29,7 +29,7 @@ class Exception extends \Exception
      *
      * Error handler
      */
-    public function ExceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
+    public static function ExceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
     {
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0) {

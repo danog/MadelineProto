@@ -131,22 +131,16 @@ class TL
         }
     }
 
-    public function deserialize($bytes_io, $type_ = null, $subtype = null)
-    {
-        return $this->deserialize_length($bytes_io, $type_, $subtype);
-    }
-
     public function get_length($bytes_io, $type_ = null, $subtype = null)
     {
-        $this->deserialize_length($bytes_io, $type_, $subtype);
-
+        $this->deserialize($bytes_io, $type_, $subtype);
         return ftell($bytes_io);
     }
 
     /**
      * :type bytes_io: io.BytesIO object.
      */
-    public function deserialize_length($bytes_io, $type_ = null, $subtype = null)
+    public function deserialize($bytes_io, $type_ = null, $subtype = null)
     {
         if (!(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream')) {
             throw new Exception('An invalid bytes_io handle provided.');
@@ -201,7 +195,7 @@ class TL
                 $count = \danog\PHP\Struct::unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];
                 foreach (\danog\MadelineProto\Tools::range($count) as $i) {
-                    $x[] = $this->deserialize_length($bytes_io, $subtype);
+                    $x[] = $this->deserialize($bytes_io, $subtype);
                 }
                 break;
             default:
@@ -219,11 +213,11 @@ class TL
 
                 $base_boxed_types = ['Vector t', 'Int', 'Long', 'Double', 'String', 'Int128', 'Int256'];
                 if (in_array($tl_elem->type, $base_boxed_types)) {
-                    $x = $this->deserialize_length($bytes_io, $tl_elem->predicate, $subtype);
+                    $x = $this->deserialize($bytes_io, $tl_elem->predicate, $subtype);
                 } else {
                     $x = ['_' => $tl_elem->predicate];
                     foreach ($tl_elem->params as $arg) {
-                        $x[$arg['name']] = $this->deserialize_length($bytes_io, $arg['type'], $arg['subtype']);
+                        $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
                     }
                 }
                 break;
