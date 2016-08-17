@@ -134,6 +134,7 @@ class TL
     public function get_length($bytes_io, $type_ = null, $subtype = null)
     {
         $this->deserialize($bytes_io, $type_, $subtype);
+
         return ftell($bytes_io);
     }
 

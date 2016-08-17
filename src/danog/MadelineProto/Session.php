@@ -24,11 +24,11 @@ class Session extends Tools
         // Set default settings
         $default_settings = [
             'authorization' => [
-                'auth_key'                 => null,
-                'temp_auth_key'            => null,
+                'auth_key'                         => null,
+                'temp_auth_key'                    => null,
                 'default_temp_auth_key_expires_in' => 86400,
-                'session_id'               => \phpseclib\Crypt\Random::string(8),
-                'rsa_key'                  => '-----BEGIN RSA PUBLIC KEY-----
+                'session_id'                       => \phpseclib\Crypt\Random::string(8),
+                'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
 an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
@@ -100,7 +100,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->settings['authorization']['auth_key'] = $this->create_auth_key(-1);
             }
             $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-            
         }
     }
 
@@ -360,7 +359,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($server_nonce != $server_dh_params['server_nonce']) {
             throw new Exception('Handshake: wrong server nonce.');
         }
-        if (isset($server_dh_params["new_nonce_hash"]) && substr(sha1($new_nonce), -32) != $server_dh_params["new_nonce_hash"]) {
+        if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
             throw new Exception('Handshake: wrong new nonce hash.');
         }
 
@@ -381,7 +380,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $server_time = $server_DH_inner_data['server_time'];
         $this->timedelta = ($server_time - time());
         $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-        
+
         // Do some checks
         $server_DH_inner_data_length = $this->tl->get_length(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
         if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
@@ -400,8 +399,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Define some needed numbers for BigInteger
         $one = new \phpseclib\Math\BigInteger(1);
         $two = new \phpseclib\Math\BigInteger(2);
-        $twoe2047 = new \phpseclib\Math\BigInteger("16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328"); 
-        $twoe2048 = new \phpseclib\Math\BigInteger("32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656"); 
+        $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
+        $twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
         // Check validity of dh_prime
         if (!$dh_prime->isPrime()) {
@@ -425,7 +424,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
         || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
         ) {
-            throw new Exception("Handshake: g is invalid (1 < g < dh_prime - 1 is false).");
+            throw new Exception('Handshake: g is invalid (1 < g < dh_prime - 1 is false).');
         }
 
         // Check validity of g_a
@@ -433,7 +432,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
         || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
         ) {
-            throw new Exception("Handshake: g_a is invalid (1 < g_a < dh_prime - 1 is false).");
+            throw new Exception('Handshake: g_a is invalid (1 < g_a < dh_prime - 1 is false).');
         }
 
         foreach (Tools::range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
@@ -445,7 +444,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
             || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
             ) {
-                throw new Exception("Handshake: g_b is invalid (1 < g_b < dh_prime - 1 is false).");
+                throw new Exception('Handshake: g_b is invalid (1 < g_b < dh_prime - 1 is false).');
             }
 
             $g_b_str = $g_b->toBytes();
@@ -460,7 +459,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
             // Send set_client_DH_params query
             $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
-            
+
             // Generate auth_key
             $auth_key = $g_a->powMod($b, $dh_prime);
             $auth_key_str = $auth_key->toBytes();
@@ -482,11 +481,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 }
                 $this->log->log('Diffie Hellman key exchange processed successfully');
 
-                $res_authorization = [ "server_salt" => substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0) ];
-                $res_authorization["auth_key"] = $auth_key_str;
-                $res_authorization["id"] = substr($auth_key_sha, -8);
+                $res_authorization = ['server_salt' => substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0)];
+                $res_authorization['auth_key'] = $auth_key_str;
+                $res_authorization['id'] = substr($auth_key_sha, -8);
                 if ($expires_in < 0) {
-                    $res_authorization["expires_in"] = $expires_in;
+                    $res_authorization['expires_in'] = $expires_in;
                 }
                 $this->log->log('Auth key generated');
                 $this->timedelta = 0;
