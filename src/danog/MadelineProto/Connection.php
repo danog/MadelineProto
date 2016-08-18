@@ -89,7 +89,7 @@ class Connection
     {
         return hexdec(hash('crc32b', $data));
     }
-    
+
     public function write($what, $length = null)
     {
         if ($length != null) {
@@ -128,7 +128,9 @@ class Connection
                 break;
         }
     }
-    public function read_message() {
+
+    public function read_message()
+    {
         switch ($this->protocol) {
             case 'tcp_full':
                 $packet_length_data = $this->read(4);
@@ -172,9 +174,12 @@ class Connection
                 $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
         }
+
         return $payload;
     }
-    public function send_message($message) {
+
+    public function send_message($message)
+    {
         switch ($this->protocol) {
             case 'tcp_full':
                 $this->out_seq_no++;

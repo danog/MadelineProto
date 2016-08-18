@@ -134,9 +134,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 array_shift($this->message_ids);
             }
         }
-            
     }
-
 
     /**
      * Forming the message frame and sending message to server
@@ -178,46 +176,46 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = Tools::fopen_and_write('php://memory', 'rw+b', Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv));
-            
+
             $server_salt = fread($decrypted_data, 8);
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
                 throw new Exception('Server salt mismatch.');
             }
-            
+
             $session_id = fread($decrypted_data, 8);
             if ($session_id != $this->settings['authorization']['session_id']) {
                 throw new Exception('Session id mismatch.');
             }
-            
+
             $message_id = fread($decrypted_data, 8);
             $this->check_message_id($message_id, false);
-            
+
             $seq_no = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
-            var_dump($seq_no, $this->seq_no *2);
+            var_dump($seq_no, $this->seq_no * 2);
             if ($seq_no != $this->seq_no * 2) {
                 throw new Exception('Seq_no mismatch');
             }
-            
+
             $message_data_length = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
-            
-            if ($message_data_length > fstat($decrypted_data)["size"]) {
+
+            if ($message_data_length > fstat($decrypted_data)['size']) {
                 throw new Exception('message_data_length is too big');
             }
-            
-            if ((fstat($decrypted_data)["size"] - 32) - $message_data_length > 15) {
+
+            if ((fstat($decrypted_data)['size'] - 32) - $message_data_length > 15) {
                 throw new Exception('difference between message_data_length and the length of the remaining decrypted buffer is too big');
             }
-            
+
             if ($message_data_length < 0) {
-               throw new Exception('message_data_length not positive');
+                throw new Exception('message_data_length not positive');
             }
-            
+
             if ($message_data_length % 4 != 0) {
-               throw new Exception('message_data_length not divisible by 4');
+                throw new Exception('message_data_length not divisible by 4');
             }
-            
+
             $message_data = fread($decrypted_data, $message_data_length);
-DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $message_data_length), true), -16), $message_key);            
+            DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $message_data_length), true), -16), $message_key);
             if ($message_key != sha1($message_data, true)) {
                 throw new Exception('msg_key mismatch');
             }
@@ -244,6 +242,7 @@ DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $mess
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
             $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+
             return $deserialized;
         }
         throw new Exception('An error occurred while calling method '.$method.'.');
@@ -337,7 +336,7 @@ DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $mess
 
         // Deserialize
         $server_DH_inner_data = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
-        
+
         // Do some checks
         $server_DH_inner_data_length = $this->tl->get_length(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
         if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {

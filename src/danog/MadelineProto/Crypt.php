@@ -71,6 +71,7 @@ class Crypt
             }
             $ciphered .= $outdata;
         }
+
         return $ciphered;
     }
 }
