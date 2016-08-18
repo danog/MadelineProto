@@ -135,16 +135,19 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
         }
     }
-    
-    public function generate_seq_no($content_related = true) {
+
+    public function generate_seq_no($content_related = true)
+    {
         $in = $content_related ? 1 : 0;
         $value = $this->seq_no;
         $this->seq_no += $in;
         var_dump(($value * 2) + $in);
+
         return ($value * 2) + $in;
     }
 
-    public function anknowledge($msg_id) {
+    public function anknowledge($msg_id)
+    {
         return $this->method_call('msgs_ack', [$msg_id]);
     }
 
