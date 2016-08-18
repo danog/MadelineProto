@@ -135,6 +135,18 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
         }
     }
+    
+    public function generate_seq_no($content_related = true) {
+        $in = $content_related ? 1 : 0;
+        $value = $this->seq_no;
+        $this->seq_no += $in;
+        var_dump(($value * 2) + $in);
+        return ($value * 2) + $in;
+    }
+
+    public function anknowledge($msg_id) {
+        return $this->method_call('msgs_ack', [$msg_id]);
+    }
 
     /**
      * Forming the message frame and sending message to server
@@ -147,8 +159,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
-            $this->seq_no++;
-            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->seq_no, strlen($message_data)).$message_data;
+            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->generate_seq_no(), strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
@@ -175,34 +186,31 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-            $decrypted_data = Tools::fopen_and_write('php://memory', 'rw+b', Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv));
+            $decrypted_data = Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
-            $server_salt = fread($decrypted_data, 8);
+            $server_salt = substr($decrypted_data, 0, 8);
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
                 throw new Exception('Server salt mismatch.');
             }
 
-            $session_id = fread($decrypted_data, 8);
+            $session_id = substr($decrypted_data, 8, 8);
             if ($session_id != $this->settings['authorization']['session_id']) {
                 throw new Exception('Session id mismatch.');
             }
 
-            $message_id = fread($decrypted_data, 8);
+            $message_id = substr($decrypted_data, 16, 8);
             $this->check_message_id($message_id, false);
 
-            $seq_no = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
-            var_dump($seq_no, $this->seq_no * 2);
-            if ($seq_no != $this->seq_no * 2) {
-                throw new Exception('Seq_no mismatch');
-            }
+            $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
+            // Dunno how to handle any incorrect sequence numbers
 
-            $message_data_length = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
+            $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
 
-            if ($message_data_length > fstat($decrypted_data)['size']) {
+            if ($message_data_length > strlen($decrypted_data)) {
                 throw new Exception('message_data_length is too big');
             }
 
-            if ((fstat($decrypted_data)['size'] - 32) - $message_data_length > 15) {
+            if ((strlen($decrypted_data) - 32) - $message_data_length > 15) {
                 throw new Exception('difference between message_data_length and the length of the remaining decrypted buffer is too big');
             }
 
@@ -214,11 +222,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 throw new Exception('message_data_length not divisible by 4');
             }
 
-            $message_data = fread($decrypted_data, $message_data_length);
-            DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $message_data_length), true), -16), $message_key);
-            if ($message_key != sha1($message_data, true)) {
+            $message_data = substr($decrypted_data, 32, $message_data_length);
+            if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
+            var_dump($this->anknowledge($message_id));
         } else {
             throw new Exception('Got unknown auth_key id');
         }

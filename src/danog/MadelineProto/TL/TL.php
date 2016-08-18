@@ -19,7 +19,7 @@ class TL
         if (is_array($filename)) {
             $TL_dict = [];
             foreach ($filename as $file) {
-                $TL_dict = array_replace(json_decode(file_get_contents($file), true), $TL_dict);
+                $TL_dict = array_merge(json_decode(file_get_contents($file), true), $TL_dict);
             }
         } else {
             $TL_dict = json_decode(file_get_contents($file), true);
