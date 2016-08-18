@@ -82,7 +82,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Load rsa key
         $this->key = new RSA($settings['authorization']['rsa_key']);
         // Istantiate struct class
-        $this->struct = new \danog\PHP\Struct();
+        $this->struct = new \danog\PHP\StructTools();
         // Istantiate prime class
         $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
@@ -90,8 +90,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Istantiate logging class
         $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
 
-        $this->connection_seq_no = -1;
-        $this->seq_no = -1;
+        $this->seq_no = 0;
         $this->timedelta = 0; // time delta
         $this->message_ids = [];
 
@@ -108,34 +107,36 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         unset($this->sock);
     }
 
-    public function add_check_message_ids($new_message_id)
+    public function check_message_id($new_message_id, $from_client)
     {
+        $new_message_id = $this->struct->unpack('<Q', $new_message_id)[0];
         if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
             throw new Exception('Given message id is too old.');
         }
         if (((int) ((time() + $this->timedelta + 30) * pow(2, 30)) * 4) < $new_message_id) {
             throw new Exception('Given message id is too new.');
         }
-        foreach ($this->message_ids as $message_id) {
-            if ($new_message_id <= $message_id) {
-                throw new Exception('Given message id is lower than or equal than the current limit ('.$message_id.').');
+        if ($from_client) {
+            if ($new_message_id % 4 != 0) {
+                throw new Exception('Given message id is not divisible by 4.');
+            }
+        } else {
+            if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
+                throw new Exception('message id mod 4 != 1 or 3');
+            }
+            foreach ($this->message_ids as $message_id) {
+                if ($new_message_id <= $message_id) {
+                    throw new Exception('Given message id is lower than or equal than the current limit ('.$message_id.').');
+                }
+            }
+            $this->message_ids[] = $new_message_id;
+            if (count($this->message_ids) > $this->settings['authorization']['message_ids_limit']) {
+                array_shift($this->message_ids);
             }
         }
-        $this->message_ids[] = $new_message_id;
-        if (count($this->message_ids) > $this->settings['authorization']['message_ids_limit']) {
-            array_shift($this->message_ids);
-        }
+            
     }
 
-    /**
-     * Function to get hex crc32.
-     *
-     * @param $data Data to encode.
-     */
-    public function newcrc32($data)
-    {
-        return hexdec(hash('crc32b', $data));
-    }
 
     /**
      * Forming the message frame and sending message to server
@@ -144,6 +145,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function send_message($message_data)
     {
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
+        $this->check_message_id($message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
@@ -154,29 +156,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
         }
-        switch ($this->settings['connection']['protocol']) {
-            case 'tcp_full':
-                $this->connection_seq_no++;
-                $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->connection_seq_no).$message;
-                $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
-                $this->sock->write($step2);
-                break;
-            case 'tcp_intermediate':
-                $step1 = $this->struct->pack('<I', strlen($message)).$message;
-                $this->sock->write($step1);
-                break;
-            case 'tcp_abridged':
-                $len = strlen($message) / 4;
-                if ($len < 127) {
-                    $step1 = chr($len).$message;
-                } else {
-                    $step1 = chr(127).substr($this->struct->pack('<I', $len), 0, 3).$message;
-                }
-                $this->sock->write($step1);
-                break;
-            default:
-                break;
-        }
+        $this->sock->send_message($message);
     }
 
     /**
@@ -184,87 +164,68 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function recv_message()
     {
-        switch ($this->settings['connection']['protocol']) {
-            case 'tcp_full':
-                $packet_length_data = $this->sock->read(4);
-                if (strlen($packet_length_data) < 4) {
-                    throw new Exception('Nothing in the socket!');
-                }
-                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-                $packet = $this->sock->read($packet_length - 4);
-                if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
-                    throw new Exception('CRC32 was not correct!');
-                }
-                $connection_seq_no = $this->struct->unpack('<I', substr($packet, 0, 4))[0];
-                if ($connection_seq_no != $this->connection_seq_no) {
-                    throw new Exception('Connection seq_no mismatch');
-                }
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
-                break;
-            case 'tcp_intermediate':
-                $packet_length_data = $this->sock->read(4);
-                if (strlen($packet_length_data) < 4) {
-                    throw new Exception('Nothing in the socket!');
-                }
-                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
-                $packet = $this->sock->read($packet_length);
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
-                break;
-            case 'tcp_abridged':
-                $packet_length_data = $this->sock->read(1);
-                if (strlen($packet_length_data) < 1) {
-                    throw new Exception('Nothing in the socket!');
-                }
-                $packet_length = ord($packet_length_data);
-                if ($packet_length < 127) {
-                    $packet_length <<= 2;
-                } else {
-                    $packet_length_data = $this->sock->read(3);
-                    $packet_length = $this->struct->unpack('<I', $packet_length_data.pack('x'))[0] << 2;
-                }
-                $packet = $this->sock->read($packet_length);
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
-                break;
-        }
-
+        $payload = $this->sock->read_message();
         if (fstat($payload)['size'] == 4) {
             throw new Exception('Server response error: '.abs($this->struct->unpack('<i', fread($payload, 4))[0]));
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
-            $this->add_check_message_ids($message_id);
-            $data = fread($payload, $message_length);
+            list($message_id, $message_length) = $this->struct->unpack('<8sI', fread($payload, 12));
+            $this->check_message_id($message_id, false);
+            $message_data = fread($payload, $message_length);
         } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = Tools::fopen_and_write('php://memory', 'rw+b', Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv));
+            
             $server_salt = fread($decrypted_data, 8);
-            $session_id = fread($decrypted_data, 8);
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
                 throw new Exception('Server salt mismatch.');
             }
+            
+            $session_id = fread($decrypted_data, 8);
             if ($session_id != $this->settings['authorization']['session_id']) {
                 throw new Exception('Session id mismatch.');
             }
-            $message_id = $this->struct->unpack('<Q', fread($decrypted_data, 8))[0];
-            $this->add_check_message_ids($message_id);
+            
+            $message_id = fread($decrypted_data, 8);
+            $this->check_message_id($message_id, false);
+            
             $seq_no = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
-            var_dump($seq_no, $this->seq_no);
-            if ($seq_no != $this->seq_no) {
+            var_dump($seq_no, $this->seq_no *2);
+            if ($seq_no != $this->seq_no * 2) {
                 throw new Exception('Seq_no mismatch');
             }
+            
             $message_data_length = $this->struct->unpack('<I', fread($decrypted_data, 4)) [0];
-            $data = fread($decrypted_data, $message_data_length);
-            if ($message_key != substr(sha1(stream_get_contents($decrypted_data, 0, ftell($decrypted_data)), true), -16)) {
+            
+            if ($message_data_length > fstat($decrypted_data)["size"]) {
+                throw new Exception('message_data_length is too big');
+            }
+            
+            if ((fstat($decrypted_data)["size"] - 32) - $message_data_length > 15) {
+                throw new Exception('difference between message_data_length and the length of the remaining decrypted buffer is too big');
+            }
+            
+            if ($message_data_length < 0) {
+               throw new Exception('message_data_length not positive');
+            }
+            
+            if ($message_data_length % 4 != 0) {
+               throw new Exception('message_data_length not divisible by 4');
+            }
+            
+            $message_data = fread($decrypted_data, $message_data_length);
+DebugTools::hex_dump(substr(sha1(stream_get_contents($decrypted_data, 32 + $message_data_length), true), -16), $message_key);            
+            if ($message_key != sha1($message_data, true)) {
                 throw new Exception('msg_key mismatch');
             }
         } else {
             throw new Exception('Got unknown auth_key id');
         }
 
-        return $data;
+        return $message_data;
     }
 
     public function method_call($method, $kwargs)
@@ -274,21 +235,22 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
-                $this->log->log(PHP_EOL.'An error occurred while calling method '.$method.': '.$e->getMessage().' on line '.$e->getLine().' of file '.$e->getFile().PHP_EOL.'Retrying to call method...'.PHP_EOL);
+                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
+                unset($this->sock);
+                $this->sock = new Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
                 continue;
             }
             if ($server_answer == null) {
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
-
-            return $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+            $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+            return $deserialized;
         }
         throw new Exception('An error occurred while calling method '.$method.'.');
     }
 
     public function create_auth_key($expires_in = -1)
     {
-
         // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
         $this->log->log('Handshake: Requesting pq');
@@ -375,12 +337,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         // Deserialize
         $server_DH_inner_data = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
-
-        // Time delta
-        $server_time = $server_DH_inner_data['server_time'];
-        $this->timedelta = ($server_time - time());
-        $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
-
+        
         // Do some checks
         $server_DH_inner_data_length = $this->tl->get_length(Tools::fopen_and_write('php://memory', 'rw+b', $answer));
         if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
@@ -395,6 +352,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
         $g_a = new \phpseclib\Math\BigInteger($server_DH_inner_data['g_a'], 256);
         $dh_prime = new \phpseclib\Math\BigInteger($server_DH_inner_data['dh_prime'], 256);
+
+        // Time delta
+        $server_time = $server_DH_inner_data['server_time'];
+        $this->timedelta = ($server_time - time());
+        $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
+
 
         // Define some needed numbers for BigInteger
         $one = new \phpseclib\Math\BigInteger(1);

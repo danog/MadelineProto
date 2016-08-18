@@ -32,6 +32,8 @@ class Connection
         - udp
         */
         $this->protocol = $protocol;
+        // Istantiate struct class
+        $this->struct = new \danog\PHP\StructTools();
         switch ($this->protocol) {
             case 'tcp_abridged':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
@@ -55,6 +57,8 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                $this->out_seq_no = -1;
+                $this->in_seq_no = -1;
                 break;
             default:
                 throw new Exception('Connection: invalid protocol specified.');
@@ -76,6 +80,16 @@ class Connection
         }
     }
 
+    /**
+     * Function to get hex crc32.
+     *
+     * @param $data Data to encode.
+     */
+    public function newcrc32($data)
+    {
+        return hexdec(hash('crc32b', $data));
+    }
+    
     public function write($what, $length = null)
     {
         if ($length != null) {
@@ -111,6 +125,77 @@ class Connection
                 break;
             default:
                 throw new Exception('Connection: invalid protocol specified.');
+                break;
+        }
+    }
+    public function read_message() {
+        switch ($this->protocol) {
+            case 'tcp_full':
+                $packet_length_data = $this->read(4);
+                if (strlen($packet_length_data) < 4) {
+                    throw new Exception('Nothing in the socket!');
+                }
+                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+                $packet = $this->read($packet_length - 4);
+                if (!($this->newcrc32($packet_length_data.substr($packet, 0, -4)) == $this->struct->unpack('<I', substr($packet, -4))[0])) {
+                    throw new Exception('CRC32 was not correct!');
+                }
+                $this->in_seq_no++;
+                $in_seq_no = $this->struct->unpack('<I', substr($packet, 0, 4))[0];
+                if ($in_seq_no != $this->in_seq_no) {
+                    throw new Exception('Incoming seq_no mismatch');
+                }
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
+                break;
+            case 'tcp_intermediate':
+                $packet_length_data = $this->sock->read(4);
+                if (strlen($packet_length_data) < 4) {
+                    throw new Exception('Nothing in the socket!');
+                }
+                $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
+                $packet = $this->sock->read($packet_length);
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                break;
+            case 'tcp_abridged':
+                $packet_length_data = $this->sock->read(1);
+                if (strlen($packet_length_data) < 1) {
+                    throw new Exception('Nothing in the socket!');
+                }
+                $packet_length = ord($packet_length_data);
+                if ($packet_length < 127) {
+                    $packet_length <<= 2;
+                } else {
+                    $packet_length_data = $this->sock->read(3);
+                    $packet_length = $this->struct->unpack('<I', $packet_length_data.pack('x'))[0] << 2;
+                }
+                $packet = $this->sock->read($packet_length);
+                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                break;
+        }
+        return $payload;
+    }
+    public function send_message($message) {
+        switch ($this->protocol) {
+            case 'tcp_full':
+                $this->out_seq_no++;
+                $step1 = $this->struct->pack('<II', (strlen($message) + 12), $this->out_seq_no).$message;
+                $step2 = $step1.$this->struct->pack('<I', $this->newcrc32($step1));
+                $this->write($step2);
+                break;
+            case 'tcp_intermediate':
+                $step1 = $this->struct->pack('<I', strlen($message)).$message;
+                $this->write($step1);
+                break;
+            case 'tcp_abridged':
+                $len = strlen($message) / 4;
+                if ($len < 127) {
+                    $step1 = chr($len).$message;
+                } else {
+                    $step1 = chr(127).substr($this->struct->pack('<I', $len), 0, 3).$message;
+                }
+                $this->write($step1);
+                break;
+            default:
                 break;
         }
     }
