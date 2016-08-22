@@ -128,7 +128,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if (count($this->outgoing_message_ids) > $this->settings['authorization']['message_ids_limit']) {
                 array_shift($this->outgoing_message_ids);
             }
-
         } else {
             if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
                 throw new Exception('message id mod 4 != 1 or 3');
@@ -145,25 +144,28 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
     }
 
-    public function ack_outgoing_message_id($message_id) {
+    public function ack_outgoing_message_id($message_id)
+    {
         $message_id = $this->struct->unpack('<Q', $message_id)[0];
         // The server acknowledges that it received my message
         if (!in_array($message_id, $this->outgoing_message_ids)) {
-            throw new Exception("Couldn't find message id ".$message_id." in the array of outgoing message ids. Maybe try to increase its size?");
+            throw new Exception("Couldn't find message id ".$message_id.' in the array of outgoing message ids. Maybe try to increase its size?');
         }
         $this->ack_outgoing_message_ids[] = $message_id;
         if (count($this->ack_outgoing_message_ids) > $this->settings['authorization']['message_ids_limit']) {
             array_shift($this->ack_outgoing_message_ids);
         }
     }
-    public function ack_incoming_message_id($message_id) {
+
+    public function ack_incoming_message_id($message_id)
+    {
         if ($this->settings['authorization']['temp_auth_key']['id'] === null || $this->settings['authorization']['temp_auth_key']['id'] == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             return;
         }
         $message_id = $this->struct->unpack('<Q', $message_id)[0];
         // I let the server know that I received its message
         if (!in_array($message_id, $this->incoming_message_ids)) {
-            throw new Exception("Couldn't find message id ".$message_id." in the array of incoming message ids. Maybe try to increase its size?");
+            throw new Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]]);
         $this->ack_incoming_message_ids[] = $message_id;
@@ -182,7 +184,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         return ($value * 2) + $in;
     }
 
-
     /**
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
@@ -193,7 +194,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->check_message_id($message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
-            $this->last_sent = ["message_id" => $message_id];
+            $this->last_sent = ['message_id' => $message_id];
         } else {
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
@@ -201,7 +202,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-            $this->last_sent = ["message_id" => $message_id, "seq_no" => $seq_no];
+            $this->last_sent = ['message_id' => $message_id, 'seq_no' => $seq_no];
         }
         $this->sock->send_message($message);
     }
@@ -220,7 +221,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             list($message_id, $message_length) = $this->struct->unpack('<8sI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
-            $this->last_received = ["message_id" => $message_id];
+            $this->last_received = ['message_id' => $message_id];
         } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
@@ -265,10 +266,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
-            $this->last_received = ["message_id" => $message_id, "seq_no" => $seq_no];
+            $this->last_received = ['message_id' => $message_id, 'seq_no' => $seq_no];
         } else {
             throw new Exception('Got unknown auth_key id');
         }
+
         return $message_data;
     }
 
@@ -288,6 +290,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
             $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+
             return $this->handle_response($deserialized, $method, $args);
         }
         throw new Exception('An error occurred while calling method '.$method.'.');
@@ -313,85 +316,90 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         throw new Exception('An error occurred while calling object '.$object.'.');
     }
-    public function handle_response($response, $name, $args) {
-        switch ($response["_"]) {
-            case "rpc_result":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->ack_outgoing_message_id($response["req_msg_id"]); // Acknowledge that the server received my 
-                if ($response["req_msg_id"] != $last_sent["message_id"]) {
-                    throw new Exception("Message id mismatch.");
+
+    public function handle_response($response, $name, $args)
+    {
+        switch ($response['_']) {
+            case 'rpc_result':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my
+                if ($response['req_msg_id'] != $last_sent['message_id']) {
+                    throw new Exception('Message id mismatch.');
                 }
-                return $this->handle_response($response["result"], $name, $args);
+
+                return $this->handle_response($response['result'], $name, $args);
                 break;
-            case "rpc_error":
-                throw new Exception("Got rpc error " . $response["error_code"] . ": " . $response["error_message"]);
+            case 'rpc_error':
+                throw new Exception('Got rpc error '.$response['error_code'].': '.$response['error_message']);
                 break;
-            case "rpc_answer_unknown":
-                $this->ack_outgoing_message_id($this->last_sent["message_id"]); // Acknowledge that the server received my message
+            case 'rpc_answer_unknown':
+                $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
                 return $response; // I'm not handling this error
                 break;
-            case "rpc_answer_dropped_running":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->ack_outgoing_message_id($this->last_sent["message_id"]); // Acknowledge that the server received my message
+            case 'rpc_answer_dropped_running':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
 
-                $this->ack_outgoing_message_id($response["req_msg_id"]); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
+                $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
                 return $response; // I'm not handling this
                 break;
-            case "rpc_answer_dropped":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->ack_outgoing_message_id($this->last_sent["message_id"]); // Acknowledge that the server received my message
+            case 'rpc_answer_dropped':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
 
-                $this->ack_outgoing_message_id($response["req_msg_id"]); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
+                $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
                 return $response; // I'm not handling this
                 break;
-            case "future_salts":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->ack_outgoing_message_id($this->last_sent["message_id"]); // Acknowledge that the server received my message
-                if ($response["req_msg_id"] != $last_sent["message_id"]) {
-                    throw new Exception("Message id mismatch.");
+            case 'future_salts':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
+                if ($response['req_msg_id'] != $last_sent['message_id']) {
+                    throw new Exception('Message id mismatch.');
                 }
-                $this->future_salts = $response["salts"];
+                $this->future_salts = $response['salts'];
                 break;
-            case "pong":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->ack_outgoing_message_id($this->last_sent["message_id"]); // Acknowledge that the server received my message
-                $this->log->log("pong");
+            case 'pong':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
+                $this->log->log('pong');
                 break;
-            case "msgs_ack":
-                foreach ($response["msg_ids"] as $msg_id) {
+            case 'msgs_ack':
+                foreach ($response['msg_ids'] as $msg_id) {
                     $this->ack_outgoing_message_id($msg_id); // Acknowledge that the server received my message
                 }
                 break;
-            case "new_session_created":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
-                $this->log->log("new session created");
+            case 'new_session_created':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
+                $this->log->log('new session created');
                 $this->log->log($response);
                 break;
-            case "msg_container":
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
+            case 'msg_container':
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
                 $responses = [];
-                $this->log->log("Received container.");
-                $this->log->log($response["messages"]);
-                foreach ($response["messages"] as $message) {
-                    $this->last_recieved = ["message_id" => $message["msg_id"], "seq_no" => $message["seqno"]];
-                    $responses[] = $this->handle_response($message["body"], $name, $args);
+                $this->log->log('Received container.');
+                $this->log->log($response['messages']);
+                foreach ($response['messages'] as $message) {
+                    $this->last_recieved = ['message_id' => $message['msg_id'], 'seq_no' => $message['seqno']];
+                    $responses[] = $this->handle_response($message['body'], $name, $args);
                 }
                 foreach ($responses as $response) {
-                    if ($response != null) return $response;
+                    if ($response != null) {
+                        return $response;
+                    }
                 }
                 break;
-            case "msg_copy":
-                $this->handle_response($response["orig_message"], $name, $args);
+            case 'msg_copy':
+                $this->handle_response($response['orig_message'], $name, $args);
                 break;
-            case "gzip_packed":
+            case 'gzip_packed':
                 return $this->handle_response(gzdecode($response));
                 break;
-            case "http_wait":
-                $this->log->log("Received http wait.");
+            case 'http_wait':
+                $this->log->log('Received http wait.');
                 $this->log->log($response);
                 break;
             default:
-                $this->ack_incoming_message_id($this->last_received["message_id"]); // Acknowledge that I received the server's response
+                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
                 return $response;
                 break;
         }
