@@ -146,23 +146,23 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         return ($value * 2) + $in;
     }
 
-    public function anknowledge($msg_id)
+    public function acknowledge($msg_id)
     {
-        return $this->send_message($this->tl->serialize_obj('msgs_ack', ['msg_ids' => [$msg_id]]));
+        return $this->object_call('msgs_ack', ['msg_ids' => [$msg_id]]);
     }
 
     /**
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-    public function send_message($message_data)
+    public function send_message($message_data, $content_related)
     {
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
         $this->check_message_id($message_id, true);
-        $seq_no = $this->generate_seq_no(true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
+            $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
@@ -230,7 +230,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
-            $this->anknowledge($message_id);
+            //$this->acknowledge($message_id);
         } else {
             throw new Exception('Got unknown auth_key id');
         }
@@ -242,8 +242,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
-                var_dump($method);
-                $this->send_message($this->tl->serialize_method($method, $kwargs));
+                $this->send_message($this->tl->serialize_method($method, $kwargs), $this->tl->content_related($method));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
@@ -255,10 +254,33 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
             $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
-
+            switch ($deserialized["_"]) {
+                
+            }
             return $deserialized;
         }
         throw new Exception('An error occurred while calling method '.$method.'.');
+    }
+
+    public function object_call($object, $kwargs)
+    {
+        foreach (range(1, $this->settings['max_tries']['query']) as $i) {
+            try {
+                $this->send_message($this->tl->serialize_obj($object, $kwargs), $this->tl->content_related($object));
+                $server_answer = $this->recv_message();
+            } catch (Exception $e) {
+                $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
+                unset($this->sock);
+                $this->sock = new Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
+                continue;
+            }
+            if ($server_answer == null) {
+                throw new Exception('An error occurred while calling object '.$object.'.');
+            }
+            $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+            return $deserialized;
+        }
+        throw new Exception('An error occurred while calling object '.$object.'.');
     }
 
     public function create_auth_key($expires_in = -1)
