@@ -21,6 +21,7 @@ class API
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new Session($params);
         $future_salts = $this->get_future_salts(3);
+        $this->session->log->log($future_salts);
         $future_salts = $this->get_future_salts(3);
         $this->session->log->log($future_salts);
     }

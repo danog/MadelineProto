@@ -17,9 +17,10 @@ class TL
     public function __construct($filename)
     {
         if (is_array($filename)) {
-            $TL_dict = [];
+            $TL_dict = ["constructors" => [], "methods" => []];
             foreach ($filename as $file) {
-                $TL_dict = array_merge(json_decode(file_get_contents($file), true), $TL_dict);
+                $TL_dict["constructors"] = array_merge(json_decode(file_get_contents($file), true)["constructors"], $TL_dict["constructors"]);
+                $TL_dict["methods"] = array_merge(json_decode(file_get_contents($file), true)["methods"], $TL_dict["methods"]);
             }
         } else {
             $TL_dict = json_decode(file_get_contents($file), true);

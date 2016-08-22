@@ -13,6 +13,7 @@ Here all of the things that still have to be done in this library.
 You can (and you are also encouraged to) contribute by completing any of the following points.  
 The importance of each item will range from 1 to 5. It's better to start from the most important items.
 
+* In Session.php fix the management of sequence numbers (5).
 * In Session.php and TL, manage rpc errors, notifications, error codes and basically everything that isn't a normal response (4).
 * In Connection.php and Session.php, add support for http, https and (maybe) udp connections (3).
 * In API.php, complete a decent authorization flow that supports both bots and normal users (2).

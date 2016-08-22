@@ -141,14 +141,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $in = $content_related ? 1 : 0;
         $value = $this->seq_no;
         $this->seq_no += $in;
-        var_dump(($value * 2) + $in);
-
-        return ($value * 2) + $in;
+var_dump((($value*2)+ $in));
+        return (($value*2) + $in);
     }
 
     public function anknowledge($msg_id)
     {
-        return $this->method_call('msgs_ack', [$msg_id]);
+        return $this->send_message($this->tl->serialize_obj("msgs_ack", ["msg_ids" => [$msg_id]]));
     }
 
     /**
@@ -159,10 +158,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
         $this->check_message_id($message_id, true);
+	$seq_no = $this->generate_seq_no(true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
-            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $this->generate_seq_no(), strlen($message_data)).$message_data;
+            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
@@ -229,7 +229,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
-            var_dump($this->anknowledge($message_id));
+            $this->anknowledge($message_id);
         } else {
             throw new Exception('Got unknown auth_key id');
         }
@@ -241,6 +241,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
+var_dump($method);
                 $this->send_message($this->tl->serialize_method($method, $kwargs));
                 $server_answer = $this->recv_message();
             } catch (Exception $e) {
@@ -261,6 +262,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function create_auth_key($expires_in = -1)
     {
+        foreach (Tools::range(0, $this->settings['max_tries']['authorization']) as $retry_id_total) {
         // Make pq request
         $nonce = \phpseclib\Crypt\Random::string(16);
         $this->log->log('Handshake: Requesting pq');
@@ -474,11 +476,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     throw new Exception('Handshake: wrong new_nonce_hash_3');
                 }
                 $this->log->log('Auth Failed');
-                throw new Exception('Auth Failed');
+		break;
             } else {
                 throw new Exception('Response Error');
             }
         }
+	}
         throw new Exception('Auth Failed');
     }
 
