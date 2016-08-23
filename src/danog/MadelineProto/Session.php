@@ -187,7 +187,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data, $content_related)
     {
-	$int_message_id = (int) ((time() + $this->timedelta) * pow(2, 30)) * 4;
+        $int_message_id = (int) ((time() + $this->timedelta) * pow(2, 30)) * 4;
         $message_id = $this->struct->pack('<Q', $int_message_id);
         $this->check_message_id($int_message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
@@ -306,6 +306,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->sock = new Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
                 continue;
             }
+
             return;
 //            if ($server_answer == null) {
 //                throw new Exception('An error occurred while calling object '.$object.'.');
@@ -354,7 +355,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 if ($response['req_msg_id'] != $this->last_sent['message_id']) {
                     throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.$this->last_sent['message_id'].').');
                 }
-		$this->log->log("Received future salts.");
+        $this->log->log('Received future salts.');
                 $this->future_salts = $response['salts'];
                 break;
             case 'pong':
