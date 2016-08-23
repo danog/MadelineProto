@@ -113,7 +113,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function check_message_id($new_message_id, $outgoing)
     {
-        $new_message_id = $this->struct->unpack('<Q', $new_message_id)[0];
         if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
             throw new Exception('Given message id ('.$new_message_id.') is too old.');
         }
@@ -146,7 +145,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function ack_outgoing_message_id($message_id)
     {
-        $message_id = $this->struct->unpack('<Q', $message_id)[0];
         // The server acknowledges that it received my message
         if (!in_array($message_id, $this->outgoing_message_ids)) {
             throw new Exception("Couldn't find message id ".$message_id.' in the array of outgoing message ids. Maybe try to increase its size?');
@@ -162,7 +160,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($this->settings['authorization']['temp_auth_key']['id'] === null || $this->settings['authorization']['temp_auth_key']['id'] == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             return;
         }
-        $message_id = $this->struct->unpack('<Q', $message_id)[0];
         // I let the server know that I received its message
         if (!in_array($message_id, $this->incoming_message_ids)) {
             throw new Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
@@ -190,11 +187,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
      */
     public function send_message($message_data, $content_related)
     {
-        $message_id = $this->struct->pack('<Q', (int) ((time() + $this->timedelta) * pow(2, 30)) * 4);
-        $this->check_message_id($message_id, true);
+	$int_message_id = (int) ((time() + $this->timedelta) * pow(2, 30)) * 4;
+        $message_id = $this->struct->pack('<Q', $int_message_id);
+        $this->check_message_id($int_message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
-            $this->last_sent = ['message_id' => $message_id];
+            $this->last_sent = ['message_id' => $int_message_id];
         } else {
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
@@ -202,7 +200,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $padding = \phpseclib\Crypt\Random::string(Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-            $this->last_sent = ['message_id' => $message_id, 'seq_no' => $seq_no];
+            $this->last_sent = ['message_id' => $int_message_id, 'seq_no' => $seq_no];
         }
         $this->sock->send_message($message);
     }
@@ -218,7 +216,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = $this->struct->unpack('<8sI', fread($payload, 12));
+            list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
             $this->last_received = ['message_id' => $message_id];
@@ -238,7 +236,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 throw new Exception('Session id mismatch.');
             }
 
-            $message_id = substr($decrypted_data, 16, 8);
+            $message_id = $this->struct->unpack('<Q', substr($decrypted_data, 16, 8))[0];
             $this->check_message_id($message_id, false);
 
             $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
@@ -301,16 +299,17 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $this->send_message($this->tl->serialize_obj($object, $kwargs), $this->tl->content_related($object));
-                $server_answer = $this->recv_message();
+//                $server_answer = $this->recv_message();
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 unset($this->sock);
                 $this->sock = new Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
                 continue;
             }
-            if ($server_answer == null) {
-                throw new Exception('An error occurred while calling object '.$object.'.');
-            }
+            return;
+//            if ($server_answer == null) {
+//                throw new Exception('An error occurred while calling object '.$object.'.');
+//            }
 //            $deserialized = $this->tl->deserialize(Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
 //            return $deserialized;
         }
@@ -323,8 +322,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             case 'rpc_result':
                 $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my
-                if ($response['req_msg_id'] != $last_sent['message_id']) {
-                    throw new Exception('Message id mismatch.');
+                if ($response['req_msg_id'] != $this->last_sent['message_id']) {
+                    throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.$this->last_sent['message_id'].').');
                 }
 
                 return $this->handle_response($response['result'], $name, $args);
@@ -351,11 +350,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 return $response; // I'm not handling this
                 break;
             case 'future_salts':
-                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
                 $this->ack_outgoing_message_id($this->last_sent['message_id']); // Acknowledge that the server received my message
-                if ($response['req_msg_id'] != $last_sent['message_id']) {
-                    throw new Exception('Message id mismatch.');
+                if ($response['req_msg_id'] != $this->last_sent['message_id']) {
+                    throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.$this->last_sent['message_id'].').');
                 }
+		$this->log->log("Received future salts.");
                 $this->future_salts = $response['salts'];
                 break;
             case 'pong':
@@ -374,7 +373,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->log->log($response);
                 break;
             case 'msg_container':
-                $this->ack_incoming_message_id($this->last_received['message_id']); // Acknowledge that I received the server's response
                 $responses = [];
                 $this->log->log('Received container.');
                 $this->log->log($response['messages']);

@@ -123,22 +123,23 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v2.0.3",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "e085e08c939de49707dbf64315d178d90fbc708d"
+                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/e085e08c939de49707dbf64315d178d90fbc708d",
-                "reference": "e085e08c939de49707dbf64315d178d90fbc708d",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d96e63b79a7135a65659ba5b1cb02826172bfedd",
+                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd",
                 "shasum": ""
             },
             "require": {
-                "php": "^7"
+                "php": "^5.3|^7"
             },
             "require-dev": {
+                "paragonie/random_compat": "^1.4|^2.0",
                 "phpunit/phpunit": "4.*|5.*"
             },
             "type": "library",
@@ -180,7 +181,7 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-07-11 20:32:06"
+            "time": "2016-06-13 01:00:24"
         },
         {
             "name": "paragonie/random_compat",
@@ -232,16 +233,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "3d265f7c079f5b37d33475f996d7a383c5fc8aeb"
+                "reference": "41f85e9c2582b3f6d1b7d20395fb40c687ad5370"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/3d265f7c079f5b37d33475f996d7a383c5fc8aeb",
-                "reference": "3d265f7c079f5b37d33475f996d7a383c5fc8aeb",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/41f85e9c2582b3f6d1b7d20395fb40c687ad5370",
+                "reference": "41f85e9c2582b3f6d1b7d20395fb40c687ad5370",
                 "shasum": ""
             },
             "require": {
@@ -320,7 +321,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2016-05-13 01:15:21"
+            "time": "2016-08-18 18:49:14"
         }
     ],
     "packages-dev": [],
