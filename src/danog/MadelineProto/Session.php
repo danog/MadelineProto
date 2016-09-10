@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 /**
- * Manages encryption and message frames.
+ * Manages session and the creation of authorization keys.
  */
 class Session extends Tools
 {
@@ -176,8 +176,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $in = $content_related ? 1 : 0;
         $value = $this->seq_no;
         $this->seq_no += $in;
-        var_dump((($value * 2) + $in));
-
         return ($value * 2) + $in;
     }
 
@@ -274,10 +272,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function method_call($method, $args)
     {
+        $opts = $this->tl->get_opts($method);
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
-                $server_answer = $this->recv_message();
+                if ($opts["requires_answer"]) $server_answer = $this->recv_message();
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
                 unset($this->sock);
@@ -355,7 +354,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 if ($response['req_msg_id'] != $this->last_sent['message_id']) {
                     throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.$this->last_sent['message_id'].').');
                 }
-        $this->log->log('Received future salts.');
+                $this->log->log('Received future salts.');
                 $this->future_salts = $response['salts'];
                 break;
             case 'pong':
