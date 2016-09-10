@@ -15,6 +15,6 @@ namespace danog\MadelineProto;
 /**
  * Manages encryption and message frames.
  */
-class MTProto extends Tools {
-    
+class MTProto extends Tools
+{
 }
