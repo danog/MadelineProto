@@ -13,11 +13,10 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Manages packing and unpacking of messages
+ * Manages packing and unpacking of messages.
  */
 class MessageHandler extends Crypt
 {
-
     /**
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
@@ -108,5 +107,4 @@ class MessageHandler extends Crypt
 
         return $message_data;
     }
-
 }

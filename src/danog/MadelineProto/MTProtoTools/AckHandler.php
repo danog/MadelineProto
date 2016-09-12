@@ -44,5 +44,4 @@ class AckHandler extends \danog\MadelineProto\Tools
             array_shift($this->ack_incoming_message_ids);
         }
     }
-
 }

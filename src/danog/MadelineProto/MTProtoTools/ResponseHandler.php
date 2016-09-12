@@ -103,5 +103,4 @@ class ResponseHandler extends MsgIdHandler
                 break;
         }
     }
-
 }

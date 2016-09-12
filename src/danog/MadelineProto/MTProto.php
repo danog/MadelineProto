@@ -110,5 +110,4 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         unset($this->sock);
     }
-
 }

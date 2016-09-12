@@ -64,5 +64,4 @@ class CallHandler extends AuthKeyHandler
         }
         throw new Exception('An error occurred while calling object '.$object.'.');
     }
-
 }

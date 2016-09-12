@@ -17,7 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class SeqNoHandler extends ResponseHandler
 {
-
     public function generate_seq_no($content_related = true)
     {
         $in = $content_related ? 1 : 0;
@@ -26,5 +25,4 @@ class SeqNoHandler extends ResponseHandler
 
         return ($value * 2) + $in;
     }
-
 }

@@ -17,7 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class MsgIdHandler extends MessageHandler
 {
-
     public function check_message_id($new_message_id, $outgoing)
     {
         if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
@@ -49,5 +48,4 @@ class MsgIdHandler extends MessageHandler
             }
         }
     }
-
 }
