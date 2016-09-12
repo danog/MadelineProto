@@ -10,28 +10,21 @@ You should have received a copy of the GNU General Public License along with the
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\MTProtoTools;
 
-class API
+/**
+ * Manages sequence number.
+ */
+class SeqNoHandler extends ResponseHandler
 {
-    public $session;
 
-    public function __construct($params = [])
+    public function generate_seq_no($content_related = true)
     {
-        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
-        $this->session = new MTProto($params);
-        $future_salts = $this->get_future_salts(3);
-        $future_salts = $this->get_future_salts(3);
+        $in = $content_related ? 1 : 0;
+        $value = $this->seq_no;
+        $this->seq_no += $in;
+
+        return ($value * 2) + $in;
     }
 
-    public function __destruct()
-    {
-        unset($this->session);
-        restore_error_handler();
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $this->session->method_call($name, $arguments);
-    }
 }

@@ -266,6 +266,6 @@ class TL
     public function get_opts($method) {
         $opts = ["requires_answer" => !in_array($method, [
             'msgs_ack',
-        ]]
+        ])];
     }
 }

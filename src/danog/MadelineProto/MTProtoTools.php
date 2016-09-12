@@ -12,26 +12,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class API
+/**
+ * Manages encryption and message frames.
+ */
+class MTProtoTools extends \danog\MadelineProto\MTProtoTools\SeqNoHandler
 {
-    public $session;
-
-    public function __construct($params = [])
-    {
-        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
-        $this->session = new MTProto($params);
-        $future_salts = $this->get_future_salts(3);
-        $future_salts = $this->get_future_salts(3);
-    }
-
-    public function __destruct()
-    {
-        unset($this->session);
-        restore_error_handler();
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $this->session->method_call($name, $arguments);
-    }
 }
