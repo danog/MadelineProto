@@ -38,6 +38,7 @@ class MessageHandler extends Crypt
             $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
         $this->sock->send_message($message);
+
         return $int_message_id;
     }
 

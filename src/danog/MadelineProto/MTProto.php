@@ -61,12 +61,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'max_tries'         => [
                 'query'         => 5,
                 'authorization' => 5,
-                'response'      => 5
+                'response'      => 5,
             ],
             'msg_array_limit'        => [
                 'incoming' => 30,
                 'outgoing' => 30,
-            ]
+            ],
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {

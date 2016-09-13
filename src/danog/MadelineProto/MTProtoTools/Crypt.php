@@ -87,5 +87,4 @@ class Crypt extends CallHandler
 
         return $ciphered;
     }
-
 }

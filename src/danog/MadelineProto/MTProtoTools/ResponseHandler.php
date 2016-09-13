@@ -25,7 +25,7 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_outgoing_message_id($msg_id); // Acknowledge that the server received my message
                 }
                 break;
-                
+
             case 'rpc_result':
                 end($this->incoming_messages);
                 end($this->outgoing_messages);
@@ -34,9 +34,10 @@ class ResponseHandler extends MsgIdHandler
                 if ($response['req_msg_id'] != key($this->outgoing_messages)) {
                     throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.key($this->outgoing_messages).').');
                 }
+
                 return $this->handle_response($response['result'], $response['req_msg_id']);
                 break;
-                
+
             case 'future_salts':
                 end($this->outgoing_messages);
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
@@ -44,13 +45,14 @@ class ResponseHandler extends MsgIdHandler
                     throw new Exception('Message id mismatch; req_msg_id ('.$response['req_msg_id'].') != last sent msg id ('.key($this->outgoing_messages).').');
                 }
                 $this->log->log('Received future salts.');
+
                 return $this->handle_response($response, $response['req_msg_id']);
                 break;
 
             case 'pong':
                 foreach ($this->outgoing_messages as $omessage) {
-                    if ($omessage["args"]["ping_id"] == $response["ping_id"]) {
-                        $this->outgoing_messages[$response["msg_id"]]["response"] = $response;
+                    if ($omessage['args']['ping_id'] == $response['ping_id']) {
+                        $this->outgoing_messages[$response['msg_id']]['response'] = $response;
                     }
                 }
                 break;
@@ -65,7 +67,7 @@ class ResponseHandler extends MsgIdHandler
                 $this->log->log('Received container.');
                 $this->log->log($response['messages']);
                 foreach ($response['messages'] as $message) {
-                    $this->incoming_messages[$message['msg_id']] = [ 'seq_no' => $message['seqno']];
+                    $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno']];
                     $responses[] = $this->handle_message($message['body']);
                 }
                 foreach ($responses as $response) {
@@ -91,7 +93,9 @@ class ResponseHandler extends MsgIdHandler
                 break;
         }
     }
-    public function handle_response($response, $res_id = null) {
+
+    public function handle_response($response, $res_id = null)
+    {
         if ($res_id == null) {
             return $response;
         }
@@ -100,7 +104,7 @@ class ResponseHandler extends MsgIdHandler
             case 'rpc_answer_dropped':
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
             default:
-                $this->outgoing_messages[$res_id]["response"] = $response;
+                $this->outgoing_messages[$res_id]['response'] = $response;
                 break;
         }
     }
