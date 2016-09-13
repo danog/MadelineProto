@@ -36,7 +36,6 @@ Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
-                'message_ids_limit' => 5,
             ],
             'connection' => [
                 'ip_address'    => '149.154.167.50',
@@ -62,7 +61,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'max_tries'         => [
                 'query'         => 5,
                 'authorization' => 5,
+                'response'      => 5
             ],
+            'msg_array_limit'        => [
+                'incoming' => 30,
+                'outgoing' => 30,
+            ]
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -92,10 +96,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         $this->seq_no = 0;
         $this->timedelta = 0; // time delta
-        $this->incoming_message_ids = [];
-        $this->outgoing_message_ids = [];
-        $this->ack_incoming_message_ids = [];
-        $this->ack_outgoing_message_ids = [];
+        $this->incoming_messages = [];
+        $this->outgoing_messages = [];
         $this->future_salts = [];
 
         if ($this->settings['authorization']['temp_auth_key'] == null || $this->settings['authorization']['auth_key'] == null) {

@@ -20,13 +20,10 @@ class AckHandler extends \danog\MadelineProto\Tools
     public function ack_outgoing_message_id($message_id)
     {
         // The server acknowledges that it received my message
-        if (!in_array($message_id, $this->outgoing_message_ids)) {
-            throw new Exception("Couldn't find message id ".$message_id.' in the array of outgoing message ids. Maybe try to increase its size?');
+        if (!isset($this->outgoing_messages[$message_id])) {
+            throw new Exception("Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?');
         }
-        $this->ack_outgoing_message_ids[] = $message_id;
-        if (count($this->ack_outgoing_message_ids) > $this->settings['authorization']['message_ids_limit']) {
-            array_shift($this->ack_outgoing_message_ids);
-        }
+        $this->outgoing_messages[$message_id]['ack'] = true;
     }
 
     public function ack_incoming_message_id($message_id)
@@ -35,13 +32,10 @@ class AckHandler extends \danog\MadelineProto\Tools
             return;
         }
         // I let the server know that I received its message
-        if (!in_array($message_id, $this->incoming_message_ids)) {
+        if (!isset($this->incoming_messages[$message_id])) {
             throw new Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]]);
-        $this->ack_incoming_message_ids[] = $message_id;
-        if (count($this->ack_incoming_message_ids) > $this->settings['authorization']['message_ids_limit']) {
-            array_shift($this->ack_incoming_message_ids);
-        }
+        $this->incoming_messages[$message_id]['ack'] = true;
     }
 }

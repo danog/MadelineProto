@@ -98,7 +98,7 @@ class AuthKeyHandler extends AckHandler
             $encrypted_answer = $server_dh_params['encrypted_answer'];
             $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
             $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
-            $answer_with_hash = \danog\MadelineProto\Crypt::ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+            $answer_with_hash = $this->ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
 
             // Separate answer and hash
             $answer_hash = substr($answer_with_hash, 0, 20);
@@ -187,7 +187,7 @@ class AuthKeyHandler extends AckHandler
                 $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string(\danog\MadelineProto\Tools::posmod(-strlen($data_with_sha), 16));
 
                 // encrypt client_DH_inner_data
-                $encrypted_data = \danog\MadelineProto\Crypt::ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
+                $encrypted_data = $this->ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
 
                 // Send set_client_DH_params query
                 $Set_client_DH_params_answer = $this->method_call('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);

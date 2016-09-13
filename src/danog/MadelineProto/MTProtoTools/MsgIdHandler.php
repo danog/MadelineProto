@@ -29,22 +29,22 @@ class MsgIdHandler extends MessageHandler
             if ($new_message_id % 4 != 0) {
                 throw new Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $this->outgoing_message_ids[] = $new_message_id;
-            if (count($this->outgoing_message_ids) > $this->settings['authorization']['message_ids_limit']) {
-                array_shift($this->outgoing_message_ids);
+            $this->outgoing_messages[$new_message_id] = [];
+            if (count($this->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
+                array_shift($this->outgoing_messages);
             }
         } else {
             if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
                 throw new Exception('message id mod 4 != 1 or 3');
             }
-            foreach ($this->incoming_message_ids as $message_id) {
+            foreach (array_keys($this->incoming_messages) as $message_id) {
                 if ($new_message_id <= $message_id) {
                     throw new Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').');
                 }
             }
-            $this->incoming_message_ids[] = $new_message_id;
-            if (count($this->incoming_message_ids) > $this->settings['authorization']['message_ids_limit']) {
-                array_shift($this->incoming_message_ids);
+            $this->incoming_messages[$new_message_id] = [];
+            if (count($this->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
+                array_shift($this->incoming_messages);
             }
         }
     }

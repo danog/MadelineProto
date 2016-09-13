@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Manages packing and unpacking of messages.
+ * Manages packing and unpacking of messages, and the list of sent and received messages.
  */
 class MessageHandler extends Crypt
 {
@@ -28,17 +28,17 @@ class MessageHandler extends Crypt
         $this->check_message_id($int_message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = \danog\MadelineProto\Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
-            $this->last_sent = ['message_id' => $int_message_id];
         } else {
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(\danog\MadelineProto\Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
-            $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.\danog\MadelineProto\Crypt::ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-            $this->last_sent = ['message_id' => $int_message_id, 'seq_no' => $seq_no];
+            $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
         $this->sock->send_message($message);
+        return $int_message_id;
     }
 
     /**
@@ -55,12 +55,11 @@ class MessageHandler extends Crypt
             list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
-            $this->last_received = ['message_id' => $message_id];
         } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
-            $decrypted_data = \danog\MadelineProto\Crypt::ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+            $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
             $server_salt = substr($decrypted_data, 0, 8);
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
@@ -100,7 +99,7 @@ class MessageHandler extends Crypt
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new Exception('msg_key mismatch');
             }
-            $this->last_received = ['message_id' => $message_id, 'seq_no' => $seq_no];
+            $this->incoming_messages[$message_id]['seq_no'] = $seq_no;
         } else {
             throw new Exception('Got unknown auth_key id');
         }

@@ -263,11 +263,4 @@ class TL
             'msg_resend_ans_req',
         ]);
     }
-
-    public function get_opts($method)
-    {
-        $opts = ['requires_answer' => !in_array($method, [
-            'msgs_ack',
-        ])];
-    }
 }

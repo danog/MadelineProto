@@ -21,7 +21,6 @@ class API
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
         $future_salts = $this->get_future_salts(3);
-        $future_salts = $this->get_future_salts(3);
     }
 
     public function __destruct()
