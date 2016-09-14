@@ -24,18 +24,18 @@ class CallHandler extends AuthKeyHandler
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
             $server_answer = $this->recv_message();
             $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
-            end($this->incoming_messages);
-            $tempres = $this->handle_message($deserialized, $last_sent, key($this->incoming_messages));
+
+            $tempres = $this->handle_message($deserialized, $last_sent, );
             if ($tempres == null) {
-                if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
-                    $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
+                if (isset($this->outgoing_messages[$last_sent]['response'])) {
+                    $response = $this->outgoing_messages[$last_sent]['response'];
                 }
             } else {
                 $response = $tempres;
             }
         }
         if ($response == null) {
-            throw new Exception("Couldn't get response");
+            throw new Excpetion("Couldn't get response");
         }
         switch ($response['_']) {
             case 'rpc_error':
@@ -52,7 +52,8 @@ class CallHandler extends AuthKeyHandler
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
-                $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args ];
+                $this->outgoing_messages[$int_message_id]['method'] = $method;
+                $this->outgoing_messages[$int_message_id]['args'] = $args;
                 $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
@@ -75,7 +76,8 @@ class CallHandler extends AuthKeyHandler
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_obj($object, $args), $this->tl->content_related($object));
 //                $server_answer = $this->recv_message();
-                $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args ];
+                $this->outgoing_messages[$int_message_id]['method'] = $object;
+                $this->outgoing_messages[$int_message_id]['args'] = $args;
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 unset($this->sock);
