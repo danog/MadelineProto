@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "1.1.2",
+            "version": "1.1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
-                "reference": "635b6a57a903b976c56c1283d00ee26b8a1b175d"
+                "reference": "da588a75fd4fdbd72745fd48f1241b775aee8fa9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/635b6a57a903b976c56c1283d00ee26b8a1b175d",
-                "reference": "635b6a57a903b976c56c1283d00ee26b8a1b175d",
+                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/da588a75fd4fdbd72745fd48f1241b775aee8fa9",
+                "reference": "da588a75fd4fdbd72745fd48f1241b775aee8fa9",
                 "shasum": ""
             },
             "require": {
@@ -46,14 +46,19 @@
             "description": "PHP implementation of python's struct module.",
             "homepage": "https://daniil.it/phpstruct",
             "keywords": [
+                "binary",
                 "byte",
                 "bytes",
+                "decimal",
+                "float",
+                "integer",
                 "pack",
                 "python",
+                "string",
                 "struct",
                 "unpack"
             ],
-            "time": "2016-08-14 17:51:55"
+            "time": "2016-08-25 11:07:20"
         },
         {
             "name": "icicleio/icicle",
@@ -123,23 +128,22 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v1.0.1",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd"
+                "reference": "e085e08c939de49707dbf64315d178d90fbc708d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d96e63b79a7135a65659ba5b1cb02826172bfedd",
-                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/e085e08c939de49707dbf64315d178d90fbc708d",
+                "reference": "e085e08c939de49707dbf64315d178d90fbc708d",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3|^7"
+                "php": "^7"
             },
             "require-dev": {
-                "paragonie/random_compat": "^1.4|^2.0",
                 "phpunit/phpunit": "4.*|5.*"
             },
             "type": "library",
@@ -181,7 +185,7 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-06-13 01:00:24"
+            "time": "2016-07-11 20:32:06"
         },
         {
             "name": "paragonie/random_compat",

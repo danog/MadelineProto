@@ -23,9 +23,8 @@ class CallHandler extends AuthKeyHandler
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
             $this->log->log('Getting response....');
-            $deserialized = $this->recv_message();
-            end($this->incoming_messages);
-            $tempres = $this->handle_message($deserialized, $last_sent, key($this->incoming_messages));
+            $last_received = $this->recv_message();
+            $this->handle_message($last_sent, $last_received);
             var_dump($this->incoming_messages);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
                 $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
@@ -52,7 +51,7 @@ class CallHandler extends AuthKeyHandler
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
-                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
+                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().$e->getTraceAsString().'. Recreating connection and retrying to call method...');
                 unset($this->sock);
                 $this->sock = new \danog\MadelineProto\Connection($this->settings['connection']['ip_address'], $this->settings['connection']['port'], $this->settings['connection']['protocol']);
                 continue;
@@ -60,7 +59,6 @@ class CallHandler extends AuthKeyHandler
             if ($server_answer == null) {
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
-
             return $server_answer;
         }
         throw new Exception('An error occurred while calling method '.$method.'.');

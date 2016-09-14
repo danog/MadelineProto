@@ -107,6 +107,6 @@ class MessageHandler extends Crypt
         $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->incoming_messages[$message_id]['content'] = $deserialized;
 
-        return $deserialized;
+        return $message_id;
     }
 }

@@ -17,11 +17,9 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class ResponseHandler extends MsgIdHandler
 {
-    public function handle_message($response, $last_sent, $last_received)
+    public function handle_message($last_sent, $last_received)
     {
-        $this->incoming_messages[$last_received]['content'] = $response;
-        ksort($this->incoming_messages);
-        end($this->incoming_messages);
+        $response = $this->incoming_messages[$last_received]['content'];
         switch ($response['_']) {
             case 'msgs_ack':
                 foreach ($response['msg_ids'] as $msg_id) {
@@ -32,21 +30,21 @@ class ResponseHandler extends MsgIdHandler
             case 'rpc_result':
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
-
-                return $this->handle_response($response['result'], $response['req_msg_id'], $last_received);
+                $this->outgoing_messages[$response['req_msg_id']]['response'] = $last_received;
+                $this->incoming_messages[$last_received]['content'] = $response['result'];
                 break;
 
             case 'future_salts':
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
-
-                return $this->handle_response($response, $response['req_msg_id'], $last_received);
+                $this->outgoing_messages[$response['req_msg_id']]['response'] = $last_received;
+                $this->incoming_messages[$last_received]['content'] = $response;
                 break;
 
             case 'bad_msg_notification':
             case 'bad_server_salt':
                 $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
-
-                return $this->handle_response($response, $response['bad_msg_id'], $last_received);
+                $this->outgoing_messages[$response['bad_msg_id']]['response'] = $last_received;
+                $this->incoming_messages[$last_received]['content'] = $response;
                 break;
 
             case 'pong':
@@ -68,8 +66,9 @@ class ResponseHandler extends MsgIdHandler
                 $this->log->log('Received container.');
                 $this->log->log($response['messages']);
                 foreach ($response['messages'] as $message) {
-                    $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno']];
-                    $responses[] = $this->handle_message($message['body'], $last_sent, $message['msg_id']);
+                    $this->check_message_id($message['msg_id'], false, true);
+                    $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
+                    $responses[] = $this->handle_message($last_sent, $message['msg_id']);
                 }
                 foreach ($responses as $key => $response) {
                     if ($response == null) {
@@ -96,33 +95,25 @@ class ResponseHandler extends MsgIdHandler
                 if (isset($this->incoming_messages[$response['orig_message']['msg_id']])) {
                     $this->ack_incoming_message_id($response['orig_message']['msg_id']); // Acknowledge that I received the server's response
                 } else {
-                    $this->check_message_id($message['orig_message']['msg_id'], false);
-
-                    return $this->handle_message($response['orig_message']);
+                    $this->check_message_id($message['orig_message']['msg_id'], false, true);
+                    $this->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $response['orig_message']];
+                    return $this->handle_message($last_sent, $message['orig_message']['msg_id']);
                 }
                 break;
             case 'http_wait':
                 $this->log->log('Received http wait.');
                 $this->log->log($response);
                 break;
-            default:
-                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                return $this->handle_response($response, $last_sent, $last_received);
-                break;
-        }
-    }
-
-    public function handle_response($response, $res_id, $last_received)
-    {
-        switch ($response['_']) {
             case 'gzip_packed':
-                return $this->handle_response(gzdecode($response), $res_id, $last_received);
+                $this->incoming_messages[$last_received]['content'] = gzdecode($response);
+                return $this->handle_message($last_sent, $last_received);
                 break;
             case 'rpc_answer_dropped_running':
             case 'rpc_answer_dropped':
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
             default:
-                $this->outgoing_messages[$res_id]['response'] = $last_received;
+                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
+                $this->outgoing_messages[$last_sent]['response'] = $last_received;
                 $this->incoming_messages[$last_received]['content'] = $response;
                 break;
         }
