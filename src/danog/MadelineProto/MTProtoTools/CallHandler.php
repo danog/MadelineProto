@@ -22,16 +22,13 @@ class CallHandler extends AuthKeyHandler
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $server_answer = $this->recv_message();
-            $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+            $this->log->log("Getting response....");
+            $deserialized = $this->recv_message();
             end($this->incoming_messages);
             $tempres = $this->handle_message($deserialized, $last_sent, key($this->incoming_messages));
-            if ($tempres == null) {
-                if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
-                    $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
-                }
-            } else {
-                $response = $tempres;
+var_dump($this->incoming_messages);
+            if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
+                $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
             }
         }
         if ($response == null) {
@@ -74,8 +71,8 @@ class CallHandler extends AuthKeyHandler
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_obj($object, $args), $this->tl->content_related($object));
-//                $server_answer = $this->recv_message();
                 $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args ];
+//                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 unset($this->sock);

@@ -19,6 +19,9 @@ class ResponseHandler extends MsgIdHandler
 {
     public function handle_message($response, $last_sent, $last_received)
     {
+        $this->incoming_messages[$last_received]['content'] = $response;
+        ksort($this->incoming_messages);
+        end($this->incoming_messages);
         switch ($response['_']) {
             case 'msgs_ack':
                 foreach ($response['msg_ids'] as $msg_id) {
@@ -30,20 +33,20 @@ class ResponseHandler extends MsgIdHandler
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
 
-                return $this->handle_response($response['result'], $response['req_msg_id']);
+                return $this->handle_response($response['result'], $response['req_msg_id'], $last_received);
                 break;
 
             case 'future_salts':
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
 
-                return $this->handle_response($response, $response['req_msg_id']);
+                return $this->handle_response($response, $response['req_msg_id'], $last_received);
                 break;
 
             case 'bad_msg_notification':
             case 'bad_server_salt':
                 $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
 
-                return $this->handle_response($response, $response['bad_msg_id']);
+                return $this->handle_response($response, $response['bad_msg_id'], $last_received);
                 break;
 
             case 'pong':
@@ -59,7 +62,6 @@ class ResponseHandler extends MsgIdHandler
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
                 $this->log->log('new session created');
                 $this->log->log($response);
-                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];
                 break;
             case 'msg_container':
                 $responses = [];
@@ -93,7 +95,8 @@ class ResponseHandler extends MsgIdHandler
                 if (isset($this->incoming_messages[$response['orig_message']['msg_id']])) {
                     $this->ack_incoming_message_id($response['orig_message']['msg_id']); // Acknowledge that I received the server's response
                 } else {
-                    return $this->handle_response($response['orig_message']);
+                    $this->check_message_id($message['orig_message']['msg_id'], false);
+                    return $this->handle_message($response['orig_message']);
                 }
                 break;
             case 'http_wait':
@@ -102,16 +105,13 @@ class ResponseHandler extends MsgIdHandler
                 break;
             default:
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                return $this->handle_response($response);
+                return $this->handle_response($response, $last_sent, $last_received);
                 break;
         }
     }
 
-    public function handle_response($response, $res_id = null, $last_received = null)
+    public function handle_response($response, $res_id, $last_received)
     {
-        if ($res_id == null) {
-            return $response;
-        }
         switch ($response['_']) {
             case 'gzip_packed':
                 return $this->handle_response(gzdecode($response), $res_id, $last_received);

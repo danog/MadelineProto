@@ -104,7 +104,8 @@ class MessageHandler extends Crypt
         } else {
             throw new Exception('Got unknown auth_key id');
         }
-
-        return $message_data;
+        $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $message_data));
+        $this->incoming_messages[$message_id]['content'] = $deserialized;
+        return $deserialized;
     }
 }
