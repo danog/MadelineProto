@@ -22,11 +22,11 @@ class CallHandler extends AuthKeyHandler
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $this->log->log("Getting response....");
+            $this->log->log('Getting response....');
             $deserialized = $this->recv_message();
             end($this->incoming_messages);
             $tempres = $this->handle_message($deserialized, $last_sent, key($this->incoming_messages));
-var_dump($this->incoming_messages);
+            var_dump($this->incoming_messages);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
                 $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
             }
@@ -49,7 +49,7 @@ var_dump($this->incoming_messages);
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
-                $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args ];
+                $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call method...');
@@ -71,7 +71,7 @@ var_dump($this->incoming_messages);
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_obj($object, $args), $this->tl->content_related($object));
-                $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args ];
+                $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
 //                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');

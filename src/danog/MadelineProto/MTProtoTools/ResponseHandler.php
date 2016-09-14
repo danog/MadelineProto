@@ -84,8 +84,9 @@ class ResponseHandler extends MsgIdHandler
                         return end($responses);
                         break;
                     default:
-                        $this->log->log("Received multiple responses, returning last one");
+                        $this->log->log('Received multiple responses, returning last one');
                         $this->log->log($responses);
+
                         return end($responses);
                         break;
                 }
@@ -96,6 +97,7 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_incoming_message_id($response['orig_message']['msg_id']); // Acknowledge that I received the server's response
                 } else {
                     $this->check_message_id($message['orig_message']['msg_id'], false);
+
                     return $this->handle_message($response['orig_message']);
                 }
                 break;
