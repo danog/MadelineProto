@@ -97,6 +97,7 @@ class ResponseHandler extends MsgIdHandler
                 } else {
                     $this->check_message_id($message['orig_message']['msg_id'], false, true);
                     $this->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $response['orig_message']];
+
                     return $this->handle_message($last_sent, $message['orig_message']['msg_id']);
                 }
                 break;
@@ -106,6 +107,7 @@ class ResponseHandler extends MsgIdHandler
                 break;
             case 'gzip_packed':
                 $this->incoming_messages[$last_received]['content'] = gzdecode($response);
+
                 return $this->handle_message($last_sent, $last_received);
                 break;
             case 'rpc_answer_dropped_running':

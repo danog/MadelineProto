@@ -59,6 +59,7 @@ class CallHandler extends AuthKeyHandler
             if ($server_answer == null) {
                 throw new Exception('An error occurred while calling method '.$method.'.');
             }
+
             return $server_answer;
         }
         throw new Exception('An error occurred while calling method '.$method.'.');

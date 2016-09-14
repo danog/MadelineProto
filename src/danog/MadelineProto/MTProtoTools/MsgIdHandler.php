@@ -41,7 +41,7 @@ class MsgIdHandler extends MessageHandler
             if ($container) {
                 asort($keys);
                 if ($new_message_id >= end($keys)) {
-                        throw new Exception('Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
+                    throw new Exception('Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
                 }
             } else {
                 asort($keys);
