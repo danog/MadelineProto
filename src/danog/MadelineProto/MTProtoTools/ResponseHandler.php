@@ -57,6 +57,7 @@ class ResponseHandler extends MsgIdHandler
                 }
                 break;
             case 'new_session_created':
+                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
                 $this->log->log('new session created');
                 $this->log->log($response);

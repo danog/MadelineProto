@@ -30,7 +30,7 @@ class MessageHandler extends Crypt
             $message = \danog\MadelineProto\Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
-            $encrypted_data = $this->settings['authorization']['temp_auth_key']['server_salt'].$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
+            $encrypted_data = $this->struct->pack('<Q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(\danog\MadelineProto\Tools::posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
@@ -62,9 +62,9 @@ class MessageHandler extends Crypt
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
-            $server_salt = substr($decrypted_data, 0, 8);
+            $server_salt = $this->struct->unpack('<Q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
-                throw new Exception('Server salt mismatch.');
+                throw new Exception('Server salt mismatch (my server salt '.$this->settings['authorization']['temp_auth_key']['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
 
             $session_id = substr($decrypted_data, 8, 8);
