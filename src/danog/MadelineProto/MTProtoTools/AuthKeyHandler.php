@@ -213,7 +213,7 @@ class AuthKeyHandler extends AckHandler
                     }
                     $this->log->log('Diffie Hellman key exchange processed successfully');
 
-                    $res_authorization = ['server_salt' => $this->struct->unpack('<Q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0]];
+                    $res_authorization = ['server_salt' => $this->struct->unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0]];
                     $res_authorization['auth_key'] = $auth_key_str;
                     $res_authorization['id'] = substr($auth_key_sha, -8);
                     if ($expires_in < 0) {

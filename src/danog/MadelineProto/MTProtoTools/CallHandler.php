@@ -25,7 +25,6 @@ class CallHandler extends AuthKeyHandler
             $this->log->log('Getting response....');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
-            var_dump($this->incoming_messages);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
                 $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
             }

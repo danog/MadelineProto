@@ -30,6 +30,7 @@ class MessageHandler extends Crypt
             $message = \danog\MadelineProto\Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
+            var_dump($this->settings['authorization']['temp_auth_key']['server_salt']);
             $encrypted_data = $this->struct->pack('<Q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string(\danog\MadelineProto\Tools::posmod(-strlen($encrypted_data), 16));

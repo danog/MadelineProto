@@ -20,9 +20,11 @@ class API
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
-        $future_salts = $this->get_future_salts(3);
-        var_dump($future_salts);
         $future_salts = $this->ping(3);
+        var_dump($future_salts);
+        $future_salts = $this->get_future_salts(3);
+        var_dump($this->session->incoming_messages);
+
         var_dump($future_salts);
     }
 
