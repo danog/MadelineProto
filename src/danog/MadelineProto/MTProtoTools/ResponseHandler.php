@@ -51,13 +51,12 @@ class ResponseHandler extends MsgIdHandler
 
                     var_dump($this->outgoing_messages);
                     foreach ($this->outgoing_messages as $msg_id => &$omessage) {
-
-                    if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
-                        $omessage['response'] = $response['msg_id'];
-                        $this->incoming_messages[$response['msg_id']]['content'] = $response;
-                        $this->ack_outgoing_message_id($msg_id);
+                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
+                            $omessage['response'] = $response['msg_id'];
+                            $this->incoming_messages[$response['msg_id']]['content'] = $response;
+                            $this->ack_outgoing_message_id($msg_id);
+                        }
                     }
-                }
                 break;
             case 'new_session_created':
                 $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];
