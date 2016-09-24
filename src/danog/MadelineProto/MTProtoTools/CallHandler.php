@@ -48,6 +48,7 @@ class CallHandler extends AuthKeyHandler
             try {
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
+                var_dump($this->outgoing_messages);
                 $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().$e->getTraceAsString().'. Recreating connection and retrying to call method...');

@@ -48,7 +48,10 @@ class ResponseHandler extends MsgIdHandler
                 break;
 
             case 'pong':
-                foreach ($this->outgoing_messages as $msg_id => &$omessage) {
+
+                    var_dump($this->outgoing_messages);
+                    foreach ($this->outgoing_messages as $msg_id => &$omessage) {
+
                     if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
                         $omessage['response'] = $response['msg_id'];
                         $this->incoming_messages[$response['msg_id']]['content'] = $response;

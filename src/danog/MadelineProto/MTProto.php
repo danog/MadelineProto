@@ -38,9 +38,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
             ],
             'connection' => [
-                'ip_address'    => '149.154.167.50',
-                'port'          => '443',
-                'protocol'      => 'tcp_full',
+                'dc_list' => [
+                    2 => [
+                        'ip_address'    => '149.154.167.50',
+                        'port'          => '443',
+                        'protocol'      => 'tcp_full',
+                    ],
+                ],
             ],
             'app_info' => [
                 'api_id'        => 25628,
