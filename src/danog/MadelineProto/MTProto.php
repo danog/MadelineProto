@@ -62,6 +62,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'all' => [
                     'protocol'  => 'tcp_full',
                     'test_mode' => true,
+                    'port'      => '443',
                 ],
             ],
             'app_info' => [
@@ -104,8 +105,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         // Connect to servers
         $this->connection = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
-        var_dump($this->connection);
-        $this->connection->connect(2);
+        $this->connection->dc_connect(2);
 
         // Load rsa key
         $this->key = new RSA($settings['authorization']['rsa_key']);

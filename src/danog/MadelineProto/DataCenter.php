@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 /**
- * Manages all of the mtproto stuff.
+ * Manages datacenters.
  */
 class DataCenter extends Tools
 {
@@ -36,10 +36,18 @@ class DataCenter extends Tools
                 ];
             }
         }
+        $this->dc_connect(2);
     }
 
-    public function connnect($dc_number, $settings = [])
+    public function dc_disconnect($dc_number) {
+        unset($this->sockets[$dc_number]);
+    }
+
+    public function dc_connect($dc_number, $settings = [])
     {
+        if (isset($this->sockets[$dc_number])) {
+            return;
+        }
         if ($settings == []) {
             $settings = $this->settings[$dc_number];
         }

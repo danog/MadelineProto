@@ -419,7 +419,7 @@ class AuthKeyHandler extends AckHandler
                             throw new Exception('Handshake: wrong new_nonce_hash1');
                         }
 
-                        $this->log->log('Diffie Hellman key exchange processed successfully');
+                        $this->log->log('Handshake: Diffie Hellman key exchange processed successfully');
 
                         $res_authorization['server_salt'] = $this->struct->unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
                         $res_authorization['auth_key'] = $auth_key_str;
@@ -429,7 +429,7 @@ class AuthKeyHandler extends AckHandler
                             $res_authorization['expires_in'] = $expires_in;
                         }
 
-                        $this->log->log('Auth key generated');
+                        $this->log->log('Handshake: Auth key generated');
                         $this->timedelta = 0;
 
                         return $res_authorization;
