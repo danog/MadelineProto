@@ -39,7 +39,8 @@ class DataCenter extends Tools
         $this->dc_connect(2);
     }
 
-    public function dc_disconnect($dc_number) {
+    public function dc_disconnect($dc_number)
+    {
         unset($this->sockets[$dc_number]);
     }
 
