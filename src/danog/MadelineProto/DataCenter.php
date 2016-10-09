@@ -17,53 +17,63 @@ namespace danog\MadelineProto;
  */
 class DataCenter extends Tools
 {
-    public function __construct($dclist, $settings) {
+    public function __construct($dclist, $settings)
+    {
         $this->dclist = $dclist;
         $this->settings = $settings;
-        if (isset($this->settings["all"])) {
+        if (isset($this->settings['all'])) {
             foreach ($this->range(1, 6) as $n) {
-                $this->settings[$n] = $this->settings["all"];
+                $this->settings[$n] = $this->settings['all'];
             }
-            unset($this->settings["all"]);
+            unset($this->settings['all']);
         }
         foreach ($this->range(1, 6) as $n) {
             if (!isset($this->settings[$n])) {
                 $this->settings[$n] = [
-                    'protocol' => 'tcp_full',
-                    'port'     => '443',
-                    'test_mode' => true
+                    'protocol'  => 'tcp_full',
+                    'port'      => '443',
+                    'test_mode' => true,
                 ];
             }
         }
         $this->connect(2);
     }
-    public function connnect($dc_number, $settings = []) {
+
+    public function connnect($dc_number, $settings = [])
+    {
         if ($settings == []) {
             $settings = $this->settings[$dc_number];
         }
-        $address = $settings["test_mode"] ? $this->dclist["test"][$dc_number] : $this->dclist["main"][$dc_number];
-        if ($settings["protocol"] == "https") {
-            $subdomain = $this->dclist["ssl_subdomains"][$dc_number] . ($settings["upload"] ? '-1' : '');
-            $path = $settings["test_mode"] ? 'apiw_test1' : 'apiw1';
-            $address = 'https://' . $subdomain . '.web.telegram.org/' . $path;
+        $address = $settings['test_mode'] ? $this->dclist['test'][$dc_number] : $this->dclist['main'][$dc_number];
+        if ($settings['protocol'] == 'https') {
+            $subdomain = $this->dclist['ssl_subdomains'][$dc_number].($settings['upload'] ? '-1' : '');
+            $path = $settings['test_mode'] ? 'apiw_test1' : 'apiw1';
+            $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
-        $this->sockets[$dc_number] = new Connection($address, $settings["port"], $settings["protocol"]);
+        $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol']);
         $this->curdc = $dc_number;
     }
-    public function send_message($message, $dc_number = -1) {
+
+    public function send_message($message, $dc_number = -1)
+    {
         if ($dc_number == -1) {
             $dc_number = $this->curdc;
         }
+
         return $this->sockets[$dc_number]->send_message($message);
     }
-    public function read_message($dc_number = -1) {
+
+    public function read_message($dc_number = -1)
+    {
         if ($dc_number == -1) {
             $dc_number = $this->curdc;
         }
+
         return $this->sockets[$dc_number]->read_message();
     }
 
-    public function __destroy() {
+    public function __destroy()
+    {
         foreach ($this->sockets as $n => $socket) {
             unset($this->sockets[$n]);
         }

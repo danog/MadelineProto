@@ -431,6 +431,7 @@ class AuthKeyHandler extends AckHandler
 
                         $this->log->log('Auth key generated');
                         $this->timedelta = 0;
+
                         return $res_authorization;
                     case 'dh_gen_retry':
                         if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {

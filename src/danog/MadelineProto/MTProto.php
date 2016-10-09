@@ -38,30 +38,30 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
             ],
             'connection' => [
-                'ssl_subdomains' =>  [
+                'ssl_subdomains' => [
                     1 => 'pluto',
                     2 => 'venus',
                     3 => 'aurora',
                     4 => 'vesta',
-                    5 => 'flora'
+                    5 => 'flora',
                 ],
                 'test' => [
                     1 => '149.154.175.10',
                     2 => '149.154.167.40',
-                    3 => '149.154.175.117'
+                    3 => '149.154.175.117',
                 ],
                 'main' => [
-                    1 => '149.154.175.50', 
-                    2 => '149.154.167.51', 
-                    3 => '149.154.175.100', 
-                    4 => '149.154.167.91', 
-                    5 => '149.154.171.5'
-                ]
+                    1 => '149.154.175.50',
+                    2 => '149.154.167.51',
+                    3 => '149.154.175.100',
+                    4 => '149.154.167.91',
+                    5 => '149.154.171.5',
+                ],
             ],
             'connection_settings' => [
                 'all' => [
-                    'protocol' => 'tcp_full',
-                    'test_mode' => true
+                    'protocol'  => 'tcp_full',
+                    'test_mode' => true,
                 ],
             ],
             'app_info' => [
