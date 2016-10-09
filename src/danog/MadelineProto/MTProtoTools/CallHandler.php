@@ -53,7 +53,7 @@ class CallHandler extends AuthKeyHandler
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().$e->getTraceAsString().'. Recreating connection and retrying to call method...');
                 unset($this->connection);
-                $this->connection = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+                $this->connection = new \danog\MadelineProto\DataCenter($this->settings['connection'], $this->settings['connection_settings']);
                 continue;
             }
             if ($server_answer == null) {
@@ -75,7 +75,7 @@ class CallHandler extends AuthKeyHandler
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 unset($this->connection);
-                $this->connection = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+                $this->connection = new \danog\MadelineProto\DataCenter($this->settings['connection'], $this->settings['connection_settings']);
                 continue;
             }
 
