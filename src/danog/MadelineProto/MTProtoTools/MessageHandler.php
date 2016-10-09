@@ -38,17 +38,17 @@ class MessageHandler extends Crypt
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
-        $this->sock->send_message($message);
+        $this->connection->send_message($message);
 
         return $int_message_id;
     }
 
     /**
-     * Reading socket and receiving message from server. Check the CRC32.
+     * Reading connectionet and receiving message from server. Check the CRC32.
      */
     public function recv_message()
     {
-        $payload = $this->sock->read_message();
+        $payload = $this->connection->read_message();
         if (fstat($payload)['size'] == 4) {
             throw new Exception('Server response error: '.abs($this->struct->unpack('<i', fread($payload, 4))[0]));
         }
