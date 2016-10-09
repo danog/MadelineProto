@@ -36,7 +36,6 @@ class DataCenter extends Tools
                 ];
             }
         }
-        $this->connect(2);
     }
 
     public function connnect($dc_number, $settings = [])
