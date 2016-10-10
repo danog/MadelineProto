@@ -64,7 +64,7 @@ class MessageHandler extends Crypt
 
             $server_salt = $this->struct->unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
-//                throw new Exception('Server salt mismatch (my server salt '.$this->settings['authorization']['temp_auth_key']['server_salt'].' is not equal to server server salt '.$server_salt.').');
+                //                throw new Exception('Server salt mismatch (my server salt '.$this->settings['authorization']['temp_auth_key']['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
 
             $session_id = substr($decrypted_data, 8, 8);

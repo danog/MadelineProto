@@ -15,7 +15,8 @@ namespace danog\MadelineProto;
 class PrimeModule extends Tools
 {
     // Uses https://github.com/LonamiWebs/Telethon/blob/master/telethon/crypto/factorizator.py, thank you so freaking much!
-    function find_small_multiplier_lopatin($what) {
+    public function find_small_multiplier_lopatin($what)
+    {
         $g = 0;
         foreach ($this->range(3) as $i) {
             $q = (rand(0, 127) & 15) + 17;
@@ -55,7 +56,9 @@ class PrimeModule extends Tools
         $p = $what; // g
         return min($p, $g);
     }
-    function gcd($a, $b){
+
+    public function gcd($a, $b)
+    {
         while ($a != 0 && $b != 0) {
             while ($b & 1 == 0) {
                 $b >>= 1;
@@ -77,7 +80,7 @@ class PrimeModule extends Tools
     {
         // Use the native version
         $pqstr = (string) $pq;
-        $res = $this->find_small_multiplier_lopatin((int)$pqstr);
+        $res = $this->find_small_multiplier_lopatin((int) $pqstr);
         $res = [$res, $pqstr / $res];
         if ($res[1] != 1) {
             return $res;
@@ -85,7 +88,6 @@ class PrimeModule extends Tools
         // Use the python version.
         if (function_exists('shell_exec')) {
             try {
-                
                 $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.$pqstr));
                 if (count($res) == 2) {
                     return $res;
