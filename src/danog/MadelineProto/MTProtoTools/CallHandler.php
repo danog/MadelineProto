@@ -22,7 +22,7 @@ class CallHandler extends AuthKeyHandler
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $this->log->log('Getting response....');
+            $this->log->log('Getting response ('.$count.')...');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
