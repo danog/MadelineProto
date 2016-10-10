@@ -12,177 +12,81 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class PrimeModule
+class PrimeModule extends Tools
 {
-    public function __construct()
-    {
-        $this->smallprimeset = array_unique($this->primesbelow(100000));
-        $this->_smallprimeset = 100000;
-        $this->smallprimes = $this->primesbelow(10000);
-    }
-
-    public function primesbelow($N)
-    {
-        $res = [];
-        for ($i = 2; $i <= $N; $i++) {
-            if ($i % 2 != 1 && $i != 2) {
-                continue;
-            }
-            $d = 3;
-            $x = sqrt($i);
-            while ($i % $d != 0 && $d < $x) {
-                $d += 2;
-            }
-            if ((($i % $d == 0 && $i != $d) * 1) == 0) {
-                $res[] = $i;
-            }
-        }
-
-        return $res;
-    }
-
-    public function isprime($n, $precision = 7)
-    {
-        if (($n == 1) || (($n % 2) == 0)) {
-            return false;
-        } elseif (($n < 1)) {
-            throw new Exception('Out of bounds, first argument must be > 0');
-        } elseif (($n < $this->_smallprimeset)) {
-            return in_array($n, $this->smallprimeset);
-        }
-        $d = ($n - 1);
-        $s = 0;
-        while (($d % 2) == 0) {
-            $d = intval($d / 2);
-            $s++;
-        }
-        $break = false;
-        foreach (Tools::range($precision) as $repeat) {
-            $a = rand(2, ($n - 2));
-            $x = posmod(pow($a, $d), $n);
-            if (($x == 1) || ($x == ($n - 1))) {
-                continue;
-            }
-            foreach (Tools::range($s - 1) as $r) {
-                $x = posmod(pow($x, 2), $n);
-                if (($x == 1)) {
-                    return false;
-                }
-                if (($x == ($n - 1))) {
-                    $break = true;
-                }
-            }
-            if (!$break) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // taken from https://github.com/enricostara/telegram-mt-node/blob/master/lib/security/pq-finder.js
-    public function getpq($pq)
-    {
-        $p = 0;
-        $q = 0;
-        while ($pq != $p * $q && $p != 0) {
-            for ($i = 0; $i < 3; $i++) {
-                $q = new \phpseclib\Math\BigInteger((random_int(0, 128) & 15) + 17);
-                $x = new \phpseclib\Math\BigInteger(random_int(0, 1000000000) + 1);
-                $y = $x;
-                $lim = 1 << ($i + 18);
-                for ($j = 1; $j < $lim; $j++) {
-                    $a = $x;
-                    $b = $x;
-                    $c = $q;
-                    while (!$b->equals($zero)) {
-                        if ($b->powMod($one, $two)->equals($zero)) {
-                            $c = $c->add($a);
-                            if ($c->compare($pq) > 0) {
-                                $c = $c->subtract($pq);
-                            }
+    // Uses https://github.com/LonamiWebs/Telethon/blob/master/telethon/crypto/factorizator.py, thank you so freaking much!
+    function find_small_multiplier_lopatin($what) {
+        $g = 0;
+        foreach ($this->range(3) as $i) {
+            $q = (rand(0, 127) & 15) + 17;
+            $x = rand(0, 1000000000) + 1;
+            $y = $x;
+            $lim = 1 << ($i + 18);
+            foreach ($this->range(1, $lim) as $j) {
+                list($a, $b, $c) = [$x, $x, $q];
+                while ($b != 0) {
+                    if (($b & 1) != 0) {
+                        $c += $a;
+                        if ($c >= $what) {
+                            $c -= $what;
                         }
-                        $a = $a->add($a);
-                        if ($a->compare($pq) > 0) {
-                            $a = $a->subtract($pq);
-                        }
-                        $b = $b->rightShift(1);
                     }
-                    $x = $c;
-                    $z = ($y->compare($x) > 0) ? $y->subtract($x) : $x->subtract($y);
-                    $p = $z->gcd($pq);
-                    if (!$p->equals($one)) {
-                        break;
+                    $a += $a;
+                    if ($a >= $what) {
+                        $a -= $what;
                     }
-                    if (($j & ($j - 1)) === 0) {
-                        $y = $x;
-                    }
+                    $b >>= 1;
                 }
-                if (prime.gt(BigInteger.One())) {
+                $x = $c;
+                $z = ($x < $y) ? $y - $x : $x - $y;
+                $g = $this->gcd($z, $what);
+                if ($g != 1) {
                     break;
                 }
-            }
-            $q = $pq->divide(prime)[0];
-        }
-        $_pq = ($q->compare($p) > 0) ? [$p, $q] : [$q, $p];
 
-        return $_pq;
-    }
-
-    public function pollard_brent($n)
-    {
-        $zero = new \phpseclib\Math\BigInteger(1);
-        if (Tools::posmod($n, 2) == 0) {
-            return 2;
-        }
-        if (Tools::posmod($n, 3) == 0) {
-            return 3;
-        }
-        $max = new \phpseclib\Math\BigInteger($n - 1);
-        $big = new \phpseclib\Math\BigInteger();
-        list($y, $c, $m) = [(int) $big->random($zero, $max)->toString(), (int) $big->random($zero, $max)->toString(), (int) $big->random($zero, $max)->toString()];
-        list($g, $r, $q) = [1, 1, 1];
-        do {
-            $x = $y;
-            $i = 0;
-            do {
-                $i++;
-                $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
-            } while ($i < $r);
-            $k = 0;
-            do {
-                $ys = $y;
-                $i = 0;
-                do {
-                    $i++;
-                    $y = Tools::posmod(Tools::posmod(pow($y, 2), $n) + $c, $n);
-                    $q = Tools::posmod($q * abs($x - $y), $n);
-                } while ($i < min($m, $r - $k));
-                $g = $this->gcd($q, $n);
-                $k += $m;
-            } while ($k < $r and $g == 1);
-            $r *= 2;
-        } while ($g == 1);
-
-        if ($g == $n) {
-            while (true) {
-                $ys = Tools::posmod(Tools::posmod(pow($ys, 2), $n) + $c, $n);
-                $g = $this->gcd(abs($x - $ys), $n);
-                if ($g > 1) {
-                    break;
+                if (($j & ($j - 1)) == 0) {
+                    $y = $x;
                 }
             }
+            if ($g > 1) {
+                break;
+            }
+        }
+        $p = $what; // g
+        return min($p, $g);
+    }
+    function gcd($a, $b){
+        while ($a != 0 && $b != 0) {
+            while ($b & 1 == 0) {
+                $b >>= 1;
+            }
+            while ($a & 1 == 0) {
+                $a >>= 1;
+            }
+            if ($a > $b) {
+                $a -= $b;
+            } else {
+                $b -= $a;
+            }
         }
 
-        return $g;
+        return ($b == 0) ? $a : $b;
     }
 
     public function primefactors($pq, $sort = false)
     {
+        // Use the native version
+        $pqstr = (string) $pq;
+        $res = $this->find_small_multiplier_lopatin((int)$pqstr);
+        $res = [$res, $pqstr / $res];
+        if ($res[1] != 1) {
+            return $res;
+        }
+        // Use the python version.
         if (function_exists('shell_exec')) {
             try {
-                // Use the python version.
-                $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.(string) $pq));
+                
+                $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.$pqstr));
                 if (count($res) == 2) {
                     return $res;
                 }
@@ -190,7 +94,7 @@ class PrimeModule
             }
         }
         // Else do factorization with wolfram alpha :)))))
-        $query = 'Do prime factorization of '.$pq;
+        $query = 'Do prime factorization of '.$pqstr;
         $params = [
             'async'         => true,
             'banners'       => 'raw',
@@ -217,92 +121,6 @@ class PrimeModule
         if (count($res) == 2) {
             return $res;
         }
-        if (is_object($pq)) {
-            $n = $pq->toString();
-        } else {
-            $n = $pq;
-        }
-        $n = (int) $n;
-        $factors = [];
-        $limit = sqrt($n) + 1;
-        foreach ($this->smallprimes as $checker) {
-            if ($checker > $limit) {
-                break;
-            }
-            do {
-                $factors[] = $checker;
-                $n = intval($n / $checker);
-                $limit = sqrt($n) + 1;
-                if ($checker > $limit) {
-                    break;
-                }
-            } while (Tools::posmod($n, $checker) == 0);
-        }
-        if ($n < 2) {
-            return $factors;
-        }
-        while ($n > 1) {
-            if ($this->isprime($n)) {
-                $factors[] = $n;
-                break;
-            }
-            $factor = $this->pollard_brent($n);
-            $factors[] = $this->primefactors($factor);
-            $n = intval($n / $factor);
-        }
-        if ($sort) {
-            $factors = sort($factors);
-        }
-
-        return $factors;
-    }
-
-    public function factorization($n)
-    {
-        $factors = [];
-        foreach (primefactors($n) as $p1) {
-            if (isset($factors[$p1])) {
-                $factors[$p1] += 1;
-            } else {
-                $factors[$p1] = 1;
-            }
-        }
-
-        return $factors;
-    }
-
-    public function totient($n)
-    {
-        $totients = [];
-        if ($n == 0) {
-            return 1;
-        }
-        if (isset($totients[$n])) {
-            return $totients[$n];
-        }
-        $tot = 1;
-        foreach (factorization($n) as $p => $exp) {
-            $tot *= (($p - 1) * pow($p, ($exp - 1)));
-        }
-        $totients[$n] = $tot;
-
-        return $tot;
-    }
-
-    public function gcd($a, $b)
-    {
-        if ($a == $b) {
-            return $a;
-        }
-        while ($b > 0) {
-            list($a, $b) = [$b, Tools::posmod($a, $b)];
-        }
-
-        return $a;
-    }
-
-    public function lcm($a, $b)
-    {
-        return intval(abs(($a * $b)) / $this->gcd($a, $b));
+        throw new Exception("Couldn't calculate pq!");
     }
 }
