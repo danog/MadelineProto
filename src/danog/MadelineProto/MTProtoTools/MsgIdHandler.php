@@ -63,10 +63,12 @@ class MsgIdHandler extends MessageHandler
             ksort($this->incoming_messages);
         }
     }
-    public function generate_message_id() {
+
+    public function generate_message_id()
+    {
         $ms_time = (time() + $this->timedelta) * 1000;
         $int_message_id = (int) (
-            ((int)($ms_time / 1000) << 32) |
+            ((int) ($ms_time / 1000) << 32) |
             ($this->posmod($ms_time, 1000) << 22) |
             rand(0, 524288) << 2
         );
@@ -76,6 +78,7 @@ class MsgIdHandler extends MessageHandler
             $int_message_id += 4;
         }
         $this->check_message_id($int_message_id, true);
+
         return $int_message_id;
     }
 }
