@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class Connection
+class Connection extends Tools
 {
     public $sock = null;
     public $protocol = null;
@@ -41,7 +41,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->write(Tools::string2bin('\xef'));
+                $this->write($this->string2bin('\xef'));
                 break;
             case 'tcp_intermediate':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
@@ -49,7 +49,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->write(Tools::string2bin('\xee\xee\xee\xee'));
+                $this->write($this->string2bin('\xee\xee\xee\xee'));
                 break;
             case 'tcp_full':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
@@ -147,7 +147,7 @@ class Connection
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
+                $payload = $this->fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
                 break;
             case 'tcp_intermediate':
                 $packet_length_data = $this->sock->read(4);
@@ -156,7 +156,7 @@ class Connection
                 }
                 $packet_length = $this->struct->unpack('<I', $packet_length_data)[0];
                 $packet = $this->sock->read($packet_length);
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
             case 'tcp_abridged':
                 $packet_length_data = $this->sock->read(1);
@@ -171,7 +171,7 @@ class Connection
                     $packet_length = $this->struct->unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
                 $packet = $this->sock->read($packet_length);
-                $payload = Tools::fopen_and_write('php://memory', 'rw+b', $packet);
+                $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
         }
 

@@ -23,16 +23,15 @@ class MessageHandler extends Crypt
      */
     public function send_message($message_data, $content_related)
     {
-        $int_message_id = (int) ((time() + $this->timedelta) * pow(2, 30)) * 4;
+        $int_message_id = $this->generate_message_id();
         $message_id = $this->struct->pack('<Q', $int_message_id);
-        $this->check_message_id($int_message_id, true);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
-            $message = \danog\MadelineProto\Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
+            $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = $this->struct->pack('<q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = \phpseclib\Crypt\Random::string(\danog\MadelineProto\Tools::posmod(-strlen($encrypted_data), 16));
+            $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
@@ -52,7 +51,7 @@ class MessageHandler extends Crypt
             throw new Exception('Server response error: '.abs($this->struct->unpack('<i', fread($payload, 4))[0]));
         }
         $auth_key_id = fread($payload, 8);
-        if ($auth_key_id == \danog\MadelineProto\Tools::string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+        if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
@@ -104,7 +103,7 @@ class MessageHandler extends Crypt
         } else {
             throw new Exception('Got unknown auth_key id');
         }
-        $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $message_data));
+        $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->incoming_messages[$message_id]['content'] = $deserialized;
 
         return $message_id;

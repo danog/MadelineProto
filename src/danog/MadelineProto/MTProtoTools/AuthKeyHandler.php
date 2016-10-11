@@ -23,7 +23,7 @@ class AuthKeyHandler extends AckHandler
     public function create_auth_key($expires_in = -1)
     {
         foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id_total) {
-            $this->log->log('Handshake: Requesting pq');
+            $this->log->log('Requesting pq');
 
             /**
              * ***********************************************************************
@@ -54,7 +54,7 @@ class AuthKeyHandler extends AckHandler
              * Check if the client's nonce and the server's nonce are the same
              */
             if ($ResPQ['nonce'] !== $nonce) {
-                throw new Exception('Handshake: wrong nonce');
+                throw new Exception('wrong nonce');
             }
 
             /*
@@ -71,7 +71,7 @@ class AuthKeyHandler extends AckHandler
             }
 
             if (!isset($public_key_fingerprint)) {
-                throw new Exception("Handshake: couldn't find our key in the server_public_key_fingerprints vector.");
+                throw new Exception("couldn't find our key in the server_public_key_fingerprints vector.");
             }
 
             $pq_bytes = $ResPQ['pq'];
@@ -82,7 +82,7 @@ class AuthKeyHandler extends AckHandler
              * Compute p and q
              */
             $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
-            list($p, $q) = $this->PrimeModule->primefactors($pq);
+            list($p, $q) = $this->PrimeFactors($pq);
             $p = new \phpseclib\Math\BigInteger($p);
             $q = new \phpseclib\Math\BigInteger($q);
 
@@ -91,10 +91,10 @@ class AuthKeyHandler extends AckHandler
             }
 
             if (!($pq->equals($p->multiply($q)) && $p->compare($q) < 0)) {
-                throw new Exception("Handshake: couldn't compute p and q.");
+                throw new Exception("couldn't compute p and q.");
             }
 
-            $this->log->log('Handshake: Factorization '.$pq.' = '.$p.' * '.$q);
+            $this->log->log('Factorization '.$pq.' = '.$p.' * '.$q);
 
             /*
              * ***********************************************************************
@@ -138,7 +138,7 @@ class AuthKeyHandler extends AckHandler
             $to_encrypt = $sha_digest.$data.$random_bytes;
             $encrypted_data = $this->key->encrypt($to_encrypt);
 
-            $this->log->log('Handshake: Starting Diffie Hellman key exchange');
+            $this->log->log('Starting Diffie Hellman key exchange');
             /*
              * ***********************************************************************
              * Starting Diffie Hellman key exchange, Server authentication
@@ -175,7 +175,7 @@ class AuthKeyHandler extends AckHandler
              * Check if the client's nonce and the server's nonce are the same
              */
             if ($nonce != $server_dh_params['nonce']) {
-                throw new Exception('Handshake: wrong nonce.');
+                throw new Exception('wrong nonce.');
             }
 
             /*
@@ -183,7 +183,7 @@ class AuthKeyHandler extends AckHandler
              * Check if server_nonce and new server_nonce are the same
              */
             if ($server_nonce != $server_dh_params['server_nonce']) {
-                throw new Exception('Handshake: wrong server nonce.');
+                throw new Exception('wrong server nonce.');
             }
 
             /*
@@ -192,7 +192,7 @@ class AuthKeyHandler extends AckHandler
              * new nonce hash return in server_DH_params_fail
              */
             if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
-                throw new Exception('Handshake: wrong new nonce hash.');
+                throw new Exception('wrong new nonce hash.');
             }
 
             /*
@@ -232,15 +232,15 @@ class AuthKeyHandler extends AckHandler
              */
             $server_DH_inner_data_length = $this->tl->get_length($this->fopen_and_write('php://memory', 'rw+b', $answer));
             if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
-                throw new Exception('Handshake: answer_hash mismatch.');
+                throw new Exception('answer_hash mismatch.');
             }
 
             if ($nonce != $server_DH_inner_data['nonce']) {
-                throw new Exception('Handshake: wrong nonce');
+                throw new Exception('wrong nonce');
             }
 
             if ($server_nonce != $server_DH_inner_data['server_nonce']) {
-                throw new Exception('Handshake: wrong server nonce');
+                throw new Exception('wrong server nonce');
             }
 
             $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
@@ -254,13 +254,14 @@ class AuthKeyHandler extends AckHandler
             $server_time = $server_DH_inner_data['server_time'];
             $this->timedelta = $server_time - time();
 
-            $this->log->log(sprintf('Handshake: Server-client time delta = %.1f s', $this->timedelta));
+            $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
 
 
             /*
              * ***********************************************************************
              * Define some needed numbers for BigInteger
              */
+            $this->log->log('Executing dh_prime checks...');
             $one = new \phpseclib\Math\BigInteger(1);
             $two = new \phpseclib\Math\BigInteger(2);
             $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
@@ -272,20 +273,20 @@ class AuthKeyHandler extends AckHandler
              * 2^2047 < dh_prime < 2^2048
              */
             if (!$dh_prime->isPrime()) {
-                throw new Exception("Handshake: dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
+                throw new Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
             }
 
             /*
             // Almost always fails
             if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
-                throw new Exception("Handshake: dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
+                throw new Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
             }
             */
 
             if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
             || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
             ) {
-                throw new Exception("Handshake: g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
+                throw new Exception("g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
             }
 
             /*
@@ -296,7 +297,7 @@ class AuthKeyHandler extends AckHandler
             if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
             || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
             ) {
-                throw new Exception('Handshake: g is invalid (1 < g < dh_prime - 1 is false).');
+                throw new Exception('g is invalid (1 < g < dh_prime - 1 is false).');
             }
 
             /*
@@ -307,7 +308,7 @@ class AuthKeyHandler extends AckHandler
             if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
             || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
             ) {
-                throw new Exception('Handshake: g_a is invalid (1 < g_a < dh_prime - 1 is false).');
+                throw new Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
             }
 
             foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
@@ -322,7 +323,7 @@ class AuthKeyHandler extends AckHandler
                 if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
                 || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                 ) {
-                    throw new Exception('Handshake: g_b is invalid (1 < g_b < dh_prime - 1 is false).');
+                    throw new Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                 }
 
                 $g_b_str = $g_b->toBytes();
@@ -398,7 +399,7 @@ class AuthKeyHandler extends AckHandler
                  * Check if the client's nonce and the server's nonce are the same
                  */
                 if ($Set_client_DH_params_answer['nonce'] != $nonce) {
-                    throw new Exception('Handshake: wrong nonce.');
+                    throw new Exception('wrong nonce.');
                 }
 
                 /*
@@ -406,7 +407,7 @@ class AuthKeyHandler extends AckHandler
                  * Check if server_nonce and new server_nonce are the same
                  */
                 if ($Set_client_DH_params_answer['server_nonce'] != $server_nonce) {
-                    throw new Exception('Handshake: wrong server nonce');
+                    throw new Exception('wrong server nonce');
                 }
 
                 /*
@@ -416,10 +417,10 @@ class AuthKeyHandler extends AckHandler
                 switch ($Set_client_DH_params_answer['_']) {
                     case 'dh_gen_ok':
                         if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
-                            throw new Exception('Handshake: wrong new_nonce_hash1');
+                            throw new Exception('wrong new_nonce_hash1');
                         }
 
-                        $this->log->log('Handshake: Diffie Hellman key exchange processed successfully');
+                        $this->log->log('Diffie Hellman key exchange processed successfully');
 
                         $res_authorization['server_salt'] = $this->struct->unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
                         $res_authorization['auth_key'] = $auth_key_str;
@@ -429,24 +430,24 @@ class AuthKeyHandler extends AckHandler
                             $res_authorization['expires_in'] = $expires_in;
                         }
 
-                        $this->log->log('Handshake: Auth key generated');
+                        $this->log->log('Auth key generated');
                         $this->timedelta = 0;
 
                         return $res_authorization;
                     case 'dh_gen_retry':
                         if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
-                            throw new Exception('Handshake: wrong new_nonce_hash_2');
+                            throw new Exception('wrong new_nonce_hash_2');
                         }
 
                         //repeat foreach
-                        $this->log->log('Handshake: Retrying Auth');
+                        $this->log->log('Retrying Auth');
                         break;
                     case 'dh_gen_fail':
                         if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
-                            throw new Exception('Handshake: wrong new_nonce_hash_3');
+                            throw new Exception('wrong new_nonce_hash_3');
                         }
 
-                        $this->log->log('Handshake: Auth Failed');
+                        $this->log->log('Auth Failed');
                         break 2;
                     default:
                         throw new Exception('Response Error');

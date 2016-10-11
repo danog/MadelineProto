@@ -111,8 +111,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->key = new RSA($settings['authorization']['rsa_key']);
         // Istantiate struct class
         $this->struct = new \danog\PHP\StructTools();
-        // Istantiate prime class
-        $this->PrimeModule = new PrimeModule();
         // Istantiate TL class
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
         // Istantiate logging class

@@ -76,16 +76,11 @@ class PrimeModule extends Tools
         return ($b == 0) ? $a : $b;
     }
 
-    public function primefactors($pq, $sort = false)
+    public function PrimeFactors($pq, $sort = false)
     {
-        // Use the native version
         $pqstr = (string) $pq;
-        $res = $this->find_small_multiplier_lopatin((int) $pqstr);
-        $res = [$res, $pqstr / $res];
-        if ($res[1] != 1) {
-            return $res;
-        }
-        // Use the python version.
+
+        $this->log->log("Trying to use the python factorization module");
         if (function_exists('shell_exec')) {
             try {
                 $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.$pqstr));
@@ -95,7 +90,8 @@ class PrimeModule extends Tools
             } catch (Exception $e) {
             }
         }
-        // Else do factorization with wolfram alpha :)))))
+
+        $this->log->log("Trying to use the wolfram alpha factorization module");
         $query = 'Do prime factorization of '.$pqstr;
         $params = [
             'async'         => true,
@@ -123,6 +119,15 @@ class PrimeModule extends Tools
         if (count($res) == 2) {
             return $res;
         }
+
+        $this->log->log("Trying to use the native factorization module");
+        $res = $this->find_small_multiplier_lopatin((int) $pqstr);
+        $res = [$res, $pqstr / $res];
+        if ($res[1] != 1) {
+            return $res;
+        }
+
+
         throw new Exception("Couldn't calculate pq!");
     }
 }

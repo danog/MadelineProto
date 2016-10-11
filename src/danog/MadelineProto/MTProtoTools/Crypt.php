@@ -65,7 +65,7 @@ class Crypt extends CallHandler
         $ivp = substr($iv, 0, $blocksize);
         $ivp2 = substr($iv, $blocksize);
         $ciphered = '';
-        foreach (\danog\MadelineProto\Tools::range(0, strlen($message), $blocksize) as $i) {
+        foreach ($this->range(0, strlen($message), $blocksize) as $i) {
             $indata = substr($message, $i, $blocksize);
             if ($operation == 'decrypt') {
                 $xored = $indata ^ $ivp2;

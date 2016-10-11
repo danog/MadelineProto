@@ -64,6 +64,7 @@ class Logging
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
+            $param = basename(debug_backtrace()[0]["file"], '.php').': '.$param;
             switch ($mode) {
                 case '1':
                     error_log($param);

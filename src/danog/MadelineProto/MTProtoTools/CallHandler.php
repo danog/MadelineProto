@@ -22,7 +22,7 @@ class CallHandler extends AuthKeyHandler
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $this->log->log('Getting response ('.$count.')...');
+            $this->log->log('Getting response (try number '.$count.' for '.$last_sent.')...');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
@@ -82,7 +82,7 @@ class CallHandler extends AuthKeyHandler
 //            if ($server_answer == null) {
 //                throw new Exception('An error occurred while calling object '.$object.'.');
 //            }
-//            $deserialized = $this->tl->deserialize(\danog\MadelineProto\Tools::fopen_and_write('php://memory', 'rw+b', $server_answer));
+//            $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $server_answer));
 //            return $deserialized;
         }
         throw new Exception('An error occurred while calling object '.$object.'.');
