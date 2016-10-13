@@ -58,7 +58,9 @@ class TL
 
         return $bytes_io;
     }
-    public function get_named_method_args($type_, $kwargs) {
+
+    public function get_named_method_args($type_, $kwargs)
+    {
         if (isset($this->method_name[$type_])) {
             $tl_method = $this->method_name[$type_];
         } else {
@@ -73,8 +75,10 @@ class TL
             }
             $kwargs = $newargs;
         }
+
         return $kwargs;
     }
+
     public function serialize_method($type_, $kwargs)
     {
         $bytes_io = '';

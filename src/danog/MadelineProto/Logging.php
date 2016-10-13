@@ -64,7 +64,7 @@ class Logging
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
-            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).(($mode == 3) ? "\t" : "").$param;
+            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).(($mode == 3) ? "\t" : '').$param;
             switch ($mode) {
                 case '1':
                     error_log($param);
