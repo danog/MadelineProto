@@ -37,7 +37,7 @@ src/danog/MadelineProto/
     MTProto - Extends MTProtoTools, handles initial connection, generation of authorization keys, istantiation of classes
     MTProtoTools - Extends all of the classes in MTProtoTools/
     prime.py - prime module (python) for p and q generation
-    PrimeModule.php - prime module (php) for p and q generation by wrapping the python module, using wolfram alpha or a (broken) built in engine
+    PrimeModule.php - prime module (php) for p and q generation by wrapping the python module, using wolfram alpha or a built in PHP engine
     RSA - Handles RSA public keys and signatures
     Tools - Various tools (positive modulus, string2bin, python-like range)
 ```
