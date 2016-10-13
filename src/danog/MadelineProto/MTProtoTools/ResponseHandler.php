@@ -43,7 +43,7 @@ class ResponseHandler extends MsgIdHandler
             case 'bad_msg_notification':
                 break;
             case 'bad_server_salt':
-                $this->settings["authorization"]["temp_auth_key"]["server_salt"] = $response["new_server_salt"];
+                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['new_server_salt'];
                 $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
                 $this->outgoing_messages[$response['bad_msg_id']]['response'] = $last_received;
                 $this->incoming_messages[$last_received]['content'] = $response;

@@ -66,12 +66,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ],
             ],
             'app_info' => [
-                'api_id'        => 25628,
-                'api_hash'      => '1fe17cda7d355166cdaa71f04122873c',
-                'device_model'  => php_uname('s'),
+                'api_id'          => 25628,
+                'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
+                'device_model'    => php_uname('s'),
                 'system_version'  => php_uname('r'),
-                'app_version'  => 'Unicorn',
-                'lang_code'  => 'en',
+                'app_version'     => 'Unicorn',
+                'lang_code'       => 'en',
             ],
             'tl_schema'     => [
                 'layer'         => 55,
@@ -133,15 +133,15 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
         $nearestDc = $this->method_call('invokeWithLayer', [
-            'layer' => $this->settings["tl_schema"]["layer"], 
-            'query' => $this->tl->serialize_method('initConnection', 
+            'layer' => $this->settings['tl_schema']['layer'],
+            'query' => $this->tl->serialize_method('initConnection',
                 array_merge(
-                    $this->settings["app_info"],
-                    ["query" => $this->tl->serialize_method('help.getNearestDc', [])]
+                    $this->settings['app_info'],
+                    ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
                 )
-             )
+             ),
          ]);
-         var_dump($nearestDc);
+        var_dump($nearestDc);
     }
 
     public function __destruct()
