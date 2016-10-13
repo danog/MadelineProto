@@ -46,11 +46,12 @@ class CallHandler extends AuthKeyHandler
     {
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
+                $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
-                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().$e->getTraceAsString().'. Recreating connection and retrying to call method...');
+                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 unset($this->connection);
                 $this->connection = new \danog\MadelineProto\DataCenter($this->settings['connection'], $this->settings['connection_settings']);
                 continue;

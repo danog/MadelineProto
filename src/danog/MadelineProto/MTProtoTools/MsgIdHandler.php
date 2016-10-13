@@ -74,7 +74,8 @@ class MsgIdHandler extends MessageHandler
         );
         $keys = array_keys($this->outgoing_messages);
         asort($keys);
-        if ($int_message_id <= end($keys)) {
+        $keys = end($keys);
+        while ($int_message_id <= $keys) {
             $int_message_id += 4;
         }
         $this->check_message_id($int_message_id, true);

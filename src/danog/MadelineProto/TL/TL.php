@@ -58,7 +58,23 @@ class TL
 
         return $bytes_io;
     }
+    public function get_named_method_args($type_, $kwargs) {
+        if (isset($this->method_name[$type_])) {
+            $tl_method = $this->method_name[$type_];
+        } else {
+            throw new Exception('Could not extract type: '.$type_);
+        }
 
+        if (count(array_filter(array_keys($kwargs), 'is_string')) == 0) {
+            $argcount = 0;
+            $newargs = [];
+            foreach ($tl_method->params as $arg) {
+                $newargs[$arg['name']] = $kwargs[$argcount++];
+            }
+            $kwargs = $newargs;
+        }
+        return $kwargs;
+    }
     public function serialize_method($type_, $kwargs)
     {
         $bytes_io = '';
@@ -68,15 +84,8 @@ class TL
             throw new Exception('Could not extract type: '.$type_);
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_method->id);
-        if (count(array_filter(array_keys($kwargs), 'is_string')) > 0) {
-            foreach ($tl_method->params as $arg) {
-                $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
-            }
-        } else {
-            $argcount = 0;
-            foreach ($tl_method->params as $arg) {
-                $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$argcount++]);
-            }
+        foreach ($tl_method->params as $arg) {
+            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
         }
 
         return $bytes_io;

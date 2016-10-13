@@ -41,6 +41,7 @@ class ResponseHandler extends MsgIdHandler
                 break;
 
             case 'bad_msg_notification':
+                break;
             case 'bad_server_salt':
                 $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
                 $this->outgoing_messages[$response['bad_msg_id']]['response'] = $last_received;
@@ -48,14 +49,13 @@ class ResponseHandler extends MsgIdHandler
                 break;
 
             case 'pong':
-var_dump($this->outgoing_messages);
-                    foreach ($this->outgoing_messages as $msg_id => &$omessage) {
-                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
-                            $omessage['response'] = $response['msg_id'];
-                            $this->incoming_messages[$response['msg_id']]['content'] = $response;
-                            $this->ack_outgoing_message_id($msg_id);
-                        }
+                foreach ($this->outgoing_messages as $msg_id => &$omessage) {
+                    if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
+                        $omessage['response'] = $response['msg_id'];
+                        $this->incoming_messages[$response['msg_id']]['content'] = $response;
+                        $this->ack_outgoing_message_id($msg_id);
                     }
+                }
                 break;
             case 'new_session_created':
 //                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];

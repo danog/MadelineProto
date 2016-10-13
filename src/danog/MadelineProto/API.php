@@ -21,7 +21,7 @@ class API extends Tools
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
         var_dump($future_salts = $this->ping(3));
-        $future_salts = $this->get_future_salts(3);
+        var_dump($this->get_future_salts(3));
     }
 
     public function __destruct()
