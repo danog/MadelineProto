@@ -140,7 +140,9 @@ class TL
 
                 return $concat;
                 break;
+
             default:
+                throw new Exception("Couldn't serialize param with type ".$type_);
                 break;
         }
     }
