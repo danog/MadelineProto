@@ -17,12 +17,15 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class CallHandler extends AuthKeyHandler
 {
-    public function wait_for_response($last_sent)
+    public function wait_for_response($last_sent, $optional_name = null)
     {
+        if ($optional_name == null) {
+            $optional_name = $last_sent;
+        }
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $this->log->log('Getting response (try number '.$count.' for '.$last_sent.')...');
+            $this->log->log('Getting response (try number '.$count.' for '.$optional_name.')...');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
@@ -49,7 +52,7 @@ class CallHandler extends AuthKeyHandler
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
-                $server_answer = $this->wait_for_response($int_message_id);
+                $server_answer = $this->wait_for_response($int_message_id, $method);
             } catch (Exception $e) {
                 $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 unset($this->connection);

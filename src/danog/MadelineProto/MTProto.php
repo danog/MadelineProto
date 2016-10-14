@@ -132,6 +132,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
             $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
+
         $nearestDc = $this->method_call('invokeWithLayer', [
             'layer' => $this->settings['tl_schema']['layer'],
             'query' => $this->tl->serialize_method('initConnection',
@@ -140,8 +141,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
                 )
              ),
-         ]);
-        var_dump($nearestDc);
+        ]);
+        $this->log->log("Current dc is ".$nearestDc["this_dc"].", nearest dc is ".$nearestDc["nearest_dc"]." in ".$nearestDc["country"].".");
+        
+        if ($nearestDc["nearest_dc"] != $nearestDc["this_dc"]) {
+            $this->log->log("Switching to dc ".$nearestDc["nearest_dc"]."...");
+            $this->connection->dc_connect($nearestDc["nearest_dc"]);
+        }
     }
 
     public function __destruct()

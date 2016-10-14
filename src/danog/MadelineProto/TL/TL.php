@@ -53,7 +53,7 @@ class TL
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_constructor->id);
         foreach ($tl_constructor->params as $arg) {
-            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
+            $bytes_io .= $this->serialize_param($arg['type'], $arg['subtype'], $kwargs[$arg['name']]);
         }
 
         return $bytes_io;
@@ -89,13 +89,16 @@ class TL
         }
         $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_method->id);
         foreach ($tl_method->params as $arg) {
-            $bytes_io .= $this->serialize_param($arg['type'], $kwargs[$arg['name']]);
+            if (!isset($arg['subtype'])) {
+                $arg['subtype'] = null;
+            }
+            $bytes_io .= $this->serialize_param($arg['type'], $arg['subtype'], $kwargs[$arg['name']]);
         }
 
         return $bytes_io;
     }
 
-    public function serialize_param($type_, $value)
+    public function serialize_param($type_, $subtype, $value)
     {
         switch ($type_) {
             case 'int':
@@ -107,6 +110,16 @@ class TL
                 }
 
                 return \danog\PHP\Struct::pack('<i', $value);
+                break;
+            case '#':
+                if (!is_numeric($value)) {
+                    throw new Exception("serialize_param: given value isn't numeric");
+                }
+                if (!(strlen(decbin($value)) <= 32)) {
+                    throw new Exception('Given value is too long.');
+                }
+
+                return \danog\PHP\Struct::pack('<I', $value);
                 break;
             case 'long':
                 if (!is_numeric($value)) {
@@ -122,6 +135,9 @@ class TL
                 }
 
                 return $value;
+                break;
+            case 'double':
+                return \danog\PHP\Struct::pack('<d', $value);
                 break;
             case 'string':
             case 'bytes':
@@ -140,7 +156,14 @@ class TL
 
                 return $concat;
                 break;
-
+            case '!X':
+                return $value;
+            case 'Vector t':
+                $concat = \danog\PHP\Struct::pack('<i', $this->constructor_type["vector"]->id);
+                foreach ($value as $curv) {
+                    $concat .= $this->serialize_param($subtype, null, $curv);
+                }
+                return $concat;
             default:
                 throw new Exception("Couldn't serialize param with type ".$type_);
                 break;

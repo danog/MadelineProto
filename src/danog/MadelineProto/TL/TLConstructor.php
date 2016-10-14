@@ -17,21 +17,26 @@ class TLConstructor
     public function __construct($json_dict)
     {
         $this->id = (int) $json_dict['id'];
-        $this->type = $json_dict['type'];
         $this->predicate = $json_dict['predicate'];
+        $this->type = $json_dict['type'];
         $this->params = [];
         foreach ($json_dict['params'] as $param) {
-            if (($param['type'] == 'Vector<long>')) {
-                $param['type'] = 'Vector t';
-                $param['subtype'] = 'long';
-            } elseif (($param['type'] == 'vector<%Message>')) {
-                $param['type'] = 'vector';
-                $param['subtype'] = 'message';
-            } elseif (($param['type'] == 'vector<future_salt>')) {
-                $param['type'] = 'vector';
-                $param['subtype'] = 'future_salt';
-            } else {
-                $param['subtype'] = null;
+            switch ($param['type']) {
+                case 'Vector<long>':
+                    $param['type'] = 'Vector t';
+                    $param['subtype'] = 'long';
+                    break;
+                case 'vector<%Message>':
+                    $param['type'] = 'vector';
+                    $param['subtype'] = 'message';
+                    break;
+                case 'vector<future_salt>':
+                    $param['type'] = 'vector';
+                    $param['subtype'] = 'future_salt';
+                    break;
+                default:
+                    $param['subtype'] = null;
+                    break;
             }
             $this->params[] = $param;
         }
