@@ -159,10 +159,11 @@ class TL
             case '!X':
                 return $value;
             case 'Vector t':
-                $concat = \danog\PHP\Struct::pack('<i', $this->constructor_type["vector"]->id);
+                $concat = \danog\PHP\Struct::pack('<i', $this->constructor_type['vector']->id);
                 foreach ($value as $curv) {
                     $concat .= $this->serialize_param($subtype, null, $curv);
                 }
+
                 return $concat;
             default:
                 throw new Exception("Couldn't serialize param with type ".$type_);

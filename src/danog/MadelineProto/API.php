@@ -21,8 +21,8 @@ class API extends Tools
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
         $ping_res = $this->ping(3);
-        if(isset($ping["_"]) && $ping["_"] == "pong") {
-            $this->log->log("Pong: ".$ping["ping_id"]);
+        if (isset($ping['_']) && $ping['_'] == 'pong') {
+            $this->log->log('Pong: '.$ping['ping_id']);
         }
         $future_salts = $this->get_future_salts(3);
     }

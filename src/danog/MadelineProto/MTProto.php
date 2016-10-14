@@ -142,11 +142,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 )
              ),
         ]);
-        $this->log->log("Current dc is ".$nearestDc["this_dc"].", nearest dc is ".$nearestDc["nearest_dc"]." in ".$nearestDc["country"].".");
-        
-        if ($nearestDc["nearest_dc"] != $nearestDc["this_dc"]) {
-            $this->log->log("Switching to dc ".$nearestDc["nearest_dc"]."...");
-            $this->connection->dc_connect($nearestDc["nearest_dc"]);
+        $this->log->log('Current dc is '.$nearestDc['this_dc'].', nearest dc is '.$nearestDc['nearest_dc'].' in '.$nearestDc['country'].'.');
+
+        if ($nearestDc['nearest_dc'] != $nearestDc['this_dc']) {
+            $this->log->log('Switching to dc '.$nearestDc['nearest_dc'].'...');
+            $this->connection->dc_connect($nearestDc['nearest_dc']);
         }
     }
 
