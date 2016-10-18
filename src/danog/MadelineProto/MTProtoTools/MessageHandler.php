@@ -21,9 +21,11 @@ class MessageHandler extends Crypt
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-    public function send_message($message_data, $content_related)
+    public function send_message($message_data, $content_related, $int_message_id = null)
     {
-        $int_message_id = $this->generate_message_id();
+        if ($int_message_id == null) {
+            $int_message_id = $this->generate_message_id();
+        }
         $message_id = $this->struct->pack('<Q', $int_message_id);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;

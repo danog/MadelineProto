@@ -484,7 +484,7 @@ class AuthKeyHandler extends AckHandler
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['auth_key']['auth_key']);
         $encrypted_message = $this->settings['authorization']['auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
 
-        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message])) {
+        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $message_id)) {
             $this->log->log('Successfully binded temporary and permanent authorization keys.');
             $this->write_client_info();
 

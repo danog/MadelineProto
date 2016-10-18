@@ -41,6 +41,7 @@ class ResponseHandler extends MsgIdHandler
                 break;
 
             case 'bad_msg_notification':
+                throw new Exception('Received bad_msg_notification '.var_export($response, true));
                 break;
             case 'bad_server_salt':
                 $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['new_server_salt'];

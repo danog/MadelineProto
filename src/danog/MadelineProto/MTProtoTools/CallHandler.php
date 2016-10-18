@@ -45,12 +45,12 @@ class CallHandler extends AuthKeyHandler
         }
     }
 
-    public function method_call($method, $args)
+    public function method_call($method, $args, $message_id = null)
     {
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
                 $args = $this->tl->get_named_method_args($method, $args);
-                $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method));
+                $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id, $method);
             } catch (Exception $e) {
