@@ -458,19 +458,21 @@ class AuthKeyHandler extends AckHandler
 
         throw new Exception('Auth Failed');
     }
-    public function bind_temp_auth_key($expires_in) {
+
+    public function bind_temp_auth_key($expires_in)
+    {
         $nonce = $this->struct->unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
         $expires_at = time() + $expires_in;
         $temp_auth_key_id = $this->struct->unpack('<q', $this->settings['authorization']['temp_auth_key']['id'])[0];
-        $perm_auth_key_id= $this->struct->unpack('<q', $this->settings['authorization']['auth_key']['id'])[0];
+        $perm_auth_key_id = $this->struct->unpack('<q', $this->settings['authorization']['auth_key']['id'])[0];
         $temp_session_id = $this->struct->unpack('<q', $this->settings['authorization']['session_id'])[0];
         $message_data = $this->tl->serialize_obj('bind_auth_key_inner',
             [
-                'nonce'           => $nonce,
-                'temp_auth_key_id'    => $temp_auth_key_id,
-                'perm_auth_key_id'        => $perm_auth_key_id,
+                'nonce'                       => $nonce,
+                'temp_auth_key_id'            => $temp_auth_key_id,
+                'perm_auth_key_id'            => $perm_auth_key_id,
                 'temp_session_id'             => $temp_session_id,
-                'expires_at'             => $expires_at,
+                'expires_at'                  => $expires_at,
             ]
         );
         $int_message_id = $this->generate_message_id();
@@ -485,6 +487,7 @@ class AuthKeyHandler extends AckHandler
         if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message])) {
             $this->log->log('Successfully binded temporary and permanent authorization keys.');
             $this->write_client_info();
+
             return true;
         }
         throw new Exception('An error occurred while binding temporary and permanent authorization keys.');

@@ -144,15 +144,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         $nearestDc = $this->method_call('auth.sendCode', [
             'phone_number' => '393373737',
-            'sms_type' => 5,
-            'api_id' => $this->settings['app_info']['api_id'],
-            'api_hash' => $this->settings['app_info']['api_hash'],
-            'lang_code' => $this->settings['app_info']['lang_code'],
+            'sms_type'     => 5,
+            'api_id'       => $this->settings['app_info']['api_id'],
+            'api_hash'     => $this->settings['app_info']['api_hash'],
+            'lang_code'    => $this->settings['app_info']['lang_code'],
         ]);
-var_dump($nearestDc);
+        var_dump($nearestDc);
     }
 
-    public function write_client_info() {
+    public function write_client_info()
+    {
         $this->log->log('Writing client info...');
         $nearestDc = $this->method_call('invokeWithLayer', [
             'layer' => $this->settings['tl_schema']['layer'],
@@ -170,6 +171,7 @@ var_dump($nearestDc);
             $this->connection->dc_connect($nearestDc['nearest_dc']);
         }
     }
+
     public function __destruct()
     {
         unset($this->sock);
