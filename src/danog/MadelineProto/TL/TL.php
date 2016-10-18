@@ -168,6 +168,8 @@ class TL extends \danog\MadelineProto\Tools
                 return $value;
             case 'Vector t':
                 $concat = $this->struct->pack('<i', $this->constructor_type['vector']->id);
+
+                $concat .= $this->struct->pack('<l', count($value));
                 foreach ($value as $curv) {
                     $concat .= $this->serialize_param($subtype, null, $curv);
                 }

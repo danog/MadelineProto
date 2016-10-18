@@ -115,9 +115,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->connection->dc_connect(2);
 
         // Load rsa key
+        $this->log->log('Loading RSA key...');
         $this->key = new RSA($settings['authorization']['rsa_key']);
+
         // Istantiate struct class
+        $this->log->log('Initializing StructTools...');
         $this->struct = new \danog\PHP\StructTools();
+
         // Istantiate TL class
         $this->log->log('Translating tl schemas...');
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
@@ -130,11 +134,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         if ($this->settings['authorization']['temp_auth_key'] == null || $this->settings['authorization']['auth_key'] == null) {
             if ($this->settings['authorization']['auth_key'] == null) {
+                $this->log->log('Generating permanent authorization key...');
                 $this->settings['authorization']['auth_key'] = $this->create_auth_key(-1);
             }
+            $this->log->log('Generating temporary authorization key...');
             $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
         $this->write_client_info();
+        $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         $nearestDc = $this->method_call('auth.sendCode', [
             'phone_number' => '393373737',
             'sms_type' => 5,
@@ -146,6 +153,7 @@ var_dump($nearestDc);
     }
 
     public function write_client_info() {
+        $this->log->log('Writing client info...');
         $nearestDc = $this->method_call('invokeWithLayer', [
             'layer' => $this->settings['tl_schema']['layer'],
             'query' => $this->tl->serialize_method('initConnection',

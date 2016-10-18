@@ -458,9 +458,35 @@ class AuthKeyHandler extends AckHandler
 
         throw new Exception('Auth Failed');
     }
-    public function bind_temp_auth_key($expires_in = 86400) {
-        $nonce = $this->struct->unpack('<q', \phpseclib\Crypt\Random::string(8));
+    public function bind_temp_auth_key($expires_in) {
+        $nonce = $this->struct->unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
         $expires_at = time() + $expires_in;
-        
+        $temp_auth_key_id = $this->struct->unpack('<q', $this->settings['authorization']['temp_auth_key']['id'])[0];
+        $perm_auth_key_id= $this->struct->unpack('<q', $this->settings['authorization']['auth_key']['id'])[0];
+        $temp_session_id = $this->struct->unpack('<q', $this->settings['authorization']['session_id'])[0];
+        $message_data = $this->tl->serialize_obj('bind_auth_key_inner',
+            [
+                'nonce'           => $nonce,
+                'temp_auth_key_id'    => $temp_auth_key_id,
+                'perm_auth_key_id'        => $perm_auth_key_id,
+                'temp_session_id'             => $temp_session_id,
+                'expires_at'             => $expires_at,
+            ]
+        );
+        $int_message_id = $this->generate_message_id();
+        $message_id = $this->struct->pack('<Q', $int_message_id);
+        $seq_no = 0;
+        $encrypted_data = \phpseclib\Crypt\Random::string(16).$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
+        $message_key = substr(sha1($encrypted_data, true), -16);
+        $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
+        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['auth_key']['auth_key']);
+        $encrypted_message = $this->settings['authorization']['auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+
+        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message])) {
+            $this->log->log('Successfully binded temporary and permanent authorization keys.');
+            $this->write_client_info();
+            return true;
+        }
+        throw new Exception('An error occurred while binding temporary and permanent authorization keys.');
     }
 }

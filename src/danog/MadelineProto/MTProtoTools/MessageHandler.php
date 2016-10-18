@@ -32,7 +32,7 @@ class MessageHandler extends Crypt
             $encrypted_data = $this->struct->pack('<q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key);
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key']);
             $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
@@ -58,7 +58,7 @@ class MessageHandler extends Crypt
         } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, 'from server');
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key'], 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
             $server_salt = $this->struct->unpack('<q', substr($decrypted_data, 0, 8))[0];
