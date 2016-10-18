@@ -91,10 +91,14 @@ class TL extends \danog\MadelineProto\Tools
         $bytes_io .= $this->struct->pack('<i', $tl_method->id);
         foreach ($tl_method->params as $arg) {
             if (!isset($kwargs[$arg['name']])) {
-                if ($arg['opt']) {
-                    continue;
+                if ($arg['name'] == 'flags') {
+                    $kwargs['flags'] = 0;
+                } else {
+                    if ($arg['opt']) {
+                        continue;
+                    }
+                    throw new Exception('Missing required parameter ('.$arg['name'].')');
                 }
-                throw new Exception('Missing required parameter ('.$arg['name'].')');
             }
             $bytes_io .= $this->serialize_param($arg['type'], $arg['subtype'], $kwargs[$arg['name']]);
         }

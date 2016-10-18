@@ -22,7 +22,7 @@ class TLMethod
         $this->params = $json_dict['params'];
         foreach ($this->params as &$param) {
             $param['opt'] = false;
-            $param['subtype'] = '';
+            $param['subtype'] = null;
             if (preg_match('/^flags\.\d\?/', $param['type'])) {
                 $param['opt'] = true;
                 $param['flag'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);

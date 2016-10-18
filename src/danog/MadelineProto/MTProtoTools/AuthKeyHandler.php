@@ -458,4 +458,9 @@ class AuthKeyHandler extends AckHandler
 
         throw new Exception('Auth Failed');
     }
+    public function bind_temp_auth_key($expires_in = 86400) {
+        $nonce = $this->struct->unpack('<q', \phpseclib\Crypt\Random::string(8));
+        $expires_at = time() + $expires_in;
+        
+    }
 }
