@@ -75,8 +75,7 @@ class PrimeModule extends Tools
 
         return ($b == 0) ? $a : $b;
     }
-
-    public function PrimeFactors($pq, $sort = false)
+    public function PrimeFactors($pq)
     {
         $pqstr = (string) $pq;
 

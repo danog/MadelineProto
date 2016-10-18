@@ -20,5 +20,27 @@ class TLMethod
         $this->type = $json_dict['type'];
         $this->method = $json_dict['method'];
         $this->params = $json_dict['params'];
+        foreach ($this->params as &$param) {
+            $param['opt'] = false;
+            $param['subtype'] = '';
+            if (preg_match('/^flags\.\d\?/',  $param['type'])) {
+                $param['opt'] = true;
+                $param['flag'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
+                $param['type'] = preg_replace('/^flags\.\d\?/', '', $param['type']);
+            }
+            if (preg_match('/vector<.*>/i',  $param['type'])) {
+                if (preg_match('/vector/', $param['type'])) {
+                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
+                    $param['type'] = 'vector';
+                }
+                if (preg_match('/Vector/', $param['type'])) {
+                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
+                    $param['type'] = 'Vector t';
+                }
+                if (preg_match('/^\%/', $param['subtype'])) {
+                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
+                }
+            }
+        }
     }
 }

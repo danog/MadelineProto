@@ -106,8 +106,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
         }
         $this->settings = $settings;
+        // Istantiate logging class
+        $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
 
         // Connect to servers
+        $this->log->log('Connecting to server...');
         $this->connection = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         $this->connection->dc_connect(2);
 
@@ -116,9 +119,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         // Istantiate struct class
         $this->struct = new \danog\PHP\StructTools();
         // Istantiate TL class
+        $this->log->log('Translating tl schemas...');
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
-        // Istantiate logging class
-        $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
 
         $this->seq_no = 0;
         $this->timedelta = 0; // time delta

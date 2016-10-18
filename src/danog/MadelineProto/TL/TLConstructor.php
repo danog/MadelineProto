@@ -19,26 +19,28 @@ class TLConstructor
         $this->id = (int) $json_dict['id'];
         $this->predicate = $json_dict['predicate'];
         $this->type = $json_dict['type'];
-        $this->params = [];
-        foreach ($json_dict['params'] as $param) {
-            switch ($param['type']) {
-                case 'Vector<long>':
-                    $param['type'] = 'Vector t';
-                    $param['subtype'] = 'long';
-                    break;
-                case 'vector<%Message>':
-                    $param['type'] = 'vector';
-                    $param['subtype'] = 'message';
-                    break;
-                case 'vector<future_salt>':
-                    $param['type'] = 'vector';
-                    $param['subtype'] = 'future_salt';
-                    break;
-                default:
-                    $param['subtype'] = null;
-                    break;
+        $this->params = $json_dict['params'];
+        foreach ($this->params as &$param) {
+            $param['opt'] = false;
+            $param['subtype'] = '';
+            if (preg_match('/^flags\.\d\?/',  $param['type'])) {
+                $param['opt'] = true;
+                $param['flag'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
+                $param['type'] = preg_replace('/^flags\.\d\?/', '', $param['type']);
             }
-            $this->params[] = $param;
+            if (preg_match('/vector<.*>/i',  $param['type'])) {
+                if (preg_match('/vector/', $param['type'])) {
+                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
+                    $param['type'] = 'vector';
+                }
+                if (preg_match('/Vector/', $param['type'])) {
+                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
+                    $param['type'] = 'Vector t';
+                }
+                if (preg_match('/^\%/', $param['subtype'])) {
+                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
+                }
+            }
         }
     }
 }

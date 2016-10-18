@@ -26,7 +26,7 @@ class RSA extends TL\TL
         $this->key->loadKey($key);
         $this->n = $this->key->modulus;
         $this->e = $this->key->exponent;
-
+        $this->struct = new \danog\PHP\StructTools();
         $this->fp_bytes = substr(sha1($this->serialize_param('bytes', null, $this->n->toBytes()).$this->serialize_param('bytes', null, $this->e->toBytes()), true), -8);
         $this->fp = new \phpseclib\Math\BigInteger(strrev($this->fp_bytes), -256);
     }
