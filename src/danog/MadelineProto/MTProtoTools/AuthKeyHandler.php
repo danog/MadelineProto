@@ -71,7 +71,7 @@ class AuthKeyHandler extends AckHandler
             }
 
             if (!isset($public_key_fingerprint)) {
-                throw new Exception("couldn't find our key in the server_public_key_fingerprints vector.");
+                throw new Exception("Couldn't find our key in the server_public_key_fingerprints vector.");
             }
 
             $pq_bytes = $ResPQ['pq'];
@@ -284,7 +284,7 @@ class AuthKeyHandler extends AckHandler
             */
 
             if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
-            || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
+                || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
             ) {
                 throw new Exception("g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
             }
@@ -295,7 +295,7 @@ class AuthKeyHandler extends AckHandler
              * 1 < g < dh_prime - 1
              */
             if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
-            || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
+                || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
             ) {
                 throw new Exception('g is invalid (1 < g < dh_prime - 1 is false).');
             }
@@ -306,7 +306,7 @@ class AuthKeyHandler extends AckHandler
              * 1 < g_a < dh_prime - 1
              */
             if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
-            || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
+                || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
             ) {
                 throw new Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
             }
