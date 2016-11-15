@@ -26,12 +26,12 @@ class MessageHandler extends Crypt
         if ($int_message_id == null) {
             $int_message_id = $this->generate_message_id();
         }
-        $message_id = $this->struct->pack('<Q', $int_message_id);
+        $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
-            $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.$this->struct->pack('<I', strlen($message_data)).$message_data;
+            $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
-            $encrypted_data = $this->struct->pack('<q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
+            $encrypted_data = \danog\PHP\Struct::pack('<q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key']);
@@ -50,11 +50,11 @@ class MessageHandler extends Crypt
     {
         $payload = $this->connection->read_message();
         if (fstat($payload)['size'] == 4) {
-            throw new Exception('Server response error: '.abs($this->struct->unpack('<i', fread($payload, 4))[0]));
+            throw new Exception('Server response error: '.abs(\danog\PHP\Struct::unpack('<i', fread($payload, 4))[0]));
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = $this->struct->unpack('<QI', fread($payload, 12));
+            list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
         } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
@@ -63,7 +63,7 @@ class MessageHandler extends Crypt
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key'], 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
-            $server_salt = $this->struct->unpack('<q', substr($decrypted_data, 0, 8))[0];
+            $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
                 //                throw new Exception('Server salt mismatch (my server salt '.$this->settings['authorization']['temp_auth_key']['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
@@ -73,13 +73,13 @@ class MessageHandler extends Crypt
                 throw new Exception('Session id mismatch.');
             }
 
-            $message_id = $this->struct->unpack('<Q', substr($decrypted_data, 16, 8))[0];
+            $message_id = \danog\PHP\Struct::unpack('<Q', substr($decrypted_data, 16, 8))[0];
             $this->check_message_id($message_id, false);
 
-            $seq_no = $this->struct->unpack('<I', substr($decrypted_data, 24, 4)) [0];
+            $seq_no = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 24, 4)) [0];
             // Dunno how to handle any incorrect sequence numbers
 
-            $message_data_length = $this->struct->unpack('<I', substr($decrypted_data, 28, 4)) [0];
+            $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 28, 4)) [0];
 
             if ($message_data_length > strlen($decrypted_data)) {
                 throw new Exception('message_data_length is too big');

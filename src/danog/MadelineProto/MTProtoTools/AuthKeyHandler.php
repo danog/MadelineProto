@@ -23,7 +23,7 @@ class AuthKeyHandler extends AckHandler
     public function create_auth_key($expires_in = -1)
     {
         foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id_total) {
-            $this->log->log('Requesting pq');
+            \danog\MadelineProto\Logging::log('Requesting pq');
 
             /**
              * ***********************************************************************
@@ -94,14 +94,14 @@ class AuthKeyHandler extends AckHandler
                 throw new Exception("couldn't compute p and q.");
             }
 
-            $this->log->log('Factorization '.$pq.' = '.$p.' * '.$q);
+            \danog\MadelineProto\Logging::log('Factorization '.$pq.' = '.$p.' * '.$q);
 
             /*
              * ***********************************************************************
              * Serialize object for req_DH_params
              */
-            $p_bytes = $this->struct->pack('>I', (string) $p);
-            $q_bytes = $this->struct->pack('>I', (string) $q);
+            $p_bytes = \danog\PHP\Struct::pack('>I', (string) $p);
+            $q_bytes = \danog\PHP\Struct::pack('>I', (string) $q);
 
             $new_nonce = \phpseclib\Crypt\Random::string(32);
             if ($expires_in < 0) {
@@ -138,7 +138,7 @@ class AuthKeyHandler extends AckHandler
             $to_encrypt = $sha_digest.$data.$random_bytes;
             $encrypted_data = $this->key->encrypt($to_encrypt);
 
-            $this->log->log('Starting Diffie Hellman key exchange');
+            \danog\MadelineProto\Logging::log('Starting Diffie Hellman key exchange');
             /*
              * ***********************************************************************
              * Starting Diffie Hellman key exchange, Server authentication
@@ -254,14 +254,14 @@ class AuthKeyHandler extends AckHandler
             $server_time = $server_DH_inner_data['server_time'];
             $this->timedelta = $server_time - time();
 
-            $this->log->log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
+            \danog\MadelineProto\Logging::log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
 
 
             /*
              * ***********************************************************************
              * Define some needed numbers for BigInteger
              */
-            $this->log->log('Executing dh_prime checks...');
+            \danog\MadelineProto\Logging::log('Executing dh_prime checks...');
             $one = new \phpseclib\Math\BigInteger(1);
             $two = new \phpseclib\Math\BigInteger(2);
             $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
@@ -420,9 +420,9 @@ class AuthKeyHandler extends AckHandler
                             throw new Exception('wrong new_nonce_hash1');
                         }
 
-                        $this->log->log('Diffie Hellman key exchange processed successfully');
+                        \danog\MadelineProto\Logging::log('Diffie Hellman key exchange processed successfully');
 
-                        $res_authorization['server_salt'] = $this->struct->unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
+                        $res_authorization['server_salt'] = \danog\PHP\Struct::unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
                         $res_authorization['auth_key'] = $auth_key_str;
                         $res_authorization['id'] = substr($auth_key_sha, -8);
 
@@ -430,7 +430,7 @@ class AuthKeyHandler extends AckHandler
                             $res_authorization['expires_in'] = $expires_in;
                         }
 
-                        $this->log->log('Auth key generated');
+                        \danog\MadelineProto\Logging::log('Auth key generated');
                         $this->timedelta = 0;
 
                         return $res_authorization;
@@ -440,14 +440,14 @@ class AuthKeyHandler extends AckHandler
                         }
 
                         //repeat foreach
-                        $this->log->log('Retrying Auth');
+                        \danog\MadelineProto\Logging::log('Retrying Auth');
                         break;
                     case 'dh_gen_fail':
                         if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                             throw new Exception('wrong new_nonce_hash_3');
                         }
 
-                        $this->log->log('Auth Failed');
+                        \danog\MadelineProto\Logging::log('Auth Failed');
                         break 2;
                     default:
                         throw new Exception('Response Error');
@@ -461,11 +461,11 @@ class AuthKeyHandler extends AckHandler
 
     public function bind_temp_auth_key($expires_in)
     {
-        $nonce = $this->struct->unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
+        $nonce = \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
         $expires_at = time() + $expires_in;
-        $temp_auth_key_id = $this->struct->unpack('<q', $this->settings['authorization']['temp_auth_key']['id'])[0];
-        $perm_auth_key_id = $this->struct->unpack('<q', $this->settings['authorization']['auth_key']['id'])[0];
-        $temp_session_id = $this->struct->unpack('<q', $this->settings['authorization']['session_id'])[0];
+        $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->settings['authorization']['temp_auth_key']['id'])[0];
+        $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->settings['authorization']['auth_key']['id'])[0];
+        $temp_session_id = \danog\PHP\Struct::unpack('<q', $this->settings['authorization']['session_id'])[0];
         $message_data = $this->tl->serialize_obj('bind_auth_key_inner',
             [
                 'nonce'                       => $nonce,
@@ -476,16 +476,16 @@ class AuthKeyHandler extends AckHandler
             ]
         );
         $int_message_id = $this->generate_message_id();
-        $message_id = $this->struct->pack('<Q', $int_message_id);
+        $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         $seq_no = 0;
-        $encrypted_data = \phpseclib\Crypt\Random::string(16).$message_id.$this->struct->pack('<II', $seq_no, strlen($message_data)).$message_data;
+        $encrypted_data = \phpseclib\Crypt\Random::string(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
         $message_key = substr(sha1($encrypted_data, true), -16);
         $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['auth_key']['auth_key']);
         $encrypted_message = $this->settings['authorization']['auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
 
         if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $message_id)) {
-            $this->log->log('Successfully binded temporary and permanent authorization keys.');
+            \danog\MadelineProto\Logging::log('Successfully binded temporary and permanent authorization keys.');
             $this->write_client_info();
 
             return true;

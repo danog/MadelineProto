@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "966d0bc73f86b42249ee2a37fea56e64",
-    "content-hash": "c5463d805ceb0061da4eca7c688a973e",
+    "hash": "8d6fcaae1bc321e5d42b8b4749ea4266",
+    "content-hash": "d004c37ebd93efd29d86d09824fdd71b",
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "1.1.2.1",
+            "version": "1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
-                "reference": "da588a75fd4fdbd72745fd48f1241b775aee8fa9"
+                "reference": "f050e9bedf2edd6828c4759cc56fd665895a5e90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/da588a75fd4fdbd72745fd48f1241b775aee8fa9",
-                "reference": "da588a75fd4fdbd72745fd48f1241b775aee8fa9",
+                "url": "https://api.github.com/repos/danog/PHPStruct/zipball/f050e9bedf2edd6828c4759cc56fd665895a5e90",
+                "reference": "f050e9bedf2edd6828c4759cc56fd665895a5e90",
                 "shasum": ""
             },
             "require": {
@@ -58,93 +58,26 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-08-25 11:07:20"
-        },
-        {
-            "name": "icicleio/icicle",
-            "version": "v0.9.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/icicleio/icicle.git",
-                "reference": "84a3cc6f7dc38500f4ed9bdae79f458d191cb119"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/icicleio/icicle/zipball/84a3cc6f7dc38500f4ed9bdae79f458d191cb119",
-                "reference": "84a3cc6f7dc38500f4ed9bdae79f458d191cb119",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5|^7.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.6"
-            },
-            "suggest": {
-                "ext-ev": "Provides an event loop with better performance.",
-                "ext-pcntl": "Enables custom signal handling."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Icicle\\": "src"
-                },
-                "files": [
-                    "src/functions.php",
-                    "src/Awaitable/functions.php",
-                    "src/Coroutine/functions.php",
-                    "src/Loop/functions.php",
-                    "src/Observable/functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aaron Piotrowski",
-                    "email": "aaron@icicle.io"
-                }
-            ],
-            "description": "Icicle is a PHP library for writing asynchronous code using synchronous coding techniques.",
-            "homepage": "http://icicle.io",
-            "keywords": [
-                "Socket",
-                "async",
-                "asynchronous",
-                "awaitable",
-                "coroutine",
-                "event",
-                "generator",
-                "interruptible",
-                "multitasking",
-                "network",
-                "promise",
-                "server",
-                "stream"
-            ],
-            "time": "2016-03-31 16:34:26"
+            "time": "2016-11-14 15:09:50"
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v1.0.1",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd"
+                "reference": "e085e08c939de49707dbf64315d178d90fbc708d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d96e63b79a7135a65659ba5b1cb02826172bfedd",
-                "reference": "d96e63b79a7135a65659ba5b1cb02826172bfedd",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/e085e08c939de49707dbf64315d178d90fbc708d",
+                "reference": "e085e08c939de49707dbf64315d178d90fbc708d",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3|^7"
+                "php": "^7"
             },
             "require-dev": {
-                "paragonie/random_compat": "^1.4|^2.0",
                 "phpunit/phpunit": "4.*|5.*"
             },
             "type": "library",
@@ -186,20 +119,20 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-06-13 01:00:24"
+            "time": "2016-07-11 20:32:06"
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.3",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb"
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/c0125896dbb151380ab47e96c621741e79623beb",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
                 "shasum": ""
             },
             "require": {
@@ -234,7 +167,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-10-17 15:23:22"
+            "time": "2016-11-07 23:38:38"
         },
         {
             "name": "phpseclib/phpseclib",

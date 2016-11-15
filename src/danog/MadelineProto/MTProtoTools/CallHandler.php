@@ -25,7 +25,7 @@ class CallHandler extends AuthKeyHandler
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            $this->log->log('Getting response (try number '.$count.' for '.$optional_name.')...');
+            \danog\MadelineProto\Logging::log('Getting response (try number '.$count.' for '.$optional_name.')...');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
             if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
@@ -54,7 +54,7 @@ class CallHandler extends AuthKeyHandler
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id, $method);
             } catch (Exception $e) {
-                $this->log->log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
+                \danog\MadelineProto\Logging::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 unset($this->connection);
                 $this->connection = new \danog\MadelineProto\DataCenter($this->settings['connection'], $this->settings['connection_settings']);
                 continue;
@@ -76,7 +76,7 @@ class CallHandler extends AuthKeyHandler
                 $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
 //                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
-                $this->log->log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
+                \danog\MadelineProto\Logging::log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 unset($this->connection);
                 $this->connection = new \danog\MadelineProto\DataCenter($this->settings['connection'], $this->settings['connection_settings']);
                 continue;

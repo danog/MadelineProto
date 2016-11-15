@@ -64,6 +64,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'test_mode' => true,
                     'port'      => '443',
                 ],
+                'default_dc' => 2
             ],
             'app_info' => [
                 'api_id'          => 25628,
@@ -106,24 +107,19 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
         }
         $this->settings = $settings;
-        // Istantiate logging class
-        $this->log = new Logging($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
+        // Set up logging class
+        \danog\MadelineProto\Logging::constructor($this->settings['logging']['logging'], $this->settings['logging']['logging_param']);
 
         // Connect to servers
-        $this->log->log('Connecting to server...');
+        \danog\MadelineProto\Logging::log('Connecting to server...');
         $this->connection = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
-        $this->connection->dc_connect(2);
 
         // Load rsa key
-        $this->log->log('Loading RSA key...');
+        \danog\MadelineProto\Logging::log('Loading RSA key...');
         $this->key = new RSA($settings['authorization']['rsa_key']);
 
-        // Istantiate struct class
-        $this->log->log('Initializing StructTools...');
-        $this->struct = new \danog\PHP\StructTools();
-
         // Istantiate TL class
-        $this->log->log('Translating tl schemas...');
+        \danog\MadelineProto\Logging::log('Translating tl schemas...');
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
 
         $this->seq_no = 0;
@@ -134,10 +130,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
         if ($this->settings['authorization']['temp_auth_key'] == null || $this->settings['authorization']['auth_key'] == null) {
             if ($this->settings['authorization']['auth_key'] == null) {
-                $this->log->log('Generating permanent authorization key...');
+                \danog\MadelineProto\Logging::log('Generating permanent authorization key...');
                 $this->settings['authorization']['auth_key'] = $this->create_auth_key(-1);
             }
-            $this->log->log('Generating temporary authorization key...');
+            \danog\MadelineProto\Logging::log('Generating temporary authorization key...');
             $this->settings['authorization']['temp_auth_key'] = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
         $this->write_client_info();
@@ -154,21 +150,25 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function write_client_info()
     {
-        $this->log->log('Writing client info...');
-        $nearestDc = $this->method_call('invokeWithLayer', [
-            'layer' => $this->settings['tl_schema']['layer'],
-            'query' => $this->tl->serialize_method('initConnection',
-                array_merge(
-                    $this->settings['app_info'],
-                    ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
-                )
-             ),
-        ]);
-        $this->log->log('Current dc is '.$nearestDc['this_dc'].', nearest dc is '.$nearestDc['nearest_dc'].' in '.$nearestDc['country'].'.');
+        \danog\MadelineProto\Logging::log('Writing client info...');
+        $nearestDc = $this->method_call(
+            'invokeWithLayer', 
+            [
+                'layer' => $this->settings['tl_schema']['layer'],
+                'query' => $this->tl->serialize_method('initConnection',
+                    array_merge(
+                        $this->settings['app_info'],
+                        ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
+                    )
+                ),
+            ]
+        );
+        \danog\MadelineProto\Logging::log('Current dc is '.$nearestDc['this_dc'].', nearest dc is '.$nearestDc['nearest_dc'].' in '.$nearestDc['country'].'.');
 
         if ($nearestDc['nearest_dc'] != $nearestDc['this_dc']) {
-            $this->log->log('Switching to dc '.$nearestDc['nearest_dc'].'...');
+            \danog\MadelineProto\Logging::log('Switching to dc '.$nearestDc['nearest_dc'].'...');
             $this->connection->dc_connect($nearestDc['nearest_dc']);
+            $this->settings['connection_settings']['default_dc'] = $nearestDc['nearest_dc'];
         }
     }
 

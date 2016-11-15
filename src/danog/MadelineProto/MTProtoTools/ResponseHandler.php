@@ -62,13 +62,13 @@ class ResponseHandler extends MsgIdHandler
             case 'new_session_created':
                 $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                $this->log->log('new session created');
-                $this->log->log($response);
+                \danog\MadelineProto\Logging::log('new session created');
+                \danog\MadelineProto\Logging::log($response);
                 break;
             case 'msg_container':
                 $responses = [];
-                $this->log->log('Received container.');
-                $this->log->log($response['messages']);
+                \danog\MadelineProto\Logging::log('Received container.');
+                \danog\MadelineProto\Logging::log($response['messages']);
                 foreach ($response['messages'] as $message) {
                     $this->check_message_id($message['msg_id'], false, true);
                     $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
@@ -87,8 +87,8 @@ class ResponseHandler extends MsgIdHandler
                         return end($responses);
                         break;
                     default:
-                        $this->log->log('Received multiple responses, returning last one');
-                        $this->log->log($responses);
+                        \danog\MadelineProto\Logging::log('Received multiple responses, returning last one');
+                        \danog\MadelineProto\Logging::log($responses);
 
                         return end($responses);
                         break;
@@ -106,8 +106,8 @@ class ResponseHandler extends MsgIdHandler
                 }
                 break;
             case 'http_wait':
-                $this->log->log('Received http wait.');
-                $this->log->log($response);
+                \danog\MadelineProto\Logging::log('Received http wait.');
+                \danog\MadelineProto\Logging::log($response);
                 break;
             case 'gzip_packed':
                 $this->incoming_messages[$last_received]['content'] = gzdecode($response);

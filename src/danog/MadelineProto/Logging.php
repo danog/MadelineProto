@@ -17,9 +17,9 @@ namespace danog\MadelineProto;
 
 class Logging
 {
-    public $mode = null;
-    public $optional = null;
-
+    public static $mode = null;
+    public static $optional = null;
+    public static $constructed = false;
     /*
      * Constructor function
      * Accepts various logging modes:
@@ -28,49 +28,32 @@ class Logging
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public function __construct($mode, $optional = null)
+    public static function constructor($mode, $optional = null)
     {
-        $this->mode = (string) $mode;
-        $this->optional = $optional;
-    }
-
-    public function __invoke(...$params)
-    {
-        foreach ($params as $param) {
-            switch ($this->mode) {
-                case '1':
-                    error_log($param);
-                    break;
-                case '2':
-                    error_log($param, 3, $this->optional);
-                    break;
-                case '3':
-                    echo $param.PHP_EOL;
-                    break;
-                default:
-                    break;
-            }
+        if ($mode == null) {
+            throw new Exception("No mode was specified!");
         }
+        self::$mode = (string) $mode;
+        self::$optional = $optional;
+        self::$constructed = true;
     }
 
-    public function log(...$params)
+    public static function log(...$params)
     {
-        if ($this->mode == null) {
-            $mode = array_pop($params);
-        } else {
-            $mode = $this->mode;
+        if (!self::$constructed) {
+            throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
         }
         foreach ($params as $param) {
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
-            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).(($mode == 3) ? "\t" : '').$param;
-            switch ($mode) {
+            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).((self::$mode == 3) ? "\t" : '').$param;
+            switch (self::$mode) {
                 case '1':
                     error_log($param);
                     break;
                 case '2':
-                    error_log($param, 3, $this->optional);
+                    error_log($param, 3, self::$optional);
                     break;
                 case '3':
                     echo $param.PHP_EOL;

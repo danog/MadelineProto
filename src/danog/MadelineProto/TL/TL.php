@@ -16,7 +16,6 @@ class TL extends \danog\MadelineProto\Tools
 {
     public function __construct($filename)
     {
-        $this->struct = new \danog\PHP\StructTools();
         if (is_array($filename)) {
             $TL_dict = ['constructors' => [], 'methods' => []];
             foreach ($filename as $file) {
@@ -52,7 +51,7 @@ class TL extends \danog\MadelineProto\Tools
         } else {
             throw new Exception('Could not extract type: '.$type_);
         }
-        $bytes_io .= $this->struct->pack('<i', $tl_constructor->id);
+        $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_constructor->id);
         foreach ($tl_constructor->params as $arg) {
             $bytes_io .= $this->serialize_param($arg['type'], $arg['subtype'], $kwargs[$arg['name']]);
         }
@@ -88,7 +87,7 @@ class TL extends \danog\MadelineProto\Tools
         } else {
             throw new Exception('Could not extract type: '.$type_);
         }
-        $bytes_io .= $this->struct->pack('<i', $tl_method->id);
+        $bytes_io .= \danog\PHP\Struct::pack('<i', $tl_method->id);
         foreach ($tl_method->params as $arg) {
             if (!isset($kwargs[$arg['name']])) {
                 if ($arg['name'] == 'flags') {
@@ -117,7 +116,7 @@ class TL extends \danog\MadelineProto\Tools
                     throw new Exception('Given value is too long.');
                 }
 
-                return $this->struct->pack('<i', $value);
+                return \danog\PHP\Struct::pack('<i', $value);
                 break;
             case '#':
                 if (!is_numeric($value)) {
@@ -127,14 +126,14 @@ class TL extends \danog\MadelineProto\Tools
                     throw new Exception('Given value is too long.');
                 }
 
-                return $this->struct->pack('<I', $value);
+                return \danog\PHP\Struct::pack('<I', $value);
                 break;
             case 'long':
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
                 }
 
-                return $this->struct->pack('<q', $value);
+                return \danog\PHP\Struct::pack('<q', $value);
                 break;
             case 'int128':
             case 'int256':
@@ -145,19 +144,19 @@ class TL extends \danog\MadelineProto\Tools
                 return $value;
                 break;
             case 'double':
-                return $this->struct->pack('<d', $value);
+                return \danog\PHP\Struct::pack('<d', $value);
                 break;
             case 'string':
             case 'bytes':
                 $l = strlen($value);
                 $concat = '';
                 if ($l <= 253) {
-                    $concat .= $this->struct->pack('<b', $l);
+                    $concat .= \danog\PHP\Struct::pack('<b', $l);
                     $concat .= $value;
                     $concat .= pack('@'.$this->posmod((-$l - 1), 4));
                 } else {
                     $concat .= $this->string2bin('\xfe');
-                    $concat .= substr($this->struct->pack('<i', $l), 0, 3);
+                    $concat .= substr(\danog\PHP\Struct::pack('<i', $l), 0, 3);
                     $concat .= $value;
                     $concat .= pack('@'.$this->posmod(-$l, 4));
                 }
@@ -167,9 +166,9 @@ class TL extends \danog\MadelineProto\Tools
             case '!X':
                 return $value;
             case 'Vector t':
-                $concat = $this->struct->pack('<i', $this->constructor_type['vector']->id);
+                $concat = \danog\PHP\Struct::pack('<i', $this->constructor_type['vector']->id);
 
-                $concat .= $this->struct->pack('<l', count($value));
+                $concat .= \danog\PHP\Struct::pack('<l', count($value));
                 foreach ($value as $curv) {
                     $concat .= $this->serialize_param($subtype, null, $curv);
                 }
@@ -198,16 +197,16 @@ class TL extends \danog\MadelineProto\Tools
         }
         switch ($type_) {
             case 'int':
-                $x = $this->struct->unpack('<i', fread($bytes_io, 4)) [0];
+                $x = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
                 break;
             case '#':
-                $x = $this->struct->unpack('<I', fread($bytes_io, 4)) [0];
+                $x = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 4)) [0];
                 break;
             case 'long':
-                $x = $this->struct->unpack('<q', fread($bytes_io, 8)) [0];
+                $x = \danog\PHP\Struct::unpack('<q', fread($bytes_io, 8)) [0];
                 break;
             case 'double':
-                $x = $this->struct->unpack('<d', fread($bytes_io, 8)) [0];
+                $x = \danog\PHP\Struct::unpack('<d', fread($bytes_io, 8)) [0];
                 break;
             case 'int128':
                 $x = fread($bytes_io, 16);
@@ -217,12 +216,12 @@ class TL extends \danog\MadelineProto\Tools
                 break;
             case 'string':
             case 'bytes':
-                $l = $this->struct->unpack('<B', fread($bytes_io, 1)) [0];
+                $l = \danog\PHP\Struct::unpack('<B', fread($bytes_io, 1)) [0];
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l == 254) {
-                    $long_len = $this->struct->unpack('<I', fread($bytes_io, 3).$this->string2bin('\x00')) [0];
+                    $long_len = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 3).$this->string2bin('\x00')) [0];
                     $x = fread($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -243,7 +242,7 @@ class TL extends \danog\MadelineProto\Tools
                 if ($subtype == null) {
                     throw new Exception("deserialize: subtype isn't null");
                 }
-                $count = $this->struct->unpack('<l', fread($bytes_io, 4)) [0];
+                $count = \danog\PHP\Struct::unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];
                 foreach ($this->range($count) as $i) {
                     $x[] = $this->deserialize($bytes_io, $subtype);
@@ -254,7 +253,7 @@ class TL extends \danog\MadelineProto\Tools
                     $tl_elem = $this->constructor_type[$type_];
                 } else {
                     $Idata = fread($bytes_io, 4);
-                    $i = $this->struct->unpack('<i', $Idata) [0];
+                    $i = \danog\PHP\Struct::unpack('<i', $Idata) [0];
                     if (isset($this->constructor_id[$i])) {
                         $tl_elem = $this->constructor_id[$i];
                     } else {
