@@ -20,6 +20,7 @@ class Logging
     public static $mode = null;
     public static $optional = null;
     public static $constructed = false;
+
     /*
      * Constructor function
      * Accepts various logging modes:
@@ -31,7 +32,7 @@ class Logging
     public static function constructor($mode, $optional = null)
     {
         if ($mode == null) {
-            throw new Exception("No mode was specified!");
+            throw new Exception('No mode was specified!');
         }
         self::$mode = (string) $mode;
         self::$optional = $optional;

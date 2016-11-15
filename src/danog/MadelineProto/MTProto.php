@@ -64,7 +64,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'test_mode' => true,
                     'port'      => '443',
                 ],
-                'default_dc' => 2
+                'default_dc' => 2,
             ],
             'app_info' => [
                 'api_id'          => 25628,
@@ -152,7 +152,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         \danog\MadelineProto\Logging::log('Writing client info...');
         $nearestDc = $this->method_call(
-            'invokeWithLayer', 
+            'invokeWithLayer',
             [
                 'layer' => $this->settings['tl_schema']['layer'],
                 'query' => $this->tl->serialize_method('initConnection',

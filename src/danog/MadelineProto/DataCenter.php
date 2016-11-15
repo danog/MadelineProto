@@ -42,7 +42,7 @@ class DataCenter extends Tools
     public function dc_disconnect($dc_number)
     {
         if (isset($this->sockets[$dc_number])) {
-            \danog\MadelineProto\Logging::log("Disconnecting from DC ".$dc_number."...");
+            \danog\MadelineProto\Logging::log('Disconnecting from DC '.$dc_number.'...');
             unset($this->sockets[$dc_number]);
             unset($this->curdc);
         }
@@ -53,7 +53,7 @@ class DataCenter extends Tools
         if (isset($this->sockets[$dc_number])) {
             return;
         }
-        \danog\MadelineProto\Logging::log("Connecting to DC ".$dc_number."...");
+        \danog\MadelineProto\Logging::log('Connecting to DC '.$dc_number.'...');
 
         if ($settings == []) {
             $settings = $this->settings[$dc_number];
