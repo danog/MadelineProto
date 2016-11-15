@@ -79,12 +79,16 @@ class Connection extends Tools
         }
     }
 
-    public function set_time_delta($delta) {
+    public function set_time_delta($delta)
+    {
         $this->_delta = $delta;
     }
-    public function get_time_delta() {
+
+    public function get_time_delta()
+    {
         return $this->_delta;
     }
+
     /**
      * Function to get hex crc32.
      *
