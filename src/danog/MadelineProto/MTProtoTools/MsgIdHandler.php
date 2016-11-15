@@ -19,10 +19,10 @@ class MsgIdHandler extends MessageHandler
 {
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
-        if (((int) ((time() + $this->timedelta - 300) * pow(2, 30)) * 4) > $new_message_id) {
+        if (((int) ((time() + $this->connection->get_time_delta() - 300) * pow(2, 30)) * 4) > $new_message_id) {
             throw new Exception('Given message id ('.$new_message_id.') is too old.');
         }
-        if (((int) ((time() + $this->timedelta + 30) * pow(2, 30)) * 4) < $new_message_id) {
+        if (((int) ((time() + $this->connection->get_time_delta() + 30) * pow(2, 30)) * 4) < $new_message_id) {
             throw new Exception('Given message id ('.$new_message_id.') is too new.');
         }
         if ($outgoing) {
@@ -66,17 +66,17 @@ class MsgIdHandler extends MessageHandler
 
     public function generate_message_id()
     {
-        $ms_time = (time() + $this->timedelta) * 1000;
-        $int_message_id = (int) (
+        $int_message_id = (int) ((time() + $this->connection->get_time_delta()) << 32);
+/*        $int_message_id = (int) (
             ((int) ($ms_time / 1000) << 32) |
             ($this->posmod($ms_time, 1000) << 22) |
             rand(0, 524288) << 2
-        );
+        );*/
         $keys = array_keys($this->outgoing_messages);
         asort($keys);
         $keys = end($keys);
-        while ($int_message_id <= $keys) {
-            $int_message_id += 4;
+        if ($int_message_id <= $keys) {
+            $int_message_id = $keys + 4;
         }
         $this->check_message_id($int_message_id, true);
 

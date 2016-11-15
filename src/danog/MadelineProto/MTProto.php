@@ -123,7 +123,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
 
         $this->seq_no = 0;
-        $this->timedelta = 0; // time delta
         $this->incoming_messages = [];
         $this->outgoing_messages = [];
         $this->future_salts = [];
@@ -138,14 +137,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $this->write_client_info();
         $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-        $nearestDc = $this->method_call('auth.sendCode', [
-            'phone_number' => '393373737',
-            'sms_type'     => 5,
-            'api_id'       => $this->settings['app_info']['api_id'],
-            'api_hash'     => $this->settings['app_info']['api_hash'],
-            'lang_code'    => $this->settings['app_info']['lang_code'],
-        ]);
-        var_dump($nearestDc);
+        \danog\MadelineProto\Logging::log('You may now login to Telegram.');
     }
 
     public function write_client_info()

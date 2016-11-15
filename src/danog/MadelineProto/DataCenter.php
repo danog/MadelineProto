@@ -68,6 +68,20 @@ class DataCenter extends Tools
         $this->curdc = $dc_number;
     }
 
+    public function set_time_delta($delta, $dc_number = -1)
+    {
+        if ($dc_number == -1) {
+            $dc_number = $this->curdc;
+        }
+        return $this->sockets[$dc_number]->set_time_delta($delta);
+    } 
+    public function get_time_delta($dc_number = -1)
+    {
+        if ($dc_number == -1) {
+            $dc_number = $this->curdc;
+        }
+        return $this->sockets[$dc_number]->get_time_delta();
+    } 
     public function send_message($message, $dc_number = -1)
     {
         if ($dc_number == -1) {

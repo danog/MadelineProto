@@ -19,6 +19,7 @@ class Connection extends Tools
 {
     public $sock = null;
     public $protocol = null;
+    private $_delta = 0;
 
     public function __construct($ip, $port, $protocol = 'tcp_full')
     {
@@ -78,6 +79,12 @@ class Connection extends Tools
         }
     }
 
+    public function set_time_delta($delta) {
+        $this->_delta = $delta;
+    }
+    public function get_time_delta() {
+        return $this->_delta;
+    }
     /**
      * Function to get hex crc32.
      *

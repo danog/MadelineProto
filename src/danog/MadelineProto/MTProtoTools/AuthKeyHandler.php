@@ -252,9 +252,9 @@ class AuthKeyHandler extends AckHandler
              * Time delta
              */
             $server_time = $server_DH_inner_data['server_time'];
-            $this->timedelta = $server_time - time();
+            $this->connection->set_time_delta($server_time - time());
 
-            \danog\MadelineProto\Logging::log(sprintf('Server-client time delta = %.1f s', $this->timedelta));
+            \danog\MadelineProto\Logging::log(sprintf('Server-client time delta = %.1f s', $this->connection->get_time_delta()));
 
 
             /*
@@ -431,7 +431,6 @@ class AuthKeyHandler extends AckHandler
                         }
 
                         \danog\MadelineProto\Logging::log('Auth key generated');
-                        $this->timedelta = 0;
 
                         return $res_authorization;
                     case 'dh_gen_retry':
@@ -461,6 +460,7 @@ class AuthKeyHandler extends AckHandler
 
     public function bind_temp_auth_key($expires_in)
     {
+        \danog\MadelineProto\Logging::log('Binding authorization keys...');
         $nonce = \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
         $expires_at = time() + $expires_in;
         $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->settings['authorization']['temp_auth_key']['id'])[0];
@@ -484,7 +484,7 @@ class AuthKeyHandler extends AckHandler
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['auth_key']['auth_key']);
         $encrypted_message = $this->settings['authorization']['auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
 
-        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $message_id)) {
+        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id)) {
             \danog\MadelineProto\Logging::log('Successfully binded temporary and permanent authorization keys.');
             $this->write_client_info();
 

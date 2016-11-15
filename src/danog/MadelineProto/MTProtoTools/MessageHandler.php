@@ -26,6 +26,9 @@ class MessageHandler extends Crypt
         if ($int_message_id == null) {
             $int_message_id = $this->generate_message_id();
         }
+        if (!is_int($int_message_id)) {
+            throw new Exception("Given message id isn't an integer!");
+        }
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
             $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
