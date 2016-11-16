@@ -18,8 +18,14 @@ namespace danog\MadelineProto;
 class Connection extends Tools
 {
     public $sock = null;
+
     public $protocol = null;
-    private $_delta = 0;
+
+    public $time_delta = 0;
+    public $temp_auth_key;
+    public $auth_key;
+    public $session_id;
+    public $seq_no = 0;
 
     public function __construct($ip, $port, $protocol = 'tcp_full')
     {
@@ -33,6 +39,8 @@ class Connection extends Tools
         - udp
         */
         $this->protocol = $protocol;
+        $this->ip = $ip;
+        $this->port = $port;
         switch ($this->protocol) {
             case 'tcp_abridged':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
@@ -59,6 +67,10 @@ class Connection extends Tools
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
@@ -73,20 +85,19 @@ class Connection extends Tools
             case 'tcp_full':
                 fclose($this->sock);
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
         }
     }
 
-    public function set_time_delta($delta)
-    {
-        $this->_delta = $delta;
-    }
-
-    public function get_time_delta()
-    {
-        return $this->_delta;
+    public function close_and_reopen() {
+        $this->__destruct();
+        $this->__construct($this->ip, $this->port, $this->protocol);
     }
 
     /**
@@ -114,6 +125,10 @@ class Connection extends Tools
 
                 return fwrite($this->sock, $what);
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
@@ -132,6 +147,10 @@ class Connection extends Tools
 
                 return fread($this->sock, $length);
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
@@ -182,6 +201,10 @@ class Connection extends Tools
                 $packet = $this->sock->read($packet_length);
                 $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
         }
 
         return $payload;
@@ -209,6 +232,10 @@ class Connection extends Tools
                 }
                 $this->write($step1);
                 break;
+            case 'http':
+            case 'https':
+            case 'udp':
+                throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
                 break;
         }

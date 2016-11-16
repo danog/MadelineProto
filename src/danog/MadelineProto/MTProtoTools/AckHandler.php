@@ -28,7 +28,7 @@ class AckHandler extends \danog\MadelineProto\PrimeModule
 
     public function ack_incoming_message_id($message_id)
     {
-        if ($this->settings['authorization']['temp_auth_key']['id'] === null || $this->settings['authorization']['temp_auth_key']['id'] == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+        if ($this->datacenter->temp_auth_key['id'] === null || $this->datacenter->temp_auth_key['id'] == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
             return;
         }
         // I let the server know that I received its message

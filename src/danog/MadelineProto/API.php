@@ -20,11 +20,23 @@ class API extends Tools
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
-        $ping_res = $this->ping(3);
-        if (isset($ping['_']) && $ping['_'] == 'pong') {
-            $this->log->log('Pong: '.$ping['ping_id']);
+
+        \danog\MadelineProto\Logger::log('Running APIFactory...');
+        foreach ($this->session->tl->method_name_namespaced as $method) {
+            if (isset($method[1])) {
+                if (!isset($this->{$method[0]})) {
+                    $this->{$method[0]} = new APIFactory($method[0], $this->session);
+                }
+                $this->{$method[0]}->allowed_methods[] = $method[1];
+            }
         }
+
+        \danog\MadelineProto\Logger::log('Ping...');
+        $ping = $this->ping(3);
+        \danog\MadelineProto\Logger::log('Pong: '.$ping['ping_id']);
+        \danog\MadelineProto\Logger::log('Getting future salts...');
         $future_salts = $this->get_future_salts(3);
+        \danog\MadelineProto\Logger::log('MadelineProto is ready!');
     }
 
     public function __destruct()
@@ -35,6 +47,9 @@ class API extends Tools
 
     public function __call($name, $arguments)
     {
+        if (!in_array($name, $this->session->tl->method_name_namespaced)) {
+            throw new Exception("The called method doesn't exist!");
+        }
         return $this->session->method_call($name, $arguments);
     }
 }

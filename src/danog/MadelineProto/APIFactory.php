@@ -10,24 +10,25 @@ You should have received a copy of the GNU General Public License along with the
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto\MTProtoTools;
+namespace danog\MadelineProto;
 
-/**
- * Manages message ids.
- */
-class SaltHandler extends ResponseHandler
+class APIFactory
 {
-    public function add_salts($salts)
-    {
-        foreach ($salts as $salt) {
-            $this->addsalt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
-        }
+    public $namespace;
+    public $session;
+    public $allowed_methods = [];
+
+    public function __construct($namespace, $session) {
+        $this->namespace = $namespace;
+        $this->session = $session;
     }
 
-    public function addsalt($valid_since, $valid_until, $salt)
+    public function __call($name, $arguments)
     {
-        if (!isset($this->datacenter->temp_auth_key['salts'][$salt])) {
-            $this->datacenter->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
+        if (!in_array($name, $this->allowed_methods)) {
+            throw new Exception("The called method doesn't exist!");
         }
+        return $this->session->method_call($this->namespace.'.'.$name, $arguments);
     }
+
 }

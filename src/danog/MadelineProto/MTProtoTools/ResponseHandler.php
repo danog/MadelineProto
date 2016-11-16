@@ -57,7 +57,7 @@ class ResponseHandler extends MsgIdHandler
                 throw new Exception('Received bad_msg_notification for '.$response['bad_msg_id'].': '.$error_codes[$response['error_code']]);
                 break;
             case 'bad_server_salt':
-                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['new_server_salt'];
+                $this->datacenter->temp_auth_key['server_salt'] = $response['new_server_salt'];
                 $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
                 $this->outgoing_messages[$response['bad_msg_id']]['response'] = $last_received;
                 $this->incoming_messages[$last_received]['content'] = $response;
@@ -73,15 +73,15 @@ class ResponseHandler extends MsgIdHandler
                 }
                 break;
             case 'new_session_created':
-                $this->settings['authorization']['temp_auth_key']['server_salt'] = $response['server_salt'];
+                $this->datacenter->temp_auth_key['server_salt'] = $response['server_salt'];
                 $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                \danog\MadelineProto\Logging::log('new session created');
-                \danog\MadelineProto\Logging::log($response);
+                \danog\MadelineProto\Logger::log('new session created');
+                \danog\MadelineProto\Logger::log($response);
                 break;
             case 'msg_container':
                 $responses = [];
-                \danog\MadelineProto\Logging::log('Received container.');
-                \danog\MadelineProto\Logging::log($response['messages']);
+                \danog\MadelineProto\Logger::log('Received container.');
+                \danog\MadelineProto\Logger::log($response['messages']);
                 foreach ($response['messages'] as $message) {
                     $this->check_message_id($message['msg_id'], false, true);
                     $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
@@ -100,8 +100,8 @@ class ResponseHandler extends MsgIdHandler
                         return end($responses);
                         break;
                     default:
-                        \danog\MadelineProto\Logging::log('Received multiple responses, returning last one');
-                        \danog\MadelineProto\Logging::log($responses);
+                        \danog\MadelineProto\Logger::log('Received multiple responses, returning last one');
+                        \danog\MadelineProto\Logger::log($responses);
 
                         return end($responses);
                         break;
@@ -119,8 +119,8 @@ class ResponseHandler extends MsgIdHandler
                 }
                 break;
             case 'http_wait':
-                \danog\MadelineProto\Logging::log('Received http wait.');
-                \danog\MadelineProto\Logging::log($response);
+                \danog\MadelineProto\Logger::log('Received http wait.');
+                \danog\MadelineProto\Logger::log($response);
                 break;
             case 'gzip_packed':
                 $this->incoming_messages[$last_received]['content'] = gzdecode($response);

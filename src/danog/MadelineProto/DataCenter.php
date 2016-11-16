@@ -17,6 +17,8 @@ namespace danog\MadelineProto;
  */
 class DataCenter extends Tools
 {
+    public $referenced_variables = ["time_delta", "temp_auth_key", "auth_key", "session_id", "seq_no"];
+
     public function __construct($dclist, $settings)
     {
         $this->dclist = $dclist;
@@ -36,13 +38,12 @@ class DataCenter extends Tools
                 ];
             }
         }
-        $this->dc_connect($settings['default_dc']);
     }
 
     public function dc_disconnect($dc_number)
     {
         if (isset($this->sockets[$dc_number])) {
-            \danog\MadelineProto\Logging::log('Disconnecting from DC '.$dc_number.'...');
+            \danog\MadelineProto\Logger::log('Disconnecting from DC '.$dc_number.'...');
             unset($this->sockets[$dc_number]);
             unset($this->curdc);
         }
@@ -51,9 +52,9 @@ class DataCenter extends Tools
     public function dc_connect($dc_number, $settings = [])
     {
         if (isset($this->sockets[$dc_number])) {
-            return;
+            return false;
         }
-        \danog\MadelineProto\Logging::log('Connecting to DC '.$dc_number.'...');
+        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.'...');
 
         if ($settings == []) {
             $settings = $this->settings[$dc_number];
@@ -65,47 +66,32 @@ class DataCenter extends Tools
             $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
         $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol']);
+        $this->set_curdc($dc_number);
+        return true;
+    }
+
+    public function set_curdc($dc_number) {
         $this->curdc = $dc_number;
+        foreach ($referenced_variables as $key) {
+            $this->{$key} = &$this->sockets[$dc_number]->{$key};            
+        }
+    }
+    public function unset_curdc($dc_number) {
+        unset($this->curdc);
+        foreach ($referenced_variables as $key) {
+            unset($this->sockets[$dc_number]->{$key});
+        }
     }
 
-    public function set_time_delta($delta, $dc_number = -1)
+
+    public function __call($name, $arguments)
     {
-        if ($dc_number == -1) {
-            $dc_number = $this->curdc;
-        }
-
-        return $this->sockets[$dc_number]->set_time_delta($delta);
-    }
-
-    public function get_time_delta($dc_number = -1)
-    {
-        if ($dc_number == -1) {
-            $dc_number = $this->curdc;
-        }
-
-        return $this->sockets[$dc_number]->get_time_delta();
-    }
-
-    public function send_message($message, $dc_number = -1)
-    {
-        if ($dc_number == -1) {
-            $dc_number = $this->curdc;
-        }
-
-        return $this->sockets[$dc_number]->send_message($message);
-    }
-
-    public function read_message($dc_number = -1)
-    {
-        if ($dc_number == -1) {
-            $dc_number = $this->curdc;
-        }
-
-        return $this->sockets[$dc_number]->read_message();
+        return $this->sockets[$this->curdc]->{$name}(...$arguments);
     }
 
     public function __destroy()
     {
+        $this->unset_curdc();
         foreach ($this->sockets as $n => $socket) {
             unset($this->sockets[$n]);
         }

@@ -26,22 +26,21 @@ class MessageHandler extends Crypt
         if ($int_message_id == null) {
             $int_message_id = $this->generate_message_id();
         }
-        if (!is_int($int_message_id)) {
-            throw new Exception("Given message id isn't an integer!");
-        }
+        $this->check_message_id($int_message_id, true);
+
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
-        if (($this->settings['authorization']['temp_auth_key']['auth_key'] == null) || ($this->settings['authorization']['temp_auth_key']['server_salt'] == null)) {
+        if ($this->datacenter->temp_auth_key['auth_key'] == null || $this->datacenter->temp_auth_key['server_salt'] == null) {
             $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
-            $encrypted_data = \danog\PHP\Struct::pack('<q', $this->settings['authorization']['temp_auth_key']['server_salt']).$this->settings['authorization']['session_id'].$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+            $encrypted_data = \danog\PHP\Struct::pack('<q', $this->datacenter->temp_auth_key['server_salt']).$this->datacenter->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
             $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key']);
-            $message = $this->settings['authorization']['temp_auth_key']['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key']);
+            $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
-        $this->connection->send_message($message);
+        $this->datacenter->send_message($message);
 
         return $int_message_id;
     }
@@ -51,7 +50,7 @@ class MessageHandler extends Crypt
      */
     public function recv_message()
     {
-        $payload = $this->connection->read_message();
+        $payload = $this->datacenter->read_message();
         if (fstat($payload)['size'] == 4) {
             throw new Exception('Server response error: '.abs(\danog\PHP\Struct::unpack('<i', fread($payload, 4))[0]));
         }
@@ -60,19 +59,19 @@ class MessageHandler extends Crypt
             list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', fread($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = fread($payload, $message_length);
-        } elseif ($auth_key_id == $this->settings['authorization']['temp_auth_key']['id']) {
+        } elseif ($auth_key_id == $this->datacenter->temp_auth_key['id']) {
             $message_key = fread($payload, 16);
             $encrypted_data = stream_get_contents($payload);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->settings['authorization']['temp_auth_key']['auth_key'], 'from server');
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key'], 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
             $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
-            if ($server_salt != $this->settings['authorization']['temp_auth_key']['server_salt']) {
-                //                throw new Exception('Server salt mismatch (my server salt '.$this->settings['authorization']['temp_auth_key']['server_salt'].' is not equal to server server salt '.$server_salt.').');
+            if ($server_salt != $this->datacenter->temp_auth_key['server_salt']) {
+                throw new Exception('Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
 
             $session_id = substr($decrypted_data, 8, 8);
-            if ($session_id != $this->settings['authorization']['session_id']) {
+            if ($session_id != $this->datacenter->session_id) {
                 throw new Exception('Session id mismatch.');
             }
 
