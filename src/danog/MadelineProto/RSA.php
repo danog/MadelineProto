@@ -14,21 +14,21 @@ namespace danog\MadelineProto;
 
 class RSA extends TL\TL
 {
-    public $key; // phpseclib\Crypt\RSA class
     public $n; // phpseclib\Math\BigInteger class
     public $e; // phpseclib\Math\BigInteger class
     public $fp; // phpseclib\Math\BigInteger class
     public $fp_bytes; // bytes
 
-    public function __construct($key)
+    public function __construct($rsa_key)
     {
         \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...');
-        $this->key = new \phpseclib\Crypt\RSA();
+        $key = new \phpseclib\Crypt\RSA();
 
         \danog\MadelineProto\Logger::log('Loading key...');
-        $this->key->loadKey($key);
-        $this->n = $this->key->modulus;
-        $this->e = $this->key->exponent;
+        $key->loadKey($rsa_key);
+        $this->n = $key->modulus;
+        $this->e = $key->exponent;
+        unset($key);
 
         \danog\MadelineProto\Logger::log('Computing fingerprint...');
         $this->fp_bytes = substr(
