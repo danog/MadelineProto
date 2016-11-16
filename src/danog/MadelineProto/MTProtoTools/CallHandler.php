@@ -40,6 +40,7 @@ class CallHandler extends AuthKeyHandler
                 switch ($response['error_code']) {
                     case 303:
                         $dc = preg_replace('/[^0-9]+/', '', $response['error_message']);
+                        \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
                         $this->switch_dc($dc);
                         return $this->method_call($this->outgoing_messages[$last_sent]['content']['method'], $this->outgoing_messages[$last_sent]['content']['args']);
 
