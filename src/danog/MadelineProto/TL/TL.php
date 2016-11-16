@@ -45,7 +45,8 @@ class TL extends \danog\MadelineProto\Tools
             $z = new \danog\MadelineProto\TL\TLMethod($elem);
             $this->method_id[$z->id] = $z;
             $this->method_name[$z->method] = $z;
-            $this->method_name_namespaced[$z->method] = explode('.', $z->method);
+            $this->method_names[$z->method] = $z->method;
+            $this->method_names_namespaced[$z->method] = explode('.', $z->method);
         }
     }
 

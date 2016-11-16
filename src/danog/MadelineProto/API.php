@@ -15,14 +15,15 @@ namespace danog\MadelineProto;
 class API extends Tools
 {
     public $session;
-
+    public $settings;
     public function __construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->session = new MTProto($params);
+        $this->settings = &$this->session->settings;
 
         \danog\MadelineProto\Logger::log('Running APIFactory...');
-        foreach ($this->session->tl->method_name_namespaced as $method) {
+        foreach ($this->session->tl->method_names_namespaced as $method) {
             if (isset($method[1])) {
                 if (!isset($this->{$method[0]})) {
                     $this->{$method[0]} = new APIFactory($method[0], $this->session);
@@ -32,10 +33,10 @@ class API extends Tools
         }
 
         \danog\MadelineProto\Logger::log('Ping...');
-        $ping = $this->ping(3);
+        $ping = $this->ping([3]);
         \danog\MadelineProto\Logger::log('Pong: '.$ping['ping_id']);
         \danog\MadelineProto\Logger::log('Getting future salts...');
-        $future_salts = $this->get_future_salts(3);
+        $future_salts = $this->get_future_salts([3]);
         \danog\MadelineProto\Logger::log('MadelineProto is ready!');
     }
 
@@ -47,9 +48,9 @@ class API extends Tools
 
     public function __call($name, $arguments)
     {
-        if (!in_array($name, $this->session->tl->method_name_namespaced)) {
+        if (!in_array($name, $this->session->tl->method_names)) {
             throw new Exception("The called method doesn't exist!");
         }
-        return $this->session->method_call($name, $arguments);
+        return $this->session->method_call($name, $arguments[0]);
     }
 }

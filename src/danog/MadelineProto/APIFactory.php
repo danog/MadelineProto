@@ -28,7 +28,7 @@ class APIFactory
         if (!in_array($name, $this->allowed_methods)) {
             throw new Exception("The called method doesn't exist!");
         }
-        return $this->session->method_call($this->namespace.'.'.$name, $arguments);
+        return $this->session->method_call($this->namespace.'.'.$name, $arguments[0]);
     }
 
 }

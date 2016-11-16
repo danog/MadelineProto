@@ -125,7 +125,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->future_salts = [];
 
         $this->switch_dc($this->settings['connection_settings']['default_dc'], true);
-
     }
 
     public function setup_logger()
