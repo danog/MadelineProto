@@ -168,7 +168,7 @@ class Connection extends Tools
                 }
                 $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
                 $packet = $this->read($packet_length - 4);
-                if ($this->newcrc32($packet_length_data.substr($packet, 0, -4) != \danog\PHP\Struct::unpack('<I', substr($packet, -4))[0])) {
+                if ($this->newcrc32($packet_length_data.substr($packet, 0, -4)) != \danog\PHP\Struct::unpack('<I', substr($packet, -4))[0]) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
