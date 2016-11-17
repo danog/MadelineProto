@@ -95,7 +95,8 @@ class Connection extends Tools
         }
     }
 
-    public function close_and_reopen() {
+    public function close_and_reopen()
+    {
         $this->__destruct();
         $this->__construct($this->ip, $this->port, $this->protocol);
     }

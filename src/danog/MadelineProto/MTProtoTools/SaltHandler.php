@@ -20,11 +20,11 @@ class SaltHandler extends ResponseHandler
     public function add_salts($salts)
     {
         foreach ($salts as $salt) {
-            $this->addsalt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
+            $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
         }
     }
 
-    public function addsalt($valid_since, $valid_until, $salt)
+    public function add_salt($valid_since, $valid_until, $salt)
     {
         if (!isset($this->datacenter->temp_auth_key['salts'][$salt])) {
             $this->datacenter->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];

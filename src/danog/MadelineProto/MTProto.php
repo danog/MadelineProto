@@ -136,13 +136,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     }
 
     // Switches to a new datacenter and if necessary creates authorization keys, binds them and writes client info
-    public function switch_dc($new_dc, $allow_nearestdc_switch = false)
+    public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
         if ($this->datacenter->dc_connect($new_dc)) {
             $this->init_authorization();
             $this->write_client_info();
-            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $allow_nearestdc_switch);
+            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $allow_nearest_dc_switch);
         }
     }
 
@@ -164,23 +164,23 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function write_client_info($allow_switch) {
 
         \danog\MadelineProto\Logger::log('Writing client info...');
-        $nearestDc = $this->method_call(
+        $nearest_dc = $this->method_call(
             'invokeWithLayer',
             [
                 'layer' => $this->settings['tl_schema']['layer'],
                 'query' => $this->tl->serialize_method('initConnection',
                     array_merge(
                         $this->settings['app_info'],
-                        ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
+                        ['query' => $this->tl->serialize_method('help.getnearest_dc', [])]
                     )
                 ),
             ]
         );
-        \danog\MadelineProto\Logger::log('Current dc is '.$nearestDc['this_dc'].', nearest dc is '.$nearestDc['nearest_dc'].' in '.$nearestDc['country'].'.');
+        \danog\MadelineProto\Logger::log('Current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].' in '.$nearest_dc['country'].'.');
 
-        if ($nearestDc['nearest_dc'] != $nearestDc['this_dc'] && $allow_switch) {
-            $this->switch_dc($nearestDc['nearest_dc']);
-            $this->settings['connection_settings']['default_dc'] = $nearestDc['nearest_dc'];
+        if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
+            $this->switch_dc($nearest_dc['nearest_dc']);
+            $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
         }
 
     }

@@ -67,11 +67,14 @@ class MsgIdHandler extends MessageHandler
     public function generate_message_id()
     {
         $int_message_id = (int) ((time() + $this->datacenter->time_delta) << 32);
-/*        $int_message_id = (int) (
+        /*
+        $int_message_id = (int) (
             ((int) ($ms_time / 1000) << 32) |
             ($this->posmod($ms_time, 1000) << 22) |
             rand(0, 524288) << 2
-        );*/
+        );
+        */
+        
         $keys = array_keys($this->outgoing_messages);
         asort($keys);
         $keys = end($keys);

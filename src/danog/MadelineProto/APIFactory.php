@@ -17,7 +17,8 @@ class APIFactory
     public $namespace;
     public $API;
 
-    public function __construct($namespace, $API) {
+    public function __construct($namespace, $API)
+    {
         $this->namespace = $namespace.'.';
         $this->API = $API;
     }

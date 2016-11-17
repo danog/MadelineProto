@@ -14,7 +14,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require_once 'vendor/autoload.php';
 
 $MadelineProto = new \danog\MadelineProto\API();
-var_dump(strlen(var_export($MadelineProto,true)));
+var_dump(strlen(var_export($MadelineProto, true)));
 if (file_exists('number.php')) {
     include_once 'number.php';
     $sendCode = $MadelineProto->auth->sendCode(

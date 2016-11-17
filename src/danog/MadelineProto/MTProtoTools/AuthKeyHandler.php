@@ -153,10 +153,10 @@ class AuthKeyHandler extends AckHandler
                 * 		string		$encrypted_data
                 * ]
                 * @return Server_DH_Params [
-                * 		int128 		$nonce 							: The value of nonce is selected randomly by the server
+                * 		int128 		$nonce 						: The value of nonce is selected randomly by the server
                 * 		int128 		$server_nonce 					: The value of server_nonce is selected randomly by the server
-                * 		string 		$new_nonce_hash					: Return this value If server responds is server_DH_params_fail
-                * 		string 		$encrypted_answer				: Return this value If server responds is server_DH_params_ok
+                * 		string 		$new_nonce_hash					: Return this value if server responds with server_DH_params_fail
+                * 		string 		$encrypted_answer				: Return this value if server responds with server_DH_params_ok
                 * ]
                 */
                 //
@@ -271,19 +271,31 @@ class AuthKeyHandler extends AckHandler
                 /*
                 * ***********************************************************************
                 * Check validity of dh_prime
-                * 2^2047 < dh_prime < 2^2048
+                * Is it a prime?
                 */
                 if (!$dh_prime->isPrime()) {
                     throw new Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
                 }
 
+
                 /*
-                // Almost always fails
+                * ***********************************************************************
+                * Check validity of dh_prime
+                * Is (dh_prime - 1) / 2 a prime?
+                *
+                * Almost always fails
+                */
+                /*
                 if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
                     throw new Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
                 }
                 */
 
+                /*
+                * ***********************************************************************
+                * Check validity of dh_prime
+                * 2^2047 < dh_prime < 2^2048
+                */
                 if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
                     || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
                 ) {
@@ -322,7 +334,7 @@ class AuthKeyHandler extends AckHandler
                     * 1 < g_b < dh_prime - 1
                     */
                     if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
-                    || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
+                        || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                     ) {
                         throw new Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
@@ -340,7 +352,8 @@ class AuthKeyHandler extends AckHandler
                     * 		string		$g_b							: g^b mod dh_prime
                     * ]
                     */
-                    $data = $this->tl->serialize_obj('client_DH_inner_data',
+                    $data = $this->tl->serialize_obj(
+                        'client_DH_inner_data',
                         [
                             'nonce'           => $nonce,
                             'server_nonce'    => $server_nonce,
@@ -369,12 +382,13 @@ class AuthKeyHandler extends AckHandler
                     * @return Set_client_DH_params_answer [
                     * 		string 		$_ 								: This value is dh_gen_ok, dh_gen_retry OR dh_gen_fail
                     * 		int128 		$server_nonce 					: The value of server_nonce is selected randomly by the server
-                    * 		int128 		$new_nonce_hash1				: Return this value If server responds is dh_gen_ok
-                    * 		int128 		$new_nonce_hash2				: Return this value If server responds is dh_gen_retry
-                    * 		int128 		$new_nonce_hash2				: Return this value If server responds is dh_gen_fail
+                    * 		int128 		$new_nonce_hash1				: Return this value if server responds with dh_gen_ok
+                    * 		int128 		$new_nonce_hash2				: Return this value if server responds with dh_gen_retry
+                    * 		int128 		$new_nonce_hash2				: Return this value if server responds with dh_gen_fail
                     * ]
                     */
-                    $Set_client_DH_params_answer = $this->method_call('set_client_DH_params',
+                    $Set_client_DH_params_answer = $this->method_call(
+                        'set_client_DH_params',
                         [
                             'nonce'               => $nonce,
                             'server_nonce'        => $server_nonce,
