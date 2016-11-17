@@ -161,8 +161,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
     }
-    public function write_client_info($allow_switch) {
 
+    public function write_client_info($allow_switch)
+    {
         \danog\MadelineProto\Logger::log('Writing client info...');
         $nearest_dc = $this->method_call(
             'invokeWithLayer',
@@ -182,6 +183,5 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->switch_dc($nearest_dc['nearest_dc']);
             $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
         }
-
     }
 }

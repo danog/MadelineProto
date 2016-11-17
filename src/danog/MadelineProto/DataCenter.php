@@ -17,7 +17,7 @@ namespace danog\MadelineProto;
  */
 class DataCenter extends Tools
 {
-    public $referenced_variables = ["time_delta", "temp_auth_key", "auth_key", "session_id", "seq_no"];
+    public $referenced_variables = ['time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'seq_no'];
     public $sockets;
 
     public function __construct($dclist, $settings)
@@ -72,22 +72,25 @@ class DataCenter extends Tools
             $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
         $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol']);
+
         return true;
     }
 
-    public function set_curdc($dc_number) {
+    public function set_curdc($dc_number)
+    {
         $this->curdc = $dc_number;
         foreach ($this->referenced_variables as $key) {
-            $this->{$key} = &$this->sockets[$dc_number]->{$key};            
+            $this->{$key} = &$this->sockets[$dc_number]->{$key};
         }
     }
-    public function unset_curdc($dc_number) {
+
+    public function unset_curdc($dc_number)
+    {
         unset($this->curdc);
         foreach ($this->referenced_variables as $key) {
             unset($this->sockets[$dc_number]->{$key});
         }
     }
-
 
     public function __call($name, $arguments)
     {

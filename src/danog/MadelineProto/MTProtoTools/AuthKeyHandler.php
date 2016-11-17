@@ -27,22 +27,22 @@ class AuthKeyHandler extends AckHandler
                 \danog\MadelineProto\Logger::log('Requesting pq');
 
                 /**
-                * ***********************************************************************
-                * Make pq request, DH exchange initiation.
-                *
-                * @method req_pq
-                *
-                * @param [
-                * 		int128 		$nonce 							: The value of nonce is selected randomly by the client (random number) and identifies the client within this communication
-                * ]
-                *
-                * @return ResPQ [
-                *               int128 		$nonce 							: The value of nonce is selected randomly by the server
-                *               int128 		$server_nonce 					: The value of server_nonce is selected randomly by the server
-                *               string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
-                *               Vector long $server_public_key_fingerprints : This is a list of public RSA key fingerprints
-                *               ]
-                */
+                 * ***********************************************************************
+                 * Make pq request, DH exchange initiation.
+                 *
+                 * @method req_pq
+                 *
+                 * @param [
+                 * 		int128 		$nonce 							: The value of nonce is selected randomly by the client (random number) and identifies the client within this communication
+                 * ]
+                 *
+                 * @return ResPQ [
+                 *               int128 		$nonce 							: The value of nonce is selected randomly by the server
+                 *               int128 		$server_nonce 					: The value of server_nonce is selected randomly by the server
+                 *               string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
+                 *               Vector long $server_public_key_fingerprints : This is a list of public RSA key fingerprints
+                 *               ]
+                 */
                 $nonce = \phpseclib\Crypt\Random::string(16);
                 $ResPQ = $this->method_call('req_pq',
                     [
@@ -495,7 +495,7 @@ class AuthKeyHandler extends AckHandler
         );
         $int_message_id = $this->generate_message_id();
         $this->check_message_id($int_message_id, true);
-        
+
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         $seq_no = 0;
         $encrypted_data = \phpseclib\Crypt\Random::string(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
@@ -506,6 +506,7 @@ class AuthKeyHandler extends AckHandler
 
         if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id)) {
             \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
+
             return true;
         }
         throw new Exception('An error occurred while binding temporary and permanent authorization keys.');

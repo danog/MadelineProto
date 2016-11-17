@@ -74,7 +74,7 @@ class MsgIdHandler extends MessageHandler
             rand(0, 524288) << 2
         );
         */
-        
+
         $keys = array_keys($this->outgoing_messages);
         asort($keys);
         $keys = end($keys);

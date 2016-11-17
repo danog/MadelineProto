@@ -50,22 +50,28 @@ class TLConstructor
         }
         $this->key++;
     }
-    public function find_by_type($type) {
+
+    public function find_by_type($type)
+    {
         $key = array_search($type, $this->type);
+
         return ($key == false) ? false : [
-            'id' => $this->id[$key],
+            'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
-            'type' => $this->type[$key],
-            'params' => $this->params[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->params[$key],
         ];
     }
-    public function find_by_id($id) {
+
+    public function find_by_id($id)
+    {
         $key = array_search($id, $this->id);
+
         return ($key == false) ? false : [
-            'id' => $this->id[$key],
+            'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
-            'type' => $this->type[$key],
-            'params' => $this->params[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->params[$key],
         ];
     }
 }

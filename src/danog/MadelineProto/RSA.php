@@ -35,15 +35,15 @@ class RSA extends TL\TL
             sha1(
                 $this->serialize_param(
                     'bytes',
-                    null, 
+                    null,
                     $this->n->toBytes()
                 )
                 .
                 $this->serialize_param(
                     'bytes',
-                    null, 
+                    null,
                     $this->e->toBytes()
-                ), 
+                ),
                 true
             ),
             -8

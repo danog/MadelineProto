@@ -123,7 +123,7 @@ class TL extends \danog\MadelineProto\Tools
                 break;
             case 'int128':
             case 'int256':
-                return (string)$value;
+                return (string) $value;
                 break;
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $value);
@@ -222,7 +222,7 @@ class TL extends \danog\MadelineProto\Tools
                 break;
             case 'vector':
                 if ($subtype == null) {
-                    throw new Exception("deserialize: subtype is null");
+                    throw new Exception('deserialize: subtype is null');
                 }
                 $count = \danog\PHP\Struct::unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];

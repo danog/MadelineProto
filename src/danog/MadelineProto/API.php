@@ -16,6 +16,7 @@ class API extends Tools
 {
     public $API;
     public $settings;
+
     public function __construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);

@@ -27,5 +27,4 @@ class APIFactory
     {
         return $this->API->method_call($this->namespace.$name, $arguments[0]);
     }
-
 }

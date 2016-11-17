@@ -53,15 +53,17 @@ class TLMethod
         }
         $this->key++;
     }
-    public function find_by_method($method) {
+
+    public function find_by_method($method)
+    {
         $key = array_search($method, $this->method);
+
         return ($key == false) ? false : [
-            'id' => $this->id[$key],
-            'method' => $this->method[$key],
-            'type' => $this->type[$key],
-            'params' => $this->params[$key],
+            'id'                => $this->id[$key],
+            'method'            => $this->method[$key],
+            'type'              => $this->type[$key],
+            'params'            => $this->params[$key],
             'method_namespaced' => $this->method_namespaced[$key],
         ];
     }
-
 }
