@@ -39,7 +39,7 @@ class TL extends \danog\MadelineProto\Tools
     public function get_named_method_args($method, $arguments)
     {
         $tl_method = $this->methods->find_by_method($method);
-        if ($tl_method == false) {
+        if ($tl_method === false) {
             throw new Exception('Could not extract type: '.$method);
         }
 
@@ -57,8 +57,8 @@ class TL extends \danog\MadelineProto\Tools
 
     public function serialize_obj($object, $arguments)
     {
-        $tl_constructor = $this->constructors->find_by_type($object);
-        if ($tl_constructor == false) {
+        $tl_constructor = $this->constructors->find_by_predicate($object);
+        if ($tl_constructor === false) {
             throw new Exception('Could not extract type: '.$object);
         }
 
@@ -74,7 +74,7 @@ class TL extends \danog\MadelineProto\Tools
     public function serialize_method($method, $arguments)
     {
         $tl_method = $this->methods->find_by_method($method);
-        if ($tl_method == false) {
+        if ($tl_method === false) {
             throw new Exception('Could not extract type: '.$method);
         }
 
@@ -148,7 +148,7 @@ class TL extends \danog\MadelineProto\Tools
             case '!X':
                 return $value;
             case 'Vector t':
-                $concat = \danog\PHP\Struct::pack('<i', $this->constructors->find_by_type('vector')['id']);
+                $concat = \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
 
                 $concat .= \danog\PHP\Struct::pack('<l', count($value));
                 foreach ($value as $curv) {
@@ -226,16 +226,16 @@ class TL extends \danog\MadelineProto\Tools
                 }
                 $count = \danog\PHP\Struct::unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];
-                foreach ($this->range($count) as $i) {
+                for ($i = 0; $i < $count; $i++) {
                     $x[] = $this->deserialize($bytes_io, $subtype);
                 }
                 break;
             default:
-                $tl_elem = $this->constructors->find_by_type($type);
-                if ($tl_elem == false) {
+                $tl_elem = $this->constructors->find_by_predicate($type);
+                if ($tl_elem === false) {
                     $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
                     $tl_elem = $this->constructors->find_by_id($id);
-                    if ($tl_elem == false) {
+                    if ($tl_elem === false) {
                         throw new Exception('Could not extract type: '.$type.' with id '.$id);
                     }
                 }

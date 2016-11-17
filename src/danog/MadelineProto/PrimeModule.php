@@ -80,7 +80,7 @@ class PrimeModule extends Tools
     {
         $pqstr = (string) $pq;
 
-        \danog\MadelineProto\Logging::log('Trying to use the python factorization module');
+        \danog\MadelineProto\Logger::log('Trying to use the python factorization module');
         if (function_exists('shell_exec')) {
             try {
                 $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.$pqstr));
@@ -91,7 +91,7 @@ class PrimeModule extends Tools
             }
         }
 
-        \danog\MadelineProto\Logging::log('Trying to use the wolfram alpha factorization module');
+        \danog\MadelineProto\Logger::log('Trying to use the wolfram alpha factorization module');
         $query = 'Do prime factorization of '.$pqstr;
         $params = [
             'async'         => true,
@@ -120,7 +120,7 @@ class PrimeModule extends Tools
             return $res;
         }
 
-        \danog\MadelineProto\Logging::log('Trying to use the native factorization module');
+        \danog\MadelineProto\Logger::log('Trying to use the native factorization module');
         $res = $this->find_small_multiplier_lopatin((int) $pqstr);
         $res = [$res, $pqstr / $res];
         if ($res[1] != 1) {

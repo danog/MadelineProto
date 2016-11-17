@@ -44,18 +44,19 @@ class TLConstructor
                     $param['type'] = 'Vector t';
                 }
                 if (preg_match('/^\%/', $param['subtype'])) {
-                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
+                    $param['subtype'] = preg_replace('/^\%/', '', $param['subtype']);
                 }
+//lcfirst
             }
         }
         $this->key++;
     }
 
-    public function find_by_type($type)
+    public function find_by_predicate($predicate)
     {
-        $key = array_search($type, $this->type);
+        $key = array_search($predicate, $this->predicate);
 
-        return ($key == false) ? false : [
+        return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
             'type'      => $this->type[$key],
@@ -67,7 +68,7 @@ class TLConstructor
     {
         $key = array_search($id, $this->id);
 
-        return ($key == false) ? false : [
+        return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
             'type'      => $this->type[$key],

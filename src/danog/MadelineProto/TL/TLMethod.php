@@ -57,8 +57,7 @@ class TLMethod
     public function find_by_method($method)
     {
         $key = array_search($method, $this->method);
-
-        return ($key == false) ? false : [
+        return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],

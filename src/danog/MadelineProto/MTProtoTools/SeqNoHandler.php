@@ -20,8 +20,8 @@ class SeqNoHandler extends SaltHandler
     public function generate_seq_no($content_related = true)
     {
         $in = $content_related ? 1 : 0;
-        $value = $this->seq_no;
-        $this->seq_no += $in;
+        $value = $this->datacenter->seq_no;
+        $this->datacenter->seq_no += $in;
 
         return ($value * 2) + $in;
     }

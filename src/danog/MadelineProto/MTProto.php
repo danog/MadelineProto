@@ -141,8 +141,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
         if ($this->datacenter->dc_connect($new_dc)) {
             $this->init_authorization();
-            $this->write_client_info();
-            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $allow_nearest_dc_switch);
+            $this->write_client_info($allow_nearest_dc_switch);
+            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
     }
 
@@ -172,7 +172,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'query' => $this->tl->serialize_method('initConnection',
                     array_merge(
                         $this->settings['app_info'],
-                        ['query' => $this->tl->serialize_method('help.getnearest_dc', [])]
+                        ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
                     )
                 ),
             ]
