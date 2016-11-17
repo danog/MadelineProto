@@ -18,6 +18,7 @@ namespace danog\MadelineProto;
 class DataCenter extends Tools
 {
     public $referenced_variables = ["time_delta", "temp_auth_key", "auth_key", "session_id", "seq_no"];
+    public $sockets;
 
     public function __construct($dclist, $settings)
     {
@@ -42,10 +43,12 @@ class DataCenter extends Tools
 
     public function dc_disconnect($dc_number)
     {
+        if ($this->curdc == $dc_number) {
+            $this->unset_curdc();
+        }
         if (isset($this->sockets[$dc_number])) {
             \danog\MadelineProto\Logger::log('Disconnecting from DC '.$dc_number.'...');
             unset($this->sockets[$dc_number]);
-            unset($this->curdc);
         }
     }
 
@@ -53,7 +56,10 @@ class DataCenter extends Tools
     {
         if (isset($this->sockets[$dc_number])) {
             return false;
+            $this->set_curdc($dc_number);
         }
+        $this->set_curdc($dc_number);
+
         \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.'...');
 
         if ($settings == []) {
@@ -66,19 +72,18 @@ class DataCenter extends Tools
             $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
         $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol']);
-        $this->set_curdc($dc_number);
         return true;
     }
 
     public function set_curdc($dc_number) {
         $this->curdc = $dc_number;
-        foreach ($referenced_variables as $key) {
+        foreach ($this->referenced_variables as $key) {
             $this->{$key} = &$this->sockets[$dc_number]->{$key};            
         }
     }
     public function unset_curdc($dc_number) {
         unset($this->curdc);
-        foreach ($referenced_variables as $key) {
+        foreach ($this->referenced_variables as $key) {
             unset($this->sockets[$dc_number]->{$key});
         }
     }

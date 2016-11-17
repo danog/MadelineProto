@@ -14,13 +14,22 @@ namespace danog\MadelineProto\TL;
 
 class TLMethod
 {
-    public function __construct($json_dict)
+    public $id = [];
+    public $method = [];
+    public $type = [];
+    public $params = [];
+    public $method_namespaced = [];
+    public $key = 0;
+
+    public function add($json_dict)
     {
-        $this->id = (int) $json_dict['id'];
-        $this->type = $json_dict['type'];
-        $this->method = $json_dict['method'];
-        $this->params = $json_dict['params'];
-        foreach ($this->params as &$param) {
+        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->method[$this->key] = $json_dict['method'];
+        $this->type[$this->key] = $json_dict['type'];
+        $this->params[$this->key] = $json_dict['params'];
+        $this->method_namespaced[$this->key] = explode('.', $json_dict['method']);
+
+        foreach ($this->params[$this->key] as &$param) {
             $param['opt'] = false;
             $param['subtype'] = null;
             if (preg_match('/^flags\.\d\?/', $param['type'])) {
@@ -42,5 +51,17 @@ class TLMethod
                 }
             }
         }
+        $this->key++;
     }
+    public function find_by_method($method) {
+        $key = array_search($method, $this->method);
+        return ($key == false) ? false : [
+            'id' => $this->id[$key],
+            'method' => $this->method[$key],
+            'type' => $this->type[$key],
+            'params' => $this->params[$key],
+            'method_namespaced' => $this->method_namespaced[$key],
+        ];
+    }
+
 }

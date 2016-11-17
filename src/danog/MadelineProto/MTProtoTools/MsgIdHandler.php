@@ -19,10 +19,10 @@ class MsgIdHandler extends MessageHandler
 {
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
-        if (((int) ((time() + $this->datacenter->get_time_delta() - 300) * pow(2, 30)) * 4) > $new_message_id) {
+        if (((int) ((time() + $this->datacenter->time_delta - 300) * pow(2, 30)) * 4) > $new_message_id) {
             throw new Exception('Given message id ('.$new_message_id.') is too old.');
         }
-        if (((int) ((time() + $this->datacenter->get_time_delta() + 30) * pow(2, 30)) * 4) < $new_message_id) {
+        if (((int) ((time() + $this->datacenter->time_delta + 30) * pow(2, 30)) * 4) < $new_message_id) {
             throw new Exception('Given message id ('.$new_message_id.') is too new.');
         }
         if ($outgoing) {
@@ -66,7 +66,7 @@ class MsgIdHandler extends MessageHandler
 
     public function generate_message_id()
     {
-        $int_message_id = (int) ((time() + $this->datacenter->get_time_delta()) << 32);
+        $int_message_id = (int) ((time() + $this->datacenter->time_delta) << 32);
 /*        $int_message_id = (int) (
             ((int) ($ms_time / 1000) << 32) |
             ($this->posmod($ms_time, 1000) << 22) |

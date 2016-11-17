@@ -253,9 +253,9 @@ class AuthKeyHandler extends AckHandler
                 * Time delta
                 */
                 $server_time = $server_DH_inner_data['server_time'];
-                $this->datacenter->set_time_delta($server_time - time());
+                $this->datacenter->time_delta = $server_time - time();
 
-                \danog\MadelineProto\Logger::log(sprintf('Server-client time delta = %.1f s', $this->datacenter->get_time_delta()));
+                \danog\MadelineProto\Logger::log(sprintf('Server-client time delta = %.1f s', $this->datacenter->time_delta));
 
 
                 /*

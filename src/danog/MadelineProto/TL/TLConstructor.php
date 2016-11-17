@@ -14,13 +14,19 @@ namespace danog\MadelineProto\TL;
 
 class TLConstructor
 {
-    public function __construct($json_dict)
+    public $id = [];
+    public $predicate = [];
+    public $type = [];
+    public $params = [];
+    public $key = 0;
+
+    public function add($json_dict)
     {
-        $this->id = (int) $json_dict['id'];
-        $this->predicate = $json_dict['predicate'];
-        $this->type = $json_dict['type'];
-        $this->params = $json_dict['params'];
-        foreach ($this->params as &$param) {
+        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->predicate[$this->key] = $json_dict['predicate'];
+        $this->type[$this->key] = $json_dict['type'];
+        $this->params[$this->key] = $json_dict['params'];
+        foreach ($this->params[$this->key] as &$param) {
             $param['opt'] = false;
             $param['subtype'] = null;
             if (preg_match('/^flags\.\d\?/', $param['type'])) {
@@ -42,5 +48,24 @@ class TLConstructor
                 }
             }
         }
+        $this->key++;
+    }
+    public function find_by_type($type) {
+        $key = array_search($type, $this->type);
+        return ($key == false) ? false : [
+            'id' => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type' => $this->type[$key],
+            'params' => $this->params[$key],
+        ];
+    }
+    public function find_by_id($id) {
+        $key = array_search($id, $this->id);
+        return ($key == false) ? false : [
+            'id' => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type' => $this->type[$key],
+            'params' => $this->params[$key],
+        ];
     }
 }

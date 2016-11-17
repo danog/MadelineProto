@@ -16,52 +16,37 @@ class TL extends \danog\MadelineProto\Tools
 {
     public function __construct($filename)
     {
-        if (is_array($filename)) {
-            $TL_dict = ['constructors' => [], 'methods' => []];
-            foreach ($filename as $file) {
-                $TL_dict['constructors'] = array_merge(json_decode(file_get_contents($file), true)['constructors'], $TL_dict['constructors']);
-                $TL_dict['methods'] = array_merge(json_decode(file_get_contents($file), true)['methods'], $TL_dict['methods']);
-            }
-        } else {
-            $TL_dict = json_decode(file_get_contents($filename), true);
+        \danog\MadelineProto\Logger::log('Loading TL schemes...');
+        $TL_dict = ['constructors' => [], 'methods' => []];
+        foreach ($filename as $file) {
+            $TL_dict['constructors'] = array_merge(json_decode(file_get_contents($file), true)['constructors'], $TL_dict['constructors']);
+            $TL_dict['methods'] = array_merge(json_decode(file_get_contents($file), true)['methods'], $TL_dict['methods']);
         }
 
         \danog\MadelineProto\Logger::log('Translating objects...');
-        $this->constructors = $TL_dict['constructors'];
-        $this->constructor_id = [];
-        $this->constructor_type = [];
-        foreach ($this->constructors as $elem) {
-            $z = new \danog\MadelineProto\TL\TLConstructor($elem);
-            $this->constructor_id[$z->id] = $z;
-            $this->constructor_type[$z->predicate] = $z;
+        $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
+        foreach ($TL_dict['constructors'] as $elem) {
+            $this->constructors->add($elem);
         }
 
         \danog\MadelineProto\Logger::log('Translating methods...');
-        $this->methods = $TL_dict['methods'];
-        $this->method_id = [];
-        $this->method_name = [];
-        $this->method_name_namespaced = [];
-        foreach ($this->methods as $elem) {
-            $z = new \danog\MadelineProto\TL\TLMethod($elem);
-            $this->method_id[$z->id] = $z;
-            $this->method_name[$z->method] = $z;
-            $this->method_names[$z->method] = $z->method;
-            $this->method_names_namespaced[$z->method] = explode('.', $z->method);
+        $this->methods = new \danog\MadelineProto\TL\TLMethod();
+        foreach ($TL_dict['methods'] as $elem) {
+            $this->methods->add($elem);
         }
     }
 
     public function get_named_method_args($method, $arguments)
     {
-        if (!isset($this->method_name[$method])) {
+        $tl_method = $this->methods->find_by_method($method);
+        if ($tl_method == false) {
             throw new Exception('Could not extract type: '.$method);
         }
-        $tl_method = $this->method_name[$method];
-
 
         if (count(array_filter(array_keys($arguments), 'is_string')) == 0) {
             $argcount = 0;
             $newargs = [];
-            foreach ($tl_method->params as $current_argument) {
+            foreach ($tl_method['params'] as $current_argument) {
                 $newargs[$current_argument['name']] = $arguments[$argcount++];
             }
             $arguments = $newargs;
@@ -72,14 +57,14 @@ class TL extends \danog\MadelineProto\Tools
 
     public function serialize_obj($object, $arguments)
     {
-        if (!isset($this->constructor_type[$object])) {
+        $tl_constructor = $this->constructors->find_by_type($object);
+        if ($tl_constructor == false) {
             throw new Exception('Could not extract type: '.$object);
         }
 
-        $tl_method = $this->constructor_type[$object];
-        $serialized = \danog\PHP\Struct::pack('<i', $tl_constructor->id);
+        $serialized = \danog\PHP\Struct::pack('<i', $tl_constructor['id']);
 
-        foreach ($tl_constructor->params as $current_argument) {
+        foreach ($tl_constructor['params'] as $current_argument) {
             $serialized .= $this->serialize_param($current_argument['type'], $current_argument['subtype'], $arguments[$current_argument['name']]);
         }
 
@@ -88,14 +73,14 @@ class TL extends \danog\MadelineProto\Tools
 
     public function serialize_method($method, $arguments)
     {
-        if (!isset($this->method_name[$method])) {
+        $tl_method = $this->methods->find_by_method($method);
+        if ($tl_method == false) {
             throw new Exception('Could not extract type: '.$method);
         }
 
-        $tl_method = $this->method_name[$method];
-        $serialized = \danog\PHP\Struct::pack('<i', $tl_method->id);
+        $serialized = \danog\PHP\Struct::pack('<i', $tl_method['id']);
 
-        foreach ($tl_method->params as $current_argument) {
+        foreach ($tl_method['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
                 if ($current_argument['name'] == 'flags') {
                     $arguments['flags'] = 0;
@@ -163,7 +148,7 @@ class TL extends \danog\MadelineProto\Tools
             case '!X':
                 return $value;
             case 'Vector t':
-                $concat = \danog\PHP\Struct::pack('<i', $this->constructor_type['vector']->id);
+                $concat = \danog\PHP\Struct::pack('<i', $this->constructors->find_by_type('vector')['id']);
 
                 $concat .= \danog\PHP\Struct::pack('<l', count($value));
                 foreach ($value as $curv) {
@@ -237,7 +222,7 @@ class TL extends \danog\MadelineProto\Tools
                 break;
             case 'vector':
                 if ($subtype == null) {
-                    throw new Exception("deserialize: subtype isn't null");
+                    throw new Exception("deserialize: subtype is null");
                 }
                 $count = \danog\PHP\Struct::unpack('<l', fread($bytes_io, 4)) [0];
                 $x = [];
@@ -246,22 +231,21 @@ class TL extends \danog\MadelineProto\Tools
                 }
                 break;
             default:
-                if (isset($this->constructor_type[$type])) {
-                    $tl_elem = $this->constructor_type[$type];
-                } else {
-                    $i = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
-                    if (!isset($this->constructor_id[$i])) {
-                        throw new Exception('Could not extract type: '.$type);
+                $tl_elem = $this->constructors->find_by_type($type);
+                if ($tl_elem == false) {
+                    $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                    $tl_elem = $this->constructors->find_by_id($id);
+                    if ($tl_elem == false) {
+                        throw new Exception('Could not extract type: '.$type.' with id '.$id);
                     }
-                    $tl_elem = $this->constructor_id[$i];
                 }
 
                 $base_boxed_types = ['Vector t', 'Int', 'Long', 'Double', 'String', 'Int128', 'Int256'];
-                if (in_array($tl_elem->type, $base_boxed_types)) {
-                    $x = $this->deserialize($bytes_io, $tl_elem->predicate, $subtype);
+                if (in_array($tl_elem['type'], $base_boxed_types)) {
+                    $x = $this->deserialize($bytes_io, $tl_elem['predicate'], $subtype);
                 } else {
-                    $x = ['_' => $tl_elem->predicate];
-                    foreach ($tl_elem->params as $arg) {
+                    $x = ['_' => $tl_elem['predicate']];
+                    foreach ($tl_elem['params'] as $arg) {
                         $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
                     }
                 }

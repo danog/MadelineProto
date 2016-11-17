@@ -14,16 +14,16 @@ If not, see <http://www.gnu.org/licenses/>.
 require_once 'vendor/autoload.php';
 
 $MadelineProto = new \danog\MadelineProto\API();
-
+var_dump(strlen(var_export($MadelineProto,true)));
 if (file_exists('number.php')) {
     include_once 'number.php';
     $sendCode = $MadelineProto->auth->sendCode(
         [
             'phone_number' => $number,
             'sms_type'     => 5,
-            'api_id'       => $MadelineProto->settings['app_info']['api_id'],
-            'api_hash'     => $MadelineProto->settings['app_info']['api_hash'],
-            'lang_code'    => $MadelineProto->settings['app_info']['lang_code'],
+            'api_id'       => $MadelineProto->API->settings['app_info']['api_id'],
+            'api_hash'     => $MadelineProto->API->settings['app_info']['api_hash'],
+            'lang_code'    => $MadelineProto->API->settings['app_info']['lang_code'],
         ]
     );
     var_dump($sendCode);

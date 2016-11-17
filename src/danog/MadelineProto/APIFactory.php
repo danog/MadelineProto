@@ -15,20 +15,16 @@ namespace danog\MadelineProto;
 class APIFactory
 {
     public $namespace;
-    public $session;
-    public $allowed_methods = [];
+    public $API;
 
-    public function __construct($namespace, $session) {
-        $this->namespace = $namespace;
-        $this->session = $session;
+    public function __construct($namespace, $API) {
+        $this->namespace = $namespace.'.';
+        $this->API = $API;
     }
 
     public function __call($name, $arguments)
     {
-        if (!in_array($name, $this->allowed_methods)) {
-            throw new Exception("The called method doesn't exist!");
-        }
-        return $this->session->method_call($this->namespace.'.'.$name, $arguments[0]);
+        return $this->API->method_call($this->namespace.$name, $arguments[0]);
     }
 
 }

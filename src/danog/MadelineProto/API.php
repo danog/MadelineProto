@@ -14,21 +14,17 @@ namespace danog\MadelineProto;
 
 class API extends Tools
 {
-    public $session;
+    public $API;
     public $settings;
     public function __construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
-        $this->session = new MTProto($params);
-        $this->settings = &$this->session->settings;
+        $this->API = new MTProto($params);
 
         \danog\MadelineProto\Logger::log('Running APIFactory...');
-        foreach ($this->session->tl->method_names_namespaced as $method) {
-            if (isset($method[1])) {
-                if (!isset($this->{$method[0]})) {
-                    $this->{$method[0]} = new APIFactory($method[0], $this->session);
-                }
-                $this->{$method[0]}->allowed_methods[] = $method[1];
+        foreach ($this->API->tl->methods->method_namespaced as $method) {
+            if (isset($method[1]) && !isset($this->{$method[0]})) {
+                $this->{$method[0]} = new APIFactory($method[0], $this->API);
             }
         }
 
@@ -42,15 +38,12 @@ class API extends Tools
 
     public function __destruct()
     {
-        unset($this->session);
+        unset($this->API);
         restore_error_handler();
     }
 
     public function __call($name, $arguments)
     {
-        if (!in_array($name, $this->session->tl->method_names)) {
-            throw new Exception("The called method doesn't exist!");
-        }
-        return $this->session->method_call($name, $arguments[0]);
+        return $this->API->method_call($name, $arguments[0]);
     }
 }
