@@ -220,8 +220,7 @@ class Connection extends Tools
                 $this->write($step2);
                 break;
             case 'tcp_intermediate':
-                $step1 = \danog\PHP\Struct::pack('<I', strlen($message)).$message;
-                $this->write($step1);
+                $this->write(\danog\PHP\Struct::pack('<I', strlen($message)).$message);
                 break;
             case 'tcp_abridged':
                 $len = strlen($message) / 4;
