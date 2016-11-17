@@ -29,10 +29,12 @@ class API extends Tools
         }
 
         \danog\MadelineProto\Logger::log('Ping...');
-        $ping = $this->ping([3]);
-        \danog\MadelineProto\Logger::log('Pong: '.$ping['ping_id']);
+        $pong = $this->ping([3]);
+        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id']);
         \danog\MadelineProto\Logger::log('Getting future salts...');
-        $future_salts = $this->get_future_salts([3]);
+        $this->future_salts = $this->get_future_salts([3]);
+
+        
         \danog\MadelineProto\Logger::log('MadelineProto is ready!');
     }
 
