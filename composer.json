@@ -5,7 +5,7 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "homepage": "https://daniil.it/MadelineProto",
-    "keywords": ["telegram", "mtproto", "protocol", "bytes", "telegram", "client", "PHP"],
+    "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "require": {
         "danog/phpstruct": "^1.2",
         "phpseclib/phpseclib": "^2.0.4",
