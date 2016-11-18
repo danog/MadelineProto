@@ -81,7 +81,7 @@ class MsgIdHandler extends MessageHandler
         if ($int_message_id <= $keys) {
             $int_message_id = $keys + 4;
         }
-
+        $this->check_message_id($int_message_id, true);
         return $int_message_id;
     }
 }

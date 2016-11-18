@@ -17,22 +17,21 @@ class TL extends \danog\MadelineProto\Tools
     public function __construct($filename)
     {
         \danog\MadelineProto\Logger::log('Loading TL schemes...');
-        $TL_dict = ['constructors' => [], 'methods' => []];
-        foreach ($filename as $file) {
-            $TL_dict['constructors'] = array_merge(json_decode(file_get_contents($file), true)['constructors'], $TL_dict['constructors']);
-            $TL_dict['methods'] = array_merge(json_decode(file_get_contents($file), true)['methods'], $TL_dict['methods']);
-        }
-
-        \danog\MadelineProto\Logger::log('Translating objects...');
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
-        foreach ($TL_dict['constructors'] as $elem) {
-            $this->constructors->add($elem);
-        }
-
-        \danog\MadelineProto\Logger::log('Translating methods...');
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
-        foreach ($TL_dict['methods'] as $elem) {
-            $this->methods->add($elem);
+        foreach ($filename as $type => $file) {
+            $type = $type === "mtproto";
+            $TL_dict = json_decode(file_get_contents($file), true);
+           
+            \danog\MadelineProto\Logger::log('Translating objects...');
+            foreach ($TL_dict['constructors'] as $elem) {
+                $this->constructors->add($elem, $type);
+            }
+
+            \danog\MadelineProto\Logger::log('Translating methods...');
+            foreach ($TL_dict['methods'] as $elem) {
+                $this->methods->add($elem);
+            }
         }
     }
 

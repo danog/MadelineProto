@@ -23,10 +23,8 @@ class API extends Tools
         $this->API = new MTProto($params);
 
         \danog\MadelineProto\Logger::log('Running APIFactory...');
-        foreach ($this->API->tl->methods->method_namespaced as $method) {
-            if (isset($method[1]) && !isset($this->{$method[0]})) {
-                $this->{$method[0]} = new APIFactory($method[0], $this->API);
-            }
+        foreach ($this->API->tl->methods->method_namespace as $namespace => $method) {
+            $this->{$method} = new APIFactory($method, $this->API);
         }
 
         \danog\MadelineProto\Logger::log('Ping...');

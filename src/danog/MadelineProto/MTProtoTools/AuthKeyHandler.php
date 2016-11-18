@@ -494,7 +494,6 @@ class AuthKeyHandler extends AckHandler
             ]
         );
         $int_message_id = $this->generate_message_id();
-        $this->check_message_id($int_message_id, true);
 
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         $seq_no = 0;

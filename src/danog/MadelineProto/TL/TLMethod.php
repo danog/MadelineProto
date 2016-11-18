@@ -18,7 +18,7 @@ class TLMethod
     public $method = [];
     public $type = [];
     public $params = [];
-    public $method_namespaced = [];
+    public $method_namespace = [];
     public $key = 0;
 
     public function add($json_dict)
@@ -27,7 +27,10 @@ class TLMethod
         $this->method[$this->key] = $json_dict['method'];
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
-        $this->method_namespaced[$this->key] = explode('.', $json_dict['method']);
+        $namespace = explode('.', $json_dict['method']);
+        if (isset($namespace[1])) {
+            $this->method_namespace[$namespace[0]] = $namespace[0];
+        }
 
         foreach ($this->params[$this->key] as &$param) {
             $param['opt'] = false;
@@ -63,7 +66,6 @@ class TLMethod
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],
             'params'            => $this->params[$key],
-            'method_namespaced' => $this->method_namespaced[$key],
         ];
     }
 }
