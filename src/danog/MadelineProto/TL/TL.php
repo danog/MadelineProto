@@ -176,6 +176,7 @@ class TL extends \danog\MadelineProto\Tools
         if (!(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream')) {
             throw new Exception('An invalid bytes_io handle was provided.');
         }
+        \danog\MadelineProto\Logger::log('Extracting '.$type.'/'.$subtype.' at byte '.ftell($bytes_io));
         switch ($type) {
             case 'int':
                 $x = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];

@@ -141,8 +141,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
         if ($this->datacenter->dc_connect($new_dc)) {
             $this->init_authorization();
-            $this->write_client_info($allow_nearest_dc_switch);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
+            $this->write_client_info($allow_nearest_dc_switch);
         }
     }
 
