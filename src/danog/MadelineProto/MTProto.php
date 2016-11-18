@@ -74,7 +74,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'tl_schema'     => [
                 'layer'         => 55,
                 'src'           => [
-                    'mtproto' => __DIR__.'/TL_mtproto_v1.json',
+                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json',
                     'telegram' => __DIR__.'/TL_telegram_v55.json',
                 ],
             ],

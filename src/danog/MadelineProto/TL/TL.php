@@ -20,9 +20,9 @@ class TL extends \danog\MadelineProto\Tools
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
         foreach ($filename as $type => $file) {
-            $type = $type === "mtproto";
+            $type = $type === 'mtproto';
             $TL_dict = json_decode(file_get_contents($file), true);
-           
+
             \danog\MadelineProto\Logger::log('Translating objects...');
             foreach ($TL_dict['constructors'] as $elem) {
                 $this->constructors->add($elem, $type);

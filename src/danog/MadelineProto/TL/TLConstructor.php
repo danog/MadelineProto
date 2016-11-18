@@ -23,7 +23,7 @@ class TLConstructor
     public function add($json_dict, $mtproto)
     {
         $this->id[$this->key] = (int) $json_dict['id'];
-        $this->predicate[$this->key] = (($mtproto && $json_dict['predicate'] == "message") ? "MT" : "").$json_dict['predicate'];
+        $this->predicate[$this->key] = (($mtproto && $json_dict['predicate'] == 'message') ? 'MT' : '').$json_dict['predicate'];
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
         foreach ($this->params[$this->key] as &$param) {
@@ -46,7 +46,7 @@ class TLConstructor
                 if (preg_match('/^\%/', $param['subtype'])) {
                     $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
                 }
-                $param['subtype'] = (($mtproto && $param['subtype'] == "message") ? "MT" : "").$param['subtype'];
+                $param['subtype'] = (($mtproto && $param['subtype'] == 'message') ? 'MT' : '').$param['subtype'];
             }
         }
         $this->key++;
@@ -55,6 +55,7 @@ class TLConstructor
     public function find_by_predicate($predicate)
     {
         $key = array_search($predicate, $this->predicate);
+
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
