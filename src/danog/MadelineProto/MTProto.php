@@ -177,7 +177,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ),
             ]
         );
-        \danog\MadelineProto\Logger::log('Current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].' in '.$nearest_dc['country'].'.');
+        \danog\MadelineProto\Logger::log("We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.');
 
         if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
             $this->switch_dc($nearest_dc['nearest_dc']);

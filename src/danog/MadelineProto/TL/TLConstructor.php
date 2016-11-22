@@ -31,7 +31,7 @@ class TLConstructor
             $param['subtype'] = null;
             if (preg_match('/^flags\.\d\?/', $param['type'])) {
                 $param['opt'] = true;
-                $param['flag'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
+                $param['pow'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
                 $param['type'] = preg_replace('/^flags\.\d\?/', '', $param['type']);
             }
             if (preg_match('/vector<.*>/i', $param['type'])) {

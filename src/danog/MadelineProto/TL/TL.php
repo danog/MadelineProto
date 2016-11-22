@@ -78,17 +78,30 @@ class TL extends \danog\MadelineProto\Tools
         }
 
         $serialized = \danog\PHP\Struct::pack('<i', $tl_method['id']);
-
+        $flags = 0;
+        foreach ($tl_method['params'] as $cur_flag) {
+            if ($cur_flag['opt']) {
+                $flag_pow = pow(2, $cur_flag['pow']);
+                switch ($cur_flag['type']) {
+                    case 'true':
+                    case 'false':
+                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                        unset($arguments[$cur_flag['name']]);
+                        break;
+                    case 'int':
+                    case 'string':
+                       $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                        break;
+                    default:
+                        throw new Exception('Unrecognized flag type ('.$cur_flag['type'].')');
+                }
+            }
+        }
+        $arguments['flags'] = $flags;
         foreach ($tl_method['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['name'] == 'flags') {
-                    $arguments['flags'] = 0;
-                } else {
-                    if ($current_argument['opt']) {
-                        continue;
-                    }
-                    throw new Exception('Missing required parameter ('.$current_argument['name'].')');
-                }
+                if ($current_argument['opt']) continue;
+                throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
             $serialized .= $this->serialize_param($current_argument['type'], $current_argument['subtype'], $arguments[$current_argument['name']]);
         }
@@ -245,6 +258,7 @@ class TL extends \danog\MadelineProto\Tools
                     $x = $this->deserialize($bytes_io, $tl_elem['predicate'], $subtype);
                 } else {
                     $x = ['_' => $tl_elem['predicate']];
+                    $done_opt = false;
                     foreach ($tl_elem['params'] as $arg) {
                         $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
                     }
