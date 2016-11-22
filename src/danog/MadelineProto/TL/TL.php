@@ -100,7 +100,9 @@ class TL extends \danog\MadelineProto\Tools
         $arguments['flags'] = $flags;
         foreach ($tl_method['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['opt']) continue;
+                if ($current_argument['opt']) {
+                    continue;
+                }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
             $serialized .= $this->serialize_param($current_argument['type'], $current_argument['subtype'], $arguments[$current_argument['name']]);

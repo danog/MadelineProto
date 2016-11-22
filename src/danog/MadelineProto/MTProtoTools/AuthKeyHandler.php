@@ -262,9 +262,9 @@ class AuthKeyHandler extends AckHandler
                 * ***********************************************************************
                 * Define some needed numbers for BigInteger
                 */
-                \danog\MadelineProto\Logger::log('Executing dh_prime checks...');
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (0/3)...');
                 $one = new \phpseclib\Math\BigInteger(1);
-                $two = new \phpseclib\Math\BigInteger(2);
+                //$two = new \phpseclib\Math\BigInteger(2);
                 $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
                 $twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
@@ -273,6 +273,7 @@ class AuthKeyHandler extends AckHandler
                 * Check validity of dh_prime
                 * Is it a prime?
                 */
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (1/3)...');
                 if (!$dh_prime->isPrime()) {
                     throw new Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
                 }
@@ -286,6 +287,7 @@ class AuthKeyHandler extends AckHandler
                 * Almost always fails
                 */
                 /*
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (2/3)...');
                 if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
                     throw new Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
                 }
@@ -296,6 +298,7 @@ class AuthKeyHandler extends AckHandler
                 * Check validity of dh_prime
                 * 2^2047 < dh_prime < 2^2048
                 */
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (3/3)...');
                 if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
                     || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
                 ) {
@@ -307,6 +310,8 @@ class AuthKeyHandler extends AckHandler
                 * Check validity of g
                 * 1 < g < dh_prime - 1
                 */
+                \danog\MadelineProto\Logger::log('Executing g check...');
+
                 if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
                     || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
                 ) {
@@ -318,6 +323,7 @@ class AuthKeyHandler extends AckHandler
                 * Check validity of g_a
                 * 1 < g_a < dh_prime - 1
                 */
+                \danog\MadelineProto\Logger::log('Executing g_a check...');
                 if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
                     || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
                 ) {
@@ -333,11 +339,14 @@ class AuthKeyHandler extends AckHandler
                     * Check validity of g_b
                     * 1 < g_b < dh_prime - 1
                     */
+                    \danog\MadelineProto\Logger::log('Executing g_b check...');
                     if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
                         || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                     ) {
                         throw new Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
+
+                    \danog\MadelineProto\Logger::log('Preparing client_DH_inner_data...');
 
                     $g_b_str = $g_b->toBytes();
 
@@ -370,6 +379,7 @@ class AuthKeyHandler extends AckHandler
                     $data_with_sha_padded = $data_with_sha.\phpseclib\Crypt\Random::string($this->posmod(-strlen($data_with_sha), 16));
                     $encrypted_data = $this->ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
 
+                    \danog\MadelineProto\Logger::log('Executing set_client_DH_params...');
                     /*
                     * ***********************************************************************
                     * Send set_client_DH_params query
@@ -400,6 +410,7 @@ class AuthKeyHandler extends AckHandler
                     * ***********************************************************************
                     * Generate auth_key
                     */
+                    \danog\MadelineProto\Logger::log('Generating authorization key...');
                     $auth_key = $g_a->powMod($b, $dh_prime);
                     $auth_key_str = $auth_key->toBytes();
                     $auth_key_sha = sha1($auth_key_str, true);
@@ -435,7 +446,7 @@ class AuthKeyHandler extends AckHandler
                                 throw new Exception('wrong new_nonce_hash1');
                             }
 
-                            \danog\MadelineProto\Logger::log('Diffie Hellman key exchange processed successfully');
+                            \danog\MadelineProto\Logger::log('Diffie Hellman key exchange processed successfully!');
 
                             $res_authorization['server_salt'] = \danog\PHP\Struct::unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
                             $res_authorization['auth_key'] = $auth_key_str;
