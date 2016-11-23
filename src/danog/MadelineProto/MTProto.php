@@ -61,7 +61,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'test_mode' => false,
                     'port'      => '443',
                 ],
-                'default_dc' => 2,
+                'default_dc' => 4,
             ],
             'app_info' => [
                 'api_id'          => 25628,

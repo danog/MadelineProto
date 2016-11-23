@@ -35,10 +35,10 @@ class TLMethod
         foreach ($this->params[$this->key] as &$param) {
             $param['opt'] = false;
             $param['subtype'] = null;
-            if (preg_match('/^flags\.\d\?/', $param['type'])) {
+            if (preg_match('/^flags\.\d*\?/', $param['type'])) {
                 $param['opt'] = true;
                 $param['pow'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
-                $param['type'] = preg_replace('/^flags\.\d\?/', '', $param['type']);
+                $param['type'] = preg_replace('/^flags\.\d*\?/', '', $param['type']);
             }
             if (preg_match('/vector<.*>/i', $param['type'])) {
                 if (preg_match('/vector/', $param['type'])) {

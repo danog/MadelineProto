@@ -60,27 +60,22 @@ class TL extends \danog\MadelineProto\Tools
         if ($tl_constructor === false) {
             throw new Exception('Could not extract type: '.$object);
         }
-
-        $serialized = \danog\PHP\Struct::pack('<i', $tl_constructor['id']);
-
-        foreach ($tl_constructor['params'] as $current_argument) {
-            $serialized .= $this->serialize_param($current_argument['type'], $current_argument['subtype'], $arguments[$current_argument['name']]);
-        }
-
-        return $serialized;
+        return $this->serialize_generic($tl_constructor, $arguments);
     }
-
     public function serialize_method($method, $arguments)
     {
         $tl_method = $this->methods->find_by_method($method);
         if ($tl_method === false) {
             throw new Exception('Could not extract type: '.$method);
         }
+        return $this->serialize_generic($tl_method, $arguments);
+    }
 
-        $serialized = \danog\PHP\Struct::pack('<i', $tl_method['id']);
+    public function serialize_generic($tl, $arguments)
+    {
+        $serialized = \danog\PHP\Struct::pack('<i', $tl['id']);
         $flags = 0;
-        $flags_to_send = [];
-        foreach ($tl_method['params'] as $cur_flag) {
+        foreach ($tl['params'] as $cur_flag) {
             if ($cur_flag['opt']) {
                 $flag_pow = pow(2, $cur_flag['pow']);
                 switch ($cur_flag['type']) {
@@ -88,40 +83,42 @@ class TL extends \danog\MadelineProto\Tools
                     case 'false':
                         $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
                         unset($arguments[$cur_flag['name']]);
-                        $flags_to_send[$cur_flag['name']] = false;
                         break;
                     case 'Bool':
-                        $flags_to_send[$cur_flag['name']] = true;
-                        if (($flags & $flag_pow) == 0) { // If source flag isn't set
-                            $flags_to_send[$cur_flag['name']] = false;
-                            unset($arguments[$cur_flag['name']]);
-                        }
+                        $arguments[$cur_flag['name']] = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) && (($flags & $flag_pow) != 0);
+                        if (($flags & $flag_pow) == 0) unset($arguments[$cur_flag['name']]);
                         break;
                     default:
-                        $flags_to_send[$cur_flag['name']] = true;
                         $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
                         break;
                 }
             }
         }
-        var_dump($flags_to_send);
         $arguments['flags'] = $flags;
-        foreach ($tl_method['params'] as $current_argument) {
+        foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['opt'] && $flags_to_send[$current_argument['name']]) {
+                if ($current_argument['opt'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & pow(2, $current_argument['pow'])) == 0)) {
+                    //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
                     continue;
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
+            //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
             $serialized .= $this->serialize_param($current_argument['type'], $current_argument['subtype'], $arguments[$current_argument['name']]);
         }
 
         return $serialized;
     }
 
-    public function serialize_param($type, $subtype, $value)
+    public function serialize_param($type, $subtype = null, $value = null)
     {
         switch ($type) {
+            case 'Bool':
+                if (!is_bool($value)) {
+                    throw new Exception("serialize_param: given value isn't a boolean");
+                }
+                return $this->serialize_param('bool'.($value ? "True" : "False"));
+                break;
             case 'int':
                 if (!is_numeric($value)) {
                     throw new Exception("serialize_param: given value isn't numeric");
@@ -179,7 +176,11 @@ class TL extends \danog\MadelineProto\Tools
 
                 return $concat;
             default:
-                throw new Exception("Couldn't serialize param with type ".$type);
+                $tl_elem = $this->constructors->find_by_predicate($type);
+                if ($tl_elem === false) {
+                    throw new Exception('Could not serialize type: '.$type);
+                }
+                return \danog\PHP\Struct::pack('<i', $tl_elem['id']);
                 break;
         }
     }
@@ -199,8 +200,16 @@ class TL extends \danog\MadelineProto\Tools
         if (!(get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream')) {
             throw new Exception('An invalid bytes_io handle was provided.');
         }
-        \danog\MadelineProto\Logger::log('Extracting '.$type.'/'.$subtype.' at byte '.ftell($bytes_io));
+        //\danog\MadelineProto\Logger::log('Deserializing '.$type.'/'.$subtype.' at byte '.ftell($bytes_io));
         switch ($type) {
+            case 'Bool':
+                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                $tl_elem = $this->constructors->find_by_id($id);
+                if ($tl_elem === false) {
+                    throw new Exception('Could not extract type: '.$type.' with id '.$id);
+                }
+                $x = $tl_elem['predicate'] === 'boolTrue';
+                break;
             case 'int':
                 $x = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
                 break;
@@ -270,6 +279,27 @@ class TL extends \danog\MadelineProto\Tools
                     $x = ['_' => $tl_elem['predicate']];
                     $done_opt = false;
                     foreach ($tl_elem['params'] as $arg) {
+                        if ($arg['opt']) {
+                            $flag_pow = pow(2, $arg['pow']);
+                            switch ($arg['type']) {
+                                case 'true':
+                                case 'false':
+
+                                    $x[$arg['name']] = ($x['flags'] & $flag_pow) == 1;
+                                    continue 2;
+                                    break;
+                                case 'Bool':
+                                    $default = false;
+                                default:
+                                    $default = null;
+                                    if (($x['flags'] & $flag_pow) == 0) {
+                                        $x[$arg['name']] = $default;
+                                        //\danog\MadelineProto\Logger::log('Skipping '.$arg['name'].' of type '.$arg['type'].'/'.$arg['subtype']);
+                                        continue 2;
+                                    }
+                                    break;
+                            }
+                        }
                         $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
                     }
                 }

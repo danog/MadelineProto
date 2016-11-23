@@ -17,7 +17,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 var_dump(strlen(var_export($MadelineProto, true)));
 if (file_exists('number.php')) {
     include_once 'number.php';
-    $sendCode = $MadelineProto->auth->sendCode(
+    $sentCode = $MadelineProto->auth->sendCode(
         [
             'phone_number' => $number,
             'sms_type'     => 5,
@@ -26,5 +26,18 @@ if (file_exists('number.php')) {
             'lang_code'    => $MadelineProto->API->settings['app_info']['lang_code'],
         ]
     );
-    var_dump($sendCode);
+    var_dump($sentCode);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $authorization = $MadelineProto->auth->signIn(
+        [
+            'phone_number' => $number,
+            'phone_code_hash' => $sentCode['phone_code_hash'],
+            'phone_code'    => $code,
+        ]
+    );
+    var_dump($authorization);
 }
