@@ -60,14 +60,17 @@ class TL extends \danog\MadelineProto\Tools
         if ($tl_constructor === false) {
             throw new Exception('Could not extract type: '.$object);
         }
+
         return $this->serialize_generic($tl_constructor, $arguments);
     }
+
     public function serialize_method($method, $arguments)
     {
         $tl_method = $this->methods->find_by_method($method);
         if ($tl_method === false) {
             throw new Exception('Could not extract type: '.$method);
         }
+
         return $this->serialize_generic($tl_method, $arguments);
     }
 
@@ -86,7 +89,9 @@ class TL extends \danog\MadelineProto\Tools
                         break;
                     case 'Bool':
                         $arguments[$cur_flag['name']] = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) && (($flags & $flag_pow) != 0);
-                        if (($flags & $flag_pow) == 0) unset($arguments[$cur_flag['name']]);
+                        if (($flags & $flag_pow) == 0) {
+                            unset($arguments[$cur_flag['name']]);
+                        }
                         break;
                     default:
                         $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
@@ -117,7 +122,8 @@ class TL extends \danog\MadelineProto\Tools
                 if (!is_bool($value)) {
                     throw new Exception("serialize_param: given value isn't a boolean");
                 }
-                return $this->serialize_param('bool'.($value ? "True" : "False"));
+
+                return $this->serialize_param('bool'.($value ? 'True' : 'False'));
                 break;
             case 'int':
                 if (!is_numeric($value)) {
@@ -180,6 +186,7 @@ class TL extends \danog\MadelineProto\Tools
                 if ($tl_elem === false) {
                     throw new Exception('Could not serialize type: '.$type);
                 }
+
                 return \danog\PHP\Struct::pack('<i', $tl_elem['id']);
                 break;
         }

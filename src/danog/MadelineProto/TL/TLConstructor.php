@@ -23,7 +23,7 @@ class TLConstructor
     public function add($json_dict, $mtproto)
     {
         $this->id[$this->key] = (int) $json_dict['id'];
-        $this->predicate[$this->key] = (string)((($mtproto && $json_dict['predicate'] == 'message') ? 'MT' : '').$json_dict['predicate']);
+        $this->predicate[$this->key] = (string) ((($mtproto && $json_dict['predicate'] == 'message') ? 'MT' : '').$json_dict['predicate']);
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
         foreach ($this->params[$this->key] as &$param) {

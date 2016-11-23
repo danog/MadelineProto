@@ -34,9 +34,9 @@ if (file_exists('number.php')) {
     }
     $authorization = $MadelineProto->auth->signIn(
         [
-            'phone_number' => $number,
+            'phone_number'    => $number,
             'phone_code_hash' => $sentCode['phone_code_hash'],
-            'phone_code'    => $code,
+            'phone_code'      => $code,
         ]
     );
     var_dump($authorization);
