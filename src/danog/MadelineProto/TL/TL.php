@@ -79,6 +79,7 @@ class TL extends \danog\MadelineProto\Tools
 
         $serialized = \danog\PHP\Struct::pack('<i', $tl_method['id']);
         $flags = 0;
+        $flags_to_send = [];
         foreach ($tl_method['params'] as $cur_flag) {
             if ($cur_flag['opt']) {
                 $flag_pow = pow(2, $cur_flag['pow']);
@@ -87,20 +88,27 @@ class TL extends \danog\MadelineProto\Tools
                     case 'false':
                         $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
                         unset($arguments[$cur_flag['name']]);
+                        $flags_to_send[$cur_flag['name']] = false;
                         break;
-                    case 'int':
-                    case 'string':
-                       $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                    case 'Bool':
+                        $flags_to_send[$cur_flag['name']] = true;
+                        if (($flags & $flag_pow) == 0) { // If source flag isn't set
+                            $flags_to_send[$cur_flag['name']] = false;
+                            unset($arguments[$cur_flag['name']]);
+                        }
                         break;
                     default:
-                        throw new Exception('Unrecognized flag type ('.$cur_flag['type'].')');
+                        $flags_to_send[$cur_flag['name']] = true;
+                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                        break;
                 }
             }
         }
+        var_dump($flags_to_send);
         $arguments['flags'] = $flags;
         foreach ($tl_method['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['opt']) {
+                if ($current_argument['opt'] && $flags_to_send[$current_argument['name']]) {
                     continue;
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
