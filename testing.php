@@ -14,41 +14,28 @@ If not, see <http://www.gnu.org/licenses/>.
 require_once 'vendor/autoload.php';
 
 $MadelineProto = new \danog\MadelineProto\API();
-/*if (file_exists('number.php')) {
+
+if (file_exists('number.php')) {
     include_once 'number.php';
-    $sentCode = $MadelineProto->auth->sendCode(
+    
+    $checkedPhone = $MadelineProto->auth->checkPhone( // auth.checkPhone becomes auth->checkPhone
         [
-            'phone_number' => $number,
-            'sms_type'     => 5,
-            'api_id'       => $MadelineProto->API->settings['app_info']['api_id'],
-            'api_hash'     => $MadelineProto->API->settings['app_info']['api_hash'],
-            'lang_code'    => $MadelineProto->API->settings['app_info']['lang_code'],
+            'phone_number'     => $number
         ]
     );
+    var_dump($checkedPhone);
+    $sentCode = $MadelineProto->phone_login($number);
     var_dump($sentCode);
     echo 'Enter the code you received: ';
     $code = '';
     for ($x = 0; $x < $sentCode['type']['length']; $x++) {
         $code .= fgetc(STDIN);
     }
-    $authorization = $MadelineProto->auth->signIn(
-        [
-            'phone_number'    => $number,
-            'phone_code_hash' => $sentCode['phone_code_hash'],
-            'phone_code'      => $code,
-        ]
-    );
+    $authorization = $MadelineProto->complete_phone_login($code);
     var_dump($authorization);
-}*/
+}
 if (file_exists('token.php')) {
     include_once 'token.php';
-    $botauthorization = $MadelineProto->auth->importBotAuthorization(
-        [
-            'bot_auth_token'     => $token,
-            'api_id'       => $MadelineProto->API->settings['app_info']['api_id'],
-            'api_hash'     => $MadelineProto->API->settings['app_info']['api_hash'],
-        ]
-    );
-    var_dump($botauthorization);
+    $MadelineProto->bot_login($token);
 }
 echo 'Size of MadelineProto instance is '.strlen(var_export($MadelineProto, true)).' bytes'.PHP_EOL;

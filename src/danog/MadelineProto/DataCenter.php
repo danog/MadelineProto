@@ -17,36 +17,22 @@ namespace danog\MadelineProto;
  */
 class DataCenter extends Tools
 {
-    public $referenced_variables = ['time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'seq_no'];
+    
     public $sockets;
     public $curdc = 0;
+    public $dclist = [];
+    public $settings = [];
 
-    public function __construct($dclist, $settings)
+    public function __construct(&$dclist, &$settings)
     {
-        $this->dclist = $dclist;
-        $this->settings = $settings;
-        if (isset($this->settings['all'])) {
-            foreach ($this->range(1, 6) as $n) {
-                $this->settings[$n] = $this->settings['all'];
-            }
-            unset($this->settings['all']);
-        }
-        foreach ($this->range(1, 6) as $n) {
-            if (!isset($this->settings[$n])) {
-                $this->settings[$n] = [
-                    'protocol'  => 'tcp_full',
-                    'port'      => '443',
-                    'test_mode' => true,
-                    'timeout'   => 10,
-                ];
-            }
-        }
+        $this->dclist = &$dclist;
+        $this->settings = &$settings;
     }
 
     public function dc_disconnect($dc_number)
     {
         if ($this->curdc == $dc_number) {
-            $this->unset_curdc();
+            $this->curdc = 0;
         }
         if (isset($this->sockets[$dc_number])) {
             \danog\MadelineProto\Logger::log('Disconnecting from DC '.$dc_number.'...');
@@ -56,53 +42,40 @@ class DataCenter extends Tools
 
     public function dc_connect($dc_number, $settings = [])
     {
+        $this->curdc = $dc_number;
         if (isset($this->sockets[$dc_number])) {
-            $this->set_curdc($dc_number);
             return false;
         }
-
-        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.'...');
 
         if ($settings == []) {
             $settings = $this->settings[$dc_number];
         }
-        $address = $settings['test_mode'] ? $this->dclist['test'][$dc_number] : $this->dclist['main'][$dc_number];
+        $test = $settings['test_mode'] ? 'test' : 'main';
+        $ipv6 = $settings['ipv6'] ? 'ipv6' : 'ipv4';
+        $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+        $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($settings['protocol'] == 'https') {
             $subdomain = $this->dclist['ssl_subdomains'][$dc_number].($settings['upload'] ? '-1' : '');
             $path = $settings['test_mode'] ? 'apiw_test1' : 'apiw1';
             $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
-        $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol'], $settings['timeout']);
-        $this->set_curdc($dc_number);
+        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.')...');
+
+        $this->sockets[$dc_number] = new Connection($address, $port, $settings['protocol'], $settings['timeout']);
         return true;
     }
-
-    public function set_curdc($dc_number)
+    
+    public function &__get($name)
     {
-        $this->curdc = $dc_number;
-        foreach ($this->referenced_variables as $key) {
-            $this->{$key} = &$this->sockets[$dc_number]->{$key};
-        }
-    }
-
-    public function unset_curdc()
+        return $this->sockets[$this->curdc]->{$name};
+    }    
+    public function __set($name, $value)
     {
-        $this->curdc = 0;
-        foreach ($this->referenced_variables as $key) {
-            unset($this->{$key});
-        }
+        $this->sockets[$this->curdc]->{$name} =& $value;
     }
 
     public function __call($name, $arguments)
     {
         return $this->sockets[$this->curdc]->{$name}(...$arguments);
-    }
-
-    public function __destroy()
-    {
-        $this->unset_curdc();
-        foreach ($this->sockets as $n => $socket) {
-            unset($this->sockets[$n]);
-        }
     }
 }

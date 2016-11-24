@@ -29,13 +29,13 @@ class Logger
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public static function constructor($mode, $optional = null)
+    public static function constructor(&$mode, &$optional = null)
     {
         if ($mode == null) {
             throw new Exception('No mode was specified!');
         }
-        self::$mode = (string) $mode;
-        self::$optional = $optional;
+        self::$mode =& $mode;
+        self::$optional =& $optional;
         self::$constructed = true;
     }
 
@@ -50,13 +50,13 @@ class Logger
             }
             $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).((self::$mode == 3) ? "\t" : '').$param;
             switch (self::$mode) {
-                case '1':
+                case 1:
                     error_log($param);
                     break;
-                case '2':
+                case 2:
                     error_log($param, 3, self::$optional);
                     break;
-                case '3':
+                case 3:
                     echo $param.PHP_EOL;
                     break;
                 default:

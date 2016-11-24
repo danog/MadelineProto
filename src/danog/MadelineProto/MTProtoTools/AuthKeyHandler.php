@@ -318,7 +318,9 @@ class AuthKeyHandler extends AckHandler
                 }
 
                 foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
+                    \danog\MadelineProto\Logger::log('Generating b...');
                     $b = new \phpseclib\Math\BigInteger(\phpseclib\Crypt\Random::string(256), 256);
+                    \danog\MadelineProto\Logger::log('Generating g_b...');
                     $g_b = $g->powMod($b, $dh_prime);
 
                     /*
@@ -467,8 +469,10 @@ class AuthKeyHandler extends AckHandler
                             break;
                     }
                 }
-            } catch (Exception $e) {
+            } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key. Retrying...');
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                \danog\MadelineProto\Logger::log('An RPCErrorExceptiom occurred while generating the authorization key. Retrying...');
             }
         }
 

@@ -18,13 +18,23 @@ namespace danog\MadelineProto;
 class MTProto extends MTProtoTools
 {
     public $settings = [];
-
+    public $authorized = false;
+    public $waiting_code = false;
+    public $config = ['expires' => -1];
+    public $ipv6 = false;
+    
     public function __construct($settings = [])
     {
+        $google = '';
+        try {
+            $google = file_get_contents('https://ipv6.google.com');
+        } catch (Exception $e) { ; };
+        $this->ipv6 = strlen($google) > 0;
+        
         // Set default settings
         $default_settings = [
-            'authorization' => [
-                'default_temp_auth_key_expires_in' => 31557600,
+            'authorization' => [ // Authorization settings
+                'default_temp_auth_key_expires_in' => 31557600, // validity of temporary keys and the binding of the temporary and permanent keys
                 'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
@@ -32,64 +42,94 @@ an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
 Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----',
+-----END RSA PUBLIC KEY-----', // RSA public key
             ],
-            'connection' => [
-                'ssl_subdomains' => [
+            'connection' => [ // List of datacenters/subdomains where to connect
+                'ssl_subdomains' => [ // Subdomains of web.telegram.org for https protocol
                     1 => 'pluto',
                     2 => 'venus',
                     3 => 'aurora',
                     4 => 'vesta',
-                    5 => 'flora',
+                    5 => 'flora', // musa oh wait no :(
                 ],
-                'test' => [
-                    1 => '149.154.175.10',
-                    2 => '149.154.167.40',
-                    3 => '149.154.175.117',
+                'test' => [ // Test datacenters
+                    'ipv4' => [ // ipv4 addresses
+                        2 => [ // The rest will be fetched using help.getConfig
+                            'ip_address' => '149.154.167.40',
+                            'port' => 443,
+                            'media_only' => false,
+                            'tcpo_only' => false
+                        ]
+                     ],
+                    'ipv6' => [ // ipv6 addresses
+                        2 => [ // The rest will be fetched using help.getConfig
+                            'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
+                            'port' => 443,
+                            'media_only' => false,
+                            'tcpo_only' => false
+                         ]
+                     ]
                 ],
-                'main' => [
-                    1 => '149.154.175.50',
-                    2 => '149.154.167.51',
-                    3 => '149.154.175.100',
-                    4 => '149.154.167.91',
-                    5 => '149.154.171.5',
+                'main' => [ // Main datacenters
+                    'ipv4' => [ // ipv4 addresses
+                        2 => [ // The rest will be fetched using help.getConfig
+                            'ip_address' => '149.154.167.51',
+                            'port' => 443,
+                            'media_only' => false,
+                            'tcpo_only' => false
+                         ]
+                     ],
+                    'ipv6' => [ // ipv6 addresses
+                        2 => [ // The rest will be fetched using help.getConfig
+                            'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
+                            'port' => 443,
+                            'media_only' => false,
+                            'tcpo_only' => false
+                         ]
+                     ]
                 ],
             ],
-            'connection_settings' => [
-                'all' => [
-                    'protocol'  => 'tcp_full',
-                    'test_mode' => false,
-                    'port'      => '443',
-                    'timeout'      => 10
+            'connection_settings' => [ // connection settings
+                'all' => [ // These settings will be applied on every datacenter that hasn't a custom settings subarray...
+                    'protocol'  => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
+                    'test_mode' => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
+                    'ipv6' => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
+                    'timeout'      => 10 // timeout for sockets
                 ],
-                'default_dc' => 2,
             ],
-            'app_info' => [
+            'app_info' => [ // obtained in https://my.telegram.org
                 'api_id'          => 25628,
                 'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
                 'device_model'    => php_uname('s'),
                 'system_version'  => php_uname('r'),
-                'app_version'     => 'Unicorn',
+                'app_version'     => 'Unicorn', // 🌚
                 'lang_code'       => 'en',
             ],
-            'tl_schema'     => [
-                'layer'         => 57,
+            'tl_schema'     => [ // TL scheme files
+                'layer'         => 57, // layer version
                 'src'           => [
-                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json',
-                    'telegram' => __DIR__.'/TL_telegram_v57.json',
+                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
+                    'telegram' => __DIR__.'/TL_telegram_v57.json', // telegram TL scheme
                 ],
             ],
-            'logger'       => [
-                'logger'       => 1,
+            'logger'       => [ // Logger settings
+                /*
+                 * logger modes:
+                 * 0 - No logger
+                 * 1 - Log to the default logger destination
+                 * 2 - Log to file defined in second parameter
+                 * 3 - Echo logs
+                 */
+                'logger'       => 1, // write to
                 'logger_param' => '/tmp/MadelineProto.log',
-                'logger'       => 3,
+                'logger'       => 3, // overwrite previous setting and echo logs
             ],
             'max_tries'         => [
-                'query'         => 5,
-                'authorization' => 5,
-                'response'      => 5,
+                'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
+                'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
+                'response'      => 5,// How many times should I try to get a response of a query before throwing an exception
             ],
-            'msg_array_limit'        => [
+            'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
                 'incoming' => 30,
                 'outgoing' => 30,
             ],
@@ -104,14 +144,21 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 }
             }
         }
+        if (isset($settings['connection_settings']['all'])) {
+            foreach ($this->range(1, 6) as $n) {
+                if (!isset($settings['connection_settings'][$n])) {
+                    $settings['connection_settings'][$n] = $settings['connection_settings']['all'];
+                }
+            }
+            unset($settings['connection_settings']['all']);
+        }
         $this->settings = $settings;
 
         // Setup logger
         $this->setup_logger();
 
         // Connect to servers
-        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
-        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+        $this->mk_datacenter();
 
         // Load rsa key
         \danog\MadelineProto\Logger::log('Loading RSA key...');
@@ -121,13 +168,19 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         \danog\MadelineProto\Logger::log('Translating tl schemas...');
         $this->tl = new TL\TL($this->settings['tl_schema']['src']);
 
-        $this->incoming_messages = [];
-        $this->outgoing_messages = [];
-        $this->future_salts = [];
-
-        $this->switch_dc($this->settings['connection_settings']['default_dc'], true);
+        $this->switch_dc(2, true);
+        $this->get_config();
     }
-
+    public function __wakeup() {
+        $this->setup_logger();
+        $this->mk_datacenter();
+    }
+    public function mk_datacenter() {
+        // Connect to servers
+        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
+        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+    }
+    
     public function setup_logger()
     {
         if (!\danog\MadelineProto\Logger::$constructed) {
@@ -140,15 +193,18 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
-/*        if ($this->datacenter->curdc !== 0) {
-            try {
-                $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
-            } catch (\danog\MadelineProto\RPCErrorException $e) { ; }
-        }*/
+        if ($this->datacenter->curdc !== 0 && $this->datacenter->authorized) {
+            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
+        }
         if ($this->datacenter->dc_connect($new_dc)) {
             $this->init_authorization();
-            $this->write_client_info($allow_nearest_dc_switch);
-//            if (isset($exported_authorization)) $this->method_call('auth.importAuthorization', $exported_authorization);
+            $this->config = $this->write_client_info('help.getConfig');
+            $this->parse_config();
+            if (isset($exported_authorization)) {
+                $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
+                $this->datacenter->authorized = true;
+            }
+            $this->get_nearest_dc($allow_nearest_dc_switch);
         }
     }
 
@@ -169,26 +225,48 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
     }
 
-    public function write_client_info($allow_switch)
+    public function write_client_info($method, $arguments = [])
     {
-        \danog\MadelineProto\Logger::log('Writing client info...');
-        $nearest_dc = $this->method_call(
+        \danog\MadelineProto\Logger::log('Writing client info (also executing '.$method.')...');
+        return $this->method_call(
             'invokeWithLayer',
             [
                 'layer' => $this->settings['tl_schema']['layer'],
                 'query' => $this->tl->serialize_method('initConnection',
                     array_merge(
                         $this->settings['app_info'],
-                        ['query' => $this->tl->serialize_method('help.getNearestDc', [])]
+                        ['query' => $this->tl->serialize_method($method, $arguments)]
                     )
                 ),
             ]
         );
+    }
+    public function get_nearest_dc($allow_switch) {
+        $nearest_dc = $this->method_call('help.getNearestDc');
         \danog\MadelineProto\Logger::log("We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.');
 
         if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
             $this->switch_dc($nearest_dc['nearest_dc']);
             $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
+        }
+    }
+    
+    public function get_config() {
+        if ($this->config['expires'] > time()) {
+            return;
+        }
+        $this->config = $this->method_call('help.getConfig');
+        $this->parse_config();
+    }
+    
+    public function parse_config() {
+        \danog\MadelineProto\Logger::log('Received config!', $this->config);
+        foreach ($this->config["dc_options"] as $dc) {
+            $test = $this->config['test_mode'] ? 'test' : 'main';
+            $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
+            $id = $dc['id'];
+            $test .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
+            $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
     }
 }

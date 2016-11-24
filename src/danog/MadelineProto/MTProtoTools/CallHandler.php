@@ -28,8 +28,8 @@ class CallHandler extends AuthKeyHandler
             \danog\MadelineProto\Logger::log('Getting response (try number '.$count.' for '.$optional_name.')...');
             $last_received = $this->recv_message();
             $this->handle_message($last_sent, $last_received);
-            if (isset($this->outgoing_messages[$last_sent]['response']) && isset($this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'])) {
-                $response = $this->incoming_messages[$this->outgoing_messages[$last_sent]['response']]['content'];
+            if (isset($this->datacenter->outgoing_messages[$last_sent]['response']) && isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'])) {
+                $response = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'];
             }
         }
         if ($response == null) {
@@ -43,7 +43,7 @@ class CallHandler extends AuthKeyHandler
                         \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
                         $this->switch_dc($dc);
 
-                        return $this->method_call($this->outgoing_messages[$last_sent]['content']['method'], $this->outgoing_messages[$last_sent]['content']['args']);
+                        return $this->method_call($this->datacenter->outgoing_messages[$last_sent]['content']['method'], $this->datacenter->outgoing_messages[$last_sent]['content']['args']);
 
                         break;
                     default:
@@ -57,29 +57,22 @@ class CallHandler extends AuthKeyHandler
         }
     }
 
-    public function method_call($method, $args, $message_id = null)
+    public function method_call($method, $args = [], $message_id = null)
     {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
-        foreach (range(1, $this->settings['max_tries']['query']) as $i) {
+        foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
+                \danog\MadelineProto\Logger::log('Calling method (try number '.$count.' for '.$method.')...');
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
-                $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
+                $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id, $method);
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 $this->datacenter->close_and_reopen();
                 continue;
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->getCode() == -404) {
-                    \danog\MadelineProto\Logger::log('Temporary authorization key expired. Regenerating and recalling method...');
-                    $this->datacenter->temp_auth_key = null;
-                    $this->init_authorization();
-                    continue;
-                }
-                throw $e;
             }
             if ($server_answer == null) {
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
@@ -90,16 +83,17 @@ class CallHandler extends AuthKeyHandler
         throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
     }
 
-    public function object_call($object, $args)
+    public function object_call($object, $args = [])
     {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
 
-        foreach (range(1, $this->settings['max_tries']['query']) as $i) {
+        foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
+                \danog\MadelineProto\Logger::log('Sending object (try number '.$count.' for '.$object.')...');
                 $int_message_id = $this->send_message($this->tl->serialize_obj($object, $args), $this->tl->content_related($object));
-                $this->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
+                $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
 //                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');

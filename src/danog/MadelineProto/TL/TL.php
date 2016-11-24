@@ -79,7 +79,7 @@ class TL extends \danog\MadelineProto\Tools
         $serialized = \danog\PHP\Struct::pack('<i', $tl['id']);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
-            if ($cur_flag['opt']) {
+            if ($cur_flag['flag']) {
                 $flag_pow = pow(2, $cur_flag['pow']);
                 switch ($cur_flag['type']) {
                     case 'true':
@@ -102,7 +102,7 @@ class TL extends \danog\MadelineProto\Tools
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['opt'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & pow(2, $current_argument['pow'])) == 0)) {
+                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & pow(2, $current_argument['pow'])) == 0)) {
                     //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
                     continue;
                 }
@@ -284,9 +284,8 @@ class TL extends \danog\MadelineProto\Tools
                     $x = $this->deserialize($bytes_io, $tl_elem['predicate'], $subtype);
                 } else {
                     $x = ['_' => $tl_elem['predicate']];
-                    $done_opt = false;
                     foreach ($tl_elem['params'] as $arg) {
-                        if ($arg['opt']) {
+                        if ($arg['flag']) {
                             $flag_pow = pow(2, $arg['pow']);
                             switch ($arg['type']) {
                                 case 'true':
@@ -308,6 +307,9 @@ class TL extends \danog\MadelineProto\Tools
                             }
                         }
                         $x[$arg['name']] = $this->deserialize($bytes_io, $arg['type'], $arg['subtype']);
+                    }
+                    if (isset($x['flags'])) { // I don't think we need this anymore
+                        unset($x['flags']);
                     }
                 }
                 break;

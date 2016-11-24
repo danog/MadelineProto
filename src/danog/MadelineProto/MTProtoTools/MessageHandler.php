@@ -40,7 +40,7 @@ class MessageHandler extends Crypt
             $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key']);
             $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-            $this->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
+            $this->datacenter->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
         $this->datacenter->send_message($message);
 
@@ -105,12 +105,12 @@ class MessageHandler extends Crypt
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new \danog\MadelineProto\Exception('msg_key mismatch');
             }
-            $this->incoming_messages[$message_id]['seq_no'] = $seq_no;
+            $this->datacenter->incoming_messages[$message_id]['seq_no'] = $seq_no;
         } else {
             throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
         }
         $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
-        $this->incoming_messages[$message_id]['content'] = $deserialized;
+        $this->datacenter->incoming_messages[$message_id]['content'] = $deserialized;
 
         return $message_id;
     }

@@ -29,20 +29,20 @@ class MsgIdHandler extends MessageHandler
             if ($new_message_id % 4 != 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $keys = array_keys($this->outgoing_messages);
+            $keys = array_keys($this->datacenter->outgoing_messages);
             asort($keys);
             if ($new_message_id <= end($keys)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.end($keys).').', 1);
             }
-            $this->outgoing_messages[$new_message_id] = [];
-            if (count($this->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
-                array_shift($this->outgoing_messages);
+            $this->datacenter->outgoing_messages[$new_message_id] = [];
+            if (count($this->datacenter->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
+                array_shift($this->datacenter->outgoing_messages);
             }
         } else {
             if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
             }
-            $keys = array_keys($this->incoming_messages);
+            $keys = array_keys($this->datacenter->incoming_messages);
             if ($container) {
                 asort($keys);
                 if ($new_message_id >= end($keys)) {
@@ -56,11 +56,11 @@ class MsgIdHandler extends MessageHandler
                     }
                 }
             }
-            $this->incoming_messages[$new_message_id] = [];
-            if (count($this->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
-                array_shift($this->incoming_messages);
+            $this->datacenter->incoming_messages[$new_message_id] = [];
+            if (count($this->datacenter->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
+                array_shift($this->datacenter->incoming_messages);
             }
-            ksort($this->incoming_messages);
+            ksort($this->datacenter->incoming_messages);
         }
     }
 
@@ -75,7 +75,7 @@ class MsgIdHandler extends MessageHandler
         );
         */
 
-        $keys = array_keys($this->outgoing_messages);
+        $keys = array_keys($this->datacenter->outgoing_messages);
         asort($keys);
         $keys = end($keys);
         if ($int_message_id <= $keys) {

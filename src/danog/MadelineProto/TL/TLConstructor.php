@@ -27,10 +27,10 @@ class TLConstructor
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
         foreach ($this->params[$this->key] as &$param) {
-            $param['opt'] = false;
+            $param['flag'] = false;
             $param['subtype'] = null;
             if (preg_match('/^flags\.\d*\?/', $param['type'])) {
-                $param['opt'] = true;
+                $param['flag'] = true;
                 $param['pow'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
                 $param['type'] = preg_replace('/^flags\.\d*\?/', '', $param['type']);
             }

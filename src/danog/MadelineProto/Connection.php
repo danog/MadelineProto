@@ -29,7 +29,14 @@ class Connection extends Tools
     public $auth_key;
     public $session_id;
     public $seq_no = 0;
-
+    public $authorized = false;
+    public $authorization = null;
+    public $waiting_code = false;
+    
+    
+    public $incoming_messages = [];
+    public $outgoing_messages = [];
+    
     public function __construct($ip, $port, $protocol, $timeout)
     {
         // Can use:
@@ -104,7 +111,9 @@ class Connection extends Tools
         $this->__destruct();
         $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
     }
-
+    public function __wakeup() {
+        $this->close_and_reopen();
+    }
     /**
      * Function to get hex crc32.
      *
