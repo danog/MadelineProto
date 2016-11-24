@@ -17,10 +17,10 @@ $MadelineProto = new \danog\MadelineProto\API();
 
 if (file_exists('number.php')) {
     include_once 'number.php';
-    
-    $checkedPhone = $MadelineProto->auth->checkPhone( // auth.checkPhone becomes auth->checkPhone
+
+    $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
-            'phone_number'     => $number
+            'phone_number'     => $number,
         ]
     );
     var_dump($checkedPhone);

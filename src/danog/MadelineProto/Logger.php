@@ -34,8 +34,8 @@ class Logger
         if ($mode == null) {
             throw new Exception('No mode was specified!');
         }
-        self::$mode =& $mode;
-        self::$optional =& $optional;
+        self::$mode = &$mode;
+        self::$optional = &$optional;
         self::$constructed = true;
     }
 

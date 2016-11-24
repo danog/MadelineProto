@@ -22,15 +22,16 @@ class MTProto extends MTProtoTools
     public $waiting_code = false;
     public $config = ['expires' => -1];
     public $ipv6 = false;
-    
+
     public function __construct($settings = [])
     {
         $google = '';
         try {
             $google = file_get_contents('https://ipv6.google.com');
-        } catch (Exception $e) { ; };
+        } catch (Exception $e) {
+        }
         $this->ipv6 = strlen($google) > 0;
-        
+
         // Set default settings
         $default_settings = [
             'authorization' => [ // Authorization settings
@@ -56,45 +57,45 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'ipv4' => [ // ipv4 addresses
                         2 => [ // The rest will be fetched using help.getConfig
                             'ip_address' => '149.154.167.40',
-                            'port' => 443,
+                            'port'       => 443,
                             'media_only' => false,
-                            'tcpo_only' => false
-                        ]
+                            'tcpo_only'  => false,
+                        ],
                      ],
                     'ipv6' => [ // ipv6 addresses
                         2 => [ // The rest will be fetched using help.getConfig
                             'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                            'port' => 443,
+                            'port'       => 443,
                             'media_only' => false,
-                            'tcpo_only' => false
-                         ]
-                     ]
+                            'tcpo_only'  => false,
+                         ],
+                     ],
                 ],
                 'main' => [ // Main datacenters
                     'ipv4' => [ // ipv4 addresses
                         2 => [ // The rest will be fetched using help.getConfig
                             'ip_address' => '149.154.167.51',
-                            'port' => 443,
+                            'port'       => 443,
                             'media_only' => false,
-                            'tcpo_only' => false
-                         ]
+                            'tcpo_only'  => false,
+                         ],
                      ],
                     'ipv6' => [ // ipv6 addresses
                         2 => [ // The rest will be fetched using help.getConfig
                             'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                            'port' => 443,
+                            'port'       => 443,
                             'media_only' => false,
-                            'tcpo_only' => false
-                         ]
-                     ]
+                            'tcpo_only'  => false,
+                         ],
+                     ],
                 ],
             ],
             'connection_settings' => [ // connection settings
                 'all' => [ // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                    'protocol'  => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
-                    'test_mode' => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                    'ipv6' => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 10 // timeout for sockets
+                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
+                    'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
+                    'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
+                    'timeout'      => 10, // timeout for sockets
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -127,7 +128,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'max_tries'         => [
                 'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
                 'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
-                'response'      => 5,// How many times should I try to get a response of a query before throwing an exception
+                'response'      => 5, // How many times should I try to get a response of a query before throwing an exception
             ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
                 'incoming' => 30,
@@ -171,16 +172,20 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->switch_dc(2, true);
         $this->get_config();
     }
-    public function __wakeup() {
+
+    public function __wakeup()
+    {
         $this->setup_logger();
         $this->mk_datacenter();
     }
-    public function mk_datacenter() {
+
+    public function mk_datacenter()
+    {
         // Connect to servers
         \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
         $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
     }
-    
+
     public function setup_logger()
     {
         if (!\danog\MadelineProto\Logger::$constructed) {
@@ -228,6 +233,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function write_client_info($method, $arguments = [])
     {
         \danog\MadelineProto\Logger::log('Writing client info (also executing '.$method.')...');
+
         return $this->method_call(
             'invokeWithLayer',
             [
@@ -241,7 +247,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ]
         );
     }
-    public function get_nearest_dc($allow_switch) {
+
+    public function get_nearest_dc($allow_switch)
+    {
         $nearest_dc = $this->method_call('help.getNearestDc');
         \danog\MadelineProto\Logger::log("We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.');
 
@@ -250,18 +258,20 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
         }
     }
-    
-    public function get_config() {
+
+    public function get_config()
+    {
         if ($this->config['expires'] > time()) {
             return;
         }
         $this->config = $this->method_call('help.getConfig');
         $this->parse_config();
     }
-    
-    public function parse_config() {
+
+    public function parse_config()
+    {
         \danog\MadelineProto\Logger::log('Received config!', $this->config);
-        foreach ($this->config["dc_options"] as $dc) {
+        foreach ($this->config['dc_options'] as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
             $id = $dc['id'];

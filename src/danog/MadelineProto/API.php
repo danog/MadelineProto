@@ -22,9 +22,9 @@ class API extends APIFactory
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
-        
+
         $this->APIFactory();
-        
+
         \danog\MadelineProto\Logger::log('Ping...');
         $pong = $this->ping([3]);
         \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id']);
@@ -35,23 +35,29 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log('MadelineProto is ready!');
         restore_error_handler();
     }
-    public function APIFactory() {
+
+    public function APIFactory()
+    {
         \danog\MadelineProto\Logger::log('Running APIFactory...');
         foreach ($this->API->tl->methods->method_namespace as $namespace => $method) {
             $this->{$method} = new APIFactory($method, $this->API);
         }
     }
-    
-    public function logout() {
+
+    public function logout()
+    {
         $this->API->datacenter->authorized = false;
         $this->API->datacenter->authorization = null;
         if (!$this->API->method_call('auth.logOut')) {
             throw new Exception('An error occurred while logging out!');
         }
         \danog\MadelineProto\Logger::log('Logged out successfully!');
+
         return true;
     }
-    public function bot_login($token) {
+
+    public function bot_login($token)
+    {
         if ($this->API->datacenter->authorized) {
             \danog\MadelineProto\Logger::log('This instance of MadelineProto is already logged in. Logging out first...');
             $this->logout();
@@ -61,15 +67,18 @@ class API extends APIFactory
             'auth.importBotAuthorization',
             [
                 'bot_auth_token'     => $token,
-                'api_id'       => $this->API->settings['app_info']['api_id'],
-                'api_hash'     => $this->API->settings['app_info']['api_hash'],
+                'api_id'             => $this->API->settings['app_info']['api_id'],
+                'api_hash'           => $this->API->settings['app_info']['api_hash'],
             ]
         );
         $this->API->datacenter->authorized = true;
         \danog\MadelineProto\Logger::log('Logged in successfully!');
+
         return $this->API->datacenter->authorization;
     }
-    public function phone_login($number, $sms_type = 5) {
+
+    public function phone_login($number, $sms_type = 5)
+    {
         if ($this->API->datacenter->authorized) {
             \danog\MadelineProto\Logger::log('This instance of MadelineProto is already logged in. Logging out first...');
             $this->logout();
@@ -88,9 +97,12 @@ class API extends APIFactory
         $this->API->datacenter->authorization['phone_number'] = $number;
         $this->API->datacenter->waiting_code = true;
         \danog\MadelineProto\Logger::log('Code sent successfully! Once you receive the code you should use the complete_phone_login function.');
+
         return $this->API->datacenter->authorization;
     }
-    public function complete_phone_login($code) {
+
+    public function complete_phone_login($code)
+    {
         if (!$this->API->datacenter->waiting_code) {
             throw new Exception("I'm not waiting for the code! Please call the phone_login method first");
         }
@@ -106,12 +118,15 @@ class API extends APIFactory
         $this->API->datacenter->waiting_code = false;
         $this->API->datacenter->authorized = true;
         \danog\MadelineProto\Logger::log('Logged in successfully!');
+
         return $this->API->datacenter->authorization;
     }
-    public function __wakeup() {
+
+    public function __wakeup()
+    {
         $this->APIFactory();
     }
-        
+
     public function __destruct()
     {
         restore_error_handler();

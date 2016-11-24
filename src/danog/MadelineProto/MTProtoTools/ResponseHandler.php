@@ -33,6 +33,7 @@ class ResponseHandler extends MsgIdHandler
                 $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
                 $this->datacenter->outgoing_messages[$response['req_msg_id']]['response'] = $last_received;
                 $this->datacenter->incoming_messages[$last_received]['content'] = $response['result'];
+
                 return $this->handle_message($last_sent, $last_received);
                 break;
 
@@ -126,6 +127,7 @@ class ResponseHandler extends MsgIdHandler
                 break;
             case 'gzip_packed':
                 $this->datacenter->incoming_messages[$last_received]['content'] = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', gzdecode($response['packed_data'])));
+
                 return $this->handle_message($last_sent, $last_received);
                 break;
             case 'rpc_answer_dropped_running':

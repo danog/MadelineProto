@@ -35,7 +35,7 @@ class AckHandler extends \danog\MadelineProto\PrimeModule
         if ($this->datacenter->temp_auth_key['id'] === null || $this->datacenter->temp_auth_key['id'] == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00') || (isset($this->datacenter->incoming_messages[$message_id]['ack']) && $this->datacenter->incoming_messages[$message_id]['ack'])) {
             return;
         }
-        
+
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]]);
         $this->datacenter->incoming_messages[$message_id]['ack'] = true;
     }

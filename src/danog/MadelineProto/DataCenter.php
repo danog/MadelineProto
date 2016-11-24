@@ -17,7 +17,6 @@ namespace danog\MadelineProto;
  */
 class DataCenter extends Tools
 {
-    
     public $sockets;
     public $curdc = 0;
     public $dclist = [];
@@ -62,16 +61,18 @@ class DataCenter extends Tools
         \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.')...');
 
         $this->sockets[$dc_number] = new Connection($address, $port, $settings['protocol'], $settings['timeout']);
+
         return true;
     }
-    
+
     public function &__get($name)
     {
         return $this->sockets[$this->curdc]->{$name};
-    }    
+    }
+
     public function __set($name, $value)
     {
-        $this->sockets[$this->curdc]->{$name} =& $value;
+        $this->sockets[$this->curdc]->{$name} = &$value;
     }
 
     public function __call($name, $arguments)

@@ -113,7 +113,7 @@ class AuthKeyHandler extends AckHandler
                     'nonce'           => $nonce,
                     'server_nonce'    => $server_nonce,
                     'new_nonce'       => $new_nonce,
-                    'expires_in'      => $expires_in
+                    'expires_in'      => $expires_in,
                 ];
                 $p_q_inner_data = $this->tl->serialize_obj('p_q_inner_data'.(($expires_in < 0) ? '' : '_temp'), $data_unserialized);
 
