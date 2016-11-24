@@ -190,7 +190,7 @@ for ($x = 0; $x < $sentCode['type']['length']; $x++) {
 $authorization = $MadelineProto->complete_phone_login($code); // Complete authorization
 var_dump($authorization);
 
-$authorization = $MadelineProto->bot_login($token); // Note that every time you login as a bot or as a user MadelineProto will logout first, so now MadelineProto is logged in as the bot with the token $token, not with the number $number
+$authorization = $MadelineProto->bot_login($token); // Note that every time you login as a bot or as a user MadelineProto will logout first, so now MadelineProto is logged in as the bot with token $token, not as the user with number $number
 var_dump($authorization);
 ```
 
@@ -199,7 +199,7 @@ var_dump($authorization);
 MadelineProto can throw three different exceptions:  
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
 * \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API)
-* \danog\MadelineProto\TL/Exception - Thrown on TL serialization/deserialization errors
+* \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
 
 
 ## Contributing
