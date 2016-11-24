@@ -13,6 +13,17 @@ This project is in beta state.
 
 ## Usage
 
+### Dependencies
+
+This project depends on [PHPStruct](https://github.com/danog/PHPStruct), [phpseclib](https://github.com/phpseclib/phpseclib), https://packagist.org/packages/paragonie/constant_time_encoding and https://packagist.org/packages/paragonie/random_compat
+
+To install them all simply run:
+```
+composer update
+```
+In the cloned repo.
+
+
 ### Instantiation
 
 ```

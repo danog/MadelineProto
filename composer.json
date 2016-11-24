@@ -2,8 +2,7 @@
     "name": "danog/madelineproto",
     "description": "PHP implementation of telegram's MTProto protocol.",
     "type": "project",
-    "license": "MIT",
-    "minimum-stability": "stable",
+    "license": "AGPLV3",
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "require": {
