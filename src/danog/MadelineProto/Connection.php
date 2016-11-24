@@ -20,6 +20,9 @@ class Connection extends Tools
     public $sock = null;
 
     public $protocol = null;
+    public $ip = null;
+    public $port = null;
+    public $timeout = null;
 
     public $time_delta = 0;
     public $temp_auth_key;
@@ -27,7 +30,7 @@ class Connection extends Tools
     public $session_id;
     public $seq_no = 0;
 
-    public function __construct($ip, $port, $protocol = 'tcp_full')
+    public function __construct($ip, $port, $protocol, $timeout)
     {
         // Can use:
         /*
@@ -39,12 +42,13 @@ class Connection extends Tools
         - udp
         */
         $this->protocol = $protocol;
+        $this->timeout = $timeout;
         $this->ip = $ip;
         $this->port = $port;
         switch ($this->protocol) {
             case 'tcp_abridged':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, 5);
+                stream_set_timeout($this->sock, $timeout);
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -52,7 +56,7 @@ class Connection extends Tools
                 break;
             case 'tcp_intermediate':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, 5);
+                stream_set_timeout($this->sock, $timeout);
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -60,7 +64,7 @@ class Connection extends Tools
                 break;
             case 'tcp_full':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, 5);
+                stream_set_timeout($this->sock, $timeout);
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -98,7 +102,7 @@ class Connection extends Tools
     public function close_and_reopen()
     {
         $this->__destruct();
-        $this->__construct($this->ip, $this->port, $this->protocol);
+        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
     }
 
     /**

@@ -55,7 +55,7 @@ class AuthKeyHandler extends AckHandler
                 * Check if the client's nonce and the server's nonce are the same
                 */
                 if ($ResPQ['nonce'] !== $nonce) {
-                    throw new Exception('wrong nonce');
+                    throw new \danog\MadelineProto\Exception('wrong nonce');
                 }
 
                 /*
@@ -72,7 +72,7 @@ class AuthKeyHandler extends AckHandler
                 }
 
                 if (!isset($public_key_fingerprint)) {
-                    throw new Exception("Couldn't find our key in the server_public_key_fingerprints vector.");
+                    throw new \danog\MadelineProto\Exception("Couldn't find our key in the server_public_key_fingerprints vector.");
                 }
 
                 $pq_bytes = $ResPQ['pq'];
@@ -92,7 +92,7 @@ class AuthKeyHandler extends AckHandler
                 }
 
                 if (!($pq->equals($p->multiply($q)) && $p->compare($q) < 0)) {
-                    throw new Exception("couldn't compute p and q.");
+                    throw new \danog\MadelineProto\Exception("couldn't compute p and q.");
                 }
 
                 \danog\MadelineProto\Logger::log('Factorization '.$pq.' = '.$p.' * '.$q);
@@ -105,38 +105,25 @@ class AuthKeyHandler extends AckHandler
                 $q_bytes = \danog\PHP\Struct::pack('>I', (string) $q);
 
                 $new_nonce = \phpseclib\Crypt\Random::string(32);
-                if ($expires_in < 0) {
-                    $data = $this->tl->serialize_obj('p_q_inner_data',
-                        [
-                            'pq'              => $pq_bytes,
-                            'p'               => $p_bytes,
-                            'q'               => $q_bytes,
-                            'nonce'           => $nonce,
-                            'server_nonce'    => $server_nonce,
-                            'new_nonce'       => $new_nonce,
-                        ]
-                    );
-                } else {
-                    $data = $this->tl->serialize_obj('p_q_inner_data_temp',
-                        [
-                            'pq'              => $pq_bytes,
-                            'p'               => $p_bytes,
-                            'q'               => $q_bytes,
-                            'nonce'           => $nonce,
-                            'server_nonce'    => $server_nonce,
-                            'new_nonce'       => $new_nonce,
-                            'expires_in'      => $expires_in,
-                        ]
-                    );
-                }
+
+                $data_unserialized = [
+                    'pq'              => $pq_bytes,
+                    'p'               => $p_bytes,
+                    'q'               => $q_bytes,
+                    'nonce'           => $nonce,
+                    'server_nonce'    => $server_nonce,
+                    'new_nonce'       => $new_nonce,
+                    'expires_in'      => $expires_in
+                ];
+                $p_q_inner_data = $this->tl->serialize_obj('p_q_inner_data'.(($expires_in < 0) ? '' : '_temp'), $data_unserialized);
 
                 /*
                 * ***********************************************************************
                 * Encrypt serialized object
                 */
-                $sha_digest = sha1($data, true);
-                $random_bytes = \phpseclib\Crypt\Random::string(255 - strlen($data) - strlen($sha_digest));
-                $to_encrypt = $sha_digest.$data.$random_bytes;
+                $sha_digest = sha1($p_q_inner_data, true);
+                $random_bytes = \phpseclib\Crypt\Random::string(255 - strlen($p_q_inner_data) - strlen($sha_digest));
+                $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
                 $encrypted_data = $this->key->encrypt($to_encrypt);
 
                 \danog\MadelineProto\Logger::log('Starting Diffie Hellman key exchange');
@@ -176,7 +163,7 @@ class AuthKeyHandler extends AckHandler
                 * Check if the client's nonce and the server's nonce are the same
                 */
                 if ($nonce != $server_dh_params['nonce']) {
-                    throw new Exception('wrong nonce.');
+                    throw new \danog\MadelineProto\Exception('wrong nonce.');
                 }
 
                 /*
@@ -184,7 +171,7 @@ class AuthKeyHandler extends AckHandler
                 * Check if server_nonce and new server_nonce are the same
                 */
                 if ($server_nonce != $server_dh_params['server_nonce']) {
-                    throw new Exception('wrong server nonce.');
+                    throw new \danog\MadelineProto\Exception('wrong server nonce.');
                 }
 
                 /*
@@ -193,7 +180,7 @@ class AuthKeyHandler extends AckHandler
                 * new nonce hash return in server_DH_params_fail
                 */
                 if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
-                    throw new Exception('wrong new nonce hash.');
+                    throw new \danog\MadelineProto\Exception('wrong new nonce hash.');
                 }
 
                 /*
@@ -233,15 +220,15 @@ class AuthKeyHandler extends AckHandler
                 */
                 $server_DH_inner_data_length = $this->tl->get_length($this->fopen_and_write('php://memory', 'rw+b', $answer));
                 if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
-                    throw new Exception('answer_hash mismatch.');
+                    throw new \danog\MadelineProto\Exception('answer_hash mismatch.');
                 }
 
                 if ($nonce != $server_DH_inner_data['nonce']) {
-                    throw new Exception('wrong nonce');
+                    throw new \danog\MadelineProto\Exception('wrong nonce');
                 }
 
                 if ($server_nonce != $server_DH_inner_data['server_nonce']) {
-                    throw new Exception('wrong server nonce');
+                    throw new \danog\MadelineProto\Exception('wrong server nonce');
                 }
 
                 $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
@@ -275,7 +262,7 @@ class AuthKeyHandler extends AckHandler
                 */
                 \danog\MadelineProto\Logger::log('Executing dh_prime checks (1/3)...');
                 if (!$dh_prime->isPrime()) {
-                    throw new Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
+                    throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
                 }
 
 
@@ -289,7 +276,7 @@ class AuthKeyHandler extends AckHandler
                 /*
                 \danog\MadelineProto\Logger::log('Executing dh_prime checks (2/3)...');
                 if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
-                    throw new Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
+                    throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
                 }
                 */
 
@@ -302,7 +289,7 @@ class AuthKeyHandler extends AckHandler
                 if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
                     || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
                 ) {
-                    throw new Exception("g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
+                    throw new \danog\MadelineProto\Exception("g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
                 }
 
                 /*
@@ -315,7 +302,7 @@ class AuthKeyHandler extends AckHandler
                 if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
                     || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
                 ) {
-                    throw new Exception('g is invalid (1 < g < dh_prime - 1 is false).');
+                    throw new \danog\MadelineProto\Exception('g is invalid (1 < g < dh_prime - 1 is false).');
                 }
 
                 /*
@@ -327,7 +314,7 @@ class AuthKeyHandler extends AckHandler
                 if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
                     || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
                 ) {
-                    throw new Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
+                    throw new \danog\MadelineProto\Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
                 }
 
                 foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
@@ -343,7 +330,7 @@ class AuthKeyHandler extends AckHandler
                     if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
                         || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                     ) {
-                        throw new Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
+                        throw new \danog\MadelineProto\Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
 
                     \danog\MadelineProto\Logger::log('Preparing client_DH_inner_data...');
@@ -425,7 +412,7 @@ class AuthKeyHandler extends AckHandler
                     * Check if the client's nonce and the server's nonce are the same
                     */
                     if ($Set_client_DH_params_answer['nonce'] != $nonce) {
-                        throw new Exception('wrong nonce.');
+                        throw new \danog\MadelineProto\Exception('wrong nonce.');
                     }
 
                     /*
@@ -433,7 +420,7 @@ class AuthKeyHandler extends AckHandler
                     * Check if server_nonce and new server_nonce are the same
                     */
                     if ($Set_client_DH_params_answer['server_nonce'] != $server_nonce) {
-                        throw new Exception('wrong server nonce');
+                        throw new \danog\MadelineProto\Exception('wrong server nonce');
                     }
 
                     /*
@@ -443,7 +430,7 @@ class AuthKeyHandler extends AckHandler
                     switch ($Set_client_DH_params_answer['_']) {
                         case 'dh_gen_ok':
                             if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
-                                throw new Exception('wrong new_nonce_hash1');
+                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash1');
                             }
 
                             \danog\MadelineProto\Logger::log('Diffie Hellman key exchange processed successfully!');
@@ -452,8 +439,9 @@ class AuthKeyHandler extends AckHandler
                             $res_authorization['auth_key'] = $auth_key_str;
                             $res_authorization['id'] = substr($auth_key_sha, -8);
 
-                            if ($expires_in < 0) { //check if permanent authorization
+                            if ($expires_in >= 0) { //check if permanent authorization
                                 $res_authorization['expires_in'] = $expires_in;
+                                $res_authorization['p_q_inner_data_temp'] = $p_q_inner_data;
                             }
 
                             \danog\MadelineProto\Logger::log('Auth key generated');
@@ -461,7 +449,7 @@ class AuthKeyHandler extends AckHandler
                             return $res_authorization;
                         case 'dh_gen_retry':
                             if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
-                                throw new Exception('wrong new_nonce_hash_2');
+                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash_2');
                             }
 
                             //repeat foreach
@@ -469,13 +457,13 @@ class AuthKeyHandler extends AckHandler
                             break;
                         case 'dh_gen_fail':
                             if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
-                                throw new Exception('wrong new_nonce_hash_3');
+                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash_3');
                             }
 
                             \danog\MadelineProto\Logger::log('Auth Failed');
                             break 2;
                         default:
-                            throw new Exception('Response Error');
+                            throw new \danog\MadelineProto\Exception('Response Error');
                             break;
                     }
                 }
@@ -484,7 +472,7 @@ class AuthKeyHandler extends AckHandler
             }
         }
 
-        throw new Exception('Auth Failed');
+        throw new \danog\MadelineProto\Exception('Auth Failed');
     }
 
     public function bind_temp_auth_key($expires_in)
@@ -519,6 +507,6 @@ class AuthKeyHandler extends AckHandler
 
             return true;
         }
-        throw new Exception('An error occurred while binding temporary and permanent authorization keys.');
+        throw new \danog\MadelineProto\Exception('An error occurred while binding temporary and permanent authorization keys.');
     }
 }

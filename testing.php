@@ -14,8 +14,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require_once 'vendor/autoload.php';
 
 $MadelineProto = new \danog\MadelineProto\API();
-var_dump(strlen(var_export($MadelineProto, true)));
-if (file_exists('number.php')) {
+/*if (file_exists('number.php')) {
     include_once 'number.php';
     $sentCode = $MadelineProto->auth->sendCode(
         [
@@ -40,4 +39,16 @@ if (file_exists('number.php')) {
         ]
     );
     var_dump($authorization);
+}*/
+if (file_exists('token.php')) {
+    include_once 'token.php';
+    $botauthorization = $MadelineProto->auth->importBotAuthorization(
+        [
+            'bot_auth_token'     => $token,
+            'api_id'       => $MadelineProto->API->settings['app_info']['api_id'],
+            'api_hash'     => $MadelineProto->API->settings['app_info']['api_hash'],
+        ]
+    );
+    var_dump($botauthorization);
 }
+echo 'Size of MadelineProto instance is '.strlen(var_export($MadelineProto, true)).' bytes'.PHP_EOL;

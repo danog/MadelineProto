@@ -54,7 +54,7 @@ class ResponseHandler extends MsgIdHandler
                     48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
                     64 => 'invalid container.',
                 ];
-                throw new Exception('Received bad_msg_notification for '.$response['bad_msg_id'].': '.$error_codes[$response['error_code']]);
+                throw new \danog\MadelineProto\Exception('Received bad_msg_notification for '.$response['bad_msg_id'].': '.$error_codes[$response['error_code']]);
                 break;
             case 'bad_server_salt':
                 $this->datacenter->temp_auth_key['server_salt'] = $response['new_server_salt'];

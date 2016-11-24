@@ -22,7 +22,7 @@ class DebugTools
     public static function hex_dump(...$what)
     {
         foreach ($what as $w) {
-            var_dump(bin2hex($w));
+            \danog\MadelienProto\Logger::log(bin2hex($w));
         }
     }
 

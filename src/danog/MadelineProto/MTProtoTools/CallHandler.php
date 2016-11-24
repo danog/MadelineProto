@@ -33,7 +33,7 @@ class CallHandler extends AuthKeyHandler
             }
         }
         if ($response == null) {
-            throw new Exception("Couldn't get response");
+            throw new \danog\MadelineProto\Exception("Couldn't get response");
         }
         switch ($response['_']) {
             case 'rpc_error':
@@ -47,7 +47,7 @@ class CallHandler extends AuthKeyHandler
 
                         break;
                     default:
-                        throw new Exception('Got rpc error '.$response['error_code'].': '.$response['error_message']);
+                        throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
                         break;
                 }
                 break;
@@ -60,7 +60,7 @@ class CallHandler extends AuthKeyHandler
     public function method_call($method, $args, $message_id = null)
     {
         if (!is_array($args)) {
-            throw new Exception("Arguments aren't an array.");
+            throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
             try {
@@ -68,24 +68,32 @@ class CallHandler extends AuthKeyHandler
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $server_answer = $this->wait_for_response($int_message_id, $method);
-            } catch (Exception $e) {
+            } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 $this->datacenter->close_and_reopen();
                 continue;
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                if ($e->getCode() == -404) {
+                    \danog\MadelineProto\Logger::log('Temporary authorization key expired. Regenerating and recalling method...');
+                    $this->datacenter->temp_auth_key = null;
+                    $this->init_authorization();
+                    continue;
+                }
+                throw $e;
             }
             if ($server_answer == null) {
-                throw new Exception('An error occurred while calling method '.$method.'.');
+                throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
             }
 
             return $server_answer;
         }
-        throw new Exception('An error occurred while calling method '.$method.'.');
+        throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
     }
 
     public function object_call($object, $args)
     {
         if (!is_array($args)) {
-            throw new Exception("Arguments aren't an array.");
+            throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
 
         foreach (range(1, $this->settings['max_tries']['query']) as $i) {
@@ -101,11 +109,11 @@ class CallHandler extends AuthKeyHandler
 
             return;
 //            if ($server_answer == null) {
-//                throw new Exception('An error occurred while calling object '.$object.'.');
+//                throw new \danog\MadelineProto\Exception('An error occurred while calling object '.$object.'.');
 //            }
 //            $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $server_answer));
 //            return $deserialized;
         }
-        throw new Exception('An error occurred while calling object '.$object.'.');
+        throw new \danog\MadelineProto\Exception('An error occurred while calling object '.$object.'.');
     }
 }

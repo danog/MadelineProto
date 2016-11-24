@@ -50,17 +50,17 @@ class Crypt extends CallHandler
     public function _ige($message, $key, $iv, $operation = 'decrypt')
     {
         if (strlen($key) != 32) {
-            throw new Exception('key must be 32 bytes long (was '.strlen($key).' bytes)');
+            throw new \danog\MadelineProto\Exception('key must be 32 bytes long (was '.strlen($key).' bytes)');
         }
         if (strlen($iv) != 32) {
-            throw new Exception('iv must be 32 bytes long (was '.strlen($iv).' bytes)');
+            throw new \danog\MadelineProto\Exception('iv must be 32 bytes long (was '.strlen($iv).' bytes)');
         }
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_ECB);
         $cipher->setKey($key);
         $cipher->paddable = false;
         $blocksize = $cipher->block_size;
         if ((strlen($message) % $blocksize) != 0) {
-            throw new Exception('message must be a multiple of 16 bytes (try adding '.(16 - (strlen($message) % 16)).' bytes of padding)');
+            throw new \danog\MadelineProto\Exception('message must be a multiple of 16 bytes (try adding '.(16 - (strlen($message) % 16)).' bytes of padding)');
         }
         $ivp = substr($iv, 0, $blocksize);
         $ivp2 = substr($iv, $blocksize);
@@ -80,7 +80,7 @@ class Crypt extends CallHandler
                 $ivp = $outdata;
                 $ivp2 = $indata;
             } else {
-                throw new Exception('Crypt: operation must be either \'decrypt\' or \'encrypt\'');
+                throw new \danog\MadelineProto\Exception('Crypt: operation must be either \'decrypt\' or \'encrypt\'');
             }
             $ciphered .= $outdata;
         }

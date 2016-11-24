@@ -19,6 +19,7 @@ class DataCenter extends Tools
 {
     public $referenced_variables = ['time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'seq_no'];
     public $sockets;
+    public $curdc = 0;
 
     public function __construct($dclist, $settings)
     {
@@ -36,6 +37,7 @@ class DataCenter extends Tools
                     'protocol'  => 'tcp_full',
                     'port'      => '443',
                     'test_mode' => true,
+                    'timeout'   => 10,
                 ];
             }
         }
@@ -55,10 +57,9 @@ class DataCenter extends Tools
     public function dc_connect($dc_number, $settings = [])
     {
         if (isset($this->sockets[$dc_number])) {
-            return false;
             $this->set_curdc($dc_number);
+            return false;
         }
-        $this->set_curdc($dc_number);
 
         \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.'...');
 
@@ -71,8 +72,8 @@ class DataCenter extends Tools
             $path = $settings['test_mode'] ? 'apiw_test1' : 'apiw1';
             $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
         }
-        $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol']);
-
+        $this->sockets[$dc_number] = new Connection($address, $settings['port'], $settings['protocol'], $settings['timeout']);
+        $this->set_curdc($dc_number);
         return true;
     }
 
@@ -84,11 +85,11 @@ class DataCenter extends Tools
         }
     }
 
-    public function unset_curdc($dc_number)
+    public function unset_curdc()
     {
-        unset($this->curdc);
+        $this->curdc = 0;
         foreach ($this->referenced_variables as $key) {
-            unset($this->sockets[$dc_number]->{$key});
+            unset($this->{$key});
         }
     }
 

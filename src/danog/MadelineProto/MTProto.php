@@ -24,7 +24,7 @@ class MTProto extends MTProtoTools
         // Set default settings
         $default_settings = [
             'authorization' => [
-                'default_temp_auth_key_expires_in' => 86400,
+                'default_temp_auth_key_expires_in' => 31557600,
                 'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
 lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
@@ -60,8 +60,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'protocol'  => 'tcp_full',
                     'test_mode' => false,
                     'port'      => '443',
+                    'timeout'      => 10
                 ],
-                'default_dc' => 4,
+                'default_dc' => 2,
             ],
             'app_info' => [
                 'api_id'          => 25628,
@@ -139,10 +140,15 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
+/*        if ($this->datacenter->curdc !== 0) {
+            try {
+                $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
+            } catch (\danog\MadelineProto\RPCErrorException $e) { ; }
+        }*/
         if ($this->datacenter->dc_connect($new_dc)) {
             $this->init_authorization();
-            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->write_client_info($allow_nearest_dc_switch);
+//            if (isset($exported_authorization)) $this->method_call('auth.importAuthorization', $exported_authorization);
         }
     }
 
@@ -159,6 +165,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
+            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
         }
     }
 

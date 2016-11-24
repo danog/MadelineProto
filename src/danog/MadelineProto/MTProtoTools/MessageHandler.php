@@ -27,7 +27,7 @@ class MessageHandler extends Crypt
             $int_message_id = $this->generate_message_id();
         }
         if (!is_int($int_message_id)) {
-            throw new Exception("Specified message id isn't an integer");
+            throw new \danog\MadelineProto\Exception("Specified message id isn't an integer");
         }
 
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
@@ -54,7 +54,7 @@ class MessageHandler extends Crypt
     {
         $payload = $this->datacenter->read_message();
         if (fstat($payload)['size'] == 4) {
-            throw new Exception('Server response error: '.abs(\danog\PHP\Struct::unpack('<i', fread($payload, 4))[0]));
+            throw new \danog\MadelineProto\RPCErrorException('Generic', \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0]);
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
@@ -69,12 +69,12 @@ class MessageHandler extends Crypt
 
             $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->datacenter->temp_auth_key['server_salt']) {
-                throw new Exception('Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
+                throw new \danog\MadelineProto\Exception('Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
 
             $session_id = substr($decrypted_data, 8, 8);
             if ($session_id != $this->datacenter->session_id) {
-                throw new Exception('Session id mismatch.');
+                throw new \danog\MadelineProto\Exception('Session id mismatch.');
             }
 
             $message_id = \danog\PHP\Struct::unpack('<Q', substr($decrypted_data, 16, 8))[0];
@@ -86,28 +86,28 @@ class MessageHandler extends Crypt
             $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 28, 4)) [0];
 
             if ($message_data_length > strlen($decrypted_data)) {
-                throw new Exception('message_data_length is too big');
+                throw new \danog\MadelineProto\Exception('message_data_length is too big');
             }
 
             if ((strlen($decrypted_data) - 32) - $message_data_length > 15) {
-                throw new Exception('difference between message_data_length and the length of the remaining decrypted buffer is too big');
+                throw new \danog\MadelineProto\Exception('difference between message_data_length and the length of the remaining decrypted buffer is too big');
             }
 
             if ($message_data_length < 0) {
-                throw new Exception('message_data_length not positive');
+                throw new \danog\MadelineProto\Exception('message_data_length not positive');
             }
 
             if ($message_data_length % 4 != 0) {
-                throw new Exception('message_data_length not divisible by 4');
+                throw new \danog\MadelineProto\Exception('message_data_length not divisible by 4');
             }
 
             $message_data = substr($decrypted_data, 32, $message_data_length);
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
-                throw new Exception('msg_key mismatch');
+                throw new \danog\MadelineProto\Exception('msg_key mismatch');
             }
             $this->incoming_messages[$message_id]['seq_no'] = $seq_no;
         } else {
-            throw new Exception('Got unknown auth_key id');
+            throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
         }
         $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->incoming_messages[$message_id]['content'] = $deserialized;

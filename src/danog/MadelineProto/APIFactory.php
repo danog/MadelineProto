@@ -25,6 +25,8 @@ class APIFactory
 
     public function __call($name, $arguments)
     {
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         return $this->API->method_call($this->namespace.$name, $arguments[0]);
+        restore_error_handler();
     }
 }

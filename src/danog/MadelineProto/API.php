@@ -12,16 +12,16 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class API extends Tools
+class API extends APIFactory
 {
     public $API;
     public $settings;
+    public $namespace = '';
 
     public function __construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
-
         \danog\MadelineProto\Logger::log('Running APIFactory...');
         foreach ($this->API->tl->methods->method_namespace as $namespace => $method) {
             $this->{$method} = new APIFactory($method, $this->API);
@@ -35,15 +35,11 @@ class API extends Tools
 
 
         \danog\MadelineProto\Logger::log('MadelineProto is ready!');
+        restore_error_handler();
     }
 
     public function __destruct()
     {
         restore_error_handler();
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $this->API->method_call($name, $arguments[0]);
     }
 }

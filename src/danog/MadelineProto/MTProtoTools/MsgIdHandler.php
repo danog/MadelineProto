@@ -20,19 +20,19 @@ class MsgIdHandler extends MessageHandler
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
         if (((int) ((time() + $this->datacenter->time_delta - 300) * pow(2, 30)) * 4) > $new_message_id) {
-            throw new Exception('Given message id ('.$new_message_id.') is too old.');
+            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too old.');
         }
         if (((int) ((time() + $this->datacenter->time_delta + 30) * pow(2, 30)) * 4) < $new_message_id) {
-            throw new Exception('Given message id ('.$new_message_id.') is too new.');
+            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
         }
         if ($outgoing) {
             if ($new_message_id % 4 != 0) {
-                throw new Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
+                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
             $keys = array_keys($this->outgoing_messages);
             asort($keys);
             if ($new_message_id <= end($keys)) {
-                throw new Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.end($keys).').', 1);
+                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.end($keys).').', 1);
             }
             $this->outgoing_messages[$new_message_id] = [];
             if (count($this->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
@@ -40,19 +40,19 @@ class MsgIdHandler extends MessageHandler
             }
         } else {
             if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
-                throw new Exception('message id mod 4 != 1 or 3');
+                throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
             }
             $keys = array_keys($this->incoming_messages);
             if ($container) {
                 asort($keys);
                 if ($new_message_id >= end($keys)) {
-                    throw new Exception('Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
+                    throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
                 }
             } else {
                 asort($keys);
                 foreach ($keys as $message_id) {
                     if ($new_message_id <= $message_id) {
-                        throw new Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').');
+                        throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').');
                     }
                 }
             }
