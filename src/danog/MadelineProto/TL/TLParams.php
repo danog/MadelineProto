@@ -14,7 +14,8 @@ namespace danog\MadelineProto\TL;
 
 class TLParams
 {
-    public function parse_params($key, $mtproto = false) {
+    public function parse_params($key, $mtproto = false)
+    {
         foreach ($this->params[$key] as &$param) {
             $param['flag'] = false;
             $param['subtype'] = null;
