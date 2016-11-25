@@ -1,18 +1,20 @@
 sudo: required
-dist: trusty
-group: edge
+#dist: trusty
+#group: edge
 language: php
 php:
-  - '7.0'
-  - nightly
-  - hhvm
-  - '5.6'
+- '7.0'
+- nightly
+- hhvm
+- '5.6'
 addons:
   apt:
     packages:
     - python3
-
 before_script:
-  - composer update --dev
+- composer update --dev
 script:
-  - ./testing.php
+- "./testing.php"
+before_install:
+- openssl aes-256-cbc -K $encrypted_f108bed02ef2_key -iv $encrypted_f108bed02ef2_iv
+  -in token.php.enc -out token.php -d
