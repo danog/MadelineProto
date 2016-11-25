@@ -20,7 +20,6 @@ class TLConstructor extends TLParams
     public $params = [];
     public $key = 0;
 
-
     public function add($json_dict, $mtproto)
     {
         $this->id[$this->key] = (int) $json_dict['id'];

@@ -47,4 +47,3 @@ if (file_exists('token.php')) {
     var_dump($authorization);
 }
 echo 'Size of MadelineProto instance is '.strlen(serialize($unserialized)).' bytes'.PHP_EOL;
-

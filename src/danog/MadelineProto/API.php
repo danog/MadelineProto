@@ -132,8 +132,9 @@ class API extends APIFactory
 
     public function __sleep()
     {
-        return ["API"];
+        return ['API'];
     }
+
     public function __wakeup()
     {
         $this->APIFactory();
