@@ -1,6 +1,6 @@
 sudo: required
-#dist: trusty
-#group: edge
+dist: trusty
+group: edge
 language: php
 php:
 - '7.0'

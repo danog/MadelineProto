@@ -42,8 +42,7 @@ class CallHandler extends AuthKeyHandler
                         $dc = preg_replace('/[^0-9]+/', '', $response['error_message']);
                         \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
                         $this->switch_dc($dc);
-
-                        return $this->method_call($this->datacenter->outgoing_messages[$last_sent]['content']['method'], $this->datacenter->outgoing_messages[$last_sent]['content']['args']);
+                        throw new \danog\MadelineProto\Exception('I had to switch to datacenter '.$dc);
 
                         break;
                     default:
