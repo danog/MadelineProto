@@ -114,7 +114,7 @@ class Connection extends Tools
 
     public function __wakeup()
     {
-        $this->close_and_reopen();
+        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
     }
 
     /**

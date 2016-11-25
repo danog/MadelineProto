@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLConstructor
+class TLConstructor extends TLParams
 {
     public $id = [];
     public $predicate = [];
@@ -20,35 +20,14 @@ class TLConstructor
     public $params = [];
     public $key = 0;
 
+
     public function add($json_dict, $mtproto)
     {
         $this->id[$this->key] = (int) $json_dict['id'];
         $this->predicate[$this->key] = (string) ((($mtproto && $json_dict['predicate'] == 'message') ? 'MT' : '').$json_dict['predicate']);
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
-        foreach ($this->params[$this->key] as &$param) {
-            $param['flag'] = false;
-            $param['subtype'] = null;
-            if (preg_match('/^flags\.\d*\?/', $param['type'])) {
-                $param['flag'] = true;
-                $param['pow'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
-                $param['type'] = preg_replace('/^flags\.\d*\?/', '', $param['type']);
-            }
-            if (preg_match('/vector<.*>/i', $param['type'])) {
-                if (preg_match('/vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'vector';
-                }
-                if (preg_match('/Vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'Vector t';
-                }
-                if (preg_match('/^\%/', $param['subtype'])) {
-                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
-                }
-                $param['subtype'] = (($mtproto && $param['subtype'] == 'message') ? 'MT' : '').$param['subtype'];
-            }
-        }
+        $this->parse_params($this->key, $mtproto);
         $this->key++;
     }
 

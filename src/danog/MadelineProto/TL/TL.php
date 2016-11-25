@@ -80,21 +80,20 @@ class TL extends \danog\MadelineProto\Tools
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if ($cur_flag['flag']) {
-                $flag_pow = pow(2, $cur_flag['pow']);
                 switch ($cur_flag['type']) {
                     case 'true':
                     case 'false':
-                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) ? ($flags | $cur_flag['pow']) : ($flags & ~$cur_flag['pow']);
                         unset($arguments[$cur_flag['name']]);
                         break;
                     case 'Bool':
-                        $arguments[$cur_flag['name']] = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) && (($flags & $flag_pow) != 0);
-                        if (($flags & $flag_pow) == 0) {
+                        $arguments[$cur_flag['name']] = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) && (($flags & $cur_flag['pow']) != 0);
+                        if (($flags & $cur_flag['pow']) == 0) {
                             unset($arguments[$cur_flag['name']]);
                         }
                         break;
                     default:
-                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $flag_pow) : ($flags & ~$flag_pow);
+                        $flags = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']] !== null) ? ($flags | $cur_flag['pow']) : ($flags & ~$cur_flag['pow']);
                         break;
                 }
             }
@@ -102,7 +101,7 @@ class TL extends \danog\MadelineProto\Tools
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & pow(2, $current_argument['pow'])) == 0)) {
+                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) == 0)) {
                     //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
                     continue;
                 }
@@ -182,12 +181,7 @@ class TL extends \danog\MadelineProto\Tools
 
                 return $concat;
             default:
-                $tl_elem = $this->constructors->find_by_predicate($type);
-                if ($tl_elem === false) {
-                    throw new Exception('Could not serialize type: '.$type);
-                }
-
-                return \danog\PHP\Struct::pack('<i', $tl_elem['id']);
+                return $this->serialize_generic($type, $value);
                 break;
         }
     }
@@ -286,19 +280,18 @@ class TL extends \danog\MadelineProto\Tools
                     $x = ['_' => $tl_elem['predicate']];
                     foreach ($tl_elem['params'] as $arg) {
                         if ($arg['flag']) {
-                            $flag_pow = pow(2, $arg['pow']);
                             switch ($arg['type']) {
                                 case 'true':
                                 case 'false':
 
-                                    $x[$arg['name']] = ($x['flags'] & $flag_pow) == 1;
+                                    $x[$arg['name']] = ($x['flags'] & $arg['pow']) == 1;
                                     continue 2;
                                     break;
                                 case 'Bool':
                                     $default = false;
                                 default:
                                     $default = null;
-                                    if (($x['flags'] & $flag_pow) == 0) {
+                                    if (($x['flags'] & $arg['pow']) == 0) {
                                         $x[$arg['name']] = $default;
                                         //\danog\MadelineProto\Logger::log('Skipping '.$arg['name'].' of type '.$arg['type'].'/'.$arg['subtype']);
                                         continue 2;

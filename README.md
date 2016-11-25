@@ -17,7 +17,7 @@ This project is in beta state.
 
 This project depends on [PHPStruct](https://github.com/danog/PHPStruct), [phpseclib](https://github.com/phpseclib/phpseclib), https://packagist.org/packages/paragonie/constant_time_encoding and https://packagist.org/packages/paragonie/random_compat
 
-To install them all simply run:
+To install dependencies install composer and run:
 ```
 composer update
 ```
@@ -27,13 +27,13 @@ In the cloned repo.
 ### Instantiation
 
 ```
-$madeline = new \danog\MadelineProto\API();
+$MadelineProto = new \danog\MadelineProto\API();
 ```
 
 ### Settings
 
-The constructor accepts an optional parameter, which is the settings array.  
-Here you can see its default value and explanations for every setting:
+The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
+Here you can see the default values for the settings\ arrays and explanations for every setting:
 ```
 $settings = [
     'authorization' => [ // Authorization settings
@@ -86,60 +86,53 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 2 => [ // The rest will be fetched using help.getConfig
                     'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
                     'port' => 443,
-                            'media_only' => false,
-                            'tcpo_only' => false
-                         ]
-                     ]
-                ],
-            ],
-            'connection_settings' => [ // connection settings
-                'all' => [ // Connection settings will be applied on datacenter ids matching the key of these settings subarrays, if the key is equal to all like in this case that will match all datacenters that haven't a custom settings subarray...
-                    'protocol'  => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
-                    'test_mode' => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                    'ipv6' => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 10 // timeout for sockets
-                ],
-            ],
-            'app_info' => [ // obtained in https://my.telegram.org
-                'api_id'          => 25628,
-                'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
-                'device_model'    => php_uname('s'),
-                'system_version'  => php_uname('r'),
-                'app_version'     => 'Unicorn', // 🌚
-                'lang_code'       => 'en',
-            ],
-            'tl_schema'     => [ // TL scheme files
-                'layer'         => 57, // layer version
-                'src'           => [
-                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram' => __DIR__.'/TL_telegram_v57.json', // telegram TL scheme
-                ],
-            ],
-            'logger'       => [ // Logger settings
-                /*
-                 * logger modes:
-                 * 0 - No logger
-                 * 1 - Log to the default logger destination
-                 * 2 - Log to file defined in second parameter
-                 * 3 - Echo logs
-                 */
-                'logger'       => 1, // write to
-                'logger_param' => '/tmp/MadelineProto.log',
-                'logger'       => 3, // overwrite previous setting and echo logs
-            ],
-            'max_tries'         => [
-                'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
-                'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
-                'response'      => 5,// How many times should I try to get a response of a query before throwing an exception
-            ],
-            'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-                'incoming' => 30,
-                'outgoing' => 30,
-            ],
-        ];
+                    'media_only' => false,
+                    'tcpo_only' => false
+                ]
+            ]
+        ],
+    ],
+    'connection_settings' => [ // connection settings
+        'all' => [ // Connection settings will be applied on datacenter ids matching the key of these settings subarrays, if the key is equal to all like in this case that will match all datacenters that haven't a custom settings subarray...
+            'protocol'  => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
+            'test_mode' => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
+            'ipv6' => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
+            'timeout'      => 10 // timeout for sockets
+        ],
+    ],
+    'app_info' => [ // obtained in https://my.telegram.org
+        'api_id'          => 25628,
+        'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
+        'device_model'    => php_uname('s'),
+        'system_version'  => php_uname('r'),
+        'app_version'     => 'Unicorn', // 🌚
+        'lang_code'       => 'en',
+    ],
+    'tl_schema'     => [ // TL scheme files
+        'layer'         => 57, // layer version
+        'src'           => [
+            'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
+            'telegram' => __DIR__.'/TL_telegram_v57.json', // telegram TL scheme
+        ],
+    ],
+    'logger'       => [ // Logger settings
+        'logger'       => 1, // 0 - No logger, 1 - Log to the default logger destination, 2 - Log to file defined in logger_param, 3 - Echo logs
+        'logger_param' => '/tmp/MadelineProto.log',
+        'logger'       => 3, // overwrite previous setting and echo logs
+    ],
+    'max_tries'         => [
+        'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
+        'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
+        'response'      => 5,// How many times should I try to get a response of a query before throwing an exception
+    ],
+    'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
+        'incoming' => 30,
+        'outgoing' => 30,
+    ],
+];
 ```
 
-You can provide only part of any of the subsettings array, the rest will be automagically set to the default values of the specified subsettings array.   
+You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
 ```
 $settings = [
@@ -162,17 +155,16 @@ Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
 Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 -----END RSA PUBLIC KEY-----',
     ]
-    // The remaining subsetting arrays are the set to the default ones
+    // The remaining subsetting arrays are the set to default
 ]
 ```
 
-The rest of the settings array and of the authorization array will be set to the default values specified in the default array.  
-Note that only subsetting arrays or values of a subsetting array will be set to default.
+Note that only settings arrays or values of a settings array will be set to default.
 
 The settings array can be accessed in the instantiated class like this:
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-$generated_settings = $MadelineProto->API->settings;
+var_dump($MadelineProto->API->settings);
 ```
 
 ### Calling mtproto methods and available wrappers
@@ -205,6 +197,10 @@ $authorization = $MadelineProto->bot_login($token); // Note that every time you 
 var_dump($authorization);
 ```
 
+### Storing sessions
+
+An istance of MadelineProto can be safely serialized or unserialized.  
+
 ### Exceptions
 
 MadelineProto can throw three different exceptions:  
@@ -233,16 +229,16 @@ src/danog/MadelineProto/
     TL/
         Exception - Handles exceptions in the TL namespace
         TL - Handles TL serialization and deserialization
-        TLConstructor - Represents a TL Constructor
-        TLMethod - Represents a TL method
-    API - Wrapper class that istantiates the MTProto class, sets the error handler, provides a wrapper for calling mtproto methods directly as class submethods, and provides some simplified wrappers for logging in to telegram
+        TLConstructor - Stores TL constructors
+        TLMethod - Stores TL methods
+    API - Wrapper class that instantiates the MTProto class, sets the error handler, provides a wrapper for calling mtproto methods directly as class submethods, and provides some simplified wrappers for logging in to telegram
     APIFactory - Provides a wrapper for calling namespaced mtproto methods directly as class submethods
     Connection - Handles tcp/udp/http connections and wrapping payloads generated by MTProtoTools/MessageHandler into the right message according to the protocol, stores authorization keys, session id and sequence number
     DataCenter - Handles mtproto datacenters (is a wrapper for Connection classes)
     DebugTools - Various debugging tools
     Exception - Handles exceptions and PHP errors
     RPCErrorException - Handles RPC errors
-    MTProto - Extends MTProtoTools, handles initial connection, generation of authorization keys, istantiation of classes, writing of client info
+    MTProto - Extends MTProtoTools, handles initial connection, generation of authorization keys, instantiation of classes, writing of client info
     MTProtoTools - Extends all of the classes in MTProtoTools/
     Logger - Static logging class
     prime.py and getpq.py - prime module (python) for p and q generation

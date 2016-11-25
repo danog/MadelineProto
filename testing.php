@@ -34,8 +34,17 @@ if (file_exists('number.php')) {
     $authorization = $MadelineProto->complete_phone_login($code);
     var_dump($authorization);
 }
+
+echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
+echo 'Wrote '.file_put_contents('session.madeline', serialize($MadelineProto)).' bytes'.PHP_EOL;
+
+echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
+$unserialized = unserialize(file_get_contents('session.madeline'));
+
 if (file_exists('token.php')) {
     include_once 'token.php';
-    $MadelineProto->bot_login($token);
+    $authorization = $unserialized->bot_login($token);
+    var_dump($authorization);
 }
-echo 'Size of MadelineProto instance is '.strlen(var_export($MadelineProto, true)).' bytes'.PHP_EOL;
+echo 'Size of MadelineProto instance is '.strlen(serialize($unserialized)).' bytes'.PHP_EOL;
+

@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLMethod
+class TLMethod extends TLParams
 {
     public $id = [];
     public $method = [];
@@ -32,28 +32,7 @@ class TLMethod
             $this->method_namespace[$namespace[0]] = $namespace[0];
         }
 
-        foreach ($this->params[$this->key] as &$param) {
-            $param['flag'] = false;
-            $param['subtype'] = null;
-            if (preg_match('/^flags\.\d*\?/', $param['type'])) {
-                $param['flag'] = true;
-                $param['pow'] = preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']);
-                $param['type'] = preg_replace('/^flags\.\d*\?/', '', $param['type']);
-            }
-            if (preg_match('/vector<.*>/i', $param['type'])) {
-                if (preg_match('/vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'vector';
-                }
-                if (preg_match('/Vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'Vector t';
-                }
-                if (preg_match('/^\%/', $param['subtype'])) {
-                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
-                }
-            }
-        }
+        $this->parse_params($this->key);
         $this->key++;
     }
 

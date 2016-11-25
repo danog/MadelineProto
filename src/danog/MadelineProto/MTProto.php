@@ -159,7 +159,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->setup_logger();
 
         // Connect to servers
-        $this->mk_datacenter();
+        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
+        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
 
         // Load rsa key
         \danog\MadelineProto\Logger::log('Loading RSA key...');
@@ -176,14 +177,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function __wakeup()
     {
         $this->setup_logger();
-        $this->mk_datacenter();
-    }
-
-    public function mk_datacenter()
-    {
-        // Connect to servers
-        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
-        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
     }
 
     public function setup_logger()
@@ -278,5 +272,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $test .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
+        unset($this->config['dc_options']);
     }
 }
