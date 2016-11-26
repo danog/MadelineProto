@@ -8,6 +8,8 @@ PHP implementation of MTProto, based on [telepy](https://github.com/griganton/te
 
 This project can run on PHP 7, PHP 5.6 and HHVM.  
 
+Also note that MadelineProto will perform better if a big math extension like gmp o bcmath is installed.
+
 This project is in beta state.  
 
 

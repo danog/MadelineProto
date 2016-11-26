@@ -69,7 +69,7 @@ class MessageHandler extends Crypt
 
             $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->datacenter->temp_auth_key['server_salt']) {
-                throw new \danog\MadelineProto\Exception('Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
+                \danog\MadelineProto\Logger::log('WARNING: Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
             }
 
             $session_id = substr($decrypted_data, 8, 8);

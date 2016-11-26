@@ -178,6 +178,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         $this->setup_logger();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $this->reset_session();
     }
 
     public function setup_logger()
@@ -187,23 +188,39 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param']);
         }
     }
+    
+    public function reset_session() {
+        foreach ($this->datacenter->sockets as $id => &$socket) {
+            \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
+            $socket->session_id = \phpseclib\Crypt\Random::string(8);
+            $socket->seq_no = 0;
+        }
+    }
 
     // Switches to a new datacenter and if necessary creates authorization keys, binds them and writes client info
     public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
         \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
-        if ($this->datacenter->curdc !== 0 && $this->datacenter->authorized) {
-            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
-        }
-        if ($this->datacenter->dc_connect($new_dc)) {
+        $old_dc = $this->datacenter->curdc;
+        if (!isset($this->datacenter->sockets[$new_dc])) {
+            $this->datacenter->dc_connect($new_dc);
             $this->init_authorization();
             $this->config = $this->write_client_info('help.getConfig');
             $this->parse_config();
-            if (isset($exported_authorization)) {
-                $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
-                $this->datacenter->authorized = true;
-            }
             $this->get_nearest_dc($allow_nearest_dc_switch);
+        }
+        if (
+            (isset($this->datacenter->sockets[$old_dc]->authorized) && $this->datacenter->sockets[$old_dc]->authorized) &&
+            !(isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] === $this->datacenter->sockets[$old_dc]->authorization['user']['id'])
+        ) {
+            $this->datacenter->curdc = $old_dc;
+            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
+            $this->datacenter->curdc = $new_dc;
+            if (isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] !== $this->datacenter->sockets[$old_dc]->authorization['user']['id']) {
+                $this->method_call('auth.logOut');
+            }
+            $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
+            $this->datacenter->authorized = true;
         }
     }
 

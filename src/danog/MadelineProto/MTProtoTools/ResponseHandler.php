@@ -43,6 +43,7 @@ class ResponseHandler extends MsgIdHandler
                 $this->datacenter->incoming_messages[$last_received]['content'] = $response;
                 break;
 
+            case 'bad_server_salt':
             case 'bad_msg_notification':
                 $error_codes = [
                     16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
@@ -57,13 +58,15 @@ class ResponseHandler extends MsgIdHandler
                     48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
                     64 => 'invalid container.',
                 ];
+                switch ($response['error_code']) {
+                    case 48:
+                        $this->datacenter->temp_auth_key['server_salt'] = $response['new_server_salt'];
+                        $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
+                        throw new \danog\MadelineProto\Exception('New server salt stored, re-executing query');
+                        break;
+                }
                 throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification for '.$response['bad_msg_id'].': '.$error_codes[$response['error_code']]);
                 break;
-            case 'bad_server_salt':
-                $this->datacenter->temp_auth_key['server_salt'] = $response['new_server_salt'];
-                $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
-                $this->datacenter->outgoing_messages[$response['bad_msg_id']]['response'] = $last_received;
-                $this->datacenter->incoming_messages[$last_received]['content'] = $response;
                 break;
 
             case 'pong':
