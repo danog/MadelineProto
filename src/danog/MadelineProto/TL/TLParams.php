@@ -21,8 +21,9 @@ class TLParams
             $param['subtype'] = null;
             if (preg_match('/^flags\.\d*\?/', $param['type'])) {
                 $param['flag'] = true;
-                $param['pow'] = pow(2, preg_replace(['/^flags\./', '/\?.*/'], '', $param['type']));
-                $param['type'] = preg_replace('/^flags\.\d*\?/', '', $param['type']);
+                $flag = explode('?', explode('.', $param['type'])[1]);
+                $param['pow'] = pow(2, $flag[0]);
+                $param['type'] = $flag[1];
             }
             if (preg_match('/vector<.*>/i', $param['type'])) {
                 if (preg_match('/vector/', $param['type'])) {
