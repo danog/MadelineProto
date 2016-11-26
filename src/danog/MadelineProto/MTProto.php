@@ -188,8 +188,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param']);
         }
     }
-    
-    public function reset_session() {
+
+    public function reset_session()
+    {
         foreach ($this->datacenter->sockets as $id => &$socket) {
             \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
             $socket->session_id = \phpseclib\Crypt\Random::string(8);
