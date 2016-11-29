@@ -44,14 +44,14 @@ class CallHandler extends AuthKeyHandler
                         break;
                     case 401:
                         switch ($response['error_message']) {
-                            case "AUTH_KEY_UNREGISTERED":
-                            case "AUTH_KEY_INVALID":
+                            case 'AUTH_KEY_UNREGISTERED':
+                            case 'AUTH_KEY_INVALID':
                                 unset($this->datacenter->temp_auth_key);
                                 unset($this->datacenter->auth_key);
                                 $this->init_authorization();
-                            case "USER_DEACTIVATED":
-                            case "SESSION_REVOKED":
-                            case "SESSION_EXPIRED":
+                            case 'USER_DEACTIVATED':
+                            case 'SESSION_REVOKED':
+                            case 'SESSION_EXPIRED':
                                 $this->datacenter->authorized = false;
                                 $this->datacenter->authorization = null;
                                 throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
