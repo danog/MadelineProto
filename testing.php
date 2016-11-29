@@ -60,7 +60,9 @@ if (file_exists('token.php')) {
     $authorization = $MadelineProto->bot_login($token);
     var_dump($authorization);
 }
+/*
 foreach ($peers as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
     var_dump($sentMessage);
 }
+*/
