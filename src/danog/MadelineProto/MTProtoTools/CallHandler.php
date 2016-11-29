@@ -17,7 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class CallHandler extends AuthKeyHandler
 {
-
     public function method_call($method, $args = [], $message_id = null)
     {
         if (!is_array($args)) {

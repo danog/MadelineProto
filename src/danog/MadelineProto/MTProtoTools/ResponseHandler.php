@@ -106,6 +106,7 @@ class ResponseHandler extends MsgIdHandler
                             $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
                             unset($this->datacenter->new_outgoing[$expecting['msg_id']]);
                             unset($this->datacenter->new_incoming[$current_msg_id]);
+
                             return;
                         }
                     }
