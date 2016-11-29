@@ -17,26 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class CallHandler extends AuthKeyHandler
 {
-    public function wait_for_response()
-    {
-        foreach ($this->datacenter->new_outgoing as $key => $current) {
-            $response = null;
-            $count = 0;
-            while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-                \danog\MadelineProto\Logger::log('Getting response (try number '.$count.' for '.$current['method'].')...');
-                $this->recv_message();
-                $this->handle_messages($current);
-                if (isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$current['msg_id']]['response']]['content'])) {
-                    $response = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$current['msg_id']]['response']]['content'];
-                }
-            }
-            if ($response === null) {
-                \danog\MadelineProto\Logger::log('Could not get response for '.$current['method'].'!');
-            } else {
-                unset($this->datacenter->new_outgoing[$key]);
-            }
-        }
-    }
 
     public function method_call($method, $args = [], $message_id = null)
     {
@@ -50,11 +30,17 @@ class CallHandler extends AuthKeyHandler
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $this->datacenter->new_outgoing[$int_message_id] = ['msg_id' => $int_message_id, 'method' => $method, 'type' => $this->tl->methods->find_by_method($method)['type']];
-                $this->wait_for_response();
-                if (!isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) {
-                    throw new \danog\MadelineProto\Exception("Response isn't yet present!");
+                $res_count = 0;
+                $server_answer = null;
+                while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response']) {
+                    \danog\MadelineProto\Logger::log('Getting response (try number '.$res_count.' for '.$method.')...');
+                    $this->recv_message();
+                    $this->handle_messages();
+                    if (!isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) {
+                        continue;
+                    }
+                    $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'];
                 }
-                $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'];
                 if ($server_answer == null) {
                     throw new \danog\MadelineProto\Exception("Couldn't get response");
                 }

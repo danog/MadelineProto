@@ -17,7 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class ResponseHandler extends MsgIdHandler
 {
-    public function handle_messages($expecting)
+    public function handle_messages()
     {
         foreach ($this->datacenter->new_incoming as $current_msg_id) {
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
@@ -37,6 +37,7 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
                     $this->datacenter->outgoing_messages[$response['req_msg_id']]['response'] = $current_msg_id;
                     unset($this->datacenter->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->new_outgoing[$response['req_msg_id']]);
                     break;
 
                 case 'bad_server_salt':
@@ -44,6 +45,7 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
                     $this->datacenter->outgoing_messages[$response['bad_msg_id']]['response'] = $current_msg_id;
                     unset($this->datacenter->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->new_outgoing[$response['bad_msg_id']]);
                     break;
 
                 case 'pong':
@@ -53,6 +55,7 @@ class ResponseHandler extends MsgIdHandler
                             $omessage['response'] = $response['msg_id'];
                             $this->datacenter->incoming_messages[$response['msg_id']]['content'] = $response;
                             unset($this->datacenter->new_incoming[$current_msg_id]);
+                            unset($this->datacenter->new_outgoing[$msg_id]);
                         }
                     }
                     break;
@@ -72,7 +75,7 @@ class ResponseHandler extends MsgIdHandler
                         $this->datacenter->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
                         $this->datacenter->new_incoming[$message['msg_id']] = $message['msg_id'];
 
-                        $this->handle_messages($expecting);
+                        $this->handle_messages();
                     }
                     break;
                 case 'msg_copy':
@@ -84,7 +87,7 @@ class ResponseHandler extends MsgIdHandler
                         $this->datacenter->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $response['orig_message']];
                         $this->datacenter->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
 
-                        $this->handle_messages($expecting);
+                        $this->handle_messages();
                     }
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
@@ -98,12 +101,15 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
                 default:
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
-                    if ($this->tl->constructors->find_by_predicate($this->datacenter->response['_'])['type'] == $expecting['type']) {
-                        $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $response;
-                        unset($this->datacenter->new_incoming[$current_msg_id]);
-                    } else {
-                        throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
+                    foreach ($this->datacenter->new_outgoing as $expecting) {
+                        if ($this->tl->constructors->find_by_predicate($response['_'])['type'] == $expecting['type']) {
+                            $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
+                            unset($this->datacenter->new_outgoing[$expecting['msg_id']]);
+                            unset($this->datacenter->new_incoming[$current_msg_id]);
+                            return;
+                        }
                     }
+                    throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
                     break;
             }
         }
