@@ -17,127 +17,95 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class ResponseHandler extends MsgIdHandler
 {
-    public function handle_message($last_sent, $last_received, $expected_type)
+    public function handle_messages($expecting)
     {
-        $response = $this->datacenter->incoming_messages[$last_received]['content'];
+        foreach ($this->datacenter->new_incoming as $current_msg_id) {
+            $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
 
-        switch ($response['_']) {
-            case 'msgs_ack':
-                foreach ($response['msg_ids'] as $msg_id) {
-                    $this->ack_outgoing_message_id($msg_id); // Acknowledge that the server received my message
-                }
-                break;
-
-            case 'rpc_result':
-                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                $this->datacenter->incoming_messages[$last_received]['content'] = $response['result'];
-            case 'future_salts':
-                $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
-
-                $this->try_store_response($response['req_msg_id'], $last_received, $expected_type, true);
-                break;
-
-            case 'bad_server_salt':
-            case 'bad_msg_notification':
-                $error_codes = [
-                    16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
-                    17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
-                    18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
-                    19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)',
-                    20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not',
-                    32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)',
-                    33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)',
-                    34 => 'an even msg_seqno expected (irrelevant message), but odd received',
-                    35 => 'odd msg_seqno expected (relevant message), but even received',
-                    48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
-                    64 => 'invalid container.',
-                ];
-                switch ($response['error_code']) {
-                    case 48:
-                        $this->datacenter->temp_auth_key['server_salt'] = $response['new_server_salt'];
-                        $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
-                        throw new \danog\MadelineProto\Exception('New server salt stored, re-executing query');
-                        break;
-                }
-                throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification for '.$response['bad_msg_id'].': '.$error_codes[$response['error_code']]);
-                break;
-
-            case 'pong':
-                foreach ($this->datacenter->outgoing_messages as $msg_id => &$omessage) {
-                    if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
-                        $omessage['response'] = $response['msg_id'];
-                        $this->datacenter->incoming_messages[$response['msg_id']]['content'] = $response;
-                        $this->ack_outgoing_message_id($msg_id);
+            switch ($response['_']) {
+                case 'msgs_ack':
+                    foreach ($response['msg_ids'] as $msg_id) {
+                        $this->ack_outgoing_message_id($msg_id); // Acknowledge that the server received my message
                     }
-                }
-                break;
-            case 'new_session_created':
-                $this->datacenter->temp_auth_key['server_salt'] = $response['server_salt'];
-                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                \danog\MadelineProto\Logger::log('new session created');
-                \danog\MadelineProto\Logger::log($response);
-                break;
-            case 'msg_container':
-                $responses = [];
-                \danog\MadelineProto\Logger::log('Received container.');
-                \danog\MadelineProto\Logger::log($response['messages']);
-                foreach ($response['messages'] as $message) {
-                    $this->check_message_id($message['msg_id'], false, true);
-                    $this->datacenter->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
-                    $responses[] = $this->handle_message($last_sent, $message['msg_id'], $expected_type);
-                }
-                foreach ($responses as $key => $response) {
-                    if ($response == null) {
-                        unset($responses[$key]);
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+
+                case 'rpc_result':
+                    $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
+                    $this->datacenter->incoming_messages[$current_msg_id]['content'] = $response['result'];
+                case 'future_salts':
+                    $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received my request
+                    $this->datacenter->outgoing_messages[$response['req_msg_id']]['response'] = $current_msg_id;
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+
+                case 'bad_server_salt':
+                case 'bad_msg_notification':
+                    $this->ack_outgoing_message_id($response['bad_msg_id']); // Acknowledge that the server received my request
+                    $this->datacenter->outgoing_messages[$response['bad_msg_id']]['response'] = $current_msg_id;
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+
+                case 'pong':
+                    foreach ($this->datacenter->outgoing_messages as $msg_id => &$omessage) {
+                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
+                            $this->ack_outgoing_message_id($msg_id);
+                            $omessage['response'] = $response['msg_id'];
+                            $this->datacenter->incoming_messages[$response['msg_id']]['content'] = $response;
+                            unset($this->datacenter->new_incoming[$current_msg_id]);
+                        }
                     }
-                }
-                switch (count($responses)) {
-                    case 0:
-                        return;
+                    break;
+                case 'new_session_created':
+                    $this->datacenter->temp_auth_key['server_salt'] = $response['server_salt'];
+                    $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
+                    \danog\MadelineProto\Logger::log('new session created');
+                    \danog\MadelineProto\Logger::log($response);
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+                case 'msg_container':
+                    \danog\MadelineProto\Logger::log('Received container.');
+                    \danog\MadelineProto\Logger::log($response['messages']);
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    foreach ($response['messages'] as $message) {
+                        $this->check_message_id($message['msg_id'], false, true);
+                        $this->datacenter->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
+                        $this->datacenter->new_incoming[$message['msg_id']] = $message['msg_id'];
 
-                    case 1:
-                        return end($responses);
-                        break;
-                    default:
-                        \danog\MadelineProto\Logger::log('Received multiple responses, returning last one');
-                        \danog\MadelineProto\Logger::log($responses);
+                        $this->handle_messages($expecting);
+                    }
+                    break;
+                case 'msg_copy':
+                    $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
+                    if (isset($this->datacenter->incoming_messages[$response['orig_message']['msg_id']])) {
+                        $this->ack_incoming_message_id($response['orig_message']['msg_id']); // Acknowledge that I received the server's response
+                    } else {
+                        $this->check_message_id($message['orig_message']['msg_id'], false, true);
+                        $this->datacenter->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $response['orig_message']];
+                        $this->datacenter->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
 
-                        return end($responses);
-                        break;
-                }
-                break;
-            case 'msg_copy':
-                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                if (isset($this->datacenter->incoming_messages[$response['orig_message']['msg_id']])) {
-                    $this->ack_incoming_message_id($response['orig_message']['msg_id']); // Acknowledge that I received the server's response
-                } else {
-                    $this->check_message_id($message['orig_message']['msg_id'], false, true);
-                    $this->datacenter->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $response['orig_message']];
-
-                    return $this->handle_message($last_sent, $message['orig_message']['msg_id'], $expected_type);
-                }
-                break;
-            case 'http_wait':
-                \danog\MadelineProto\Logger::log('Received http wait.');
-                \danog\MadelineProto\Logger::log($response);
-                break;
-            case 'rpc_answer_dropped_running':
-            case 'rpc_answer_dropped':
-                $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
-            default:
-                $this->ack_incoming_message_id($last_received); // Acknowledge that I received the server's response
-                $this->try_store_response($last_sent, $last_received, $expected_type);
-                break;
-        }
-    }
-
-    public function try_store_response($request, $response, $type, $force = true)
-    {
-        if ($force) {
-            return $this->datacenter->outgoing_messages[$request]['response'] = $response;
-        }
-        if ($this->tl->constructors->find_by_predicate($this->datacenter->incoming_messages[$response]['content']['_'])['type'] == $type) {
-            $this->datacenter->outgoing_messages[$request]['response'] = $response;
+                        $this->handle_messages($expecting);
+                    }
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+                case 'http_wait':
+                    \danog\MadelineProto\Logger::log('Received http wait.');
+                    \danog\MadelineProto\Logger::log($response);
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
+                    break;
+                case 'rpc_answer_dropped_running':
+                case 'rpc_answer_dropped':
+                    $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
+                default:
+                    $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
+                    if ($this->tl->constructors->find_by_predicate($this->datacenter->response['_'])['type'] == $expecting['type']) {
+                        $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $response;
+                        unset($this->datacenter->new_incoming[$current_msg_id]);
+                    } else {
+                        throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
+                    }
+                    break;
+            }
         }
     }
 }

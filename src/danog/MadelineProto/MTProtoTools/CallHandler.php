@@ -17,59 +17,24 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class CallHandler extends AuthKeyHandler
 {
-    public function wait_for_response($last_sent, $optional_name, $response_type)
+    public function wait_for_response()
     {
-        $response = null;
-        $count = 0;
-        while ($response == null && $count++ < $this->settings['max_tries']['response']) {
-            \danog\MadelineProto\Logger::log('Getting response (try number '.$count.' for '.$optional_name.')...');
-            $last_received = $this->recv_message();
-            $this->handle_message($last_sent, $last_received, $response_type);
-            if (isset($this->datacenter->outgoing_messages[$last_sent]['response']) && isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'])) {
-                $response = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'];
-            }
-        }
-        if ($response == null) {
-            throw new \danog\MadelineProto\Exception("Couldn't get response");
-        }
-        switch ($response['_']) {
-            case 'rpc_error':
-                switch ($response['error_code']) {
-                    case 303:
-                        $dc = preg_replace('/[^0-9]+/', '', $response['error_message']);
-                        \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
-                        $this->switch_dc($dc);
-                        throw new \danog\MadelineProto\Exception('I had to switch to datacenter '.$dc);
-
-                        break;
-                    case 401:
-                        switch ($response['error_message']) {
-                            case 'AUTH_KEY_UNREGISTERED':
-                            case 'AUTH_KEY_INVALID':
-                                unset($this->datacenter->temp_auth_key);
-                                unset($this->datacenter->auth_key);
-                                $this->init_authorization();
-                            case 'USER_DEACTIVATED':
-                            case 'SESSION_REVOKED':
-                            case 'SESSION_EXPIRED':
-                                $this->datacenter->authorized = false;
-                                $this->datacenter->authorization = null;
-                                throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
-                                break;
-                        }
-                    case 420:
-                        $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
-                        \danog\MadelineProto\Logger::log('Flood, waiting '.$seconds.' seconds...');
-                        sleep($seconds);
-                        throw new \danog\MadelineProto\Exception('Re-executing query...');
-                    default:
-                        throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
-                        break;
+        foreach ($this->datacenter->new_outgoing as $key => $current) {
+            $response = null;
+            $count = 0;
+            while ($response == null && $count++ < $this->settings['max_tries']['response']) {
+                \danog\MadelineProto\Logger::log('Getting response (try number '.$count.' for '.$current['method'].')...');
+                $this->recv_message();
+                $this->handle_messages($current);
+                if (isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$current['msg_id']]['response']]['content'])) {
+                    $response = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$current['msg_id']]['response']]['content'];
                 }
-                break;
-            default:
-                return $response;
-                break;
+            }
+            if ($response === null) {
+                \danog\MadelineProto\Logger::log('Could not get response for '.$current['method'].'!');
+            } else {
+                unset($this->datacenter->new_outgoing[$key]);
+            }
         }
     }
 
@@ -84,7 +49,61 @@ class CallHandler extends AuthKeyHandler
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
-                $server_answer = $this->wait_for_response($int_message_id, $method, $this->tl->methods->find_by_method($method)['type']);
+                $this->datacenter->new_outgoing[$int_message_id] = ['msg_id' => $int_message_id, 'method' => $method, 'type' => $this->tl->methods->find_by_method($method)['type']];
+                $this->wait_for_response();
+                if (!isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) {
+                    throw new \danog\MadelineProto\Exception("Response isn't yet present!");
+                }
+                $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'];
+                if ($server_answer == null) {
+                    throw new \danog\MadelineProto\Exception("Couldn't get response");
+                }
+                switch ($server_answer['_']) {
+                    case 'rpc_error':
+                        switch ($server_answer['error_code']) {
+                            case 303:
+                                $dc = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+                                \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
+                                $this->switch_dc($dc);
+                                throw new \danog\MadelineProto\Exception('I had to switch to datacenter '.$dc);
+
+                                break;
+                            case 401:
+                                switch ($server_answer['error_message']) {
+                                    case 'AUTH_KEY_UNREGISTERED':
+                                    case 'AUTH_KEY_INVALID':
+                                        unset($this->datacenter->temp_auth_key);
+                                        unset($this->datacenter->auth_key);
+                                        $this->init_authorization();
+                                    case 'USER_DEACTIVATED':
+                                    case 'SESSION_REVOKED':
+                                    case 'SESSION_EXPIRED':
+                                        $this->datacenter->authorized = false;
+                                        $this->datacenter->authorization = null;
+                                        throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                                        break;
+                                }
+                            case 420:
+                                $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+                                \danog\MadelineProto\Logger::log('Flood, waiting '.$seconds.' seconds...');
+                                sleep($seconds);
+                                throw new \danog\MadelineProto\Exception('Re-executing query...');
+                            default:
+                                throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                                break;
+                        }
+                        break;
+                    case 'bad_server_salt':
+                    case 'bad_msg_notification':
+                        switch ($server_answer['error_code']) {
+                            case 48:
+                                $this->datacenter->temp_auth_key['server_salt'] = $server_answer['new_server_salt'];
+                                throw new \danog\MadelineProto\Exception('New server salt stored, re-executing query');
+                                break;
+                        }
+                        throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
+                        break;
+                }
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 $this->datacenter->close_and_reopen();
@@ -110,7 +129,6 @@ class CallHandler extends AuthKeyHandler
                 \danog\MadelineProto\Logger::log('Sending object (try number '.$count.' for '.$object.')...');
                 $int_message_id = $this->send_message($this->tl->serialize_object(['type' => $object], $args), $this->tl->content_related($object));
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
-//                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 $this->datacenter->close_and_reopen();
@@ -118,11 +136,6 @@ class CallHandler extends AuthKeyHandler
             }
 
             return;
-//            if ($server_answer == null) {
-//                throw new \danog\MadelineProto\Exception('An error occurred while calling object '.$object.'.');
-//            }
-//            $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $server_answer));
-//            return $deserialized;
         }
         throw new \danog\MadelineProto\Exception('An error occurred while calling object '.$object.'.');
     }

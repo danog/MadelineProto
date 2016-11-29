@@ -42,6 +42,7 @@ class MessageHandler extends Crypt
             $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->datacenter->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
+        $this->datacenter->outgoing_messages[$int_message_id]['response'] = -1;
         $this->datacenter->send_message($message);
 
         return $int_message_id;
@@ -112,7 +113,6 @@ class MessageHandler extends Crypt
         }
         $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->datacenter->incoming_messages[$message_id]['content'] = $deserialized;
-
-        return $message_id;
+        $this->datacenter->new_incoming[$message_id] = $message_id;
     }
 }
