@@ -22,8 +22,10 @@ class AckHandler extends \danog\MadelineProto\PrimeModule
         // The server acknowledges that it received my message
         if (!isset($this->datacenter->outgoing_messages[$message_id])) {
             \danog\MadelineProto\Logger::log("Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?');
+
             return false;
         }
+
         return $this->datacenter->outgoing_messages[$message_id]['ack'] = true;
     }
 
@@ -38,6 +40,7 @@ class AckHandler extends \danog\MadelineProto\PrimeModule
         }
 
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]]);
+
         return $this->datacenter->incoming_messages[$message_id]['ack'] = true;
     }
 }

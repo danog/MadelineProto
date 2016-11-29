@@ -130,7 +130,9 @@ class ResponseHandler extends MsgIdHandler
                 break;
         }
     }
-    public function try_store_response($request, $response, $type, $force = true) {
+
+    public function try_store_response($request, $response, $type, $force = true)
+    {
         if ($force) {
             return $this->datacenter->outgoing_messages[$request]['response'] = $response;
         }

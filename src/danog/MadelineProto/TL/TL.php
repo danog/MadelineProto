@@ -54,15 +54,19 @@ class TL extends \danog\MadelineProto\Tools
         return $arguments;
     }
 
-    public function serialize_bool($bool) {
+    public function serialize_bool($bool)
+    {
         return \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('bool'.($bool ? 'True' : 'False'))['id']);
     }
-    public function deserialize_bool($data) {
+
+    public function deserialize_bool($data)
+    {
         $id = \danog\PHP\Struct::unpack('<i', $data) [0];
         $tl_elem = $this->constructors->find_by_id($id);
         if ($tl_elem === false) {
             throw new Exception('Could not extract boolean');
         }
+
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
@@ -83,7 +87,7 @@ class TL extends \danog\MadelineProto\Tools
                 return \danog\PHP\Struct::pack('<I', $object);
             case 'long':
                 if (!is_numeric($object)) {
-var_dump($object);
+                    var_dump($object);
                     throw new Exception("given value isn't numeric");
                 }
 
@@ -108,6 +112,7 @@ var_dump($object);
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod(-$l, 4));
                 }
+
                 return $concat;
             case 'Bool':
                 if (!is_bool($object)) {
@@ -125,6 +130,7 @@ var_dump($object);
                 foreach ($object as $current_object) {
                     $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object);
                 }
+
                 return $concat;
 
         }
@@ -144,7 +150,7 @@ var_dump($object);
             throw new Exception('Could not extract type: '.$object);
         }
 
-        if ($bare = ($type['type'] != '' && $type['type'][0] == "%")) {
+        if ($bare = ($type['type'] != '' && $type['type'][0] == '%')) {
             $type['type'] = substr($type['type'], 1);
         }
 
@@ -156,17 +162,20 @@ var_dump($object);
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
-        return $concat.$this->serialize_params($constructorData, $object);
 
+        return $concat.$this->serialize_params($constructorData, $object);
     }
+
     public function serialize_method($method, $arguments)
     {
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
             throw new Exception('Could not extract type: '.$method);
         }
+
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
+
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
@@ -267,6 +276,7 @@ var_dump($object);
                 if (!is_string($x)) {
                     throw new Exception("deserialize: generated value isn't a string");
                 }
+
                 return $x;
             case 'true':
                 return true;
@@ -291,13 +301,14 @@ var_dump($object);
                 for ($i = 0; $i < $count; $i++) {
                     $result[] = $this->deserialize($bytes_io, ['type' => $type['subtype']]);
                 }
+
                 return $result;
         }
         if ($type['type'] != '' && $type['type'][0] == '%') {
             $checkType = substr($type['type'], 1);
             $constructorData = $this->constructors->find_by_type($checkType);
             if ($constructorData === false) {
-                throw new Exception('Constructor not found for type: '. $checkType);
+                throw new Exception('Constructor not found for type: '.$checkType);
             }
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
@@ -337,6 +348,7 @@ var_dump($object);
         if (isset($x['flags'])) { // I don't think we need this anymore
             unset($x['flags']);
         }
+
         return $x;
     }
 
