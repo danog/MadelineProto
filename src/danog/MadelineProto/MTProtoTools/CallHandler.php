@@ -17,17 +17,14 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 class CallHandler extends AuthKeyHandler
 {
-    public function wait_for_response($last_sent, $optional_name = null)
+    public function wait_for_response($last_sent, $optional_name, $response_type)
     {
-        if ($optional_name == null) {
-            $optional_name = $last_sent;
-        }
         $response = null;
         $count = 0;
         while ($response == null && $count++ < $this->settings['max_tries']['response']) {
             \danog\MadelineProto\Logger::log('Getting response (try number '.$count.' for '.$optional_name.')...');
             $last_received = $this->recv_message();
-            $this->handle_message($last_sent, $last_received);
+            $this->handle_message($last_sent, $last_received, $response_type);
             if (isset($this->datacenter->outgoing_messages[$last_sent]['response']) && isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'])) {
                 $response = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$last_sent]['response']]['content'];
             }
@@ -67,7 +64,7 @@ class CallHandler extends AuthKeyHandler
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
-                $server_answer = $this->wait_for_response($int_message_id, $method);
+                $server_answer = $this->wait_for_response($int_message_id, $method, $this->tl->methods->find_by_method($method)['type']);
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 $this->datacenter->close_and_reopen();
@@ -91,7 +88,7 @@ class CallHandler extends AuthKeyHandler
         foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
                 \danog\MadelineProto\Logger::log('Sending object (try number '.$count.' for '.$object.')...');
-                $int_message_id = $this->send_message($this->tl->serialize_obj($object, $args), $this->tl->content_related($object));
+                $int_message_id = $this->send_message($this->tl->serialize_object(['type' => $object], $args), $this->tl->content_related($object));
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
 //                $server_answer = $this->wait_for_response($int_message_id);
             } catch (Exception $e) {

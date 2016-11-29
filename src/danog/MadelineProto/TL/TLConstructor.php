@@ -30,6 +30,18 @@ class TLConstructor extends TLParams
         $this->key++;
     }
 
+    public function find_by_type($type)
+    {
+        $key = array_search($type, $this->type);
+
+        return ($key === false) ? false : [
+            'id'        => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->params[$key],
+        ];
+    }
+
     public function find_by_predicate($predicate)
     {
         $key = array_search($predicate, $this->predicate);

@@ -28,20 +28,17 @@ class RSA extends TL\TL
         $key->loadKey($rsa_key);
         $this->n = $key->modulus;
         $this->e = $key->exponent;
-        unset($key);
 
         \danog\MadelineProto\Logger::log('Computing fingerprint...');
         $this->fp_bytes = substr(
             sha1(
-                $this->serialize_param(
-                    'bytes',
-                    null,
+                $this->serialize_object(
+                    ['type' => 'bytes'],
                     $this->n->toBytes()
                 )
                 .
-                $this->serialize_param(
-                    'bytes',
-                    null,
+                $this->serialize_object(
+                    ['type' => 'bytes'],
                     $this->e->toBytes()
                 ),
                 true
@@ -55,6 +52,7 @@ class RSA extends TL\TL
 
     public function encrypt($data)
     {
+        \danog\MadelineProto\Logger::log('Encrypting with rsa key...');
         $bigintdata = new \phpseclib\Math\BigInteger($data, 256);
 
         return $bigintdata->powMod($this->e, $this->n)->toBytes();

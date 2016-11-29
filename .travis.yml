@@ -16,5 +16,7 @@ before_script:
 script:
 - "./testing.php"
 before_install:
-- openssl aes-256-cbc -K $encrypted_f108bed02ef2_key -iv $encrypted_f108bed02ef2_iv
+- openssl aes-256-cbc -K $encrypted_0b05103af24b_key -iv $encrypted_0b05103af24b_iv
+  -in session.madeline.enc -out session.madeline -d
+- openssl aes-256-cbc -K $encrypted_0b05103af24b_key -iv $encrypted_0b05103af24b_iv
   -in token.php.enc -out token.php -d

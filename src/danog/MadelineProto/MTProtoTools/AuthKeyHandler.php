@@ -64,7 +64,6 @@ class AuthKeyHandler extends AckHandler
                 */
                 foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
                     $curfp_biginteger = new \phpseclib\Math\BigInteger($curfp);
-
                     if ($this->key->fp->equals($curfp_biginteger)) {
                         $public_key_fingerprint = $curfp;
                         break;
@@ -115,7 +114,7 @@ class AuthKeyHandler extends AckHandler
                     'new_nonce'       => $new_nonce,
                     'expires_in'      => $expires_in,
                 ];
-                $p_q_inner_data = $this->tl->serialize_obj('p_q_inner_data'.(($expires_in < 0) ? '' : '_temp'), $data_unserialized);
+                $p_q_inner_data = $this->tl->serialize_object(['type' => 'p_q_inner_data'.(($expires_in < 0) ? '' : '_temp')], $data_unserialized);
 
                 /*
                 * ***********************************************************************
@@ -350,8 +349,8 @@ class AuthKeyHandler extends AckHandler
                     * 		string		$g_b							: g^b mod dh_prime
                     * ]
                     */
-                    $data = $this->tl->serialize_obj(
-                        'client_DH_inner_data',
+                    $data = $this->tl->serialize_object(
+                        ['type' => 'client_DH_inner_data'],
                         [
                             'nonce'           => $nonce,
                             'server_nonce'    => $server_nonce,
@@ -470,9 +469,9 @@ class AuthKeyHandler extends AckHandler
                     }
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key. Retrying...');
+                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying...');
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log('An RPCErrorExceptiom occurred while generating the authorization key. Retrying...');
+                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying...');
             }
         }
 
@@ -487,7 +486,7 @@ class AuthKeyHandler extends AckHandler
         $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
         $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->auth_key['id'])[0];
         $temp_session_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->session_id)[0];
-        $message_data = $this->tl->serialize_obj('bind_auth_key_inner',
+        $message_data = $this->tl->serialize_object(['type' => 'bind_auth_key_inner'],
             [
                 'nonce'                       => $nonce,
                 'temp_auth_key_id'            => $temp_auth_key_id,

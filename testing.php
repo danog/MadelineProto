@@ -13,10 +13,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'vendor/autoload.php';
 
-$MadelineProto = new \danog\MadelineProto\API();
 
-if (file_exists('number.php')) {
+if (file_exists('number.php') && !file_exists('session.madeline')) {
     include_once 'number.php';
+    $MadelineProto = new \danog\MadelineProto\API();
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
@@ -33,17 +33,34 @@ if (file_exists('number.php')) {
     }
     $authorization = $MadelineProto->complete_phone_login($code);
     var_dump($authorization);
+    echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
+    echo 'Wrote '.file_put_contents('session.madeline', serialize($MadelineProto)).' bytes'.PHP_EOL;
+}
+echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
+$MadelineProto = unserialize(file_get_contents('session.madeline'));
+
+$message = 'Travis ci tests in progress...';
+$peers = [];
+foreach (['pwrtelegramgroup', 'pwrtelegramgroupita'] as $user) {
+    $username = $MadelineProto->contacts->resolveUsername(['username' => $user]);
+    var_dump($username);
+    $peers[$user] = ['_' => 'inputPeerChannel', 'channel_id' => $username['peer']['channel_id'], 'access_hash' => $username['chats'][0]['access_hash']];
 }
 
-echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-echo 'Wrote '.file_put_contents('session.madeline', serialize($MadelineProto)).' bytes'.PHP_EOL;
+foreach ($peers as $peer) {
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+    var_dump($sentMessage);
+}
 
-echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-$unserialized = unserialize(file_get_contents('session.madeline'));
+echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
 
 if (file_exists('token.php')) {
     include_once 'token.php';
-    $authorization = $unserialized->bot_login($token);
+    $MadelineProto = new \danog\MadelineProto\API();
+    $authorization = $MadelineProto->bot_login($token);
     var_dump($authorization);
 }
-echo 'Size of MadelineProto instance is '.strlen(serialize($unserialized)).' bytes'.PHP_EOL;
+foreach ($peers as $peer) {
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+    var_dump($sentMessage);
+}

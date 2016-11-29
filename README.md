@@ -181,6 +181,12 @@ $checkedPhone = $MadelineProto->auth->checkPhone( // auth.checkPhone becomes aut
     ]
 );
 $ping = $MadelineProto->ping([3]); // parameter names can be omitted as long as the order specified by the TL scheme is respected
+$message = "Hey! I'm sending this message with MadelineProto!";
+$username = $MadelineProto->contacts->resolveUsername(['username' => 'pwrtelegramgroup']);
+var_dump($username);
+$peer = ['_' => 'inputPeerChannel', 'channel_id' => $username['peer']['channel_id'], 'access_hash' => $username['chats'][0]['access_hash']];
+$sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+var_dump($sentMessage);
 ```
 
 The API class also provides some wrapper methods for logging in as a bot or as a normal user:
@@ -198,6 +204,8 @@ var_dump($authorization);
 $authorization = $MadelineProto->bot_login($token); // Note that every time you login as a bot or as a user MadelineProto will logout first, so now MadelineProto is logged in as the bot with token $token, not as the user with number $number
 var_dump($authorization);
 ```
+
+See testing.php for more examples.
 
 ### Storing sessions
 

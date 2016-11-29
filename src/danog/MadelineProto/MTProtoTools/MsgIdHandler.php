@@ -19,10 +19,10 @@ class MsgIdHandler extends MessageHandler
 {
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
-        if (((int) ((time() + $this->datacenter->time_delta - 300) * pow(2, 30)) * 4) > $new_message_id) {
+        if (((int) ((time() + $this->datacenter->time_delta - 300) << 32)) > $new_message_id) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too old.');
         }
-        if (((int) ((time() + $this->datacenter->time_delta + 30) * pow(2, 30)) * 4) < $new_message_id) {
+        if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $new_message_id) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
         }
         if ($outgoing) {

@@ -54,7 +54,8 @@ class MessageHandler extends Crypt
     {
         $payload = $this->datacenter->read_message();
         if (fstat($payload)['size'] == 4) {
-            throw new \danog\MadelineProto\RPCErrorException('Generic', \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0]);
+            $error = \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0];
+            throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
         $auth_key_id = fread($payload, 8);
         if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {

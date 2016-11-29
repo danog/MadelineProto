@@ -25,6 +25,7 @@ class MTProto extends MTProtoTools
 
     public function __construct($settings = [])
     {
+        // Detect ipv6
         $google = '';
         try {
             $google = file_get_contents('https://ipv6.google.com');
@@ -32,6 +33,22 @@ class MTProto extends MTProtoTools
         }
         $this->ipv6 = strlen($google) > 0;
 
+
+        // Detect device model
+        $device_model = 'Web server';
+        try {
+            $device_model = php_uname('s');
+        } catch (Exception $e) {
+        }
+        
+
+        // Detect system version
+        $system_version = phpversion();
+        try {
+            $system_version = php_uname('r');
+        } catch (Exception $e) {
+        }
+        
         // Set default settings
         $default_settings = [
             'authorization' => [ // Authorization settings
@@ -101,8 +118,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'app_info' => [ // obtained in https://my.telegram.org
                 'api_id'          => 25628,
                 'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
-                'device_model'    => php_uname('s'),
-                'system_version'  => php_uname('r'),
+                'device_model'    => $device_model,
+                'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // 🌚
                 'lang_code'       => 'en',
             ],

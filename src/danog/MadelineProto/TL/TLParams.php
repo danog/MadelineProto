@@ -18,7 +18,6 @@ class TLParams
     {
         foreach ($this->params[$key] as &$param) {
             $param['flag'] = false;
-            $param['subtype'] = null;
             if (preg_match('/^flags\.\d*\?/', $param['type'])) {
                 $param['flag'] = true;
                 $flag = explode('?', explode('.', $param['type'])[1]);
@@ -34,11 +33,9 @@ class TLParams
                     $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
                     $param['type'] = 'Vector t';
                 }
-                if (preg_match('/^\%/', $param['subtype'])) {
-                    $param['subtype'] = lcfirst(preg_replace('/^\%/', '', $param['subtype']));
-                }
-                $param['subtype'] = (($mtproto && $param['subtype'] == 'message') ? 'MT' : '').$param['subtype'];
+                $param['subtype'] = (($mtproto && $param['subtype'] == 'Message') ? 'MT' : '').$param['subtype'];
             }
+            $param['type'] = (($mtproto && $param['type'] == 'Message') ? 'MT' : '').$param['type'];
         }
     }
 }
