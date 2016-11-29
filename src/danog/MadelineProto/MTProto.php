@@ -40,7 +40,7 @@ class MTProto extends MTProtoTools
             $device_model = php_uname('s');
         } catch (Exception $e) {
         }
-        
+
 
         // Detect system version
         $system_version = phpversion();
@@ -48,7 +48,7 @@ class MTProto extends MTProtoTools
             $system_version = php_uname('r');
         } catch (Exception $e) {
         }
-        
+
         // Set default settings
         $default_settings = [
             'authorization' => [ // Authorization settings
