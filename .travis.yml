@@ -18,4 +18,4 @@ script:
 before_install:
 - openssl aes-256-cbc -K $encrypted_0b05103af24b_key -iv $encrypted_0b05103af24b_iv
   -in enc.tar.xz.enc -out enc.tar.xz -d
-- tar -xJpf enc.tar.xz.enc
+- tar -xJpf enc.tar.xz
