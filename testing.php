@@ -39,7 +39,7 @@ if (file_exists('number.php') && !file_exists('session.madeline')) {
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = unserialize(file_get_contents('session.madeline'));
 
-$message = 'Travis ci tests in progress...';
+$message = 'Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION');
 $peers = [];
 foreach (['pwrtelegramgroup', 'pwrtelegramgroupita'] as $user) {
     $username = $MadelineProto->contacts->resolveUsername(['username' => $user]);
