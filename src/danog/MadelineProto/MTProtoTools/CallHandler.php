@@ -42,6 +42,26 @@ class CallHandler extends AuthKeyHandler
                         throw new \danog\MadelineProto\Exception('I had to switch to datacenter '.$dc);
 
                         break;
+                    case 401:
+                        switch ($response['error_message']) {
+                            case "AUTH_KEY_UNREGISTERED":
+                            case "AUTH_KEY_INVALID":
+                                unset($this->datacenter->temp_auth_key);
+                                unset($this->datacenter->auth_key);
+                                $this->init_authorization();
+                            case "USER_DEACTIVATED":
+                            case "SESSION_REVOKED":
+                            case "SESSION_EXPIRED":
+                                $this->datacenter->authorized = false;
+                                $this->datacenter->authorization = null;
+                                throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
+                                break;
+                        }
+                    case 420:
+                        $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
+                        \danog\MadelineProto\Logger::log('Flood, waiting '.$seconds.' seconds...');
+                        sleep($seconds);
+                        throw new \danog\MadelineProto\Exception('Re-executing query...');
                     default:
                         throw new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']);
                         break;
