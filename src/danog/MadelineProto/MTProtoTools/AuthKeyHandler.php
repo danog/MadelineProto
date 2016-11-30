@@ -22,7 +22,7 @@ class AuthKeyHandler extends AckHandler
 {
     public function create_auth_key($expires_in = -1)
     {
-        foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id_total) {
+        for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 \danog\MadelineProto\Logger::log('Requesting pq');
 
@@ -469,9 +469,9 @@ class AuthKeyHandler extends AckHandler
                     }
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying...');
+                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying...');
+                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
             }
         }
 
@@ -505,7 +505,7 @@ class AuthKeyHandler extends AckHandler
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->auth_key['auth_key']);
         $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
 
-        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id)) {
+        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id) === true) {
             \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
 
             return true;

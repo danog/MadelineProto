@@ -56,6 +56,13 @@ class MessageHandler extends Crypt
         $payload = $this->datacenter->read_message();
         if (fstat($payload)['size'] == 4) {
             $error = \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0];
+            if ($error == -404) {
+                unset($this->datacenter->temp_auth_key);
+                unset($this->datacenter->auth_key);
+                $this->datacenter->authorized = false;
+                $this->datacenter->authorization = null;
+                throw new \danog\MadelineProto\RPCErrorException('Please login again', $error);
+            }
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
         $auth_key_id = fread($payload, 8);

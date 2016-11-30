@@ -57,12 +57,11 @@ class CallHandler extends AuthKeyHandler
                                 switch ($server_answer['error_message']) {
                                     case 'AUTH_KEY_UNREGISTERED':
                                     case 'AUTH_KEY_INVALID':
-                                        unset($this->datacenter->temp_auth_key);
-                                        unset($this->datacenter->auth_key);
-                                        $this->init_authorization();
                                     case 'USER_DEACTIVATED':
                                     case 'SESSION_REVOKED':
                                     case 'SESSION_EXPIRED':
+                                        unset($this->datacenter->temp_auth_key);
+                                        unset($this->datacenter->auth_key);
                                         $this->datacenter->authorized = false;
                                         $this->datacenter->authorization = null;
                                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
@@ -87,6 +86,10 @@ class CallHandler extends AuthKeyHandler
                                 break;
                         }
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
+                        break;
+                    case 'boolTrue':
+                    case 'boolFalse':
+                        $server_answer = $server_answer['_'] === 'boolTrue';
                         break;
                 }
             } catch (\danog\MadelineProto\Exception $e) {

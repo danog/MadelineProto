@@ -39,7 +39,7 @@ if (file_exists('number.php') && !file_exists('session.madeline')) {
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = unserialize(file_get_contents('session.madeline'));
 
-$message = 'Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION');
+$message = (getenv('TRAVIS_COMMIT') == '') ? 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 $peers = [];
 foreach (['pwrtelegramgroup', 'pwrtelegramgroupita'] as $user) {
     $username = $MadelineProto->contacts->resolveUsername(['username' => $user]);
@@ -53,7 +53,6 @@ foreach ($peers as $peer) {
 }
 
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
-
 if (file_exists('token.php')) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API();

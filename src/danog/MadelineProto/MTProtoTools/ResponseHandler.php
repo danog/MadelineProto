@@ -21,7 +21,6 @@ class ResponseHandler extends MsgIdHandler
     {
         foreach ($this->datacenter->new_incoming as $current_msg_id) {
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
-
             switch ($response['_']) {
                 case 'msgs_ack':
                     foreach ($response['msg_ids'] as $msg_id) {
@@ -101,10 +100,11 @@ class ResponseHandler extends MsgIdHandler
                     $this->ack_outgoing_message_id($response['req_msg_id']); // Acknowledge that the server received the original query (the same one, the response to which we wish to forget)
                 default:
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
-                    foreach ($this->datacenter->new_outgoing as $expecting) {
-                        if ($this->tl->constructors->find_by_predicate($response['_'])['type'] == $expecting['type']) {
+                    $response_type = $this->tl->constructors->find_by_predicate($response['_'])['type'];
+                    foreach ($this->datacenter->new_outgoing as $key => $expecting) {
+                        if ($response_type == $expecting['type']) {
                             $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
-                            unset($this->datacenter->new_outgoing[$expecting['msg_id']]);
+                            unset($this->datacenter->new_outgoing[$key]);
                             unset($this->datacenter->new_incoming[$current_msg_id]);
 
                             return;
