@@ -33,7 +33,6 @@ class Connection extends Tools
     public $authorization = null;
     public $waiting_code = false;
 
-
     public $incoming_messages = [];
     public $outgoing_messages = [];
     public $new_incoming = [];

@@ -32,7 +32,6 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log('Getting future salts...');
         $this->future_salts = $this->get_future_salts([3]);
 
-
         \danog\MadelineProto\Logger::log('MadelineProto is ready!');
         restore_error_handler();
     }

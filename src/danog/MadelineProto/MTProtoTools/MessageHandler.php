@@ -89,10 +89,10 @@ class MessageHandler extends Crypt
             $message_id = \danog\PHP\Struct::unpack('<Q', substr($decrypted_data, 16, 8))[0];
             $this->check_message_id($message_id, false);
 
-            $seq_no = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 24, 4)) [0];
+            $seq_no = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 24, 4))[0];
             // Dunno how to handle any incorrect sequence numbers
 
-            $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 28, 4)) [0];
+            $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 28, 4))[0];
 
             if ($message_data_length > strlen($decrypted_data)) {
                 throw new \danog\MadelineProto\Exception('message_data_length is too big');

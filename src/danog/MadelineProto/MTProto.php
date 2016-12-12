@@ -51,14 +51,12 @@ class MTProto extends MTProtoTools
         }
         $this->ipv6 = strlen($google) > 0;
 
-
         // Detect device model
         $device_model = 'Web server';
         try {
             $device_model = php_uname('s');
         } catch (Exception $e) {
         }
-
 
         // Detect system version
         $system_version = phpversion();

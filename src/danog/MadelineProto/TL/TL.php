@@ -61,7 +61,7 @@ class TL extends \danog\MadelineProto\Tools
 
     public function deserialize_bool($data)
     {
-        $id = \danog\PHP\Struct::unpack('<i', $data) [0];
+        $id = \danog\PHP\Struct::unpack('<i', $data)[0];
         $tl_elem = $this->constructors->find_by_id($id);
         if ($tl_elem === false) {
             throw new Exception('Could not extract boolean');
@@ -240,13 +240,13 @@ class TL extends \danog\MadelineProto\Tools
             case 'Bool':
                 return $this->deserialize_bool(fread($bytes_io, 4));
             case 'int':
-                return \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                return \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
             case '#':
-                return \danog\PHP\Struct::unpack('<I', fread($bytes_io, 4)) [0];
+                return \danog\PHP\Struct::unpack('<I', fread($bytes_io, 4))[0];
             case 'long':
-                return \danog\PHP\Struct::unpack('<q', fread($bytes_io, 8)) [0];
+                return \danog\PHP\Struct::unpack('<q', fread($bytes_io, 8))[0];
             case 'double':
-                return \danog\PHP\Struct::unpack('<d', fread($bytes_io, 8)) [0];
+                return \danog\PHP\Struct::unpack('<d', fread($bytes_io, 8))[0];
             case 'int128':
                 return fread($bytes_io, 16);
             case 'int256':
@@ -255,12 +255,12 @@ class TL extends \danog\MadelineProto\Tools
                 return fread($bytes_io, 32);
             case 'string':
             case 'bytes':
-                $l = \danog\PHP\Struct::unpack('<B', fread($bytes_io, 1)) [0];
+                $l = \danog\PHP\Struct::unpack('<B', fread($bytes_io, 1))[0];
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l == 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 3).$this->string2bin('\x00')) [0];
+                    $long_len = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 3).$this->string2bin('\x00'))[0];
                     $x = fread($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -281,7 +281,7 @@ class TL extends \danog\MadelineProto\Tools
             case 'true':
                 return true;
             case 'Vector t':
-                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
@@ -296,7 +296,7 @@ class TL extends \danog\MadelineProto\Tools
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             case 'vector':
-                $count = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                $count = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
                     $result[] = $this->deserialize($bytes_io, ['type' => $type['subtype']]);
@@ -313,7 +313,7 @@ class TL extends \danog\MadelineProto\Tools
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
-                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4)) [0];
+                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
