@@ -38,6 +38,11 @@ class MTProto extends MTProtoTools
 
     public function __construct($settings = [])
     {
+        // Detect 64 bit
+        if (PHP_INT_SIZE < 8) {
+            throw new Exception('MadelineProto supports only 64 bit systems ATM');
+        }
+
         // Detect ipv6
         $google = '';
         try {
