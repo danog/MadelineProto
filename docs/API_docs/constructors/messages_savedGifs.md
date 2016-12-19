@@ -1,0 +1,19 @@
+## Constructor: messages\_savedGifs  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|hash|[int](../types/int.md) | Required|
+|gifs|Array of [Document](../types/Document.md) | Required|
+
+
+
+### Type: [messages\_SavedGifs](../types/messages_SavedGifs.md)
+
+
+### Example:
+
+```
+$messages_savedGifs = ['_' => messages_savedGifs', 'hash' => int, 'gifs' => [Vector t], ];
+```

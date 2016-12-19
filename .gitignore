@@ -61,7 +61,7 @@ target/
 .#*#
 *.swp
 vendor
-*save*
+*save
 *bak
 number.php
 token.php
