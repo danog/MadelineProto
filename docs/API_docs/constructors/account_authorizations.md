@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |authorizations|Array of [Authorization](../types/Authorization.md) | Required|
-### Type: 
 
-[account\_Authorizations](../types/account_Authorizations.md)
+
+
+### Type: [account\_Authorizations](../types/account_Authorizations.md)
+
+
 ### Example:
 
 ```

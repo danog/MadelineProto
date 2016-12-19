@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |status|[UserStatus](../types/UserStatus.md) | Required|
-### Type: 
 
-[ContactStatus](../types/ContactStatus.md)
+
+
+### Type: [ContactStatus](../types/ContactStatus.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
-### Type: 
 
-[Photo](../types/Photo.md)
+
+
+### Type: [Photo](../types/Photo.md)
+
+
 ### Example:
 
 ```

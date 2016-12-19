@@ -16,9 +16,12 @@
 |ip|[string](../types/string.md) | Required|
 |country|[string](../types/string.md) | Required|
 |region|[string](../types/string.md) | Required|
-### Type: 
 
-[Authorization](../types/Authorization.md)
+
+
+### Type: [Authorization](../types/Authorization.md)
+
+
 ### Example:
 
 ```

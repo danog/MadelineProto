@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[InputPhoto](../types/InputPhoto.md) | Required|
 |caption|[string](../types/string.md) | Required|
-### Type: 
 
-[InputMedia](../types/InputMedia.md)
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+
 ### Example:
 
 ```

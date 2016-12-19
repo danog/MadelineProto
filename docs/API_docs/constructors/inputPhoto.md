@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputPhoto](../types/InputPhoto.md)
+
+
+### Type: [InputPhoto](../types/InputPhoto.md)
+
+
 ### Example:
 
 ```

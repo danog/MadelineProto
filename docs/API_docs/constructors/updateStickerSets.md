@@ -1,8 +1,11 @@
 ## Constructor: updateStickerSets  
 
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

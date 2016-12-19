@@ -1,8 +1,11 @@
 ## Constructor: draftMessageEmpty  
 
-### Type: 
 
-[DraftMessage](../types/DraftMessage.md)
+
+
+### Type: [DraftMessage](../types/DraftMessage.md)
+
+
 ### Example:
 
 ```

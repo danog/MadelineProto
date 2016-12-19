@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[Peer](../types/Peer.md)
+
+
+### Type: [Peer](../types/Peer.md)
+
+
 ### Example:
 
 ```

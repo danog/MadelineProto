@@ -1,8 +1,11 @@
 ## Constructor: messages\_stickersNotModified  
 
-### Type: 
 
-[messages\_Stickers](../types/messages_Stickers.md)
+
+
+### Type: [messages\_Stickers](../types/messages_Stickers.md)
+
+
 ### Example:
 
 ```

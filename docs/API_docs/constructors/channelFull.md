@@ -21,9 +21,12 @@
 |migrated\_from\_chat\_id|[int](../types/int.md) | Optional|
 |migrated\_from\_max\_id|[int](../types/int.md) | Optional|
 |pinned\_msg\_id|[int](../types/int.md) | Optional|
-### Type: 
 
-[ChatFull](../types/ChatFull.md)
+
+
+### Type: [ChatFull](../types/ChatFull.md)
+
+
 ### Example:
 
 ```

@@ -121,10 +121,10 @@ foreach ($TL->methods->method as $key => $method) {
 ';
     $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)
 
-### Example:
-
 ';
-    $example = str_replace('[]', '', '
+    $example = str_replace('[]', '', '### Example:
+
+
 ```
 $MadelineProto = new \danog\MadelineProto\API();
 if (isset($token)) {
@@ -247,9 +247,13 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
 
 ');
-    $type = '### Type: 
+    $table .= '
 
-['.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md)
+
+';
+    $type = '### Type: ['.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md)
+
+
 ';
     $example = '### Example:
 
@@ -299,6 +303,13 @@ foreach ($types as $type => $keys) {
     file_put_contents('types/'.$type.'.md', $header.$constructors);
 }
 
+\danog\MadelineProto\Logger::log('Generating types index...');
+
+file_put_contents('types/index.md', '# Types  
+
+'.$index);
+
+
 \danog\MadelineProto\Logger::log('Generating additional types...');
 
 file_put_contents('types/string.md', '## Type: string  
@@ -328,12 +339,6 @@ Represents a TL serialized payload.');
 file_put_contents('types/X.md', '## Type: X  
 
 Represents a TL serialized payload.');
-
-\danog\MadelineProto\Logger::log('Generating types index...');
-
-file_put_contents('types/index.md', '# Types  
-
-'.$index);
 
 file_put_contents('constructors/boolFalse.md', '# boolFalse  
 

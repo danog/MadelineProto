@@ -1,8 +1,11 @@
 ## Constructor: messages\_recentStickersNotModified  
 
-### Type: 
 
-[messages\_RecentStickers](../types/messages_RecentStickers.md)
+
+
+### Type: [messages\_RecentStickers](../types/messages_RecentStickers.md)
+
+
 ### Example:
 
 ```

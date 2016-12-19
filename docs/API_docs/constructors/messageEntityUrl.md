@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
-### Type: 
 
-[MessageEntity](../types/MessageEntity.md)
+
+
+### Type: [MessageEntity](../types/MessageEntity.md)
+
+
 ### Example:
 
 ```

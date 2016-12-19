@@ -8,9 +8,12 @@
 |parts|[int](../types/int.md) | Required|
 |md5\_checksum|[string](../types/string.md) | Required|
 |key\_fingerprint|[int](../types/int.md) | Required|
-### Type: 
 
-[InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
+### Type: [InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
 ### Example:
 
 ```

@@ -19,9 +19,12 @@
 |duration|[int](../types/int.md) | Optional|
 |author|[string](../types/string.md) | Optional|
 |document|[Document](../types/Document.md) | Optional|
-### Type: 
 
-[WebPage](../types/WebPage.md)
+
+
+### Type: [WebPage](../types/WebPage.md)
+
+
 ### Example:
 
 ```

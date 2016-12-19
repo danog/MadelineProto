@@ -8,9 +8,12 @@
 |title|[string](../types/string.md) | Required|
 |bg\_color|[int](../types/int.md) | Required|
 |color|[int](../types/int.md) | Required|
-### Type: 
 
-[WallPaper](../types/WallPaper.md)
+
+
+### Type: [WallPaper](../types/WallPaper.md)
+
+
 ### Example:
 
 ```

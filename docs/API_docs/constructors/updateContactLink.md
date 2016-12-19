@@ -7,9 +7,12 @@
 |user\_id|[int](../types/int.md) | Required|
 |my\_link|[ContactLink](../types/ContactLink.md) | Required|
 |foreign\_link|[ContactLink](../types/ContactLink.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

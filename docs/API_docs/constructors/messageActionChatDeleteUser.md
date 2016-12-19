@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[MessageAction](../types/MessageAction.md)
+
+
+### Type: [MessageAction](../types/MessageAction.md)
+
+
 ### Example:
 
 ```

@@ -10,9 +10,12 @@
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
 |state|[updates\_State](../types/updates_State.md) | Required|
-### Type: 
 
-[updates\_Difference](../types/updates_Difference.md)
+
+
+### Type: [updates\_Difference](../types/updates_Difference.md)
+
+
 ### Example:
 
 ```

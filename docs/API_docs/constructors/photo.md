@@ -9,9 +9,12 @@
 |access\_hash|[long](../types/long.md) | Required|
 |date|[int](../types/int.md) | Required|
 |sizes|Array of [PhotoSize](../types/PhotoSize.md) | Required|
-### Type: 
 
-[Photo](../types/Photo.md)
+
+
+### Type: [Photo](../types/Photo.md)
+
+
 ### Example:
 
 ```

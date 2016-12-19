@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
+### Type: [InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[InputPeer](../types/InputPeer.md)
+
+
+### Type: [InputPeer](../types/InputPeer.md)
+
+
 ### Example:
 
 ```

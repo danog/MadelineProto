@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[account\_PrivacyRules](../types/account_PrivacyRules.md)
+
+
+### Type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
+
+
 ### Example:
 
 ```

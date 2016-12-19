@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |tmp\_sessions|[int](../types/int.md) | Optional|
 |user|[User](../types/User.md) | Required|
-### Type: 
 
-[auth\_Authorization](../types/auth_Authorization.md)
+
+
+### Type: [auth\_Authorization](../types/auth_Authorization.md)
+
+
 ### Example:
 
 ```

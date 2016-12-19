@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |date|[int](../types/int.md) | Required|
 |file|[EncryptedFile](../types/EncryptedFile.md) | Required|
-### Type: 
 
-[messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
+
+
+### Type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
+
+
 ### Example:
 
 ```

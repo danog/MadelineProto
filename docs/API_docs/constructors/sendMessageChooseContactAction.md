@@ -1,8 +1,11 @@
 ## Constructor: sendMessageChooseContactAction  
 
-### Type: 
 
-[SendMessageAction](../types/SendMessageAction.md)
+
+
+### Type: [SendMessageAction](../types/SendMessageAction.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |critical|[Bool](../types/Bool.md) | Required|
 |url|[string](../types/string.md) | Required|
 |text|[string](../types/string.md) | Required|
-### Type: 
 
-[help\_AppUpdate](../types/help_AppUpdate.md)
+
+
+### Type: [help\_AppUpdate](../types/help_AppUpdate.md)
+
+
 ### Example:
 
 ```

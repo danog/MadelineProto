@@ -1,8 +1,11 @@
 ## Constructor: geoPointEmpty  
 
-### Type: 
 
-[GeoPoint](../types/GeoPoint.md)
+
+
+### Type: [GeoPoint](../types/GeoPoint.md)
+
+
 ### Example:
 
 ```

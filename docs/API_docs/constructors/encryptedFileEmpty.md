@@ -1,8 +1,11 @@
 ## Constructor: encryptedFileEmpty  
 
-### Type: 
 
-[EncryptedFile](../types/EncryptedFile.md)
+
+
+### Type: [EncryptedFile](../types/EncryptedFile.md)
+
+
 ### Example:
 
 ```

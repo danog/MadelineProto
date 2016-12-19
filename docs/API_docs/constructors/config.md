@@ -27,9 +27,12 @@
 |stickers\_recent\_limit|[int](../types/int.md) | Required|
 |tmp\_sessions|[int](../types/int.md) | Optional|
 |disabled\_features|Array of [DisabledFeature](../types/DisabledFeature.md) | Required|
-### Type: 
 
-[Config](../types/Config.md)
+
+
+### Type: [Config](../types/Config.md)
+
+
 ### Example:
 
 ```

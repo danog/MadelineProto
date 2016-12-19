@@ -14,9 +14,12 @@
 |short\_name|[string](../types/string.md) | Required|
 |count|[int](../types/int.md) | Required|
 |hash|[int](../types/int.md) | Required|
-### Type: 
 
-[StickerSet](../types/StickerSet.md)
+
+
+### Type: [StickerSet](../types/StickerSet.md)
+
+
 ### Example:
 
 ```

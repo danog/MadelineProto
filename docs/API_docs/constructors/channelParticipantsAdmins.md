@@ -1,8 +1,11 @@
 ## Constructor: channelParticipantsAdmins  
 
-### Type: 
 
-[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
+
+
+### Type: [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
+
+
 ### Example:
 
 ```

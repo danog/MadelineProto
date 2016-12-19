@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
-### Type: 
 
-[ContactBlocked](../types/ContactBlocked.md)
+
+
+### Type: [ContactBlocked](../types/ContactBlocked.md)
+
+
 ### Example:
 
 ```

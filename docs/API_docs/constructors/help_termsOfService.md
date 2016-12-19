@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
-### Type: 
 
-[help\_TermsOfService](../types/help_TermsOfService.md)
+
+
+### Type: [help\_TermsOfService](../types/help_TermsOfService.md)
+
+
 ### Example:
 
 ```

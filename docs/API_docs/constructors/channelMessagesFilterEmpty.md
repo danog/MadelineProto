@@ -1,8 +1,11 @@
 ## Constructor: channelMessagesFilterEmpty  
 
-### Type: 
 
-[ChannelMessagesFilter](../types/ChannelMessagesFilter.md)
+
+
+### Type: [ChannelMessagesFilter](../types/ChannelMessagesFilter.md)
+
+
 ### Example:
 
 ```

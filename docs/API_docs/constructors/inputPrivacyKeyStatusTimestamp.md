@@ -1,8 +1,11 @@
 ## Constructor: inputPrivacyKeyStatusTimestamp  
 
-### Type: 
 
-[InputPrivacyKey](../types/InputPrivacyKey.md)
+
+
+### Type: [InputPrivacyKey](../types/InputPrivacyKey.md)
+
+
 ### Example:
 
 ```

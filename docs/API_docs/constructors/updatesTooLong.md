@@ -1,8 +1,11 @@
 ## Constructor: updatesTooLong  
 
-### Type: 
 
-[Updates](../types/Updates.md)
+
+
+### Type: [Updates](../types/Updates.md)
+
+
 ### Example:
 
 ```

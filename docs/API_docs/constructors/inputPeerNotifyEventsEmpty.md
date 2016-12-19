@@ -1,8 +1,11 @@
 ## Constructor: inputPeerNotifyEventsEmpty  
 
-### Type: 
 
-[InputPeerNotifyEvents](../types/InputPeerNotifyEvents.md)
+
+
+### Type: [InputPeerNotifyEvents](../types/InputPeerNotifyEvents.md)
+
+
 ### Example:
 
 ```

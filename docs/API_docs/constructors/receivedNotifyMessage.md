@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
-### Type: 
 
-[ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)
+
+
+### Type: [ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)
+
+
 ### Example:
 
 ```

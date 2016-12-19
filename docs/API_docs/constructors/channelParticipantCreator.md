@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[ChannelParticipant](../types/ChannelParticipant.md)
+
+
+### Type: [ChannelParticipant](../types/ChannelParticipant.md)
+
+
 ### Example:
 
 ```

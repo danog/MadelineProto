@@ -7,9 +7,12 @@
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
 |version|[int](../types/int.md) | Required|
-### Type: 
 
-[InputFileLocation](../types/InputFileLocation.md)
+
+
+### Type: [InputFileLocation](../types/InputFileLocation.md)
+
+
 ### Example:
 
 ```

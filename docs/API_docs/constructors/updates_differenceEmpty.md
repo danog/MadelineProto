@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |date|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
-### Type: 
 
-[updates\_Difference](../types/updates_Difference.md)
+
+
+### Type: [updates\_Difference](../types/updates_Difference.md)
+
+
 ### Example:
 
 ```

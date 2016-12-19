@@ -7,9 +7,12 @@
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
 |url|[string](../types/string.md) | Required|
-### Type: 
 
-[MessageEntity](../types/MessageEntity.md)
+
+
+### Type: [MessageEntity](../types/MessageEntity.md)
+
+
 ### Example:
 
 ```

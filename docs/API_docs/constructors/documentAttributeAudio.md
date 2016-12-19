@@ -9,9 +9,12 @@
 |title|[string](../types/string.md) | Optional|
 |performer|[string](../types/string.md) | Optional|
 |waveform|[bytes](../types/bytes.md) | Optional|
-### Type: 
 
-[DocumentAttribute](../types/DocumentAttribute.md)
+
+
+### Type: [DocumentAttribute](../types/DocumentAttribute.md)
+
+
 ### Example:
 
 ```

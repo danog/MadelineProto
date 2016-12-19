@@ -1,8 +1,11 @@
 ## Constructor: inputPrivacyValueAllowContacts  
 
-### Type: 
 
-[InputPrivacyRule](../types/InputPrivacyRule.md)
+
+
+### Type: [InputPrivacyRule](../types/InputPrivacyRule.md)
+
+
 ### Example:
 
 ```

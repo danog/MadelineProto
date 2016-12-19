@@ -9,9 +9,12 @@
 |phone\_code\_hash|[string](../types/string.md) | Required|
 |next\_type|[auth\_CodeType](../types/auth_CodeType.md) | Optional|
 |timeout|[int](../types/int.md) | Optional|
-### Type: 
 
-[auth\_SentCode](../types/auth_SentCode.md)
+
+
+### Type: [auth\_SentCode](../types/auth_SentCode.md)
+
+
 ### Example:
 
 ```

@@ -7,9 +7,12 @@
 |final|[Bool](../types/Bool.md) | Optional|
 |pts|[int](../types/int.md) | Required|
 |timeout|[int](../types/int.md) | Optional|
-### Type: 
 
-[updates\_ChannelDifference](../types/updates_ChannelDifference.md)
+
+
+### Type: [updates\_ChannelDifference](../types/updates_ChannelDifference.md)
+
+
 ### Example:
 
 ```

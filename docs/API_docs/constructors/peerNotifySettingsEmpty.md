@@ -1,8 +1,11 @@
 ## Constructor: peerNotifySettingsEmpty  
 
-### Type: 
 
-[PeerNotifySettings](../types/PeerNotifySettings.md)
+
+
+### Type: [PeerNotifySettings](../types/PeerNotifySettings.md)
+
+
 ### Example:
 
 ```

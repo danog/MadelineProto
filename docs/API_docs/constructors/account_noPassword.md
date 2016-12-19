@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |new\_salt|[bytes](../types/bytes.md) | Required|
 |email\_unconfirmed\_pattern|[string](../types/string.md) | Required|
-### Type: 
 
-[account\_Password](../types/account_Password.md)
+
+
+### Type: [account\_Password](../types/account_Password.md)
+
+
 ### Example:
 
 ```

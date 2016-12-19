@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |scores|Array of [HighScore](../types/HighScore.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[messages\_HighScores](../types/messages_HighScores.md)
+
+
+### Type: [messages\_HighScores](../types/messages_HighScores.md)
+
+
 ### Example:
 
 ```

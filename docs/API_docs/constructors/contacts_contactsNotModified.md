@@ -1,8 +1,11 @@
 ## Constructor: contacts\_contactsNotModified  
 
-### Type: 
 
-[contacts\_Contacts](../types/contacts_Contacts.md)
+
+
+### Type: [contacts\_Contacts](../types/contacts_Contacts.md)
+
+
 ### Example:
 
 ```

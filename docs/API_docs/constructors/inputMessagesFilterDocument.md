@@ -1,8 +1,11 @@
 ## Constructor: inputMessagesFilterDocument  
 
-### Type: 
 
-[MessagesFilter](../types/MessagesFilter.md)
+
+
+### Type: [MessagesFilter](../types/MessagesFilter.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
-### Type: 
 
-[Document](../types/Document.md)
+
+
+### Type: [Document](../types/Document.md)
+
+
 ### Example:
 
 ```

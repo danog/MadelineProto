@@ -9,9 +9,12 @@
 |date|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
 |file|[EncryptedFile](../types/EncryptedFile.md) | Required|
-### Type: 
 
-[EncryptedMessage](../types/EncryptedMessage.md)
+
+
+### Type: [EncryptedMessage](../types/EncryptedMessage.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: inputNotifyUsers  
 
-### Type: 
 
-[InputNotifyPeer](../types/InputNotifyPeer.md)
+
+
+### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
+
+
 ### Example:
 
 ```

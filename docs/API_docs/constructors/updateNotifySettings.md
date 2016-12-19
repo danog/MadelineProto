@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |peer|[NotifyPeer](../types/NotifyPeer.md) | Required|
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

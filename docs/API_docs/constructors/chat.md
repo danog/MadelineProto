@@ -17,9 +17,12 @@
 |date|[int](../types/int.md) | Required|
 |version|[int](../types/int.md) | Required|
 |migrated\_to|[InputChannel](../types/InputChannel.md) | Optional|
-### Type: 
 
-[Chat](../types/Chat.md)
+
+
+### Type: [Chat](../types/Chat.md)
+
+
 ### Example:
 
 ```

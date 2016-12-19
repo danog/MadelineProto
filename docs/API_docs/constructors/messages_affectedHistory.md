@@ -7,9 +7,12 @@
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
 |offset|[int](../types/int.md) | Required|
-### Type: 
 
-[messages\_AffectedHistory](../types/messages_AffectedHistory.md)
+
+
+### Type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
+
+
 ### Example:
 
 ```

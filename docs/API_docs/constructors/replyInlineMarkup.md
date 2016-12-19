@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Required|
-### Type: 
 
-[ReplyMarkup](../types/ReplyMarkup.md)
+
+
+### Type: [ReplyMarkup](../types/ReplyMarkup.md)
+
+
 ### Example:
 
 ```

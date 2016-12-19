@@ -1,8 +1,11 @@
 ## Constructor: messageActionPinMessage  
 
-### Type: 
 
-[MessageAction](../types/MessageAction.md)
+
+
+### Type: [MessageAction](../types/MessageAction.md)
+
+
 ### Example:
 
 ```

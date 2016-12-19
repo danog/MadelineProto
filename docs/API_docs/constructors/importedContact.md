@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |client\_id|[long](../types/long.md) | Required|
-### Type: 
 
-[ImportedContact](../types/ImportedContact.md)
+
+
+### Type: [ImportedContact](../types/ImportedContact.md)
+
+
 ### Example:
 
 ```

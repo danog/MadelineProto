@@ -1,8 +1,11 @@
 ## Constructor: true  
 
-### Type: 
 
-[True](../types/True.md)
+
+
+### Type: [True](../types/True.md)
+
+
 ### Example:
 
 ```

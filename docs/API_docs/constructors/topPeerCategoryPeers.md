@@ -7,9 +7,12 @@
 |category|[TopPeerCategory](../types/TopPeerCategory.md) | Required|
 |count|[int](../types/int.md) | Required|
 |peers|Array of [TopPeer](../types/TopPeer.md) | Required|
-### Type: 
 
-[TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)
+
+
+### Type: [TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)
+
+
 ### Example:
 
 ```

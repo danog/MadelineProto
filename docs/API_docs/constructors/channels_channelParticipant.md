@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |participant|[ChannelParticipant](../types/ChannelParticipant.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)
+
+
+### Type: [channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: auth\_codeTypeCall  
 
-### Type: 
 
-[auth\_CodeType](../types/auth_CodeType.md)
+
+
+### Type: [auth\_CodeType](../types/auth_CodeType.md)
+
+
 ### Example:
 
 ```

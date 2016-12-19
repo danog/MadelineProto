@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |was\_online|[int](../types/int.md) | Required|
-### Type: 
 
-[UserStatus](../types/UserStatus.md)
+
+
+### Type: [UserStatus](../types/UserStatus.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |game|[Game](../types/Game.md) | Required|
-### Type: 
 
-[MessageMedia](../types/MessageMedia.md)
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+
 ### Example:
 
 ```

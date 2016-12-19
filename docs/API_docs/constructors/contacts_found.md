@@ -7,9 +7,12 @@
 |results|Array of [Peer](../types/Peer.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[contacts\_Found](../types/contacts_Found.md)
+
+
+### Type: [contacts\_Found](../types/contacts_Found.md)
+
+
 ### Example:
 
 ```

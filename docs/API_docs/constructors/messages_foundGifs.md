@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |next\_offset|[int](../types/int.md) | Required|
 |results|Array of [FoundGif](../types/FoundGif.md) | Required|
-### Type: 
 
-[messages\_FoundGifs](../types/messages_FoundGifs.md)
+
+
+### Type: [messages\_FoundGifs](../types/messages_FoundGifs.md)
+
+
 ### Example:
 
 ```

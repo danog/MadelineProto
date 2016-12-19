@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |photo|[Photo](../types/Photo.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[photos\_Photo](../types/photos_Photo.md)
+
+
+### Type: [photos\_Photo](../types/photos_Photo.md)
+
+
 ### Example:
 
 ```

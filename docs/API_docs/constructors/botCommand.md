@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |command|[string](../types/string.md) | Required|
 |description|[string](../types/string.md) | Required|
-### Type: 
 
-[BotCommand](../types/BotCommand.md)
+
+
+### Type: [BotCommand](../types/BotCommand.md)
+
+
 ### Example:
 
 ```

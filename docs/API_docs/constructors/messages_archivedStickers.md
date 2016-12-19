@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |count|[int](../types/int.md) | Required|
 |sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Required|
-### Type: 
 
-[messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)
+
+
+### Type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)
+
+
 ### Example:
 
 ```

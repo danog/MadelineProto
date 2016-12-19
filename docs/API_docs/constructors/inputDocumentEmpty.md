@@ -1,8 +1,11 @@
 ## Constructor: inputDocumentEmpty  
 
-### Type: 
 
-[InputDocument](../types/InputDocument.md)
+
+
+### Type: [InputDocument](../types/InputDocument.md)
+
+
 ### Example:
 
 ```

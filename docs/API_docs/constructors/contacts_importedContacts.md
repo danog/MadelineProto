@@ -7,9 +7,12 @@
 |imported|Array of [ImportedContact](../types/ImportedContact.md) | Required|
 |retry\_contacts|Array of [long](../types/long.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
+
+
+### Type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
+
+
 ### Example:
 
 ```

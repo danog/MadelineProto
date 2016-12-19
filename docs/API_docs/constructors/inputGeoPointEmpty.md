@@ -1,8 +1,11 @@
 ## Constructor: inputGeoPointEmpty  
 
-### Type: 
 
-[InputGeoPoint](../types/InputGeoPoint.md)
+
+
+### Type: [InputGeoPoint](../types/InputGeoPoint.md)
+
+
 ### Example:
 
 ```

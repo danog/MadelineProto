@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
-### Type: 
 
-[Chat](../types/Chat.md)
+
+
+### Type: [Chat](../types/Chat.md)
+
+
 ### Example:
 
 ```

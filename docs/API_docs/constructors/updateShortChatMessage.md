@@ -19,9 +19,12 @@
 |via\_bot\_id|[int](../types/int.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
-### Type: 
 
-[Updates](../types/Updates.md)
+
+
+### Type: [Updates](../types/Updates.md)
+
+
 ### Example:
 
 ```

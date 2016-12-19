@@ -7,9 +7,12 @@
 |full\_chat|[ChatFull](../types/ChatFull.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[messages\_ChatFull](../types/messages_ChatFull.md)
+
+
+### Type: [messages\_ChatFull](../types/messages_ChatFull.md)
+
+
 ### Example:
 
 ```

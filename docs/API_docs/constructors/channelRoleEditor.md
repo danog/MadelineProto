@@ -1,8 +1,11 @@
 ## Constructor: channelRoleEditor  
 
-### Type: 
 
-[ChannelParticipantRole](../types/ChannelParticipantRole.md)
+
+
+### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
+
+
 ### Example:
 
 ```

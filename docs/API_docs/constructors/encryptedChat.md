@@ -11,9 +11,12 @@
 |participant\_id|[int](../types/int.md) | Required|
 |g\_a\_or\_b|[bytes](../types/bytes.md) | Required|
 |key\_fingerprint|[long](../types/long.md) | Required|
-### Type: 
 
-[EncryptedChat](../types/EncryptedChat.md)
+
+
+### Type: [EncryptedChat](../types/EncryptedChat.md)
+
+
 ### Example:
 
 ```

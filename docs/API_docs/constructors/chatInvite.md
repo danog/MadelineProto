@@ -12,9 +12,12 @@
 |photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
 |participants\_count|[int](../types/int.md) | Required|
 |participants|Array of [User](../types/User.md) | Optional|
-### Type: 
 
-[ChatInvite](../types/ChatInvite.md)
+
+
+### Type: [ChatInvite](../types/ChatInvite.md)
+
+
 ### Example:
 
 ```

@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
 |data|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[KeyboardButton](../types/KeyboardButton.md)
+
+
+### Type: [KeyboardButton](../types/KeyboardButton.md)
+
+
 ### Example:
 
 ```

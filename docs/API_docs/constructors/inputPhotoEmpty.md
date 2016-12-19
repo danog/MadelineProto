@@ -1,8 +1,11 @@
 ## Constructor: inputPhotoEmpty  
 
-### Type: 
 
-[InputPhoto](../types/InputPhoto.md)
+
+
+### Type: [InputPhoto](../types/InputPhoto.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: updateRecentStickers  
 
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

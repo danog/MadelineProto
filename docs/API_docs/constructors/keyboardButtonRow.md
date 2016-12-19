@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |buttons|Array of [KeyboardButton](../types/KeyboardButton.md) | Required|
-### Type: 
 
-[KeyboardButtonRow](../types/KeyboardButtonRow.md)
+
+
+### Type: [KeyboardButtonRow](../types/KeyboardButtonRow.md)
+
+
 ### Example:
 
 ```

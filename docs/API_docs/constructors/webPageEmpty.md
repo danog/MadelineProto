@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
-### Type: 
 
-[WebPage](../types/WebPage.md)
+
+
+### Type: [WebPage](../types/WebPage.md)
+
+
 ### Example:
 
 ```

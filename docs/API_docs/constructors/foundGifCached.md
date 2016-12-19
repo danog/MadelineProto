@@ -7,9 +7,12 @@
 |url|[string](../types/string.md) | Required|
 |photo|[Photo](../types/Photo.md) | Required|
 |document|[Document](../types/Document.md) | Required|
-### Type: 
 
-[FoundGif](../types/FoundGif.md)
+
+
+### Type: [FoundGif](../types/FoundGif.md)
+
+
 ### Example:
 
 ```

@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md)
+
+
+### Type: [auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md)
+
+
 ### Example:
 
 ```

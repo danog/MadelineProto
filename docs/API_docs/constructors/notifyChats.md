@@ -1,8 +1,11 @@
 ## Constructor: notifyChats  
 
-### Type: 
 
-[NotifyPeer](../types/NotifyPeer.md)
+
+
+### Type: [NotifyPeer](../types/NotifyPeer.md)
+
+
 ### Example:
 
 ```

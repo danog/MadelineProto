@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputEncryptedChat](../types/InputEncryptedChat.md)
+
+
+### Type: [InputEncryptedChat](../types/InputEncryptedChat.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |message|[string](../types/string.md) | Required|
 |media|[MessageMedia](../types/MessageMedia.md) | Required|
 |popup|[Bool](../types/Bool.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

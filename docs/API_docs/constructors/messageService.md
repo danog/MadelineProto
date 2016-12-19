@@ -15,9 +15,12 @@
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Required|
 |action|[MessageAction](../types/MessageAction.md) | Required|
-### Type: 
 
-[Message](../types/Message.md)
+
+
+### Type: [Message](../types/Message.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: null  
 
-### Type: 
 
-[Null](../types/Null.md)
+
+
+### Type: [Null](../types/Null.md)
+
+
 ### Example:
 
 ```

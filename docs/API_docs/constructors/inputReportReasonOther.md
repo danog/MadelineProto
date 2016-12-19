@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
-### Type: 
 
-[ReportReason](../types/ReportReason.md)
+
+
+### Type: [ReportReason](../types/ReportReason.md)
+
+
 ### Example:
 
 ```

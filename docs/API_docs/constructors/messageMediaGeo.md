@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |geo|[GeoPoint](../types/GeoPoint.md) | Required|
-### Type: 
 
-[MessageMedia](../types/MessageMedia.md)
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+
 ### Example:
 
 ```

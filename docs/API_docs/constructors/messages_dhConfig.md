@@ -8,9 +8,12 @@
 |p|[bytes](../types/bytes.md) | Required|
 |version|[int](../types/int.md) | Required|
 |random|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[messages\_DhConfig](../types/messages_DhConfig.md)
+
+
+### Type: [messages\_DhConfig](../types/messages_DhConfig.md)
+
+
 ### Example:
 
 ```

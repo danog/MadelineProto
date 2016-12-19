@@ -1,8 +1,11 @@
 ## Constructor: vector  
 
-### Type: 
 
-[Vector t](../types/Vector t.md)
+
+
+### Type: [Vector t](../types/Vector t.md)
+
+
 ### Example:
 
 ```

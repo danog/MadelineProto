@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |feature|[string](../types/string.md) | Required|
 |description|[string](../types/string.md) | Required|
-### Type: 
 
-[DisabledFeature](../types/DisabledFeature.md)
+
+
+### Type: [DisabledFeature](../types/DisabledFeature.md)
+
+
 ### Example:
 
 ```

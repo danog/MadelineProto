@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |peer|[InputPeer](../types/InputPeer.md) | Required|
-### Type: 
 
-[InputNotifyPeer](../types/InputNotifyPeer.md)
+
+
+### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
+
+
 ### Example:
 
 ```

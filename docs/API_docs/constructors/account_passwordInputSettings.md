@@ -8,9 +8,12 @@
 |new\_password\_hash|[bytes](../types/bytes.md) | Optional|
 |hint|[string](../types/string.md) | Optional|
 |email|[string](../types/string.md) | Optional|
-### Type: 
 
-[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md)
+
+
+### Type: [account\_PasswordInputSettings](../types/account_PasswordInputSettings.md)
+
+
 ### Example:
 
 ```

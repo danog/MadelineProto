@@ -13,9 +13,12 @@
 |dc\_id|[int](../types/int.md) | Required|
 |version|[int](../types/int.md) | Required|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Required|
-### Type: 
 
-[Document](../types/Document.md)
+
+
+### Type: [Document](../types/Document.md)
+
+
 ### Example:
 
 ```

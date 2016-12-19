@@ -11,9 +11,12 @@
 |description|[string](../types/string.md) | Required|
 |photo|[Photo](../types/Photo.md) | Required|
 |document|[Document](../types/Document.md) | Optional|
-### Type: 
 
-[Game](../types/Game.md)
+
+
+### Type: [Game](../types/Game.md)
+
+
 ### Example:
 
 ```

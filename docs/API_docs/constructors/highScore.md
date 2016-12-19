@@ -7,9 +7,12 @@
 |pos|[int](../types/int.md) | Required|
 |user\_id|[int](../types/int.md) | Required|
 |score|[int](../types/int.md) | Required|
-### Type: 
 
-[HighScore](../types/HighScore.md)
+
+
+### Type: [HighScore](../types/HighScore.md)
+
+
 ### Example:
 
 ```

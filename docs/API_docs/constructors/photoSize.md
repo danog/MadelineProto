@@ -9,9 +9,12 @@
 |w|[int](../types/int.md) | Required|
 |h|[int](../types/int.md) | Required|
 |size|[int](../types/int.md) | Required|
-### Type: 
 
-[PhotoSize](../types/PhotoSize.md)
+
+
+### Type: [PhotoSize](../types/PhotoSize.md)
+
+
 ### Example:
 
 ```

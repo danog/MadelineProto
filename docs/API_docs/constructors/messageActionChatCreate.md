@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |title|[string](../types/string.md) | Required|
 |users|Array of [int](../types/int.md) | Required|
-### Type: 
 
-[MessageAction](../types/MessageAction.md)
+
+
+### Type: [MessageAction](../types/MessageAction.md)
+
+
 ### Example:
 
 ```

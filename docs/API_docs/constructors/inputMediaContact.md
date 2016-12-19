@@ -7,9 +7,12 @@
 |phone\_number|[string](../types/string.md) | Required|
 |first\_name|[string](../types/string.md) | Required|
 |last\_name|[string](../types/string.md) | Required|
-### Type: 
 
-[InputMedia](../types/InputMedia.md)
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+
 ### Example:
 
 ```

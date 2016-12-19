@@ -16,9 +16,12 @@
 |h|[int](../types/int.md) | Optional|
 |duration|[int](../types/int.md) | Optional|
 |send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Required|
-### Type: 
 
-[InputBotInlineResult](../types/InputBotInlineResult.md)
+
+
+### Type: [InputBotInlineResult](../types/InputBotInlineResult.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[InputPhoto](../types/InputPhoto.md) | Required|
-### Type: 
 
-[InputStickeredMedia](../types/InputStickeredMedia.md)
+
+
+### Type: [InputStickeredMedia](../types/InputStickeredMedia.md)
+
+
 ### Example:
 
 ```

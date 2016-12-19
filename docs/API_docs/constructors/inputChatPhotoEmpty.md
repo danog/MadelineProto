@@ -1,8 +1,11 @@
 ## Constructor: inputChatPhotoEmpty  
 
-### Type: 
 
-[InputChatPhoto](../types/InputChatPhoto.md)
+
+
+### Type: [InputChatPhoto](../types/InputChatPhoto.md)
+
+
 ### Example:
 
 ```

@@ -10,9 +10,12 @@
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Required|
 |caption|[string](../types/string.md) | Required|
 |stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
-### Type: 
 
-[InputMedia](../types/InputMedia.md)
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+
 ### Example:
 
 ```

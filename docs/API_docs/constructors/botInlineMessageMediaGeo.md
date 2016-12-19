@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |geo|[GeoPoint](../types/GeoPoint.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-### Type: 
 
-[BotInlineMessage](../types/BotInlineMessage.md)
+
+
+### Type: [BotInlineMessage](../types/BotInlineMessage.md)
+
+
 ### Example:
 
 ```

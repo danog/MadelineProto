@@ -22,9 +22,12 @@
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |views|[int](../types/int.md) | Optional|
 |edit\_date|[int](../types/int.md) | Optional|
-### Type: 
 
-[Message](../types/Message.md)
+
+
+### Type: [Message](../types/Message.md)
+
+
 ### Example:
 
 ```

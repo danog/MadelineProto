@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |peer|[Peer](../types/Peer.md) | Required|
-### Type: 
 
-[NotifyPeer](../types/NotifyPeer.md)
+
+
+### Type: [NotifyPeer](../types/NotifyPeer.md)
+
+
 ### Example:
 
 ```

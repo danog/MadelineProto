@@ -1,8 +1,11 @@
 ## Constructor: chatInviteEmpty  
 
-### Type: 
 
-[ExportedChatInvite](../types/ExportedChatInvite.md)
+
+
+### Type: [ExportedChatInvite](../types/ExportedChatInvite.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: contacts\_topPeersNotModified  
 
-### Type: 
 
-[contacts\_TopPeers](../types/contacts_TopPeers.md)
+
+
+### Type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
+
+
 ### Example:
 
 ```

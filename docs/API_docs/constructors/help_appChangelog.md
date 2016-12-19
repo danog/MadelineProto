@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
-### Type: 
 
-[help\_AppChangelog](../types/help_AppChangelog.md)
+
+
+### Type: [help\_AppChangelog](../types/help_AppChangelog.md)
+
+
 ### Example:
 
 ```

@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |link|[string](../types/string.md) | Required|
-### Type: 
 
-[ExportedChatInvite](../types/ExportedChatInvite.md)
+
+
+### Type: [ExportedChatInvite](../types/ExportedChatInvite.md)
+
+
 ### Example:
 
 ```

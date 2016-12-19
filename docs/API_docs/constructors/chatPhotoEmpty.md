@@ -1,8 +1,11 @@
 ## Constructor: chatPhotoEmpty  
 
-### Type: 
 
-[ChatPhoto](../types/ChatPhoto.md)
+
+
+### Type: [ChatPhoto](../types/ChatPhoto.md)
+
+
 ### Example:
 
 ```

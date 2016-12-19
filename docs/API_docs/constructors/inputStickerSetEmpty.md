@@ -1,8 +1,11 @@
 ## Constructor: inputStickerSetEmpty  
 
-### Type: 
 
-[InputStickerSet](../types/InputStickerSet.md)
+
+
+### Type: [InputStickerSet](../types/InputStickerSet.md)
+
+
 ### Example:
 
 ```

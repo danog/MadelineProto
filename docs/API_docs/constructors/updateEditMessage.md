@@ -7,9 +7,12 @@
 |message|[Message](../types/Message.md) | Required|
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

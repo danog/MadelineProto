@@ -9,9 +9,12 @@
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |id|[string](../types/string.md) | Required|
 |msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Optional|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: privacyValueDisallowContacts  
 
-### Type: 
 
-[PrivacyRule](../types/PrivacyRule.md)
+
+
+### Type: [PrivacyRule](../types/PrivacyRule.md)
+
+
 ### Example:
 
 ```

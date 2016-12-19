@@ -8,9 +8,12 @@
 |type|[string](../types/string.md) | Required|
 |peer|[long](../types/long.md) | Required|
 |data|[string](../types/string.md) | Required|
-### Type: 
 
-[InputAppEvent](../types/InputAppEvent.md)
+
+
+### Type: [InputAppEvent](../types/InputAppEvent.md)
+
+
 ### Example:
 
 ```

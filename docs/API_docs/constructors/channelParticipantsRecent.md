@@ -1,8 +1,11 @@
 ## Constructor: channelParticipantsRecent  
 
-### Type: 
 
-[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
+
+
+### Type: [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
+
+
 ### Example:
 
 ```

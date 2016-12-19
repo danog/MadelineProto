@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |email|[string](../types/string.md) | Required|
-### Type: 
 
-[account\_PasswordSettings](../types/account_PasswordSettings.md)
+
+
+### Type: [account\_PasswordSettings](../types/account_PasswordSettings.md)
+
+
 ### Example:
 
 ```

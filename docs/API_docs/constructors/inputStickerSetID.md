@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputStickerSet](../types/InputStickerSet.md)
+
+
+### Type: [InputStickerSet](../types/InputStickerSet.md)
+
+
 ### Example:
 
 ```

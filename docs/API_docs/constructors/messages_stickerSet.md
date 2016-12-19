@@ -7,9 +7,12 @@
 |set|[StickerSet](../types/StickerSet.md) | Required|
 |packs|Array of [StickerPack](../types/StickerPack.md) | Required|
 |documents|Array of [Document](../types/Document.md) | Required|
-### Type: 
 
-[messages\_StickerSet](../types/messages_StickerSet.md)
+
+
+### Type: [messages\_StickerSet](../types/messages_StickerSet.md)
+
+
 ### Example:
 
 ```

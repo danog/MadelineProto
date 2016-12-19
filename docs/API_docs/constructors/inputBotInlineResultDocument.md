@@ -10,9 +10,12 @@
 |description|[string](../types/string.md) | Optional|
 |document|[InputDocument](../types/InputDocument.md) | Required|
 |send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Required|
-### Type: 
 
-[InputBotInlineResult](../types/InputBotInlineResult.md)
+
+
+### Type: [InputBotInlineResult](../types/InputBotInlineResult.md)
+
+
 ### Example:
 
 ```

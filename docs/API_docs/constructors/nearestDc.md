@@ -7,9 +7,12 @@
 |country|[string](../types/string.md) | Required|
 |this\_dc|[int](../types/int.md) | Required|
 |nearest\_dc|[int](../types/int.md) | Required|
-### Type: 
 
-[NearestDc](../types/NearestDc.md)
+
+
+### Type: [NearestDc](../types/NearestDc.md)
+
+
 ### Example:
 
 ```

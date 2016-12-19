@@ -12,9 +12,12 @@
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
 |pts|[int](../types/int.md) | Optional|
 |draft|[DraftMessage](../types/DraftMessage.md) | Optional|
-### Type: 
 
-[Dialog](../types/Dialog.md)
+
+
+### Type: [Dialog](../types/Dialog.md)
+
+
 ### Example:
 
 ```

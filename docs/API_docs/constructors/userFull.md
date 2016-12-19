@@ -11,9 +11,12 @@
 |profile\_photo|[Photo](../types/Photo.md) | Optional|
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
 |bot\_info|[BotInfo](../types/BotInfo.md) | Optional|
-### Type: 
 
-[UserFull](../types/UserFull.md)
+
+
+### Type: [UserFull](../types/UserFull.md)
+
+
 ### Example:
 
 ```

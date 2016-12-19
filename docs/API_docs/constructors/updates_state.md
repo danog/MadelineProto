@@ -9,9 +9,12 @@
 |date|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
 |unread\_count|[int](../types/int.md) | Required|
-### Type: 
 
-[updates\_State](../types/updates_State.md)
+
+
+### Type: [updates\_State](../types/updates_State.md)
+
+
 ### Example:
 
 ```

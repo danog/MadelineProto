@@ -1,8 +1,11 @@
 ## Constructor: messageMediaEmpty  
 
-### Type: 
 
-[MessageMedia](../types/MessageMedia.md)
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+
 ### Example:
 
 ```

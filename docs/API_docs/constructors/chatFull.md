@@ -10,9 +10,12 @@
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
 |exported\_invite|[ExportedChatInvite](../types/ExportedChatInvite.md) | Required|
 |bot\_info|Array of [BotInfo](../types/BotInfo.md) | Required|
-### Type: 
 
-[ChatFull](../types/ChatFull.md)
+
+
+### Type: [ChatFull](../types/ChatFull.md)
+
+
 ### Example:
 
 ```

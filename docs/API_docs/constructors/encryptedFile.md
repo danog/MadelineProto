@@ -9,9 +9,12 @@
 |size|[int](../types/int.md) | Required|
 |dc\_id|[int](../types/int.md) | Required|
 |key\_fingerprint|[int](../types/int.md) | Required|
-### Type: 
 
-[EncryptedFile](../types/EncryptedFile.md)
+
+
+### Type: [EncryptedFile](../types/EncryptedFile.md)
+
+
 ### Example:
 
 ```

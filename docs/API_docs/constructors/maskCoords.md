@@ -8,9 +8,12 @@
 |x|[double](../types/double.md) | Required|
 |y|[double](../types/double.md) | Required|
 |zoom|[double](../types/double.md) | Required|
-### Type: 
 
-[MaskCoords](../types/MaskCoords.md)
+
+
+### Type: [MaskCoords](../types/MaskCoords.md)
+
+
 ### Example:
 
 ```

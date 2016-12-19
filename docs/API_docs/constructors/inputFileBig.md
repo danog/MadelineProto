@@ -7,9 +7,12 @@
 |id|[long](../types/long.md) | Required|
 |parts|[int](../types/int.md) | Required|
 |name|[string](../types/string.md) | Required|
-### Type: 
 
-[InputFile](../types/InputFile.md)
+
+
+### Type: [InputFile](../types/InputFile.md)
+
+
 ### Example:
 
 ```

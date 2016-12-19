@@ -1,8 +1,11 @@
 ## Constructor: documentAttributeAnimated  
 
-### Type: 
 
-[DocumentAttribute](../types/DocumentAttribute.md)
+
+
+### Type: [DocumentAttribute](../types/DocumentAttribute.md)
+
+
 ### Example:
 
 ```

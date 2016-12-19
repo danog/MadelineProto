@@ -10,9 +10,12 @@
 |date|[int](../types/int.md) | Required|
 |seq\_start|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
-### Type: 
 
-[Updates](../types/Updates.md)
+
+
+### Type: [Updates](../types/Updates.md)
+
+
 ### Example:
 
 ```

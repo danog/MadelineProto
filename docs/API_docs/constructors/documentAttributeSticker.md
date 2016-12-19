@@ -8,9 +8,12 @@
 |alt|[string](../types/string.md) | Required|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
 |mask\_coords|[MaskCoords](../types/MaskCoords.md) | Optional|
-### Type: 
 
-[DocumentAttribute](../types/DocumentAttribute.md)
+
+
+### Type: [DocumentAttribute](../types/DocumentAttribute.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |first\_name|[string](../types/string.md) | Required|
 |last\_name|[string](../types/string.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-### Type: 
 
-[BotInlineMessage](../types/BotInlineMessage.md)
+
+
+### Type: [BotInlineMessage](../types/BotInlineMessage.md)
+
+
 ### Example:
 
 ```

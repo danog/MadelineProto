@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |file|[InputFile](../types/InputFile.md) | Required|
-### Type: 
 
-[InputChatPhoto](../types/InputChatPhoto.md)
+
+
+### Type: [InputChatPhoto](../types/InputChatPhoto.md)
+
+
 ### Example:
 
 ```

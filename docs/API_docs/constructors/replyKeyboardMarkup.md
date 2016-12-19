@@ -8,9 +8,12 @@
 |single\_use|[Bool](../types/Bool.md) | Optional|
 |selective|[Bool](../types/Bool.md) | Optional|
 |rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Required|
-### Type: 
 
-[ReplyMarkup](../types/ReplyMarkup.md)
+
+
+### Type: [ReplyMarkup](../types/ReplyMarkup.md)
+
+
 ### Example:
 
 ```

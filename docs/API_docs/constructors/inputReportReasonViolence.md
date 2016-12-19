@@ -1,8 +1,11 @@
 ## Constructor: inputReportReasonViolence  
 
-### Type: 
 
-[ReportReason](../types/ReportReason.md)
+
+
+### Type: [ReportReason](../types/ReportReason.md)
+
+
 ### Example:
 
 ```

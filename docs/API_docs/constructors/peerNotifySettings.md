@@ -8,9 +8,12 @@
 |silent|[Bool](../types/Bool.md) | Optional|
 |mute\_until|[int](../types/int.md) | Required|
 |sound|[string](../types/string.md) | Required|
-### Type: 
 
-[PeerNotifySettings](../types/PeerNotifySettings.md)
+
+
+### Type: [PeerNotifySettings](../types/PeerNotifySettings.md)
+
+
 ### Example:
 
 ```

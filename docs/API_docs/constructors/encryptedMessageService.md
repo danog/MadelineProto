@@ -8,9 +8,12 @@
 |chat\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[EncryptedMessage](../types/EncryptedMessage.md)
+
+
+### Type: [EncryptedMessage](../types/EncryptedMessage.md)
+
+
 ### Example:
 
 ```

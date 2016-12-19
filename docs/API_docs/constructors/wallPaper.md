@@ -8,9 +8,12 @@
 |title|[string](../types/string.md) | Required|
 |sizes|Array of [PhotoSize](../types/PhotoSize.md) | Required|
 |color|[int](../types/int.md) | Required|
-### Type: 
 
-[WallPaper](../types/WallPaper.md)
+
+
+### Type: [WallPaper](../types/WallPaper.md)
+
+
 ### Example:
 
 ```

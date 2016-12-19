@@ -1,8 +1,11 @@
 ## Constructor: privacyKeyChatInvite  
 
-### Type: 
 
-[PrivacyKey](../types/PrivacyKey.md)
+
+
+### Type: [PrivacyKey](../types/PrivacyKey.md)
+
+
 ### Example:
 
 ```

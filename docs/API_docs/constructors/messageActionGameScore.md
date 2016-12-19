@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |game\_id|[long](../types/long.md) | Required|
 |score|[int](../types/int.md) | Required|
-### Type: 
 
-[MessageAction](../types/MessageAction.md)
+
+
+### Type: [MessageAction](../types/MessageAction.md)
+
+
 ### Example:
 
 ```

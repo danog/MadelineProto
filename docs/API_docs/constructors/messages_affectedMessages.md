@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
-### Type: 
 
-[messages\_AffectedMessages](../types/messages_AffectedMessages.md)
+
+
+### Type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
+
+
 ### Example:
 
 ```

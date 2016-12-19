@@ -9,9 +9,12 @@
 |next\_offset|[string](../types/string.md) | Optional|
 |switch\_pm|[InlineBotSwitchPM](../types/InlineBotSwitchPM.md) | Optional|
 |results|Array of [BotInlineResult](../types/BotInlineResult.md) | Required|
-### Type: 
 
-[messages\_BotResults](../types/messages_BotResults.md)
+
+
+### Type: [messages\_BotResults](../types/messages_BotResults.md)
+
+
 ### Example:
 
 ```

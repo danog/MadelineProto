@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
-### Type: 
 
-[Message](../types/Message.md)
+
+
+### Type: [Message](../types/Message.md)
+
+
 ### Example:
 
 ```

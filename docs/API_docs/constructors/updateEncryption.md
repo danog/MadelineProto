@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |chat|[EncryptedChat](../types/EncryptedChat.md) | Required|
 |date|[int](../types/int.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

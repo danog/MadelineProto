@@ -1,8 +1,11 @@
 ## Constructor: userStatusLastMonth  
 
-### Type: 
 
-[UserStatus](../types/UserStatus.md)
+
+
+### Type: [UserStatus](../types/UserStatus.md)
+
+
 ### Example:
 
 ```

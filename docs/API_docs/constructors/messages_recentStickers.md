@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |hash|[int](../types/int.md) | Required|
 |stickers|Array of [Document](../types/Document.md) | Required|
-### Type: 
 
-[messages\_RecentStickers](../types/messages_RecentStickers.md)
+
+
+### Type: [messages\_RecentStickers](../types/messages_RecentStickers.md)
+
+
 ### Example:
 
 ```

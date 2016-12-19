@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |mutual|[Bool](../types/Bool.md) | Required|
-### Type: 
 
-[Contact](../types/Contact.md)
+
+
+### Type: [Contact](../types/Contact.md)
+
+
 ### Example:
 
 ```

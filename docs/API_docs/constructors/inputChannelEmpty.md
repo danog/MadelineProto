@@ -1,8 +1,11 @@
 ## Constructor: inputChannelEmpty  
 
-### Type: 
 
-[InputChannel](../types/InputChannel.md)
+
+
+### Type: [InputChannel](../types/InputChannel.md)
+
+
 ### Example:
 
 ```

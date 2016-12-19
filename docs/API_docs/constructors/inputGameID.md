@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputGame](../types/InputGame.md)
+
+
+### Type: [InputGame](../types/InputGame.md)
+
+
 ### Example:
 
 ```

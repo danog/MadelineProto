@@ -1,8 +1,11 @@
 ## Constructor: contactLinkContact  
 
-### Type: 
 
-[ContactLink](../types/ContactLink.md)
+
+
+### Type: [ContactLink](../types/ContactLink.md)
+
+
 ### Example:
 
 ```

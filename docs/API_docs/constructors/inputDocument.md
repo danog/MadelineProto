@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputDocument](../types/InputDocument.md)
+
+
+### Type: [InputDocument](../types/InputDocument.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: inputMediaEmpty  
 
-### Type: 
 
-[InputMedia](../types/InputMedia.md)
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+
 ### Example:
 
 ```

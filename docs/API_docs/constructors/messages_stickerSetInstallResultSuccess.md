@@ -1,8 +1,11 @@
 ## Constructor: messages\_stickerSetInstallResultSuccess  
 
-### Type: 
 
-[messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)
+
+
+### Type: [messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)
+
+
 ### Example:
 
 ```

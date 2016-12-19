@@ -8,9 +8,12 @@
 |phone|[string](../types/string.md) | Required|
 |first\_name|[string](../types/string.md) | Required|
 |last\_name|[string](../types/string.md) | Required|
-### Type: 
 
-[InputContact](../types/InputContact.md)
+
+
+### Type: [InputContact](../types/InputContact.md)
+
+
 ### Example:
 
 ```

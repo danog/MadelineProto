@@ -1,8 +1,11 @@
 ## Constructor: topPeerCategoryBotsPM  
 
-### Type: 
 
-[TopPeerCategory](../types/TopPeerCategory.md)
+
+
+### Type: [TopPeerCategory](../types/TopPeerCategory.md)
+
+
 ### Example:
 
 ```

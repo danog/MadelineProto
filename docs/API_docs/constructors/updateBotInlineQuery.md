@@ -9,9 +9,12 @@
 |query|[string](../types/string.md) | Required|
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |offset|[string](../types/string.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

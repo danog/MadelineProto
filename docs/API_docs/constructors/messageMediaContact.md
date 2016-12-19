@@ -8,9 +8,12 @@
 |first\_name|[string](../types/string.md) | Required|
 |last\_name|[string](../types/string.md) | Required|
 |user\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[MessageMedia](../types/MessageMedia.md)
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+
 ### Example:
 
 ```

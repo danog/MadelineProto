@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
 |random\_id|[long](../types/long.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

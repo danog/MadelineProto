@@ -10,9 +10,12 @@
 |id|[int](../types/int.md) | Required|
 |ip\_address|[string](../types/string.md) | Required|
 |port|[int](../types/int.md) | Required|
-### Type: 
 
-[DcOption](../types/DcOption.md)
+
+
+### Type: [DcOption](../types/DcOption.md)
+
+
 ### Example:
 
 ```

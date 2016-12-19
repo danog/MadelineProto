@@ -1,8 +1,11 @@
 ## Constructor: help\_appChangelogEmpty  
 
-### Type: 
 
-[help\_AppChangelog](../types/help_AppChangelog.md)
+
+
+### Type: [help\_AppChangelog](../types/help_AppChangelog.md)
+
+
 ### Example:
 
 ```

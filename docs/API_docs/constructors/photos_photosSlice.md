@@ -7,9 +7,12 @@
 |count|[int](../types/int.md) | Required|
 |photos|Array of [Photo](../types/Photo.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[photos\_Photos](../types/photos_Photos.md)
+
+
+### Type: [photos\_Photos](../types/photos_Photos.md)
+
+
 ### Example:
 
 ```

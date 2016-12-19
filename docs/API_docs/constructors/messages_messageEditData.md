@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |caption|[Bool](../types/Bool.md) | Optional|
-### Type: 
 
-[messages\_MessageEditData](../types/messages_MessageEditData.md)
+
+
+### Type: [messages\_MessageEditData](../types/messages_MessageEditData.md)
+
+
 ### Example:
 
 ```

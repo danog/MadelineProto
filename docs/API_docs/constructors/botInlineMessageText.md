@@ -8,9 +8,12 @@
 |message|[string](../types/string.md) | Required|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-### Type: 
 
-[BotInlineMessage](../types/BotInlineMessage.md)
+
+
+### Type: [BotInlineMessage](../types/BotInlineMessage.md)
+
+
 ### Example:
 
 ```

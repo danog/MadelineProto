@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |min\_id|[int](../types/int.md) | Required|
 |max\_id|[int](../types/int.md) | Required|
-### Type: 
 
-[MessageRange](../types/MessageRange.md)
+
+
+### Type: [MessageRange](../types/MessageRange.md)
+
+
 ### Example:
 
 ```

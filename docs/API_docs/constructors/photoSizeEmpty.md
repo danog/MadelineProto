@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |type|[string](../types/string.md) | Required|
-### Type: 
 
-[PhotoSize](../types/PhotoSize.md)
+
+
+### Type: [PhotoSize](../types/PhotoSize.md)
+
+
 ### Example:
 
 ```

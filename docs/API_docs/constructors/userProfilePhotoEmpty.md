@@ -1,8 +1,11 @@
 ## Constructor: userProfilePhotoEmpty  
 
-### Type: 
 
-[UserProfilePhoto](../types/UserProfilePhoto.md)
+
+
+### Type: [UserProfilePhoto](../types/UserProfilePhoto.md)
+
+
 ### Example:
 
 ```

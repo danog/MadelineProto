@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chats|Array of [Chat](../types/Chat.md) | Required|
-### Type: 
 
-[messages\_Chats](../types/messages_Chats.md)
+
+
+### Type: [messages\_Chats](../types/messages_Chats.md)
+
+
 ### Example:
 
 ```

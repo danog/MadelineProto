@@ -7,9 +7,12 @@
 |chat\_id|[int](../types/int.md) | Required|
 |enabled|[Bool](../types/Bool.md) | Required|
 |version|[int](../types/int.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

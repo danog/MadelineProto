@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |masks|[Bool](../types/Bool.md) | Optional|
 |order|Array of [long](../types/long.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

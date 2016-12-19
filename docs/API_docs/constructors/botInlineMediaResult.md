@@ -11,9 +11,12 @@
 |title|[string](../types/string.md) | Optional|
 |description|[string](../types/string.md) | Optional|
 |send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Required|
-### Type: 
 
-[BotInlineResult](../types/BotInlineResult.md)
+
+
+### Type: [BotInlineResult](../types/BotInlineResult.md)
+
+
 ### Example:
 
 ```

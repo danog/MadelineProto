@@ -7,9 +7,12 @@
 |type|[storage\_FileType](../types/storage_FileType.md) | Required|
 |mtime|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[upload\_File](../types/upload_File.md)
+
+
+### Type: [upload\_File](../types/upload_File.md)
+
+
 ### Example:
 
 ```

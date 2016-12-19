@@ -7,9 +7,12 @@
 |user\_id|[int](../types/int.md) | Required|
 |description|[string](../types/string.md) | Required|
 |commands|Array of [BotCommand](../types/BotCommand.md) | Required|
-### Type: 
 
-[BotInfo](../types/BotInfo.md)
+
+
+### Type: [BotInfo](../types/BotInfo.md)
+
+
 ### Example:
 
 ```

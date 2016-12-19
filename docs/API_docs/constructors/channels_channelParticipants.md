@@ -7,9 +7,12 @@
 |count|[int](../types/int.md) | Required|
 |participants|Array of [ChannelParticipant](../types/ChannelParticipant.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)
+
+
+### Type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)
+
+
 ### Example:
 
 ```

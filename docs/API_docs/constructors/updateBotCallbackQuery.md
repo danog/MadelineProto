@@ -11,9 +11,12 @@
 |chat\_instance|[long](../types/long.md) | Required|
 |data|[bytes](../types/bytes.md) | Optional|
 |game\_short\_name|[string](../types/string.md) | Optional|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

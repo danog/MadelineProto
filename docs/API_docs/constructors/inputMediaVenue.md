@@ -9,9 +9,12 @@
 |address|[string](../types/string.md) | Required|
 |provider|[string](../types/string.md) | Required|
 |venue\_id|[string](../types/string.md) | Required|
-### Type: 
 
-[InputMedia](../types/InputMedia.md)
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+
 ### Example:
 
 ```

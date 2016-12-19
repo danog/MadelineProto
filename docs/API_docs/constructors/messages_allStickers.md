@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |hash|[int](../types/int.md) | Required|
 |sets|Array of [StickerSet](../types/StickerSet.md) | Required|
-### Type: 
 
-[messages\_AllStickers](../types/messages_AllStickers.md)
+
+
+### Type: [messages\_AllStickers](../types/messages_AllStickers.md)
+
+
 ### Example:
 
 ```

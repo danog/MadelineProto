@@ -1,8 +1,11 @@
 ## Constructor: inputPrivacyValueDisallowAll  
 
-### Type: 
 
-[InputPrivacyRule](../types/InputPrivacyRule.md)
+
+
+### Type: [InputPrivacyRule](../types/InputPrivacyRule.md)
+
+
 ### Example:
 
 ```

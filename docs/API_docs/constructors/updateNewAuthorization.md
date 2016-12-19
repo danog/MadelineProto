@@ -8,9 +8,12 @@
 |date|[int](../types/int.md) | Required|
 |device|[string](../types/string.md) | Required|
 |location|[string](../types/string.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

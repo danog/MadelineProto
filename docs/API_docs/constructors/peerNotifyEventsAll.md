@@ -1,8 +1,11 @@
 ## Constructor: peerNotifyEventsAll  
 
-### Type: 
 
-[PeerNotifyEvents](../types/PeerNotifyEvents.md)
+
+
+### Type: [PeerNotifyEvents](../types/PeerNotifyEvents.md)
+
+
 ### Example:
 
 ```

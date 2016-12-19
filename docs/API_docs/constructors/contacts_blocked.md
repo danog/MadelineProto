@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |blocked|Array of [ContactBlocked](../types/ContactBlocked.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[contacts\_Blocked](../types/contacts_Blocked.md)
+
+
+### Type: [contacts\_Blocked](../types/contacts_Blocked.md)
+
+
 ### Example:
 
 ```

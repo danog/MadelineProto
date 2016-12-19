@@ -11,9 +11,12 @@
 |date|[int](../types/int.md) | Required|
 |media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
-### Type: 
 
-[Updates](../types/Updates.md)
+
+
+### Type: [Updates](../types/Updates.md)
+
+
 ### Example:
 
 ```

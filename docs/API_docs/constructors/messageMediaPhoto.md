@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |photo|[Photo](../types/Photo.md) | Required|
 |caption|[string](../types/string.md) | Required|
-### Type: 
 
-[MessageMedia](../types/MessageMedia.md)
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+
 ### Example:
 
 ```

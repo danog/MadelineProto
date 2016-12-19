@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
-### Type: 
 
-[InputPeer](../types/InputPeer.md)
+
+
+### Type: [InputPeer](../types/InputPeer.md)
+
+
 ### Example:
 
 ```

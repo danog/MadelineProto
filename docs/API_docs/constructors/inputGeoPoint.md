@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |lat|[double](../types/double.md) | Required|
 |long|[double](../types/double.md) | Required|
-### Type: 
 
-[InputGeoPoint](../types/InputGeoPoint.md)
+
+
+### Type: [InputGeoPoint](../types/InputGeoPoint.md)
+
+
 ### Example:
 
 ```

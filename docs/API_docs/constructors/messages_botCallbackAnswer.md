@@ -8,9 +8,12 @@
 |has\_url|[Bool](../types/Bool.md) | Optional|
 |message|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
-### Type: 
 
-[messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)
+
+
+### Type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)
+
+
 ### Example:
 
 ```

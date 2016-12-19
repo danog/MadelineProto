@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |photo\_small|[FileLocation](../types/FileLocation.md) | Required|
 |photo\_big|[FileLocation](../types/FileLocation.md) | Required|
-### Type: 
 
-[ChatPhoto](../types/ChatPhoto.md)
+
+
+### Type: [ChatPhoto](../types/ChatPhoto.md)
+
+
 ### Example:
 
 ```

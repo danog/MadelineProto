@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |pattern|[string](../types/string.md) | Required|
-### Type: 
 
-[auth\_SentCodeType](../types/auth_SentCodeType.md)
+
+
+### Type: [auth\_SentCodeType](../types/auth_SentCodeType.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |first\_name|[string](../types/string.md) | Required|
 |last\_name|[string](../types/string.md) | Required|
 |username|[string](../types/string.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

@@ -1,8 +1,11 @@
 ## Constructor: storage\_fileUnknown  
 
-### Type: 
 
-[storage\_FileType](../types/storage_FileType.md)
+
+
+### Type: [storage\_FileType](../types/storage_FileType.md)
+
+
 ### Example:
 
 ```

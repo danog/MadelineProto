@@ -9,9 +9,12 @@
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |date|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
-### Type: 
 
-[Updates](../types/Updates.md)
+
+
+### Type: [Updates](../types/Updates.md)
+
+
 ### Example:
 
 ```

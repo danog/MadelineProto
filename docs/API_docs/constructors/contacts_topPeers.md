@@ -7,9 +7,12 @@
 |categories|Array of [TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-### Type: 
 
-[contacts\_TopPeers](../types/contacts_TopPeers.md)
+
+
+### Type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
+
+
 ### Example:
 
 ```

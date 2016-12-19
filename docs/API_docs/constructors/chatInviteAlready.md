@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chat|[Chat](../types/Chat.md) | Required|
-### Type: 
 
-[ChatInvite](../types/ChatInvite.md)
+
+
+### Type: [ChatInvite](../types/ChatInvite.md)
+
+
 ### Example:
 
 ```

@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |peer|[Peer](../types/Peer.md) | Required|
 |rating|[double](../types/double.md) | Required|
-### Type: 
 
-[TopPeer](../types/TopPeer.md)
+
+
+### Type: [TopPeer](../types/TopPeer.md)
+
+
 ### Example:
 
 ```

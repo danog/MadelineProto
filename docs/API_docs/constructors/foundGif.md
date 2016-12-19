@@ -10,9 +10,12 @@
 |content\_type|[string](../types/string.md) | Required|
 |w|[int](../types/int.md) | Required|
 |h|[int](../types/int.md) | Required|
-### Type: 
 
-[FoundGif](../types/FoundGif.md)
+
+
+### Type: [FoundGif](../types/FoundGif.md)
+
+
 ### Example:
 
 ```

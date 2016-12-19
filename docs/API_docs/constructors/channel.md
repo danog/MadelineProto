@@ -24,9 +24,12 @@
 |date|[int](../types/int.md) | Required|
 |version|[int](../types/int.md) | Required|
 |restriction\_reason|[string](../types/string.md) | Optional|
-### Type: 
 
-[Chat](../types/Chat.md)
+
+
+### Type: [Chat](../types/Chat.md)
+
+
 ### Example:
 
 ```

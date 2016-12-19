@@ -1,8 +1,11 @@
 ## Constructor: inputUserSelf  
 
-### Type: 
 
-[InputUser](../types/InputUser.md)
+
+
+### Type: [InputUser](../types/InputUser.md)
+
+
 ### Example:
 
 ```

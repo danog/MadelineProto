@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |phone\_number|[string](../types/string.md) | Required|
 |user|[User](../types/User.md) | Required|
-### Type: 
 
-[help\_Support](../types/help_Support.md)
+
+
+### Type: [help\_Support](../types/help_Support.md)
+
+
 ### Example:
 
 ```

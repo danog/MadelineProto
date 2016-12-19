@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |email\_pattern|[string](../types/string.md) | Required|
-### Type: 
 
-[auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)
+
+
+### Type: [auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)
+
+
 ### Example:
 
 ```

@@ -7,9 +7,12 @@
 |chat\_id|[int](../types/int.md) | Required|
 |participants|Array of [ChatParticipant](../types/ChatParticipant.md) | Required|
 |version|[int](../types/int.md) | Required|
-### Type: 
 
-[ChatParticipants](../types/ChatParticipants.md)
+
+
+### Type: [ChatParticipants](../types/ChatParticipants.md)
+
+
 ### Example:
 
 ```

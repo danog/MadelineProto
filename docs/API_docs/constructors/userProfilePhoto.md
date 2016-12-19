@@ -7,9 +7,12 @@
 |photo\_id|[long](../types/long.md) | Required|
 |photo\_small|[FileLocation](../types/FileLocation.md) | Required|
 |photo\_big|[FileLocation](../types/FileLocation.md) | Required|
-### Type: 
 
-[UserProfilePhoto](../types/UserProfilePhoto.md)
+
+
+### Type: [UserProfilePhoto](../types/UserProfilePhoto.md)
+
+
 ### Example:
 
 ```

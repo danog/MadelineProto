@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |set|[StickerSet](../types/StickerSet.md) | Required|
 |covers|Array of [Document](../types/Document.md) | Required|
-### Type: 
 
-[StickerSetCovered](../types/StickerSetCovered.md)
+
+
+### Type: [StickerSetCovered](../types/StickerSetCovered.md)
+
+
 ### Example:
 
 ```

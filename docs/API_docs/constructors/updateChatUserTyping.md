@@ -7,9 +7,12 @@
 |chat\_id|[int](../types/int.md) | Required|
 |user\_id|[int](../types/int.md) | Required|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

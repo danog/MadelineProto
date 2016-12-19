@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |caption|[string](../types/string.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-### Type: 
 
-[InputBotInlineMessage](../types/InputBotInlineMessage.md)
+
+
+### Type: [InputBotInlineMessage](../types/InputBotInlineMessage.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |date|[int](../types/int.md) | Required|
 |photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Required|
 |previous|[Bool](../types/Bool.md) | Required|
-### Type: 
 
-[Update](../types/Update.md)
+
+
+### Type: [Update](../types/Update.md)
+
+
 ### Example:
 
 ```

@@ -9,9 +9,12 @@
 |message|[string](../types/string.md) | Required|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |date|[int](../types/int.md) | Required|
-### Type: 
 
-[DraftMessage](../types/DraftMessage.md)
+
+
+### Type: [DraftMessage](../types/DraftMessage.md)
+
+
 ### Example:
 
 ```

@@ -8,9 +8,12 @@
 |date|[int](../types/int.md) | Required|
 |channel\_id|[int](../types/int.md) | Optional|
 |channel\_post|[int](../types/int.md) | Optional|
-### Type: 
 
-[MessageFwdHeader](../types/MessageFwdHeader.md)
+
+
+### Type: [MessageFwdHeader](../types/MessageFwdHeader.md)
+
+
 ### Example:
 
 ```

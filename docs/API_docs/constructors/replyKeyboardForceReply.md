@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |single\_use|[Bool](../types/Bool.md) | Optional|
 |selective|[Bool](../types/Bool.md) | Optional|
-### Type: 
 
-[ReplyMarkup](../types/ReplyMarkup.md)
+
+
+### Type: [ReplyMarkup](../types/ReplyMarkup.md)
+
+
 ### Example:
 
 ```

@@ -7,9 +7,12 @@
 |id|[long](../types/long.md) | Required|
 |parts|[int](../types/int.md) | Required|
 |key\_fingerprint|[int](../types/int.md) | Required|
-### Type: 
 
-[InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
+### Type: [InputEncryptedFile](../types/InputEncryptedFile.md)
+
+
 ### Example:
 
 ```

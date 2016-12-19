@@ -26,9 +26,12 @@
 |bot\_info\_version|[int](../types/int.md) | Optional|
 |restriction\_reason|[string](../types/string.md) | Optional|
 |bot\_inline\_placeholder|[string](../types/string.md) | Optional|
-### Type: 
 
-[User](../types/User.md)
+
+
+### Type: [User](../types/User.md)
+
+
 ### Example:
 
 ```

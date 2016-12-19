@@ -10,9 +10,12 @@
 |admin\_id|[int](../types/int.md) | Required|
 |participant\_id|[int](../types/int.md) | Required|
 |g\_a|[bytes](../types/bytes.md) | Required|
-### Type: 
 
-[EncryptedChat](../types/EncryptedChat.md)
+
+
+### Type: [EncryptedChat](../types/EncryptedChat.md)
+
+
 ### Example:
 
 ```

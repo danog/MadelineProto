@@ -5,9 +5,12 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Required|
-### Type: 
 
-[messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)
+
+
+### Type: [messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)
+
+
 ### Example:
 
 ```

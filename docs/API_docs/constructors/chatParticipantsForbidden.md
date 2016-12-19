@@ -6,9 +6,12 @@
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
 |self\_participant|[ChatParticipant](../types/ChatParticipant.md) | Optional|
-### Type: 
 
-[ChatParticipants](../types/ChatParticipants.md)
+
+
+### Type: [ChatParticipants](../types/ChatParticipants.md)
+
+
 ### Example:
 
 ```
