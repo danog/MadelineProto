@@ -308,7 +308,6 @@ file_put_contents('types/index.md', '# Types
 
 '.$index);
 
-
 \danog\MadelineProto\Logger::log('Generating additional types...');
 
 file_put_contents('types/string.md', '## Type: string  
