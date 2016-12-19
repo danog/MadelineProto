@@ -87,7 +87,7 @@ foreach ($TL->methods->method as $key => $method) {
 
         $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
     }
-    $md_method = '['.str_replace(['_', '.'], ['->', '\_'], $method).']('.$method.'.md)';
+    $md_method = '['.str_replace('_', '->', $method).']('.$method.'.md)';
 
     $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)  
 
@@ -115,9 +115,9 @@ foreach ($TL->methods->method as $key => $method) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
     }
-    $header = str_replace('_', '\_', '## Method: '.$method.'  
+    $header = '## Method: '.str_replace('_', '\_', $method).'  
 
-');
+';
     $table .= '
 
 ';
@@ -142,7 +142,7 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$'.$type.' = $MadelineProto->'.str_replace('.', '->', $method).'(['.$params.']);
+$'.$type.' = $MadelineProto->'.$method.'(['.$params.']);
 ```');
     file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
 }
@@ -245,9 +245,9 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     }
     $params = "['_' => ".$constructor."', ".$params.']';
 
-    $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
+    $header = '## Constructor: '.str_replace('_', '\_', $constructor).'  
 
-');
+';
     $table .= '
 
 
@@ -288,7 +288,7 @@ $index = '';
 foreach ($types as $type => $keys) {
     $type = str_replace('.', '_', $type);
 
-    $index .= '['.$type.']('.$type.'.md)  
+    $index .= '['.str_replace('_', '\_', $type).']('.$type.'.md)  
 
 ';
     $constructors = '';
@@ -298,11 +298,11 @@ foreach ($types as $type => $keys) {
 
 ';
     }
-    $header = str_replace('_', '\_', '## Type: '.$type.'  
+    $header = '## Type: '.str_replace('_', '\_', $type).'  
 
 ### Possible values (constructors):
 
-');
+';
     file_put_contents('types/'.$type.'.md', $header.$constructors);
 }
 
