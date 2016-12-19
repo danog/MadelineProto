@@ -339,7 +339,6 @@ file_put_contents('constructors/boolFalse.md', '# boolFalse
 
 Represents boolean with value equal to `false`.');
 
-
 file_put_contents('constructors/boolTrue.md', '# boolTrue  
 
 Represents boolean with value equal to `true`.');
