@@ -1,0 +1,4 @@
+http://localhost {
+	root docs/
+	markdown
+}

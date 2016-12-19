@@ -1,0 +1,21 @@
+## Constructor: draftMessage  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|no\_webpage|[Bool](../types/Bool.md) | Optional|
+|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
+|message|[string](../types/string.md) | Required|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+|date|[int](../types/int.md) | Required|
+
+
+### Type: [DraftMessage](../types/DraftMessage.md)
+
+### Example:
+
+
+```
+$draftMessage = ['no_webpage' => Bool, 'reply_to_msg_id' => int, 'message' => string, 'entities' => [MessageEntity], 'date' => int, ];
+```

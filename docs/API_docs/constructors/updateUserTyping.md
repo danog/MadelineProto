@@ -1,0 +1,18 @@
+## Constructor: updateUserTyping  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|user\_id|[int](../types/int.md) | Required|
+|action|[SendMessageAction](../types/SendMessageAction.md) | Required|
+
+
+### Type: [Update](../types/Update.md)
+
+### Example:
+
+
+```
+$updateUserTyping = ['user_id' => int, 'action' => SendMessageAction, ];
+```

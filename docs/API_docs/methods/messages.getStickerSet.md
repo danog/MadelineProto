@@ -1,0 +1,31 @@
+## Method: messages.getStickerSet  
+
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
+
+
+### Return type: [messages\_StickerSet](../types/messages\_StickerSet.md)
+
+### Example:
+
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+if (isset($token)) {
+    $this->bot_login($token);
+}
+if (isset($number)) {
+    $sentCode = $MadelineProto->phone_login($number);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $MadelineProto->complete_phone_login($code);
+}
+
+$messages_StickerSet = $MadelineProto->messages->getStickerSet(['stickerset' => InputStickerSet, ]);
+```

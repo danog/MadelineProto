@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages responses.
  */
-class ResponseHandler extends MsgIdHandler
+trait ResponseHandler
 {
     public function handle_messages()
     {

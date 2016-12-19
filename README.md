@@ -12,6 +12,7 @@ Also note that MadelineProto will perform better if a big math extension like gm
 
 This project is in beta state.  
 
+The API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
 
 ## Usage
 
@@ -171,7 +172,7 @@ var_dump($MadelineProto->API->settings);
 
 ### Calling mtproto methods and available wrappers
 
-A list of mtproto methods can be found [here](https://tjhorner.com/tl-schema/#functions).  
+The API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
 To call an MTProto method simply call it as if it is a method of the API class, substitute namespace sepators (.) with -> if needed:
 ```
 $MadelineProto = new \danog\MadelineProto\API();
@@ -225,6 +226,7 @@ MadelineProto can throw three different exceptions:
 
 You can use this scheme of the structure of this project to help yourself:
 ```
+build_docs.php - Builds API docs from TL scheme files
 src/danog/MadelineProto/
     MTProtoTools/
         AckHandler - Handles acknowledgement of incoming and outgoing mtproto messages
@@ -249,8 +251,7 @@ src/danog/MadelineProto/
     DebugTools - Various debugging tools
     Exception - Handles exceptions and PHP errors
     RPCErrorException - Handles RPC errors
-    MTProto - Extends MTProtoTools, handles initial connection, generation of authorization keys, instantiation of classes, writing of client info
-    MTProtoTools - Extends all of the classes in MTProtoTools/
+    MTProto - Handles initial connection, generation of authorization keys, instantiation of classes, writing of client info
     Logger - Static logging class
     prime.py and getpq.py - prime module (python) for p and q generation
     PrimeModule.php - prime module (php) for p and q generation by wrapping the python module, using wolfram alpha or a built in PHP engine

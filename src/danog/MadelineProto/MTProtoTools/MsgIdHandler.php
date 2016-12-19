@@ -15,16 +15,18 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages message ids.
  */
-class MsgIdHandler extends MessageHandler
+trait MsgIdHandler
 {
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
         if (((int) ((time() + $this->datacenter->time_delta - 300) << 32)) > $new_message_id) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too old.');
         }
+        /*
         if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $new_message_id) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
         }
+        */
         if ($outgoing) {
             if ($new_message_id % 4 != 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');

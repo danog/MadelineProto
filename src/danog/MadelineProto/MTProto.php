@@ -15,8 +15,19 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto extends MTProtoTools
+class MTProto extends PrimeModule
 {
+    use \danog\MadelineProto\MTProtoTools\AckHandler;
+    use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
+    use \danog\MadelineProto\MTProtoTools\CallHandler;
+    use \danog\MadelineProto\MTProtoTools\Crypt;
+    use \danog\MadelineProto\MTProtoTools\MessageHandler;
+    use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
+    use \danog\MadelineProto\MTProtoTools\ResponseHandler;
+    use \danog\MadelineProto\MTProtoTools\SaltHandler;
+    use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
+
+    
     public $settings = [];
     public $authorized = false;
     public $waiting_code = false;
@@ -238,6 +249,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->init_authorization();
             $this->config = $this->write_client_info('help.getConfig');
             $this->parse_config();
+
             $this->get_nearest_dc($allow_nearest_dc_switch);
         }
         if (
@@ -269,6 +281,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
+
         }
     }
 

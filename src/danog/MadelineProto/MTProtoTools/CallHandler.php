@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages method and object calls.
  */
-class CallHandler extends AuthKeyHandler
+trait CallHandler
 {
     public function method_call($method, $args = [], $message_id = null)
     {

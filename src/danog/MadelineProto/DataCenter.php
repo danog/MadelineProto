@@ -75,6 +75,11 @@ class DataCenter extends Tools
         $this->sockets[$this->curdc]->{$name} = &$value;
     }
 
+    public function __isset($name)
+    {
+        return isset($this->sockets[$this->curdc]->{$name});
+    }
+
     public function __call($name, $arguments)
     {
         return $this->sockets[$this->curdc]->{$name}(...$arguments);

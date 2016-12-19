@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages message ids.
  */
-class SaltHandler extends ResponseHandler
+trait SaltHandler
 {
     public function add_salts($salts)
     {

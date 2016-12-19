@@ -18,7 +18,7 @@ namespace danog\MadelineProto\MTProtoTools;
  * https://core.telegram.org/mtproto/auth_key
  * https://core.telegram.org/mtproto/samples-auth_key
  */
-class AuthKeyHandler extends AckHandler
+trait AuthKeyHandler
 {
     public function create_auth_key($expires_in = -1)
     {

@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
  */
-class MessageHandler extends Crypt
+trait MessageHandler
 {
     /**
      * Forming the message frame and sending message to server
@@ -57,11 +57,15 @@ class MessageHandler extends Crypt
         if (fstat($payload)['size'] == 4) {
             $error = \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0];
             if ($error == -404) {
-                unset($this->datacenter->temp_auth_key);
-                unset($this->datacenter->auth_key);
-                $this->datacenter->authorized = false;
-                $this->datacenter->authorization = null;
-                throw new \danog\MadelineProto\RPCErrorException('Please login again', $error);
+                if ($this->datacenter->temp_auth_key != null) {
+                    \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...');
+                    $this->datacenter->temp_auth_key = null;
+                    $this->init_authorization();
+                    $this->config = $this->write_client_info('help.getConfig');
+                    $this->parse_config();
+                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                }
+                
             }
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }

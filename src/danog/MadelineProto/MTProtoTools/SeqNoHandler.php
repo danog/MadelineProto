@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages sequence number.
  */
-class SeqNoHandler extends SaltHandler
+trait SeqNoHandler
 {
     public function generate_seq_no($content_related = true)
     {

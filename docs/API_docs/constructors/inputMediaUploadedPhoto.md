@@ -1,0 +1,19 @@
+## Constructor: inputMediaUploadedPhoto  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|file|[InputFile](../types/InputFile.md) | Required|
+|caption|[string](../types/string.md) | Required|
+|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+
+
+### Type: [InputMedia](../types/InputMedia.md)
+
+### Example:
+
+
+```
+$inputMediaUploadedPhoto = ['file' => InputFile, 'caption' => string, 'stickers' => [InputDocument], ];
+```

@@ -79,7 +79,7 @@ class PrimeModule extends Tools
     public function PrimeFactors($pq)
     {
         $pqstr = (string) $pq;
-/*
+
         \danog\MadelineProto\Logger::log('Trying to use the python factorization module');
         if (function_exists('shell_exec')) {
             try {
@@ -119,7 +119,7 @@ class PrimeModule extends Tools
         if (count($res) == 2) {
             return $res;
         }
-*/
+
         \danog\MadelineProto\Logger::log('Trying to use the native factorization module');
         $res = $this->find_small_multiplier_lopatin((int) $pqstr);
         $res = [$res, $pqstr / $res];

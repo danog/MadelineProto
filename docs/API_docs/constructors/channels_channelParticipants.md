@@ -1,0 +1,19 @@
+## Constructor: channels\_channelParticipants  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|count|[int](../types/int.md) | Required|
+|participants|Array of [ChannelParticipant](../types/ChannelParticipant.md) | Required|
+|users|Array of [User](../types/User.md) | Required|
+
+
+### Type: [channels\_ChannelParticipants](../types/channels\_ChannelParticipants.md)
+
+### Example:
+
+
+```
+$channels_channelParticipants = ['count' => int, 'participants' => [ChannelParticipant], 'users' => [User], ];
+```

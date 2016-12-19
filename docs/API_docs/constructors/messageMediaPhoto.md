@@ -1,0 +1,18 @@
+## Constructor: messageMediaPhoto  
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|photo|[Photo](../types/Photo.md) | Required|
+|caption|[string](../types/string.md) | Required|
+
+
+### Type: [MessageMedia](../types/MessageMedia.md)
+
+### Example:
+
+
+```
+$messageMediaPhoto = ['photo' => Photo, 'caption' => string, ];
+```

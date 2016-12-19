@@ -14,12 +14,12 @@ namespace danog\MadelineProto\TL;
 
 class TL extends \danog\MadelineProto\Tools
 {
-    public function __construct($filename)
+    public function __construct($files)
     {
         \danog\MadelineProto\Logger::log('Loading TL schemes...');
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
-        foreach ($filename as $type => $file) {
+        foreach ($files as $type => $file) {
             $type = $type === 'mtproto';
             $TL_dict = json_decode(file_get_contents($file), true);
 

@@ -15,7 +15,7 @@ namespace danog\MadelineProto\MTProtoTools;
 /**
  * Manages acknowledgement of messages.
  */
-class AckHandler extends \danog\MadelineProto\PrimeModule
+trait AckHandler
 {
     public function ack_outgoing_message_id($message_id)
     {

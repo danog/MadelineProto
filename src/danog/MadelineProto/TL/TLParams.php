@@ -20,7 +20,7 @@ class TLParams
             $param['flag'] = false;
             if (preg_match('/^flags\.\d*\?/', $param['type'])) {
                 $param['flag'] = true;
-                $flag = explode('?', explode('.', $param['type'])[1]);
+                $flag = explode('?', explode('flags.', $param['type'])[1]);
                 $param['pow'] = pow(2, $flag[0]);
                 $param['type'] = $flag[1];
             }

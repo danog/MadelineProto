@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\MTProtoTools;
 
-class Crypt extends CallHandler
+trait Crypt
 {
     public function aes_calculate($msg_key, $auth_key, $direction = 'to server')
     {
