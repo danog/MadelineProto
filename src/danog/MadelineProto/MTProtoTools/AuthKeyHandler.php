@@ -243,7 +243,6 @@ trait AuthKeyHandler
 
                 \danog\MadelineProto\Logger::log(sprintf('Server-client time delta = %.1f s', $this->datacenter->time_delta));
 
-
                 /*
                 * ***********************************************************************
                 * Define some needed numbers for BigInteger
@@ -263,7 +262,6 @@ trait AuthKeyHandler
                 if (!$dh_prime->isPrime()) {
                     throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
                 }
-
 
                 /*
                 * ***********************************************************************
@@ -406,7 +404,6 @@ trait AuthKeyHandler
                     $new_nonce_hash1 = substr(sha1($new_nonce.chr(1).$auth_key_aux_hash, true), -16);
                     $new_nonce_hash2 = substr(sha1($new_nonce.chr(2).$auth_key_aux_hash, true), -16);
                     $new_nonce_hash3 = substr(sha1($new_nonce.chr(3).$auth_key_aux_hash, true), -16);
-
 
                     /*
                     * ***********************************************************************

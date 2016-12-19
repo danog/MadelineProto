@@ -13,7 +13,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'vendor/autoload.php';
 
-
 if (file_exists('number.php') && !file_exists('session.madeline')) {
     include_once 'number.php';
     $MadelineProto = new \danog\MadelineProto\API();

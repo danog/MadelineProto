@@ -51,7 +51,6 @@ trait CallHandler
                                 \danog\MadelineProto\Logger::log('Received request to switch to DC '.$dc);
                                 $this->switch_dc($dc);
                                 throw new \danog\MadelineProto\Exception('I had to switch to datacenter '.$dc);
-
                                 break;
                             case 401:
                                 switch ($server_answer['error_message']) {

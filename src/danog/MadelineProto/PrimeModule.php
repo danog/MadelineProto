@@ -127,7 +127,6 @@ class PrimeModule extends Tools
             return $res;
         }
 
-
         throw new Exception("Couldn't calculate pq!");
     }
 }

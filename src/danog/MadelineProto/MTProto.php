@@ -49,6 +49,11 @@ class MTProto extends PrimeModule
 
     public function __construct($settings = [])
     {
+        // Detect 64 bit
+        if (PHP_INT_SIZE < 8) {
+            throw new Exception('MadelineProto supports only 64 bit systems ATM');
+        }
+
         // Detect ipv6
         $google = '';
         try {
@@ -57,14 +62,12 @@ class MTProto extends PrimeModule
         }
         $this->ipv6 = strlen($google) > 0;
 
-
         // Detect device model
         $device_model = 'Web server';
         try {
             $device_model = php_uname('s');
         } catch (Exception $e) {
         }
-
 
         // Detect system version
         $system_version = phpversion();
