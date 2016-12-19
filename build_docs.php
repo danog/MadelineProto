@@ -141,17 +141,7 @@ $'.$type.' = $MadelineProto->'.str_replace('.', '->', $method).'(['.$params.']);
 ksort($methods);
 file_put_contents('methods/index.md', '# Methods  
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
-'.implode('', $methods).'</div>');
+'.implode('', $methods));
 
 foreach (glob('constructors/*') as $unlink) {
     unlink($unlink);
@@ -258,17 +248,7 @@ $'.$constructor.' = ['.$params.'];
 ksort($constructors);
 file_put_contents('constructors/index.md', '# Constructors  
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
-'.implode('', $constructors).'</div>');
+'.implode('', $constructors));
 
 foreach (glob('types/*') as $unlink) {
     unlink($unlink);
@@ -299,17 +279,7 @@ foreach ($types as $type => $keys) {
 
 ### Constructors:
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
-'.$constructors.'</div>');
+'.$constructors);
     file_put_contents('types/'.$type.'.md', $header);
 }
 
@@ -346,16 +316,7 @@ Represents a TL serialized payload.');
 \danog\MadelineProto\Logger::log('Generating types index...');
 
 file_put_contents('types/index.md', '# Types  
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
-'.$index.'</div>');
+
+'.$index);
 
 \danog\MadelineProto\Logger::log('Done!');

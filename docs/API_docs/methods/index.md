@@ -1,15 +1,5 @@
 # Methods  
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
 $MadelineProto->[account->changePhone](account.changePhone.md)(\['phone\_number' => [string](../types/string.md), 'phone\_code\_hash' => [string](../types/string.md), 'phone\_code' => [string](../types/string.md), \]) == [$User](../types/User.md);  
 
 $MadelineProto->[account->checkUsername](account.checkUsername.md)(\['username' => [string](../types/string.md), \]) == [$Bool](../types/Bool.md);  
@@ -380,4 +370,3 @@ $MadelineProto->[users->getFullUser](users.getFullUser.md)(\['id' => [InputUser]
 
 $MadelineProto->[users->getUsers](users.getUsers.md)(\['id' => [[InputUser](../types/InputUser.md)], \]) == [$Vector\_of\_User](../types/User.md);  
 
-</div>

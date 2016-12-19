@@ -2,16 +2,6 @@
 
 ### Constructors:
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
 [storage\_fileUnknown](../constructors/storage\_fileUnknown.md)  
 
 [storage\_fileJpeg](../constructors/storage\_fileJpeg.md)  
@@ -32,4 +22,3 @@
 
 [storage\_fileWebp](../constructors/storage\_fileWebp.md)  
 
-</div>

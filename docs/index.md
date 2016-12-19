@@ -6,7 +6,7 @@ Created by [Daniil Gentili](https://daniil.it), licensed under AGPLv3.
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
-This project can run on PHP 7, PHP 5.6 and HHVM.  
+This project can run on PHP 7, PHP 5.6 and HHVM, only 64 bit systems are supported ATM.  
 
 Also note that MadelineProto will perform better if a big math extension like gmp o bcmath is installed.
 
@@ -226,6 +226,7 @@ MadelineProto can throw three different exceptions:
 
 You can use this scheme of the structure of this project to help yourself:
 ```
+build_docs.php - Builds API docs from TL scheme files
 src/danog/MadelineProto/
     MTProtoTools/
         AckHandler - Handles acknowledgement of incoming and outgoing mtproto messages
@@ -250,8 +251,7 @@ src/danog/MadelineProto/
     DebugTools - Various debugging tools
     Exception - Handles exceptions and PHP errors
     RPCErrorException - Handles RPC errors
-    MTProto - Extends MTProtoTools, handles initial connection, generation of authorization keys, instantiation of classes, writing of client info
-    MTProtoTools - Extends all of the classes in MTProtoTools/
+    MTProto - Handles initial connection, generation of authorization keys, instantiation of classes, writing of client info
     Logger - Static logging class
     prime.py and getpq.py - prime module (python) for p and q generation
     PrimeModule.php - prime module (php) for p and q generation by wrapping the python module, using wolfram alpha or a built in PHP engine

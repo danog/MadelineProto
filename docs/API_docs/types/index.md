@@ -1,14 +1,5 @@
 # Types  
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
+
 [AccountDaysTTL](AccountDaysTTL.md)  
 
 [Authorization](Authorization.md)  
@@ -333,4 +324,3 @@
 
 [upload_File](upload_File.md)  
 
-</div>

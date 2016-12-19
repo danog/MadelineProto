@@ -1,15 +1,5 @@
 # Constructors  
 
-<style>
-.container {
-    width: auto;
-    overflow-x: auto;
-    white-space: nowrap;
-    background: #ecf3f8;
-    padding: 10px;
-}
-</style>
-<div class="container">
 [$AccountDaysTTL](../types/AccountDaysTTL.md)\['[accountDaysTTL](accountDaysTTL.md)'\] = \['days' => [int](../types/int.md), \]  
 
 [$account\_Authorizations](../types/account\_Authorizations.md)\['[account\_authorizations](account\_authorizations.md)'\] = \['authorizations' => [[Authorization](../types/Authorization.md)], \]  
@@ -918,4 +908,3 @@
 
 [$WebPage](../types/WebPage.md)\['[webPagePending](webPagePending.md)'\] = \['id' => [long](../types/long.md), 'date' => [int](../types/int.md), \]  
 
-</div>
