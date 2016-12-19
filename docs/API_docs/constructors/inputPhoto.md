@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputPhoto](../types/InputPhoto.md)
-
+[InputPhoto](../types/InputPhoto.md)
 ### Example:
-
 
 ```
 $inputPhoto = ['_' => inputPhoto', 'id' => long, 'access_hash' => long, ];

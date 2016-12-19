@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |set|[StickerSet](../types/StickerSet.md) | Required|
 |covers|Array of [Document](../types/Document.md) | Required|
+### Type: 
 
-
-### Type: [StickerSetCovered](../types/StickerSetCovered.md)
-
+[StickerSetCovered](../types/StickerSetCovered.md)
 ### Example:
-
 
 ```
 $stickerSetMultiCovered = ['_' => stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Vector t], ];

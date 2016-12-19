@@ -1,11 +1,9 @@
 ## Constructor: channelParticipantsKicked  
 
+### Type: 
 
-
-### Type: [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
-
+[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
 ### Example:
-
 
 ```
 $channelParticipantsKicked = ['_' => channelParticipantsKicked', ];

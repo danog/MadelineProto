@@ -7,7 +7,7 @@
 |current\_password\_hash|[bytes](../types/bytes.md) | Required|
 
 
-### Return type: [account\_PasswordSettings](../types/account\_PasswordSettings.md)
+### Return type: [account\_PasswordSettings](../types/account_PasswordSettings.md)
 
 ### Example:
 

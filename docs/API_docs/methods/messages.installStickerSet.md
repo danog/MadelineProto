@@ -8,7 +8,7 @@
 |archived|[Bool](../types/Bool.md) | Required|
 
 
-### Return type: [messages\_StickerSetInstallResult](../types/messages\_StickerSetInstallResult.md)
+### Return type: [messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)
 
 ### Example:
 

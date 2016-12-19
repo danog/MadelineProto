@@ -10,7 +10,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_Dialogs](../types/messages\_Dialogs.md)
+### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)
 
 ### Example:
 

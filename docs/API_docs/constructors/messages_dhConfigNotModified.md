@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |random|[bytes](../types/bytes.md) | Required|
+### Type: 
 
-
-### Type: [messages\_DhConfig](../types/messages\_DhConfig.md)
-
+[messages\_DhConfig](../types/messages_DhConfig.md)
 ### Example:
-
 
 ```
 $messages_dhConfigNotModified = ['_' => messages_dhConfigNotModified', 'random' => bytes, ];

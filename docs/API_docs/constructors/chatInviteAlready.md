@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chat|[Chat](../types/Chat.md) | Required|
+### Type: 
 
-
-### Type: [ChatInvite](../types/ChatInvite.md)
-
+[ChatInvite](../types/ChatInvite.md)
 ### Example:
-
 
 ```
 $chatInviteAlready = ['_' => chatInviteAlready', 'chat' => Chat, ];

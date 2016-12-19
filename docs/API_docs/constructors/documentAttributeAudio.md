@@ -9,12 +9,10 @@
 |title|[string](../types/string.md) | Optional|
 |performer|[string](../types/string.md) | Optional|
 |waveform|[bytes](../types/bytes.md) | Optional|
+### Type: 
 
-
-### Type: [DocumentAttribute](../types/DocumentAttribute.md)
-
+[DocumentAttribute](../types/DocumentAttribute.md)
 ### Example:
-
 
 ```
 $documentAttributeAudio = ['_' => documentAttributeAudio', 'voice' => true, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |authorizations|Array of [Authorization](../types/Authorization.md) | Required|
+### Type: 
 
-
-### Type: [account\_Authorizations](../types/account\_Authorizations.md)
-
+[account\_Authorizations](../types/account_Authorizations.md)
 ### Example:
-
 
 ```
 $account_authorizations = ['_' => account_authorizations', 'authorizations' => [Vector t], ];

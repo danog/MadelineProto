@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |code|[int](../types/int.md) | Required|
 |text|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [Error](../types/Error.md)
-
+[Error](../types/Error.md)
 ### Example:
-
 
 ```
 $error = ['_' => error', 'code' => int, 'text' => string, ];

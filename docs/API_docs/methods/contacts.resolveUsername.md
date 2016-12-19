@@ -7,7 +7,7 @@
 |username|[string](../types/string.md) | Required|
 
 
-### Return type: [contacts\_ResolvedPeer](../types/contacts\_ResolvedPeer.md)
+### Return type: [contacts\_ResolvedPeer](../types/contacts_ResolvedPeer.md)
 
 ### Example:
 

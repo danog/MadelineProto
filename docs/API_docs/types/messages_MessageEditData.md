@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_messageEditData](../constructors/messages\_messageEditData.md)  
+[messages\_messageEditData](../constructors/messages_messageEditData.md)  
 

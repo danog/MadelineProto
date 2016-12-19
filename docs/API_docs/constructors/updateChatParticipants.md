@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |participants|[ChatParticipants](../types/ChatParticipants.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateChatParticipants = ['_' => updateChatParticipants', 'participants' => ChatParticipants, ];

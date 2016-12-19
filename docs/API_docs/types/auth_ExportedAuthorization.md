@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[auth\_exportedAuthorization](../constructors/auth\_exportedAuthorization.md)  
+[auth\_exportedAuthorization](../constructors/auth_exportedAuthorization.md)  
 

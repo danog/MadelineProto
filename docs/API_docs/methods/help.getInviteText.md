@@ -2,7 +2,7 @@
 
 
 
-### Return type: [help\_InviteText](../types/help\_InviteText.md)
+### Return type: [help\_InviteText](../types/help_InviteText.md)
 
 ### Example:
 

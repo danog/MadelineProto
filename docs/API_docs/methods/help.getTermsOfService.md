@@ -2,7 +2,7 @@
 
 
 
-### Return type: [help\_TermsOfService](../types/help\_TermsOfService.md)
+### Return type: [help\_TermsOfService](../types/help_TermsOfService.md)
 
 ### Example:
 

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [InputPeer](../types/InputPeer.md)
-
+[InputPeer](../types/InputPeer.md)
 ### Example:
-
 
 ```
 $inputPeerChat = ['_' => inputPeerChat', 'chat_id' => int, ];

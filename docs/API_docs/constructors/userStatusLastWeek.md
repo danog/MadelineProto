@@ -1,11 +1,9 @@
 ## Constructor: userStatusLastWeek  
 
+### Type: 
 
-
-### Type: [UserStatus](../types/UserStatus.md)
-
+[UserStatus](../types/UserStatus.md)
 ### Example:
-
 
 ```
 $userStatusLastWeek = ['_' => userStatusLastWeek', ];

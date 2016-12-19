@@ -8,12 +8,10 @@
 |chat\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
+### Type: 
 
-
-### Type: [EncryptedMessage](../types/EncryptedMessage.md)
-
+[EncryptedMessage](../types/EncryptedMessage.md)
 ### Example:
-
 
 ```
 $encryptedMessageService = ['_' => encryptedMessageService', 'random_id' => long, 'chat_id' => int, 'date' => int, 'bytes' => bytes, ];

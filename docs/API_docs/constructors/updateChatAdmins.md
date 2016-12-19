@@ -7,12 +7,10 @@
 |chat\_id|[int](../types/int.md) | Required|
 |enabled|[Bool](../types/Bool.md) | Required|
 |version|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateChatAdmins = ['_' => updateChatAdmins', 'chat_id' => int, 'enabled' => Bool, 'version' => int, ];

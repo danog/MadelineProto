@@ -1,11 +1,9 @@
 ## Constructor: notifyChats  
 
+### Type: 
 
-
-### Type: [NotifyPeer](../types/NotifyPeer.md)
-
+[NotifyPeer](../types/NotifyPeer.md)
 ### Example:
-
 
 ```
 $notifyChats = ['_' => notifyChats', ];

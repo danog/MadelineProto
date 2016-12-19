@@ -1,11 +1,9 @@
 ## Constructor: userProfilePhotoEmpty  
 
+### Type: 
 
-
-### Type: [UserProfilePhoto](../types/UserProfilePhoto.md)
-
+[UserProfilePhoto](../types/UserProfilePhoto.md)
 ### Example:
-
 
 ```
 $userProfilePhotoEmpty = ['_' => userProfilePhotoEmpty', ];

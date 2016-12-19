@@ -78,11 +78,18 @@ foreach ($TL->methods->method as $key => $method) {
                 $ptype = 'Bool';
         }
         $params .= "'".$param['name']."' => ";
-        $params .= (isset($param['subtype']) ? '[' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
-    }
-    $methods[$method] = str_replace(['_', '\[\]'], ['\_', ''], '$MadelineProto->['.str_replace('.', '->', $method).']('.$method.'.md)(\['.$params.'\]) == [$'.$type.'](../types/'.$real_type.'.md);  
+        $ptype = 
+            '['.
+            str_replace('_', '\_', $ptype).
+            '](../'.$link_type.'/'.$ptype.'.md)';
 
-');
+        $params .= (isset($param['subtype']) ? '\[' . $ptype . '\]' : $ptype).', ';
+    }
+    $md_method = '['.str_replace(['_', '.'], ['->', '\_'], $method).']('.$method.'.md)';
+
+    $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)  
+
+';
 
     $params = '';
     $table = empty($TL->methods->params[$key]) ? '' : '### Parameters:
@@ -100,12 +107,23 @@ foreach ($TL->methods->method as $key => $method) {
             case 'false':
                 $ptype = 'Bool';
         }
-        $table .= '|'.$param['name'].'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.$ptype.'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
+        $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
 ';
 
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
     }
+    $header = str_replace('_', '\_', '## Method: '.$method.'  
+
+');
+    $table .= '
+
+';
+    $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)
+
+### Example:
+
+';
     $example = str_replace('[]', '', '
 ```
 $MadelineProto = new \danog\MadelineProto\API();
@@ -124,16 +142,7 @@ if (isset($number)) {
 
 $'.$type.' = $MadelineProto->'.str_replace('.', '->', $method).'(['.$params.']);
 ```');
-    $header = str_replace('_', '\_', '## Method: '.$method.'  
-
-'.$table.'
-
-### Return type: ['.$type.'](../types/'.$real_type.'.md)
-
-### Example:
-
-');
-    file_put_contents('methods/'.$method.'.md', $header.$example);
+    file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
 }
 
 \danog\MadelineProto\Logger::log('Generating methods index...');
@@ -183,13 +192,20 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             case 'false':
                 $ptype = 'Bool';
         }
+        
         $params .= "'".$param['name']."' => ";
-        $params .= (isset($param['subtype']) ? '[' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
-    }
-    $params = "\[".$params.'\]';
-    $constructors[$constructor] = str_replace(['_'], ['\_'], '[$'.$real_type.'](../types/'.$real_type.'.md) = '.$params.';  
+        $ptype = 
+            '['.
+            str_replace('_', '\_', $ptype).
+            '](../'.$link_type.'/'.$ptype.'.md)';
 
-');
+        $params .= (isset($param['subtype']) ? '\[' . $ptype . '\]' : $ptype).', ';
+
+    }
+
+    $constructors[$constructor] = '[$'.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md) = \['.$params.'\];  
+
+';
 
     if (!isset($types[$real_type])) {
         $types[$real_type] = [];
@@ -220,7 +236,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             case 'false':
                 $ptype = 'Bool';
         }
-        $table .= '|'.$param['name'].'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
+        $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
 ';
 
         $params .= "'".$param['name']."' => ";
@@ -228,20 +244,19 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     }
     $params = "['_' => ".$constructor."', ".$params.']';
 
-    $example = '
+    $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
+
+');
+    $type = '### Type: 
+
+['.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md)
+';
+    $example = '### Example:
+
 ```
 $'.$constructor.' = '.$params.';
 ```';
-    $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
-
-'.$table.'
-
-### Type: ['.$real_type.'](../types/'.$real_type.'.md)
-
-### Example:
-
-');
-    file_put_contents('constructors/'.$constructor.'.md', $header.$example);
+    file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
 }
 
 \danog\MadelineProto\Logger::log('Generating constructors index...');
@@ -272,7 +287,7 @@ foreach ($types as $type => $keys) {
     $constructors = '';
     foreach ($keys as $key) {
         $predicate = str_replace('.', '_', $TL->constructors->predicate[$key]);
-        $constructors .= '['.$predicate.'](../constructors/'.$predicate.'.md)  
+        $constructors .= '['.str_replace('_', '\_', $predicate).'](../constructors/'.$predicate.'.md)  
 
 ';
     }
@@ -280,8 +295,8 @@ foreach ($types as $type => $keys) {
 
 ### Possible values (constructors):
 
-'.$constructors);
-    file_put_contents('types/'.$type.'.md', $header);
+');
+    file_put_contents('types/'.$type.'.md', $header.$constructors);
 }
 
 \danog\MadelineProto\Logger::log('Generating additional types...');

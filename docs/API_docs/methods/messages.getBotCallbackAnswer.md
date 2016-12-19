@@ -10,7 +10,7 @@
 |data|[bytes](../types/bytes.md) | Optional|
 
 
-### Return type: [messages\_BotCallbackAnswer](../types/messages\_BotCallbackAnswer.md)
+### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)
 
 ### Example:
 

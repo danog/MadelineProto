@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_botResults](../constructors/messages\_botResults.md)  
+[messages\_botResults](../constructors/messages_botResults.md)  
 

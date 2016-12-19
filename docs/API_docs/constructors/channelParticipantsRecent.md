@@ -1,11 +1,9 @@
 ## Constructor: channelParticipantsRecent  
 
+### Type: 
 
-
-### Type: [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
-
+[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
 ### Example:
-
 
 ```
 $channelParticipantsRecent = ['_' => channelParticipantsRecent', ];

@@ -19,12 +19,10 @@
 |via\_bot\_id|[int](../types/int.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updateShortChatMessage = ['_' => updateShortChatMessage', 'out' => true, 'mentioned' => true, 'media_unread' => true, 'silent' => true, 'id' => int, 'from_id' => int, 'chat_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from' => MessageFwdHeader, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'entities' => [Vector t], ];

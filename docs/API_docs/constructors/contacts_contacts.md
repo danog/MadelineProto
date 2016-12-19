@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |contacts|Array of [Contact](../types/Contact.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [contacts\_Contacts](../types/contacts\_Contacts.md)
-
+[contacts\_Contacts](../types/contacts_Contacts.md)
 ### Example:
-
 
 ```
 $contacts_contacts = ['_' => contacts_contacts', 'contacts' => [Vector t], 'users' => [Vector t], ];

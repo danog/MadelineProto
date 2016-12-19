@@ -1,11 +1,9 @@
 ## Constructor: documentAttributeHasStickers  
 
+### Type: 
 
-
-### Type: [DocumentAttribute](../types/DocumentAttribute.md)
-
+[DocumentAttribute](../types/DocumentAttribute.md)
 ### Example:
-
 
 ```
 $documentAttributeHasStickers = ['_' => documentAttributeHasStickers', ];

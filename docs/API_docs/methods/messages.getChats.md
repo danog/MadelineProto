@@ -7,7 +7,7 @@
 |id|Array of [int](../types/int.md) | Required|
 
 
-### Return type: [messages\_Chats](../types/messages\_Chats.md)
+### Return type: [messages\_Chats](../types/messages_Chats.md)
 
 ### Example:
 

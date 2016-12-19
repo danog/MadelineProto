@@ -1,11 +1,9 @@
 ## Constructor: messageActionPinMessage  
 
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionPinMessage = ['_' => messageActionPinMessage', ];

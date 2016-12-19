@@ -1,11 +1,9 @@
 ## Constructor: privacyKeyStatusTimestamp  
 
+### Type: 
 
-
-### Type: [PrivacyKey](../types/PrivacyKey.md)
-
+[PrivacyKey](../types/PrivacyKey.md)
 ### Example:
-
 
 ```
 $privacyKeyStatusTimestamp = ['_' => privacyKeyStatusTimestamp', ];

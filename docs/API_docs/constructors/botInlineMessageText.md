@@ -8,12 +8,10 @@
 |message|[string](../types/string.md) | Required|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+### Type: 
 
-
-### Type: [BotInlineMessage](../types/BotInlineMessage.md)
-
+[BotInlineMessage](../types/BotInlineMessage.md)
 ### Example:
-
 
 ```
 $botInlineMessageText = ['_' => botInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [Vector t], 'reply_markup' => ReplyMarkup, ];

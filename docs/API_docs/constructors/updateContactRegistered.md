@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateContactRegistered = ['_' => updateContactRegistered', 'user_id' => int, 'date' => int, ];

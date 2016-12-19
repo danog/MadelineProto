@@ -1,11 +1,9 @@
 ## Constructor: updateConfig  
 
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateConfig = ['_' => updateConfig', ];

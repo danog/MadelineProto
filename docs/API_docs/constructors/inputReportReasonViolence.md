@@ -1,11 +1,9 @@
 ## Constructor: inputReportReasonViolence  
 
+### Type: 
 
-
-### Type: [ReportReason](../types/ReportReason.md)
-
+[ReportReason](../types/ReportReason.md)
 ### Example:
-
 
 ```
 $inputReportReasonViolence = ['_' => inputReportReasonViolence', ];

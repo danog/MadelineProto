@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
 |pts|[int](../types/int.md) | Optional|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateChannelTooLong = ['_' => updateChannelTooLong', 'channel_id' => int, 'pts' => int, ];

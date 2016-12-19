@@ -1,11 +1,9 @@
 ## Constructor: contacts\_topPeersNotModified  
 
+### Type: 
 
-
-### Type: [contacts\_TopPeers](../types/contacts\_TopPeers.md)
-
+[contacts\_TopPeers](../types/contacts_TopPeers.md)
 ### Example:
-
 
 ```
 $contacts_topPeersNotModified = ['_' => contacts_topPeersNotModified', ];

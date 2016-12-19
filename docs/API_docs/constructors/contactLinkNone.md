@@ -1,11 +1,9 @@
 ## Constructor: contactLinkNone  
 
+### Type: 
 
-
-### Type: [ContactLink](../types/ContactLink.md)
-
+[ContactLink](../types/ContactLink.md)
 ### Example:
-
 
 ```
 $contactLinkNone = ['_' => contactLinkNone', ];

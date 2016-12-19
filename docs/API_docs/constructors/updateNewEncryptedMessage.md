@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |message|[EncryptedMessage](../types/EncryptedMessage.md) | Required|
 |qts|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateNewEncryptedMessage = ['_' => updateNewEncryptedMessage', 'message' => EncryptedMessage, 'qts' => int, ];

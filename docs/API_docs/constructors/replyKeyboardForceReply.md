@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |single\_use|[Bool](../types/Bool.md) | Optional|
 |selective|[Bool](../types/Bool.md) | Optional|
+### Type: 
 
-
-### Type: [ReplyMarkup](../types/ReplyMarkup.md)
-
+[ReplyMarkup](../types/ReplyMarkup.md)
 ### Example:
-
 
 ```
 $replyKeyboardForceReply = ['_' => replyKeyboardForceReply', 'single_use' => true, 'selective' => true, ];

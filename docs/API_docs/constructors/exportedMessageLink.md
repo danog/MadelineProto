@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |link|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [ExportedMessageLink](../types/ExportedMessageLink.md)
-
+[ExportedMessageLink](../types/ExportedMessageLink.md)
 ### Example:
-
 
 ```
 $exportedMessageLink = ['_' => exportedMessageLink', 'link' => string, ];

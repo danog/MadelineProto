@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |title|[string](../types/string.md) | Required|
 |users|Array of [int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionChatCreate = ['_' => messageActionChatCreate', 'title' => string, 'users' => [Vector t], ];

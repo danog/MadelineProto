@@ -8,12 +8,10 @@
 |volume\_id|[long](../types/long.md) | Required|
 |local\_id|[int](../types/int.md) | Required|
 |secret|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [FileLocation](../types/FileLocation.md)
-
+[FileLocation](../types/FileLocation.md)
 ### Example:
-
 
 ```
 $fileLocation = ['_' => fileLocation', 'dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];

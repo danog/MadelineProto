@@ -10,12 +10,10 @@
 |id|[int](../types/int.md) | Required|
 |ip\_address|[string](../types/string.md) | Required|
 |port|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [DcOption](../types/DcOption.md)
-
+[DcOption](../types/DcOption.md)
 ### Example:
-
 
 ```
 $dcOption = ['_' => dcOption', 'ipv6' => true, 'media_only' => true, 'tcpo_only' => true, 'id' => int, 'ip_address' => string, 'port' => int, ];

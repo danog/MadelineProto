@@ -1,11 +1,9 @@
 ## Constructor: inputGeoPointEmpty  
 
+### Type: 
 
-
-### Type: [InputGeoPoint](../types/InputGeoPoint.md)
-
+[InputGeoPoint](../types/InputGeoPoint.md)
 ### Example:
-
 
 ```
 $inputGeoPointEmpty = ['_' => inputGeoPointEmpty', ];

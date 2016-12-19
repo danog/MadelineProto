@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
 |url|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [KeyboardButton](../types/KeyboardButton.md)
-
+[KeyboardButton](../types/KeyboardButton.md)
 ### Example:
-
 
 ```
 $keyboardButtonUrl = ['_' => keyboardButtonUrl', 'text' => string, 'url' => string, ];

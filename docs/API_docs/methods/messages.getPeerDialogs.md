@@ -7,7 +7,7 @@
 |peers|Array of [InputPeer](../types/InputPeer.md) | Required|
 
 
-### Return type: [messages\_PeerDialogs](../types/messages\_PeerDialogs.md)
+### Return type: [messages\_PeerDialogs](../types/messages_PeerDialogs.md)
 
 ### Example:
 

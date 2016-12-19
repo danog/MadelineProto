@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[account\_privacyRules](../constructors/account\_privacyRules.md)  
+[account\_privacyRules](../constructors/account_privacyRules.md)  
 

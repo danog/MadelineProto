@@ -14,7 +14,7 @@
 |hash|[int](../types/int.md) | Required|
 
 
-### Return type: [contacts\_TopPeers](../types/contacts\_TopPeers.md)
+### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
 
 ### Example:
 

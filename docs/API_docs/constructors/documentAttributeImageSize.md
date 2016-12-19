@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |w|[int](../types/int.md) | Required|
 |h|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [DocumentAttribute](../types/DocumentAttribute.md)
-
+[DocumentAttribute](../types/DocumentAttribute.md)
 ### Example:
-
 
 ```
 $documentAttributeImageSize = ['_' => documentAttributeImageSize', 'w' => int, 'h' => int, ];

@@ -9,12 +9,10 @@
 |date|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
 |file|[EncryptedFile](../types/EncryptedFile.md) | Required|
+### Type: 
 
-
-### Type: [EncryptedMessage](../types/EncryptedMessage.md)
-
+[EncryptedMessage](../types/EncryptedMessage.md)
 ### Example:
-
 
 ```
 $encryptedMessage = ['_' => encryptedMessage', 'random_id' => long, 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];

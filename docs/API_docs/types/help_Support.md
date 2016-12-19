@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[help\_support](../constructors/help\_support.md)  
+[help\_support](../constructors/help_support.md)  
 

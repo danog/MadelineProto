@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [help\_TermsOfService](../types/help\_TermsOfService.md)
-
+[help\_TermsOfService](../types/help_TermsOfService.md)
 ### Example:
-
 
 ```
 $help_termsOfService = ['_' => help_termsOfService', 'text' => string, ];

@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_peerDialogs](../constructors/messages\_peerDialogs.md)  
+[messages\_peerDialogs](../constructors/messages_peerDialogs.md)  
 

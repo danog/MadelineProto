@@ -1,11 +1,9 @@
 ## Constructor: inputReportReasonPornography  
 
+### Type: 
 
-
-### Type: [ReportReason](../types/ReportReason.md)
-
+[ReportReason](../types/ReportReason.md)
 ### Example:
-
 
 ```
 $inputReportReasonPornography = ['_' => inputReportReasonPornography', ];

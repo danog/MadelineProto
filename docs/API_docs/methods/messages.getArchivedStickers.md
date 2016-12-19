@@ -9,7 +9,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_ArchivedStickers](../types/messages\_ArchivedStickers.md)
+### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)
 
 ### Example:
 

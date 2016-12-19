@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateEncryptedChatTyping = ['_' => updateEncryptedChatTyping', 'chat_id' => int, ];

@@ -2,7 +2,7 @@
 
 
 
-### Return type: [updates\_State](../types/updates\_State.md)
+### Return type: [updates\_State](../types/updates_State.md)
 
 ### Example:
 

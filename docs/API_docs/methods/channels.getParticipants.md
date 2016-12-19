@@ -10,7 +10,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [channels\_ChannelParticipants](../types/channels\_ChannelParticipants.md)
+### Return type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)
 
 ### Example:
 

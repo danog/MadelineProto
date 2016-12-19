@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[messages\_stickersNotModified](../constructors/messages\_stickersNotModified.md)  
+[messages\_stickersNotModified](../constructors/messages_stickersNotModified.md)  
 
-[messages\_stickers](../constructors/messages\_stickers.md)  
+[messages\_stickers](../constructors/messages_stickers.md)  
 

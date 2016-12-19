@@ -1,11 +1,9 @@
 ## Constructor: inputStickerSetEmpty  
 
+### Type: 
 
-
-### Type: [InputStickerSet](../types/InputStickerSet.md)
-
+[InputStickerSet](../types/InputStickerSet.md)
 ### Example:
-
 
 ```
 $inputStickerSetEmpty = ['_' => inputStickerSetEmpty', ];

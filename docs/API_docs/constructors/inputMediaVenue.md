@@ -9,12 +9,10 @@
 |address|[string](../types/string.md) | Required|
 |provider|[string](../types/string.md) | Required|
 |venue\_id|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaVenue = ['_' => inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];

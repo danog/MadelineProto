@@ -8,7 +8,7 @@
 |hash|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_RecentStickers](../types/messages\_RecentStickers.md)
+### Return type: [messages\_RecentStickers](../types/messages_RecentStickers.md)
 
 ### Example:
 

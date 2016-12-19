@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[messages\_sentEncryptedMessage](../constructors/messages\_sentEncryptedMessage.md)  
+[messages\_sentEncryptedMessage](../constructors/messages_sentEncryptedMessage.md)  
 
-[messages\_sentEncryptedFile](../constructors/messages\_sentEncryptedFile.md)  
+[messages\_sentEncryptedFile](../constructors/messages_sentEncryptedFile.md)  
 

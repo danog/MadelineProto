@@ -10,12 +10,10 @@
 |provider|[string](../types/string.md) | Required|
 |venue\_id|[string](../types/string.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+### Type: 
 
-
-### Type: [BotInlineMessage](../types/BotInlineMessage.md)
-
+[BotInlineMessage](../types/BotInlineMessage.md)
 ### Example:
-
 
 ```
 $botInlineMessageMediaVenue = ['_' => botInlineMessageMediaVenue', 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, 'reply_markup' => ReplyMarkup, ];

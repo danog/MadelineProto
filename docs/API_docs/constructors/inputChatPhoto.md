@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[InputPhoto](../types/InputPhoto.md) | Required|
+### Type: 
 
-
-### Type: [InputChatPhoto](../types/InputChatPhoto.md)
-
+[InputChatPhoto](../types/InputChatPhoto.md)
 ### Example:
-
 
 ```
 $inputChatPhoto = ['_' => inputChatPhoto', 'id' => InputPhoto, ];

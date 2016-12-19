@@ -1,11 +1,9 @@
 ## Constructor: sendMessageRecordAudioAction  
 
+### Type: 
 
-
-### Type: [SendMessageAction](../types/SendMessageAction.md)
-
+[SendMessageAction](../types/SendMessageAction.md)
 ### Example:
-
 
 ```
 $sendMessageRecordAudioAction = ['_' => sendMessageRecordAudioAction', ];

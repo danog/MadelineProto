@@ -7,12 +7,10 @@
 |category|[TopPeerCategory](../types/TopPeerCategory.md) | Required|
 |count|[int](../types/int.md) | Required|
 |peers|Array of [TopPeer](../types/TopPeer.md) | Required|
+### Type: 
 
-
-### Type: [TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)
-
+[TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)
 ### Example:
-
 
 ```
 $topPeerCategoryPeers = ['_' => topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [Vector t], ];

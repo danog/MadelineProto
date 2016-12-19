@@ -9,7 +9,7 @@
 |qts|[int](../types/int.md) | Required|
 
 
-### Return type: [updates\_Difference](../types/updates\_Difference.md)
+### Return type: [updates\_Difference](../types/updates_Difference.md)
 
 ### Example:
 

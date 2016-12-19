@@ -1,11 +1,9 @@
 ## Constructor: storage\_fileJpeg  
 
+### Type: 
 
-
-### Type: [storage\_FileType](../types/storage\_FileType.md)
-
+[storage\_FileType](../types/storage_FileType.md)
 ### Example:
-
 
 ```
 $storage_fileJpeg = ['_' => storage_fileJpeg', ];

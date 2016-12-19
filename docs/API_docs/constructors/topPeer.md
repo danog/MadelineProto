@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |peer|[Peer](../types/Peer.md) | Required|
 |rating|[double](../types/double.md) | Required|
+### Type: 
 
-
-### Type: [TopPeer](../types/TopPeer.md)
-
+[TopPeer](../types/TopPeer.md)
 ### Example:
-
 
 ```
 $topPeer = ['_' => topPeer', 'peer' => Peer, 'rating' => double, ];

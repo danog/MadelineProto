@@ -9,7 +9,7 @@
 |max\_id|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_AffectedHistory](../types/messages\_AffectedHistory.md)
+### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 
 ### Example:
 

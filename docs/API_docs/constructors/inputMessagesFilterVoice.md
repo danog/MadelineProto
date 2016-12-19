@@ -1,11 +1,9 @@
 ## Constructor: inputMessagesFilterVoice  
 
+### Type: 
 
-
-### Type: [MessagesFilter](../types/MessagesFilter.md)
-
+[MessagesFilter](../types/MessagesFilter.md)
 ### Example:
-
 
 ```
 $inputMessagesFilterVoice = ['_' => inputMessagesFilterVoice', ];

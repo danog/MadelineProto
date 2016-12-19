@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputGame](../types/InputGame.md)
-
+[InputGame](../types/InputGame.md)
 ### Example:
-
 
 ```
 $inputGameID = ['_' => inputGameID', 'id' => long, 'access_hash' => long, ];

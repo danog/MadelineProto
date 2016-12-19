@@ -1,11 +1,9 @@
 ## Constructor: inputPhotoEmpty  
 
+### Type: 
 
-
-### Type: [InputPhoto](../types/InputPhoto.md)
-
+[InputPhoto](../types/InputPhoto.md)
 ### Example:
-
 
 ```
 $inputPhotoEmpty = ['_' => inputPhotoEmpty', ];

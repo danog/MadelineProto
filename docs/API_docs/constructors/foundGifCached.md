@@ -7,12 +7,10 @@
 |url|[string](../types/string.md) | Required|
 |photo|[Photo](../types/Photo.md) | Required|
 |document|[Document](../types/Document.md) | Required|
+### Type: 
 
-
-### Type: [FoundGif](../types/FoundGif.md)
-
+[FoundGif](../types/FoundGif.md)
 ### Example:
-
 
 ```
 $foundGifCached = ['_' => foundGifCached', 'url' => string, 'photo' => Photo, 'document' => Document, ];

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[InputGame](../types/InputGame.md) | Required|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaGame = ['_' => inputMediaGame', 'id' => InputGame, ];

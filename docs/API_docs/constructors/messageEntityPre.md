@@ -7,12 +7,10 @@
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
 |language|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [MessageEntity](../types/MessageEntity.md)
-
+[MessageEntity](../types/MessageEntity.md)
 ### Example:
-
 
 ```
 $messageEntityPre = ['_' => messageEntityPre', 'offset' => int, 'length' => int, 'language' => string, ];

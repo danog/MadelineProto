@@ -1,11 +1,9 @@
 ## Constructor: peerNotifyEventsEmpty  
 
+### Type: 
 
-
-### Type: [PeerNotifyEvents](../types/PeerNotifyEvents.md)
-
+[PeerNotifyEvents](../types/PeerNotifyEvents.md)
 ### Example:
-
 
 ```
 $peerNotifyEventsEmpty = ['_' => peerNotifyEventsEmpty', ];

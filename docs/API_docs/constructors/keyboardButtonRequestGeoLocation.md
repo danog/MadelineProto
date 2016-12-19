@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [KeyboardButton](../types/KeyboardButton.md)
-
+[KeyboardButton](../types/KeyboardButton.md)
 ### Example:
-
 
 ```
 $keyboardButtonRequestGeoLocation = ['_' => keyboardButtonRequestGeoLocation', 'text' => string, ];

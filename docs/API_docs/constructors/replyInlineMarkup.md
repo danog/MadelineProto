@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Required|
+### Type: 
 
-
-### Type: [ReplyMarkup](../types/ReplyMarkup.md)
-
+[ReplyMarkup](../types/ReplyMarkup.md)
 ### Example:
-
 
 ```
 $replyInlineMarkup = ['_' => replyInlineMarkup', 'rows' => [Vector t], ];

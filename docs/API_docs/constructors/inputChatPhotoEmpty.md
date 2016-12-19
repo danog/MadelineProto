@@ -1,11 +1,9 @@
 ## Constructor: inputChatPhotoEmpty  
 
+### Type: 
 
-
-### Type: [InputChatPhoto](../types/InputChatPhoto.md)
-
+[InputChatPhoto](../types/InputChatPhoto.md)
 ### Example:
-
 
 ```
 $inputChatPhotoEmpty = ['_' => inputChatPhotoEmpty', ];

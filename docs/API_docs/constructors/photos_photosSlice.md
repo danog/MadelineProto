@@ -7,12 +7,10 @@
 |count|[int](../types/int.md) | Required|
 |photos|Array of [Photo](../types/Photo.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [photos\_Photos](../types/photos\_Photos.md)
-
+[photos\_Photos](../types/photos_Photos.md)
 ### Example:
-
 
 ```
 $photos_photosSlice = ['_' => photos_photosSlice', 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];

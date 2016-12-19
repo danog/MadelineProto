@@ -11,7 +11,7 @@
 |api\_hash|[string](../types/string.md) | Required|
 
 
-### Return type: [auth\_SentCode](../types/auth\_SentCode.md)
+### Return type: [auth\_SentCode](../types/auth_SentCode.md)
 
 ### Example:
 

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |report\_spam|[Bool](../types/Bool.md) | Optional|
+### Type: 
 
-
-### Type: [PeerSettings](../types/PeerSettings.md)
-
+[PeerSettings](../types/PeerSettings.md)
 ### Example:
-
 
 ```
 $peerSettings = ['_' => peerSettings', 'report_spam' => true, ];

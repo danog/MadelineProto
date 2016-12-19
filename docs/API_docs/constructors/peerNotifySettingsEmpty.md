@@ -1,11 +1,9 @@
 ## Constructor: peerNotifySettingsEmpty  
 
+### Type: 
 
-
-### Type: [PeerNotifySettings](../types/PeerNotifySettings.md)
-
+[PeerNotifySettings](../types/PeerNotifySettings.md)
 ### Example:
-
 
 ```
 $peerNotifySettingsEmpty = ['_' => peerNotifySettingsEmpty', ];

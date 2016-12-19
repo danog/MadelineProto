@@ -9,12 +9,10 @@
 |w|[int](../types/int.md) | Required|
 |h|[int](../types/int.md) | Required|
 |size|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [PhotoSize](../types/PhotoSize.md)
-
+[PhotoSize](../types/PhotoSize.md)
 ### Example:
-
 
 ```
 $photoSize = ['_' => photoSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int, ];

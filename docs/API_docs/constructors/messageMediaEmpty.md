@@ -1,11 +1,9 @@
 ## Constructor: messageMediaEmpty  
 
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaEmpty = ['_' => messageMediaEmpty', ];

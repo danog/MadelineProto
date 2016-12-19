@@ -8,12 +8,10 @@
 |messages|Array of [int](../types/int.md) | Required|
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateDeleteChannelMessages = ['_' => updateDeleteChannelMessages', 'channel_id' => int, 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];

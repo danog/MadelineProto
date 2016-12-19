@@ -8,7 +8,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [contacts\_Blocked](../types/contacts\_Blocked.md)
+### Return type: [contacts\_Blocked](../types/contacts_Blocked.md)
 
 ### Example:
 

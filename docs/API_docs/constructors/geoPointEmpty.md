@@ -1,11 +1,9 @@
 ## Constructor: geoPointEmpty  
 
+### Type: 
 
-
-### Type: [GeoPoint](../types/GeoPoint.md)
-
+[GeoPoint](../types/GeoPoint.md)
 ### Example:
-
 
 ```
 $geoPointEmpty = ['_' => geoPointEmpty', ];

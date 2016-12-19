@@ -7,7 +7,7 @@
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
 
 
-### Return type: [messages\_StickerSet](../types/messages\_StickerSet.md)
+### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Example:
 

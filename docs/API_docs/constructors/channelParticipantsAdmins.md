@@ -1,11 +1,9 @@
 ## Constructor: channelParticipantsAdmins  
 
+### Type: 
 
-
-### Type: [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
-
+[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md)
 ### Example:
-
 
 ```
 $channelParticipantsAdmins = ['_' => channelParticipantsAdmins', ];

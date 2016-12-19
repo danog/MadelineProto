@@ -8,7 +8,7 @@
 |rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Required|
 
 
-### Return type: [account\_PrivacyRules](../types/account\_PrivacyRules.md)
+### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
 
 ### Example:
 

@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[contacts\_contactsNotModified](../constructors/contacts\_contactsNotModified.md)  
+[contacts\_contactsNotModified](../constructors/contacts_contactsNotModified.md)  
 
-[contacts\_contacts](../constructors/contacts\_contacts.md)  
+[contacts\_contacts](../constructors/contacts_contacts.md)  
 

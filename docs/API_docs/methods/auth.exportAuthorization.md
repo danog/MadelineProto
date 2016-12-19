@@ -7,7 +7,7 @@
 |dc\_id|[int](../types/int.md) | Required|
 
 
-### Return type: [auth\_ExportedAuthorization](../types/auth\_ExportedAuthorization.md)
+### Return type: [auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md)
 
 ### Example:
 

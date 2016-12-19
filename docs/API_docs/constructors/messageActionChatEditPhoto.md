@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |photo|[Photo](../types/Photo.md) | Required|
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionChatEditPhoto = ['_' => messageActionChatEditPhoto', 'photo' => Photo, ];

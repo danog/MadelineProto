@@ -8,12 +8,10 @@
 |date|[int](../types/int.md) | Required|
 |device|[string](../types/string.md) | Required|
 |location|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateNewAuthorization = ['_' => updateNewAuthorization', 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];

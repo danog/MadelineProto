@@ -9,12 +9,10 @@
 |message|[string](../types/string.md) | Required|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [DraftMessage](../types/DraftMessage.md)
-
+[DraftMessage](../types/DraftMessage.md)
 ### Example:
-
 
 ```
 $draftMessage = ['_' => draftMessage', 'no_webpage' => true, 'reply_to_msg_id' => int, 'message' => string, 'entities' => [Vector t], 'date' => int, ];

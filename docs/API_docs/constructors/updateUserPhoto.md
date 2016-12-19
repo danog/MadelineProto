@@ -8,12 +8,10 @@
 |date|[int](../types/int.md) | Required|
 |photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Required|
 |previous|[Bool](../types/Bool.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateUserPhoto = ['_' => updateUserPhoto', 'user_id' => int, 'date' => int, 'photo' => UserProfilePhoto, 'previous' => Bool, ];

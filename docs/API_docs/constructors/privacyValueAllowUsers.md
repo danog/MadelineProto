@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |users|Array of [int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [PrivacyRule](../types/PrivacyRule.md)
-
+[PrivacyRule](../types/PrivacyRule.md)
 ### Example:
-
 
 ```
 $privacyValueAllowUsers = ['_' => privacyValueAllowUsers', 'users' => [Vector t], ];

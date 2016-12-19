@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [messages\_SentEncryptedMessage](../types/messages\_SentEncryptedMessage.md)
-
+[messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
 ### Example:
-
 
 ```
 $messages_sentEncryptedMessage = ['_' => messages_sentEncryptedMessage', 'date' => int, ];

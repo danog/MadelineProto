@@ -16,12 +16,10 @@
 |h|[int](../types/int.md) | Optional|
 |duration|[int](../types/int.md) | Optional|
 |send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Required|
+### Type: 
 
-
-### Type: [BotInlineResult](../types/BotInlineResult.md)
-
+[BotInlineResult](../types/BotInlineResult.md)
 ### Example:
-
 
 ```
 $botInlineResult = ['_' => botInlineResult', 'id' => string, 'type' => string, 'title' => string, 'description' => string, 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, 'duration' => int, 'send_message' => BotInlineMessage, ];

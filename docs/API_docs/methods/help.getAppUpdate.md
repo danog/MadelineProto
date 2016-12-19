@@ -2,7 +2,7 @@
 
 
 
-### Return type: [help\_AppUpdate](../types/help\_AppUpdate.md)
+### Return type: [help\_AppUpdate](../types/help_AppUpdate.md)
 
 ### Example:
 

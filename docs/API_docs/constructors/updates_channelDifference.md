@@ -11,12 +11,10 @@
 |other\_updates|Array of [Update](../types/Update.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [updates\_ChannelDifference](../types/updates\_ChannelDifference.md)
-
+[updates\_ChannelDifference](../types/updates_ChannelDifference.md)
 ### Example:
-
 
 ```
 $updates_channelDifference = ['_' => updates_channelDifference', 'final' => true, 'pts' => int, 'timeout' => int, 'new_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |days|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [AccountDaysTTL](../types/AccountDaysTTL.md)
-
+[AccountDaysTTL](../types/AccountDaysTTL.md)
 ### Example:
-
 
 ```
 $accountDaysTTL = ['_' => accountDaysTTL', 'days' => int, ];

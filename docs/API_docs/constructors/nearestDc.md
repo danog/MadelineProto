@@ -7,12 +7,10 @@
 |country|[string](../types/string.md) | Required|
 |this\_dc|[int](../types/int.md) | Required|
 |nearest\_dc|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [NearestDc](../types/NearestDc.md)
-
+[NearestDc](../types/NearestDc.md)
 ### Example:
-
 
 ```
 $nearestDc = ['_' => nearestDc', 'country' => string, 'this_dc' => int, 'nearest_dc' => int, ];

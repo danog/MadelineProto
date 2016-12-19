@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |chat|[EncryptedChat](../types/EncryptedChat.md) | Required|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateEncryption = ['_' => updateEncryption', 'chat' => EncryptedChat, 'date' => int, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |update|[Update](../types/Update.md) | Required|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updateShort = ['_' => updateShort', 'update' => Update, 'date' => int, ];

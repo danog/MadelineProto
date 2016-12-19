@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[auth\_sentCode](../constructors/auth\_sentCode.md)  
+[auth\_sentCode](../constructors/auth_sentCode.md)  
 

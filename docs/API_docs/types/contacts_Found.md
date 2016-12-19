@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[contacts\_found](../constructors/contacts\_found.md)  
+[contacts\_found](../constructors/contacts_found.md)  
 

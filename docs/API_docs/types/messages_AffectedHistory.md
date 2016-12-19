@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_affectedHistory](../constructors/messages\_affectedHistory.md)  
+[messages\_affectedHistory](../constructors/messages_affectedHistory.md)  
 

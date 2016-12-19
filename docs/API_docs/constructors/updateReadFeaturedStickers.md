@@ -1,11 +1,9 @@
 ## Constructor: updateReadFeaturedStickers  
 
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateReadFeaturedStickers = ['_' => updateReadFeaturedStickers', ];

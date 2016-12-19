@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |client\_id|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [ImportedContact](../types/ImportedContact.md)
-
+[ImportedContact](../types/ImportedContact.md)
 ### Example:
-
 
 ```
 $importedContact = ['_' => importedContact', 'user_id' => int, 'client_id' => long, ];

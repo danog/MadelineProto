@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [Photo](../types/Photo.md)
-
+[Photo](../types/Photo.md)
 ### Example:
-
 
 ```
 $photoEmpty = ['_' => photoEmpty', 'id' => long, ];

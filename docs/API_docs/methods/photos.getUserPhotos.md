@@ -10,7 +10,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [photos\_Photos](../types/photos\_Photos.md)
+### Return type: [photos\_Photos](../types/photos_Photos.md)
 
 ### Example:
 

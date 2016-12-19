@@ -7,7 +7,7 @@
 |key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Required|
 
 
-### Return type: [account\_PrivacyRules](../types/account\_PrivacyRules.md)
+### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
 
 ### Example:
 

@@ -14,7 +14,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_Messages](../types/messages\_Messages.md)
+### Return type: [messages\_Messages](../types/messages_Messages.md)
 
 ### Example:
 

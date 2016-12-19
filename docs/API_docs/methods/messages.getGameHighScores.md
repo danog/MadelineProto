@@ -9,7 +9,7 @@
 |user\_id|[InputUser](../types/InputUser.md) | Required|
 
 
-### Return type: [messages\_HighScores](../types/messages\_HighScores.md)
+### Return type: [messages\_HighScores](../types/messages_HighScores.md)
 
 ### Example:
 

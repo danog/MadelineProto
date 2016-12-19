@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_chats](../constructors/messages\_chats.md)  
+[messages\_chats](../constructors/messages_chats.md)  
 

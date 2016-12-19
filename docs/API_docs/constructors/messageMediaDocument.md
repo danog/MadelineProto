@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |document|[Document](../types/Document.md) | Required|
 |caption|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaDocument = ['_' => messageMediaDocument', 'document' => Document, 'caption' => string, ];

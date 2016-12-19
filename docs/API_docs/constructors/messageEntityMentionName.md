@@ -7,12 +7,10 @@
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
 |user\_id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [MessageEntity](../types/MessageEntity.md)
-
+[MessageEntity](../types/MessageEntity.md)
 ### Example:
-
 
 ```
 $messageEntityMentionName = ['_' => messageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => int, ];

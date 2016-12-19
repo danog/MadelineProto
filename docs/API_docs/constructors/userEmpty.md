@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [User](../types/User.md)
-
+[User](../types/User.md)
 ### Example:
-
 
 ```
 $userEmpty = ['_' => userEmpty', 'id' => int, ];

@@ -9,13 +9,11 @@
 |other\_updates|Array of [Update](../types/Update.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
-|intermediate\_state|[updates\_State](../types/updates\_State.md) | Required|
+|intermediate\_state|[updates\_State](../types/updates_State.md) | Required|
+### Type: 
 
-
-### Type: [updates\_Difference](../types/updates\_Difference.md)
-
+[updates\_Difference](../types/updates_Difference.md)
 ### Example:
-
 
 ```
 $updates_differenceSlice = ['_' => updates_differenceSlice', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'intermediate_state' => updates.State, ];

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[InputDocument](../types/InputDocument.md) | Required|
+### Type: 
 
-
-### Type: [InputStickeredMedia](../types/InputStickeredMedia.md)
-
+[InputStickeredMedia](../types/InputStickeredMedia.md)
 ### Example:
-
 
 ```
 $inputStickeredMediaDocument = ['_' => inputStickeredMediaDocument', 'id' => InputDocument, ];

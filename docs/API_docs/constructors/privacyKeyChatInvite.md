@@ -1,11 +1,9 @@
 ## Constructor: privacyKeyChatInvite  
 
+### Type: 
 
-
-### Type: [PrivacyKey](../types/PrivacyKey.md)
-
+[PrivacyKey](../types/PrivacyKey.md)
 ### Example:
-
 
 ```
 $privacyKeyChatInvite = ['_' => privacyKeyChatInvite', ];

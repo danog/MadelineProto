@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |peer|[Peer](../types/Peer.md) | Required|
 |draft|[DraftMessage](../types/DraftMessage.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateDraftMessage = ['_' => updateDraftMessage', 'peer' => Peer, 'draft' => DraftMessage, ];

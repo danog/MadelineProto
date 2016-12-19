@@ -1,11 +1,9 @@
 ## Constructor: inputMessagesFilterDocument  
 
+### Type: 
 
-
-### Type: [MessagesFilter](../types/MessagesFilter.md)
-
+[MessagesFilter](../types/MessagesFilter.md)
 ### Example:
-
 
 ```
 $inputMessagesFilterDocument = ['_' => inputMessagesFilterDocument', ];

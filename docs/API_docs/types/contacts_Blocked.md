@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[contacts\_blocked](../constructors/contacts\_blocked.md)  
+[contacts\_blocked](../constructors/contacts_blocked.md)  
 
-[contacts\_blockedSlice](../constructors/contacts\_blockedSlice.md)  
+[contacts\_blockedSlice](../constructors/contacts_blockedSlice.md)  
 

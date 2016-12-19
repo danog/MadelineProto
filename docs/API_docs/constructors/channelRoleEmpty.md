@@ -1,11 +1,9 @@
 ## Constructor: channelRoleEmpty  
 
+### Type: 
 
-
-### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
-
+[ChannelParticipantRole](../types/ChannelParticipantRole.md)
 ### Example:
-
 
 ```
 $channelRoleEmpty = ['_' => channelRoleEmpty', ];

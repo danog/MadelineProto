@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |geo|[GeoPoint](../types/GeoPoint.md) | Required|
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaGeo = ['_' => messageMediaGeo', 'geo' => GeoPoint, ];

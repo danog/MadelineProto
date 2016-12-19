@@ -11,12 +11,10 @@
 |description|[string](../types/string.md) | Required|
 |photo|[Photo](../types/Photo.md) | Required|
 |document|[Document](../types/Document.md) | Optional|
+### Type: 
 
-
-### Type: [Game](../types/Game.md)
-
+[Game](../types/Game.md)
 ### Example:
-
 
 ```
 $game = ['_' => game', 'id' => long, 'access_hash' => long, 'short_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'document' => Document, ];

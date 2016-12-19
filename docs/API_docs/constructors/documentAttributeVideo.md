@@ -7,12 +7,10 @@
 |duration|[int](../types/int.md) | Required|
 |w|[int](../types/int.md) | Required|
 |h|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [DocumentAttribute](../types/DocumentAttribute.md)
-
+[DocumentAttribute](../types/DocumentAttribute.md)
 ### Example:
-
 
 ```
 $documentAttributeVideo = ['_' => documentAttributeVideo', 'duration' => int, 'w' => int, 'h' => int, ];

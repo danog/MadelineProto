@@ -1,11 +1,9 @@
 ## Constructor: draftMessageEmpty  
 
+### Type: 
 
-
-### Type: [DraftMessage](../types/DraftMessage.md)
-
+[DraftMessage](../types/DraftMessage.md)
 ### Example:
-
 
 ```
 $draftMessageEmpty = ['_' => draftMessageEmpty', ];

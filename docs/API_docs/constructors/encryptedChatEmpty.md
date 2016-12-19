@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [EncryptedChat](../types/EncryptedChat.md)
-
+[EncryptedChat](../types/EncryptedChat.md)
 ### Example:
-
 
 ```
 $encryptedChatEmpty = ['_' => encryptedChatEmpty', 'id' => int, ];

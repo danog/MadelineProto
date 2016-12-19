@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[auth\_checkedPhone](../constructors/auth\_checkedPhone.md)  
+[auth\_checkedPhone](../constructors/auth_checkedPhone.md)  
 

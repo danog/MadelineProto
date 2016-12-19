@@ -2,23 +2,23 @@
 
 ### Possible values (constructors):
 
-[storage\_fileUnknown](../constructors/storage\_fileUnknown.md)  
+[storage\_fileUnknown](../constructors/storage_fileUnknown.md)  
 
-[storage\_fileJpeg](../constructors/storage\_fileJpeg.md)  
+[storage\_fileJpeg](../constructors/storage_fileJpeg.md)  
 
-[storage\_fileGif](../constructors/storage\_fileGif.md)  
+[storage\_fileGif](../constructors/storage_fileGif.md)  
 
-[storage\_filePng](../constructors/storage\_filePng.md)  
+[storage\_filePng](../constructors/storage_filePng.md)  
 
-[storage\_filePdf](../constructors/storage\_filePdf.md)  
+[storage\_filePdf](../constructors/storage_filePdf.md)  
 
-[storage\_fileMp3](../constructors/storage\_fileMp3.md)  
+[storage\_fileMp3](../constructors/storage_fileMp3.md)  
 
-[storage\_fileMov](../constructors/storage\_fileMov.md)  
+[storage\_fileMov](../constructors/storage_fileMov.md)  
 
-[storage\_filePartial](../constructors/storage\_filePartial.md)  
+[storage\_filePartial](../constructors/storage_filePartial.md)  
 
-[storage\_fileMp4](../constructors/storage\_fileMp4.md)  
+[storage\_fileMp4](../constructors/storage_fileMp4.md)  
 
-[storage\_fileWebp](../constructors/storage\_fileWebp.md)  
+[storage\_fileWebp](../constructors/storage_fileWebp.md)  
 

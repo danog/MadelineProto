@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[help\_termsOfService](../constructors/help\_termsOfService.md)  
+[help\_termsOfService](../constructors/help_termsOfService.md)  
 

@@ -24,12 +24,10 @@
 |date|[int](../types/int.md) | Required|
 |version|[int](../types/int.md) | Required|
 |restriction\_reason|[string](../types/string.md) | Optional|
+### Type: 
 
-
-### Type: [Chat](../types/Chat.md)
-
+[Chat](../types/Chat.md)
 ### Example:
-
 
 ```
 $channel = ['_' => channel', 'creator' => true, 'kicked' => true, 'left' => true, 'editor' => true, 'moderator' => true, 'broadcast' => true, 'verified' => true, 'megagroup' => true, 'restricted' => true, 'democracy' => true, 'signatures' => true, 'min' => true, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];

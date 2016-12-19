@@ -2,7 +2,7 @@
 
 
 
-### Return type: [account\_Authorizations](../types/account\_Authorizations.md)
+### Return type: [account\_Authorizations](../types/account_Authorizations.md)
 
 ### Example:
 

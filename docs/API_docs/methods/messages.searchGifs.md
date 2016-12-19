@@ -8,7 +8,7 @@
 |offset|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_FoundGifs](../types/messages\_FoundGifs.md)
+### Return type: [messages\_FoundGifs](../types/messages_FoundGifs.md)
 
 ### Example:
 

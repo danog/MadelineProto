@@ -8,7 +8,7 @@
 |user\_id|[InputUser](../types/InputUser.md) | Required|
 
 
-### Return type: [messages\_AffectedHistory](../types/messages\_AffectedHistory.md)
+### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 
 ### Example:
 

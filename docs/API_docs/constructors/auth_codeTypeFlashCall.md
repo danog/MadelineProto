@@ -1,11 +1,9 @@
 ## Constructor: auth\_codeTypeFlashCall  
 
+### Type: 
 
-
-### Type: [auth\_CodeType](../types/auth\_CodeType.md)
-
+[auth\_CodeType](../types/auth_CodeType.md)
 ### Example:
-
 
 ```
 $auth_codeTypeFlashCall = ['_' => auth_codeTypeFlashCall', ];

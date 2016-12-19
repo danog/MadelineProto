@@ -7,7 +7,7 @@
 |hash|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_FeaturedStickers](../types/messages\_FeaturedStickers.md)
+### Return type: [messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)
 
 ### Example:
 

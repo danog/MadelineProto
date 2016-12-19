@@ -9,7 +9,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [upload\_File](../types/upload\_File.md)
+### Return type: [upload\_File](../types/upload_File.md)
 
 ### Example:
 

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [messages\_AffectedMessages](../types/messages\_AffectedMessages.md)
-
+[messages\_AffectedMessages](../types/messages_AffectedMessages.md)
 ### Example:
-
 
 ```
 $messages_affectedMessages = ['_' => messages_affectedMessages', 'pts' => int, 'pts_count' => int, ];

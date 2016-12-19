@@ -1,11 +1,9 @@
 ## Constructor: inputDocumentEmpty  
 
+### Type: 
 
-
-### Type: [InputDocument](../types/InputDocument.md)
-
+[InputDocument](../types/InputDocument.md)
 ### Example:
-
 
 ```
 $inputDocumentEmpty = ['_' => inputDocumentEmpty', ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |key|[PrivacyKey](../types/PrivacyKey.md) | Required|
 |rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updatePrivacy = ['_' => updatePrivacy', 'key' => PrivacyKey, 'rules' => [Vector t], ];

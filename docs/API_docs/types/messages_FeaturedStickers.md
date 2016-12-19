@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[messages\_featuredStickersNotModified](../constructors/messages\_featuredStickersNotModified.md)  
+[messages\_featuredStickersNotModified](../constructors/messages_featuredStickersNotModified.md)  
 
-[messages\_featuredStickers](../constructors/messages\_featuredStickers.md)  
+[messages\_featuredStickers](../constructors/messages_featuredStickers.md)  
 

@@ -7,7 +7,7 @@
 |id|Array of [InputChannel](../types/InputChannel.md) | Required|
 
 
-### Return type: [messages\_Chats](../types/messages\_Chats.md)
+### Return type: [messages\_Chats](../types/messages_Chats.md)
 
 ### Example:
 

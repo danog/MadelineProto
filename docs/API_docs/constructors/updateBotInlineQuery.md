@@ -9,12 +9,10 @@
 |query|[string](../types/string.md) | Required|
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |offset|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateBotInlineQuery = ['_' => updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'offset' => string, ];

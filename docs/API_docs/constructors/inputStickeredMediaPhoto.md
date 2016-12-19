@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[InputPhoto](../types/InputPhoto.md) | Required|
+### Type: 
 
-
-### Type: [InputStickeredMedia](../types/InputStickeredMedia.md)
-
+[InputStickeredMedia](../types/InputStickeredMedia.md)
 ### Example:
-
 
 ```
 $inputStickeredMediaPhoto = ['_' => inputStickeredMediaPhoto', 'id' => InputPhoto, ];

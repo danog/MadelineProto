@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [WebPage](../types/WebPage.md)
-
+[WebPage](../types/WebPage.md)
 ### Example:
-
 
 ```
 $webPagePending = ['_' => webPagePending', 'id' => long, 'date' => int, ];

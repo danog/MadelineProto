@@ -1,11 +1,9 @@
 ## Constructor: storage\_filePdf  
 
+### Type: 
 
-
-### Type: [storage\_FileType](../types/storage\_FileType.md)
-
+[storage\_FileType](../types/storage_FileType.md)
 ### Example:
-
 
 ```
 $storage_filePdf = ['_' => storage_filePdf', ];

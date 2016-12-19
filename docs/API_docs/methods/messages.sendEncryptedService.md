@@ -9,7 +9,7 @@
 |data|[bytes](../types/bytes.md) | Required|
 
 
-### Return type: [messages\_SentEncryptedMessage](../types/messages\_SentEncryptedMessage.md)
+### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
 
 ### Example:
 

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+### Type: 
 
-
-### Type: [InputBotInlineMessage](../types/InputBotInlineMessage.md)
-
+[InputBotInlineMessage](../types/InputBotInlineMessage.md)
 ### Example:
-
 
 ```
 $inputBotInlineMessageGame = ['_' => inputBotInlineMessageGame', 'reply_markup' => ReplyMarkup, ];

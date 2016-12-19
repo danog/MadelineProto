@@ -1,11 +1,9 @@
 ## Constructor: updateSavedGifs  
 
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateSavedGifs = ['_' => updateSavedGifs', ];

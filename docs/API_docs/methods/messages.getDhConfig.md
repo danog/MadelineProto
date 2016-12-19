@@ -8,7 +8,7 @@
 |random\_length|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_DhConfig](../types/messages\_DhConfig.md)
+### Return type: [messages\_DhConfig](../types/messages_DhConfig.md)
 
 ### Example:
 

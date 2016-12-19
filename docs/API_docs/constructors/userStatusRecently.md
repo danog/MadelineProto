@@ -1,11 +1,9 @@
 ## Constructor: userStatusRecently  
 
+### Type: 
 
-
-### Type: [UserStatus](../types/UserStatus.md)
-
+[UserStatus](../types/UserStatus.md)
 ### Example:
-
 
 ```
 $userStatusRecently = ['_' => userStatusRecently', ];

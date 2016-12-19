@@ -2,9 +2,9 @@
 
 ### Possible values (constructors):
 
-[updates\_differenceEmpty](../constructors/updates\_differenceEmpty.md)  
+[updates\_differenceEmpty](../constructors/updates_differenceEmpty.md)  
 
-[updates\_difference](../constructors/updates\_difference.md)  
+[updates\_difference](../constructors/updates_difference.md)  
 
-[updates\_differenceSlice](../constructors/updates\_differenceSlice.md)  
+[updates\_differenceSlice](../constructors/updates_differenceSlice.md)  
 

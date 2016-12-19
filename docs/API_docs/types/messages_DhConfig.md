@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[messages\_dhConfigNotModified](../constructors/messages\_dhConfigNotModified.md)  
+[messages\_dhConfigNotModified](../constructors/messages_dhConfigNotModified.md)  
 
-[messages\_dhConfig](../constructors/messages\_dhConfig.md)  
+[messages\_dhConfig](../constructors/messages_dhConfig.md)  
 

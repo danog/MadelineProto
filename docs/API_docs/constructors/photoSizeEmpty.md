@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |type|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [PhotoSize](../types/PhotoSize.md)
-
+[PhotoSize](../types/PhotoSize.md)
 ### Example:
-
 
 ```
 $photoSizeEmpty = ['_' => photoSizeEmpty', 'type' => string, ];

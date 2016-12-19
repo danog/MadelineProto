@@ -1,11 +1,9 @@
 ## Constructor: vector  
 
+### Type: 
 
-
-### Type: [Vector t](../types/Vector t.md)
-
+[Vector t](../types/Vector t.md)
 ### Example:
-
 
 ```
 $vector = ['_' => vector', ];

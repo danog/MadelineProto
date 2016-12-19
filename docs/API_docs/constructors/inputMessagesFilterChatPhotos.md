@@ -1,11 +1,9 @@
 ## Constructor: inputMessagesFilterChatPhotos  
 
+### Type: 
 
-
-### Type: [MessagesFilter](../types/MessagesFilter.md)
-
+[MessagesFilter](../types/MessagesFilter.md)
 ### Example:
-
 
 ```
 $inputMessagesFilterChatPhotos = ['_' => inputMessagesFilterChatPhotos', ];

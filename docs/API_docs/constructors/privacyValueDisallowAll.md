@@ -1,11 +1,9 @@
 ## Constructor: privacyValueDisallowAll  
 
+### Type: 
 
-
-### Type: [PrivacyRule](../types/PrivacyRule.md)
-
+[PrivacyRule](../types/PrivacyRule.md)
 ### Example:
-
 
 ```
 $privacyValueDisallowAll = ['_' => privacyValueDisallowAll', ];

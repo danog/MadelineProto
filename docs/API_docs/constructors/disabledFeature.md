@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |feature|[string](../types/string.md) | Required|
 |description|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [DisabledFeature](../types/DisabledFeature.md)
-
+[DisabledFeature](../types/DisabledFeature.md)
 ### Example:
-
 
 ```
 $disabledFeature = ['_' => disabledFeature', 'feature' => string, 'description' => string, ];

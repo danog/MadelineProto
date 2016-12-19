@@ -1,11 +1,9 @@
 ## Constructor: messageMediaUnsupported  
 
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaUnsupported = ['_' => messageMediaUnsupported', ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |long|[double](../types/double.md) | Required|
 |lat|[double](../types/double.md) | Required|
+### Type: 
 
-
-### Type: [GeoPoint](../types/GeoPoint.md)
-
+[GeoPoint](../types/GeoPoint.md)
 ### Example:
-
 
 ```
 $geoPoint = ['_' => geoPoint', 'long' => double, 'lat' => double, ];

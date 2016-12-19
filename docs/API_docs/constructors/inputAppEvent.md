@@ -8,12 +8,10 @@
 |type|[string](../types/string.md) | Required|
 |peer|[long](../types/long.md) | Required|
 |data|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [InputAppEvent](../types/InputAppEvent.md)
-
+[InputAppEvent](../types/InputAppEvent.md)
 ### Example:
-
 
 ```
 $inputAppEvent = ['_' => inputAppEvent', 'time' => double, 'type' => string, 'peer' => long, 'data' => string, ];

@@ -2,9 +2,9 @@
 
 ### Possible values (constructors):
 
-[messages\_messages](../constructors/messages\_messages.md)  
+[messages\_messages](../constructors/messages_messages.md)  
 
-[messages\_messagesSlice](../constructors/messages\_messagesSlice.md)  
+[messages\_messagesSlice](../constructors/messages_messagesSlice.md)  
 
-[messages\_channelMessages](../constructors/messages\_channelMessages.md)  
+[messages\_channelMessages](../constructors/messages_channelMessages.md)  
 

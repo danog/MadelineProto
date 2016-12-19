@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |command|[string](../types/string.md) | Required|
 |description|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [BotCommand](../types/BotCommand.md)
-
+[BotCommand](../types/BotCommand.md)
 ### Example:
-
 
 ```
 $botCommand = ['_' => botCommand', 'command' => string, 'description' => string, ];

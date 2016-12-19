@@ -14,12 +14,10 @@
 |messages|Array of [Message](../types/Message.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [updates\_ChannelDifference](../types/updates\_ChannelDifference.md)
-
+[updates\_ChannelDifference](../types/updates_ChannelDifference.md)
 ### Example:
-
 
 ```
 $updates_channelDifferenceTooLong = ['_' => updates_channelDifferenceTooLong', 'final' => true, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];

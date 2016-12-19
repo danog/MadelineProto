@@ -19,12 +19,10 @@
 |duration|[int](../types/int.md) | Optional|
 |author|[string](../types/string.md) | Optional|
 |document|[Document](../types/Document.md) | Optional|
+### Type: 
 
-
-### Type: [WebPage](../types/WebPage.md)
-
+[WebPage](../types/WebPage.md)
 ### Example:
-
 
 ```
 $webPage = ['_' => webPage', 'id' => long, 'url' => string, 'display_url' => string, 'type' => string, 'site_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'embed_url' => string, 'embed_type' => string, 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => string, 'document' => Document, ];

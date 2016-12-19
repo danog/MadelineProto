@@ -9,7 +9,7 @@
 |phone\_code|[string](../types/string.md) | Required|
 
 
-### Return type: [auth\_Authorization](../types/auth\_Authorization.md)
+### Return type: [auth\_Authorization](../types/auth_Authorization.md)
 
 ### Example:
 

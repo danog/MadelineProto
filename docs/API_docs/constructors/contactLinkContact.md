@@ -1,11 +1,9 @@
 ## Constructor: contactLinkContact  
 
+### Type: 
 
-
-### Type: [ContactLink](../types/ContactLink.md)
-
+[ContactLink](../types/ContactLink.md)
 ### Example:
-
 
 ```
 $contactLinkContact = ['_' => contactLinkContact', ];

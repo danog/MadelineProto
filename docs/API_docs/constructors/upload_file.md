@@ -4,15 +4,13 @@
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|type|[storage\_FileType](../types/storage\_FileType.md) | Required|
+|type|[storage\_FileType](../types/storage_FileType.md) | Required|
 |mtime|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
+### Type: 
 
-
-### Type: [upload\_File](../types/upload\_File.md)
-
+[upload\_File](../types/upload_File.md)
 ### Example:
-
 
 ```
 $upload_file = ['_' => upload_file', 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];

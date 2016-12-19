@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_stickerSet](../constructors/messages\_stickerSet.md)  
+[messages\_stickerSet](../constructors/messages_stickerSet.md)  
 

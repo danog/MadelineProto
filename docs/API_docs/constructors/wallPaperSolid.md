@@ -8,12 +8,10 @@
 |title|[string](../types/string.md) | Required|
 |bg\_color|[int](../types/int.md) | Required|
 |color|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [WallPaper](../types/WallPaper.md)
-
+[WallPaper](../types/WallPaper.md)
 ### Example:
-
 
 ```
 $wallPaperSolid = ['_' => wallPaperSolid', 'id' => int, 'title' => string, 'bg_color' => int, 'color' => int, ];

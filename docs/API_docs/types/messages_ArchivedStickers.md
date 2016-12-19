@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_archivedStickers](../constructors/messages\_archivedStickers.md)  
+[messages\_archivedStickers](../constructors/messages_archivedStickers.md)  
 

@@ -10,12 +10,10 @@
 |date|[int](../types/int.md) | Required|
 |seq\_start|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updatesCombined = ['_' => updatesCombined', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq_start' => int, 'seq' => int, ];

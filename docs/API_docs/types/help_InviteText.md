@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[help\_inviteText](../constructors/help\_inviteText.md)  
+[help\_inviteText](../constructors/help_inviteText.md)  
 

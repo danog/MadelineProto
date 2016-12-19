@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [WebPage](../types/WebPage.md)
-
+[WebPage](../types/WebPage.md)
 ### Example:
-
 
 ```
 $webPageEmpty = ['_' => webPageEmpty', 'id' => long, ];

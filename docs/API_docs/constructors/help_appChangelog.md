@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [help\_AppChangelog](../types/help\_AppChangelog.md)
-
+[help\_AppChangelog](../types/help_AppChangelog.md)
 ### Example:
-
 
 ```
 $help_appChangelog = ['_' => help_appChangelog', 'text' => string, ];

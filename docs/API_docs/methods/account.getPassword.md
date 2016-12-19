@@ -2,7 +2,7 @@
 
 
 
-### Return type: [account\_Password](../types/account\_Password.md)
+### Return type: [account\_Password](../types/account_Password.md)
 
 ### Example:
 

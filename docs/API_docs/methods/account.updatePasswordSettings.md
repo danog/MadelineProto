@@ -5,7 +5,7 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |current\_password\_hash|[bytes](../types/bytes.md) | Required|
-|new\_settings|[account\_PasswordInputSettings](../types/account\_PasswordInputSettings.md) | Required|
+|new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Required|
 
 
 ### Return type: [Bool](../types/Bool.md)

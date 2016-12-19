@@ -4,13 +4,11 @@
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|stickerset|[messages\_StickerSet](../types/messages\_StickerSet.md) | Required|
+|stickerset|[messages\_StickerSet](../types/messages_StickerSet.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateNewStickerSet = ['_' => updateNewStickerSet', 'stickerset' => messages.StickerSet, ];

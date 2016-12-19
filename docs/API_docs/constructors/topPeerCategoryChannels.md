@@ -1,11 +1,9 @@
 ## Constructor: topPeerCategoryChannels  
 
+### Type: 
 
-
-### Type: [TopPeerCategory](../types/TopPeerCategory.md)
-
+[TopPeerCategory](../types/TopPeerCategory.md)
 ### Example:
-
 
 ```
 $topPeerCategoryChannels = ['_' => topPeerCategoryChannels', ];

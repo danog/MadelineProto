@@ -1,11 +1,9 @@
 ## Constructor: notifyAll  
 
+### Type: 
 
-
-### Type: [NotifyPeer](../types/NotifyPeer.md)
-
+[NotifyPeer](../types/NotifyPeer.md)
 ### Example:
-
 
 ```
 $notifyAll = ['_' => notifyAll', ];

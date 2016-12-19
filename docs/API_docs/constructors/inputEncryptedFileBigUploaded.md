@@ -7,12 +7,10 @@
 |id|[long](../types/long.md) | Required|
 |parts|[int](../types/int.md) | Required|
 |key\_fingerprint|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [InputEncryptedFile](../types/InputEncryptedFile.md)
-
+[InputEncryptedFile](../types/InputEncryptedFile.md)
 ### Example:
-
 
 ```
 $inputEncryptedFileBigUploaded = ['_' => inputEncryptedFileBigUploaded', 'id' => long, 'parts' => int, 'key_fingerprint' => int, ];

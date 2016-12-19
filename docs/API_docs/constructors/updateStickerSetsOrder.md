@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |masks|[Bool](../types/Bool.md) | Optional|
 |order|Array of [long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateStickerSetsOrder = ['_' => updateStickerSetsOrder', 'masks' => true, 'order' => [Vector t], ];

@@ -1,11 +1,9 @@
 ## Constructor: inputPeerSelf  
 
+### Type: 
 
-
-### Type: [InputPeer](../types/InputPeer.md)
-
+[InputPeer](../types/InputPeer.md)
 ### Example:
-
 
 ```
 $inputPeerSelf = ['_' => inputPeerSelf', ];

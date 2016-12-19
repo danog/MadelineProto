@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[photos\_photo](../constructors/photos\_photo.md)  
+[photos\_photo](../constructors/photos_photo.md)  
 

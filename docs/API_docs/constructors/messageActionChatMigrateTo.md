@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionChatMigrateTo = ['_' => messageActionChatMigrateTo', 'channel_id' => int, ];

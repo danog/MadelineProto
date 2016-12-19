@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Required|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaGeoPoint = ['_' => inputMediaGeoPoint', 'geo_point' => InputGeoPoint, ];

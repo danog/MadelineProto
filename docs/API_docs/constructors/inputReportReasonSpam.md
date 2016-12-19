@@ -1,11 +1,9 @@
 ## Constructor: inputReportReasonSpam  
 
+### Type: 
 
-
-### Type: [ReportReason](../types/ReportReason.md)
-
+[ReportReason](../types/ReportReason.md)
 ### Example:
-
 
 ```
 $inputReportReasonSpam = ['_' => inputReportReasonSpam', ];

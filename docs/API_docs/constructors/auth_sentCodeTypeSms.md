@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |length|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [auth\_SentCodeType](../types/auth\_SentCodeType.md)
-
+[auth\_SentCodeType](../types/auth_SentCodeType.md)
 ### Example:
-
 
 ```
 $auth_sentCodeTypeSms = ['_' => auth_sentCodeTypeSms', 'length' => int, ];

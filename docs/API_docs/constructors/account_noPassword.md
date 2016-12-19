@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |new\_salt|[bytes](../types/bytes.md) | Required|
 |email\_unconfirmed\_pattern|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [account\_Password](../types/account\_Password.md)
-
+[account\_Password](../types/account_Password.md)
 ### Example:
-
 
 ```
 $account_noPassword = ['_' => account_noPassword', 'new_salt' => bytes, 'email_unconfirmed_pattern' => string, ];

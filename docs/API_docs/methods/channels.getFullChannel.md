@@ -7,7 +7,7 @@
 |channel|[InputChannel](../types/InputChannel.md) | Required|
 
 
-### Return type: [messages\_ChatFull](../types/messages\_ChatFull.md)
+### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
 
 ### Example:
 

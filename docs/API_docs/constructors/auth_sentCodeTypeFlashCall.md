@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |pattern|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [auth\_SentCodeType](../types/auth\_SentCodeType.md)
-
+[auth\_SentCodeType](../types/auth_SentCodeType.md)
 ### Example:
-
 
 ```
 $auth_sentCodeTypeFlashCall = ['_' => auth_sentCodeTypeFlashCall', 'pattern' => string, ];

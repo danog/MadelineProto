@@ -9,12 +9,10 @@
 |access\_hash|[long](../types/long.md) | Required|
 |date|[int](../types/int.md) | Required|
 |sizes|Array of [PhotoSize](../types/PhotoSize.md) | Required|
+### Type: 
 
-
-### Type: [Photo](../types/Photo.md)
-
+[Photo](../types/Photo.md)
 ### Example:
-
 
 ```
 $photo = ['_' => photo', 'has_stickers' => true, 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [Vector t], ];

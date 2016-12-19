@@ -17,12 +17,10 @@
 |date|[int](../types/int.md) | Required|
 |version|[int](../types/int.md) | Required|
 |migrated\_to|[InputChannel](../types/InputChannel.md) | Optional|
+### Type: 
 
-
-### Type: [Chat](../types/Chat.md)
-
+[Chat](../types/Chat.md)
 ### Example:
-
 
 ```
 $chat = ['_' => chat', 'creator' => true, 'kicked' => true, 'left' => true, 'admins_enabled' => true, 'admin' => true, 'deactivated' => true, 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'version' => int, 'migrated_to' => InputChannel, ];

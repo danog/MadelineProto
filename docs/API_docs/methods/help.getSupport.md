@@ -2,7 +2,7 @@
 
 
 
-### Return type: [help\_Support](../types/help\_Support.md)
+### Return type: [help\_Support](../types/help_Support.md)
 
 ### Example:
 

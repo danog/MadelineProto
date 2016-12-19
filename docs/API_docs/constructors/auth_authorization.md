@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |tmp\_sessions|[int](../types/int.md) | Optional|
 |user|[User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [auth\_Authorization](../types/auth\_Authorization.md)
-
+[auth\_Authorization](../types/auth_Authorization.md)
 ### Example:
-
 
 ```
 $auth_authorization = ['_' => auth_authorization', 'tmp_sessions' => int, 'user' => User, ];

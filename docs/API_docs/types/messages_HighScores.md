@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[messages\_highScores](../constructors/messages\_highScores.md)  
+[messages\_highScores](../constructors/messages_highScores.md)  
 

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
 |random\_id|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateMessageID = ['_' => updateMessageID', 'id' => int, 'random_id' => long, ];

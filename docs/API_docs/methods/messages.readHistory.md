@@ -8,7 +8,7 @@
 |max\_id|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_AffectedMessages](../types/messages\_AffectedMessages.md)
+### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
 
 ### Example:
 

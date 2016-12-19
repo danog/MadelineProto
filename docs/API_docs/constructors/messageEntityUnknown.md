@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [MessageEntity](../types/MessageEntity.md)
-
+[MessageEntity](../types/MessageEntity.md)
 ### Example:
-
 
 ```
 $messageEntityUnknown = ['_' => messageEntityUnknown', 'offset' => int, 'length' => int, ];

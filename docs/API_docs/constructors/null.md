@@ -1,11 +1,9 @@
 ## Constructor: null  
 
+### Type: 
 
-
-### Type: [Null](../types/Null.md)
-
+[Null](../types/Null.md)
 ### Example:
-
 
 ```
 $null = ['_' => null', ];

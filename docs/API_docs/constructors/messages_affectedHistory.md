@@ -7,12 +7,10 @@
 |pts|[int](../types/int.md) | Required|
 |pts\_count|[int](../types/int.md) | Required|
 |offset|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [messages\_AffectedHistory](../types/messages\_AffectedHistory.md)
-
+[messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 ### Example:
-
 
 ```
 $messages_affectedHistory = ['_' => messages_affectedHistory', 'pts' => int, 'pts_count' => int, 'offset' => int, ];

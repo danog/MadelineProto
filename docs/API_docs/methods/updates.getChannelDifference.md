@@ -10,7 +10,7 @@
 |limit|[int](../types/int.md) | Required|
 
 
-### Return type: [updates\_ChannelDifference](../types/updates\_ChannelDifference.md)
+### Return type: [updates\_ChannelDifference](../types/updates_ChannelDifference.md)
 
 ### Example:
 

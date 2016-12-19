@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |title|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionChannelCreate = ['_' => messageActionChannelCreate', 'title' => string, ];

@@ -1,11 +1,9 @@
 ## Constructor: messageActionHistoryClear  
 
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionHistoryClear = ['_' => messageActionHistoryClear', ];

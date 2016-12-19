@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |caption|[string](../types/string.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+### Type: 
 
-
-### Type: [BotInlineMessage](../types/BotInlineMessage.md)
-
+[BotInlineMessage](../types/BotInlineMessage.md)
 ### Example:
-
 
 ```
 $botInlineMessageMediaAuto = ['_' => botInlineMessageMediaAuto', 'caption' => string, 'reply_markup' => ReplyMarkup, ];

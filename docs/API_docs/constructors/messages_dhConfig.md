@@ -8,12 +8,10 @@
 |p|[bytes](../types/bytes.md) | Required|
 |version|[int](../types/int.md) | Required|
 |random|[bytes](../types/bytes.md) | Required|
+### Type: 
 
-
-### Type: [messages\_DhConfig](../types/messages\_DhConfig.md)
-
+[messages\_DhConfig](../types/messages_DhConfig.md)
 ### Example:
-
 
 ```
 $messages_dhConfig = ['_' => messages_dhConfig', 'g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];

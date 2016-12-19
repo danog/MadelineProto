@@ -2,7 +2,7 @@
 
 ### Possible values (constructors):
 
-[help\_appUpdate](../constructors/help\_appUpdate.md)  
+[help\_appUpdate](../constructors/help_appUpdate.md)  
 
-[help\_noAppUpdate](../constructors/help\_noAppUpdate.md)  
+[help\_noAppUpdate](../constructors/help_noAppUpdate.md)  
 

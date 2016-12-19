@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |chats|Array of [Chat](../types/Chat.md) | Required|
+### Type: 
 
-
-### Type: [messages\_Chats](../types/messages\_Chats.md)
-
+[messages\_Chats](../types/messages_Chats.md)
 ### Example:
-
 
 ```
 $messages_chats = ['_' => messages_chats', 'chats' => [Vector t], ];

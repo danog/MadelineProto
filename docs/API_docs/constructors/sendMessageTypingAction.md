@@ -1,11 +1,9 @@
 ## Constructor: sendMessageTypingAction  
 
+### Type: 
 
-
-### Type: [SendMessageAction](../types/SendMessageAction.md)
-
+[SendMessageAction](../types/SendMessageAction.md)
 ### Example:
-
 
 ```
 $sendMessageTypingAction = ['_' => sendMessageTypingAction', ];

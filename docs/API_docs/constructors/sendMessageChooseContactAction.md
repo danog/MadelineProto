@@ -1,11 +1,9 @@
 ## Constructor: sendMessageChooseContactAction  
 
+### Type: 
 
-
-### Type: [SendMessageAction](../types/SendMessageAction.md)
-
+[SendMessageAction](../types/SendMessageAction.md)
 ### Example:
-
 
 ```
 $sendMessageChooseContactAction = ['_' => sendMessageChooseContactAction', ];

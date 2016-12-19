@@ -2,7 +2,7 @@
 
 
 
-### Return type: [auth\_PasswordRecovery](../types/auth\_PasswordRecovery.md)
+### Return type: [auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)
 
 ### Example:
 

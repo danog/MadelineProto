@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[InputPhoto](../types/InputPhoto.md) | Required|
 |caption|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaPhoto = ['_' => inputMediaPhoto', 'id' => InputPhoto, 'caption' => string, ];

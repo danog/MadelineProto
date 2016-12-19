@@ -12,12 +12,10 @@
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
 |pts|[int](../types/int.md) | Optional|
 |draft|[DraftMessage](../types/DraftMessage.md) | Optional|
+### Type: 
 
-
-### Type: [Dialog](../types/Dialog.md)
-
+[Dialog](../types/Dialog.md)
 ### Example:
-
 
 ```
 $dialog = ['_' => dialog', 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings, 'pts' => int, 'draft' => DraftMessage, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |phone|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateUserPhone = ['_' => updateUserPhone', 'user_id' => int, 'phone' => string, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |game\_id|[long](../types/long.md) | Required|
 |score|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionGameScore = ['_' => messageActionGameScore', 'game_id' => long, 'score' => int, ];

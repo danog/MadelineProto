@@ -1,11 +1,9 @@
 ## Constructor: sendMessageGamePlayAction  
 
+### Type: 
 
-
-### Type: [SendMessageAction](../types/SendMessageAction.md)
-
+[SendMessageAction](../types/SendMessageAction.md)
 ### Example:
-
 
 ```
 $sendMessageGamePlayAction = ['_' => sendMessageGamePlayAction', ];

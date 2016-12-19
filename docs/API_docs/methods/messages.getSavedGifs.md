@@ -7,7 +7,7 @@
 |hash|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_SavedGifs](../types/messages\_SavedGifs.md)
+### Return type: [messages\_SavedGifs](../types/messages_SavedGifs.md)
 
 ### Example:
 

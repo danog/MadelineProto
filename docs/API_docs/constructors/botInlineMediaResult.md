@@ -11,12 +11,10 @@
 |title|[string](../types/string.md) | Optional|
 |description|[string](../types/string.md) | Optional|
 |send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Required|
+### Type: 
 
-
-### Type: [BotInlineResult](../types/BotInlineResult.md)
-
+[BotInlineResult](../types/BotInlineResult.md)
 ### Example:
-
 
 ```
 $botInlineMediaResult = ['_' => botInlineMediaResult', 'id' => string, 'type' => string, 'photo' => Photo, 'document' => Document, 'title' => string, 'description' => string, 'send_message' => BotInlineMessage, ];

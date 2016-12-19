@@ -7,7 +7,7 @@
 |hash|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_AllStickers](../types/messages\_AllStickers.md)
+### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)
 
 ### Example:
 

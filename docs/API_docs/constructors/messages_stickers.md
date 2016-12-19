@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |hash|[string](../types/string.md) | Required|
 |stickers|Array of [Document](../types/Document.md) | Required|
+### Type: 
 
-
-### Type: [messages\_Stickers](../types/messages\_Stickers.md)
-
+[messages\_Stickers](../types/messages_Stickers.md)
 ### Example:
-
 
 ```
 $messages_stickers = ['_' => messages_stickers', 'hash' => string, 'stickers' => [Vector t], ];

@@ -7,7 +7,7 @@
 |file|[InputFile](../types/InputFile.md) | Required|
 
 
-### Return type: [photos\_Photo](../types/photos\_Photo.md)
+### Return type: [photos\_Photo](../types/photos_Photo.md)
 
 ### Example:
 

@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |expires|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [UserStatus](../types/UserStatus.md)
-
+[UserStatus](../types/UserStatus.md)
 ### Example:
-
 
 ```
 $userStatusOnline = ['_' => userStatusOnline', 'expires' => int, ];

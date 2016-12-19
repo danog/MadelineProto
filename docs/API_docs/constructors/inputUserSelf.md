@@ -1,11 +1,9 @@
 ## Constructor: inputUserSelf  
 
+### Type: 
 
-
-### Type: [InputUser](../types/InputUser.md)
-
+[InputUser](../types/InputUser.md)
 ### Example:
-
 
 ```
 $inputUserSelf = ['_' => inputUserSelf', ];

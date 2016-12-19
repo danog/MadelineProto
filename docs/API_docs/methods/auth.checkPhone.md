@@ -7,7 +7,7 @@
 |phone\_number|[string](../types/string.md) | Required|
 
 
-### Return type: [auth\_CheckedPhone](../types/auth\_CheckedPhone.md)
+### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)
 
 ### Example:
 

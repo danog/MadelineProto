@@ -1,11 +1,9 @@
 ## Constructor: topPeerCategoryBotsInline  
 
+### Type: 
 
-
-### Type: [TopPeerCategory](../types/TopPeerCategory.md)
-
+[TopPeerCategory](../types/TopPeerCategory.md)
 ### Example:
-
 
 ```
 $topPeerCategoryBotsInline = ['_' => topPeerCategoryBotsInline', ];

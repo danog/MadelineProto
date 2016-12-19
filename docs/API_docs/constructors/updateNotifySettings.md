@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |peer|[NotifyPeer](../types/NotifyPeer.md) | Required|
 |notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateNotifySettings = ['_' => updateNotifySettings', 'peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];

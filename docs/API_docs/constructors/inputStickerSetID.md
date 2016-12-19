@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputStickerSet](../types/InputStickerSet.md)
-
+[InputStickerSet](../types/InputStickerSet.md)
 ### Example:
-
 
 ```
 $inputStickerSetID = ['_' => inputStickerSetID', 'id' => long, 'access_hash' => long, ];

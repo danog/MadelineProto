@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |selective|[Bool](../types/Bool.md) | Optional|
+### Type: 
 
-
-### Type: [ReplyMarkup](../types/ReplyMarkup.md)
-
+[ReplyMarkup](../types/ReplyMarkup.md)
 ### Example:
-
 
 ```
 $replyKeyboardHide = ['_' => replyKeyboardHide', 'selective' => true, ];

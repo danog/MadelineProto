@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[channels\_channelParticipants](../constructors/channels\_channelParticipants.md)  
+[channels\_channelParticipants](../constructors/channels_channelParticipants.md)  
 

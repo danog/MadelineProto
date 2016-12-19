@@ -9,7 +9,7 @@
 |current\_number|[Bool](../types/Bool.md) | Optional|
 
 
-### Return type: [auth\_SentCode](../types/auth\_SentCode.md)
+### Return type: [auth\_SentCode](../types/auth_SentCode.md)
 
 ### Example:
 

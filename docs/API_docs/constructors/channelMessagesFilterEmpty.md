@@ -1,11 +1,9 @@
 ## Constructor: channelMessagesFilterEmpty  
 
+### Type: 
 
-
-### Type: [ChannelMessagesFilter](../types/ChannelMessagesFilter.md)
-
+[ChannelMessagesFilter](../types/ChannelMessagesFilter.md)
 ### Example:
-
 
 ```
 $channelMessagesFilterEmpty = ['_' => channelMessagesFilterEmpty', ];

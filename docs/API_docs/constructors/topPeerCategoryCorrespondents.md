@@ -1,11 +1,9 @@
 ## Constructor: topPeerCategoryCorrespondents  
 
+### Type: 
 
-
-### Type: [TopPeerCategory](../types/TopPeerCategory.md)
-
+[TopPeerCategory](../types/TopPeerCategory.md)
 ### Example:
-
 
 ```
 $topPeerCategoryCorrespondents = ['_' => topPeerCategoryCorrespondents', ];

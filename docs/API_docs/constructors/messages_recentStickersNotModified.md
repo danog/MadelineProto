@@ -1,11 +1,9 @@
 ## Constructor: messages\_recentStickersNotModified  
 
+### Type: 
 
-
-### Type: [messages\_RecentStickers](../types/messages\_RecentStickers.md)
-
+[messages\_RecentStickers](../types/messages_RecentStickers.md)
 ### Example:
-
 
 ```
 $messages_recentStickersNotModified = ['_' => messages_recentStickersNotModified', ];

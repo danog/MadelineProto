@@ -8,7 +8,7 @@
 |replace|[Bool](../types/Bool.md) | Required|
 
 
-### Return type: [contacts\_ImportedContacts](../types/contacts\_ImportedContacts.md)
+### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
 
 ### Example:
 

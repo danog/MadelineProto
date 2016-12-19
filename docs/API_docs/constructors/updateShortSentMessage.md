@@ -11,12 +11,10 @@
 |date|[int](../types/int.md) | Required|
 |media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updateShortSentMessage = ['_' => updateShortSentMessage', 'out' => true, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [Vector t], ];

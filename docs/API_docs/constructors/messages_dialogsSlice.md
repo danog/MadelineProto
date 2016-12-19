@@ -9,12 +9,10 @@
 |messages|Array of [Message](../types/Message.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [messages\_Dialogs](../types/messages\_Dialogs.md)
-
+[messages\_Dialogs](../types/messages_Dialogs.md)
 ### Example:
-
 
 ```
 $messages_dialogsSlice = ['_' => messages_dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];

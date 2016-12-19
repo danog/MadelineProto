@@ -1,11 +1,9 @@
 ## Constructor: encryptedFileEmpty  
 
+### Type: 
 
-
-### Type: [EncryptedFile](../types/EncryptedFile.md)
-
+[EncryptedFile](../types/EncryptedFile.md)
 ### Example:
-
 
 ```
 $encryptedFileEmpty = ['_' => encryptedFileEmpty', ];

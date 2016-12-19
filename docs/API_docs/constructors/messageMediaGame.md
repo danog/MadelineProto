@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |game|[Game](../types/Game.md) | Required|
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaGame = ['_' => messageMediaGame', 'game' => Game, ];

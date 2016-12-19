@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[account\_authorizations](../constructors/account\_authorizations.md)  
+[account\_authorizations](../constructors/account_authorizations.md)  
 

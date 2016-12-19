@@ -1,11 +1,9 @@
 ## Constructor: inputChannelEmpty  
 
+### Type: 
 
-
-### Type: [InputChannel](../types/InputChannel.md)
-
+[InputChannel](../types/InputChannel.md)
 ### Example:
-
 
 ```
 $inputChannelEmpty = ['_' => inputChannelEmpty', ];

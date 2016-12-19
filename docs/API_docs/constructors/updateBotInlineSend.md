@@ -9,12 +9,10 @@
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |id|[string](../types/string.md) | Required|
 |msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Optional|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateBotInlineSend = ['_' => updateBotInlineSend', 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'id' => string, 'msg_id' => InputBotInlineMessageID, ];

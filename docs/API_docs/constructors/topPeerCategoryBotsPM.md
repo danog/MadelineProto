@@ -1,11 +1,9 @@
 ## Constructor: topPeerCategoryBotsPM  
 
+### Type: 
 
-
-### Type: [TopPeerCategory](../types/TopPeerCategory.md)
-
+[TopPeerCategory](../types/TopPeerCategory.md)
 ### Example:
-
 
 ```
 $topPeerCategoryBotsPM = ['_' => topPeerCategoryBotsPM', ];

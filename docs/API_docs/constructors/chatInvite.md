@@ -12,12 +12,10 @@
 |photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
 |participants\_count|[int](../types/int.md) | Required|
 |participants|Array of [User](../types/User.md) | Optional|
+### Type: 
 
-
-### Type: [ChatInvite](../types/ChatInvite.md)
-
+[ChatInvite](../types/ChatInvite.md)
 ### Example:
-
 
 ```
 $chatInvite = ['_' => chatInvite', 'channel' => true, 'broadcast' => true, 'public' => true, 'megagroup' => true, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'participants' => [Vector t], ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |phone\_number|[string](../types/string.md) | Required|
 |user|[User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [help\_Support](../types/help\_Support.md)
-
+[help\_Support](../types/help_Support.md)
 ### Example:
-
 
 ```
 $help_support = ['_' => help_support', 'phone_number' => string, 'user' => User, ];

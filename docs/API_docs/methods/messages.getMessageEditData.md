@@ -8,7 +8,7 @@
 |id|[int](../types/int.md) | Required|
 
 
-### Return type: [messages\_MessageEditData](../types/messages\_MessageEditData.md)
+### Return type: [messages\_MessageEditData](../types/messages_MessageEditData.md)
 
 ### Example:
 

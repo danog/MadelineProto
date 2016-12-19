@@ -1,11 +1,9 @@
 ## Constructor: inputMessagesFilterUrl  
 
+### Type: 
 
-
-### Type: [MessagesFilter](../types/MessagesFilter.md)
-
+[MessagesFilter](../types/MessagesFilter.md)
 ### Example:
-
 
 ```
 $inputMessagesFilterUrl = ['_' => inputMessagesFilterUrl', ];

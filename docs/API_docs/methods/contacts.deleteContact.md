@@ -7,7 +7,7 @@
 |id|[InputUser](../types/InputUser.md) | Required|
 
 
-### Return type: [contacts\_Link](../types/contacts\_Link.md)
+### Return type: [contacts\_Link](../types/contacts_Link.md)
 
 ### Example:
 

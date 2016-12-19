@@ -1,11 +1,9 @@
 ## Constructor: true  
 
+### Type: 
 
-
-### Type: [True](../types/True.md)
-
+[True](../types/True.md)
 ### Example:
-
 
 ```
 $true = ['_' => true', ];

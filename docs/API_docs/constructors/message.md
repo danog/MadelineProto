@@ -22,12 +22,10 @@
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |views|[int](../types/int.md) | Optional|
 |edit\_date|[int](../types/int.md) | Optional|
+### Type: 
 
-
-### Type: [Message](../types/Message.md)
-
+[Message](../types/Message.md)
 ### Example:
-
 
 ```
 $message = ['_' => message', 'out' => true, 'mentioned' => true, 'media_unread' => true, 'silent' => true, 'post' => true, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'fwd_from' => MessageFwdHeader, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'date' => int, 'message' => string, 'media' => MessageMedia, 'reply_markup' => ReplyMarkup, 'entities' => [Vector t], 'views' => int, 'edit_date' => int, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputPeer](../types/InputPeer.md)
-
+[InputPeer](../types/InputPeer.md)
 ### Example:
-
 
 ```
 $inputPeerChannel = ['_' => inputPeerChannel', 'channel_id' => int, 'access_hash' => long, ];

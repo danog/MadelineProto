@@ -1,11 +1,9 @@
 ## Constructor: messages\_featuredStickersNotModified  
 
+### Type: 
 
-
-### Type: [messages\_FeaturedStickers](../types/messages\_FeaturedStickers.md)
-
+[messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)
 ### Example:
-
 
 ```
 $messages_featuredStickersNotModified = ['_' => messages_featuredStickersNotModified', ];

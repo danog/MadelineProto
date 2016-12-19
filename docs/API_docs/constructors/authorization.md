@@ -16,12 +16,10 @@
 |ip|[string](../types/string.md) | Required|
 |country|[string](../types/string.md) | Required|
 |region|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [Authorization](../types/Authorization.md)
-
+[Authorization](../types/Authorization.md)
 ### Example:
-
 
 ```
 $authorization = ['_' => authorization', 'hash' => long, 'device_model' => string, 'platform' => string, 'system_version' => string, 'api_id' => int, 'app_name' => string, 'app_version' => string, 'date_created' => int, 'date_active' => int, 'ip' => string, 'country' => string, 'region' => string, ];

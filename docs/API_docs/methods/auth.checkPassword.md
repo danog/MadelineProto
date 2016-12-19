@@ -7,7 +7,7 @@
 |password\_hash|[bytes](../types/bytes.md) | Required|
 
 
-### Return type: [auth\_Authorization](../types/auth\_Authorization.md)
+### Return type: [auth\_Authorization](../types/auth_Authorization.md)
 
 ### Example:
 

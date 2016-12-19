@@ -1,11 +1,9 @@
 ## Constructor: contactLinkUnknown  
 
+### Type: 
 
-
-### Type: [ContactLink](../types/ContactLink.md)
-
+[ContactLink](../types/ContactLink.md)
 ### Example:
-
 
 ```
 $contactLinkUnknown = ['_' => contactLinkUnknown', ];

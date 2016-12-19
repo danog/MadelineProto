@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |buttons|Array of [KeyboardButton](../types/KeyboardButton.md) | Required|
+### Type: 
 
-
-### Type: [KeyboardButtonRow](../types/KeyboardButtonRow.md)
-
+[KeyboardButtonRow](../types/KeyboardButtonRow.md)
 ### Example:
-
 
 ```
 $keyboardButtonRow = ['_' => keyboardButtonRow', 'buttons' => [Vector t], ];

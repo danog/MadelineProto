@@ -1,11 +1,9 @@
 ## Constructor: documentAttributeAnimated  
 
+### Type: 
 
-
-### Type: [DocumentAttribute](../types/DocumentAttribute.md)
-
+[DocumentAttribute](../types/DocumentAttribute.md)
 ### Example:
-
 
 ```
 $documentAttributeAnimated = ['_' => documentAttributeAnimated', ];

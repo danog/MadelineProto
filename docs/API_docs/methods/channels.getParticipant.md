@@ -8,7 +8,7 @@
 |user\_id|[InputUser](../types/InputUser.md) | Required|
 
 
-### Return type: [channels\_ChannelParticipant](../types/channels\_ChannelParticipant.md)
+### Return type: [channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)
 
 ### Example:
 

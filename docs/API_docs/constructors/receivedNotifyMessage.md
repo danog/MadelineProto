@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)
-
+[ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)
 ### Example:
-
 
 ```
 $receivedNotifyMessage = ['_' => receivedNotifyMessage', 'id' => int, ];

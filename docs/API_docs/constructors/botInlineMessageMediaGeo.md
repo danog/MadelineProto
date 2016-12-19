@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |geo|[GeoPoint](../types/GeoPoint.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+### Type: 
 
-
-### Type: [BotInlineMessage](../types/BotInlineMessage.md)
-
+[BotInlineMessage](../types/BotInlineMessage.md)
 ### Example:
-
 
 ```
 $botInlineMessageMediaGeo = ['_' => botInlineMessageMediaGeo', 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];

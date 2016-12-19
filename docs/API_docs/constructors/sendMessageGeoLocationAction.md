@@ -1,11 +1,9 @@
 ## Constructor: sendMessageGeoLocationAction  
 
+### Type: 
 
-
-### Type: [SendMessageAction](../types/SendMessageAction.md)
-
+[SendMessageAction](../types/SendMessageAction.md)
 ### Example:
-
 
 ```
 $sendMessageGeoLocationAction = ['_' => sendMessageGeoLocationAction', ];

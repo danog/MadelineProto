@@ -7,12 +7,10 @@
 |offset|[int](../types/int.md) | Required|
 |length|[int](../types/int.md) | Required|
 |user\_id|[InputUser](../types/InputUser.md) | Required|
+### Type: 
 
-
-### Type: [MessageEntity](../types/MessageEntity.md)
-
+[MessageEntity](../types/MessageEntity.md)
 ### Example:
-
 
 ```
 $inputMessageEntityMentionName = ['_' => inputMessageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => InputUser, ];

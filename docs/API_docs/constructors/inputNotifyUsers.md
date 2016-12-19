@@ -1,11 +1,9 @@
 ## Constructor: inputNotifyUsers  
 
+### Type: 
 
-
-### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
-
+[InputNotifyPeer](../types/InputNotifyPeer.md)
 ### Example:
-
 
 ```
 $inputNotifyUsers = ['_' => inputNotifyUsers', ];

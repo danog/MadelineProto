@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputDocument](../types/InputDocument.md)
-
+[InputDocument](../types/InputDocument.md)
 ### Example:
-
 
 ```
 $inputDocument = ['_' => inputDocument', 'id' => long, 'access_hash' => long, ];

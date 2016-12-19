@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |next\_offset|[int](../types/int.md) | Required|
 |results|Array of [FoundGif](../types/FoundGif.md) | Required|
+### Type: 
 
-
-### Type: [messages\_FoundGifs](../types/messages\_FoundGifs.md)
-
+[messages\_FoundGifs](../types/messages_FoundGifs.md)
 ### Example:
-
 
 ```
 $messages_foundGifs = ['_' => messages_foundGifs', 'next_offset' => int, 'results' => [Vector t], ];

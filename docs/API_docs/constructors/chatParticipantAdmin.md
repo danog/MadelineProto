@@ -7,12 +7,10 @@
 |user\_id|[int](../types/int.md) | Required|
 |inviter\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [ChatParticipant](../types/ChatParticipant.md)
-
+[ChatParticipant](../types/ChatParticipant.md)
 ### Example:
-
 
 ```
 $chatParticipantAdmin = ['_' => chatParticipantAdmin', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];

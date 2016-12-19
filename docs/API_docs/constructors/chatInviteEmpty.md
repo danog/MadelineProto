@@ -1,11 +1,9 @@
 ## Constructor: chatInviteEmpty  
 
+### Type: 
 
-
-### Type: [ExportedChatInvite](../types/ExportedChatInvite.md)
-
+[ExportedChatInvite](../types/ExportedChatInvite.md)
 ### Example:
-
 
 ```
 $chatInviteEmpty = ['_' => chatInviteEmpty', ];

@@ -1,11 +1,9 @@
 ## Constructor: inputUserEmpty  
 
+### Type: 
 
-
-### Type: [InputUser](../types/InputUser.md)
-
+[InputUser](../types/InputUser.md)
 ### Example:
-
 
 ```
 $inputUserEmpty = ['_' => inputUserEmpty', ];

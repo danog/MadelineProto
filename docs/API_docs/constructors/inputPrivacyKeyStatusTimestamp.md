@@ -1,11 +1,9 @@
 ## Constructor: inputPrivacyKeyStatusTimestamp  
 
+### Type: 
 
-
-### Type: [InputPrivacyKey](../types/InputPrivacyKey.md)
-
+[InputPrivacyKey](../types/InputPrivacyKey.md)
 ### Example:
-
 
 ```
 $inputPrivacyKeyStatusTimestamp = ['_' => inputPrivacyKeyStatusTimestamp', ];

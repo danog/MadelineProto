@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateUserTyping = ['_' => updateUserTyping', 'user_id' => int, 'action' => SendMessageAction, ];

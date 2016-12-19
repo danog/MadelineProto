@@ -1,11 +1,9 @@
 ## Constructor: messageActionEmpty  
 
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionEmpty = ['_' => messageActionEmpty', ];

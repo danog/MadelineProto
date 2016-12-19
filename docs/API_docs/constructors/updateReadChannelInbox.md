@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |channel\_id|[int](../types/int.md) | Required|
 |max\_id|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateReadChannelInbox = ['_' => updateReadChannelInbox', 'channel_id' => int, 'max_id' => int, ];

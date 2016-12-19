@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |id|[long](../types/long.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputEncryptedFile](../types/InputEncryptedFile.md)
-
+[InputEncryptedFile](../types/InputEncryptedFile.md)
 ### Example:
-
 
 ```
 $inputEncryptedFile = ['_' => inputEncryptedFile', 'id' => long, 'access_hash' => long, ];

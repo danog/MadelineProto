@@ -11,12 +11,10 @@
 |chat\_instance|[long](../types/long.md) | Required|
 |data|[bytes](../types/bytes.md) | Optional|
 |game\_short\_name|[string](../types/string.md) | Optional|
+### Type: 
 
-
-### Type: [Update](../types/Update.md)
-
+[Update](../types/Update.md)
 ### Example:
-
 
 ```
 $updateBotCallbackQuery = ['_' => updateBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'peer' => Peer, 'msg_id' => int, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];

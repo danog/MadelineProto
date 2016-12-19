@@ -7,7 +7,7 @@
 |hash|[string](../types/string.md) | Required|
 
 
-### Return type: [contacts\_Contacts](../types/contacts\_Contacts.md)
+### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)
 
 ### Example:
 

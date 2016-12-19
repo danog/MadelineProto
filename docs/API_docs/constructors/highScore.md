@@ -7,12 +7,10 @@
 |pos|[int](../types/int.md) | Required|
 |user\_id|[int](../types/int.md) | Required|
 |score|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [HighScore](../types/HighScore.md)
-
+[HighScore](../types/HighScore.md)
 ### Example:
-
 
 ```
 $highScore = ['_' => highScore', 'pos' => int, 'user_id' => int, 'score' => int, ];

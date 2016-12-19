@@ -26,12 +26,10 @@
 |bot\_info\_version|[int](../types/int.md) | Optional|
 |restriction\_reason|[string](../types/string.md) | Optional|
 |bot\_inline\_placeholder|[string](../types/string.md) | Optional|
+### Type: 
 
-
-### Type: [User](../types/User.md)
-
+[User](../types/User.md)
 ### Example:
-
 
 ```
 $user = ['_' => user', 'self' => true, 'contact' => true, 'mutual_contact' => true, 'deleted' => true, 'bot' => true, 'bot_chat_history' => true, 'bot_nochats' => true, 'verified' => true, 'restricted' => true, 'min' => true, 'bot_inline_geo' => true, 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, 'restriction_reason' => string, 'bot_inline_placeholder' => string, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |text|[string](../types/string.md) | Required|
 |data|[bytes](../types/bytes.md) | Required|
+### Type: 
 
-
-### Type: [KeyboardButton](../types/KeyboardButton.md)
-
+[KeyboardButton](../types/KeyboardButton.md)
 ### Example:
-
 
 ```
 $keyboardButtonCallback = ['_' => keyboardButtonCallback', 'text' => string, 'data' => bytes, ];

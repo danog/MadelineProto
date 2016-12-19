@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |emoticon|[string](../types/string.md) | Required|
 |documents|Array of [long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [StickerPack](../types/StickerPack.md)
-
+[StickerPack](../types/StickerPack.md)
 ### Example:
-
 
 ```
 $stickerPack = ['_' => stickerPack', 'emoticon' => string, 'documents' => [Vector t], ];

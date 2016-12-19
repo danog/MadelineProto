@@ -2,7 +2,7 @@
 
 
 
-### Return type: [help\_AppChangelog](../types/help\_AppChangelog.md)
+### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)
 
 ### Example:
 

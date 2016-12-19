@@ -14,12 +14,10 @@
 |short\_name|[string](../types/string.md) | Required|
 |count|[int](../types/int.md) | Required|
 |hash|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [StickerSet](../types/StickerSet.md)
-
+[StickerSet](../types/StickerSet.md)
 ### Example:
-
 
 ```
 $stickerSet = ['_' => stickerSet', 'installed' => true, 'archived' => true, 'official' => true, 'masks' => true, 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];

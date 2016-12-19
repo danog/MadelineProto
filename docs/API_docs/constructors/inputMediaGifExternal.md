@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |url|[string](../types/string.md) | Required|
 |q|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaGifExternal = ['_' => inputMediaGifExternal', 'url' => string, 'q' => string, ];

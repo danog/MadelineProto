@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |user\_id|[int](../types/int.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputPeer](../types/InputPeer.md)
-
+[InputPeer](../types/InputPeer.md)
 ### Example:
-
 
 ```
 $inputPeerUser = ['_' => inputPeerUser', 'user_id' => int, 'access_hash' => long, ];

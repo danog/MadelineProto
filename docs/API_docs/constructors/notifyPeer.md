@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |peer|[Peer](../types/Peer.md) | Required|
+### Type: 
 
-
-### Type: [NotifyPeer](../types/NotifyPeer.md)
-
+[NotifyPeer](../types/NotifyPeer.md)
 ### Example:
-
 
 ```
 $notifyPeer = ['_' => notifyPeer', 'peer' => Peer, ];

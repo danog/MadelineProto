@@ -7,12 +7,10 @@
 |file|[InputFile](../types/InputFile.md) | Required|
 |caption|[string](../types/string.md) | Required|
 |stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+### Type: 
 
-
-### Type: [InputMedia](../types/InputMedia.md)
-
+[InputMedia](../types/InputMedia.md)
 ### Example:
-
 
 ```
 $inputMediaUploadedPhoto = ['_' => inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => string, 'stickers' => [Vector t], ];

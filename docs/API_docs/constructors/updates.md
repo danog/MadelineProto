@@ -9,12 +9,10 @@
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |date|[int](../types/int.md) | Required|
 |seq|[int](../types/int.md) | Required|
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updates = ['_' => updates', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq' => int, ];

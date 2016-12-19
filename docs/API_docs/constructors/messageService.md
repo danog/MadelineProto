@@ -15,12 +15,10 @@
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Required|
 |action|[MessageAction](../types/MessageAction.md) | Required|
+### Type: 
 
-
-### Type: [Message](../types/Message.md)
-
+[Message](../types/Message.md)
 ### Example:
-
 
 ```
 $messageService = ['_' => messageService', 'out' => true, 'mentioned' => true, 'media_unread' => true, 'silent' => true, 'post' => true, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'reply_to_msg_id' => int, 'date' => int, 'action' => MessageAction, ];

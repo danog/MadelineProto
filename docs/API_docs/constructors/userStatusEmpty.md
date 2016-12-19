@@ -1,11 +1,9 @@
 ## Constructor: userStatusEmpty  
 
+### Type: 
 
-
-### Type: [UserStatus](../types/UserStatus.md)
-
+[UserStatus](../types/UserStatus.md)
 ### Example:
-
 
 ```
 $userStatusEmpty = ['_' => userStatusEmpty', ];

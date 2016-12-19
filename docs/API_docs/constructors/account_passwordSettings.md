@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |email|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [account\_PasswordSettings](../types/account\_PasswordSettings.md)
-
+[account\_PasswordSettings](../types/account_PasswordSettings.md)
 ### Example:
-
 
 ```
 $account_passwordSettings = ['_' => account_passwordSettings', 'email' => string, ];

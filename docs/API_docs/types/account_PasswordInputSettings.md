@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[account\_passwordInputSettings](../constructors/account\_passwordInputSettings.md)  
+[account\_passwordInputSettings](../constructors/account_passwordInputSettings.md)  
 

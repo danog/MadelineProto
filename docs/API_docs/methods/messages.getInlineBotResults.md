@@ -11,7 +11,7 @@
 |offset|[string](../types/string.md) | Required|
 
 
-### Return type: [messages\_BotResults](../types/messages\_BotResults.md)
+### Return type: [messages\_BotResults](../types/messages_BotResults.md)
 
 ### Example:
 

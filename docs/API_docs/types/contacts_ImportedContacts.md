@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[contacts\_importedContacts](../constructors/contacts\_importedContacts.md)  
+[contacts\_importedContacts](../constructors/contacts_importedContacts.md)  
 

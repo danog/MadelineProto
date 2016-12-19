@@ -2,5 +2,5 @@
 
 ### Possible values (constructors):
 
-[auth\_passwordRecovery](../constructors/auth\_passwordRecovery.md)  
+[auth\_passwordRecovery](../constructors/auth_passwordRecovery.md)  
 

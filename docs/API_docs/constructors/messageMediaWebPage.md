@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |webpage|[WebPage](../types/WebPage.md) | Required|
+### Type: 
 
-
-### Type: [MessageMedia](../types/MessageMedia.md)
-
+[MessageMedia](../types/MessageMedia.md)
 ### Example:
-
 
 ```
 $messageMediaWebPage = ['_' => messageMediaWebPage', 'webpage' => WebPage, ];

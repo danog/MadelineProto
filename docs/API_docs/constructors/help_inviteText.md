@@ -5,12 +5,10 @@
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |message|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [help\_InviteText](../types/help\_InviteText.md)
-
+[help\_InviteText](../types/help_InviteText.md)
 ### Example:
-
 
 ```
 $help_inviteText = ['_' => help_inviteText', 'message' => string, ];

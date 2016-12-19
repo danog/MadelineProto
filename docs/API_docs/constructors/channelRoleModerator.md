@@ -1,11 +1,9 @@
 ## Constructor: channelRoleModerator  
 
+### Type: 
 
-
-### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
-
+[ChannelParticipantRole](../types/ChannelParticipantRole.md)
 ### Example:
-
 
 ```
 $channelRoleModerator = ['_' => channelRoleModerator', ];

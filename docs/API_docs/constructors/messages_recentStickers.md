@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |hash|[int](../types/int.md) | Required|
 |stickers|Array of [Document](../types/Document.md) | Required|
+### Type: 
 
-
-### Type: [messages\_RecentStickers](../types/messages\_RecentStickers.md)
-
+[messages\_RecentStickers](../types/messages_RecentStickers.md)
 ### Example:
-
 
 ```
 $messages_recentStickers = ['_' => messages_recentStickers', 'hash' => int, 'stickers' => [Vector t], ];

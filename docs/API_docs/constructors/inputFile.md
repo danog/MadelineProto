@@ -8,12 +8,10 @@
 |parts|[int](../types/int.md) | Required|
 |name|[string](../types/string.md) | Required|
 |md5\_checksum|[string](../types/string.md) | Required|
+### Type: 
 
-
-### Type: [InputFile](../types/InputFile.md)
-
+[InputFile](../types/InputFile.md)
 ### Example:
-
 
 ```
 $inputFile = ['_' => inputFile', 'id' => long, 'parts' => int, 'name' => string, 'md5_checksum' => string, ];

@@ -6,12 +6,10 @@
 |----------|:-------------:|---------:|
 |chat\_id|[int](../types/int.md) | Required|
 |access\_hash|[long](../types/long.md) | Required|
+### Type: 
 
-
-### Type: [InputEncryptedChat](../types/InputEncryptedChat.md)
-
+[InputEncryptedChat](../types/InputEncryptedChat.md)
 ### Example:
-
 
 ```
 $inputEncryptedChat = ['_' => inputEncryptedChat', 'chat_id' => int, 'access_hash' => long, ];

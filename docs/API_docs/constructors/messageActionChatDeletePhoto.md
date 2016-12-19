@@ -1,11 +1,9 @@
 ## Constructor: messageActionChatDeletePhoto  
 
+### Type: 
 
-
-### Type: [MessageAction](../types/MessageAction.md)
-
+[MessageAction](../types/MessageAction.md)
 ### Example:
-
 
 ```
 $messageActionChatDeletePhoto = ['_' => messageActionChatDeletePhoto', ];

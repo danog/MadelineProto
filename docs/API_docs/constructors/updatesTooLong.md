@@ -1,11 +1,9 @@
 ## Constructor: updatesTooLong  
 
+### Type: 
 
-
-### Type: [Updates](../types/Updates.md)
-
+[Updates](../types/Updates.md)
 ### Example:
-
 
 ```
 $updatesTooLong = ['_' => updatesTooLong', ];

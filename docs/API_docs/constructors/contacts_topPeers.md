@@ -7,12 +7,10 @@
 |categories|Array of [TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
+### Type: 
 
-
-### Type: [contacts\_TopPeers](../types/contacts\_TopPeers.md)
-
+[contacts\_TopPeers](../types/contacts_TopPeers.md)
 ### Example:
-
 
 ```
 $contacts_topPeers = ['_' => contacts_topPeers', 'categories' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
