@@ -1,910 +1,910 @@
 # Constructors  
 
-[$AccountDaysTTL](../types/AccountDaysTTL.md) = \['days' => [int](../types/int.md), \];  
+[$accountDaysTTL](../constructors/accountDaysTTL.md) = \['days' => [int](../types/int.md), \];  
 
-[$account\_Authorizations](../types/account_Authorizations.md) = \['authorizations' => \[[Authorization](../types/Authorization.md)\], \];  
+[$account\_authorizations](../constructors/account_authorizations.md) = \['authorizations' => \[[Authorization](../types/Authorization.md)\], \];  
 
-[$account\_Password](../types/account_Password.md) = \['new_salt' => [bytes](../types/bytes.md), 'email_unconfirmed_pattern' => [string](../types/string.md), \];  
+[$account\_noPassword](../constructors/account_noPassword.md) = \['new_salt' => [bytes](../types/bytes.md), 'email_unconfirmed_pattern' => [string](../types/string.md), \];  
 
-[$account\_Password](../types/account_Password.md) = \['current_salt' => [bytes](../types/bytes.md), 'new_salt' => [bytes](../types/bytes.md), 'hint' => [string](../types/string.md), 'has_recovery' => [Bool](../types/Bool.md), 'email_unconfirmed_pattern' => [string](../types/string.md), \];  
+[$account\_password](../constructors/account_password.md) = \['current_salt' => [bytes](../types/bytes.md), 'new_salt' => [bytes](../types/bytes.md), 'hint' => [string](../types/string.md), 'has_recovery' => [Bool](../types/Bool.md), 'email_unconfirmed_pattern' => [string](../types/string.md), \];  
 
-[$account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) = \['new_salt' => [bytes](../types/bytes.md), 'new_password_hash' => [bytes](../types/bytes.md), 'hint' => [string](../types/string.md), 'email' => [string](../types/string.md), \];  
+[$account\_passwordInputSettings](../constructors/account_passwordInputSettings.md) = \['new_salt' => [bytes](../types/bytes.md), 'new_password_hash' => [bytes](../types/bytes.md), 'hint' => [string](../types/string.md), 'email' => [string](../types/string.md), \];  
 
-[$account\_PasswordSettings](../types/account_PasswordSettings.md) = \['email' => [string](../types/string.md), \];  
+[$account\_passwordSettings](../constructors/account_passwordSettings.md) = \['email' => [string](../types/string.md), \];  
 
-[$account\_PrivacyRules](../types/account_PrivacyRules.md) = \['rules' => \[[PrivacyRule](../types/PrivacyRule.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$account\_privacyRules](../constructors/account_privacyRules.md) = \['rules' => \[[PrivacyRule](../types/PrivacyRule.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$auth\_Authorization](../types/auth_Authorization.md) = \['tmp_sessions' => [int](../types/int.md), 'user' => [User](../types/User.md), \];  
+[$auth\_authorization](../constructors/auth_authorization.md) = \['tmp_sessions' => [int](../types/int.md), 'user' => [User](../types/User.md), \];  
 
-[$auth\_CheckedPhone](../types/auth_CheckedPhone.md) = \['phone_registered' => [Bool](../types/Bool.md), \];  
+[$auth\_checkedPhone](../constructors/auth_checkedPhone.md) = \['phone_registered' => [Bool](../types/Bool.md), \];  
 
-[$auth\_CodeType](../types/auth_CodeType.md) = \[\];  
+[$auth\_codeTypeCall](../constructors/auth_codeTypeCall.md) = \[\];  
 
-[$auth\_CodeType](../types/auth_CodeType.md) = \[\];  
+[$auth\_codeTypeFlashCall](../constructors/auth_codeTypeFlashCall.md) = \[\];  
 
-[$auth\_CodeType](../types/auth_CodeType.md) = \[\];  
+[$auth\_codeTypeSms](../constructors/auth_codeTypeSms.md) = \[\];  
 
-[$auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md) = \['id' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
+[$auth\_exportedAuthorization](../constructors/auth_exportedAuthorization.md) = \['id' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
 
-[$auth\_PasswordRecovery](../types/auth_PasswordRecovery.md) = \['email_pattern' => [string](../types/string.md), \];  
+[$auth\_passwordRecovery](../constructors/auth_passwordRecovery.md) = \['email_pattern' => [string](../types/string.md), \];  
 
-[$auth\_SentCode](../types/auth_SentCode.md) = \['phone_registered' => [Bool](../types/Bool.md), 'type' => [auth\_SentCodeType](../types/auth_SentCodeType.md), 'phone_code_hash' => [string](../types/string.md), 'next_type' => [auth\_CodeType](../types/auth_CodeType.md), 'timeout' => [int](../types/int.md), \];  
+[$auth\_sentCode](../constructors/auth_sentCode.md) = \['phone_registered' => [Bool](../types/Bool.md), 'type' => [auth\_SentCodeType](../types/auth_SentCodeType.md), 'phone_code_hash' => [string](../types/string.md), 'next_type' => [auth\_CodeType](../types/auth_CodeType.md), 'timeout' => [int](../types/int.md), \];  
 
-[$auth\_SentCodeType](../types/auth_SentCodeType.md) = \['length' => [int](../types/int.md), \];  
+[$auth\_sentCodeTypeApp](../constructors/auth_sentCodeTypeApp.md) = \['length' => [int](../types/int.md), \];  
 
-[$auth\_SentCodeType](../types/auth_SentCodeType.md) = \['length' => [int](../types/int.md), \];  
+[$auth\_sentCodeTypeCall](../constructors/auth_sentCodeTypeCall.md) = \['length' => [int](../types/int.md), \];  
 
-[$auth\_SentCodeType](../types/auth_SentCodeType.md) = \['pattern' => [string](../types/string.md), \];  
+[$auth\_sentCodeTypeFlashCall](../constructors/auth_sentCodeTypeFlashCall.md) = \['pattern' => [string](../types/string.md), \];  
 
-[$auth\_SentCodeType](../types/auth_SentCodeType.md) = \['length' => [int](../types/int.md), \];  
+[$auth\_sentCodeTypeSms](../constructors/auth_sentCodeTypeSms.md) = \['length' => [int](../types/int.md), \];  
 
-[$Authorization](../types/Authorization.md) = \['hash' => [long](../types/long.md), 'device_model' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'api_id' => [int](../types/int.md), 'app_name' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'date_created' => [int](../types/int.md), 'date_active' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'country' => [string](../types/string.md), 'region' => [string](../types/string.md), \];  
+[$authorization](../constructors/authorization.md) = \['hash' => [long](../types/long.md), 'device_model' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'api_id' => [int](../types/int.md), 'app_name' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'date_created' => [int](../types/int.md), 'date_active' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'country' => [string](../types/string.md), 'region' => [string](../types/string.md), \];  
 
-[$Bool](../types/Bool.md) = \[\];  
+[$boolFalse](../constructors/boolFalse.md) = \[\];  
 
-[$Bool](../types/Bool.md) = \[\];  
+[$boolTrue](../constructors/boolTrue.md) = \[\];  
 
-[$BotCommand](../types/BotCommand.md) = \['command' => [string](../types/string.md), 'description' => [string](../types/string.md), \];  
+[$botCommand](../constructors/botCommand.md) = \['command' => [string](../types/string.md), 'description' => [string](../types/string.md), \];  
 
-[$BotInfo](../types/BotInfo.md) = \['user_id' => [int](../types/int.md), 'description' => [string](../types/string.md), 'commands' => \[[BotCommand](../types/BotCommand.md)\], \];  
+[$botInfo](../constructors/botInfo.md) = \['user_id' => [int](../types/int.md), 'description' => [string](../types/string.md), 'commands' => \[[BotCommand](../types/BotCommand.md)\], \];  
 
-[$BotInlineResult](../types/BotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];  
+[$botInlineMediaResult](../constructors/botInlineMediaResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];  
 
-[$BotInlineMessage](../types/BotInlineMessage.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$botInlineMessageMediaAuto](../constructors/botInlineMessageMediaAuto.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$BotInlineMessage](../types/BotInlineMessage.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$botInlineMessageMediaContact](../constructors/botInlineMessageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$BotInlineMessage](../types/BotInlineMessage.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$botInlineMessageMediaGeo](../constructors/botInlineMessageMediaGeo.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$BotInlineMessage](../types/BotInlineMessage.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$botInlineMessageMediaVenue](../constructors/botInlineMessageMediaVenue.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$BotInlineMessage](../types/BotInlineMessage.md) = \['no_webpage' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$botInlineMessageText](../constructors/botInlineMessageText.md) = \['no_webpage' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$BotInlineResult](../types/BotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];  
+[$botInlineResult](../constructors/botInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];  
 
-[$Chat](../types/Chat.md) = \['creator' => [Bool](../types/Bool.md), 'kicked' => [Bool](../types/Bool.md), 'left' => [Bool](../types/Bool.md), 'editor' => [Bool](../types/Bool.md), 'moderator' => [Bool](../types/Bool.md), 'broadcast' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'democracy' => [Bool](../types/Bool.md), 'signatures' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), 'username' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), \];  
+[$channel](../constructors/channel.md) = \['creator' => [Bool](../types/Bool.md), 'kicked' => [Bool](../types/Bool.md), 'left' => [Bool](../types/Bool.md), 'editor' => [Bool](../types/Bool.md), 'moderator' => [Bool](../types/Bool.md), 'broadcast' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'democracy' => [Bool](../types/Bool.md), 'signatures' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), 'username' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), \];  
 
-[$Chat](../types/Chat.md) = \['broadcast' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), \];  
+[$channelForbidden](../constructors/channelForbidden.md) = \['broadcast' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), \];  
 
-[$ChatFull](../types/ChatFull.md) = \['can_view_participants' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'about' => [string](../types/string.md), 'participants_count' => [int](../types/int.md), 'admins_count' => [int](../types/int.md), 'kicked_count' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'chat_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'exported_invite' => [ExportedChatInvite](../types/ExportedChatInvite.md), 'bot_info' => \[[BotInfo](../types/BotInfo.md)\], 'migrated_from_chat_id' => [int](../types/int.md), 'migrated_from_max_id' => [int](../types/int.md), 'pinned_msg_id' => [int](../types/int.md), \];  
+[$channelFull](../constructors/channelFull.md) = \['can_view_participants' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'about' => [string](../types/string.md), 'participants_count' => [int](../types/int.md), 'admins_count' => [int](../types/int.md), 'kicked_count' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'chat_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'exported_invite' => [ExportedChatInvite](../types/ExportedChatInvite.md), 'bot_info' => \[[BotInfo](../types/BotInfo.md)\], 'migrated_from_chat_id' => [int](../types/int.md), 'migrated_from_max_id' => [int](../types/int.md), 'pinned_msg_id' => [int](../types/int.md), \];  
 
-[$ChannelMessagesFilter](../types/ChannelMessagesFilter.md) = \['exclude_new_messages' => [Bool](../types/Bool.md), 'ranges' => \[[MessageRange](../types/MessageRange.md)\], \];  
+[$channelMessagesFilter](../constructors/channelMessagesFilter.md) = \['exclude_new_messages' => [Bool](../types/Bool.md), 'ranges' => \[[MessageRange](../types/MessageRange.md)\], \];  
 
-[$ChannelMessagesFilter](../types/ChannelMessagesFilter.md) = \[\];  
+[$channelMessagesFilterEmpty](../constructors/channelMessagesFilterEmpty.md) = \[\];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$channelParticipant](../constructors/channelParticipant.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), \];  
+[$channelParticipantCreator](../constructors/channelParticipantCreator.md) = \['user_id' => [int](../types/int.md), \];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$channelParticipantEditor](../constructors/channelParticipantEditor.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), 'kicked_by' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$channelParticipantKicked](../constructors/channelParticipantKicked.md) = \['user_id' => [int](../types/int.md), 'kicked_by' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$channelParticipantModerator](../constructors/channelParticipantModerator.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChannelParticipant](../types/ChannelParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$channelParticipantSelf](../constructors/channelParticipantSelf.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) = \[\];  
+[$channelParticipantsAdmins](../constructors/channelParticipantsAdmins.md) = \[\];  
 
-[$ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) = \[\];  
+[$channelParticipantsBots](../constructors/channelParticipantsBots.md) = \[\];  
 
-[$ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) = \[\];  
+[$channelParticipantsKicked](../constructors/channelParticipantsKicked.md) = \[\];  
 
-[$ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) = \[\];  
+[$channelParticipantsRecent](../constructors/channelParticipantsRecent.md) = \[\];  
 
-[$ChannelParticipantRole](../types/ChannelParticipantRole.md) = \[\];  
+[$channelRoleEditor](../constructors/channelRoleEditor.md) = \[\];  
 
-[$ChannelParticipantRole](../types/ChannelParticipantRole.md) = \[\];  
+[$channelRoleEmpty](../constructors/channelRoleEmpty.md) = \[\];  
 
-[$ChannelParticipantRole](../types/ChannelParticipantRole.md) = \[\];  
+[$channelRoleModerator](../constructors/channelRoleModerator.md) = \[\];  
 
-[$channels\_ChannelParticipant](../types/channels_ChannelParticipant.md) = \['participant' => [ChannelParticipant](../types/ChannelParticipant.md), 'users' => \[[User](../types/User.md)\], \];  
+[$channels\_channelParticipant](../constructors/channels_channelParticipant.md) = \['participant' => [ChannelParticipant](../types/ChannelParticipant.md), 'users' => \[[User](../types/User.md)\], \];  
 
-[$channels\_ChannelParticipants](../types/channels_ChannelParticipants.md) = \['count' => [int](../types/int.md), 'participants' => \[[ChannelParticipant](../types/ChannelParticipant.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$channels\_channelParticipants](../constructors/channels_channelParticipants.md) = \['count' => [int](../types/int.md), 'participants' => \[[ChannelParticipant](../types/ChannelParticipant.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$Chat](../types/Chat.md) = \['creator' => [Bool](../types/Bool.md), 'kicked' => [Bool](../types/Bool.md), 'left' => [Bool](../types/Bool.md), 'admins_enabled' => [Bool](../types/Bool.md), 'admin' => [Bool](../types/Bool.md), 'deactivated' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'participants_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), 'migrated_to' => [InputChannel](../types/InputChannel.md), \];  
+[$chat](../constructors/chat.md) = \['creator' => [Bool](../types/Bool.md), 'kicked' => [Bool](../types/Bool.md), 'left' => [Bool](../types/Bool.md), 'admins_enabled' => [Bool](../types/Bool.md), 'admin' => [Bool](../types/Bool.md), 'deactivated' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'participants_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), 'migrated_to' => [InputChannel](../types/InputChannel.md), \];  
 
-[$Chat](../types/Chat.md) = \['id' => [int](../types/int.md), \];  
+[$chatEmpty](../constructors/chatEmpty.md) = \['id' => [int](../types/int.md), \];  
 
-[$Chat](../types/Chat.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), \];  
+[$chatForbidden](../constructors/chatForbidden.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), \];  
 
-[$ChatFull](../types/ChatFull.md) = \['id' => [int](../types/int.md), 'participants' => [ChatParticipants](../types/ChatParticipants.md), 'chat_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'exported_invite' => [ExportedChatInvite](../types/ExportedChatInvite.md), 'bot_info' => \[[BotInfo](../types/BotInfo.md)\], \];  
+[$chatFull](../constructors/chatFull.md) = \['id' => [int](../types/int.md), 'participants' => [ChatParticipants](../types/ChatParticipants.md), 'chat_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'exported_invite' => [ExportedChatInvite](../types/ExportedChatInvite.md), 'bot_info' => \[[BotInfo](../types/BotInfo.md)\], \];  
 
-[$ChatInvite](../types/ChatInvite.md) = \['channel' => [Bool](../types/Bool.md), 'broadcast' => [Bool](../types/Bool.md), 'public' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'title' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'participants_count' => [int](../types/int.md), 'participants' => \[[User](../types/User.md)\], \];  
+[$chatInvite](../constructors/chatInvite.md) = \['channel' => [Bool](../types/Bool.md), 'broadcast' => [Bool](../types/Bool.md), 'public' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'title' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'participants_count' => [int](../types/int.md), 'participants' => \[[User](../types/User.md)\], \];  
 
-[$ChatInvite](../types/ChatInvite.md) = \['chat' => [Chat](../types/Chat.md), \];  
+[$chatInviteAlready](../constructors/chatInviteAlready.md) = \['chat' => [Chat](../types/Chat.md), \];  
 
-[$ExportedChatInvite](../types/ExportedChatInvite.md) = \[\];  
+[$chatInviteEmpty](../constructors/chatInviteEmpty.md) = \[\];  
 
-[$ExportedChatInvite](../types/ExportedChatInvite.md) = \['link' => [string](../types/string.md), \];  
+[$chatInviteExported](../constructors/chatInviteExported.md) = \['link' => [string](../types/string.md), \];  
 
-[$ChatParticipant](../types/ChatParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$chatParticipant](../constructors/chatParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChatParticipant](../types/ChatParticipant.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$chatParticipantAdmin](../constructors/chatParticipantAdmin.md) = \['user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ChatParticipant](../types/ChatParticipant.md) = \['user_id' => [int](../types/int.md), \];  
+[$chatParticipantCreator](../constructors/chatParticipantCreator.md) = \['user_id' => [int](../types/int.md), \];  
 
-[$ChatParticipants](../types/ChatParticipants.md) = \['chat_id' => [int](../types/int.md), 'participants' => \[[ChatParticipant](../types/ChatParticipant.md)\], 'version' => [int](../types/int.md), \];  
+[$chatParticipants](../constructors/chatParticipants.md) = \['chat_id' => [int](../types/int.md), 'participants' => \[[ChatParticipant](../types/ChatParticipant.md)\], 'version' => [int](../types/int.md), \];  
 
-[$ChatParticipants](../types/ChatParticipants.md) = \['chat_id' => [int](../types/int.md), 'self_participant' => [ChatParticipant](../types/ChatParticipant.md), \];  
+[$chatParticipantsForbidden](../constructors/chatParticipantsForbidden.md) = \['chat_id' => [int](../types/int.md), 'self_participant' => [ChatParticipant](../types/ChatParticipant.md), \];  
 
-[$ChatPhoto](../types/ChatPhoto.md) = \['photo_small' => [FileLocation](../types/FileLocation.md), 'photo_big' => [FileLocation](../types/FileLocation.md), \];  
+[$chatPhoto](../constructors/chatPhoto.md) = \['photo_small' => [FileLocation](../types/FileLocation.md), 'photo_big' => [FileLocation](../types/FileLocation.md), \];  
 
-[$ChatPhoto](../types/ChatPhoto.md) = \[\];  
+[$chatPhotoEmpty](../constructors/chatPhotoEmpty.md) = \[\];  
 
-[$Config](../types/Config.md) = \['date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'test_mode' => [Bool](../types/Bool.md), 'this_dc' => [int](../types/int.md), 'dc_options' => \[[DcOption](../types/DcOption.md)\], 'chat_size_max' => [int](../types/int.md), 'megagroup_size_max' => [int](../types/int.md), 'forwarded_count_max' => [int](../types/int.md), 'online_update_period_ms' => [int](../types/int.md), 'offline_blur_timeout_ms' => [int](../types/int.md), 'offline_idle_timeout_ms' => [int](../types/int.md), 'online_cloud_timeout_ms' => [int](../types/int.md), 'notify_cloud_delay_ms' => [int](../types/int.md), 'notify_default_delay_ms' => [int](../types/int.md), 'chat_big_size' => [int](../types/int.md), 'push_chat_period_ms' => [int](../types/int.md), 'push_chat_limit' => [int](../types/int.md), 'saved_gifs_limit' => [int](../types/int.md), 'edit_time_limit' => [int](../types/int.md), 'rating_e_decay' => [int](../types/int.md), 'stickers_recent_limit' => [int](../types/int.md), 'tmp_sessions' => [int](../types/int.md), 'disabled_features' => \[[DisabledFeature](../types/DisabledFeature.md)\], \];  
+[$config](../constructors/config.md) = \['date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'test_mode' => [Bool](../types/Bool.md), 'this_dc' => [int](../types/int.md), 'dc_options' => \[[DcOption](../types/DcOption.md)\], 'chat_size_max' => [int](../types/int.md), 'megagroup_size_max' => [int](../types/int.md), 'forwarded_count_max' => [int](../types/int.md), 'online_update_period_ms' => [int](../types/int.md), 'offline_blur_timeout_ms' => [int](../types/int.md), 'offline_idle_timeout_ms' => [int](../types/int.md), 'online_cloud_timeout_ms' => [int](../types/int.md), 'notify_cloud_delay_ms' => [int](../types/int.md), 'notify_default_delay_ms' => [int](../types/int.md), 'chat_big_size' => [int](../types/int.md), 'push_chat_period_ms' => [int](../types/int.md), 'push_chat_limit' => [int](../types/int.md), 'saved_gifs_limit' => [int](../types/int.md), 'edit_time_limit' => [int](../types/int.md), 'rating_e_decay' => [int](../types/int.md), 'stickers_recent_limit' => [int](../types/int.md), 'tmp_sessions' => [int](../types/int.md), 'disabled_features' => \[[DisabledFeature](../types/DisabledFeature.md)\], \];  
 
-[$Contact](../types/Contact.md) = \['user_id' => [int](../types/int.md), 'mutual' => [Bool](../types/Bool.md), \];  
+[$contact](../constructors/contact.md) = \['user_id' => [int](../types/int.md), 'mutual' => [Bool](../types/Bool.md), \];  
 
-[$ContactBlocked](../types/ContactBlocked.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$contactBlocked](../constructors/contactBlocked.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$ContactLink](../types/ContactLink.md) = \[\];  
+[$contactLinkContact](../constructors/contactLinkContact.md) = \[\];  
 
-[$ContactLink](../types/ContactLink.md) = \[\];  
+[$contactLinkHasPhone](../constructors/contactLinkHasPhone.md) = \[\];  
 
-[$ContactLink](../types/ContactLink.md) = \[\];  
+[$contactLinkNone](../constructors/contactLinkNone.md) = \[\];  
 
-[$ContactLink](../types/ContactLink.md) = \[\];  
+[$contactLinkUnknown](../constructors/contactLinkUnknown.md) = \[\];  
 
-[$ContactStatus](../types/ContactStatus.md) = \['user_id' => [int](../types/int.md), 'status' => [UserStatus](../types/UserStatus.md), \];  
+[$contactStatus](../constructors/contactStatus.md) = \['user_id' => [int](../types/int.md), 'status' => [UserStatus](../types/UserStatus.md), \];  
 
-[$contacts\_Blocked](../types/contacts_Blocked.md) = \['blocked' => \[[ContactBlocked](../types/ContactBlocked.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_blocked](../constructors/contacts_blocked.md) = \['blocked' => \[[ContactBlocked](../types/ContactBlocked.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_Blocked](../types/contacts_Blocked.md) = \['count' => [int](../types/int.md), 'blocked' => \[[ContactBlocked](../types/ContactBlocked.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_blockedSlice](../constructors/contacts_blockedSlice.md) = \['count' => [int](../types/int.md), 'blocked' => \[[ContactBlocked](../types/ContactBlocked.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_Contacts](../types/contacts_Contacts.md) = \['contacts' => \[[Contact](../types/Contact.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_contacts](../constructors/contacts_contacts.md) = \['contacts' => \[[Contact](../types/Contact.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_Contacts](../types/contacts_Contacts.md) = \[\];  
+[$contacts\_contactsNotModified](../constructors/contacts_contactsNotModified.md) = \[\];  
 
-[$contacts\_Found](../types/contacts_Found.md) = \['results' => \[[Peer](../types/Peer.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_found](../constructors/contacts_found.md) = \['results' => \[[Peer](../types/Peer.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_ImportedContacts](../types/contacts_ImportedContacts.md) = \['imported' => \[[ImportedContact](../types/ImportedContact.md)\], 'retry_contacts' => \[[long](../types/long.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_importedContacts](../constructors/contacts_importedContacts.md) = \['imported' => \[[ImportedContact](../types/ImportedContact.md)\], 'retry_contacts' => \[[long](../types/long.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_Link](../types/contacts_Link.md) = \['my_link' => [ContactLink](../types/ContactLink.md), 'foreign_link' => [ContactLink](../types/ContactLink.md), 'user' => [User](../types/User.md), \];  
+[$contacts\_link](../constructors/contacts_link.md) = \['my_link' => [ContactLink](../types/ContactLink.md), 'foreign_link' => [ContactLink](../types/ContactLink.md), 'user' => [User](../types/User.md), \];  
 
-[$contacts\_ResolvedPeer](../types/contacts_ResolvedPeer.md) = \['peer' => [Peer](../types/Peer.md), 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_resolvedPeer](../constructors/contacts_resolvedPeer.md) = \['peer' => [Peer](../types/Peer.md), 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_TopPeers](../types/contacts_TopPeers.md) = \['categories' => \[[TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$contacts\_topPeers](../constructors/contacts_topPeers.md) = \['categories' => \[[TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$contacts\_TopPeers](../types/contacts_TopPeers.md) = \[\];  
+[$contacts\_topPeersNotModified](../constructors/contacts_topPeersNotModified.md) = \[\];  
 
-[$DcOption](../types/DcOption.md) = \['ipv6' => [Bool](../types/Bool.md), 'media_only' => [Bool](../types/Bool.md), 'tcpo_only' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'ip_address' => [string](../types/string.md), 'port' => [int](../types/int.md), \];  
+[$dcOption](../constructors/dcOption.md) = \['ipv6' => [Bool](../types/Bool.md), 'media_only' => [Bool](../types/Bool.md), 'tcpo_only' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'ip_address' => [string](../types/string.md), 'port' => [int](../types/int.md), \];  
 
-[$Dialog](../types/Dialog.md) = \['peer' => [Peer](../types/Peer.md), 'top_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'pts' => [int](../types/int.md), 'draft' => [DraftMessage](../types/DraftMessage.md), \];  
+[$dialog](../constructors/dialog.md) = \['peer' => [Peer](../types/Peer.md), 'top_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'pts' => [int](../types/int.md), 'draft' => [DraftMessage](../types/DraftMessage.md), \];  
 
-[$DisabledFeature](../types/DisabledFeature.md) = \['feature' => [string](../types/string.md), 'description' => [string](../types/string.md), \];  
+[$disabledFeature](../constructors/disabledFeature.md) = \['feature' => [string](../types/string.md), 'description' => [string](../types/string.md), \];  
 
-[$Document](../types/Document.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'thumb' => [PhotoSize](../types/PhotoSize.md), 'dc_id' => [int](../types/int.md), 'version' => [int](../types/int.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], \];  
+[$document](../constructors/document.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'thumb' => [PhotoSize](../types/PhotoSize.md), 'dc_id' => [int](../types/int.md), 'version' => [int](../types/int.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], \];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \[\];  
+[$documentAttributeAnimated](../constructors/documentAttributeAnimated.md) = \[\];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \['voice' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), 'waveform' => [bytes](../types/bytes.md), \];  
+[$documentAttributeAudio](../constructors/documentAttributeAudio.md) = \['voice' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), 'waveform' => [bytes](../types/bytes.md), \];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \['file_name' => [string](../types/string.md), \];  
+[$documentAttributeFilename](../constructors/documentAttributeFilename.md) = \['file_name' => [string](../types/string.md), \];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \[\];  
+[$documentAttributeHasStickers](../constructors/documentAttributeHasStickers.md) = \[\];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
+[$documentAttributeImageSize](../constructors/documentAttributeImageSize.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \['mask' => [Bool](../types/Bool.md), 'alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'mask_coords' => [MaskCoords](../types/MaskCoords.md), \];  
+[$documentAttributeSticker](../constructors/documentAttributeSticker.md) = \['mask' => [Bool](../types/Bool.md), 'alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'mask_coords' => [MaskCoords](../types/MaskCoords.md), \];  
 
-[$DocumentAttribute](../types/DocumentAttribute.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
+[$documentAttributeVideo](../constructors/documentAttributeVideo.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
 
-[$Document](../types/Document.md) = \['id' => [long](../types/long.md), \];  
+[$documentEmpty](../constructors/documentEmpty.md) = \['id' => [long](../types/long.md), \];  
 
-[$DraftMessage](../types/DraftMessage.md) = \['no_webpage' => [Bool](../types/Bool.md), 'reply_to_msg_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'date' => [int](../types/int.md), \];  
+[$draftMessage](../constructors/draftMessage.md) = \['no_webpage' => [Bool](../types/Bool.md), 'reply_to_msg_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'date' => [int](../types/int.md), \];  
 
-[$DraftMessage](../types/DraftMessage.md) = \[\];  
+[$draftMessageEmpty](../constructors/draftMessageEmpty.md) = \[\];  
 
-[$EncryptedChat](../types/EncryptedChat.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), 'g_a_or_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \];  
+[$encryptedChat](../constructors/encryptedChat.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), 'g_a_or_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \];  
 
-[$EncryptedChat](../types/EncryptedChat.md) = \['id' => [int](../types/int.md), \];  
+[$encryptedChatDiscarded](../constructors/encryptedChatDiscarded.md) = \['id' => [int](../types/int.md), \];  
 
-[$EncryptedChat](../types/EncryptedChat.md) = \['id' => [int](../types/int.md), \];  
+[$encryptedChatEmpty](../constructors/encryptedChatEmpty.md) = \['id' => [int](../types/int.md), \];  
 
-[$EncryptedChat](../types/EncryptedChat.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), 'g_a' => [bytes](../types/bytes.md), \];  
+[$encryptedChatRequested](../constructors/encryptedChatRequested.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), 'g_a' => [bytes](../types/bytes.md), \];  
 
-[$EncryptedChat](../types/EncryptedChat.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), \];  
+[$encryptedChatWaiting](../constructors/encryptedChatWaiting.md) = \['id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'admin_id' => [int](../types/int.md), 'participant_id' => [int](../types/int.md), \];  
 
-[$EncryptedFile](../types/EncryptedFile.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'size' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), 'key_fingerprint' => [int](../types/int.md), \];  
+[$encryptedFile](../constructors/encryptedFile.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'size' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), 'key_fingerprint' => [int](../types/int.md), \];  
 
-[$EncryptedFile](../types/EncryptedFile.md) = \[\];  
+[$encryptedFileEmpty](../constructors/encryptedFileEmpty.md) = \[\];  
 
-[$EncryptedMessage](../types/EncryptedMessage.md) = \['random_id' => [long](../types/long.md), 'chat_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), 'file' => [EncryptedFile](../types/EncryptedFile.md), \];  
+[$encryptedMessage](../constructors/encryptedMessage.md) = \['random_id' => [long](../types/long.md), 'chat_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), 'file' => [EncryptedFile](../types/EncryptedFile.md), \];  
 
-[$EncryptedMessage](../types/EncryptedMessage.md) = \['random_id' => [long](../types/long.md), 'chat_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
+[$encryptedMessageService](../constructors/encryptedMessageService.md) = \['random_id' => [long](../types/long.md), 'chat_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
 
-[$Error](../types/Error.md) = \['code' => [int](../types/int.md), 'text' => [string](../types/string.md), \];  
+[$error](../constructors/error.md) = \['code' => [int](../types/int.md), 'text' => [string](../types/string.md), \];  
 
-[$ExportedMessageLink](../types/ExportedMessageLink.md) = \['link' => [string](../types/string.md), \];  
+[$exportedMessageLink](../constructors/exportedMessageLink.md) = \['link' => [string](../types/string.md), \];  
 
-[$FileLocation](../types/FileLocation.md) = \['dc_id' => [int](../types/int.md), 'volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
+[$fileLocation](../constructors/fileLocation.md) = \['dc_id' => [int](../types/int.md), 'volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
 
-[$FileLocation](../types/FileLocation.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
+[$fileLocationUnavailable](../constructors/fileLocationUnavailable.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
 
-[$FoundGif](../types/FoundGif.md) = \['url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
+[$foundGif](../constructors/foundGif.md) = \['url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];  
 
-[$FoundGif](../types/FoundGif.md) = \['url' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];  
+[$foundGifCached](../constructors/foundGifCached.md) = \['url' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];  
 
-[$Game](../types/Game.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'short_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];  
+[$game](../constructors/game.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'short_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];  
 
-[$GeoPoint](../types/GeoPoint.md) = \['long' => [double](../types/double.md), 'lat' => [double](../types/double.md), \];  
+[$geoPoint](../constructors/geoPoint.md) = \['long' => [double](../types/double.md), 'lat' => [double](../types/double.md), \];  
 
-[$GeoPoint](../types/GeoPoint.md) = \[\];  
+[$geoPointEmpty](../constructors/geoPointEmpty.md) = \[\];  
 
-[$help\_AppChangelog](../types/help_AppChangelog.md) = \['text' => [string](../types/string.md), \];  
+[$help\_appChangelog](../constructors/help_appChangelog.md) = \['text' => [string](../types/string.md), \];  
 
-[$help\_AppChangelog](../types/help_AppChangelog.md) = \[\];  
+[$help\_appChangelogEmpty](../constructors/help_appChangelogEmpty.md) = \[\];  
 
-[$help\_AppUpdate](../types/help_AppUpdate.md) = \['id' => [int](../types/int.md), 'critical' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'text' => [string](../types/string.md), \];  
+[$help\_appUpdate](../constructors/help_appUpdate.md) = \['id' => [int](../types/int.md), 'critical' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'text' => [string](../types/string.md), \];  
 
-[$help\_InviteText](../types/help_InviteText.md) = \['message' => [string](../types/string.md), \];  
+[$help\_inviteText](../constructors/help_inviteText.md) = \['message' => [string](../types/string.md), \];  
 
-[$help\_AppUpdate](../types/help_AppUpdate.md) = \[\];  
+[$help\_noAppUpdate](../constructors/help_noAppUpdate.md) = \[\];  
 
-[$help\_Support](../types/help_Support.md) = \['phone_number' => [string](../types/string.md), 'user' => [User](../types/User.md), \];  
+[$help\_support](../constructors/help_support.md) = \['phone_number' => [string](../types/string.md), 'user' => [User](../types/User.md), \];  
 
-[$help\_TermsOfService](../types/help_TermsOfService.md) = \['text' => [string](../types/string.md), \];  
+[$help\_termsOfService](../constructors/help_termsOfService.md) = \['text' => [string](../types/string.md), \];  
 
-[$HighScore](../types/HighScore.md) = \['pos' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), \];  
+[$highScore](../constructors/highScore.md) = \['pos' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), \];  
 
-[$ImportedContact](../types/ImportedContact.md) = \['user_id' => [int](../types/int.md), 'client_id' => [long](../types/long.md), \];  
+[$importedContact](../constructors/importedContact.md) = \['user_id' => [int](../types/int.md), 'client_id' => [long](../types/long.md), \];  
 
-[$InlineBotSwitchPM](../types/InlineBotSwitchPM.md) = \['text' => [string](../types/string.md), 'start_param' => [string](../types/string.md), \];  
+[$inlineBotSwitchPM](../constructors/inlineBotSwitchPM.md) = \['text' => [string](../types/string.md), 'start_param' => [string](../types/string.md), \];  
 
-[$InputAppEvent](../types/InputAppEvent.md) = \['time' => [double](../types/double.md), 'type' => [string](../types/string.md), 'peer' => [long](../types/long.md), 'data' => [string](../types/string.md), \];  
+[$inputAppEvent](../constructors/inputAppEvent.md) = \['time' => [double](../types/double.md), 'type' => [string](../types/string.md), 'peer' => [long](../types/long.md), 'data' => [string](../types/string.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageGame](../constructors/inputBotInlineMessageGame.md) = \['reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineMessageID](../types/InputBotInlineMessageID.md) = \['dc_id' => [int](../types/int.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputBotInlineMessageID](../constructors/inputBotInlineMessageID.md) = \['dc_id' => [int](../types/int.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageMediaAuto](../constructors/inputBotInlineMessageMediaAuto.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageMediaContact](../constructors/inputBotInlineMessageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageMediaGeo](../constructors/inputBotInlineMessageMediaGeo.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageMediaVenue](../constructors/inputBotInlineMessageMediaVenue.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineMessage](../types/InputBotInlineMessage.md) = \['no_webpage' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
+[$inputBotInlineMessageText](../constructors/inputBotInlineMessageText.md) = \['no_webpage' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];  
 
-[$InputBotInlineResult](../types/InputBotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
+[$inputBotInlineResult](../constructors/inputBotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
 
-[$InputBotInlineResult](../types/InputBotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'document' => [InputDocument](../types/InputDocument.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
+[$inputBotInlineResultDocument](../constructors/inputBotInlineResultDocument.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'document' => [InputDocument](../types/InputDocument.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
 
-[$InputBotInlineResult](../types/InputBotInlineResult.md) = \['id' => [string](../types/string.md), 'short_name' => [string](../types/string.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
+[$inputBotInlineResultGame](../constructors/inputBotInlineResultGame.md) = \['id' => [string](../types/string.md), 'short_name' => [string](../types/string.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
 
-[$InputBotInlineResult](../types/InputBotInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'photo' => [InputPhoto](../types/InputPhoto.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
+[$inputBotInlineResultPhoto](../constructors/inputBotInlineResultPhoto.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'photo' => [InputPhoto](../types/InputPhoto.md), 'send_message' => [InputBotInlineMessage](../types/InputBotInlineMessage.md), \];  
 
-[$InputChannel](../types/InputChannel.md) = \['channel_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputChannel](../constructors/inputChannel.md) = \['channel_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputChannel](../types/InputChannel.md) = \[\];  
+[$inputChannelEmpty](../constructors/inputChannelEmpty.md) = \[\];  
 
-[$InputChatPhoto](../types/InputChatPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), \];  
+[$inputChatPhoto](../constructors/inputChatPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), \];  
 
-[$InputChatPhoto](../types/InputChatPhoto.md) = \[\];  
+[$inputChatPhotoEmpty](../constructors/inputChatPhotoEmpty.md) = \[\];  
 
-[$InputChatPhoto](../types/InputChatPhoto.md) = \['file' => [InputFile](../types/InputFile.md), \];  
+[$inputChatUploadedPhoto](../constructors/inputChatUploadedPhoto.md) = \['file' => [InputFile](../types/InputFile.md), \];  
 
-[$InputDocument](../types/InputDocument.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputDocument](../constructors/inputDocument.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputDocument](../types/InputDocument.md) = \[\];  
+[$inputDocumentEmpty](../constructors/inputDocumentEmpty.md) = \[\];  
 
-[$InputFileLocation](../types/InputFileLocation.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'version' => [int](../types/int.md), \];  
+[$inputDocumentFileLocation](../constructors/inputDocumentFileLocation.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'version' => [int](../types/int.md), \];  
 
-[$InputEncryptedChat](../types/InputEncryptedChat.md) = \['chat_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputEncryptedChat](../constructors/inputEncryptedChat.md) = \['chat_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputEncryptedFile](../types/InputEncryptedFile.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputEncryptedFile](../constructors/inputEncryptedFile.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputEncryptedFile](../types/InputEncryptedFile.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'key_fingerprint' => [int](../types/int.md), \];  
+[$inputEncryptedFileBigUploaded](../constructors/inputEncryptedFileBigUploaded.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'key_fingerprint' => [int](../types/int.md), \];  
 
-[$InputEncryptedFile](../types/InputEncryptedFile.md) = \[\];  
+[$inputEncryptedFileEmpty](../constructors/inputEncryptedFileEmpty.md) = \[\];  
 
-[$InputFileLocation](../types/InputFileLocation.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputEncryptedFileLocation](../constructors/inputEncryptedFileLocation.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputEncryptedFile](../types/InputEncryptedFile.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'md5_checksum' => [string](../types/string.md), 'key_fingerprint' => [int](../types/int.md), \];  
+[$inputEncryptedFileUploaded](../constructors/inputEncryptedFileUploaded.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'md5_checksum' => [string](../types/string.md), 'key_fingerprint' => [int](../types/int.md), \];  
 
-[$InputFile](../types/InputFile.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'name' => [string](../types/string.md), 'md5_checksum' => [string](../types/string.md), \];  
+[$inputFile](../constructors/inputFile.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'name' => [string](../types/string.md), 'md5_checksum' => [string](../types/string.md), \];  
 
-[$InputFile](../types/InputFile.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'name' => [string](../types/string.md), \];  
+[$inputFileBig](../constructors/inputFileBig.md) = \['id' => [long](../types/long.md), 'parts' => [int](../types/int.md), 'name' => [string](../types/string.md), \];  
 
-[$InputFileLocation](../types/InputFileLocation.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
+[$inputFileLocation](../constructors/inputFileLocation.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];  
 
-[$InputGame](../types/InputGame.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputGameID](../constructors/inputGameID.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputGame](../types/InputGame.md) = \['bot_id' => [InputUser](../types/InputUser.md), 'short_name' => [string](../types/string.md), \];  
+[$inputGameShortName](../constructors/inputGameShortName.md) = \['bot_id' => [InputUser](../types/InputUser.md), 'short_name' => [string](../types/string.md), \];  
 
-[$InputGeoPoint](../types/InputGeoPoint.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), \];  
+[$inputGeoPoint](../constructors/inputGeoPoint.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), \];  
 
-[$InputGeoPoint](../types/InputGeoPoint.md) = \[\];  
+[$inputGeoPointEmpty](../constructors/inputGeoPointEmpty.md) = \[\];  
 
-[$InputMedia](../types/InputMedia.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \];  
+[$inputMediaContact](../constructors/inputMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['id' => [InputDocument](../types/InputDocument.md), 'caption' => [string](../types/string.md), \];  
+[$inputMediaDocument](../constructors/inputMediaDocument.md) = \['id' => [InputDocument](../types/InputDocument.md), 'caption' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];  
+[$inputMediaDocumentExternal](../constructors/inputMediaDocumentExternal.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \[\];  
+[$inputMediaEmpty](../constructors/inputMediaEmpty.md) = \[\];  
 
-[$InputMedia](../types/InputMedia.md) = \['id' => [InputGame](../types/InputGame.md), \];  
+[$inputMediaGame](../constructors/inputMediaGame.md) = \['id' => [InputGame](../types/InputGame.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), \];  
+[$inputMediaGeoPoint](../constructors/inputMediaGeoPoint.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['url' => [string](../types/string.md), 'q' => [string](../types/string.md), \];  
+[$inputMediaGifExternal](../constructors/inputMediaGifExternal.md) = \['url' => [string](../types/string.md), 'q' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['id' => [InputPhoto](../types/InputPhoto.md), 'caption' => [string](../types/string.md), \];  
+[$inputMediaPhoto](../constructors/inputMediaPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), 'caption' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];  
+[$inputMediaPhotoExternal](../constructors/inputMediaPhotoExternal.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];  
 
-[$InputMedia](../types/InputMedia.md) = \['file' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
+[$inputMediaUploadedDocument](../constructors/inputMediaUploadedDocument.md) = \['file' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
 
-[$InputMedia](../types/InputMedia.md) = \['file' => [InputFile](../types/InputFile.md), 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
+[$inputMediaUploadedPhoto](../constructors/inputMediaUploadedPhoto.md) = \['file' => [InputFile](../types/InputFile.md), 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
 
-[$InputMedia](../types/InputMedia.md) = \['file' => [InputFile](../types/InputFile.md), 'thumb' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
+[$inputMediaUploadedThumbDocument](../constructors/inputMediaUploadedThumbDocument.md) = \['file' => [InputFile](../types/InputFile.md), 'thumb' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], \];  
 
-[$InputMedia](../types/InputMedia.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];  
+[$inputMediaVenue](../constructors/inputMediaVenue.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \];  
+[$inputMessageEntityMentionName](../constructors/inputMessageEntityMentionName.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterChatPhotos](../constructors/inputMessagesFilterChatPhotos.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterDocument](../constructors/inputMessagesFilterDocument.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterEmpty](../constructors/inputMessagesFilterEmpty.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterGif](../constructors/inputMessagesFilterGif.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterMusic](../constructors/inputMessagesFilterMusic.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterPhotoVideo](../constructors/inputMessagesFilterPhotoVideo.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterPhotoVideoDocuments](../constructors/inputMessagesFilterPhotoVideoDocuments.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterPhotos](../constructors/inputMessagesFilterPhotos.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterUrl](../constructors/inputMessagesFilterUrl.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterVideo](../constructors/inputMessagesFilterVideo.md) = \[\];  
 
-[$MessagesFilter](../types/MessagesFilter.md) = \[\];  
+[$inputMessagesFilterVoice](../constructors/inputMessagesFilterVoice.md) = \[\];  
 
-[$InputNotifyPeer](../types/InputNotifyPeer.md) = \[\];  
+[$inputNotifyAll](../constructors/inputNotifyAll.md) = \[\];  
 
-[$InputNotifyPeer](../types/InputNotifyPeer.md) = \[\];  
+[$inputNotifyChats](../constructors/inputNotifyChats.md) = \[\];  
 
-[$InputNotifyPeer](../types/InputNotifyPeer.md) = \['peer' => [InputPeer](../types/InputPeer.md), \];  
+[$inputNotifyPeer](../constructors/inputNotifyPeer.md) = \['peer' => [InputPeer](../types/InputPeer.md), \];  
 
-[$InputNotifyPeer](../types/InputNotifyPeer.md) = \[\];  
+[$inputNotifyUsers](../constructors/inputNotifyUsers.md) = \[\];  
 
-[$InputPeer](../types/InputPeer.md) = \['channel_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputPeerChannel](../constructors/inputPeerChannel.md) = \['channel_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputPeer](../types/InputPeer.md) = \['chat_id' => [int](../types/int.md), \];  
+[$inputPeerChat](../constructors/inputPeerChat.md) = \['chat_id' => [int](../types/int.md), \];  
 
-[$InputPeer](../types/InputPeer.md) = \[\];  
+[$inputPeerEmpty](../constructors/inputPeerEmpty.md) = \[\];  
 
-[$InputPeerNotifyEvents](../types/InputPeerNotifyEvents.md) = \[\];  
+[$inputPeerNotifyEventsAll](../constructors/inputPeerNotifyEventsAll.md) = \[\];  
 
-[$InputPeerNotifyEvents](../types/InputPeerNotifyEvents.md) = \[\];  
+[$inputPeerNotifyEventsEmpty](../constructors/inputPeerNotifyEventsEmpty.md) = \[\];  
 
-[$InputPeerNotifySettings](../types/InputPeerNotifySettings.md) = \['show_previews' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'mute_until' => [int](../types/int.md), 'sound' => [string](../types/string.md), \];  
+[$inputPeerNotifySettings](../constructors/inputPeerNotifySettings.md) = \['show_previews' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'mute_until' => [int](../types/int.md), 'sound' => [string](../types/string.md), \];  
 
-[$InputPeer](../types/InputPeer.md) = \[\];  
+[$inputPeerSelf](../constructors/inputPeerSelf.md) = \[\];  
 
-[$InputPeer](../types/InputPeer.md) = \['user_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputPeerUser](../constructors/inputPeerUser.md) = \['user_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputContact](../types/InputContact.md) = \['client_id' => [long](../types/long.md), 'phone' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \];  
+[$inputPhoneContact](../constructors/inputPhoneContact.md) = \['client_id' => [long](../types/long.md), 'phone' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \];  
 
-[$InputPhoto](../types/InputPhoto.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputPhoto](../constructors/inputPhoto.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputPhoto](../types/InputPhoto.md) = \[\];  
+[$inputPhotoEmpty](../constructors/inputPhotoEmpty.md) = \[\];  
 
-[$InputPrivacyKey](../types/InputPrivacyKey.md) = \[\];  
+[$inputPrivacyKeyChatInvite](../constructors/inputPrivacyKeyChatInvite.md) = \[\];  
 
-[$InputPrivacyKey](../types/InputPrivacyKey.md) = \[\];  
+[$inputPrivacyKeyStatusTimestamp](../constructors/inputPrivacyKeyStatusTimestamp.md) = \[\];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \[\];  
+[$inputPrivacyValueAllowAll](../constructors/inputPrivacyValueAllowAll.md) = \[\];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \[\];  
+[$inputPrivacyValueAllowContacts](../constructors/inputPrivacyValueAllowContacts.md) = \[\];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \['users' => \[[InputUser](../types/InputUser.md)\], \];  
+[$inputPrivacyValueAllowUsers](../constructors/inputPrivacyValueAllowUsers.md) = \['users' => \[[InputUser](../types/InputUser.md)\], \];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \[\];  
+[$inputPrivacyValueDisallowAll](../constructors/inputPrivacyValueDisallowAll.md) = \[\];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \[\];  
+[$inputPrivacyValueDisallowContacts](../constructors/inputPrivacyValueDisallowContacts.md) = \[\];  
 
-[$InputPrivacyRule](../types/InputPrivacyRule.md) = \['users' => \[[InputUser](../types/InputUser.md)\], \];  
+[$inputPrivacyValueDisallowUsers](../constructors/inputPrivacyValueDisallowUsers.md) = \['users' => \[[InputUser](../types/InputUser.md)\], \];  
 
-[$ReportReason](../types/ReportReason.md) = \['text' => [string](../types/string.md), \];  
+[$inputReportReasonOther](../constructors/inputReportReasonOther.md) = \['text' => [string](../types/string.md), \];  
 
-[$ReportReason](../types/ReportReason.md) = \[\];  
+[$inputReportReasonPornography](../constructors/inputReportReasonPornography.md) = \[\];  
 
-[$ReportReason](../types/ReportReason.md) = \[\];  
+[$inputReportReasonSpam](../constructors/inputReportReasonSpam.md) = \[\];  
 
-[$ReportReason](../types/ReportReason.md) = \[\];  
+[$inputReportReasonViolence](../constructors/inputReportReasonViolence.md) = \[\];  
 
-[$InputStickerSet](../types/InputStickerSet.md) = \[\];  
+[$inputStickerSetEmpty](../constructors/inputStickerSetEmpty.md) = \[\];  
 
-[$InputStickerSet](../types/InputStickerSet.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputStickerSetID](../constructors/inputStickerSetID.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputStickerSet](../types/InputStickerSet.md) = \['short_name' => [string](../types/string.md), \];  
+[$inputStickerSetShortName](../constructors/inputStickerSetShortName.md) = \['short_name' => [string](../types/string.md), \];  
 
-[$InputStickeredMedia](../types/InputStickeredMedia.md) = \['id' => [InputDocument](../types/InputDocument.md), \];  
+[$inputStickeredMediaDocument](../constructors/inputStickeredMediaDocument.md) = \['id' => [InputDocument](../types/InputDocument.md), \];  
 
-[$InputStickeredMedia](../types/InputStickeredMedia.md) = \['id' => [InputPhoto](../types/InputPhoto.md), \];  
+[$inputStickeredMediaPhoto](../constructors/inputStickeredMediaPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), \];  
 
-[$InputUser](../types/InputUser.md) = \['user_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
+[$inputUser](../constructors/inputUser.md) = \['user_id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), \];  
 
-[$InputUser](../types/InputUser.md) = \[\];  
+[$inputUserEmpty](../constructors/inputUserEmpty.md) = \[\];  
 
-[$InputUser](../types/InputUser.md) = \[\];  
+[$inputUserSelf](../constructors/inputUserSelf.md) = \[\];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), \];  
+[$keyboardButton](../constructors/keyboardButton.md) = \['text' => [string](../types/string.md), \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), 'data' => [bytes](../types/bytes.md), \];  
+[$keyboardButtonCallback](../constructors/keyboardButtonCallback.md) = \['text' => [string](../types/string.md), 'data' => [bytes](../types/bytes.md), \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), \];  
+[$keyboardButtonGame](../constructors/keyboardButtonGame.md) = \['text' => [string](../types/string.md), \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), \];  
+[$keyboardButtonRequestGeoLocation](../constructors/keyboardButtonRequestGeoLocation.md) = \['text' => [string](../types/string.md), \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), \];  
+[$keyboardButtonRequestPhone](../constructors/keyboardButtonRequestPhone.md) = \['text' => [string](../types/string.md), \];  
 
-[$KeyboardButtonRow](../types/KeyboardButtonRow.md) = \['buttons' => \[[KeyboardButton](../types/KeyboardButton.md)\], \];  
+[$keyboardButtonRow](../constructors/keyboardButtonRow.md) = \['buttons' => \[[KeyboardButton](../types/KeyboardButton.md)\], \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['same_peer' => [Bool](../types/Bool.md), 'text' => [string](../types/string.md), 'query' => [string](../types/string.md), \];  
+[$keyboardButtonSwitchInline](../constructors/keyboardButtonSwitchInline.md) = \['same_peer' => [Bool](../types/Bool.md), 'text' => [string](../types/string.md), 'query' => [string](../types/string.md), \];  
 
-[$KeyboardButton](../types/KeyboardButton.md) = \['text' => [string](../types/string.md), 'url' => [string](../types/string.md), \];  
+[$keyboardButtonUrl](../constructors/keyboardButtonUrl.md) = \['text' => [string](../types/string.md), 'url' => [string](../types/string.md), \];  
 
-[$MaskCoords](../types/MaskCoords.md) = \['n' => [int](../types/int.md), 'x' => [double](../types/double.md), 'y' => [double](../types/double.md), 'zoom' => [double](../types/double.md), \];  
+[$maskCoords](../constructors/maskCoords.md) = \['n' => [int](../types/int.md), 'x' => [double](../types/double.md), 'y' => [double](../types/double.md), 'zoom' => [double](../types/double.md), \];  
 
-[$Message](../types/Message.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'post' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'views' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), \];  
+[$message](../constructors/message.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'post' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'views' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['title' => [string](../types/string.md), \];  
+[$messageActionChannelCreate](../constructors/messageActionChannelCreate.md) = \['title' => [string](../types/string.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['title' => [string](../types/string.md), 'chat_id' => [int](../types/int.md), \];  
+[$messageActionChannelMigrateFrom](../constructors/messageActionChannelMigrateFrom.md) = \['title' => [string](../types/string.md), 'chat_id' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['users' => \[[int](../types/int.md)\], \];  
+[$messageActionChatAddUser](../constructors/messageActionChatAddUser.md) = \['users' => \[[int](../types/int.md)\], \];  
 
-[$MessageAction](../types/MessageAction.md) = \['title' => [string](../types/string.md), 'users' => \[[int](../types/int.md)\], \];  
+[$messageActionChatCreate](../constructors/messageActionChatCreate.md) = \['title' => [string](../types/string.md), 'users' => \[[int](../types/int.md)\], \];  
 
-[$MessageAction](../types/MessageAction.md) = \[\];  
+[$messageActionChatDeletePhoto](../constructors/messageActionChatDeletePhoto.md) = \[\];  
 
-[$MessageAction](../types/MessageAction.md) = \['user_id' => [int](../types/int.md), \];  
+[$messageActionChatDeleteUser](../constructors/messageActionChatDeleteUser.md) = \['user_id' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['photo' => [Photo](../types/Photo.md), \];  
+[$messageActionChatEditPhoto](../constructors/messageActionChatEditPhoto.md) = \['photo' => [Photo](../types/Photo.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['title' => [string](../types/string.md), \];  
+[$messageActionChatEditTitle](../constructors/messageActionChatEditTitle.md) = \['title' => [string](../types/string.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['inviter_id' => [int](../types/int.md), \];  
+[$messageActionChatJoinedByLink](../constructors/messageActionChatJoinedByLink.md) = \['inviter_id' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \['channel_id' => [int](../types/int.md), \];  
+[$messageActionChatMigrateTo](../constructors/messageActionChatMigrateTo.md) = \['channel_id' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \[\];  
+[$messageActionEmpty](../constructors/messageActionEmpty.md) = \[\];  
 
-[$MessageAction](../types/MessageAction.md) = \['game_id' => [long](../types/long.md), 'score' => [int](../types/int.md), \];  
+[$messageActionGameScore](../constructors/messageActionGameScore.md) = \['game_id' => [long](../types/long.md), 'score' => [int](../types/int.md), \];  
 
-[$MessageAction](../types/MessageAction.md) = \[\];  
+[$messageActionHistoryClear](../constructors/messageActionHistoryClear.md) = \[\];  
 
-[$MessageAction](../types/MessageAction.md) = \[\];  
+[$messageActionPinMessage](../constructors/messageActionPinMessage.md) = \[\];  
 
-[$Message](../types/Message.md) = \['id' => [int](../types/int.md), \];  
+[$messageEmpty](../constructors/messageEmpty.md) = \['id' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityBold](../constructors/messageEntityBold.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityBotCommand](../constructors/messageEntityBotCommand.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityCode](../constructors/messageEntityCode.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityEmail](../constructors/messageEntityEmail.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityHashtag](../constructors/messageEntityHashtag.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityItalic](../constructors/messageEntityItalic.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityMention](../constructors/messageEntityMention.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'user_id' => [int](../types/int.md), \];  
+[$messageEntityMentionName](../constructors/messageEntityMentionName.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'user_id' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'language' => [string](../types/string.md), \];  
+[$messageEntityPre](../constructors/messageEntityPre.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'language' => [string](../types/string.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'url' => [string](../types/string.md), \];  
+[$messageEntityTextUrl](../constructors/messageEntityTextUrl.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'url' => [string](../types/string.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityUnknown](../constructors/messageEntityUnknown.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageEntity](../types/MessageEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
+[$messageEntityUrl](../constructors/messageEntityUrl.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), \];  
 
-[$MessageFwdHeader](../types/MessageFwdHeader.md) = \['from_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'channel_id' => [int](../types/int.md), 'channel_post' => [int](../types/int.md), \];  
+[$messageFwdHeader](../constructors/messageFwdHeader.md) = \['from_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'channel_id' => [int](../types/int.md), 'channel_post' => [int](../types/int.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];  
+[$messageMediaContact](../constructors/messageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['document' => [Document](../types/Document.md), 'caption' => [string](../types/string.md), \];  
+[$messageMediaDocument](../constructors/messageMediaDocument.md) = \['document' => [Document](../types/Document.md), 'caption' => [string](../types/string.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \[\];  
+[$messageMediaEmpty](../constructors/messageMediaEmpty.md) = \[\];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['game' => [Game](../types/Game.md), \];  
+[$messageMediaGame](../constructors/messageMediaGame.md) = \['game' => [Game](../types/Game.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), \];  
+[$messageMediaGeo](../constructors/messageMediaGeo.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['photo' => [Photo](../types/Photo.md), 'caption' => [string](../types/string.md), \];  
+[$messageMediaPhoto](../constructors/messageMediaPhoto.md) = \['photo' => [Photo](../types/Photo.md), 'caption' => [string](../types/string.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \[\];  
+[$messageMediaUnsupported](../constructors/messageMediaUnsupported.md) = \[\];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];  
+[$messageMediaVenue](../constructors/messageMediaVenue.md) = \['geo' => [GeoPoint](../types/GeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];  
 
-[$MessageMedia](../types/MessageMedia.md) = \['webpage' => [WebPage](../types/WebPage.md), \];  
+[$messageMediaWebPage](../constructors/messageMediaWebPage.md) = \['webpage' => [WebPage](../types/WebPage.md), \];  
 
-[$MessageRange](../types/MessageRange.md) = \['min_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
+[$messageRange](../constructors/messageRange.md) = \['min_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
 
-[$Message](../types/Message.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'post' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'action' => [MessageAction](../types/MessageAction.md), \];  
+[$messageService](../constructors/messageService.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'post' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'action' => [MessageAction](../types/MessageAction.md), \];  
 
-[$messages\_AffectedHistory](../types/messages_AffectedHistory.md) = \['pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'offset' => [int](../types/int.md), \];  
+[$messages\_affectedHistory](../constructors/messages_affectedHistory.md) = \['pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'offset' => [int](../types/int.md), \];  
 
-[$messages\_AffectedMessages](../types/messages_AffectedMessages.md) = \['pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$messages\_affectedMessages](../constructors/messages_affectedMessages.md) = \['pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$messages\_AllStickers](../types/messages_AllStickers.md) = \['hash' => [int](../types/int.md), 'sets' => \[[StickerSet](../types/StickerSet.md)\], \];  
+[$messages\_allStickers](../constructors/messages_allStickers.md) = \['hash' => [int](../types/int.md), 'sets' => \[[StickerSet](../types/StickerSet.md)\], \];  
 
-[$messages\_AllStickers](../types/messages_AllStickers.md) = \[\];  
+[$messages\_allStickersNotModified](../constructors/messages_allStickersNotModified.md) = \[\];  
 
-[$messages\_ArchivedStickers](../types/messages_ArchivedStickers.md) = \['count' => [int](../types/int.md), 'sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], \];  
+[$messages\_archivedStickers](../constructors/messages_archivedStickers.md) = \['count' => [int](../types/int.md), 'sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], \];  
 
-[$messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md) = \['alert' => [Bool](../types/Bool.md), 'has_url' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'url' => [string](../types/string.md), \];  
+[$messages\_botCallbackAnswer](../constructors/messages_botCallbackAnswer.md) = \['alert' => [Bool](../types/Bool.md), 'has_url' => [Bool](../types/Bool.md), 'message' => [string](../types/string.md), 'url' => [string](../types/string.md), \];  
 
-[$messages\_BotResults](../types/messages_BotResults.md) = \['gallery' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'next_offset' => [string](../types/string.md), 'switch_pm' => [InlineBotSwitchPM](../types/InlineBotSwitchPM.md), 'results' => \[[BotInlineResult](../types/BotInlineResult.md)\], \];  
+[$messages\_botResults](../constructors/messages_botResults.md) = \['gallery' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'next_offset' => [string](../types/string.md), 'switch_pm' => [InlineBotSwitchPM](../types/InlineBotSwitchPM.md), 'results' => \[[BotInlineResult](../types/BotInlineResult.md)\], \];  
 
-[$messages\_Messages](../types/messages_Messages.md) = \['pts' => [int](../types/int.md), 'count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_channelMessages](../constructors/messages_channelMessages.md) = \['pts' => [int](../types/int.md), 'count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_ChatFull](../types/messages_ChatFull.md) = \['full_chat' => [ChatFull](../types/ChatFull.md), 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_chatFull](../constructors/messages_chatFull.md) = \['full_chat' => [ChatFull](../types/ChatFull.md), 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_Chats](../types/messages_Chats.md) = \['chats' => \[[Chat](../types/Chat.md)\], \];  
+[$messages\_chats](../constructors/messages_chats.md) = \['chats' => \[[Chat](../types/Chat.md)\], \];  
 
-[$messages\_DhConfig](../types/messages_DhConfig.md) = \['g' => [int](../types/int.md), 'p' => [bytes](../types/bytes.md), 'version' => [int](../types/int.md), 'random' => [bytes](../types/bytes.md), \];  
+[$messages\_dhConfig](../constructors/messages_dhConfig.md) = \['g' => [int](../types/int.md), 'p' => [bytes](../types/bytes.md), 'version' => [int](../types/int.md), 'random' => [bytes](../types/bytes.md), \];  
 
-[$messages\_DhConfig](../types/messages_DhConfig.md) = \['random' => [bytes](../types/bytes.md), \];  
+[$messages\_dhConfigNotModified](../constructors/messages_dhConfigNotModified.md) = \['random' => [bytes](../types/bytes.md), \];  
 
-[$messages\_Dialogs](../types/messages_Dialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_dialogs](../constructors/messages_dialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_Dialogs](../types/messages_Dialogs.md) = \['count' => [int](../types/int.md), 'dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_dialogsSlice](../constructors/messages_dialogsSlice.md) = \['count' => [int](../types/int.md), 'dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_FeaturedStickers](../types/messages_FeaturedStickers.md) = \['hash' => [int](../types/int.md), 'sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], 'unread' => \[[long](../types/long.md)\], \];  
+[$messages\_featuredStickers](../constructors/messages_featuredStickers.md) = \['hash' => [int](../types/int.md), 'sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], 'unread' => \[[long](../types/long.md)\], \];  
 
-[$messages\_FeaturedStickers](../types/messages_FeaturedStickers.md) = \[\];  
+[$messages\_featuredStickersNotModified](../constructors/messages_featuredStickersNotModified.md) = \[\];  
 
-[$messages\_FoundGifs](../types/messages_FoundGifs.md) = \['next_offset' => [int](../types/int.md), 'results' => \[[FoundGif](../types/FoundGif.md)\], \];  
+[$messages\_foundGifs](../constructors/messages_foundGifs.md) = \['next_offset' => [int](../types/int.md), 'results' => \[[FoundGif](../types/FoundGif.md)\], \];  
 
-[$messages\_HighScores](../types/messages_HighScores.md) = \['scores' => \[[HighScore](../types/HighScore.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_highScores](../constructors/messages_highScores.md) = \['scores' => \[[HighScore](../types/HighScore.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_MessageEditData](../types/messages_MessageEditData.md) = \['caption' => [Bool](../types/Bool.md), \];  
+[$messages\_messageEditData](../constructors/messages_messageEditData.md) = \['caption' => [Bool](../types/Bool.md), \];  
 
-[$messages\_Messages](../types/messages_Messages.md) = \['messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_messages](../constructors/messages_messages.md) = \['messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_Messages](../types/messages_Messages.md) = \['count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$messages\_messagesSlice](../constructors/messages_messagesSlice.md) = \['count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$messages\_PeerDialogs](../types/messages_PeerDialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];  
+[$messages\_peerDialogs](../constructors/messages_peerDialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];  
 
-[$messages\_RecentStickers](../types/messages_RecentStickers.md) = \['hash' => [int](../types/int.md), 'stickers' => \[[Document](../types/Document.md)\], \];  
+[$messages\_recentStickers](../constructors/messages_recentStickers.md) = \['hash' => [int](../types/int.md), 'stickers' => \[[Document](../types/Document.md)\], \];  
 
-[$messages\_RecentStickers](../types/messages_RecentStickers.md) = \[\];  
+[$messages\_recentStickersNotModified](../constructors/messages_recentStickersNotModified.md) = \[\];  
 
-[$messages\_SavedGifs](../types/messages_SavedGifs.md) = \['hash' => [int](../types/int.md), 'gifs' => \[[Document](../types/Document.md)\], \];  
+[$messages\_savedGifs](../constructors/messages_savedGifs.md) = \['hash' => [int](../types/int.md), 'gifs' => \[[Document](../types/Document.md)\], \];  
 
-[$messages\_SavedGifs](../types/messages_SavedGifs.md) = \[\];  
+[$messages\_savedGifsNotModified](../constructors/messages_savedGifsNotModified.md) = \[\];  
 
-[$messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md) = \['date' => [int](../types/int.md), 'file' => [EncryptedFile](../types/EncryptedFile.md), \];  
+[$messages\_sentEncryptedFile](../constructors/messages_sentEncryptedFile.md) = \['date' => [int](../types/int.md), 'file' => [EncryptedFile](../types/EncryptedFile.md), \];  
 
-[$messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md) = \['date' => [int](../types/int.md), \];  
+[$messages\_sentEncryptedMessage](../constructors/messages_sentEncryptedMessage.md) = \['date' => [int](../types/int.md), \];  
 
-[$messages\_StickerSet](../types/messages_StickerSet.md) = \['set' => [StickerSet](../types/StickerSet.md), 'packs' => \[[StickerPack](../types/StickerPack.md)\], 'documents' => \[[Document](../types/Document.md)\], \];  
+[$messages\_stickerSet](../constructors/messages_stickerSet.md) = \['set' => [StickerSet](../types/StickerSet.md), 'packs' => \[[StickerPack](../types/StickerPack.md)\], 'documents' => \[[Document](../types/Document.md)\], \];  
 
-[$messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md) = \['sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], \];  
+[$messages\_stickerSetInstallResultArchive](../constructors/messages_stickerSetInstallResultArchive.md) = \['sets' => \[[StickerSetCovered](../types/StickerSetCovered.md)\], \];  
 
-[$messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md) = \[\];  
+[$messages\_stickerSetInstallResultSuccess](../constructors/messages_stickerSetInstallResultSuccess.md) = \[\];  
 
-[$messages\_Stickers](../types/messages_Stickers.md) = \['hash' => [string](../types/string.md), 'stickers' => \[[Document](../types/Document.md)\], \];  
+[$messages\_stickers](../constructors/messages_stickers.md) = \['hash' => [string](../types/string.md), 'stickers' => \[[Document](../types/Document.md)\], \];  
 
-[$messages\_Stickers](../types/messages_Stickers.md) = \[\];  
+[$messages\_stickersNotModified](../constructors/messages_stickersNotModified.md) = \[\];  
 
-[$NearestDc](../types/NearestDc.md) = \['country' => [string](../types/string.md), 'this_dc' => [int](../types/int.md), 'nearest_dc' => [int](../types/int.md), \];  
+[$nearestDc](../constructors/nearestDc.md) = \['country' => [string](../types/string.md), 'this_dc' => [int](../types/int.md), 'nearest_dc' => [int](../types/int.md), \];  
 
-[$NotifyPeer](../types/NotifyPeer.md) = \[\];  
+[$notifyAll](../constructors/notifyAll.md) = \[\];  
 
-[$NotifyPeer](../types/NotifyPeer.md) = \[\];  
+[$notifyChats](../constructors/notifyChats.md) = \[\];  
 
-[$NotifyPeer](../types/NotifyPeer.md) = \['peer' => [Peer](../types/Peer.md), \];  
+[$notifyPeer](../constructors/notifyPeer.md) = \['peer' => [Peer](../types/Peer.md), \];  
 
-[$NotifyPeer](../types/NotifyPeer.md) = \[\];  
+[$notifyUsers](../constructors/notifyUsers.md) = \[\];  
 
-[$Null](../types/Null.md) = \[\];  
+[$null](../constructors/null.md) = \[\];  
 
-[$Peer](../types/Peer.md) = \['channel_id' => [int](../types/int.md), \];  
+[$peerChannel](../constructors/peerChannel.md) = \['channel_id' => [int](../types/int.md), \];  
 
-[$Peer](../types/Peer.md) = \['chat_id' => [int](../types/int.md), \];  
+[$peerChat](../constructors/peerChat.md) = \['chat_id' => [int](../types/int.md), \];  
 
-[$PeerNotifyEvents](../types/PeerNotifyEvents.md) = \[\];  
+[$peerNotifyEventsAll](../constructors/peerNotifyEventsAll.md) = \[\];  
 
-[$PeerNotifyEvents](../types/PeerNotifyEvents.md) = \[\];  
+[$peerNotifyEventsEmpty](../constructors/peerNotifyEventsEmpty.md) = \[\];  
 
-[$PeerNotifySettings](../types/PeerNotifySettings.md) = \['show_previews' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'mute_until' => [int](../types/int.md), 'sound' => [string](../types/string.md), \];  
+[$peerNotifySettings](../constructors/peerNotifySettings.md) = \['show_previews' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'mute_until' => [int](../types/int.md), 'sound' => [string](../types/string.md), \];  
 
-[$PeerNotifySettings](../types/PeerNotifySettings.md) = \[\];  
+[$peerNotifySettingsEmpty](../constructors/peerNotifySettingsEmpty.md) = \[\];  
 
-[$PeerSettings](../types/PeerSettings.md) = \['report_spam' => [Bool](../types/Bool.md), \];  
+[$peerSettings](../constructors/peerSettings.md) = \['report_spam' => [Bool](../types/Bool.md), \];  
 
-[$Peer](../types/Peer.md) = \['user_id' => [int](../types/int.md), \];  
+[$peerUser](../constructors/peerUser.md) = \['user_id' => [int](../types/int.md), \];  
 
-[$Photo](../types/Photo.md) = \['has_stickers' => [Bool](../types/Bool.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'sizes' => \[[PhotoSize](../types/PhotoSize.md)\], \];  
+[$photo](../constructors/photo.md) = \['has_stickers' => [Bool](../types/Bool.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'sizes' => \[[PhotoSize](../types/PhotoSize.md)\], \];  
 
-[$PhotoSize](../types/PhotoSize.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
+[$photoCachedSize](../constructors/photoCachedSize.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
 
-[$Photo](../types/Photo.md) = \['id' => [long](../types/long.md), \];  
+[$photoEmpty](../constructors/photoEmpty.md) = \['id' => [long](../types/long.md), \];  
 
-[$PhotoSize](../types/PhotoSize.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), \];  
+[$photoSize](../constructors/photoSize.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), \];  
 
-[$PhotoSize](../types/PhotoSize.md) = \['type' => [string](../types/string.md), \];  
+[$photoSizeEmpty](../constructors/photoSizeEmpty.md) = \['type' => [string](../types/string.md), \];  
 
-[$photos\_Photo](../types/photos_Photo.md) = \['photo' => [Photo](../types/Photo.md), 'users' => \[[User](../types/User.md)\], \];  
+[$photos\_photo](../constructors/photos_photo.md) = \['photo' => [Photo](../types/Photo.md), 'users' => \[[User](../types/User.md)\], \];  
 
-[$photos\_Photos](../types/photos_Photos.md) = \['photos' => \[[Photo](../types/Photo.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$photos\_photos](../constructors/photos_photos.md) = \['photos' => \[[Photo](../types/Photo.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$photos\_Photos](../types/photos_Photos.md) = \['count' => [int](../types/int.md), 'photos' => \[[Photo](../types/Photo.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$photos\_photosSlice](../constructors/photos_photosSlice.md) = \['count' => [int](../types/int.md), 'photos' => \[[Photo](../types/Photo.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$PrivacyKey](../types/PrivacyKey.md) = \[\];  
+[$privacyKeyChatInvite](../constructors/privacyKeyChatInvite.md) = \[\];  
 
-[$PrivacyKey](../types/PrivacyKey.md) = \[\];  
+[$privacyKeyStatusTimestamp](../constructors/privacyKeyStatusTimestamp.md) = \[\];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \[\];  
+[$privacyValueAllowAll](../constructors/privacyValueAllowAll.md) = \[\];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \[\];  
+[$privacyValueAllowContacts](../constructors/privacyValueAllowContacts.md) = \[\];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \['users' => \[[int](../types/int.md)\], \];  
+[$privacyValueAllowUsers](../constructors/privacyValueAllowUsers.md) = \['users' => \[[int](../types/int.md)\], \];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \[\];  
+[$privacyValueDisallowAll](../constructors/privacyValueDisallowAll.md) = \[\];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \[\];  
+[$privacyValueDisallowContacts](../constructors/privacyValueDisallowContacts.md) = \[\];  
 
-[$PrivacyRule](../types/PrivacyRule.md) = \['users' => \[[int](../types/int.md)\], \];  
+[$privacyValueDisallowUsers](../constructors/privacyValueDisallowUsers.md) = \['users' => \[[int](../types/int.md)\], \];  
 
-[$ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md) = \['id' => [int](../types/int.md), \];  
+[$receivedNotifyMessage](../constructors/receivedNotifyMessage.md) = \['id' => [int](../types/int.md), \];  
 
-[$ReplyMarkup](../types/ReplyMarkup.md) = \['rows' => \[[KeyboardButtonRow](../types/KeyboardButtonRow.md)\], \];  
+[$replyInlineMarkup](../constructors/replyInlineMarkup.md) = \['rows' => \[[KeyboardButtonRow](../types/KeyboardButtonRow.md)\], \];  
 
-[$ReplyMarkup](../types/ReplyMarkup.md) = \['single_use' => [Bool](../types/Bool.md), 'selective' => [Bool](../types/Bool.md), \];  
+[$replyKeyboardForceReply](../constructors/replyKeyboardForceReply.md) = \['single_use' => [Bool](../types/Bool.md), 'selective' => [Bool](../types/Bool.md), \];  
 
-[$ReplyMarkup](../types/ReplyMarkup.md) = \['selective' => [Bool](../types/Bool.md), \];  
+[$replyKeyboardHide](../constructors/replyKeyboardHide.md) = \['selective' => [Bool](../types/Bool.md), \];  
 
-[$ReplyMarkup](../types/ReplyMarkup.md) = \['resize' => [Bool](../types/Bool.md), 'single_use' => [Bool](../types/Bool.md), 'selective' => [Bool](../types/Bool.md), 'rows' => \[[KeyboardButtonRow](../types/KeyboardButtonRow.md)\], \];  
+[$replyKeyboardMarkup](../constructors/replyKeyboardMarkup.md) = \['resize' => [Bool](../types/Bool.md), 'single_use' => [Bool](../types/Bool.md), 'selective' => [Bool](../types/Bool.md), 'rows' => \[[KeyboardButtonRow](../types/KeyboardButtonRow.md)\], \];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageCancelAction](../constructors/sendMessageCancelAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageChooseContactAction](../constructors/sendMessageChooseContactAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageGeoLocationAction](../constructors/sendMessageGeoLocationAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageRecordAudioAction](../constructors/sendMessageRecordAudioAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageRecordVideoAction](../constructors/sendMessageRecordVideoAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \[\];  
+[$sendMessageTypingAction](../constructors/sendMessageTypingAction.md) = \[\];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \['progress' => [int](../types/int.md), \];  
+[$sendMessageUploadAudioAction](../constructors/sendMessageUploadAudioAction.md) = \['progress' => [int](../types/int.md), \];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \['progress' => [int](../types/int.md), \];  
+[$sendMessageUploadDocumentAction](../constructors/sendMessageUploadDocumentAction.md) = \['progress' => [int](../types/int.md), \];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \['progress' => [int](../types/int.md), \];  
+[$sendMessageUploadPhotoAction](../constructors/sendMessageUploadPhotoAction.md) = \['progress' => [int](../types/int.md), \];  
 
-[$SendMessageAction](../types/SendMessageAction.md) = \['progress' => [int](../types/int.md), \];  
+[$sendMessageUploadVideoAction](../constructors/sendMessageUploadVideoAction.md) = \['progress' => [int](../types/int.md), \];  
 
-[$StickerPack](../types/StickerPack.md) = \['emoticon' => [string](../types/string.md), 'documents' => \[[long](../types/long.md)\], \];  
+[$stickerPack](../constructors/stickerPack.md) = \['emoticon' => [string](../types/string.md), 'documents' => \[[long](../types/long.md)\], \];  
 
-[$StickerSet](../types/StickerSet.md) = \['installed' => [Bool](../types/Bool.md), 'archived' => [Bool](../types/Bool.md), 'official' => [Bool](../types/Bool.md), 'masks' => [Bool](../types/Bool.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), 'short_name' => [string](../types/string.md), 'count' => [int](../types/int.md), 'hash' => [int](../types/int.md), \];  
+[$stickerSet](../constructors/stickerSet.md) = \['installed' => [Bool](../types/Bool.md), 'archived' => [Bool](../types/Bool.md), 'official' => [Bool](../types/Bool.md), 'masks' => [Bool](../types/Bool.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), 'short_name' => [string](../types/string.md), 'count' => [int](../types/int.md), 'hash' => [int](../types/int.md), \];  
 
-[$StickerSetCovered](../types/StickerSetCovered.md) = \['set' => [StickerSet](../types/StickerSet.md), 'cover' => [Document](../types/Document.md), \];  
+[$stickerSetCovered](../constructors/stickerSetCovered.md) = \['set' => [StickerSet](../types/StickerSet.md), 'cover' => [Document](../types/Document.md), \];  
 
-[$StickerSetCovered](../types/StickerSetCovered.md) = \['set' => [StickerSet](../types/StickerSet.md), 'covers' => \[[Document](../types/Document.md)\], \];  
+[$stickerSetMultiCovered](../constructors/stickerSetMultiCovered.md) = \['set' => [StickerSet](../types/StickerSet.md), 'covers' => \[[Document](../types/Document.md)\], \];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileGif](../constructors/storage_fileGif.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileJpeg](../constructors/storage_fileJpeg.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileMov](../constructors/storage_fileMov.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileMp3](../constructors/storage_fileMp3.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileMp4](../constructors/storage_fileMp4.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_filePartial](../constructors/storage_filePartial.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_filePdf](../constructors/storage_filePdf.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_filePng](../constructors/storage_filePng.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileUnknown](../constructors/storage_fileUnknown.md) = \[\];  
 
-[$storage\_FileType](../types/storage_FileType.md) = \[\];  
+[$storage\_fileWebp](../constructors/storage_fileWebp.md) = \[\];  
 
-[$TopPeer](../types/TopPeer.md) = \['peer' => [Peer](../types/Peer.md), 'rating' => [double](../types/double.md), \];  
+[$topPeer](../constructors/topPeer.md) = \['peer' => [Peer](../types/Peer.md), 'rating' => [double](../types/double.md), \];  
 
-[$TopPeerCategory](../types/TopPeerCategory.md) = \[\];  
+[$topPeerCategoryBotsInline](../constructors/topPeerCategoryBotsInline.md) = \[\];  
 
-[$TopPeerCategory](../types/TopPeerCategory.md) = \[\];  
+[$topPeerCategoryBotsPM](../constructors/topPeerCategoryBotsPM.md) = \[\];  
 
-[$TopPeerCategory](../types/TopPeerCategory.md) = \[\];  
+[$topPeerCategoryChannels](../constructors/topPeerCategoryChannels.md) = \[\];  
 
-[$TopPeerCategory](../types/TopPeerCategory.md) = \[\];  
+[$topPeerCategoryCorrespondents](../constructors/topPeerCategoryCorrespondents.md) = \[\];  
 
-[$TopPeerCategory](../types/TopPeerCategory.md) = \[\];  
+[$topPeerCategoryGroups](../constructors/topPeerCategoryGroups.md) = \[\];  
 
-[$TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md) = \['category' => [TopPeerCategory](../types/TopPeerCategory.md), 'count' => [int](../types/int.md), 'peers' => \[[TopPeer](../types/TopPeer.md)\], \];  
+[$topPeerCategoryPeers](../constructors/topPeerCategoryPeers.md) = \['category' => [TopPeerCategory](../types/TopPeerCategory.md), 'count' => [int](../types/int.md), 'peers' => \[[TopPeer](../types/TopPeer.md)\], \];  
 
-[$True](../types/True.md) = \[\];  
+[$true](../constructors/true.md) = \[\];  
 
-[$Update](../types/Update.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'peer' => [Peer](../types/Peer.md), 'msg_id' => [int](../types/int.md), 'chat_instance' => [long](../types/long.md), 'data' => [bytes](../types/bytes.md), 'game_short_name' => [string](../types/string.md), \];  
+[$updateBotCallbackQuery](../constructors/updateBotCallbackQuery.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'peer' => [Peer](../types/Peer.md), 'msg_id' => [int](../types/int.md), 'chat_instance' => [long](../types/long.md), 'data' => [bytes](../types/bytes.md), 'game_short_name' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'query' => [string](../types/string.md), 'geo' => [GeoPoint](../types/GeoPoint.md), 'offset' => [string](../types/string.md), \];  
+[$updateBotInlineQuery](../constructors/updateBotInlineQuery.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'query' => [string](../types/string.md), 'geo' => [GeoPoint](../types/GeoPoint.md), 'offset' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'query' => [string](../types/string.md), 'geo' => [GeoPoint](../types/GeoPoint.md), 'id' => [string](../types/string.md), 'msg_id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), \];  
+[$updateBotInlineSend](../constructors/updateBotInlineSend.md) = \['user_id' => [int](../types/int.md), 'query' => [string](../types/string.md), 'geo' => [GeoPoint](../types/GeoPoint.md), 'id' => [string](../types/string.md), 'msg_id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), \];  
+[$updateChannel](../constructors/updateChannel.md) = \['channel_id' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'id' => [int](../types/int.md), 'views' => [int](../types/int.md), \];  
+[$updateChannelMessageViews](../constructors/updateChannelMessageViews.md) = \['channel_id' => [int](../types/int.md), 'id' => [int](../types/int.md), 'views' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'id' => [int](../types/int.md), \];  
+[$updateChannelPinnedMessage](../constructors/updateChannelPinnedMessage.md) = \['channel_id' => [int](../types/int.md), 'id' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), \];  
+[$updateChannelTooLong](../constructors/updateChannelTooLong.md) = \['channel_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'enabled' => [Bool](../types/Bool.md), 'version' => [int](../types/int.md), \];  
+[$updateChatAdmins](../constructors/updateChatAdmins.md) = \['chat_id' => [int](../types/int.md), 'enabled' => [Bool](../types/Bool.md), 'version' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), \];  
+[$updateChatParticipantAdd](../constructors/updateChatParticipantAdd.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'inviter_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'is_admin' => [Bool](../types/Bool.md), 'version' => [int](../types/int.md), \];  
+[$updateChatParticipantAdmin](../constructors/updateChatParticipantAdmin.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'is_admin' => [Bool](../types/Bool.md), 'version' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'version' => [int](../types/int.md), \];  
+[$updateChatParticipantDelete](../constructors/updateChatParticipantDelete.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'version' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['participants' => [ChatParticipants](../types/ChatParticipants.md), \];  
+[$updateChatParticipants](../constructors/updateChatParticipants.md) = \['participants' => [ChatParticipants](../types/ChatParticipants.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'action' => [SendMessageAction](../types/SendMessageAction.md), \];  
+[$updateChatUserTyping](../constructors/updateChatUserTyping.md) = \['chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'action' => [SendMessageAction](../types/SendMessageAction.md), \];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updateConfig](../constructors/updateConfig.md) = \[\];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'my_link' => [ContactLink](../types/ContactLink.md), 'foreign_link' => [ContactLink](../types/ContactLink.md), \];  
+[$updateContactLink](../constructors/updateContactLink.md) = \['user_id' => [int](../types/int.md), 'my_link' => [ContactLink](../types/ContactLink.md), 'foreign_link' => [ContactLink](../types/ContactLink.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$updateContactRegistered](../constructors/updateContactRegistered.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['dc_options' => \[[DcOption](../types/DcOption.md)\], \];  
+[$updateDcOptions](../constructors/updateDcOptions.md) = \['dc_options' => \[[DcOption](../types/DcOption.md)\], \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateDeleteChannelMessages](../constructors/updateDeleteChannelMessages.md) = \['channel_id' => [int](../types/int.md), 'messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateDeleteMessages](../constructors/updateDeleteMessages.md) = \['messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['peer' => [Peer](../types/Peer.md), 'draft' => [DraftMessage](../types/DraftMessage.md), \];  
+[$updateDraftMessage](../constructors/updateDraftMessage.md) = \['peer' => [Peer](../types/Peer.md), 'draft' => [DraftMessage](../types/DraftMessage.md), \];  
 
-[$Update](../types/Update.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateEditChannelMessage](../constructors/updateEditChannelMessage.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateEditMessage](../constructors/updateEditMessage.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), \];  
+[$updateEncryptedChatTyping](../constructors/updateEncryptedChatTyping.md) = \['chat_id' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat_id' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
+[$updateEncryptedMessagesRead](../constructors/updateEncryptedMessagesRead.md) = \['chat_id' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'date' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['chat' => [EncryptedChat](../types/EncryptedChat.md), 'date' => [int](../types/int.md), \];  
+[$updateEncryption](../constructors/updateEncryption.md) = \['chat' => [EncryptedChat](../types/EncryptedChat.md), 'date' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'msg_id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'chat_instance' => [long](../types/long.md), 'data' => [bytes](../types/bytes.md), 'game_short_name' => [string](../types/string.md), \];  
+[$updateInlineBotCallbackQuery](../constructors/updateInlineBotCallbackQuery.md) = \['query_id' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'msg_id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'chat_instance' => [long](../types/long.md), 'data' => [bytes](../types/bytes.md), 'game_short_name' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['id' => [int](../types/int.md), 'random_id' => [long](../types/long.md), \];  
+[$updateMessageID](../constructors/updateMessageID.md) = \['id' => [int](../types/int.md), 'random_id' => [long](../types/long.md), \];  
 
-[$Update](../types/Update.md) = \['auth_key_id' => [long](../types/long.md), 'date' => [int](../types/int.md), 'device' => [string](../types/string.md), 'location' => [string](../types/string.md), \];  
+[$updateNewAuthorization](../constructors/updateNewAuthorization.md) = \['auth_key_id' => [long](../types/long.md), 'date' => [int](../types/int.md), 'device' => [string](../types/string.md), 'location' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateNewChannelMessage](../constructors/updateNewChannelMessage.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['message' => [EncryptedMessage](../types/EncryptedMessage.md), 'qts' => [int](../types/int.md), \];  
+[$updateNewEncryptedMessage](../constructors/updateNewEncryptedMessage.md) = \['message' => [EncryptedMessage](../types/EncryptedMessage.md), 'qts' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateNewMessage](../constructors/updateNewMessage.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['stickerset' => [messages\_StickerSet](../types/messages_StickerSet.md), \];  
+[$updateNewStickerSet](../constructors/updateNewStickerSet.md) = \['stickerset' => [messages\_StickerSet](../types/messages_StickerSet.md), \];  
 
-[$Update](../types/Update.md) = \['peer' => [NotifyPeer](../types/NotifyPeer.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), \];  
+[$updateNotifySettings](../constructors/updateNotifySettings.md) = \['peer' => [NotifyPeer](../types/NotifyPeer.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), \];  
 
-[$Update](../types/Update.md) = \['key' => [PrivacyKey](../types/PrivacyKey.md), 'rules' => \[[PrivacyRule](../types/PrivacyRule.md)\], \];  
+[$updatePrivacy](../constructors/updatePrivacy.md) = \['key' => [PrivacyKey](../types/PrivacyKey.md), 'rules' => \[[PrivacyRule](../types/PrivacyRule.md)\], \];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updatePtsChanged](../constructors/updatePtsChanged.md) = \[\];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
+[$updateReadChannelInbox](../constructors/updateReadChannelInbox.md) = \['channel_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['channel_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
+[$updateReadChannelOutbox](../constructors/updateReadChannelOutbox.md) = \['channel_id' => [int](../types/int.md), 'max_id' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updateReadFeaturedStickers](../constructors/updateReadFeaturedStickers.md) = \[\];  
 
-[$Update](../types/Update.md) = \['peer' => [Peer](../types/Peer.md), 'max_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateReadHistoryInbox](../constructors/updateReadHistoryInbox.md) = \['peer' => [Peer](../types/Peer.md), 'max_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['peer' => [Peer](../types/Peer.md), 'max_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateReadHistoryOutbox](../constructors/updateReadHistoryOutbox.md) = \['peer' => [Peer](../types/Peer.md), 'max_id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \['messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateReadMessagesContents](../constructors/updateReadMessagesContents.md) = \['messages' => \[[int](../types/int.md)\], 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updateRecentStickers](../constructors/updateRecentStickers.md) = \[\];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updateSavedGifs](../constructors/updateSavedGifs.md) = \[\];  
 
-[$Update](../types/Update.md) = \['type' => [string](../types/string.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'popup' => [Bool](../types/Bool.md), \];  
+[$updateServiceNotification](../constructors/updateServiceNotification.md) = \['type' => [string](../types/string.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'popup' => [Bool](../types/Bool.md), \];  
 
-[$Updates](../types/Updates.md) = \['update' => [Update](../types/Update.md), 'date' => [int](../types/int.md), \];  
+[$updateShort](../constructors/updateShort.md) = \['update' => [Update](../types/Update.md), 'date' => [int](../types/int.md), \];  
 
-[$Updates](../types/Updates.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'chat_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
+[$updateShortChatMessage](../constructors/updateShortChatMessage.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'chat_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
 
-[$Updates](../types/Updates.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
+[$updateShortMessage](../constructors/updateShortMessage.md) = \['out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'fwd_from' => [MessageFwdHeader](../types/MessageFwdHeader.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
 
-[$Updates](../types/Updates.md) = \['out' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
+[$updateShortSentMessage](../constructors/updateShortSentMessage.md) = \['out' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), 'date' => [int](../types/int.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];  
 
-[$Update](../types/Update.md) = \[\];  
+[$updateStickerSets](../constructors/updateStickerSets.md) = \[\];  
 
-[$Update](../types/Update.md) = \['masks' => [Bool](../types/Bool.md), 'order' => \[[long](../types/long.md)\], \];  
+[$updateStickerSetsOrder](../constructors/updateStickerSetsOrder.md) = \['masks' => [Bool](../types/Bool.md), 'order' => \[[long](../types/long.md)\], \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'blocked' => [Bool](../types/Bool.md), \];  
+[$updateUserBlocked](../constructors/updateUserBlocked.md) = \['user_id' => [int](../types/int.md), 'blocked' => [Bool](../types/Bool.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), \];  
+[$updateUserName](../constructors/updateUserName.md) = \['user_id' => [int](../types/int.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'phone' => [string](../types/string.md), \];  
+[$updateUserPhone](../constructors/updateUserPhone.md) = \['user_id' => [int](../types/int.md), 'phone' => [string](../types/string.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'previous' => [Bool](../types/Bool.md), \];  
+[$updateUserPhoto](../constructors/updateUserPhoto.md) = \['user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'previous' => [Bool](../types/Bool.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'status' => [UserStatus](../types/UserStatus.md), \];  
+[$updateUserStatus](../constructors/updateUserStatus.md) = \['user_id' => [int](../types/int.md), 'status' => [UserStatus](../types/UserStatus.md), \];  
 
-[$Update](../types/Update.md) = \['user_id' => [int](../types/int.md), 'action' => [SendMessageAction](../types/SendMessageAction.md), \];  
+[$updateUserTyping](../constructors/updateUserTyping.md) = \['user_id' => [int](../types/int.md), 'action' => [SendMessageAction](../types/SendMessageAction.md), \];  
 
-[$Update](../types/Update.md) = \['webpage' => [WebPage](../types/WebPage.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
+[$updateWebPage](../constructors/updateWebPage.md) = \['webpage' => [WebPage](../types/WebPage.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];  
 
-[$Updates](../types/Updates.md) = \['updates' => \[[Update](../types/Update.md)\], 'users' => \[[User](../types/User.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
+[$updates](../constructors/updates.md) = \['updates' => \[[Update](../types/Update.md)\], 'users' => \[[User](../types/User.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
 
-[$Updates](../types/Updates.md) = \['updates' => \[[Update](../types/Update.md)\], 'users' => \[[User](../types/User.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'date' => [int](../types/int.md), 'seq_start' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
+[$updatesCombined](../constructors/updatesCombined.md) = \['updates' => \[[Update](../types/Update.md)\], 'users' => \[[User](../types/User.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'date' => [int](../types/int.md), 'seq_start' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
 
-[$Updates](../types/Updates.md) = \[\];  
+[$updatesTooLong](../constructors/updatesTooLong.md) = \[\];  
 
-[$updates\_ChannelDifference](../types/updates_ChannelDifference.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'new_messages' => \[[Message](../types/Message.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$updates\_channelDifference](../constructors/updates_channelDifference.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'new_messages' => \[[Message](../types/Message.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$updates\_ChannelDifference](../types/updates_ChannelDifference.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), \];  
+[$updates\_channelDifferenceEmpty](../constructors/updates_channelDifferenceEmpty.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), \];  
 
-[$updates\_ChannelDifference](../types/updates_ChannelDifference.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'top_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
+[$updates\_channelDifferenceTooLong](../constructors/updates_channelDifferenceTooLong.md) = \['final' => [Bool](../types/Bool.md), 'pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'top_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];  
 
-[$updates\_Difference](../types/updates_Difference.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];  
+[$updates\_difference](../constructors/updates_difference.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];  
 
-[$updates\_Difference](../types/updates_Difference.md) = \['date' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
+[$updates\_differenceEmpty](../constructors/updates_differenceEmpty.md) = \['date' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];  
 
-[$updates\_Difference](../types/updates_Difference.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'intermediate_state' => [updates\_State](../types/updates_State.md), \];  
+[$updates\_differenceSlice](../constructors/updates_differenceSlice.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'intermediate_state' => [updates\_State](../types/updates_State.md), \];  
 
-[$updates\_State](../types/updates_State.md) = \['pts' => [int](../types/int.md), 'qts' => [int](../types/int.md), 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), \];  
+[$updates\_state](../constructors/updates_state.md) = \['pts' => [int](../types/int.md), 'qts' => [int](../types/int.md), 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), \];  
 
-[$upload\_File](../types/upload_File.md) = \['type' => [storage\_FileType](../types/storage_FileType.md), 'mtime' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
+[$upload\_file](../constructors/upload_file.md) = \['type' => [storage\_FileType](../types/storage_FileType.md), 'mtime' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];  
 
-[$User](../types/User.md) = \['self' => [Bool](../types/Bool.md), 'contact' => [Bool](../types/Bool.md), 'mutual_contact' => [Bool](../types/Bool.md), 'deleted' => [Bool](../types/Bool.md), 'bot' => [Bool](../types/Bool.md), 'bot_chat_history' => [Bool](../types/Bool.md), 'bot_nochats' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'bot_inline_geo' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), 'phone' => [string](../types/string.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'status' => [UserStatus](../types/UserStatus.md), 'bot_info_version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), 'bot_inline_placeholder' => [string](../types/string.md), \];  
+[$user](../constructors/user.md) = \['self' => [Bool](../types/Bool.md), 'contact' => [Bool](../types/Bool.md), 'mutual_contact' => [Bool](../types/Bool.md), 'deleted' => [Bool](../types/Bool.md), 'bot' => [Bool](../types/Bool.md), 'bot_chat_history' => [Bool](../types/Bool.md), 'bot_nochats' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'bot_inline_geo' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), 'phone' => [string](../types/string.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'status' => [UserStatus](../types/UserStatus.md), 'bot_info_version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), 'bot_inline_placeholder' => [string](../types/string.md), \];  
 
-[$User](../types/User.md) = \['id' => [int](../types/int.md), \];  
+[$userEmpty](../constructors/userEmpty.md) = \['id' => [int](../types/int.md), \];  
 
-[$UserFull](../types/UserFull.md) = \['blocked' => [Bool](../types/Bool.md), 'user' => [User](../types/User.md), 'about' => [string](../types/string.md), 'link' => [contacts\_Link](../types/contacts_Link.md), 'profile_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'bot_info' => [BotInfo](../types/BotInfo.md), \];  
+[$userFull](../constructors/userFull.md) = \['blocked' => [Bool](../types/Bool.md), 'user' => [User](../types/User.md), 'about' => [string](../types/string.md), 'link' => [contacts\_Link](../types/contacts_Link.md), 'profile_photo' => [Photo](../types/Photo.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'bot_info' => [BotInfo](../types/BotInfo.md), \];  
 
-[$UserProfilePhoto](../types/UserProfilePhoto.md) = \['photo_id' => [long](../types/long.md), 'photo_small' => [FileLocation](../types/FileLocation.md), 'photo_big' => [FileLocation](../types/FileLocation.md), \];  
+[$userProfilePhoto](../constructors/userProfilePhoto.md) = \['photo_id' => [long](../types/long.md), 'photo_small' => [FileLocation](../types/FileLocation.md), 'photo_big' => [FileLocation](../types/FileLocation.md), \];  
 
-[$UserProfilePhoto](../types/UserProfilePhoto.md) = \[\];  
+[$userProfilePhotoEmpty](../constructors/userProfilePhotoEmpty.md) = \[\];  
 
-[$UserStatus](../types/UserStatus.md) = \[\];  
+[$userStatusEmpty](../constructors/userStatusEmpty.md) = \[\];  
 
-[$UserStatus](../types/UserStatus.md) = \[\];  
+[$userStatusLastMonth](../constructors/userStatusLastMonth.md) = \[\];  
 
-[$UserStatus](../types/UserStatus.md) = \[\];  
+[$userStatusLastWeek](../constructors/userStatusLastWeek.md) = \[\];  
 
-[$UserStatus](../types/UserStatus.md) = \['was_online' => [int](../types/int.md), \];  
+[$userStatusOffline](../constructors/userStatusOffline.md) = \['was_online' => [int](../types/int.md), \];  
 
-[$UserStatus](../types/UserStatus.md) = \['expires' => [int](../types/int.md), \];  
+[$userStatusOnline](../constructors/userStatusOnline.md) = \['expires' => [int](../types/int.md), \];  
 
-[$UserStatus](../types/UserStatus.md) = \[\];  
+[$userStatusRecently](../constructors/userStatusRecently.md) = \[\];  
 
-[$Vector t](../types/Vector t.md) = \[\];  
+[$vector](../constructors/vector.md) = \[\];  
 
-[$WallPaper](../types/WallPaper.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'sizes' => \[[PhotoSize](../types/PhotoSize.md)\], 'color' => [int](../types/int.md), \];  
+[$wallPaper](../constructors/wallPaper.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'sizes' => \[[PhotoSize](../types/PhotoSize.md)\], 'color' => [int](../types/int.md), \];  
 
-[$WallPaper](../types/WallPaper.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'bg_color' => [int](../types/int.md), 'color' => [int](../types/int.md), \];  
+[$wallPaperSolid](../constructors/wallPaperSolid.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'bg_color' => [int](../types/int.md), 'color' => [int](../types/int.md), \];  
 
-[$WebPage](../types/WebPage.md) = \['id' => [long](../types/long.md), 'url' => [string](../types/string.md), 'display_url' => [string](../types/string.md), 'type' => [string](../types/string.md), 'site_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'embed_url' => [string](../types/string.md), 'embed_type' => [string](../types/string.md), 'embed_width' => [int](../types/int.md), 'embed_height' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'author' => [string](../types/string.md), 'document' => [Document](../types/Document.md), \];  
+[$webPage](../constructors/webPage.md) = \['id' => [long](../types/long.md), 'url' => [string](../types/string.md), 'display_url' => [string](../types/string.md), 'type' => [string](../types/string.md), 'site_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'embed_url' => [string](../types/string.md), 'embed_type' => [string](../types/string.md), 'embed_width' => [int](../types/int.md), 'embed_height' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'author' => [string](../types/string.md), 'document' => [Document](../types/Document.md), \];  
 
-[$WebPage](../types/WebPage.md) = \['id' => [long](../types/long.md), \];  
+[$webPageEmpty](../constructors/webPageEmpty.md) = \['id' => [long](../types/long.md), \];  
 
-[$WebPage](../types/WebPage.md) = \['id' => [long](../types/long.md), 'date' => [int](../types/int.md), \];  
+[$webPagePending](../constructors/webPagePending.md) = \['id' => [long](../types/long.md), 'date' => [int](../types/int.md), \];  
 

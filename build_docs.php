@@ -204,7 +204,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
         $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
     }
 
-    $constructors[$constructor] = '[$'.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md) = \['.$params.'\];  
+    $constructors[$constructor] = '[$'.str_replace('_', '\_', $constructor).'](../constructors/'.$constructor.'.md) = \['.$params.'\];  
 
 ';
 
