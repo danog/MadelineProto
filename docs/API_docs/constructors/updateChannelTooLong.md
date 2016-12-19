@@ -14,5 +14,5 @@
 
 
 ```
-$updateChannelTooLong = ['channel_id' => int, 'pts' => int, ];
+$updateChannelTooLong = ['_' => updateChannelTooLong', 'channel_id' => int, 'pts' => int, ];
 ```

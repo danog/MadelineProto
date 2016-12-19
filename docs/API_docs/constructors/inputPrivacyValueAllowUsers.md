@@ -13,5 +13,5 @@
 
 
 ```
-$inputPrivacyValueAllowUsers = ['users' => [InputUser], ];
+$inputPrivacyValueAllowUsers = ['_' => inputPrivacyValueAllowUsers', 'users' => [Vector t], ];
 ```

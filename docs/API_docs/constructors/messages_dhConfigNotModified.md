@@ -13,5 +13,5 @@
 
 
 ```
-$messages_dhConfigNotModified = ['random' => bytes, ];
+$messages_dhConfigNotModified = ['_' => messages_dhConfigNotModified', 'random' => bytes, ];
 ```

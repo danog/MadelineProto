@@ -1,6 +1,6 @@
 ## Type: FoundGif  
 
-### Constructors:
+### Possible values (constructors):
 
 [foundGif](../constructors/foundGif.md)  
 

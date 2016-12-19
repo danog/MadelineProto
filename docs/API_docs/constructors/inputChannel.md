@@ -14,5 +14,5 @@
 
 
 ```
-$inputChannel = ['channel_id' => int, 'access_hash' => long, ];
+$inputChannel = ['_' => inputChannel', 'channel_id' => int, 'access_hash' => long, ];
 ```

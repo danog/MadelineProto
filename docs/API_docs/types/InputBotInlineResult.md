@@ -1,6 +1,6 @@
 ## Type: InputBotInlineResult  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputBotInlineResult](../constructors/inputBotInlineResult.md)  
 

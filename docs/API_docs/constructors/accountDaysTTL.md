@@ -13,5 +13,5 @@
 
 
 ```
-$accountDaysTTL = ['days' => int, ];
+$accountDaysTTL = ['_' => accountDaysTTL', 'days' => int, ];
 ```

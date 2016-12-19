@@ -1,6 +1,6 @@
 ## Type: PeerNotifySettings  
 
-### Constructors:
+### Possible values (constructors):
 
 [peerNotifySettingsEmpty](../constructors/peerNotifySettingsEmpty.md)  
 

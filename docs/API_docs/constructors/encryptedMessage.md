@@ -17,5 +17,5 @@
 
 
 ```
-$encryptedMessage = ['random_id' => long, 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
+$encryptedMessage = ['_' => encryptedMessage', 'random_id' => long, 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
 ```

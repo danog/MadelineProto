@@ -1,6 +1,6 @@
 ## Type: ChatParticipants  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatParticipantsForbidden](../constructors/chatParticipantsForbidden.md)  
 

@@ -1,9 +1,5 @@
 ## Constructor: storage\_fileUnknown  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [storage\_FileType](../types/storage\_FileType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$storage_fileUnknown = ;
+$storage_fileUnknown = ['_' => storage_fileUnknown', ];
 ```

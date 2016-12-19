@@ -1,9 +1,5 @@
 ## Constructor: topPeerCategoryChannels  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [TopPeerCategory](../types/TopPeerCategory.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$topPeerCategoryChannels = ;
+$topPeerCategoryChannels = ['_' => topPeerCategoryChannels', ];
 ```

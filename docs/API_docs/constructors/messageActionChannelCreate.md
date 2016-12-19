@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChannelCreate = ['title' => string, ];
+$messageActionChannelCreate = ['_' => messageActionChannelCreate', 'title' => string, ];
 ```

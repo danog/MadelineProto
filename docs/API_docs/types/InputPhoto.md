@@ -1,6 +1,6 @@
 ## Type: InputPhoto  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPhotoEmpty](../constructors/inputPhotoEmpty.md)  
 

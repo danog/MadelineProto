@@ -1,6 +1,6 @@
 ## Type: InputPeerNotifyEvents  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPeerNotifyEventsEmpty](../constructors/inputPeerNotifyEventsEmpty.md)  
 

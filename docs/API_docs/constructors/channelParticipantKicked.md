@@ -15,5 +15,5 @@
 
 
 ```
-$channelParticipantKicked = ['user_id' => int, 'kicked_by' => int, 'date' => int, ];
+$channelParticipantKicked = ['_' => channelParticipantKicked', 'user_id' => int, 'kicked_by' => int, 'date' => int, ];
 ```

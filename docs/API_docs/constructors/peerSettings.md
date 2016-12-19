@@ -13,5 +13,5 @@
 
 
 ```
-$peerSettings = ['report_spam' => Bool, ];
+$peerSettings = ['_' => peerSettings', 'report_spam' => true, ];
 ```

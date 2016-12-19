@@ -13,5 +13,5 @@
 
 
 ```
-$inputBotInlineMessageGame = ['reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageGame = ['_' => inputBotInlineMessageGame', 'reply_markup' => ReplyMarkup, ];
 ```

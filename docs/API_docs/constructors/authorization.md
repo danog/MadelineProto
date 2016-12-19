@@ -24,5 +24,5 @@
 
 
 ```
-$authorization = ['hash' => long, 'device_model' => string, 'platform' => string, 'system_version' => string, 'api_id' => int, 'app_name' => string, 'app_version' => string, 'date_created' => int, 'date_active' => int, 'ip' => string, 'country' => string, 'region' => string, ];
+$authorization = ['_' => authorization', 'hash' => long, 'device_model' => string, 'platform' => string, 'system_version' => string, 'api_id' => int, 'app_name' => string, 'app_version' => string, 'date_created' => int, 'date_active' => int, 'ip' => string, 'country' => string, 'region' => string, ];
 ```

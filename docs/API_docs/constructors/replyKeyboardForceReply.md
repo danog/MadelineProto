@@ -14,5 +14,5 @@
 
 
 ```
-$replyKeyboardForceReply = ['single_use' => Bool, 'selective' => Bool, ];
+$replyKeyboardForceReply = ['_' => replyKeyboardForceReply', 'single_use' => true, 'selective' => true, ];
 ```

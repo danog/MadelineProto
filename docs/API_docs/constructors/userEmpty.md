@@ -13,5 +13,5 @@
 
 
 ```
-$userEmpty = ['id' => int, ];
+$userEmpty = ['_' => userEmpty', 'id' => int, ];
 ```

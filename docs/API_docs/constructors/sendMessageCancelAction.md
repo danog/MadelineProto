@@ -1,9 +1,5 @@
 ## Constructor: sendMessageCancelAction  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [SendMessageAction](../types/SendMessageAction.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$sendMessageCancelAction = ;
+$sendMessageCancelAction = ['_' => sendMessageCancelAction', ];
 ```

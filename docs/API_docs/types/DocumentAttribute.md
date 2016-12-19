@@ -1,6 +1,6 @@
 ## Type: DocumentAttribute  
 
-### Constructors:
+### Possible values (constructors):
 
 [documentAttributeImageSize](../constructors/documentAttributeImageSize.md)  
 

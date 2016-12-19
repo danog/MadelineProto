@@ -13,5 +13,5 @@
 
 
 ```
-$updateChatParticipants = ['participants' => ChatParticipants, ];
+$updateChatParticipants = ['_' => updateChatParticipants', 'participants' => ChatParticipants, ];
 ```

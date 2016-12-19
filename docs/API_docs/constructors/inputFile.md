@@ -16,5 +16,5 @@
 
 
 ```
-$inputFile = ['id' => long, 'parts' => int, 'name' => string, 'md5_checksum' => string, ];
+$inputFile = ['_' => inputFile', 'id' => long, 'parts' => int, 'name' => string, 'md5_checksum' => string, ];
 ```

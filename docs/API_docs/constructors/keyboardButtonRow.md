@@ -13,5 +13,5 @@
 
 
 ```
-$keyboardButtonRow = ['buttons' => [KeyboardButton], ];
+$keyboardButtonRow = ['_' => keyboardButtonRow', 'buttons' => [Vector t], ];
 ```

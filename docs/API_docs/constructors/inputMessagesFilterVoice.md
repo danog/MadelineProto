@@ -1,9 +1,5 @@
 ## Constructor: inputMessagesFilterVoice  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [MessagesFilter](../types/MessagesFilter.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputMessagesFilterVoice = ;
+$inputMessagesFilterVoice = ['_' => inputMessagesFilterVoice', ];
 ```

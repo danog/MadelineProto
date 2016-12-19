@@ -1,6 +1,6 @@
 ## Type: contacts\_TopPeers  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_topPeersNotModified](../constructors/contacts\_topPeersNotModified.md)  
 

@@ -1,9 +1,5 @@
 ## Constructor: help\_noAppUpdate  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [help\_AppUpdate](../types/help\_AppUpdate.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$help_noAppUpdate = ;
+$help_noAppUpdate = ['_' => help_noAppUpdate', ];
 ```

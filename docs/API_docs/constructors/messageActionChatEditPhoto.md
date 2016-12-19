@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatEditPhoto = ['photo' => Photo, ];
+$messageActionChatEditPhoto = ['_' => messageActionChatEditPhoto', 'photo' => Photo, ];
 ```

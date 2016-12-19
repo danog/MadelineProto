@@ -14,5 +14,5 @@
 
 
 ```
-$inputPeerUser = ['user_id' => int, 'access_hash' => long, ];
+$inputPeerUser = ['_' => inputPeerUser', 'user_id' => int, 'access_hash' => long, ];
 ```

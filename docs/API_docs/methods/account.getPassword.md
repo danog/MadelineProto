@@ -1,9 +1,5 @@
 ## Method: account.getPassword  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [account\_Password](../types/account\_Password.md)

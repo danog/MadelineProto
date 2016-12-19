@@ -1,9 +1,5 @@
 ## Constructor: messages\_stickersNotModified  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [messages\_Stickers](../types/messages\_Stickers.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messages_stickersNotModified = ;
+$messages_stickersNotModified = ['_' => messages_stickersNotModified', ];
 ```

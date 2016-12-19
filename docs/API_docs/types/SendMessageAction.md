@@ -1,6 +1,6 @@
 ## Type: SendMessageAction  
 
-### Constructors:
+### Possible values (constructors):
 
 [sendMessageTypingAction](../constructors/sendMessageTypingAction.md)  
 

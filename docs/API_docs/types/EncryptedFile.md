@@ -1,6 +1,6 @@
 ## Type: EncryptedFile  
 
-### Constructors:
+### Possible values (constructors):
 
 [encryptedFileEmpty](../constructors/encryptedFileEmpty.md)  
 

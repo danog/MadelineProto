@@ -13,5 +13,5 @@
 
 
 ```
-$keyboardButtonRequestPhone = ['text' => string, ];
+$keyboardButtonRequestPhone = ['_' => keyboardButtonRequestPhone', 'text' => string, ];
 ```

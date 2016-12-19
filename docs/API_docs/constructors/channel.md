@@ -32,5 +32,5 @@
 
 
 ```
-$channel = ['creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'editor' => Bool, 'moderator' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
+$channel = ['_' => channel', 'creator' => true, 'kicked' => true, 'left' => true, 'editor' => true, 'moderator' => true, 'broadcast' => true, 'verified' => true, 'megagroup' => true, 'restricted' => true, 'democracy' => true, 'signatures' => true, 'min' => true, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
 ```

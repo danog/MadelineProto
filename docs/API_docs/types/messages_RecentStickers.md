@@ -1,6 +1,6 @@
 ## Type: messages\_RecentStickers  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_recentStickersNotModified](../constructors/messages\_recentStickersNotModified.md)  
 

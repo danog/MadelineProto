@@ -1,9 +1,5 @@
 ## Method: account.getAccountTTL  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [AccountDaysTTL](../types/AccountDaysTTL.md)

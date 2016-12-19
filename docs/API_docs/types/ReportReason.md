@@ -1,6 +1,6 @@
 ## Type: ReportReason  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputReportReasonSpam](../constructors/inputReportReasonSpam.md)  
 

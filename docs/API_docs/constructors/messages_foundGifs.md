@@ -14,5 +14,5 @@
 
 
 ```
-$messages_foundGifs = ['next_offset' => int, 'results' => [FoundGif], ];
+$messages_foundGifs = ['_' => messages_foundGifs', 'next_offset' => int, 'results' => [Vector t], ];
 ```

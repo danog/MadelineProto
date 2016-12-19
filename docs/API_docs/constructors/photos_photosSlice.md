@@ -15,5 +15,5 @@
 
 
 ```
-$photos_photosSlice = ['count' => int, 'photos' => [Photo], 'users' => [User], ];
+$photos_photosSlice = ['_' => photos_photosSlice', 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];
 ```

@@ -1,9 +1,5 @@
 ## Constructor: inputNotifyUsers  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputNotifyUsers = ;
+$inputNotifyUsers = ['_' => inputNotifyUsers', ];
 ```

@@ -1,6 +1,6 @@
 ## Type: help\_AppUpdate  
 
-### Constructors:
+### Possible values (constructors):
 
 [help\_appUpdate](../constructors/help\_appUpdate.md)  
 

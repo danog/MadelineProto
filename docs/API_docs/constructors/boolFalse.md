@@ -1,16 +1,3 @@
-## Constructor: boolFalse  
+# boolFalse  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
-
-
-### Type: [Bool](../types/Bool.md)
-
-### Example:
-
-
-```
-$boolFalse = ;
-```
+Represents boolean with value equal to `false`.

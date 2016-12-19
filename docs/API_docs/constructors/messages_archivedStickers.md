@@ -14,5 +14,5 @@
 
 
 ```
-$messages_archivedStickers = ['count' => int, 'sets' => [StickerSetCovered], ];
+$messages_archivedStickers = ['_' => messages_archivedStickers', 'count' => int, 'sets' => [Vector t], ];
 ```

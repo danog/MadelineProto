@@ -13,5 +13,5 @@
 
 
 ```
-$help_appChangelog = ['text' => string, ];
+$help_appChangelog = ['_' => help_appChangelog', 'text' => string, ];
 ```

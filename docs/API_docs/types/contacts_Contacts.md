@@ -1,6 +1,6 @@
 ## Type: contacts\_Contacts  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_contactsNotModified](../constructors/contacts\_contactsNotModified.md)  
 

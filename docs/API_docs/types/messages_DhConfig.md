@@ -1,6 +1,6 @@
 ## Type: messages\_DhConfig  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_dhConfigNotModified](../constructors/messages\_dhConfigNotModified.md)  
 

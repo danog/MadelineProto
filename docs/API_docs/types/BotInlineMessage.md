@@ -1,6 +1,6 @@
 ## Type: BotInlineMessage  
 
-### Constructors:
+### Possible values (constructors):
 
 [botInlineMessageMediaAuto](../constructors/botInlineMessageMediaAuto.md)  
 

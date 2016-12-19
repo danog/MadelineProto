@@ -1,6 +1,6 @@
 ## Type: DcOption  
 
-### Constructors:
+### Possible values (constructors):
 
 [dcOption](../constructors/dcOption.md)  
 

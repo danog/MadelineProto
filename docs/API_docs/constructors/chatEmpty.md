@@ -13,5 +13,5 @@
 
 
 ```
-$chatEmpty = ['id' => int, ];
+$chatEmpty = ['_' => chatEmpty', 'id' => int, ];
 ```

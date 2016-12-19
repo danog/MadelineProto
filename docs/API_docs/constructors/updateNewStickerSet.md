@@ -13,5 +13,5 @@
 
 
 ```
-$updateNewStickerSet = ['stickerset' => messages_StickerSet, ];
+$updateNewStickerSet = ['_' => updateNewStickerSet', 'stickerset' => messages.StickerSet, ];
 ```

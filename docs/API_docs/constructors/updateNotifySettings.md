@@ -14,5 +14,5 @@
 
 
 ```
-$updateNotifySettings = ['peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];
+$updateNotifySettings = ['_' => updateNotifySettings', 'peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];
 ```

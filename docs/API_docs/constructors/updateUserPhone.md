@@ -14,5 +14,5 @@
 
 
 ```
-$updateUserPhone = ['user_id' => int, 'phone' => string, ];
+$updateUserPhone = ['_' => updateUserPhone', 'user_id' => int, 'phone' => string, ];
 ```

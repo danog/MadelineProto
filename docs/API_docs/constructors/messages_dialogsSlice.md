@@ -17,5 +17,5 @@
 
 
 ```
-$messages_dialogsSlice = ['count' => int, 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$messages_dialogsSlice = ['_' => messages_dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

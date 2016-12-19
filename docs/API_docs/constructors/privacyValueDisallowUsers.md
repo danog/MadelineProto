@@ -13,5 +13,5 @@
 
 
 ```
-$privacyValueDisallowUsers = ['users' => [int], ];
+$privacyValueDisallowUsers = ['_' => privacyValueDisallowUsers', 'users' => [Vector t], ];
 ```

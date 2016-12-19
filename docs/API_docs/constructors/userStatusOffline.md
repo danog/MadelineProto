@@ -13,5 +13,5 @@
 
 
 ```
-$userStatusOffline = ['was_online' => int, ];
+$userStatusOffline = ['_' => userStatusOffline', 'was_online' => int, ];
 ```

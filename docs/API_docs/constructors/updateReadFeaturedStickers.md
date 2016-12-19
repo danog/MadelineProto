@@ -1,9 +1,5 @@
 ## Constructor: updateReadFeaturedStickers  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [Update](../types/Update.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$updateReadFeaturedStickers = ;
+$updateReadFeaturedStickers = ['_' => updateReadFeaturedStickers', ];
 ```

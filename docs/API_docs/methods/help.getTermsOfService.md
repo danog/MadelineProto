@@ -1,9 +1,5 @@
 ## Method: help.getTermsOfService  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_TermsOfService](../types/help\_TermsOfService.md)

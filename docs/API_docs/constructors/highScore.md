@@ -15,5 +15,5 @@
 
 
 ```
-$highScore = ['pos' => int, 'user_id' => int, 'score' => int, ];
+$highScore = ['_' => highScore', 'pos' => int, 'user_id' => int, 'score' => int, ];
 ```

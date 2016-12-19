@@ -1,6 +1,6 @@
 ## Type: WallPaper  
 
-### Constructors:
+### Possible values (constructors):
 
 [wallPaper](../constructors/wallPaper.md)  
 

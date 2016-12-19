@@ -14,5 +14,5 @@
 
 
 ```
-$inputEncryptedFileLocation = ['id' => long, 'access_hash' => long, ];
+$inputEncryptedFileLocation = ['_' => inputEncryptedFileLocation', 'id' => long, 'access_hash' => long, ];
 ```

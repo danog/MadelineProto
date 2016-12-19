@@ -1,6 +1,6 @@
 ## Type: updates\_State  
 
-### Constructors:
+### Possible values (constructors):
 
 [updates\_state](../constructors/updates\_state.md)  
 

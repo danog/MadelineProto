@@ -1,9 +1,5 @@
 ## Constructor: sendMessageGeoLocationAction  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [SendMessageAction](../types/SendMessageAction.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$sendMessageGeoLocationAction = ;
+$sendMessageGeoLocationAction = ['_' => sendMessageGeoLocationAction', ];
 ```

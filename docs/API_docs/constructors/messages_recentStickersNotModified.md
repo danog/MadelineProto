@@ -1,9 +1,5 @@
 ## Constructor: messages\_recentStickersNotModified  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [messages\_RecentStickers](../types/messages\_RecentStickers.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messages_recentStickersNotModified = ;
+$messages_recentStickersNotModified = ['_' => messages_recentStickersNotModified', ];
 ```

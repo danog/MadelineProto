@@ -13,5 +13,5 @@
 
 
 ```
-$updateDcOptions = ['dc_options' => [DcOption], ];
+$updateDcOptions = ['_' => updateDcOptions', 'dc_options' => [Vector t], ];
 ```

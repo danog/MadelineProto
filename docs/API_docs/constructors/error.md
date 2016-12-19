@@ -14,5 +14,5 @@
 
 
 ```
-$error = ['code' => int, 'text' => string, ];
+$error = ['_' => error', 'code' => int, 'text' => string, ];
 ```

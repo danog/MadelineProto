@@ -1,6 +1,6 @@
 ## Type: account\_PasswordSettings  
 
-### Constructors:
+### Possible values (constructors):
 
 [account\_passwordSettings](../constructors/account\_passwordSettings.md)  
 

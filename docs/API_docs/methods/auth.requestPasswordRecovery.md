@@ -1,9 +1,5 @@
 ## Method: auth.requestPasswordRecovery  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [auth\_PasswordRecovery](../types/auth\_PasswordRecovery.md)

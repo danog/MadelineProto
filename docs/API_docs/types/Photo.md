@@ -1,6 +1,6 @@
 ## Type: Photo  
 
-### Constructors:
+### Possible values (constructors):
 
 [photoEmpty](../constructors/photoEmpty.md)  
 

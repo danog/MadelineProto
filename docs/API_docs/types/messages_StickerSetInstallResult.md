@@ -1,6 +1,6 @@
 ## Type: messages\_StickerSetInstallResult  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_stickerSetInstallResultSuccess](../constructors/messages\_stickerSetInstallResultSuccess.md)  
 

@@ -17,5 +17,5 @@
 
 
 ```
-$messages_peerDialogs = ['dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'state' => updates_State, ];
+$messages_peerDialogs = ['_' => messages_peerDialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```

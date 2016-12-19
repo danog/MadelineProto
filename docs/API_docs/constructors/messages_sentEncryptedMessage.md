@@ -13,5 +13,5 @@
 
 
 ```
-$messages_sentEncryptedMessage = ['date' => int, ];
+$messages_sentEncryptedMessage = ['_' => messages_sentEncryptedMessage', 'date' => int, ];
 ```

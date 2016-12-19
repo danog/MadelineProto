@@ -20,5 +20,5 @@
 
 
 ```
-$chatInvite = ['channel' => Bool, 'broadcast' => Bool, 'public' => Bool, 'megagroup' => Bool, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'participants' => [User], ];
+$chatInvite = ['_' => chatInvite', 'channel' => true, 'broadcast' => true, 'public' => true, 'megagroup' => true, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'participants' => [Vector t], ];
 ```

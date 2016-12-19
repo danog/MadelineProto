@@ -19,5 +19,5 @@
 
 
 ```
-$updateShortSentMessage = ['out' => Bool, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
+$updateShortSentMessage = ['_' => updateShortSentMessage', 'out' => true, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [Vector t], ];
 ```

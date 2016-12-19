@@ -15,5 +15,5 @@
 
 
 ```
-$channelParticipantModerator = ['user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$channelParticipantModerator = ['_' => channelParticipantModerator', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```

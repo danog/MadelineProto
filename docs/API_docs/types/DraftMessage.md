@@ -1,6 +1,6 @@
 ## Type: DraftMessage  
 
-### Constructors:
+### Possible values (constructors):
 
 [draftMessageEmpty](../constructors/draftMessageEmpty.md)  
 

@@ -1,9 +1,5 @@
 ## Method: auth.resetAuthorizations  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Bool](../types/Bool.md)

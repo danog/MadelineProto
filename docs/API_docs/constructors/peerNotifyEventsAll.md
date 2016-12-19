@@ -1,9 +1,5 @@
 ## Constructor: peerNotifyEventsAll  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [PeerNotifyEvents](../types/PeerNotifyEvents.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$peerNotifyEventsAll = ;
+$peerNotifyEventsAll = ['_' => peerNotifyEventsAll', ];
 ```

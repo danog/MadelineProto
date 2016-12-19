@@ -1,9 +1,5 @@
 ## Constructor: updatesTooLong  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [Updates](../types/Updates.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$updatesTooLong = ;
+$updatesTooLong = ['_' => updatesTooLong', ];
 ```

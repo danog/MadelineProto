@@ -16,5 +16,5 @@
 
 
 ```
-$inputBotInlineResultPhoto = ['id' => string, 'type' => string, 'photo' => InputPhoto, 'send_message' => InputBotInlineMessage, ];
+$inputBotInlineResultPhoto = ['_' => inputBotInlineResultPhoto', 'id' => string, 'type' => string, 'photo' => InputPhoto, 'send_message' => InputBotInlineMessage, ];
 ```

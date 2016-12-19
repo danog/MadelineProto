@@ -1,9 +1,5 @@
 ## Constructor: geoPointEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [GeoPoint](../types/GeoPoint.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$geoPointEmpty = ;
+$geoPointEmpty = ['_' => geoPointEmpty', ];
 ```

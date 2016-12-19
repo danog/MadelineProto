@@ -13,5 +13,5 @@
 
 
 ```
-$chatParticipantCreator = ['user_id' => int, ];
+$chatParticipantCreator = ['_' => chatParticipantCreator', 'user_id' => int, ];
 ```

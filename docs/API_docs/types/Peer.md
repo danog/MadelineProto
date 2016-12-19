@@ -1,6 +1,6 @@
 ## Type: Peer  
 
-### Constructors:
+### Possible values (constructors):
 
 [peerUser](../constructors/peerUser.md)  
 

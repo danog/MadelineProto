@@ -17,5 +17,5 @@
 
 
 ```
-$account_password = ['current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, 'has_recovery' => Bool, 'email_unconfirmed_pattern' => string, ];
+$account_password = ['_' => account_password', 'current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, 'has_recovery' => Bool, 'email_unconfirmed_pattern' => string, ];
 ```

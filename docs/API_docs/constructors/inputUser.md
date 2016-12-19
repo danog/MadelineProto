@@ -14,5 +14,5 @@
 
 
 ```
-$inputUser = ['user_id' => int, 'access_hash' => long, ];
+$inputUser = ['_' => inputUser', 'user_id' => int, 'access_hash' => long, ];
 ```

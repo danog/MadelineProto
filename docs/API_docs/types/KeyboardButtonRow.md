@@ -1,6 +1,6 @@
 ## Type: KeyboardButtonRow  
 
-### Constructors:
+### Possible values (constructors):
 
 [keyboardButtonRow](../constructors/keyboardButtonRow.md)  
 

@@ -18,5 +18,5 @@
 
 
 ```
-$updates_differenceSlice = ['new_messages' => [Message], 'new_encrypted_messages' => [EncryptedMessage], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], 'intermediate_state' => updates_State, ];
+$updates_differenceSlice = ['_' => updates_differenceSlice', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'intermediate_state' => updates.State, ];
 ```

@@ -13,5 +13,5 @@
 
 
 ```
-$inputChatPhoto = ['id' => InputPhoto, ];
+$inputChatPhoto = ['_' => inputChatPhoto', 'id' => InputPhoto, ];
 ```

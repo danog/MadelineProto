@@ -1,6 +1,6 @@
 ## Type: messages\_Messages  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_messages](../constructors/messages\_messages.md)  
 

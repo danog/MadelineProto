@@ -1,6 +1,6 @@
 ## Type: GeoPoint  
 
-### Constructors:
+### Possible values (constructors):
 
 [geoPointEmpty](../constructors/geoPointEmpty.md)  
 

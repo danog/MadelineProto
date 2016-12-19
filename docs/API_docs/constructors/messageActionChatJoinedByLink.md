@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatJoinedByLink = ['inviter_id' => int, ];
+$messageActionChatJoinedByLink = ['_' => messageActionChatJoinedByLink', 'inviter_id' => int, ];
 ```

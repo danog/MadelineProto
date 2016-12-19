@@ -1,6 +1,6 @@
 ## Type: Bool  
 
-### Constructors:
+### Possible values (constructors):
 
 [boolFalse](../constructors/boolFalse.md)  
 

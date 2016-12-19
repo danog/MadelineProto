@@ -13,5 +13,5 @@
 
 
 ```
-$keyboardButtonRequestGeoLocation = ['text' => string, ];
+$keyboardButtonRequestGeoLocation = ['_' => keyboardButtonRequestGeoLocation', 'text' => string, ];
 ```

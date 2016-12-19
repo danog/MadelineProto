@@ -14,5 +14,5 @@
 
 
 ```
-$updateDraftMessage = ['peer' => Peer, 'draft' => DraftMessage, ];
+$updateDraftMessage = ['_' => updateDraftMessage', 'peer' => Peer, 'draft' => DraftMessage, ];
 ```

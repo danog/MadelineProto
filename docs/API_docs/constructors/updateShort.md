@@ -14,5 +14,5 @@
 
 
 ```
-$updateShort = ['update' => Update, 'date' => int, ];
+$updateShort = ['_' => updateShort', 'update' => Update, 'date' => int, ];
 ```

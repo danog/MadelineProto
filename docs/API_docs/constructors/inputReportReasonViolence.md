@@ -1,9 +1,5 @@
 ## Constructor: inputReportReasonViolence  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ReportReason](../types/ReportReason.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputReportReasonViolence = ;
+$inputReportReasonViolence = ['_' => inputReportReasonViolence', ];
 ```

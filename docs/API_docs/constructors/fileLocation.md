@@ -16,5 +16,5 @@
 
 
 ```
-$fileLocation = ['dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
+$fileLocation = ['_' => fileLocation', 'dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
 ```

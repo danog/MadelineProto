@@ -14,5 +14,5 @@
 
 
 ```
-$messageMediaPhoto = ['photo' => Photo, 'caption' => string, ];
+$messageMediaPhoto = ['_' => messageMediaPhoto', 'photo' => Photo, 'caption' => string, ];
 ```

@@ -18,5 +18,5 @@
 
 
 ```
-$updates_difference = ['new_messages' => [Message], 'new_encrypted_messages' => [EncryptedMessage], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], 'state' => updates_State, ];
+$updates_difference = ['_' => updates_difference', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```

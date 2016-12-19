@@ -13,5 +13,5 @@
 
 
 ```
-$sendMessageUploadAudioAction = ['progress' => int, ];
+$sendMessageUploadAudioAction = ['_' => sendMessageUploadAudioAction', 'progress' => int, ];
 ```

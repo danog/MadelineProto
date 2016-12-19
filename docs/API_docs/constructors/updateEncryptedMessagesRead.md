@@ -15,5 +15,5 @@
 
 
 ```
-$updateEncryptedMessagesRead = ['chat_id' => int, 'max_date' => int, 'date' => int, ];
+$updateEncryptedMessagesRead = ['_' => updateEncryptedMessagesRead', 'chat_id' => int, 'max_date' => int, 'date' => int, ];
 ```

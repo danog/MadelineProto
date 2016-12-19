@@ -1,6 +1,6 @@
 ## Type: messages\_FoundGifs  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_foundGifs](../constructors/messages\_foundGifs.md)  
 

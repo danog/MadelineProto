@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatDeleteUser = ['user_id' => int, ];
+$messageActionChatDeleteUser = ['_' => messageActionChatDeleteUser', 'user_id' => int, ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$documentAttributeImageSize = ['w' => int, 'h' => int, ];
+$documentAttributeImageSize = ['_' => documentAttributeImageSize', 'w' => int, 'h' => int, ];
 ```

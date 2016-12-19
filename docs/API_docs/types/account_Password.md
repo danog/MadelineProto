@@ -1,6 +1,6 @@
 ## Type: account\_Password  
 
-### Constructors:
+### Possible values (constructors):
 
 [account\_noPassword](../constructors/account\_noPassword.md)  
 

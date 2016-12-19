@@ -13,5 +13,5 @@
 
 
 ```
-$auth_sentCodeTypeCall = ['length' => int, ];
+$auth_sentCodeTypeCall = ['_' => auth_sentCodeTypeCall', 'length' => int, ];
 ```

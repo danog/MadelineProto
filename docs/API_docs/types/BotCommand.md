@@ -1,6 +1,6 @@
 ## Type: BotCommand  
 
-### Constructors:
+### Possible values (constructors):
 
 [botCommand](../constructors/botCommand.md)  
 

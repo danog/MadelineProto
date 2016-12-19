@@ -1,6 +1,6 @@
 ## Type: ContactBlocked  
 
-### Constructors:
+### Possible values (constructors):
 
 [contactBlocked](../constructors/contactBlocked.md)  
 

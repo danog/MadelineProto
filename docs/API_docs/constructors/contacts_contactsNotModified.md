@@ -1,9 +1,5 @@
 ## Constructor: contacts\_contactsNotModified  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [contacts\_Contacts](../types/contacts\_Contacts.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$contacts_contactsNotModified = ;
+$contacts_contactsNotModified = ['_' => contacts_contactsNotModified', ];
 ```

@@ -17,5 +17,5 @@
 
 
 ```
-$photoSize = ['type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int, ];
+$photoSize = ['_' => photoSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int, ];
 ```

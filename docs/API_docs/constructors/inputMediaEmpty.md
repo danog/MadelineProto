@@ -1,9 +1,5 @@
 ## Constructor: inputMediaEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputMedia](../types/InputMedia.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputMediaEmpty = ;
+$inputMediaEmpty = ['_' => inputMediaEmpty', ];
 ```

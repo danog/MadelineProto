@@ -1,9 +1,5 @@
 ## Constructor: inputMessagesFilterUrl  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [MessagesFilter](../types/MessagesFilter.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputMessagesFilterUrl = ;
+$inputMessagesFilterUrl = ['_' => inputMessagesFilterUrl', ];
 ```

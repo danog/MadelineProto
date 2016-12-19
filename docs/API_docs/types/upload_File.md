@@ -1,6 +1,6 @@
 ## Type: upload\_File  
 
-### Constructors:
+### Possible values (constructors):
 
 [upload\_file](../constructors/upload\_file.md)  
 

@@ -14,5 +14,5 @@
 
 
 ```
-$botCommand = ['command' => string, 'description' => string, ];
+$botCommand = ['_' => botCommand', 'command' => string, 'description' => string, ];
 ```

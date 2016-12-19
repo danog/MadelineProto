@@ -13,5 +13,5 @@
 
 
 ```
-$auth_passwordRecovery = ['email_pattern' => string, ];
+$auth_passwordRecovery = ['_' => auth_passwordRecovery', 'email_pattern' => string, ];
 ```

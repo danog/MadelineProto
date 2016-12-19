@@ -16,5 +16,5 @@
 
 
 ```
-$botInlineMessageMediaContact = ['phone_number' => string, 'first_name' => string, 'last_name' => string, 'reply_markup' => ReplyMarkup, ];
+$botInlineMessageMediaContact = ['_' => botInlineMessageMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'reply_markup' => ReplyMarkup, ];
 ```

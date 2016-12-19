@@ -1,9 +1,5 @@
 ## Method: help.getConfig  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Config](../types/Config.md)

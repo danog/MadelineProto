@@ -14,5 +14,5 @@
 
 
 ```
-$updateReadChannelOutbox = ['channel_id' => int, 'max_id' => int, ];
+$updateReadChannelOutbox = ['_' => updateReadChannelOutbox', 'channel_id' => int, 'max_id' => int, ];
 ```

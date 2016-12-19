@@ -14,5 +14,5 @@
 
 
 ```
-$channelMessagesFilter = ['exclude_new_messages' => Bool, 'ranges' => [MessageRange], ];
+$channelMessagesFilter = ['_' => channelMessagesFilter', 'exclude_new_messages' => true, 'ranges' => [Vector t], ];
 ```

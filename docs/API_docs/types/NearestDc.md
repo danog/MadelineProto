@@ -1,6 +1,6 @@
 ## Type: NearestDc  
 
-### Constructors:
+### Possible values (constructors):
 
 [nearestDc](../constructors/nearestDc.md)  
 

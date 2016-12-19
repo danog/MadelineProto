@@ -1,9 +1,5 @@
 ## Constructor: inputPrivacyValueDisallowAll  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputPrivacyRule](../types/InputPrivacyRule.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputPrivacyValueDisallowAll = ;
+$inputPrivacyValueDisallowAll = ['_' => inputPrivacyValueDisallowAll', ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$updateNewEncryptedMessage = ['message' => EncryptedMessage, 'qts' => int, ];
+$updateNewEncryptedMessage = ['_' => updateNewEncryptedMessage', 'message' => EncryptedMessage, 'qts' => int, ];
 ```

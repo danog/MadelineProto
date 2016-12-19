@@ -13,5 +13,5 @@
 
 
 ```
-$replyInlineMarkup = ['rows' => [KeyboardButtonRow], ];
+$replyInlineMarkup = ['_' => replyInlineMarkup', 'rows' => [Vector t], ];
 ```

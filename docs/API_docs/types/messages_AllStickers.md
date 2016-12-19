@@ -1,6 +1,6 @@
 ## Type: messages\_AllStickers  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_allStickersNotModified](../constructors/messages\_allStickersNotModified.md)  
 

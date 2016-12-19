@@ -13,5 +13,5 @@
 
 
 ```
-$inputReportReasonOther = ['text' => string, ];
+$inputReportReasonOther = ['_' => inputReportReasonOther', 'text' => string, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: PeerNotifyEvents  
 
-### Constructors:
+### Possible values (constructors):
 
 [peerNotifyEventsEmpty](../constructors/peerNotifyEventsEmpty.md)  
 

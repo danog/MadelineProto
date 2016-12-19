@@ -13,5 +13,5 @@
 
 
 ```
-$account_authorizations = ['authorizations' => [Authorization], ];
+$account_authorizations = ['_' => account_authorizations', 'authorizations' => [Vector t], ];
 ```

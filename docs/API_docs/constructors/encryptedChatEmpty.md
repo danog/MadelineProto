@@ -13,5 +13,5 @@
 
 
 ```
-$encryptedChatEmpty = ['id' => int, ];
+$encryptedChatEmpty = ['_' => encryptedChatEmpty', 'id' => int, ];
 ```

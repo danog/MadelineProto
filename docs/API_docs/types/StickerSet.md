@@ -1,6 +1,6 @@
 ## Type: StickerSet  
 
-### Constructors:
+### Possible values (constructors):
 
 [stickerSet](../constructors/stickerSet.md)  
 

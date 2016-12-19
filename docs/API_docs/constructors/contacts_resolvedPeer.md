@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_resolvedPeer = ['peer' => Peer, 'chats' => [Chat], 'users' => [User], ];
+$contacts_resolvedPeer = ['_' => contacts_resolvedPeer', 'peer' => Peer, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

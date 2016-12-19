@@ -1,6 +1,6 @@
 ## Type: messages\_FeaturedStickers  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_featuredStickersNotModified](../constructors/messages\_featuredStickersNotModified.md)  
 

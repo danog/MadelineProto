@@ -1,6 +1,6 @@
 ## Type: User  
 
-### Constructors:
+### Possible values (constructors):
 
 [userEmpty](../constructors/userEmpty.md)  
 

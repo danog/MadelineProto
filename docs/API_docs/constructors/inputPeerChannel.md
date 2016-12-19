@@ -14,5 +14,5 @@
 
 
 ```
-$inputPeerChannel = ['channel_id' => int, 'access_hash' => long, ];
+$inputPeerChannel = ['_' => inputPeerChannel', 'channel_id' => int, 'access_hash' => long, ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$disabledFeature = ['feature' => string, 'description' => string, ];
+$disabledFeature = ['_' => disabledFeature', 'feature' => string, 'description' => string, ];
 ```

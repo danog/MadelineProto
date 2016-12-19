@@ -1,6 +1,6 @@
 ## Type: messages\_BotResults  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_botResults](../constructors/messages\_botResults.md)  
 

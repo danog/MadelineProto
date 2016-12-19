@@ -1,6 +1,6 @@
 ## Type: contacts\_ResolvedPeer  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_resolvedPeer](../constructors/contacts\_resolvedPeer.md)  
 

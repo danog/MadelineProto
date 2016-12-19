@@ -1,9 +1,5 @@
 ## Constructor: inputUserEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputUser](../types/InputUser.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputUserEmpty = ;
+$inputUserEmpty = ['_' => inputUserEmpty', ];
 ```

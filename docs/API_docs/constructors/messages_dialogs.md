@@ -16,5 +16,5 @@
 
 
 ```
-$messages_dialogs = ['dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$messages_dialogs = ['_' => messages_dialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

@@ -1,9 +1,5 @@
 ## Constructor: channelRoleEditor  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$channelRoleEditor = ;
+$channelRoleEditor = ['_' => channelRoleEditor', ];
 ```

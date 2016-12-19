@@ -1,6 +1,6 @@
 ## Type: AccountDaysTTL  
 
-### Constructors:
+### Possible values (constructors):
 
 [accountDaysTTL](../constructors/accountDaysTTL.md)  
 

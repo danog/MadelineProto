@@ -17,5 +17,5 @@
 
 
 ```
-$updates = ['updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq' => int, ];
+$updates = ['_' => updates', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq' => int, ];
 ```

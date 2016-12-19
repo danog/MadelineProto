@@ -1,6 +1,6 @@
 ## Type: InputPeer  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPeerEmpty](../constructors/inputPeerEmpty.md)  
 

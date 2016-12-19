@@ -1,9 +1,5 @@
 ## Constructor: chatInviteEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ExportedChatInvite](../types/ExportedChatInvite.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$chatInviteEmpty = ;
+$chatInviteEmpty = ['_' => chatInviteEmpty', ];
 ```

@@ -21,5 +21,5 @@
 
 
 ```
-$document = ['id' => long, 'access_hash' => long, 'date' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'version' => int, 'attributes' => [DocumentAttribute], ];
+$document = ['_' => document', 'id' => long, 'access_hash' => long, 'date' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'version' => int, 'attributes' => [Vector t], ];
 ```

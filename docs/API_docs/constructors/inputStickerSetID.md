@@ -14,5 +14,5 @@
 
 
 ```
-$inputStickerSetID = ['id' => long, 'access_hash' => long, ];
+$inputStickerSetID = ['_' => inputStickerSetID', 'id' => long, 'access_hash' => long, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: Message  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageEmpty](../constructors/messageEmpty.md)  
 

@@ -1,9 +1,5 @@
 ## Method: account.getAuthorizations  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [account\_Authorizations](../types/account\_Authorizations.md)

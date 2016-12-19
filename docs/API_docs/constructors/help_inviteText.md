@@ -13,5 +13,5 @@
 
 
 ```
-$help_inviteText = ['message' => string, ];
+$help_inviteText = ['_' => help_inviteText', 'message' => string, ];
 ```

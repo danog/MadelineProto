@@ -1,9 +1,5 @@
 ## Constructor: storage\_filePdf  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [storage\_FileType](../types/storage\_FileType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$storage_filePdf = ;
+$storage_filePdf = ['_' => storage_filePdf', ];
 ```

@@ -1,6 +1,6 @@
 ## Type: InlineBotSwitchPM  
 
-### Constructors:
+### Possible values (constructors):
 
 [inlineBotSwitchPM](../constructors/inlineBotSwitchPM.md)  
 

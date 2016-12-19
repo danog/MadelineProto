@@ -1,9 +1,5 @@
 ## Constructor: updateConfig  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [Update](../types/Update.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$updateConfig = ;
+$updateConfig = ['_' => updateConfig', ];
 ```

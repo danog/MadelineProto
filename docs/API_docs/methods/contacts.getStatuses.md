@@ -1,9 +1,5 @@
 ## Method: contacts.getStatuses  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Vector\_of\_ContactStatus](../types/ContactStatus.md)

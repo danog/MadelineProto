@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatMigrateTo = ['channel_id' => int, ];
+$messageActionChatMigrateTo = ['_' => messageActionChatMigrateTo', 'channel_id' => int, ];
 ```

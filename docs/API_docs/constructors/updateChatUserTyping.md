@@ -15,5 +15,5 @@
 
 
 ```
-$updateChatUserTyping = ['chat_id' => int, 'user_id' => int, 'action' => SendMessageAction, ];
+$updateChatUserTyping = ['_' => updateChatUserTyping', 'chat_id' => int, 'user_id' => int, 'action' => SendMessageAction, ];
 ```

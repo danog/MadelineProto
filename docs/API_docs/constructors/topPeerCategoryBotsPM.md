@@ -1,9 +1,5 @@
 ## Constructor: topPeerCategoryBotsPM  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [TopPeerCategory](../types/TopPeerCategory.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$topPeerCategoryBotsPM = ;
+$topPeerCategoryBotsPM = ['_' => topPeerCategoryBotsPM', ];
 ```

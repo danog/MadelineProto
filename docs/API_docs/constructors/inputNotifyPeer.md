@@ -13,5 +13,5 @@
 
 
 ```
-$inputNotifyPeer = ['peer' => InputPeer, ];
+$inputNotifyPeer = ['_' => inputNotifyPeer', 'peer' => InputPeer, ];
 ```

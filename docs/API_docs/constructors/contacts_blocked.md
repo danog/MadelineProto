@@ -14,5 +14,5 @@
 
 
 ```
-$contacts_blocked = ['blocked' => [ContactBlocked], 'users' => [User], ];
+$contacts_blocked = ['_' => contacts_blocked', 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```

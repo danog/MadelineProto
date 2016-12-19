@@ -15,5 +15,5 @@
 
 
 ```
-$updates_channelDifferenceEmpty = ['final' => Bool, 'pts' => int, 'timeout' => int, ];
+$updates_channelDifferenceEmpty = ['_' => updates_channelDifferenceEmpty', 'final' => true, 'pts' => int, 'timeout' => int, ];
 ```

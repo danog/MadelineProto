@@ -1,6 +1,6 @@
 ## Type: InputStickerSet  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputStickerSetEmpty](../constructors/inputStickerSetEmpty.md)  
 

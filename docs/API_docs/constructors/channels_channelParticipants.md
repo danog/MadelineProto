@@ -15,5 +15,5 @@
 
 
 ```
-$channels_channelParticipants = ['count' => int, 'participants' => [ChannelParticipant], 'users' => [User], ];
+$channels_channelParticipants = ['_' => channels_channelParticipants', 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
 ```

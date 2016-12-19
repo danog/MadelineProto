@@ -1,6 +1,6 @@
 ## Type: EncryptedMessage  
 
-### Constructors:
+### Possible values (constructors):
 
 [encryptedMessage](../constructors/encryptedMessage.md)  
 

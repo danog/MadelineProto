@@ -1,6 +1,6 @@
 ## Type: Chat  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatEmpty](../constructors/chatEmpty.md)  
 

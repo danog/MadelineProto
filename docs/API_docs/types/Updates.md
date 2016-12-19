@@ -1,6 +1,6 @@
 ## Type: Updates  
 
-### Constructors:
+### Possible values (constructors):
 
 [updatesTooLong](../constructors/updatesTooLong.md)  
 

@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityCode = ['offset' => int, 'length' => int, ];
+$messageEntityCode = ['_' => messageEntityCode', 'offset' => int, 'length' => int, ];
 ```

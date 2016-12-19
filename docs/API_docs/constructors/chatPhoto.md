@@ -14,5 +14,5 @@
 
 
 ```
-$chatPhoto = ['photo_small' => FileLocation, 'photo_big' => FileLocation, ];
+$chatPhoto = ['_' => chatPhoto', 'photo_small' => FileLocation, 'photo_big' => FileLocation, ];
 ```

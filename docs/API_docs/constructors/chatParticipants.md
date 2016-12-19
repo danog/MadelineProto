@@ -15,5 +15,5 @@
 
 
 ```
-$chatParticipants = ['chat_id' => int, 'participants' => [ChatParticipant], 'version' => int, ];
+$chatParticipants = ['_' => chatParticipants', 'chat_id' => int, 'participants' => [Vector t], 'version' => int, ];
 ```

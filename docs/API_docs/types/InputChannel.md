@@ -1,6 +1,6 @@
 ## Type: InputChannel  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputChannelEmpty](../constructors/inputChannelEmpty.md)  
 

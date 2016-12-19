@@ -16,5 +16,5 @@
 
 
 ```
-$inputBotInlineMessageText = ['no_webpage' => Bool, 'message' => string, 'entities' => [MessageEntity], 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageText = ['_' => inputBotInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [Vector t], 'reply_markup' => ReplyMarkup, ];
 ```

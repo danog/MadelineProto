@@ -1,6 +1,6 @@
 ## Type: updates\_ChannelDifference  
 
-### Constructors:
+### Possible values (constructors):
 
 [updates\_channelDifferenceEmpty](../constructors/updates\_channelDifferenceEmpty.md)  
 

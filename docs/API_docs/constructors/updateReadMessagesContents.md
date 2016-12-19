@@ -15,5 +15,5 @@
 
 
 ```
-$updateReadMessagesContents = ['messages' => [int], 'pts' => int, 'pts_count' => int, ];
+$updateReadMessagesContents = ['_' => updateReadMessagesContents', 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
 ```

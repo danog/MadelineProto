@@ -1,9 +1,5 @@
 ## Constructor: encryptedFileEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [EncryptedFile](../types/EncryptedFile.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$encryptedFileEmpty = ;
+$encryptedFileEmpty = ['_' => encryptedFileEmpty', ];
 ```

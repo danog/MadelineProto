@@ -1,6 +1,6 @@
 ## Type: contacts\_Found  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_found](../constructors/contacts\_found.md)  
 

@@ -13,5 +13,5 @@
 
 
 ```
-$messageMediaGeo = ['geo' => GeoPoint, ];
+$messageMediaGeo = ['_' => messageMediaGeo', 'geo' => GeoPoint, ];
 ```

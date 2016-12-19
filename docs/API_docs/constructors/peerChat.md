@@ -13,5 +13,5 @@
 
 
 ```
-$peerChat = ['chat_id' => int, ];
+$peerChat = ['_' => peerChat', 'chat_id' => int, ];
 ```

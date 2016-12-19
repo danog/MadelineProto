@@ -14,5 +14,5 @@
 
 
 ```
-$messages_sentEncryptedFile = ['date' => int, 'file' => EncryptedFile, ];
+$messages_sentEncryptedFile = ['_' => messages_sentEncryptedFile', 'date' => int, 'file' => EncryptedFile, ];
 ```

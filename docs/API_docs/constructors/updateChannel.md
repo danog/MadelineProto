@@ -13,5 +13,5 @@
 
 
 ```
-$updateChannel = ['channel_id' => int, ];
+$updateChannel = ['_' => updateChannel', 'channel_id' => int, ];
 ```

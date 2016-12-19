@@ -1,6 +1,6 @@
 ## Type: MaskCoords  
 
-### Constructors:
+### Possible values (constructors):
 
 [maskCoords](../constructors/maskCoords.md)  
 

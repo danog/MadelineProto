@@ -1,9 +1,5 @@
 ## Constructor: draftMessageEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [DraftMessage](../types/DraftMessage.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$draftMessageEmpty = ;
+$draftMessageEmpty = ['_' => draftMessageEmpty', ];
 ```

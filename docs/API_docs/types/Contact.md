@@ -1,6 +1,6 @@
 ## Type: Contact  
 
-### Constructors:
+### Possible values (constructors):
 
 [contact](../constructors/contact.md)  
 

@@ -15,5 +15,5 @@
 
 
 ```
-$inputMediaContact = ['phone_number' => string, 'first_name' => string, 'last_name' => string, ];
+$inputMediaContact = ['_' => inputMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, ];
 ```

@@ -1,9 +1,5 @@
 ## Constructor: userProfilePhotoEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [UserProfilePhoto](../types/UserProfilePhoto.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$userProfilePhotoEmpty = ;
+$userProfilePhotoEmpty = ['_' => userProfilePhotoEmpty', ];
 ```

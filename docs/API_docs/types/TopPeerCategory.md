@@ -1,6 +1,6 @@
 ## Type: TopPeerCategory  
 
-### Constructors:
+### Possible values (constructors):
 
 [topPeerCategoryBotsPM](../constructors/topPeerCategoryBotsPM.md)  
 

@@ -14,5 +14,5 @@
 
 
 ```
-$contactStatus = ['user_id' => int, 'status' => UserStatus, ];
+$contactStatus = ['_' => contactStatus', 'user_id' => int, 'status' => UserStatus, ];
 ```

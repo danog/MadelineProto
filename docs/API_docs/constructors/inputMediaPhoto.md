@@ -14,5 +14,5 @@
 
 
 ```
-$inputMediaPhoto = ['id' => InputPhoto, 'caption' => string, ];
+$inputMediaPhoto = ['_' => inputMediaPhoto', 'id' => InputPhoto, 'caption' => string, ];
 ```

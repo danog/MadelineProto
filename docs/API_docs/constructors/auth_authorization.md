@@ -14,5 +14,5 @@
 
 
 ```
-$auth_authorization = ['tmp_sessions' => int, 'user' => User, ];
+$auth_authorization = ['_' => auth_authorization', 'tmp_sessions' => int, 'user' => User, ];
 ```

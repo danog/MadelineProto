@@ -1,6 +1,6 @@
 ## Type: account\_PrivacyRules  
 
-### Constructors:
+### Possible values (constructors):
 
 [account\_privacyRules](../constructors/account\_privacyRules.md)  
 

@@ -1,6 +1,6 @@
 ## Type: ChannelMessagesFilter  
 
-### Constructors:
+### Possible values (constructors):
 
 [channelMessagesFilterEmpty](../constructors/channelMessagesFilterEmpty.md)  
 

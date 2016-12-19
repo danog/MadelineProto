@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_importedContacts = ['imported' => [ImportedContact], 'retry_contacts' => [long], 'users' => [User], ];
+$contacts_importedContacts = ['_' => contacts_importedContacts', 'imported' => [Vector t], 'retry_contacts' => [Vector t], 'users' => [Vector t], ];
 ```

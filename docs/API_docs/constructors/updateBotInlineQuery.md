@@ -17,5 +17,5 @@
 
 
 ```
-$updateBotInlineQuery = ['query_id' => long, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'offset' => string, ];
+$updateBotInlineQuery = ['_' => updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'offset' => string, ];
 ```

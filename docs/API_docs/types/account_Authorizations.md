@@ -1,6 +1,6 @@
 ## Type: account\_Authorizations  
 
-### Constructors:
+### Possible values (constructors):
 
 [account\_authorizations](../constructors/account\_authorizations.md)  
 

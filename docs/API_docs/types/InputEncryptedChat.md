@@ -1,6 +1,6 @@
 ## Type: InputEncryptedChat  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputEncryptedChat](../constructors/inputEncryptedChat.md)  
 

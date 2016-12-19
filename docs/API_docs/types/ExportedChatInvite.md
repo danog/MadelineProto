@@ -1,6 +1,6 @@
 ## Type: ExportedChatInvite  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatInviteEmpty](../constructors/chatInviteEmpty.md)  
 

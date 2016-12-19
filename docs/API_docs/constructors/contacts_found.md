@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_found = ['results' => [Peer], 'chats' => [Chat], 'users' => [User], ];
+$contacts_found = ['_' => contacts_found', 'results' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

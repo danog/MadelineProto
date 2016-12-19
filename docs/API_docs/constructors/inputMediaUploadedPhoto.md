@@ -15,5 +15,5 @@
 
 
 ```
-$inputMediaUploadedPhoto = ['file' => InputFile, 'caption' => string, 'stickers' => [InputDocument], ];
+$inputMediaUploadedPhoto = ['_' => inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => string, 'stickers' => [Vector t], ];
 ```

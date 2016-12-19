@@ -14,5 +14,5 @@
 
 
 ```
-$updateContactRegistered = ['user_id' => int, 'date' => int, ];
+$updateContactRegistered = ['_' => updateContactRegistered', 'user_id' => int, 'date' => int, ];
 ```

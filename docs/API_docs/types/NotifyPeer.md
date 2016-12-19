@@ -1,6 +1,6 @@
 ## Type: NotifyPeer  
 
-### Constructors:
+### Possible values (constructors):
 
 [notifyPeer](../constructors/notifyPeer.md)  
 

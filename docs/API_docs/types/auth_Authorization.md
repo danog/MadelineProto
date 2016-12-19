@@ -1,6 +1,6 @@
 ## Type: auth\_Authorization  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_authorization](../constructors/auth\_authorization.md)  
 

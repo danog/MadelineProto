@@ -14,5 +14,5 @@
 
 
 ```
-$photos_photo = ['photo' => Photo, 'users' => [User], ];
+$photos_photo = ['_' => photos_photo', 'photo' => Photo, 'users' => [Vector t], ];
 ```

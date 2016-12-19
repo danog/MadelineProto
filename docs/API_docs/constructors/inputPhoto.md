@@ -14,5 +14,5 @@
 
 
 ```
-$inputPhoto = ['id' => long, 'access_hash' => long, ];
+$inputPhoto = ['_' => inputPhoto', 'id' => long, 'access_hash' => long, ];
 ```

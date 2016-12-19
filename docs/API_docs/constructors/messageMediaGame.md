@@ -13,5 +13,5 @@
 
 
 ```
-$messageMediaGame = ['game' => Game, ];
+$messageMediaGame = ['_' => messageMediaGame', 'game' => Game, ];
 ```

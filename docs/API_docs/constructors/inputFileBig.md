@@ -15,5 +15,5 @@
 
 
 ```
-$inputFileBig = ['id' => long, 'parts' => int, 'name' => string, ];
+$inputFileBig = ['_' => inputFileBig', 'id' => long, 'parts' => int, 'name' => string, ];
 ```

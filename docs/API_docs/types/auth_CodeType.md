@@ -1,6 +1,6 @@
 ## Type: auth\_CodeType  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_codeTypeSms](../constructors/auth\_codeTypeSms.md)  
 

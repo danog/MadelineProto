@@ -1,6 +1,6 @@
 ## Type: InputGeoPoint  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputGeoPointEmpty](../constructors/inputGeoPointEmpty.md)  
 

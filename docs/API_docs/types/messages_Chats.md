@@ -1,6 +1,6 @@
 ## Type: messages\_Chats  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_chats](../constructors/messages\_chats.md)  
 

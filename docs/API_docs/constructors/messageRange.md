@@ -14,5 +14,5 @@
 
 
 ```
-$messageRange = ['min_id' => int, 'max_id' => int, ];
+$messageRange = ['_' => messageRange', 'min_id' => int, 'max_id' => int, ];
 ```

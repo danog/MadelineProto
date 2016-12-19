@@ -14,5 +14,5 @@
 
 
 ```
-$messages_allStickers = ['hash' => int, 'sets' => [StickerSet], ];
+$messages_allStickers = ['_' => messages_allStickers', 'hash' => int, 'sets' => [Vector t], ];
 ```

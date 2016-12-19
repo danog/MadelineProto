@@ -1,6 +1,6 @@
 ## Type: messages\_HighScores  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_highScores](../constructors/messages\_highScores.md)  
 

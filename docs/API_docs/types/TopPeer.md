@@ -1,6 +1,6 @@
 ## Type: TopPeer  
 
-### Constructors:
+### Possible values (constructors):
 
 [topPeer](../constructors/topPeer.md)  
 

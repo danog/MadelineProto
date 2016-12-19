@@ -1,6 +1,6 @@
 ## Type: InputStickeredMedia  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputStickeredMediaPhoto](../constructors/inputStickeredMediaPhoto.md)  
 

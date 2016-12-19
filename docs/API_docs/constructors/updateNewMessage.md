@@ -15,5 +15,5 @@
 
 
 ```
-$updateNewMessage = ['message' => Message, 'pts' => int, 'pts_count' => int, ];
+$updateNewMessage = ['_' => updateNewMessage', 'message' => Message, 'pts' => int, 'pts_count' => int, ];
 ```

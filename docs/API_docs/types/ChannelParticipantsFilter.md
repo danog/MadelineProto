@@ -1,6 +1,6 @@
 ## Type: ChannelParticipantsFilter  
 
-### Constructors:
+### Possible values (constructors):
 
 [channelParticipantsRecent](../constructors/channelParticipantsRecent.md)  
 

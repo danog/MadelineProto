@@ -16,5 +16,5 @@
 
 
 ```
-$wallPaper = ['id' => int, 'title' => string, 'sizes' => [PhotoSize], 'color' => int, ];
+$wallPaper = ['_' => wallPaper', 'id' => int, 'title' => string, 'sizes' => [Vector t], 'color' => int, ];
 ```

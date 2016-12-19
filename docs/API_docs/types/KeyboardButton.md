@@ -1,6 +1,6 @@
 ## Type: KeyboardButton  
 
-### Constructors:
+### Possible values (constructors):
 
 [keyboardButton](../constructors/keyboardButton.md)  
 

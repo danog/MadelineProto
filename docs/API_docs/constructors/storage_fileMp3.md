@@ -1,9 +1,5 @@
 ## Constructor: storage\_fileMp3  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [storage\_FileType](../types/storage\_FileType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$storage_fileMp3 = ;
+$storage_fileMp3 = ['_' => storage_fileMp3', ];
 ```

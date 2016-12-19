@@ -17,5 +17,5 @@
 
 
 ```
-$messages_botResults = ['gallery' => Bool, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult], ];
+$messages_botResults = ['_' => messages_botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [Vector t], ];
 ```

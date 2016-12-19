@@ -14,5 +14,5 @@
 
 
 ```
-$updatePrivacy = ['key' => PrivacyKey, 'rules' => [PrivacyRule], ];
+$updatePrivacy = ['_' => updatePrivacy', 'key' => PrivacyKey, 'rules' => [Vector t], ];
 ```

@@ -1,6 +1,6 @@
 ## Type: MessageFwdHeader  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageFwdHeader](../constructors/messageFwdHeader.md)  
 

@@ -13,5 +13,5 @@
 
 
 ```
-$account_passwordSettings = ['email' => string, ];
+$account_passwordSettings = ['_' => account_passwordSettings', 'email' => string, ];
 ```

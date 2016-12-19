@@ -1,6 +1,6 @@
 ## Type: Vector t  
 
-### Constructors:
+### Possible values (constructors):
 
 [vector](../constructors/vector.md)  
 

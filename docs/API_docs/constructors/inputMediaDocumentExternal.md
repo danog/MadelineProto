@@ -14,5 +14,5 @@
 
 
 ```
-$inputMediaDocumentExternal = ['url' => string, 'caption' => string, ];
+$inputMediaDocumentExternal = ['_' => inputMediaDocumentExternal', 'url' => string, 'caption' => string, ];
 ```

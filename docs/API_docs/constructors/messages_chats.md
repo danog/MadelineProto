@@ -13,5 +13,5 @@
 
 
 ```
-$messages_chats = ['chats' => [Chat], ];
+$messages_chats = ['_' => messages_chats', 'chats' => [Vector t], ];
 ```

@@ -1,6 +1,6 @@
 ## Type: ContactLink  
 
-### Constructors:
+### Possible values (constructors):
 
 [contactLinkUnknown](../constructors/contactLinkUnknown.md)  
 

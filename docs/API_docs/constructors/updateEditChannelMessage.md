@@ -15,5 +15,5 @@
 
 
 ```
-$updateEditChannelMessage = ['message' => Message, 'pts' => int, 'pts_count' => int, ];
+$updateEditChannelMessage = ['_' => updateEditChannelMessage', 'message' => Message, 'pts' => int, 'pts_count' => int, ];
 ```

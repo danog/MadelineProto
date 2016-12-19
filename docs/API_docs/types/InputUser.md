@@ -1,6 +1,6 @@
 ## Type: InputUser  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputUserEmpty](../constructors/inputUserEmpty.md)  
 

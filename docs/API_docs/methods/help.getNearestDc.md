@@ -1,9 +1,5 @@
 ## Method: help.getNearestDc  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [NearestDc](../types/NearestDc.md)

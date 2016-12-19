@@ -1,6 +1,6 @@
 ## Type: True  
 
-### Constructors:
+### Possible values (constructors):
 
 [true](../constructors/true.md)  
 

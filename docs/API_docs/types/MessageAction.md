@@ -1,6 +1,6 @@
 ## Type: MessageAction  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageActionEmpty](../constructors/messageActionEmpty.md)  
 

@@ -1,6 +1,6 @@
 ## Type: UserStatus  
 
-### Constructors:
+### Possible values (constructors):
 
 [userStatusEmpty](../constructors/userStatusEmpty.md)  
 

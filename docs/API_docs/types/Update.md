@@ -1,6 +1,6 @@
 ## Type: Update  
 
-### Constructors:
+### Possible values (constructors):
 
 [updateNewMessage](../constructors/updateNewMessage.md)  
 

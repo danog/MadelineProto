@@ -85,7 +85,9 @@ foreach ($TL->methods->method as $key => $method) {
 ');
 
     $params = '';
-    $table = '| Name     |    Type       | Required |
+    $table = empty($TL->methods->params[$key]) ? '' : '### Parameters:
+
+| Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
     foreach ($TL->methods->params[$key] as $param) {
@@ -123,8 +125,6 @@ if (isset($number)) {
 $'.$type.' = $MadelineProto->'.str_replace('.', '->', $method).'(['.$params.']);
 ```');
     $header = str_replace('_', '\_', '## Method: '.$method.'  
-
-### Parameters:
 
 '.$table.'
 
@@ -186,8 +186,8 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '[' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
     }
-
-    $constructors[$constructor] = str_replace(['_', '\[\]'], ['\_', ''], '[$'.$real_type.'](../types/'.$real_type.'.md)\[\'['.str_replace('.', '->', $constructor).']('.$constructor.'.md)\'\] = \['.$params.'\]  
+    $params = "\[".$params.'\]';
+    $constructors[$constructor] = str_replace(['_'], ['\_'], '[$'.$real_type.'](../types/'.$real_type.'.md) = '.$params.';  
 
 ');
 
@@ -197,11 +197,12 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     if (!in_array($key, $types[$real_type])) {
         $types[$real_type][] = $key;
     }
+    $table = empty($TL->constructors->params[$key]) ? '' : '### Attributes:
 
-    $params = '';
-    $table = '| Name     |    Type       | Required |
+| Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
+    $params = '';
     foreach ($TL->constructors->params[$key] as $param) {
         if ($param['name'] == 'flags') {
             continue;
@@ -223,15 +224,15 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 ';
 
         $params .= "'".$param['name']."' => ";
-        $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
+        $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
     }
-    $example = str_replace('[]', '', '
-```
-$'.$constructor.' = ['.$params.'];
-```');
-    $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
+    $params = "['_' => ".$constructor."', ".$params.']';
 
-### Attributes:
+    $example = '
+```
+$'.$constructor.' = '.$params.';
+```';
+    $header = str_replace('_', '\_', '## Constructor: '.$constructor.'  
 
 '.$table.'
 
@@ -277,7 +278,7 @@ foreach ($types as $type => $keys) {
     }
     $header = str_replace('_', '\_', '## Type: '.$type.'  
 
-### Constructors:
+### Possible values (constructors):
 
 '.$constructors);
     file_put_contents('types/'.$type.'.md', $header);
@@ -318,5 +319,14 @@ Represents a TL serialized payload.');
 file_put_contents('types/index.md', '# Types  
 
 '.$index);
+
+file_put_contents('constructors/boolFalse.md', '# boolFalse  
+
+Represents boolean with value equal to `false`.');
+
+
+file_put_contents('constructors/boolTrue.md', '# boolTrue  
+
+Represents boolean with value equal to `true`.');
 
 \danog\MadelineProto\Logger::log('Done!');

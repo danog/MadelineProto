@@ -1,9 +1,5 @@
 ## Constructor: messages\_allStickersNotModified  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [messages\_AllStickers](../types/messages\_AllStickers.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messages_allStickersNotModified = ;
+$messages_allStickersNotModified = ['_' => messages_allStickersNotModified', ];
 ```

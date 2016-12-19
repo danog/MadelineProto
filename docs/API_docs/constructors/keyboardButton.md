@@ -13,5 +13,5 @@
 
 
 ```
-$keyboardButton = ['text' => string, ];
+$keyboardButton = ['_' => keyboardButton', 'text' => string, ];
 ```

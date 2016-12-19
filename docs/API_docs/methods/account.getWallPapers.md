@@ -1,9 +1,5 @@
 ## Method: account.getWallPapers  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Vector\_of\_WallPaper](../types/WallPaper.md)

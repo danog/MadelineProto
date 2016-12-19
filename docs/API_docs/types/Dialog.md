@@ -1,6 +1,6 @@
 ## Type: Dialog  
 
-### Constructors:
+### Possible values (constructors):
 
 [dialog](../constructors/dialog.md)  
 

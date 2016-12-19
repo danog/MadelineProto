@@ -17,5 +17,5 @@
 
 
 ```
-$inputMediaUploadedDocument = ['file' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, 'stickers' => [InputDocument], ];
+$inputMediaUploadedDocument = ['_' => inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [Vector t], 'caption' => string, 'stickers' => [Vector t], ];
 ```

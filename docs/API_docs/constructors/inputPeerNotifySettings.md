@@ -16,5 +16,5 @@
 
 
 ```
-$inputPeerNotifySettings = ['show_previews' => Bool, 'silent' => Bool, 'mute_until' => int, 'sound' => string, ];
+$inputPeerNotifySettings = ['_' => inputPeerNotifySettings', 'show_previews' => true, 'silent' => true, 'mute_until' => int, 'sound' => string, ];
 ```

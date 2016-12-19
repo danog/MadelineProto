@@ -1,6 +1,6 @@
 ## Type: ReceivedNotifyMessage  
 
-### Constructors:
+### Possible values (constructors):
 
 [receivedNotifyMessage](../constructors/receivedNotifyMessage.md)  
 

@@ -1,9 +1,5 @@
 ## Constructor: channelMessagesFilterEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ChannelMessagesFilter](../types/ChannelMessagesFilter.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$channelMessagesFilterEmpty = ;
+$channelMessagesFilterEmpty = ['_' => channelMessagesFilterEmpty', ];
 ```

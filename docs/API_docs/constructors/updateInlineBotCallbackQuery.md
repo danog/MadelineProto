@@ -18,5 +18,5 @@
 
 
 ```
-$updateInlineBotCallbackQuery = ['query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];
+$updateInlineBotCallbackQuery = ['_' => updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];
 ```

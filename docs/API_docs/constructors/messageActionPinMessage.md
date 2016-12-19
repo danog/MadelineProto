@@ -1,9 +1,5 @@
 ## Constructor: messageActionPinMessage  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [MessageAction](../types/MessageAction.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messageActionPinMessage = ;
+$messageActionPinMessage = ['_' => messageActionPinMessage', ];
 ```

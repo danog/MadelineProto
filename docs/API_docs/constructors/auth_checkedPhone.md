@@ -13,5 +13,5 @@
 
 
 ```
-$auth_checkedPhone = ['phone_registered' => Bool, ];
+$auth_checkedPhone = ['_' => auth_checkedPhone', 'phone_registered' => Bool, ];
 ```

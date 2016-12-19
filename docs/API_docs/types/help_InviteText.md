@@ -1,6 +1,6 @@
 ## Type: help\_InviteText  
 
-### Constructors:
+### Possible values (constructors):
 
 [help\_inviteText](../constructors/help\_inviteText.md)  
 

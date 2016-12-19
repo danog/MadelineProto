@@ -13,5 +13,5 @@
 
 
 ```
-$sendMessageUploadDocumentAction = ['progress' => int, ];
+$sendMessageUploadDocumentAction = ['_' => sendMessageUploadDocumentAction', 'progress' => int, ];
 ```

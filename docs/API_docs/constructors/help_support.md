@@ -14,5 +14,5 @@
 
 
 ```
-$help_support = ['phone_number' => string, 'user' => User, ];
+$help_support = ['_' => help_support', 'phone_number' => string, 'user' => User, ];
 ```

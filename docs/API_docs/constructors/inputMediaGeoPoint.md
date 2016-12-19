@@ -13,5 +13,5 @@
 
 
 ```
-$inputMediaGeoPoint = ['geo_point' => InputGeoPoint, ];
+$inputMediaGeoPoint = ['_' => inputMediaGeoPoint', 'geo_point' => InputGeoPoint, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: EncryptedChat  
 
-### Constructors:
+### Possible values (constructors):
 
 [encryptedChatEmpty](../constructors/encryptedChatEmpty.md)  
 

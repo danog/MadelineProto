@@ -1,9 +1,5 @@
 ## Constructor: channelRoleModerator  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$channelRoleModerator = ;
+$channelRoleModerator = ['_' => channelRoleModerator', ];
 ```

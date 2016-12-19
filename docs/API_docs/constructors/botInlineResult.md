@@ -24,5 +24,5 @@
 
 
 ```
-$botInlineResult = ['id' => string, 'type' => string, 'title' => string, 'description' => string, 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, 'duration' => int, 'send_message' => BotInlineMessage, ];
+$botInlineResult = ['_' => botInlineResult', 'id' => string, 'type' => string, 'title' => string, 'description' => string, 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, 'duration' => int, 'send_message' => BotInlineMessage, ];
 ```

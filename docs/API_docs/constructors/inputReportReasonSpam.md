@@ -1,9 +1,5 @@
 ## Constructor: inputReportReasonSpam  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ReportReason](../types/ReportReason.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputReportReasonSpam = ;
+$inputReportReasonSpam = ['_' => inputReportReasonSpam', ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$account_privacyRules = ['rules' => [PrivacyRule], 'users' => [User], ];
+$account_privacyRules = ['_' => account_privacyRules', 'rules' => [Vector t], 'users' => [Vector t], ];
 ```

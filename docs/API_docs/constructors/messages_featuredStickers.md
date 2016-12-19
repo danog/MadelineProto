@@ -15,5 +15,5 @@
 
 
 ```
-$messages_featuredStickers = ['hash' => int, 'sets' => [StickerSetCovered], 'unread' => [long], ];
+$messages_featuredStickers = ['_' => messages_featuredStickers', 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
 ```

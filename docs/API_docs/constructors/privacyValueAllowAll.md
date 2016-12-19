@@ -1,9 +1,5 @@
 ## Constructor: privacyValueAllowAll  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [PrivacyRule](../types/PrivacyRule.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$privacyValueAllowAll = ;
+$privacyValueAllowAll = ['_' => privacyValueAllowAll', ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$inlineBotSwitchPM = ['text' => string, 'start_param' => string, ];
+$inlineBotSwitchPM = ['_' => inlineBotSwitchPM', 'text' => string, 'start_param' => string, ];
 ```

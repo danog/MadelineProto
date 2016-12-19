@@ -1,6 +1,6 @@
 ## Type: ChannelParticipantRole  
 
-### Constructors:
+### Possible values (constructors):
 
 [channelRoleEmpty](../constructors/channelRoleEmpty.md)  
 

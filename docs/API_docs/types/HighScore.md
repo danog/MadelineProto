@@ -1,6 +1,6 @@
 ## Type: HighScore  
 
-### Constructors:
+### Possible values (constructors):
 
 [highScore](../constructors/highScore.md)  
 

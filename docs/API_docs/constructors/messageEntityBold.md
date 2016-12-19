@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityBold = ['offset' => int, 'length' => int, ];
+$messageEntityBold = ['_' => messageEntityBold', 'offset' => int, 'length' => int, ];
 ```

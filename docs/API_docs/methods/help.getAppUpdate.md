@@ -1,9 +1,5 @@
 ## Method: help.getAppUpdate  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_AppUpdate](../types/help\_AppUpdate.md)

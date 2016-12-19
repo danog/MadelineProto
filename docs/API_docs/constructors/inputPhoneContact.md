@@ -16,5 +16,5 @@
 
 
 ```
-$inputPhoneContact = ['client_id' => long, 'phone' => string, 'first_name' => string, 'last_name' => string, ];
+$inputPhoneContact = ['_' => inputPhoneContact', 'client_id' => long, 'phone' => string, 'first_name' => string, 'last_name' => string, ];
 ```

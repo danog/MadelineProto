@@ -19,5 +19,5 @@
 
 
 ```
-$updates_channelDifference = ['final' => Bool, 'pts' => int, 'timeout' => int, 'new_messages' => [Message], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], ];
+$updates_channelDifference = ['_' => updates_channelDifference', 'final' => true, 'pts' => int, 'timeout' => int, 'new_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$updates_differenceEmpty = ['date' => int, 'seq' => int, ];
+$updates_differenceEmpty = ['_' => updates_differenceEmpty', 'date' => int, 'seq' => int, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: auth\_SentCode  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_sentCode](../constructors/auth\_sentCode.md)  
 

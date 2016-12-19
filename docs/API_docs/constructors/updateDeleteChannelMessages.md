@@ -16,5 +16,5 @@
 
 
 ```
-$updateDeleteChannelMessages = ['channel_id' => int, 'messages' => [int], 'pts' => int, 'pts_count' => int, ];
+$updateDeleteChannelMessages = ['_' => updateDeleteChannelMessages', 'channel_id' => int, 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
 ```

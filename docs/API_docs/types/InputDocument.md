@@ -1,6 +1,6 @@
 ## Type: InputDocument  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputDocumentEmpty](../constructors/inputDocumentEmpty.md)  
 

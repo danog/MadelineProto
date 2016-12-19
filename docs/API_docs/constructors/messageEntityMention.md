@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityMention = ['offset' => int, 'length' => int, ];
+$messageEntityMention = ['_' => messageEntityMention', 'offset' => int, 'length' => int, ];
 ```

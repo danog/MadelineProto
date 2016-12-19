@@ -1,6 +1,6 @@
 ## Type: InputGame  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputGameID](../constructors/inputGameID.md)  
 

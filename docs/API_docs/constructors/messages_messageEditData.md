@@ -13,5 +13,5 @@
 
 
 ```
-$messages_messageEditData = ['caption' => Bool, ];
+$messages_messageEditData = ['_' => messages_messageEditData', 'caption' => true, ];
 ```

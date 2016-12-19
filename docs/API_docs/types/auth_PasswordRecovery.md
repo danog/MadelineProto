@@ -1,6 +1,6 @@
 ## Type: auth\_PasswordRecovery  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_passwordRecovery](../constructors/auth\_passwordRecovery.md)  
 

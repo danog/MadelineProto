@@ -1,6 +1,6 @@
 ## Type: PeerSettings  
 
-### Constructors:
+### Possible values (constructors):
 
 [peerSettings](../constructors/peerSettings.md)  
 

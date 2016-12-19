@@ -1,9 +1,5 @@
 ## Constructor: messageMediaUnsupported  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [MessageMedia](../types/MessageMedia.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messageMediaUnsupported = ;
+$messageMediaUnsupported = ['_' => messageMediaUnsupported', ];
 ```

@@ -16,5 +16,5 @@
 
 
 ```
-$replyKeyboardMarkup = ['resize' => Bool, 'single_use' => Bool, 'selective' => Bool, 'rows' => [KeyboardButtonRow], ];
+$replyKeyboardMarkup = ['_' => replyKeyboardMarkup', 'resize' => true, 'single_use' => true, 'selective' => true, 'rows' => [Vector t], ];
 ```

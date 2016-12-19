@@ -15,5 +15,5 @@
 
 
 ```
-$messages_stickerSet = ['set' => StickerSet, 'packs' => [StickerPack], 'documents' => [Document], ];
+$messages_stickerSet = ['_' => messages_stickerSet', 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
 ```

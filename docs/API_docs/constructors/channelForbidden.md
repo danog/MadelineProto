@@ -17,5 +17,5 @@
 
 
 ```
-$channelForbidden = ['broadcast' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, ];
+$channelForbidden = ['_' => channelForbidden', 'broadcast' => true, 'megagroup' => true, 'id' => int, 'access_hash' => long, 'title' => string, ];
 ```

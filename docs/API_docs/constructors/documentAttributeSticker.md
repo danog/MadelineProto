@@ -16,5 +16,5 @@
 
 
 ```
-$documentAttributeSticker = ['mask' => Bool, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
+$documentAttributeSticker = ['_' => documentAttributeSticker', 'mask' => true, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: messages\_SentEncryptedMessage  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_sentEncryptedMessage](../constructors/messages\_sentEncryptedMessage.md)  
 

@@ -1,9 +1,5 @@
 ## Method: channels.getAdminedPublicChannels  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [messages\_Chats](../types/messages\_Chats.md)

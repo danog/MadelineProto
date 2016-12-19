@@ -1,6 +1,6 @@
 ## Type: ChatPhoto  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatPhotoEmpty](../constructors/chatPhotoEmpty.md)  
 

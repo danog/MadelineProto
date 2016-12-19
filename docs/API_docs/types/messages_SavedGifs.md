@@ -1,6 +1,6 @@
 ## Type: messages\_SavedGifs  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_savedGifsNotModified](../constructors/messages\_savedGifsNotModified.md)  
 

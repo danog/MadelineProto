@@ -14,5 +14,5 @@
 
 
 ```
-$messageActionGameScore = ['game_id' => long, 'score' => int, ];
+$messageActionGameScore = ['_' => messageActionGameScore', 'game_id' => long, 'score' => int, ];
 ```

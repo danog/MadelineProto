@@ -15,5 +15,5 @@
 
 
 ```
-$messageEntityTextUrl = ['offset' => int, 'length' => int, 'url' => string, ];
+$messageEntityTextUrl = ['_' => messageEntityTextUrl', 'offset' => int, 'length' => int, 'url' => string, ];
 ```

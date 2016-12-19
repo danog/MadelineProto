@@ -1,6 +1,6 @@
 ## Type: messages\_StickerSet  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_stickerSet](../constructors/messages\_stickerSet.md)  
 

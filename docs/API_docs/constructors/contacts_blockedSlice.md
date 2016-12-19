@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_blockedSlice = ['count' => int, 'blocked' => [ContactBlocked], 'users' => [User], ];
+$contacts_blockedSlice = ['_' => contacts_blockedSlice', 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```

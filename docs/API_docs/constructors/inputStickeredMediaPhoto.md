@@ -13,5 +13,5 @@
 
 
 ```
-$inputStickeredMediaPhoto = ['id' => InputPhoto, ];
+$inputStickeredMediaPhoto = ['_' => inputStickeredMediaPhoto', 'id' => InputPhoto, ];
 ```

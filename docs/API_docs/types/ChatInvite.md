@@ -1,6 +1,6 @@
 ## Type: ChatInvite  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatInviteAlready](../constructors/chatInviteAlready.md)  
 

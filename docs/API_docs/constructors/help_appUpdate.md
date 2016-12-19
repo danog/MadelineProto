@@ -16,5 +16,5 @@
 
 
 ```
-$help_appUpdate = ['id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
+$help_appUpdate = ['_' => help_appUpdate', 'id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
 ```

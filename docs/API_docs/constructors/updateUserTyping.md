@@ -14,5 +14,5 @@
 
 
 ```
-$updateUserTyping = ['user_id' => int, 'action' => SendMessageAction, ];
+$updateUserTyping = ['_' => updateUserTyping', 'user_id' => int, 'action' => SendMessageAction, ];
 ```

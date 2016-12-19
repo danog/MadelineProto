@@ -15,5 +15,5 @@
 
 
 ```
-$messages_messages = ['messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$messages_messages = ['_' => messages_messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

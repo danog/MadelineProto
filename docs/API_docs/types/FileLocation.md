@@ -1,6 +1,6 @@
 ## Type: FileLocation  
 
-### Constructors:
+### Possible values (constructors):
 
 [fileLocationUnavailable](../constructors/fileLocationUnavailable.md)  
 

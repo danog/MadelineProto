@@ -13,5 +13,5 @@
 
 
 ```
-$encryptedChatDiscarded = ['id' => int, ];
+$encryptedChatDiscarded = ['_' => encryptedChatDiscarded', 'id' => int, ];
 ```

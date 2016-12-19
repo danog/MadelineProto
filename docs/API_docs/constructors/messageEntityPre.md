@@ -15,5 +15,5 @@
 
 
 ```
-$messageEntityPre = ['offset' => int, 'length' => int, 'language' => string, ];
+$messageEntityPre = ['_' => messageEntityPre', 'offset' => int, 'length' => int, 'language' => string, ];
 ```

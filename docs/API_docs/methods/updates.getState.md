@@ -1,9 +1,5 @@
 ## Method: updates.getState  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [updates\_State](../types/updates\_State.md)

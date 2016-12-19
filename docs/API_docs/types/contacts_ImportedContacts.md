@@ -1,6 +1,6 @@
 ## Type: contacts\_ImportedContacts  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_importedContacts](../constructors/contacts\_importedContacts.md)  
 

@@ -1,6 +1,6 @@
 ## Type: UserProfilePhoto  
 
-### Constructors:
+### Possible values (constructors):
 
 [userProfilePhotoEmpty](../constructors/userProfilePhotoEmpty.md)  
 

@@ -1,6 +1,6 @@
 ## Type: InputNotifyPeer  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputNotifyPeer](../constructors/inputNotifyPeer.md)  
 

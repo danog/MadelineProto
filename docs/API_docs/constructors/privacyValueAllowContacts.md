@@ -1,9 +1,5 @@
 ## Constructor: privacyValueAllowContacts  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [PrivacyRule](../types/PrivacyRule.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$privacyValueAllowContacts = ;
+$privacyValueAllowContacts = ['_' => privacyValueAllowContacts', ];
 ```

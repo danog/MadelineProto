@@ -1,6 +1,6 @@
 ## Type: ChatFull  
 
-### Constructors:
+### Possible values (constructors):
 
 [chatFull](../constructors/chatFull.md)  
 

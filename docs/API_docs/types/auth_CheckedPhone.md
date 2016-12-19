@@ -1,6 +1,6 @@
 ## Type: auth\_CheckedPhone  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_checkedPhone](../constructors/auth\_checkedPhone.md)  
 

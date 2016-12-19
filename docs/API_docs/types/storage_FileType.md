@@ -1,6 +1,6 @@
 ## Type: storage\_FileType  
 
-### Constructors:
+### Possible values (constructors):
 
 [storage\_fileUnknown](../constructors/storage\_fileUnknown.md)  
 

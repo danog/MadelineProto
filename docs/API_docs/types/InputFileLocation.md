@@ -1,6 +1,6 @@
 ## Type: InputFileLocation  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputFileLocation](../constructors/inputFileLocation.md)  
 

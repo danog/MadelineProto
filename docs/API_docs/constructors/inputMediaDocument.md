@@ -14,5 +14,5 @@
 
 
 ```
-$inputMediaDocument = ['id' => InputDocument, 'caption' => string, ];
+$inputMediaDocument = ['_' => inputMediaDocument', 'id' => InputDocument, 'caption' => string, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: channels\_ChannelParticipant  
 
-### Constructors:
+### Possible values (constructors):
 
 [channels\_channelParticipant](../constructors/channels\_channelParticipant.md)  
 

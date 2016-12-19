@@ -1,6 +1,6 @@
 ## Type: InputPrivacyKey  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPrivacyKeyStatusTimestamp](../constructors/inputPrivacyKeyStatusTimestamp.md)  
 

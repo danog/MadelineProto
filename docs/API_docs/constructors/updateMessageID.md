@@ -14,5 +14,5 @@
 
 
 ```
-$updateMessageID = ['id' => int, 'random_id' => long, ];
+$updateMessageID = ['_' => updateMessageID', 'id' => int, 'random_id' => long, ];
 ```

@@ -18,5 +18,5 @@
 
 
 ```
-$updatesCombined = ['updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq_start' => int, 'seq' => int, ];
+$updatesCombined = ['_' => updatesCombined', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq_start' => int, 'seq' => int, ];
 ```

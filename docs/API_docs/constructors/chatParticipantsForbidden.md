@@ -14,5 +14,5 @@
 
 
 ```
-$chatParticipantsForbidden = ['chat_id' => int, 'self_participant' => ChatParticipant, ];
+$chatParticipantsForbidden = ['_' => chatParticipantsForbidden', 'chat_id' => int, 'self_participant' => ChatParticipant, ];
 ```

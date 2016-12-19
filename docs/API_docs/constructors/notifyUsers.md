@@ -1,9 +1,5 @@
 ## Constructor: notifyUsers  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [NotifyPeer](../types/NotifyPeer.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$notifyUsers = ;
+$notifyUsers = ['_' => notifyUsers', ];
 ```

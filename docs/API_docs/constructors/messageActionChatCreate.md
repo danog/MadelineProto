@@ -14,5 +14,5 @@
 
 
 ```
-$messageActionChatCreate = ['title' => string, 'users' => [int], ];
+$messageActionChatCreate = ['_' => messageActionChatCreate', 'title' => string, 'users' => [Vector t], ];
 ```

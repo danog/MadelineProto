@@ -1,6 +1,6 @@
 ## Type: photos\_Photos  
 
-### Constructors:
+### Possible values (constructors):
 
 [photos\_photos](../constructors/photos\_photos.md)  
 

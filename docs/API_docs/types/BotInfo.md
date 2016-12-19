@@ -1,6 +1,6 @@
 ## Type: BotInfo  
 
-### Constructors:
+### Possible values (constructors):
 
 [botInfo](../constructors/botInfo.md)  
 

@@ -1,6 +1,6 @@
 ## Type: MessageRange  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageRange](../constructors/messageRange.md)  
 

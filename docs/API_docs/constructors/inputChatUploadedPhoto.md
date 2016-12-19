@@ -13,5 +13,5 @@
 
 
 ```
-$inputChatUploadedPhoto = ['file' => InputFile, ];
+$inputChatUploadedPhoto = ['_' => inputChatUploadedPhoto', 'file' => InputFile, ];
 ```

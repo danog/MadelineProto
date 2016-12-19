@@ -1,9 +1,5 @@
 ## Constructor: auth\_codeTypeCall  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [auth\_CodeType](../types/auth\_CodeType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$auth_codeTypeCall = ;
+$auth_codeTypeCall = ['_' => auth_codeTypeCall', ];
 ```

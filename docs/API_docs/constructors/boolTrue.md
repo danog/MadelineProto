@@ -1,16 +1,3 @@
-## Constructor: boolTrue  
+# boolTrue  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
-
-
-### Type: [Bool](../types/Bool.md)
-
-### Example:
-
-
-```
-$boolTrue = ;
-```
+Represents boolean with value equal to `true`.

@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatAddUser = ['users' => [int], ];
+$messageActionChatAddUser = ['_' => messageActionChatAddUser', 'users' => [Vector t], ];
 ```

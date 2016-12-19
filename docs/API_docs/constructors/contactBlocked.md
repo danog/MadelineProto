@@ -14,5 +14,5 @@
 
 
 ```
-$contactBlocked = ['user_id' => int, 'date' => int, ];
+$contactBlocked = ['_' => contactBlocked', 'user_id' => int, 'date' => int, ];
 ```

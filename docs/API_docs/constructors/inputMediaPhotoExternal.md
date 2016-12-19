@@ -14,5 +14,5 @@
 
 
 ```
-$inputMediaPhotoExternal = ['url' => string, 'caption' => string, ];
+$inputMediaPhotoExternal = ['_' => inputMediaPhotoExternal', 'url' => string, 'caption' => string, ];
 ```

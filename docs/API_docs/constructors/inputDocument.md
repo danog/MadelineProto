@@ -14,5 +14,5 @@
 
 
 ```
-$inputDocument = ['id' => long, 'access_hash' => long, ];
+$inputDocument = ['_' => inputDocument', 'id' => long, 'access_hash' => long, ];
 ```

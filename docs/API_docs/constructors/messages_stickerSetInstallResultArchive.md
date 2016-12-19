@@ -13,5 +13,5 @@
 
 
 ```
-$messages_stickerSetInstallResultArchive = ['sets' => [StickerSetCovered], ];
+$messages_stickerSetInstallResultArchive = ['_' => messages_stickerSetInstallResultArchive', 'sets' => [Vector t], ];
 ```

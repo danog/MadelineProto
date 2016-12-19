@@ -16,5 +16,5 @@
 
 
 ```
-$account_passwordInputSettings = ['new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
+$account_passwordInputSettings = ['_' => account_passwordInputSettings', 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
 ```

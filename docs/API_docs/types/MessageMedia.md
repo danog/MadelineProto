@@ -1,6 +1,6 @@
 ## Type: MessageMedia  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageMediaEmpty](../constructors/messageMediaEmpty.md)  
 

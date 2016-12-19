@@ -1,6 +1,6 @@
 ## Type: UserFull  
 
-### Constructors:
+### Possible values (constructors):
 
 [userFull](../constructors/userFull.md)  
 

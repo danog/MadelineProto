@@ -13,5 +13,5 @@
 
 
 ```
-$documentEmpty = ['id' => long, ];
+$documentEmpty = ['_' => documentEmpty', 'id' => long, ];
 ```

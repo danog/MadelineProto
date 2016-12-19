@@ -14,5 +14,5 @@
 
 
 ```
-$messages_stickers = ['hash' => string, 'stickers' => [Document], ];
+$messages_stickers = ['_' => messages_stickers', 'hash' => string, 'stickers' => [Vector t], ];
 ```

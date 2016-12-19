@@ -13,5 +13,5 @@
 
 
 ```
-$exportedMessageLink = ['link' => string, ];
+$exportedMessageLink = ['_' => exportedMessageLink', 'link' => string, ];
 ```

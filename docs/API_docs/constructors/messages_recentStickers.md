@@ -14,5 +14,5 @@
 
 
 ```
-$messages_recentStickers = ['hash' => int, 'stickers' => [Document], ];
+$messages_recentStickers = ['_' => messages_recentStickers', 'hash' => int, 'stickers' => [Vector t], ];
 ```

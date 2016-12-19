@@ -13,5 +13,5 @@
 
 
 ```
-$webPageEmpty = ['id' => long, ];
+$webPageEmpty = ['_' => webPageEmpty', 'id' => long, ];
 ```

@@ -13,5 +13,5 @@
 
 
 ```
-$receivedNotifyMessage = ['id' => int, ];
+$receivedNotifyMessage = ['_' => receivedNotifyMessage', 'id' => int, ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$stickerSetCovered = ['set' => StickerSet, 'cover' => Document, ];
+$stickerSetCovered = ['_' => stickerSetCovered', 'set' => StickerSet, 'cover' => Document, ];
 ```

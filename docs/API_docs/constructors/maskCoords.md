@@ -16,5 +16,5 @@
 
 
 ```
-$maskCoords = ['n' => int, 'x' => double, 'y' => double, 'zoom' => double, ];
+$maskCoords = ['_' => maskCoords', 'n' => int, 'x' => double, 'y' => double, 'zoom' => double, ];
 ```

@@ -1,9 +1,5 @@
 ## Method: help.getSupport  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_Support](../types/help\_Support.md)

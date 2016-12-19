@@ -1,6 +1,6 @@
 ## Type: PrivacyRule  
 
-### Constructors:
+### Possible values (constructors):
 
 [privacyValueAllowContacts](../constructors/privacyValueAllowContacts.md)  
 

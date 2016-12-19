@@ -14,5 +14,5 @@
 
 
 ```
-$updateChannelPinnedMessage = ['channel_id' => int, 'id' => int, ];
+$updateChannelPinnedMessage = ['_' => updateChannelPinnedMessage', 'channel_id' => int, 'id' => int, ];
 ```

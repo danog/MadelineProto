@@ -1,6 +1,6 @@
 ## Type: messages\_MessageEditData  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_messageEditData](../constructors/messages\_messageEditData.md)  
 

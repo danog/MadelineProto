@@ -13,5 +13,5 @@
 
 
 ```
-$photoEmpty = ['id' => long, ];
+$photoEmpty = ['_' => photoEmpty', 'id' => long, ];
 ```

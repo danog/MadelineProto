@@ -1,9 +1,5 @@
 ## Method: help.getAppChangelog  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_AppChangelog](../types/help\_AppChangelog.md)

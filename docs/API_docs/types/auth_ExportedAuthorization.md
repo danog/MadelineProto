@@ -1,6 +1,6 @@
 ## Type: auth\_ExportedAuthorization  
 
-### Constructors:
+### Possible values (constructors):
 
 [auth\_exportedAuthorization](../constructors/auth\_exportedAuthorization.md)  
 

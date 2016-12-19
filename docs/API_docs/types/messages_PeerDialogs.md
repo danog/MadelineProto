@@ -1,6 +1,6 @@
 ## Type: messages\_PeerDialogs  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_peerDialogs](../constructors/messages\_peerDialogs.md)  
 

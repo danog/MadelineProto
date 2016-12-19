@@ -15,5 +15,5 @@
 
 
 ```
-$messages_affectedHistory = ['pts' => int, 'pts_count' => int, 'offset' => int, ];
+$messages_affectedHistory = ['_' => messages_affectedHistory', 'pts' => int, 'pts_count' => int, 'offset' => int, ];
 ```

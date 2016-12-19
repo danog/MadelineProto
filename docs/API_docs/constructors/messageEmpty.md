@@ -13,5 +13,5 @@
 
 
 ```
-$messageEmpty = ['id' => int, ];
+$messageEmpty = ['_' => messageEmpty', 'id' => int, ];
 ```

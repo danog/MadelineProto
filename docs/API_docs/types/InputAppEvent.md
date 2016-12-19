@@ -1,6 +1,6 @@
 ## Type: InputAppEvent  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputAppEvent](../constructors/inputAppEvent.md)  
 

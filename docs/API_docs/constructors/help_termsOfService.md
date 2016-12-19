@@ -13,5 +13,5 @@
 
 
 ```
-$help_termsOfService = ['text' => string, ];
+$help_termsOfService = ['_' => help_termsOfService', 'text' => string, ];
 ```

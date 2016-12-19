@@ -1,6 +1,6 @@
 ## Type: messages\_AffectedHistory  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_affectedHistory](../constructors/messages\_affectedHistory.md)  
 

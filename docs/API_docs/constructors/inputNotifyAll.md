@@ -1,9 +1,5 @@
 ## Constructor: inputNotifyAll  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputNotifyAll = ;
+$inputNotifyAll = ['_' => inputNotifyAll', ];
 ```

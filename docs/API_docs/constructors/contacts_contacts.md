@@ -14,5 +14,5 @@
 
 
 ```
-$contacts_contacts = ['contacts' => [Contact], 'users' => [User], ];
+$contacts_contacts = ['_' => contacts_contacts', 'contacts' => [Vector t], 'users' => [Vector t], ];
 ```

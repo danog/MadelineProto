@@ -14,5 +14,5 @@
 
 
 ```
-$updateUserBlocked = ['user_id' => int, 'blocked' => Bool, ];
+$updateUserBlocked = ['_' => updateUserBlocked', 'user_id' => int, 'blocked' => Bool, ];
 ```

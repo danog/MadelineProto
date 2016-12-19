@@ -1,6 +1,6 @@
 ## Type: DisabledFeature  
 
-### Constructors:
+### Possible values (constructors):
 
 [disabledFeature](../constructors/disabledFeature.md)  
 

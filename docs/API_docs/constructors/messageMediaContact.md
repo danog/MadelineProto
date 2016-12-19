@@ -16,5 +16,5 @@
 
 
 ```
-$messageMediaContact = ['phone_number' => string, 'first_name' => string, 'last_name' => string, 'user_id' => int, ];
+$messageMediaContact = ['_' => messageMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'user_id' => int, ];
 ```

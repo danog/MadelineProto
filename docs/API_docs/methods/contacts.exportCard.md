@@ -1,9 +1,5 @@
 ## Method: contacts.exportCard  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

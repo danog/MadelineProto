@@ -1,6 +1,6 @@
 ## Type: ExportedMessageLink  
 
-### Constructors:
+### Possible values (constructors):
 
 [exportedMessageLink](../constructors/exportedMessageLink.md)  
 

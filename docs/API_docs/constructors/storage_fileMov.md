@@ -1,9 +1,5 @@
 ## Constructor: storage\_fileMov  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [storage\_FileType](../types/storage\_FileType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$storage_fileMov = ;
+$storage_fileMov = ['_' => storage_fileMov', ];
 ```

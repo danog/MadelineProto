@@ -1,9 +1,5 @@
 ## Constructor: messages\_stickerSetInstallResultSuccess  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [messages\_StickerSetInstallResult](../types/messages\_StickerSetInstallResult.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$messages_stickerSetInstallResultSuccess = ;
+$messages_stickerSetInstallResultSuccess = ['_' => messages_stickerSetInstallResultSuccess', ];
 ```

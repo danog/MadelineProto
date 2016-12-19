@@ -14,5 +14,5 @@
 
 
 ```
-$messages_highScores = ['scores' => [HighScore], 'users' => [User], ];
+$messages_highScores = ['_' => messages_highScores', 'scores' => [Vector t], 'users' => [Vector t], ];
 ```

@@ -14,5 +14,5 @@
 
 
 ```
-$updateStickerSetsOrder = ['masks' => Bool, 'order' => [long], ];
+$updateStickerSetsOrder = ['_' => updateStickerSetsOrder', 'masks' => true, 'order' => [Vector t], ];
 ```

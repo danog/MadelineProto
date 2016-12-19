@@ -14,5 +14,5 @@
 
 
 ```
-$importedContact = ['user_id' => int, 'client_id' => long, ];
+$importedContact = ['_' => importedContact', 'user_id' => int, 'client_id' => long, ];
 ```

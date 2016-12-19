@@ -16,5 +16,5 @@
 
 
 ```
-$messages_dhConfig = ['g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];
+$messages_dhConfig = ['_' => messages_dhConfig', 'g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];
 ```

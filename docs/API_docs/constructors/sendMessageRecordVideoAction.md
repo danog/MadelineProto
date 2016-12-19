@@ -1,9 +1,5 @@
 ## Constructor: sendMessageRecordVideoAction  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [SendMessageAction](../types/SendMessageAction.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$sendMessageRecordVideoAction = ;
+$sendMessageRecordVideoAction = ['_' => sendMessageRecordVideoAction', ];
 ```

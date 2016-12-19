@@ -13,5 +13,5 @@
 
 
 ```
-$sendMessageUploadVideoAction = ['progress' => int, ];
+$sendMessageUploadVideoAction = ['_' => sendMessageUploadVideoAction', 'progress' => int, ];
 ```

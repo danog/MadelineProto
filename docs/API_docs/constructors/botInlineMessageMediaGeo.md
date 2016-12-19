@@ -14,5 +14,5 @@
 
 
 ```
-$botInlineMessageMediaGeo = ['geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
+$botInlineMessageMediaGeo = ['_' => botInlineMessageMediaGeo', 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
 ```

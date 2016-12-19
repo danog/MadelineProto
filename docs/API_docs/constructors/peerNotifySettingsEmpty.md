@@ -1,9 +1,5 @@
 ## Constructor: peerNotifySettingsEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [PeerNotifySettings](../types/PeerNotifySettings.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$peerNotifySettingsEmpty = ;
+$peerNotifySettingsEmpty = ['_' => peerNotifySettingsEmpty', ];
 ```

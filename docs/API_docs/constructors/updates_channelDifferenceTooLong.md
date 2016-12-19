@@ -22,5 +22,5 @@
 
 
 ```
-$updates_channelDifferenceTooLong = ['final' => Bool, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$updates_channelDifferenceTooLong = ['_' => updates_channelDifferenceTooLong', 'final' => true, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

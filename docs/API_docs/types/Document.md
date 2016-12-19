@@ -1,6 +1,6 @@
 ## Type: Document  
 
-### Constructors:
+### Possible values (constructors):
 
 [documentEmpty](../constructors/documentEmpty.md)  
 

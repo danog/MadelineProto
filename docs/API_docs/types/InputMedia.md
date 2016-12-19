@@ -1,6 +1,6 @@
 ## Type: InputMedia  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputMediaEmpty](../constructors/inputMediaEmpty.md)  
 

@@ -14,5 +14,5 @@
 
 
 ```
-$auth_exportedAuthorization = ['id' => int, 'bytes' => bytes, ];
+$auth_exportedAuthorization = ['_' => auth_exportedAuthorization', 'id' => int, 'bytes' => bytes, ];
 ```

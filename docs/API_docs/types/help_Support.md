@@ -1,6 +1,6 @@
 ## Type: help\_Support  
 
-### Constructors:
+### Possible values (constructors):
 
 [help\_support](../constructors/help\_support.md)  
 

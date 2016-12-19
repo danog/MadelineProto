@@ -14,5 +14,5 @@
 
 
 ```
-$inputMediaGifExternal = ['url' => string, 'q' => string, ];
+$inputMediaGifExternal = ['_' => inputMediaGifExternal', 'url' => string, 'q' => string, ];
 ```

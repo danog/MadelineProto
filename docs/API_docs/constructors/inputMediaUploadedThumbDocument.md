@@ -18,5 +18,5 @@
 
 
 ```
-$inputMediaUploadedThumbDocument = ['file' => InputFile, 'thumb' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, 'stickers' => [InputDocument], ];
+$inputMediaUploadedThumbDocument = ['_' => inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => string, 'attributes' => [Vector t], 'caption' => string, 'stickers' => [Vector t], ];
 ```

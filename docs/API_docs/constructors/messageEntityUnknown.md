@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityUnknown = ['offset' => int, 'length' => int, ];
+$messageEntityUnknown = ['_' => messageEntityUnknown', 'offset' => int, 'length' => int, ];
 ```

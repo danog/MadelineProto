@@ -1,9 +1,5 @@
 ## Constructor: chatPhotoEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ChatPhoto](../types/ChatPhoto.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$chatPhotoEmpty = ;
+$chatPhotoEmpty = ['_' => chatPhotoEmpty', ];
 ```

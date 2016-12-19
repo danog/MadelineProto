@@ -17,5 +17,5 @@
 
 
 ```
-$inputMediaVenue = ['geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
+$inputMediaVenue = ['_' => inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```

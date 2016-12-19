@@ -1,9 +1,5 @@
 ## Constructor: contactLinkHasPhone  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ContactLink](../types/ContactLink.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$contactLinkHasPhone = ;
+$contactLinkHasPhone = ['_' => contactLinkHasPhone', ];
 ```

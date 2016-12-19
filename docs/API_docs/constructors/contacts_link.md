@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_link = ['my_link' => ContactLink, 'foreign_link' => ContactLink, 'user' => User, ];
+$contacts_link = ['_' => contacts_link', 'my_link' => ContactLink, 'foreign_link' => ContactLink, 'user' => User, ];
 ```

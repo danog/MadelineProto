@@ -1,6 +1,6 @@
 ## Type: Game  
 
-### Constructors:
+### Possible values (constructors):
 
 [game](../constructors/game.md)  
 

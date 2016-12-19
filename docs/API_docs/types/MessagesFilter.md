@@ -1,6 +1,6 @@
 ## Type: MessagesFilter  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputMessagesFilterEmpty](../constructors/inputMessagesFilterEmpty.md)  
 

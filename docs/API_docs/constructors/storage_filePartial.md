@@ -1,9 +1,5 @@
 ## Constructor: storage\_filePartial  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [storage\_FileType](../types/storage\_FileType.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$storage_filePartial = ;
+$storage_filePartial = ['_' => storage_filePartial', ];
 ```

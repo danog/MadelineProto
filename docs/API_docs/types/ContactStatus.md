@@ -1,6 +1,6 @@
 ## Type: ContactStatus  
 
-### Constructors:
+### Possible values (constructors):
 
 [contactStatus](../constructors/contactStatus.md)  
 

@@ -13,5 +13,5 @@
 
 
 ```
-$auth_sentCodeTypeFlashCall = ['pattern' => string, ];
+$auth_sentCodeTypeFlashCall = ['_' => auth_sentCodeTypeFlashCall', 'pattern' => string, ];
 ```

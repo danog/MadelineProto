@@ -14,5 +14,5 @@
 
 
 ```
-$topPeer = ['peer' => Peer, 'rating' => double, ];
+$topPeer = ['_' => topPeer', 'peer' => Peer, 'rating' => double, ];
 ```

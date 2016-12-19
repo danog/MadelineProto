@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityEmail = ['offset' => int, 'length' => int, ];
+$messageEntityEmail = ['_' => messageEntityEmail', 'offset' => int, 'length' => int, ];
 ```

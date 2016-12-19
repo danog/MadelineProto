@@ -13,5 +13,5 @@
 
 
 ```
-$photoSizeEmpty = ['type' => string, ];
+$photoSizeEmpty = ['_' => photoSizeEmpty', 'type' => string, ];
 ```

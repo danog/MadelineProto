@@ -1,9 +1,5 @@
 ## Constructor: true  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [True](../types/True.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$true = ;
+$true = ['_' => true', ];
 ```

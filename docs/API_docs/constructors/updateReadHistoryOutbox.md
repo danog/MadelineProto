@@ -16,5 +16,5 @@
 
 
 ```
-$updateReadHistoryOutbox = ['peer' => Peer, 'max_id' => int, 'pts' => int, 'pts_count' => int, ];
+$updateReadHistoryOutbox = ['_' => updateReadHistoryOutbox', 'peer' => Peer, 'max_id' => int, 'pts' => int, 'pts_count' => int, ];
 ```

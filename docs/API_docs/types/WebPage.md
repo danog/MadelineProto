@@ -1,6 +1,6 @@
 ## Type: WebPage  
 
-### Constructors:
+### Possible values (constructors):
 
 [webPageEmpty](../constructors/webPageEmpty.md)  
 

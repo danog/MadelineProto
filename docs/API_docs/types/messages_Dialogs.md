@@ -1,6 +1,6 @@
 ## Type: messages\_Dialogs  
 
-### Constructors:
+### Possible values (constructors):
 
 [messages\_dialogs](../constructors/messages\_dialogs.md)  
 

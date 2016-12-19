@@ -13,5 +13,5 @@
 
 
 ```
-$messageActionChatEditTitle = ['title' => string, ];
+$messageActionChatEditTitle = ['_' => messageActionChatEditTitle', 'title' => string, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: ImportedContact  
 
-### Constructors:
+### Possible values (constructors):
 
 [importedContact](../constructors/importedContact.md)  
 

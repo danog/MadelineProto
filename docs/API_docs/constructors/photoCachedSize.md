@@ -17,5 +17,5 @@
 
 
 ```
-$photoCachedSize = ['type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'bytes' => bytes, ];
+$photoCachedSize = ['_' => photoCachedSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'bytes' => bytes, ];
 ```

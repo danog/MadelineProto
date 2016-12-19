@@ -13,5 +13,5 @@
 
 
 ```
-$chatInviteExported = ['link' => string, ];
+$chatInviteExported = ['_' => chatInviteExported', 'link' => string, ];
 ```

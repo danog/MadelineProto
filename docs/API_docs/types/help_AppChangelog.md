@@ -1,6 +1,6 @@
 ## Type: help\_AppChangelog  
 
-### Constructors:
+### Possible values (constructors):
 
 [help\_appChangelogEmpty](../constructors/help\_appChangelogEmpty.md)  
 

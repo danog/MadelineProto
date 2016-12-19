@@ -14,5 +14,5 @@
 
 
 ```
-$geoPoint = ['long' => double, 'lat' => double, ];
+$geoPoint = ['_' => geoPoint', 'long' => double, 'lat' => double, ];
 ```

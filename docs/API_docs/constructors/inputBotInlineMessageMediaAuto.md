@@ -14,5 +14,5 @@
 
 
 ```
-$inputBotInlineMessageMediaAuto = ['caption' => string, 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageMediaAuto = ['_' => inputBotInlineMessageMediaAuto', 'caption' => string, 'reply_markup' => ReplyMarkup, ];
 ```

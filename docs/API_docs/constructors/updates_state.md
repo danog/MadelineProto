@@ -17,5 +17,5 @@
 
 
 ```
-$updates_state = ['pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
+$updates_state = ['_' => updates_state', 'pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
 ```

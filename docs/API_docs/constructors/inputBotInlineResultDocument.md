@@ -18,5 +18,5 @@
 
 
 ```
-$inputBotInlineResultDocument = ['id' => string, 'type' => string, 'title' => string, 'description' => string, 'document' => InputDocument, 'send_message' => InputBotInlineMessage, ];
+$inputBotInlineResultDocument = ['_' => inputBotInlineResultDocument', 'id' => string, 'type' => string, 'title' => string, 'description' => string, 'document' => InputDocument, 'send_message' => InputBotInlineMessage, ];
 ```

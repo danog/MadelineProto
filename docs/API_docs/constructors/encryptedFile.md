@@ -17,5 +17,5 @@
 
 
 ```
-$encryptedFile = ['id' => long, 'access_hash' => long, 'size' => int, 'dc_id' => int, 'key_fingerprint' => int, ];
+$encryptedFile = ['_' => encryptedFile', 'id' => long, 'access_hash' => long, 'size' => int, 'dc_id' => int, 'key_fingerprint' => int, ];
 ```

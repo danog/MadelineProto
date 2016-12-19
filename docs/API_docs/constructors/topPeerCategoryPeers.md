@@ -15,5 +15,5 @@
 
 
 ```
-$topPeerCategoryPeers = ['category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer], ];
+$topPeerCategoryPeers = ['_' => topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [Vector t], ];
 ```

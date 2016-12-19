@@ -1,9 +1,5 @@
 ## Constructor: channelRoleEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [ChannelParticipantRole](../types/ChannelParticipantRole.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$channelRoleEmpty = ;
+$channelRoleEmpty = ['_' => channelRoleEmpty', ];
 ```

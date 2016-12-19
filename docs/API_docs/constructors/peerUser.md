@@ -13,5 +13,5 @@
 
 
 ```
-$peerUser = ['user_id' => int, ];
+$peerUser = ['_' => peerUser', 'user_id' => int, ];
 ```

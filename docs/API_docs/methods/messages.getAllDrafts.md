@@ -1,9 +1,5 @@
 ## Method: messages.getAllDrafts  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Updates](../types/Updates.md)

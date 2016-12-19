@@ -14,5 +14,5 @@
 
 
 ```
-$keyboardButtonUrl = ['text' => string, 'url' => string, ];
+$keyboardButtonUrl = ['_' => keyboardButtonUrl', 'text' => string, 'url' => string, ];
 ```

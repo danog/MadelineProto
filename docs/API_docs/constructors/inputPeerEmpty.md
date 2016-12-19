@@ -1,9 +1,5 @@
 ## Constructor: inputPeerEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputPeer](../types/InputPeer.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputPeerEmpty = ;
+$inputPeerEmpty = ['_' => inputPeerEmpty', ];
 ```

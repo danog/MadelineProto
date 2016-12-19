@@ -14,5 +14,5 @@
 
 
 ```
-$inputEncryptedFile = ['id' => long, 'access_hash' => long, ];
+$inputEncryptedFile = ['_' => inputEncryptedFile', 'id' => long, 'access_hash' => long, ];
 ```

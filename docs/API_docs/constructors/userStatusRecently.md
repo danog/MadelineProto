@@ -1,9 +1,5 @@
 ## Constructor: userStatusRecently  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [UserStatus](../types/UserStatus.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$userStatusRecently = ;
+$userStatusRecently = ['_' => userStatusRecently', ];
 ```

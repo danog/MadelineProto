@@ -1,6 +1,6 @@
 ## Type: PhotoSize  
 
-### Constructors:
+### Possible values (constructors):
 
 [photoSizeEmpty](../constructors/photoSizeEmpty.md)  
 

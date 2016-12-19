@@ -14,5 +14,5 @@
 
 
 ```
-$messageEntityHashtag = ['offset' => int, 'length' => int, ];
+$messageEntityHashtag = ['_' => messageEntityHashtag', 'offset' => int, 'length' => int, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: MessageEntity  
 
-### Constructors:
+### Possible values (constructors):
 
 [messageEntityUnknown](../constructors/messageEntityUnknown.md)  
 

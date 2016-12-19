@@ -1,6 +1,6 @@
 ## Type: InputPrivacyRule  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPrivacyValueAllowContacts](../constructors/inputPrivacyValueAllowContacts.md)  
 

@@ -14,5 +14,5 @@
 
 
 ```
-$stickerSetMultiCovered = ['set' => StickerSet, 'covers' => [Document], ];
+$stickerSetMultiCovered = ['_' => stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Vector t], ];
 ```

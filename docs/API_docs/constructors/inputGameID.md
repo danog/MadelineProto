@@ -14,5 +14,5 @@
 
 
 ```
-$inputGameID = ['id' => long, 'access_hash' => long, ];
+$inputGameID = ['_' => inputGameID', 'id' => long, 'access_hash' => long, ];
 ```

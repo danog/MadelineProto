@@ -13,5 +13,5 @@
 
 
 ```
-$auth_sentCodeTypeSms = ['length' => int, ];
+$auth_sentCodeTypeSms = ['_' => auth_sentCodeTypeSms', 'length' => int, ];
 ```

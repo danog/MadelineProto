@@ -1,6 +1,6 @@
 ## Type: contacts\_Link  
 
-### Constructors:
+### Possible values (constructors):
 
 [contacts\_link](../constructors/contacts\_link.md)  
 

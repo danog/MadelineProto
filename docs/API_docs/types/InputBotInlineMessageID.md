@@ -1,6 +1,6 @@
 ## Type: InputBotInlineMessageID  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputBotInlineMessageID](../constructors/inputBotInlineMessageID.md)  
 

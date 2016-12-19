@@ -13,5 +13,5 @@
 
 
 ```
-$auth_sentCodeTypeApp = ['length' => int, ];
+$auth_sentCodeTypeApp = ['_' => auth_sentCodeTypeApp', 'length' => int, ];
 ```

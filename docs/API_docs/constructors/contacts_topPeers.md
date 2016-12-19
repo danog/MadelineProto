@@ -15,5 +15,5 @@
 
 
 ```
-$contacts_topPeers = ['categories' => [TopPeerCategoryPeers], 'chats' => [Chat], 'users' => [User], ];
+$contacts_topPeers = ['_' => contacts_topPeers', 'categories' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

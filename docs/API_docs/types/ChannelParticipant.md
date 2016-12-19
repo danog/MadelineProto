@@ -1,6 +1,6 @@
 ## Type: ChannelParticipant  
 
-### Constructors:
+### Possible values (constructors):
 
 [channelParticipant](../constructors/channelParticipant.md)  
 

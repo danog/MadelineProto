@@ -15,5 +15,5 @@
 
 
 ```
-$messages_chatFull = ['full_chat' => ChatFull, 'chats' => [Chat], 'users' => [User], ];
+$messages_chatFull = ['_' => messages_chatFull', 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

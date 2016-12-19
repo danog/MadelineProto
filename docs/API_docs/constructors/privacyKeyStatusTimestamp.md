@@ -1,9 +1,5 @@
 ## Constructor: privacyKeyStatusTimestamp  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [PrivacyKey](../types/PrivacyKey.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$privacyKeyStatusTimestamp = ;
+$privacyKeyStatusTimestamp = ['_' => privacyKeyStatusTimestamp', ];
 ```

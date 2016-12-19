@@ -14,5 +14,5 @@
 
 
 ```
-$stickerPack = ['emoticon' => string, 'documents' => [long], ];
+$stickerPack = ['_' => stickerPack', 'emoticon' => string, 'documents' => [Vector t], ];
 ```

@@ -1,6 +1,6 @@
 ## Type: PrivacyKey  
 
-### Constructors:
+### Possible values (constructors):
 
 [privacyKeyStatusTimestamp](../constructors/privacyKeyStatusTimestamp.md)  
 

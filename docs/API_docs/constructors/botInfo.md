@@ -15,5 +15,5 @@
 
 
 ```
-$botInfo = ['user_id' => int, 'description' => string, 'commands' => [BotCommand], ];
+$botInfo = ['_' => botInfo', 'user_id' => int, 'description' => string, 'commands' => [Vector t], ];
 ```

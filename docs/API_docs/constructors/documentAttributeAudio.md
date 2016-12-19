@@ -17,5 +17,5 @@
 
 
 ```
-$documentAttributeAudio = ['voice' => Bool, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];
+$documentAttributeAudio = ['_' => documentAttributeAudio', 'voice' => true, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];
 ```

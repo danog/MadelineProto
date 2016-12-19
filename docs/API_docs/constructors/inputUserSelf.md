@@ -1,9 +1,5 @@
 ## Constructor: inputUserSelf  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputUser](../types/InputUser.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputUserSelf = ;
+$inputUserSelf = ['_' => inputUserSelf', ];
 ```

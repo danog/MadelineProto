@@ -1,6 +1,6 @@
 ## Type: Null  
 
-### Constructors:
+### Possible values (constructors):
 
 [null](../constructors/null.md)  
 

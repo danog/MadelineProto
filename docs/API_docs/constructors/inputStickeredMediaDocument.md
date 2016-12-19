@@ -13,5 +13,5 @@
 
 
 ```
-$inputStickeredMediaDocument = ['id' => InputDocument, ];
+$inputStickeredMediaDocument = ['_' => inputStickeredMediaDocument', 'id' => InputDocument, ];
 ```

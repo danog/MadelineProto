@@ -1,9 +1,5 @@
 ## Constructor: inputNotifyChats  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputNotifyPeer](../types/InputNotifyPeer.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputNotifyChats = ;
+$inputNotifyChats = ['_' => inputNotifyChats', ];
 ```

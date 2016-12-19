@@ -1,6 +1,6 @@
 ## Type: updates\_Difference  
 
-### Constructors:
+### Possible values (constructors):
 
 [updates\_differenceEmpty](../constructors/updates\_differenceEmpty.md)  
 

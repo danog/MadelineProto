@@ -15,5 +15,5 @@
 
 
 ```
-$keyboardButtonSwitchInline = ['same_peer' => Bool, 'text' => string, 'query' => string, ];
+$keyboardButtonSwitchInline = ['_' => keyboardButtonSwitchInline', 'same_peer' => true, 'text' => string, 'query' => string, ];
 ```

@@ -1,6 +1,6 @@
 ## Type: Config  
 
-### Constructors:
+### Possible values (constructors):
 
 [config](../constructors/config.md)  
 

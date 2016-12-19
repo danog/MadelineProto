@@ -1,9 +1,5 @@
 ## Constructor: inputPrivacyValueDisallowContacts  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputPrivacyRule](../types/InputPrivacyRule.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputPrivacyValueDisallowContacts = ;
+$inputPrivacyValueDisallowContacts = ['_' => inputPrivacyValueDisallowContacts', ];
 ```

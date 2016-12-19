@@ -1,9 +1,5 @@
 ## Constructor: help\_appChangelogEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [help\_AppChangelog](../types/help\_AppChangelog.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$help_appChangelogEmpty = ;
+$help_appChangelogEmpty = ['_' => help_appChangelogEmpty', ];
 ```

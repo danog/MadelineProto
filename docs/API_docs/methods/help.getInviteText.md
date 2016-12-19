@@ -1,9 +1,5 @@
 ## Method: help.getInviteText  
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_InviteText](../types/help\_InviteText.md)

@@ -13,5 +13,5 @@
 
 
 ```
-$replyKeyboardHide = ['selective' => Bool, ];
+$replyKeyboardHide = ['_' => replyKeyboardHide', 'selective' => true, ];
 ```

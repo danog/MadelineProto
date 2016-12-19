@@ -13,5 +13,5 @@
 
 
 ```
-$chatInviteAlready = ['chat' => Chat, ];
+$chatInviteAlready = ['_' => chatInviteAlready', 'chat' => Chat, ];
 ```

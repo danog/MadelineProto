@@ -1,6 +1,6 @@
 ## Type: ReplyMarkup  
 
-### Constructors:
+### Possible values (constructors):
 
 [replyKeyboardHide](../constructors/replyKeyboardHide.md)  
 

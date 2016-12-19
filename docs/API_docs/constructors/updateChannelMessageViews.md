@@ -15,5 +15,5 @@
 
 
 ```
-$updateChannelMessageViews = ['channel_id' => int, 'id' => int, 'views' => int, ];
+$updateChannelMessageViews = ['_' => updateChannelMessageViews', 'channel_id' => int, 'id' => int, 'views' => int, ];
 ```

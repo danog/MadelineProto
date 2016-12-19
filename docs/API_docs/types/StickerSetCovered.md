@@ -1,6 +1,6 @@
 ## Type: StickerSetCovered  
 
-### Constructors:
+### Possible values (constructors):
 
 [stickerSetCovered](../constructors/stickerSetCovered.md)  
 

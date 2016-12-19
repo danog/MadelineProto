@@ -16,5 +16,5 @@
 
 
 ```
-$inputEncryptedFileUploaded = ['id' => long, 'parts' => int, 'md5_checksum' => string, 'key_fingerprint' => int, ];
+$inputEncryptedFileUploaded = ['_' => inputEncryptedFileUploaded', 'id' => long, 'parts' => int, 'md5_checksum' => string, 'key_fingerprint' => int, ];
 ```

@@ -16,5 +16,5 @@
 
 
 ```
-$updateServiceNotification = ['type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
+$updateServiceNotification = ['_' => updateServiceNotification', 'type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
 ```

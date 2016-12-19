@@ -16,5 +16,5 @@
 
 
 ```
-$updateNewAuthorization = ['auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
+$updateNewAuthorization = ['_' => updateNewAuthorization', 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
 ```

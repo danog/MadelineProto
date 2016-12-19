@@ -13,5 +13,5 @@
 
 
 ```
-$inputStickerSetShortName = ['short_name' => string, ];
+$inputStickerSetShortName = ['_' => inputStickerSetShortName', 'short_name' => string, ];
 ```

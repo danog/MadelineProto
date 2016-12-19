@@ -1,9 +1,5 @@
 ## Constructor: inputChannelEmpty  
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Type: [InputChannel](../types/InputChannel.md)
@@ -12,5 +8,5 @@
 
 
 ```
-$inputChannelEmpty = ;
+$inputChannelEmpty = ['_' => inputChannelEmpty', ];
 ```

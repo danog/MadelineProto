@@ -1,6 +1,6 @@
 ## Type: Error  
 
-### Constructors:
+### Possible values (constructors):
 
 [error](../constructors/error.md)  
 

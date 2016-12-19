@@ -1,6 +1,6 @@
 ## Type: InputContact  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputPhoneContact](../constructors/inputPhoneContact.md)  
 

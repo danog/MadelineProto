@@ -14,5 +14,5 @@
 
 
 ```
-$webPagePending = ['id' => long, 'date' => int, ];
+$webPagePending = ['_' => webPagePending', 'id' => long, 'date' => int, ];
 ```

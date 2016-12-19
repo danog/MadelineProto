@@ -1,6 +1,6 @@
 ## Type: InputFile  
 
-### Constructors:
+### Possible values (constructors):
 
 [inputFile](../constructors/inputFile.md)  
 

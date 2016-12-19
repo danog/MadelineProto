@@ -13,5 +13,5 @@
 
 
 ```
-$userStatusOnline = ['expires' => int, ];
+$userStatusOnline = ['_' => userStatusOnline', 'expires' => int, ];
 ```
