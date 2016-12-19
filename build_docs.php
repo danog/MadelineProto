@@ -55,6 +55,8 @@ $types = [];
 \danog\MadelineProto\Logger::log('Generating methods documentation...');
 
 foreach ($TL->methods->method as $key => $method) {
+    $method = str_replace('.', '_', $method);
+
     $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->methods->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
 
@@ -284,6 +286,8 @@ $index = '';
 \danog\MadelineProto\Logger::log('Generating types documentation...');
 
 foreach ($types as $type => $keys) {
+    $type = str_replace('.', '_', $type);
+
     $index .= '['.$type.']('.$type.'.md)  
 
 ';
