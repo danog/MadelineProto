@@ -51,7 +51,6 @@ mkdir('methods');
 
 $methods = [];
 
-
 $types = [];
 \danog\MadelineProto\Logger::log('Generating methods documentation...');
 
@@ -59,10 +58,11 @@ foreach ($TL->methods->method as $key => $method) {
     $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->methods->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
 
-
     $params = '';
     foreach ($TL->methods->params[$key] as $param) {
-        if ($param['name'] == 'flags') continue;
+        if ($param['name'] == 'flags') {
+            continue;
+        }
         $stype = 'type';
         $link_type = 'types';
         if (isset($param['subtype'])) {
@@ -77,32 +77,32 @@ foreach ($TL->methods->method as $key => $method) {
             case 'false':
                 $ptype = 'Bool';
         }
-        $params .= "'".$param['name'] . "' => ";
-        $params .= (isset($param['subtype']) ? '[' : '') . '['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
+        $params .= "'".$param['name']."' => ";
+        $params .= (isset($param['subtype']) ? '[' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
     }
-    $methods [$method]= str_replace(['_', '\[\]'],['\_', ''], '$MadelineProto->['.str_replace('.', '->', $method).']('.$method.'.md)(\['.$params.'\]) == [$'.$type.'](../types/'.$real_type.'.md);  
+    $methods[$method] = str_replace(['_', '\[\]'], ['\_', ''], '$MadelineProto->['.str_replace('.', '->', $method).']('.$method.'.md)(\['.$params.'\]) == [$'.$type.'](../types/'.$real_type.'.md);  
 
 ');
-
 
     $params = '';
     $table = '| Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
     foreach ($TL->methods->params[$key] as $param) {
-        if ($param['name'] == 'flags') continue;
+        if ($param['name'] == 'flags') {
+            continue;
+        }
         $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
         switch ($ptype) {
             case 'true':
             case 'false':
                 $ptype = 'Bool';
         }
-        $table .= '|'.$param['name'] . '|' . (isset($param['subtype']) ? 'Array of ' : ''). '['.$ptype.'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
+        $table .= '|'.$param['name'].'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.$ptype.'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
 ';
 
-        $params .= "'".$param['name'] . "' => ";
+        $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
-
     }
     $example = str_replace('[]', '', '
 ```
@@ -151,9 +151,7 @@ file_put_contents('methods/index.md', '# Methods
 }
 </style>
 <div class="container">
-'.join('', $methods).'</div>');
-
-
+'.implode('', $methods).'</div>');
 
 foreach (glob('constructors/*') as $unlink) {
     unlink($unlink);
@@ -171,13 +169,15 @@ $constructors = [];
 
 foreach ($TL->constructors->predicate as $key => $constructor) {
     $constructor = str_replace('.', '_', $constructor);
-    
+
     $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->constructors->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
-    
+
     $params = '';
     foreach ($TL->constructors->params[$key] as $param) {
-        if ($param['name'] == 'flags') continue;
+        if ($param['name'] == 'flags') {
+            continue;
+        }
         $stype = 'type';
         $link_type = 'types';
         if (isset($param['subtype'])) {
@@ -187,21 +187,19 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             }
         }
 
-
         $ptype = str_replace('.', '_', $param[$stype]);
         switch ($ptype) {
             case 'true':
             case 'false':
                 $ptype = 'Bool';
         }
-        $params .= "'".$param['name'] . "' => ";
-        $params .= (isset($param['subtype']) ? '[' : '') . '['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
+        $params .= "'".$param['name']."' => ";
+        $params .= (isset($param['subtype']) ? '[' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md)'.(isset($param['subtype']) ? ']' : '').', ';
     }
 
-    $constructors [$constructor]= str_replace(['_', '\[\]'],['\_', ''], '[$'.$real_type.'](../types/'.$real_type.'.md)\[\'['.str_replace('.', '->', $constructor).']('.$constructor.'.md)\'\] = \['.$params.'\]  
+    $constructors[$constructor] = str_replace(['_', '\[\]'], ['\_', ''], '[$'.$real_type.'](../types/'.$real_type.'.md)\[\'['.str_replace('.', '->', $constructor).']('.$constructor.'.md)\'\] = \['.$params.'\]  
 
 ');
-
 
     if (!isset($types[$real_type])) {
         $types[$real_type] = [];
@@ -215,9 +213,11 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 |----------|:-------------:|---------:|
 ';
     foreach ($TL->constructors->params[$key] as $param) {
-        if ($param['name'] == 'flags') continue;
+        if ($param['name'] == 'flags') {
+            continue;
+        }
         $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
-        
+
         $link_type = 'types';
         if (isset($param['subtype'])) {
             if ($param['type'] == 'vector') {
@@ -229,12 +229,11 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             case 'false':
                 $ptype = 'Bool';
         }
-        $table .= '|'.$param['name'] . '|' . (isset($param['subtype']) ? 'Array of ' : ''). '['.$ptype.'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
+        $table .= '|'.$param['name'].'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.$ptype.'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
 ';
 
-        $params .= "'".$param['name'] . "' => ";
+        $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
-
     }
     $example = str_replace('[]', '', '
 ```
@@ -254,7 +253,6 @@ $'.$constructor.' = ['.$params.'];
     file_put_contents('constructors/'.$constructor.'.md', $header.$example);
 }
 
-
 \danog\MadelineProto\Logger::log('Generating constructors index...');
 
 ksort($constructors);
@@ -270,8 +268,7 @@ file_put_contents('constructors/index.md', '# Constructors
 }
 </style>
 <div class="container">
-'.join('', $constructors).'</div>');
-
+'.implode('', $constructors).'</div>');
 
 foreach (glob('types/*') as $unlink) {
     unlink($unlink);
@@ -315,7 +312,6 @@ foreach ($types as $type => $keys) {
 '.$constructors.'</div>');
     file_put_contents('types/'.$type.'.md', $header);
 }
-
 
 \danog\MadelineProto\Logger::log('Generating additional types...');
 

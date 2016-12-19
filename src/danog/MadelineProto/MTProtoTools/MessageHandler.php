@@ -65,7 +65,6 @@ trait MessageHandler
                     $this->parse_config();
                     throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                 }
-                
             }
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }

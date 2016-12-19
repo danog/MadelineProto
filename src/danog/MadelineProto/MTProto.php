@@ -27,7 +27,6 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
 
-    
     public $settings = [];
     public $authorized = false;
     public $waiting_code = false;
@@ -284,7 +283,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-
         }
     }
 
