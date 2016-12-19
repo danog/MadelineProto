@@ -78,12 +78,12 @@ foreach ($TL->methods->method as $key => $method) {
                 $ptype = 'Bool';
         }
         $params .= "'".$param['name']."' => ";
-        $ptype = 
+        $ptype =
             '['.
             str_replace('_', '\_', $ptype).
             '](../'.$link_type.'/'.$ptype.'.md)';
 
-        $params .= (isset($param['subtype']) ? '\[' . $ptype . '\]' : $ptype).', ';
+        $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
     }
     $md_method = '['.str_replace(['_', '.'], ['->', '\_'], $method).']('.$method.'.md)';
 
@@ -192,15 +192,14 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             case 'false':
                 $ptype = 'Bool';
         }
-        
+
         $params .= "'".$param['name']."' => ";
-        $ptype = 
+        $ptype =
             '['.
             str_replace('_', '\_', $ptype).
             '](../'.$link_type.'/'.$ptype.'.md)';
 
-        $params .= (isset($param['subtype']) ? '\[' . $ptype . '\]' : $ptype).', ';
-
+        $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
     }
 
     $constructors[$constructor] = '[$'.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md) = \['.$params.'\];  
