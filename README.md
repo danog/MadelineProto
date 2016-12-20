@@ -4,6 +4,10 @@
 
 Created by [Daniil Gentili](https://daniil.it), licensed under AGPLv3.
 
+![MadelineProto logo](https://daniil.it/MadelineProto/logo.png)
+
+Logo created by [Matthew Hesketh](https://telegram.me/wrxck) (thanks again!).  
+
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
 This project can run on PHP 7, PHP 5.6 and HHVM, only 64 bit systems are supported ATM.  
