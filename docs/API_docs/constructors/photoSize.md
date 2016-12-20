@@ -1,5 +1,6 @@
 ---
 title: photoSize
+description: photoSize attributes, type and example
 ---
 ## Constructor: photoSize  
 [Back to constructors index](index.md)

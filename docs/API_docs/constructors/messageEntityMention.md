@@ -1,5 +1,6 @@
 ---
 title: messageEntityMention
+description: messageEntityMention attributes, type and example
 ---
 ## Constructor: messageEntityMention  
 [Back to constructors index](index.md)

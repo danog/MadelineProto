@@ -1,5 +1,6 @@
 ---
 title: auth_signIn
+description: auth_signIn parameters, return type and example
 ---
 ## Method: auth\_signIn  
 [Back to methods index](index.md)

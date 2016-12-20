@@ -1,5 +1,6 @@
 ---
 title: updateChannel
+description: updateChannel attributes, type and example
 ---
 ## Constructor: updateChannel  
 [Back to constructors index](index.md)

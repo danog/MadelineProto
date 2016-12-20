@@ -1,5 +1,6 @@
 ---
 title: inputMediaEmpty
+description: inputMediaEmpty attributes, type and example
 ---
 ## Constructor: inputMediaEmpty  
 [Back to constructors index](index.md)

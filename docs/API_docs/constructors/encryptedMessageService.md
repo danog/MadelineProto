@@ -1,5 +1,6 @@
 ---
 title: encryptedMessageService
+description: encryptedMessageService attributes, type and example
 ---
 ## Constructor: encryptedMessageService  
 [Back to constructors index](index.md)

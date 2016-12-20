@@ -1,5 +1,6 @@
 ---
 title: botInlineMessageMediaVenue
+description: botInlineMessageMediaVenue attributes, type and example
 ---
 ## Constructor: botInlineMessageMediaVenue  
 [Back to constructors index](index.md)

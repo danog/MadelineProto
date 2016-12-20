@@ -1,5 +1,6 @@
 ---
 title: inputDocumentEmpty
+description: inputDocumentEmpty attributes, type and example
 ---
 ## Constructor: inputDocumentEmpty  
 [Back to constructors index](index.md)

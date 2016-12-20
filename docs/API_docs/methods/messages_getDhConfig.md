@@ -1,5 +1,6 @@
 ---
 title: messages_getDhConfig
+description: messages_getDhConfig parameters, return type and example
 ---
 ## Method: messages\_getDhConfig  
 [Back to methods index](index.md)

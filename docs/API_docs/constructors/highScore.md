@@ -1,5 +1,6 @@
 ---
 title: highScore
+description: highScore attributes, type and example
 ---
 ## Constructor: highScore  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: account_sendConfirmPhoneCode
+description: account_sendConfirmPhoneCode parameters, return type and example
 ---
 ## Method: account\_sendConfirmPhoneCode  
 [Back to methods index](index.md)

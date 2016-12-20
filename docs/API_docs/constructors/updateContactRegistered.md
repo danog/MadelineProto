@@ -1,5 +1,6 @@
 ---
 title: updateContactRegistered
+description: updateContactRegistered attributes, type and example
 ---
 ## Constructor: updateContactRegistered  
 [Back to constructors index](index.md)

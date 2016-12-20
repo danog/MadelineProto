@@ -1,5 +1,6 @@
 ---
 title: privacyKeyStatusTimestamp
+description: privacyKeyStatusTimestamp attributes, type and example
 ---
 ## Constructor: privacyKeyStatusTimestamp  
 [Back to constructors index](index.md)

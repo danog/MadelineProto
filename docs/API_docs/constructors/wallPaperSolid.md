@@ -1,5 +1,6 @@
 ---
 title: wallPaperSolid
+description: wallPaperSolid attributes, type and example
 ---
 ## Constructor: wallPaperSolid  
 [Back to constructors index](index.md)

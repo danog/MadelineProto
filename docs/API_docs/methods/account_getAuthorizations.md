@@ -1,5 +1,6 @@
 ---
 title: account_getAuthorizations
+description: account_getAuthorizations parameters, return type and example
 ---
 ## Method: account\_getAuthorizations  
 [Back to methods index](index.md)

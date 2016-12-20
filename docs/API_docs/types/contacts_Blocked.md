@@ -1,5 +1,6 @@
 ---
 title: contacts_Blocked
+description: constructors of type contacts_Blocked
 ---
 ## Type: contacts\_Blocked  
 [Back to types index](index.md)

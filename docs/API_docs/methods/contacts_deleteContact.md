@@ -1,5 +1,6 @@
 ---
 title: contacts_deleteContact
+description: contacts_deleteContact parameters, return type and example
 ---
 ## Method: contacts\_deleteContact  
 [Back to methods index](index.md)

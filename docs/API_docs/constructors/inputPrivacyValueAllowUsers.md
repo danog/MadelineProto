@@ -1,5 +1,6 @@
 ---
 title: inputPrivacyValueAllowUsers
+description: inputPrivacyValueAllowUsers attributes, type and example
 ---
 ## Constructor: inputPrivacyValueAllowUsers  
 [Back to constructors index](index.md)

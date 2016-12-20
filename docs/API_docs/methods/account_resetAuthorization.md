@@ -1,5 +1,6 @@
 ---
 title: account_resetAuthorization
+description: account_resetAuthorization parameters, return type and example
 ---
 ## Method: account\_resetAuthorization  
 [Back to methods index](index.md)

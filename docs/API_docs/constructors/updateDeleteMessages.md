@@ -1,5 +1,6 @@
 ---
 title: updateDeleteMessages
+description: updateDeleteMessages attributes, type and example
 ---
 ## Constructor: updateDeleteMessages  
 [Back to constructors index](index.md)

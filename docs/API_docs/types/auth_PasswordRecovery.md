@@ -1,5 +1,6 @@
 ---
 title: auth_PasswordRecovery
+description: constructors of type auth_PasswordRecovery
 ---
 ## Type: auth\_PasswordRecovery  
 [Back to types index](index.md)

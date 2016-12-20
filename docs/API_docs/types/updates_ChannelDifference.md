@@ -1,5 +1,6 @@
 ---
 title: updates_ChannelDifference
+description: constructors of type updates_ChannelDifference
 ---
 ## Type: updates\_ChannelDifference  
 [Back to types index](index.md)

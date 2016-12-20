@@ -1,5 +1,6 @@
 ---
 title: peerNotifySettings
+description: peerNotifySettings attributes, type and example
 ---
 ## Constructor: peerNotifySettings  
 [Back to constructors index](index.md)

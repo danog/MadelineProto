@@ -1,5 +1,6 @@
 ---
 title: fileLocationUnavailable
+description: fileLocationUnavailable attributes, type and example
 ---
 ## Constructor: fileLocationUnavailable  
 [Back to constructors index](index.md)

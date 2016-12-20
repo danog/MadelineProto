@@ -1,5 +1,6 @@
 ---
 title: inputMessagesFilterUrl
+description: inputMessagesFilterUrl attributes, type and example
 ---
 ## Constructor: inputMessagesFilterUrl  
 [Back to constructors index](index.md)

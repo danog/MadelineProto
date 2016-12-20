@@ -1,5 +1,6 @@
 ---
 title: messageMediaPhoto
+description: messageMediaPhoto attributes, type and example
 ---
 ## Constructor: messageMediaPhoto  
 [Back to constructors index](index.md)

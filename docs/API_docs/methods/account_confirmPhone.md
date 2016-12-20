@@ -1,5 +1,6 @@
 ---
 title: account_confirmPhone
+description: account_confirmPhone parameters, return type and example
 ---
 ## Method: account\_confirmPhone  
 [Back to methods index](index.md)

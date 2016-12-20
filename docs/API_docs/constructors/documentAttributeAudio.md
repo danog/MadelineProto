@@ -1,5 +1,6 @@
 ---
 title: documentAttributeAudio
+description: documentAttributeAudio attributes, type and example
 ---
 ## Constructor: documentAttributeAudio  
 [Back to constructors index](index.md)

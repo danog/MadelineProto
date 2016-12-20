@@ -1,5 +1,6 @@
 ---
 title: messageActionEmpty
+description: messageActionEmpty attributes, type and example
 ---
 ## Constructor: messageActionEmpty  
 [Back to constructors index](index.md)

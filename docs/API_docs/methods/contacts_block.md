@@ -1,5 +1,6 @@
 ---
 title: contacts_block
+description: contacts_block parameters, return type and example
 ---
 ## Method: contacts\_block  
 [Back to methods index](index.md)

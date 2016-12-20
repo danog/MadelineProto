@@ -1,5 +1,6 @@
 ---
 title: InputFileLocation
+description: constructors of type InputFileLocation
 ---
 ## Type: InputFileLocation  
 [Back to types index](index.md)

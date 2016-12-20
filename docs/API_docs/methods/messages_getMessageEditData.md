@@ -1,5 +1,6 @@
 ---
 title: messages_getMessageEditData
+description: messages_getMessageEditData parameters, return type and example
 ---
 ## Method: messages\_getMessageEditData  
 [Back to methods index](index.md)

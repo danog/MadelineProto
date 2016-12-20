@@ -1,5 +1,6 @@
 ---
 title: auth_SentCodeType
+description: constructors of type auth_SentCodeType
 ---
 ## Type: auth\_SentCodeType  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputAppEvent
+description: inputAppEvent attributes, type and example
 ---
 ## Constructor: inputAppEvent  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_sendEncryptedFile
+description: messages_sendEncryptedFile parameters, return type and example
 ---
 ## Method: messages\_sendEncryptedFile  
 [Back to methods index](index.md)

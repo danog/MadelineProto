@@ -1,5 +1,6 @@
 ---
 title: userStatusOnline
+description: userStatusOnline attributes, type and example
 ---
 ## Constructor: userStatusOnline  
 [Back to constructors index](index.md)

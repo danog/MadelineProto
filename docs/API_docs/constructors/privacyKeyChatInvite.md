@@ -1,5 +1,6 @@
 ---
 title: privacyKeyChatInvite
+description: privacyKeyChatInvite attributes, type and example
 ---
 ## Constructor: privacyKeyChatInvite  
 [Back to constructors index](index.md)

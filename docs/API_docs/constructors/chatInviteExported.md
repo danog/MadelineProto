@@ -1,5 +1,6 @@
 ---
 title: chatInviteExported
+description: chatInviteExported attributes, type and example
 ---
 ## Constructor: chatInviteExported  
 [Back to constructors index](index.md)

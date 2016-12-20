@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonRow
+description: keyboardButtonRow attributes, type and example
 ---
 ## Constructor: keyboardButtonRow  
 [Back to constructors index](index.md)

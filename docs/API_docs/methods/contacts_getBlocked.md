@@ -1,5 +1,6 @@
 ---
 title: contacts_getBlocked
+description: contacts_getBlocked parameters, return type and example
 ---
 ## Method: contacts\_getBlocked  
 [Back to methods index](index.md)

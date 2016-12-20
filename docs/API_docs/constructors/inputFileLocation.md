@@ -1,5 +1,6 @@
 ---
 title: inputFileLocation
+description: inputFileLocation attributes, type and example
 ---
 ## Constructor: inputFileLocation  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messageEntityUnknown
+description: messageEntityUnknown attributes, type and example
 ---
 ## Constructor: messageEntityUnknown  
 [Back to constructors index](index.md)

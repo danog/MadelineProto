@@ -1,5 +1,6 @@
 ---
 title: updateReadHistoryInbox
+description: updateReadHistoryInbox attributes, type and example
 ---
 ## Constructor: updateReadHistoryInbox  
 [Back to constructors index](index.md)

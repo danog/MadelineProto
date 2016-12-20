@@ -1,5 +1,6 @@
 ---
 title: updateChannelMessageViews
+description: updateChannelMessageViews attributes, type and example
 ---
 ## Constructor: updateChannelMessageViews  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateEncryptedChatTyping
+description: updateEncryptedChatTyping attributes, type and example
 ---
 ## Constructor: updateEncryptedChatTyping  
 [Back to constructors index](index.md)

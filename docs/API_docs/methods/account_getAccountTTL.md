@@ -1,5 +1,6 @@
 ---
 title: account_getAccountTTL
+description: account_getAccountTTL parameters, return type and example
 ---
 ## Method: account\_getAccountTTL  
 [Back to methods index](index.md)

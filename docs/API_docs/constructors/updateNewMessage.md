@@ -1,5 +1,6 @@
 ---
 title: updateNewMessage
+description: updateNewMessage attributes, type and example
 ---
 ## Constructor: updateNewMessage  
 [Back to constructors index](index.md)

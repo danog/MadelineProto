@@ -1,5 +1,6 @@
 ---
 title: channels_getMessages
+description: channels_getMessages parameters, return type and example
 ---
 ## Method: channels\_getMessages  
 [Back to methods index](index.md)

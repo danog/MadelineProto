@@ -1,5 +1,6 @@
 ---
 title: draftMessageEmpty
+description: draftMessageEmpty attributes, type and example
 ---
 ## Constructor: draftMessageEmpty  
 [Back to constructors index](index.md)

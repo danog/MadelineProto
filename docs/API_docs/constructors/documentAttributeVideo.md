@@ -1,5 +1,6 @@
 ---
 title: documentAttributeVideo
+description: documentAttributeVideo attributes, type and example
 ---
 ## Constructor: documentAttributeVideo  
 [Back to constructors index](index.md)

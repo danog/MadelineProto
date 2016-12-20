@@ -1,5 +1,6 @@
 ---
 title: storage_fileMov
+description: storage_fileMov attributes, type and example
 ---
 ## Constructor: storage\_fileMov  
 [Back to constructors index](index.md)

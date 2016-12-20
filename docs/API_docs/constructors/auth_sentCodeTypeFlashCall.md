@@ -1,5 +1,6 @@
 ---
 title: auth_sentCodeTypeFlashCall
+description: auth_sentCodeTypeFlashCall attributes, type and example
 ---
 ## Constructor: auth\_sentCodeTypeFlashCall  
 [Back to constructors index](index.md)

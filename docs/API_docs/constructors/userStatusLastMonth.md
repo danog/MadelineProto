@@ -1,5 +1,6 @@
 ---
 title: userStatusLastMonth
+description: userStatusLastMonth attributes, type and example
 ---
 ## Constructor: userStatusLastMonth  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: StickerSet
+description: constructors of type StickerSet
 ---
 ## Type: StickerSet  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_checkUsername
+description: channels_checkUsername parameters, return type and example
 ---
 ## Method: channels\_checkUsername  
 [Back to methods index](index.md)

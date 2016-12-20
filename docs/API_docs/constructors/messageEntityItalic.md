@@ -1,5 +1,6 @@
 ---
 title: messageEntityItalic
+description: messageEntityItalic attributes, type and example
 ---
 ## Constructor: messageEntityItalic  
 [Back to constructors index](index.md)

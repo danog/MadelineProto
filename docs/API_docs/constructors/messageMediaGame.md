@@ -1,5 +1,6 @@
 ---
 title: messageMediaGame
+description: messageMediaGame attributes, type and example
 ---
 ## Constructor: messageMediaGame  
 [Back to constructors index](index.md)

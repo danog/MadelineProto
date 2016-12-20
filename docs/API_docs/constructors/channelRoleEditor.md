@@ -1,5 +1,6 @@
 ---
 title: channelRoleEditor
+description: channelRoleEditor attributes, type and example
 ---
 ## Constructor: channelRoleEditor  
 [Back to constructors index](index.md)

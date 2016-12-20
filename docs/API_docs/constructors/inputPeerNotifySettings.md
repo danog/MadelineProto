@@ -1,5 +1,6 @@
 ---
 title: inputPeerNotifySettings
+description: inputPeerNotifySettings attributes, type and example
 ---
 ## Constructor: inputPeerNotifySettings  
 [Back to constructors index](index.md)

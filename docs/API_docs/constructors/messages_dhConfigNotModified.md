@@ -1,5 +1,6 @@
 ---
 title: messages_dhConfigNotModified
+description: messages_dhConfigNotModified attributes, type and example
 ---
 ## Constructor: messages\_dhConfigNotModified  
 [Back to constructors index](index.md)

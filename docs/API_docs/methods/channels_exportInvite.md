@@ -1,5 +1,6 @@
 ---
 title: channels_exportInvite
+description: channels_exportInvite parameters, return type and example
 ---
 ## Method: channels\_exportInvite  
 [Back to methods index](index.md)

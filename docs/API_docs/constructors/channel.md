@@ -1,5 +1,6 @@
 ---
 title: channel
+description: channel attributes, type and example
 ---
 ## Constructor: channel  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: auth_bindTempAuthKey
+description: auth_bindTempAuthKey parameters, return type and example
 ---
 ## Method: auth\_bindTempAuthKey  
 [Back to methods index](index.md)

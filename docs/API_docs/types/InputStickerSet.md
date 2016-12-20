@@ -1,5 +1,6 @@
 ---
 title: InputStickerSet
+description: constructors of type InputStickerSet
 ---
 ## Type: InputStickerSet  
 [Back to types index](index.md)

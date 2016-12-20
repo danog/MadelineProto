@@ -1,5 +1,6 @@
 ---
 title: contactLinkContact
+description: contactLinkContact attributes, type and example
 ---
 ## Constructor: contactLinkContact  
 [Back to constructors index](index.md)

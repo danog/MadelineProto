@@ -1,5 +1,6 @@
 ---
 title: auth_CodeType
+description: constructors of type auth_CodeType
 ---
 ## Type: auth\_CodeType  
 [Back to types index](index.md)

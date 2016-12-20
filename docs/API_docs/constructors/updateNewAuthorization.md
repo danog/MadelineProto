@@ -1,5 +1,6 @@
 ---
 title: updateNewAuthorization
+description: updateNewAuthorization attributes, type and example
 ---
 ## Constructor: updateNewAuthorization  
 [Back to constructors index](index.md)

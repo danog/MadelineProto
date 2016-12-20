@@ -1,5 +1,6 @@
 ---
 title: messageActionChatJoinedByLink
+description: messageActionChatJoinedByLink attributes, type and example
 ---
 ## Constructor: messageActionChatJoinedByLink  
 [Back to constructors index](index.md)

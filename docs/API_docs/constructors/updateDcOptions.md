@@ -1,5 +1,6 @@
 ---
 title: updateDcOptions
+description: updateDcOptions attributes, type and example
 ---
 ## Constructor: updateDcOptions  
 [Back to constructors index](index.md)

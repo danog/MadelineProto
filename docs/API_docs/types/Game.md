@@ -1,5 +1,6 @@
 ---
 title: Game
+description: constructors of type Game
 ---
 ## Type: Game  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateUserPhone
+description: updateUserPhone attributes, type and example
 ---
 ## Constructor: updateUserPhone  
 [Back to constructors index](index.md)

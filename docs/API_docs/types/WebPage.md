@@ -1,5 +1,6 @@
 ---
 title: WebPage
+description: constructors of type WebPage
 ---
 ## Type: WebPage  
 [Back to types index](index.md)

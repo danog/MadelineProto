@@ -1,5 +1,6 @@
 ---
 title: messages_affectedHistory
+description: messages_affectedHistory attributes, type and example
 ---
 ## Constructor: messages\_affectedHistory  
 [Back to constructors index](index.md)

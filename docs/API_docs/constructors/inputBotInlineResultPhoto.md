@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineResultPhoto
+description: inputBotInlineResultPhoto attributes, type and example
 ---
 ## Constructor: inputBotInlineResultPhoto  
 [Back to constructors index](index.md)

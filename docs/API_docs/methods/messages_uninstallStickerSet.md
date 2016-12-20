@@ -1,5 +1,6 @@
 ---
 title: messages_uninstallStickerSet
+description: messages_uninstallStickerSet parameters, return type and example
 ---
 ## Method: messages\_uninstallStickerSet  
 [Back to methods index](index.md)

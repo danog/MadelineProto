@@ -1,5 +1,6 @@
 ---
 title: inputMediaUploadedDocument
+description: inputMediaUploadedDocument attributes, type and example
 ---
 ## Constructor: inputMediaUploadedDocument  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: ChannelParticipant
+description: constructors of type ChannelParticipant
 ---
 ## Type: ChannelParticipant  
 [Back to types index](index.md)

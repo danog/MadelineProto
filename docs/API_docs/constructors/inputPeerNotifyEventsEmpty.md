@@ -1,5 +1,6 @@
 ---
 title: inputPeerNotifyEventsEmpty
+description: inputPeerNotifyEventsEmpty attributes, type and example
 ---
 ## Constructor: inputPeerNotifyEventsEmpty  
 [Back to constructors index](index.md)

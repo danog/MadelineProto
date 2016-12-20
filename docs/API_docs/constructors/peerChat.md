@@ -1,5 +1,6 @@
 ---
 title: peerChat
+description: peerChat attributes, type and example
 ---
 ## Constructor: peerChat  
 [Back to constructors index](index.md)

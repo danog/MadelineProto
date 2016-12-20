@@ -1,5 +1,6 @@
 ---
 title: help_getAppUpdate
+description: help_getAppUpdate parameters, return type and example
 ---
 ## Method: help\_getAppUpdate  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: auth_sentCode
+description: auth_sentCode attributes, type and example
 ---
 ## Constructor: auth\_sentCode  
 [Back to constructors index](index.md)

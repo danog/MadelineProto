@@ -1,5 +1,6 @@
 ---
 title: messages_editChatTitle
+description: messages_editChatTitle parameters, return type and example
 ---
 ## Method: messages\_editChatTitle  
 [Back to methods index](index.md)

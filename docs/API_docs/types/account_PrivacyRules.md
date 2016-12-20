@@ -1,5 +1,6 @@
 ---
 title: account_PrivacyRules
+description: constructors of type account_PrivacyRules
 ---
 ## Type: account\_PrivacyRules  
 [Back to types index](index.md)

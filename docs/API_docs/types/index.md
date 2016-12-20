@@ -1,5 +1,6 @@
 ---
 title: Types
+description: List of types
 ---
 # Types  
 [Back to API documentation index](..)

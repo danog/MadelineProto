@@ -1,5 +1,6 @@
 ---
 title: channels_deleteUserHistory
+description: channels_deleteUserHistory parameters, return type and example
 ---
 ## Method: channels\_deleteUserHistory  
 [Back to methods index](index.md)

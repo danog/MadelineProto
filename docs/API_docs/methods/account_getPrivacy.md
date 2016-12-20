@@ -1,5 +1,6 @@
 ---
 title: account_getPrivacy
+description: account_getPrivacy parameters, return type and example
 ---
 ## Method: account\_getPrivacy  
 [Back to methods index](index.md)

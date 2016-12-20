@@ -1,5 +1,6 @@
 ---
 title: storage_fileMp3
+description: storage_fileMp3 attributes, type and example
 ---
 ## Constructor: storage\_fileMp3  
 [Back to constructors index](index.md)

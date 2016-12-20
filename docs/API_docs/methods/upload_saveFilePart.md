@@ -1,5 +1,6 @@
 ---
 title: upload_saveFilePart
+description: upload_saveFilePart parameters, return type and example
 ---
 ## Method: upload\_saveFilePart  
 [Back to methods index](index.md)

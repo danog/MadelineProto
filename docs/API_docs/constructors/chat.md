@@ -1,5 +1,6 @@
 ---
 title: chat
+description: chat attributes, type and example
 ---
 ## Constructor: chat  
 [Back to constructors index](index.md)

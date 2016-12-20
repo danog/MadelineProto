@@ -1,5 +1,6 @@
 ---
 title: updates_getDifference
+description: updates_getDifference parameters, return type and example
 ---
 ## Method: updates\_getDifference  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputPeerChat
+description: inputPeerChat attributes, type and example
 ---
 ## Constructor: inputPeerChat  
 [Back to constructors index](index.md)

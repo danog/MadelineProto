@@ -1,5 +1,6 @@
 ---
 title: updates_differenceEmpty
+description: updates_differenceEmpty attributes, type and example
 ---
 ## Constructor: updates\_differenceEmpty  
 [Back to constructors index](index.md)

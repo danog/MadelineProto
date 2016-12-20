@@ -1,5 +1,6 @@
 ---
 title: updateReadChannelOutbox
+description: updateReadChannelOutbox attributes, type and example
 ---
 ## Constructor: updateReadChannelOutbox  
 [Back to constructors index](index.md)

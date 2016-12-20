@@ -1,5 +1,6 @@
 ---
 title: messages_saveDraft
+description: messages_saveDraft parameters, return type and example
 ---
 ## Method: messages\_saveDraft  
 [Back to methods index](index.md)

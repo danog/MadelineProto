@@ -1,5 +1,6 @@
 ---
 title: account_changePhone
+description: account_changePhone parameters, return type and example
 ---
 ## Method: account\_changePhone  
 [Back to methods index](index.md)

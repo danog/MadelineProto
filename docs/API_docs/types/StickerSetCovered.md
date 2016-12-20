@@ -1,5 +1,6 @@
 ---
 title: StickerSetCovered
+description: constructors of type StickerSetCovered
 ---
 ## Type: StickerSetCovered  
 [Back to types index](index.md)

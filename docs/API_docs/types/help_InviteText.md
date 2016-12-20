@@ -1,5 +1,6 @@
 ---
 title: help_InviteText
+description: constructors of type help_InviteText
 ---
 ## Type: help\_InviteText  
 [Back to types index](index.md)

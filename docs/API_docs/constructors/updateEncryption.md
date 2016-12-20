@@ -1,5 +1,6 @@
 ---
 title: updateEncryption
+description: updateEncryption attributes, type and example
 ---
 ## Constructor: updateEncryption  
 [Back to constructors index](index.md)

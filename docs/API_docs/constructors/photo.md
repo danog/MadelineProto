@@ -1,5 +1,6 @@
 ---
 title: photo
+description: photo attributes, type and example
 ---
 ## Constructor: photo  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_getAdminedPublicChannels
+description: channels_getAdminedPublicChannels parameters, return type and example
 ---
 ## Method: channels\_getAdminedPublicChannels  
 [Back to methods index](index.md)

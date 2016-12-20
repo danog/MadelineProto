@@ -1,5 +1,6 @@
 ---
 title: messages_stickerSet
+description: messages_stickerSet attributes, type and example
 ---
 ## Constructor: messages\_stickerSet  
 [Back to constructors index](index.md)

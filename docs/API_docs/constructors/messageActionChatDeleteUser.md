@@ -1,5 +1,6 @@
 ---
 title: messageActionChatDeleteUser
+description: messageActionChatDeleteUser attributes, type and example
 ---
 ## Constructor: messageActionChatDeleteUser  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: account_setPrivacy
+description: account_setPrivacy parameters, return type and example
 ---
 ## Method: account\_setPrivacy  
 [Back to methods index](index.md)

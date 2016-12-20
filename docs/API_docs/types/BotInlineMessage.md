@@ -1,5 +1,6 @@
 ---
 title: BotInlineMessage
+description: constructors of type BotInlineMessage
 ---
 ## Type: BotInlineMessage  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: sendMessageCancelAction
+description: sendMessageCancelAction attributes, type and example
 ---
 ## Constructor: sendMessageCancelAction  
 [Back to constructors index](index.md)

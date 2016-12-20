@@ -1,5 +1,6 @@
 ---
 title: messages_reorderStickerSets
+description: messages_reorderStickerSets parameters, return type and example
 ---
 ## Method: messages\_reorderStickerSets  
 [Back to methods index](index.md)

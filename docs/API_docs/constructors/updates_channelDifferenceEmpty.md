@@ -1,5 +1,6 @@
 ---
 title: updates_channelDifferenceEmpty
+description: updates_channelDifferenceEmpty attributes, type and example
 ---
 ## Constructor: updates\_channelDifferenceEmpty  
 [Back to constructors index](index.md)

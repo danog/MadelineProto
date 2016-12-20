@@ -1,5 +1,6 @@
 ---
 title: messages_exportChatInvite
+description: messages_exportChatInvite parameters, return type and example
 ---
 ## Method: messages\_exportChatInvite  
 [Back to methods index](index.md)

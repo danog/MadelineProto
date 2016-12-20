@@ -1,5 +1,6 @@
 ---
 title: updateStickerSetsOrder
+description: updateStickerSetsOrder attributes, type and example
 ---
 ## Constructor: updateStickerSetsOrder  
 [Back to constructors index](index.md)

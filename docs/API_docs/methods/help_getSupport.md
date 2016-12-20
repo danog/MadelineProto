@@ -1,5 +1,6 @@
 ---
 title: help_getSupport
+description: help_getSupport parameters, return type and example
 ---
 ## Method: help\_getSupport  
 [Back to methods index](index.md)

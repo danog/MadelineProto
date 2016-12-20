@@ -1,5 +1,6 @@
 ---
 title: inputGeoPointEmpty
+description: inputGeoPointEmpty attributes, type and example
 ---
 ## Constructor: inputGeoPointEmpty  
 [Back to constructors index](index.md)

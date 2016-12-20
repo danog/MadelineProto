@@ -25,6 +25,7 @@ $TL = new \danog\MadelineProto\TL\TL([
 
 file_put_contents('docs/index.md', '---
 title: MadelineProto documentation
+description: PHP implementation of telegram\'s MTProto protocol
 ---
 '.file_get_contents('README.md'));
 
@@ -34,6 +35,7 @@ chdir(__DIR__.'/docs/API_docs');
 
 file_put_contents('index.md', '---
 title: MadelineProto API documentation (layer 57)
+description: MadelineProto API documentation (layer 57)
 ---
 # MadelineProto API documentation (layer 57) 
 
@@ -125,6 +127,7 @@ foreach ($TL->methods->method as $key => $method) {
     }
     $header = '---
 title: '.$method.'
+description: '.$method.' parameters, return type and example
 ---
 ## Method: '.str_replace('_', '\_', $method).'  
 [Back to methods index](index.md)
@@ -174,6 +177,7 @@ foreach ($methods as $method => &$value) {
 
 file_put_contents('methods/index.md', '---
 title: Methods
+description: List of methods
 ---
 # Methods  
 [Back to API documentation index](..)
@@ -277,6 +281,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 
     $header = '---
 title: '.$constructor.'
+description: '.$constructor.' attributes, type and example
 ---
 ## Constructor: '.str_replace('_', '\_', $constructor).'  
 [Back to constructors index](index.md)
@@ -311,7 +316,11 @@ foreach ($constructors as $method => &$value) {
     $value = $br.$value;
     $last_namespace = $new_namespace;
 }
-file_put_contents('constructors/index.md', '# Constructors  
+file_put_contents('constructors/index.md', '---
+title: Types
+description: List of constructors
+---
+# Constructors  
 [Back to API documentation index](..)
 
 
@@ -352,6 +361,7 @@ foreach ($types as $type => $keys) {
     }
     $header = '---
 title: '.$type.'
+description: constructors of type '.$type.'
 ---
 ## Type: '.str_replace('_', '\_', $type).'  
 [Back to types index](index.md)
@@ -369,6 +379,7 @@ title: '.$type.'
 
 file_put_contents('types/index.md', '---
 title: Types
+description: List of types
 ---
 # Types  
 [Back to API documentation index](..)
@@ -380,6 +391,7 @@ title: Types
 
 file_put_contents('types/string.md', '---
 title: string
+description: A string of variable length
 ---
 ## Type: string  
 [Back to constructor index](index.md)
@@ -387,6 +399,7 @@ title: string
 A string of variable length.');
 file_put_contents('types/bytes.md', '---
 title: bytes
+description: A string of variable length
 ---
 ## Type: bytes  
 [Back to constructor index](index.md)
@@ -395,6 +408,7 @@ A string of variable length.');
 
 file_put_contents('types/int.md', '---
 title: integer
+description: A 32 bit signed integer ranging from -2147483647 to 2147483647
 ---
 ## Type: int  
 [Back to constructor index](index.md)
@@ -403,6 +417,7 @@ A 32 bit signed integer ranging from `-2147483647` to `2147483647`.');
 
 file_put_contents('types/long.md', '---
 title: long
+description: A 32 bit signed integer ranging from -9223372036854775807 to 9223372036854775807
 ---
 ## Type: long  
 [Back to constructor index](index.md)
@@ -411,6 +426,7 @@ A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775
 
 file_put_contents('types/double.md', '---
 title: double
+description: A double precision floating point number
 ---
 ## Type: double  
 [Back to constructor index](index.md)
@@ -419,6 +435,7 @@ A double precision floating point number, single precision can also be used (flo
 
 file_put_contents('types/!X.md', '---
 title: !X
+description: Represents a TL serialized payload
 ---
 ## Type: !X  
 [Back to constructor index](index.md)
@@ -427,6 +444,7 @@ Represents a TL serialized payload.');
 
 file_put_contents('types/X.md', '---
 title: X
+description: Represents a TL serialized payload
 ---
 ## Type: X  
 [Back to constructor index](index.md)
@@ -435,6 +453,7 @@ Represents a TL serialized payload.');
 
 file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
+description: Represents a boolean with value equal to false
 ---
 # boolFalse  
 [Back to constructor index](index.md)
@@ -443,6 +462,7 @@ Represents a boolean with value equal to `false`.');
 
 file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
+description: Represents a boolean with value equal to true
 ---
 # boolTrue  
 [Back to constructor index](index.md)
@@ -451,6 +471,7 @@ Represents a boolean with value equal to `true`.');
 
 file_put_contents('types/Bool.md', '---
 title: Bool
+description: Represents a boolean.
 ---
 # Bool  
 [Back to types index](index.md)

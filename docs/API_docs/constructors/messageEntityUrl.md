@@ -1,5 +1,6 @@
 ---
 title: messageEntityUrl
+description: messageEntityUrl attributes, type and example
 ---
 ## Constructor: messageEntityUrl  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_editAbout
+description: channels_editAbout parameters, return type and example
 ---
 ## Method: channels\_editAbout  
 [Back to methods index](index.md)

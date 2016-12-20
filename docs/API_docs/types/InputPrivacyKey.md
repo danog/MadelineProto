@@ -1,5 +1,6 @@
 ---
 title: InputPrivacyKey
+description: constructors of type InputPrivacyKey
 ---
 ## Type: InputPrivacyKey  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputChannel
+description: inputChannel attributes, type and example
 ---
 ## Constructor: inputChannel  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateBotInlineSend
+description: updateBotInlineSend attributes, type and example
 ---
 ## Constructor: updateBotInlineSend  
 [Back to constructors index](index.md)

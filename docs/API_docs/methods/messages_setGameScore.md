@@ -1,5 +1,6 @@
 ---
 title: messages_setGameScore
+description: messages_setGameScore parameters, return type and example
 ---
 ## Method: messages\_setGameScore  
 [Back to methods index](index.md)

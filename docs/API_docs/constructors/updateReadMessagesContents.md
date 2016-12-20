@@ -1,5 +1,6 @@
 ---
 title: updateReadMessagesContents
+description: updateReadMessagesContents attributes, type and example
 ---
 ## Constructor: updateReadMessagesContents  
 [Back to constructors index](index.md)

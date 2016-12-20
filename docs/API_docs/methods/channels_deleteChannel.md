@@ -1,5 +1,6 @@
 ---
 title: channels_deleteChannel
+description: channels_deleteChannel parameters, return type and example
 ---
 ## Method: channels\_deleteChannel  
 [Back to methods index](index.md)

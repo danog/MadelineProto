@@ -1,5 +1,6 @@
 ---
 title: updateUserTyping
+description: updateUserTyping attributes, type and example
 ---
 ## Constructor: updateUserTyping  
 [Back to constructors index](index.md)

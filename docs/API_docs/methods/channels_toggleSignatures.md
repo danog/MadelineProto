@@ -1,5 +1,6 @@
 ---
 title: channels_toggleSignatures
+description: channels_toggleSignatures parameters, return type and example
 ---
 ## Method: channels\_toggleSignatures  
 [Back to methods index](index.md)

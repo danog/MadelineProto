@@ -1,5 +1,6 @@
 ---
 title: channels_getChannels
+description: channels_getChannels parameters, return type and example
 ---
 ## Method: channels\_getChannels  
 [Back to methods index](index.md)

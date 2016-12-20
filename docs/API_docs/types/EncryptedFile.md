@@ -1,5 +1,6 @@
 ---
 title: EncryptedFile
+description: constructors of type EncryptedFile
 ---
 ## Type: EncryptedFile  
 [Back to types index](index.md)

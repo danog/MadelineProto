@@ -1,5 +1,6 @@
 ---
 title: messages_dialogs
+description: messages_dialogs attributes, type and example
 ---
 ## Constructor: messages\_dialogs  
 [Back to constructors index](index.md)

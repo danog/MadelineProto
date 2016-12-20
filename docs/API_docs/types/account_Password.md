@@ -1,5 +1,6 @@
 ---
 title: account_Password
+description: constructors of type account_Password
 ---
 ## Type: account\_Password  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channelMessagesFilter
+description: channelMessagesFilter attributes, type and example
 ---
 ## Constructor: channelMessagesFilter  
 [Back to constructors index](index.md)

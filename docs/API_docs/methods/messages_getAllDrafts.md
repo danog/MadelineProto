@@ -1,5 +1,6 @@
 ---
 title: messages_getAllDrafts
+description: messages_getAllDrafts parameters, return type and example
 ---
 ## Method: messages\_getAllDrafts  
 [Back to methods index](index.md)

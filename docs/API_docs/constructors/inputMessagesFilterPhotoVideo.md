@@ -1,5 +1,6 @@
 ---
 title: inputMessagesFilterPhotoVideo
+description: inputMessagesFilterPhotoVideo attributes, type and example
 ---
 ## Constructor: inputMessagesFilterPhotoVideo  
 [Back to constructors index](index.md)

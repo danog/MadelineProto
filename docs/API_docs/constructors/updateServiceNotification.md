@@ -1,5 +1,6 @@
 ---
 title: updateServiceNotification
+description: updateServiceNotification attributes, type and example
 ---
 ## Constructor: updateServiceNotification  
 [Back to constructors index](index.md)

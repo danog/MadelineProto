@@ -1,5 +1,6 @@
 ---
 title: contacts_unblock
+description: contacts_unblock parameters, return type and example
 ---
 ## Method: contacts\_unblock  
 [Back to methods index](index.md)

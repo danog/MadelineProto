@@ -1,5 +1,6 @@
 ---
 title: updateDeleteChannelMessages
+description: updateDeleteChannelMessages attributes, type and example
 ---
 ## Constructor: updateDeleteChannelMessages  
 [Back to constructors index](index.md)

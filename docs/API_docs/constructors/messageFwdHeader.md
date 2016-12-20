@@ -1,5 +1,6 @@
 ---
 title: messageFwdHeader
+description: messageFwdHeader attributes, type and example
 ---
 ## Constructor: messageFwdHeader  
 [Back to constructors index](index.md)

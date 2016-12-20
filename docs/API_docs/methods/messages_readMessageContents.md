@@ -1,5 +1,6 @@
 ---
 title: messages_readMessageContents
+description: messages_readMessageContents parameters, return type and example
 ---
 ## Method: messages\_readMessageContents  
 [Back to methods index](index.md)

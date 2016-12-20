@@ -1,5 +1,6 @@
 ---
 title: dcOption
+description: dcOption attributes, type and example
 ---
 ## Constructor: dcOption  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: encryptedFile
+description: encryptedFile attributes, type and example
 ---
 ## Constructor: encryptedFile  
 [Back to constructors index](index.md)

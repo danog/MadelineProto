@@ -1,5 +1,6 @@
 ---
 title: MessageAction
+description: constructors of type MessageAction
 ---
 ## Type: MessageAction  
 [Back to types index](index.md)

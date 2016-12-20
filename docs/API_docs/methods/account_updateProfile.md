@@ -1,5 +1,6 @@
 ---
 title: account_updateProfile
+description: account_updateProfile parameters, return type and example
 ---
 ## Method: account\_updateProfile  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_readHistory
+description: channels_readHistory parameters, return type and example
 ---
 ## Method: channels\_readHistory  
 [Back to methods index](index.md)

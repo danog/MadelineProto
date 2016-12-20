@@ -1,5 +1,6 @@
 ---
 title: messageService
+description: messageService attributes, type and example
 ---
 ## Constructor: messageService  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: topPeerCategoryCorrespondents
+description: topPeerCategoryCorrespondents attributes, type and example
 ---
 ## Constructor: topPeerCategoryCorrespondents  
 [Back to constructors index](index.md)

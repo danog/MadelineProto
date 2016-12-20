@@ -1,5 +1,6 @@
 ---
 title: updateContactLink
+description: updateContactLink attributes, type and example
 ---
 ## Constructor: updateContactLink  
 [Back to constructors index](index.md)

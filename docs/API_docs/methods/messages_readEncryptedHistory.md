@@ -1,5 +1,6 @@
 ---
 title: messages_readEncryptedHistory
+description: messages_readEncryptedHistory parameters, return type and example
 ---
 ## Method: messages\_readEncryptedHistory  
 [Back to methods index](index.md)

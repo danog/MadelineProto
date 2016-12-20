@@ -1,5 +1,6 @@
 ---
 title: messages_getPeerDialogs
+description: messages_getPeerDialogs parameters, return type and example
 ---
 ## Method: messages\_getPeerDialogs  
 [Back to methods index](index.md)

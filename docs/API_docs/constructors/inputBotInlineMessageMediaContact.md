@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineMessageMediaContact
+description: inputBotInlineMessageMediaContact attributes, type and example
 ---
 ## Constructor: inputBotInlineMessageMediaContact  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: InputPeer
+description: constructors of type InputPeer
 ---
 ## Type: InputPeer  
 [Back to types index](index.md)

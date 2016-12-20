@@ -1,5 +1,6 @@
 ---
 title: messages_checkChatInvite
+description: messages_checkChatInvite parameters, return type and example
 ---
 ## Method: messages\_checkChatInvite  
 [Back to methods index](index.md)

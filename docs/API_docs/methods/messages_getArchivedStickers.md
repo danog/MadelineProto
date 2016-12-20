@@ -1,5 +1,6 @@
 ---
 title: messages_getArchivedStickers
+description: messages_getArchivedStickers parameters, return type and example
 ---
 ## Method: messages\_getArchivedStickers  
 [Back to methods index](index.md)

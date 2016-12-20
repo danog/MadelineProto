@@ -1,5 +1,6 @@
 ---
 title: messages_messageEditData
+description: messages_messageEditData attributes, type and example
 ---
 ## Constructor: messages\_messageEditData  
 [Back to constructors index](index.md)

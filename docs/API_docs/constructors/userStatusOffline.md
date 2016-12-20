@@ -1,5 +1,6 @@
 ---
 title: userStatusOffline
+description: userStatusOffline attributes, type and example
 ---
 ## Constructor: userStatusOffline  
 [Back to constructors index](index.md)

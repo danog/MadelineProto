@@ -1,5 +1,6 @@
 ---
 title: messages_featuredStickersNotModified
+description: messages_featuredStickersNotModified attributes, type and example
 ---
 ## Constructor: messages\_featuredStickersNotModified  
 [Back to constructors index](index.md)

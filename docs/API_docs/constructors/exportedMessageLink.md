@@ -1,5 +1,6 @@
 ---
 title: exportedMessageLink
+description: exportedMessageLink attributes, type and example
 ---
 ## Constructor: exportedMessageLink  
 [Back to constructors index](index.md)

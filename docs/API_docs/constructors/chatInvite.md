@@ -1,5 +1,6 @@
 ---
 title: chatInvite
+description: chatInvite attributes, type and example
 ---
 ## Constructor: chatInvite  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: UserProfilePhoto
+description: constructors of type UserProfilePhoto
 ---
 ## Type: UserProfilePhoto  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_getStickerSet
+description: messages_getStickerSet parameters, return type and example
 ---
 ## Method: messages\_getStickerSet  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_readHistory
+description: messages_readHistory parameters, return type and example
 ---
 ## Method: messages\_readHistory  
 [Back to methods index](index.md)

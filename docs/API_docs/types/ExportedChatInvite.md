@@ -1,5 +1,6 @@
 ---
 title: ExportedChatInvite
+description: constructors of type ExportedChatInvite
 ---
 ## Type: ExportedChatInvite  
 [Back to types index](index.md)

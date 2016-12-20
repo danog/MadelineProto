@@ -1,5 +1,6 @@
 ---
 title: contactStatus
+description: contactStatus attributes, type and example
 ---
 ## Constructor: contactStatus  
 [Back to constructors index](index.md)

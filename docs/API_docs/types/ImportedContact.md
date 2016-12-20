@@ -1,5 +1,6 @@
 ---
 title: ImportedContact
+description: constructors of type ImportedContact
 ---
 ## Type: ImportedContact  
 [Back to types index](index.md)

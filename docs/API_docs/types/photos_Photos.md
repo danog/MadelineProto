@@ -1,5 +1,6 @@
 ---
 title: photos_Photos
+description: constructors of type photos_Photos
 ---
 ## Type: photos\_Photos  
 [Back to types index](index.md)

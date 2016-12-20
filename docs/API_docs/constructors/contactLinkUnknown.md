@@ -1,5 +1,6 @@
 ---
 title: contactLinkUnknown
+description: contactLinkUnknown attributes, type and example
 ---
 ## Constructor: contactLinkUnknown  
 [Back to constructors index](index.md)

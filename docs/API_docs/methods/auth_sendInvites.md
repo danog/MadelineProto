@@ -1,5 +1,6 @@
 ---
 title: auth_sendInvites
+description: auth_sendInvites parameters, return type and example
 ---
 ## Method: auth\_sendInvites  
 [Back to methods index](index.md)

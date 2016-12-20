@@ -1,5 +1,6 @@
 ---
 title: MessageRange
+description: constructors of type MessageRange
 ---
 ## Type: MessageRange  
 [Back to types index](index.md)

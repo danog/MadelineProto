@@ -1,5 +1,6 @@
 ---
 title: replyKeyboardMarkup
+description: replyKeyboardMarkup attributes, type and example
 ---
 ## Constructor: replyKeyboardMarkup  
 [Back to constructors index](index.md)

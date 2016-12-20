@@ -1,5 +1,6 @@
 ---
 title: stickerSetMultiCovered
+description: stickerSetMultiCovered attributes, type and example
 ---
 ## Constructor: stickerSetMultiCovered  
 [Back to constructors index](index.md)

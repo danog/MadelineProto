@@ -1,5 +1,6 @@
 ---
 title: messages_getAttachedStickers
+description: messages_getAttachedStickers parameters, return type and example
 ---
 ## Method: messages\_getAttachedStickers  
 [Back to methods index](index.md)

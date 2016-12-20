@@ -1,5 +1,6 @@
 ---
 title: encryptedChatWaiting
+description: encryptedChatWaiting attributes, type and example
 ---
 ## Constructor: encryptedChatWaiting  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: InputBotInlineMessage
+description: constructors of type InputBotInlineMessage
 ---
 ## Type: InputBotInlineMessage  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputMediaGeoPoint
+description: inputMediaGeoPoint attributes, type and example
 ---
 ## Constructor: inputMediaGeoPoint  
 [Back to constructors index](index.md)

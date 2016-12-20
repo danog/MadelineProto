@@ -1,5 +1,6 @@
 ---
 title: Message
+description: constructors of type Message
 ---
 ## Type: Message  
 [Back to types index](index.md)

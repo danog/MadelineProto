@@ -1,5 +1,6 @@
 ---
 title: photos_photo
+description: photos_photo attributes, type and example
 ---
 ## Constructor: photos\_photo  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputChatUploadedPhoto
+description: inputChatUploadedPhoto attributes, type and example
 ---
 ## Constructor: inputChatUploadedPhoto  
 [Back to constructors index](index.md)

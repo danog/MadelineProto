@@ -1,5 +1,6 @@
 ---
 title: messages_RecentStickers
+description: constructors of type messages_RecentStickers
 ---
 ## Type: messages\_RecentStickers  
 [Back to types index](index.md)

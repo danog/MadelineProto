@@ -1,5 +1,6 @@
 ---
 title: foundGifCached
+description: foundGifCached attributes, type and example
 ---
 ## Constructor: foundGifCached  
 [Back to constructors index](index.md)

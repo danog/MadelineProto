@@ -1,5 +1,6 @@
 ---
 title: PhotoSize
+description: constructors of type PhotoSize
 ---
 ## Type: PhotoSize  
 [Back to types index](index.md)

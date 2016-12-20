@@ -1,5 +1,6 @@
 ---
 title: messages_sendEncryptedService
+description: messages_sendEncryptedService parameters, return type and example
 ---
 ## Method: messages\_sendEncryptedService  
 [Back to methods index](index.md)

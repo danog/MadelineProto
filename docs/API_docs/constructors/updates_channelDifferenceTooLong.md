@@ -1,5 +1,6 @@
 ---
 title: updates_channelDifferenceTooLong
+description: updates_channelDifferenceTooLong attributes, type and example
 ---
 ## Constructor: updates\_channelDifferenceTooLong  
 [Back to constructors index](index.md)

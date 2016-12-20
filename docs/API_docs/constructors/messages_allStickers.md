@@ -1,5 +1,6 @@
 ---
 title: messages_allStickers
+description: messages_allStickers attributes, type and example
 ---
 ## Constructor: messages\_allStickers  
 [Back to constructors index](index.md)

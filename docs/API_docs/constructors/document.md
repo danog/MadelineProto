@@ -1,5 +1,6 @@
 ---
 title: document
+description: document attributes, type and example
 ---
 ## Constructor: document  
 [Back to constructors index](index.md)

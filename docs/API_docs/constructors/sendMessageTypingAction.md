@@ -1,5 +1,6 @@
 ---
 title: sendMessageTypingAction
+description: sendMessageTypingAction attributes, type and example
 ---
 ## Constructor: sendMessageTypingAction  
 [Back to constructors index](index.md)

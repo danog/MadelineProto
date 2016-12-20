@@ -1,5 +1,6 @@
 ---
 title: inputMediaVenue
+description: inputMediaVenue attributes, type and example
 ---
 ## Constructor: inputMediaVenue  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: GeoPoint
+description: constructors of type GeoPoint
 ---
 ## Type: GeoPoint  
 [Back to types index](index.md)

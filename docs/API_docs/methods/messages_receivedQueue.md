@@ -1,5 +1,6 @@
 ---
 title: messages_receivedQueue
+description: messages_receivedQueue parameters, return type and example
 ---
 ## Method: messages\_receivedQueue  
 [Back to methods index](index.md)

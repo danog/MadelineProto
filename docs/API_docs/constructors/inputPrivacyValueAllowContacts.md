@@ -1,5 +1,6 @@
 ---
 title: inputPrivacyValueAllowContacts
+description: inputPrivacyValueAllowContacts attributes, type and example
 ---
 ## Constructor: inputPrivacyValueAllowContacts  
 [Back to constructors index](index.md)

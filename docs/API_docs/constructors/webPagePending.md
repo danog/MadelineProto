@@ -1,5 +1,6 @@
 ---
 title: webPagePending
+description: webPagePending attributes, type and example
 ---
 ## Constructor: webPagePending  
 [Back to constructors index](index.md)

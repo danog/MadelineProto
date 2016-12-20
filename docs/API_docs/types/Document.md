@@ -1,5 +1,6 @@
 ---
 title: Document
+description: constructors of type Document
 ---
 ## Type: Document  
 [Back to types index](index.md)

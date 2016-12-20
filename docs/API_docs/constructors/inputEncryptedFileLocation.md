@@ -1,5 +1,6 @@
 ---
 title: inputEncryptedFileLocation
+description: inputEncryptedFileLocation attributes, type and example
 ---
 ## Constructor: inputEncryptedFileLocation  
 [Back to constructors index](index.md)

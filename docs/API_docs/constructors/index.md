@@ -1,3 +1,7 @@
+---
+title: Types
+description: List of constructors
+---
 # Constructors  
 [Back to API documentation index](..)
 

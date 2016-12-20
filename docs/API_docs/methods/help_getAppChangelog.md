@@ -1,5 +1,6 @@
 ---
 title: help_getAppChangelog
+description: help_getAppChangelog parameters, return type and example
 ---
 ## Method: help\_getAppChangelog  
 [Back to methods index](index.md)

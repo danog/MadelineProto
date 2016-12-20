@@ -1,5 +1,6 @@
 ---
 title: InputStickeredMedia
+description: constructors of type InputStickeredMedia
 ---
 ## Type: InputStickeredMedia  
 [Back to types index](index.md)

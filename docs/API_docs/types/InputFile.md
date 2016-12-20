@@ -1,5 +1,6 @@
 ---
 title: InputFile
+description: constructors of type InputFile
 ---
 ## Type: InputFile  
 [Back to types index](index.md)

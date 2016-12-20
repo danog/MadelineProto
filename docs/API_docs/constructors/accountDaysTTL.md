@@ -1,5 +1,6 @@
 ---
 title: accountDaysTTL
+description: accountDaysTTL attributes, type and example
 ---
 ## Constructor: accountDaysTTL  
 [Back to constructors index](index.md)

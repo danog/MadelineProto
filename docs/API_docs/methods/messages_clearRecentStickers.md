@@ -1,5 +1,6 @@
 ---
 title: messages_clearRecentStickers
+description: messages_clearRecentStickers parameters, return type and example
 ---
 ## Method: messages\_clearRecentStickers  
 [Back to methods index](index.md)

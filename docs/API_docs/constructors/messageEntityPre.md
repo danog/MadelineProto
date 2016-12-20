@@ -1,5 +1,6 @@
 ---
 title: messageEntityPre
+description: messageEntityPre attributes, type and example
 ---
 ## Constructor: messageEntityPre  
 [Back to constructors index](index.md)

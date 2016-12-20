@@ -1,5 +1,6 @@
 ---
 title: updatePrivacy
+description: updatePrivacy attributes, type and example
 ---
 ## Constructor: updatePrivacy  
 [Back to constructors index](index.md)

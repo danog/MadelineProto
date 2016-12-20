@@ -1,5 +1,6 @@
 ---
 title: updateShortSentMessage
+description: updateShortSentMessage attributes, type and example
 ---
 ## Constructor: updateShortSentMessage  
 [Back to constructors index](index.md)

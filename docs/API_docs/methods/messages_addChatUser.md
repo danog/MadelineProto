@@ -1,5 +1,6 @@
 ---
 title: messages_addChatUser
+description: messages_addChatUser parameters, return type and example
 ---
 ## Method: messages\_addChatUser  
 [Back to methods index](index.md)

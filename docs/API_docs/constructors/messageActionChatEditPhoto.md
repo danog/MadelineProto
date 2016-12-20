@@ -1,5 +1,6 @@
 ---
 title: messageActionChatEditPhoto
+description: messageActionChatEditPhoto attributes, type and example
 ---
 ## Constructor: messageActionChatEditPhoto  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_getPeerSettings
+description: messages_getPeerSettings parameters, return type and example
 ---
 ## Method: messages\_getPeerSettings  
 [Back to methods index](index.md)

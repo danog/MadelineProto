@@ -1,5 +1,6 @@
 ---
 title: messages_Messages
+description: constructors of type messages_Messages
 ---
 ## Type: messages\_Messages  
 [Back to types index](index.md)

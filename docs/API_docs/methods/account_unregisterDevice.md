@@ -1,5 +1,6 @@
 ---
 title: account_unregisterDevice
+description: account_unregisterDevice parameters, return type and example
 ---
 ## Method: account\_unregisterDevice  
 [Back to methods index](index.md)

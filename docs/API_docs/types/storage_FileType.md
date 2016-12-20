@@ -1,5 +1,6 @@
 ---
 title: storage_FileType
+description: constructors of type storage_FileType
 ---
 ## Type: storage\_FileType  
 [Back to types index](index.md)

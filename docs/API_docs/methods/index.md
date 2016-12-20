@@ -1,5 +1,6 @@
 ---
 title: Methods
+description: List of methods
 ---
 # Methods  
 [Back to API documentation index](..)

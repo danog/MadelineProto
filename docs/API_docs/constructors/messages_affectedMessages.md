@@ -1,5 +1,6 @@
 ---
 title: messages_affectedMessages
+description: messages_affectedMessages attributes, type and example
 ---
 ## Constructor: messages\_affectedMessages  
 [Back to constructors index](index.md)

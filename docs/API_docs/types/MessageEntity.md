@@ -1,5 +1,6 @@
 ---
 title: MessageEntity
+description: constructors of type MessageEntity
 ---
 ## Type: MessageEntity  
 [Back to types index](index.md)

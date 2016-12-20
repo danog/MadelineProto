@@ -1,5 +1,6 @@
 ---
 title: inputStickeredMediaDocument
+description: inputStickeredMediaDocument attributes, type and example
 ---
 ## Constructor: inputStickeredMediaDocument  
 [Back to constructors index](index.md)

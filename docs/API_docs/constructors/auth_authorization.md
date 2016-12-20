@@ -1,5 +1,6 @@
 ---
 title: auth_authorization
+description: auth_authorization attributes, type and example
 ---
 ## Constructor: auth\_authorization  
 [Back to constructors index](index.md)

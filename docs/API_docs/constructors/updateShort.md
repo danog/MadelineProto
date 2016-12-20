@@ -1,5 +1,6 @@
 ---
 title: updateShort
+description: updateShort attributes, type and example
 ---
 ## Constructor: updateShort  
 [Back to constructors index](index.md)

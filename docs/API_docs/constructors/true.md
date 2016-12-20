@@ -1,5 +1,6 @@
 ---
 title: true
+description: true attributes, type and example
 ---
 ## Constructor: true  
 [Back to constructors index](index.md)

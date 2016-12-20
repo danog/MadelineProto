@@ -1,5 +1,6 @@
 ---
 title: photos_getUserPhotos
+description: photos_getUserPhotos parameters, return type and example
 ---
 ## Method: photos\_getUserPhotos  
 [Back to methods index](index.md)

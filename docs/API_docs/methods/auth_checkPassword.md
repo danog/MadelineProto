@@ -1,5 +1,6 @@
 ---
 title: auth_checkPassword
+description: auth_checkPassword parameters, return type and example
 ---
 ## Method: auth\_checkPassword  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updates_getChannelDifference
+description: updates_getChannelDifference parameters, return type and example
 ---
 ## Method: updates\_getChannelDifference  
 [Back to methods index](index.md)

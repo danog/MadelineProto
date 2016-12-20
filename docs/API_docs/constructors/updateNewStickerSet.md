@@ -1,5 +1,6 @@
 ---
 title: updateNewStickerSet
+description: updateNewStickerSet attributes, type and example
 ---
 ## Constructor: updateNewStickerSet  
 [Back to constructors index](index.md)

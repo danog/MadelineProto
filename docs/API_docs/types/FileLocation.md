@@ -1,5 +1,6 @@
 ---
 title: FileLocation
+description: constructors of type FileLocation
 ---
 ## Type: FileLocation  
 [Back to types index](index.md)

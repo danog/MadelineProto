@@ -1,5 +1,6 @@
 ---
 title: inputPhoto
+description: inputPhoto attributes, type and example
 ---
 ## Constructor: inputPhoto  
 [Back to constructors index](index.md)

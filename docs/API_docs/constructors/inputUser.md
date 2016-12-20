@@ -1,5 +1,6 @@
 ---
 title: inputUser
+description: inputUser attributes, type and example
 ---
 ## Constructor: inputUser  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_botCallbackAnswer
+description: messages_botCallbackAnswer attributes, type and example
 ---
 ## Constructor: messages\_botCallbackAnswer  
 [Back to constructors index](index.md)

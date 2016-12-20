@@ -1,5 +1,6 @@
 ---
 title: disabledFeature
+description: disabledFeature attributes, type and example
 ---
 ## Constructor: disabledFeature  
 [Back to constructors index](index.md)

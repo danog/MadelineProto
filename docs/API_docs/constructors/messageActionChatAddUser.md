@@ -1,5 +1,6 @@
 ---
 title: messageActionChatAddUser
+description: messageActionChatAddUser attributes, type and example
 ---
 ## Constructor: messageActionChatAddUser  
 [Back to constructors index](index.md)

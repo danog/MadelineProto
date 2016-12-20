@@ -1,5 +1,6 @@
 ---
 title: messageActionPinMessage
+description: messageActionPinMessage attributes, type and example
 ---
 ## Constructor: messageActionPinMessage  
 [Back to constructors index](index.md)

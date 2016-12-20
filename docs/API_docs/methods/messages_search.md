@@ -1,5 +1,6 @@
 ---
 title: messages_search
+description: messages_search parameters, return type and example
 ---
 ## Method: messages\_search  
 [Back to methods index](index.md)

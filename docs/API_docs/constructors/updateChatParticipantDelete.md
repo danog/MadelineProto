@@ -1,5 +1,6 @@
 ---
 title: updateChatParticipantDelete
+description: updateChatParticipantDelete attributes, type and example
 ---
 ## Constructor: updateChatParticipantDelete  
 [Back to constructors index](index.md)

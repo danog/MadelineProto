@@ -1,5 +1,6 @@
 ---
 title: updatePtsChanged
+description: updatePtsChanged attributes, type and example
 ---
 ## Constructor: updatePtsChanged  
 [Back to constructors index](index.md)

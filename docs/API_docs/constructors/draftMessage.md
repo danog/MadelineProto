@@ -1,5 +1,6 @@
 ---
 title: draftMessage
+description: draftMessage attributes, type and example
 ---
 ## Constructor: draftMessage  
 [Back to constructors index](index.md)

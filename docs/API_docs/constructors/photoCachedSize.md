@@ -1,5 +1,6 @@
 ---
 title: photoCachedSize
+description: photoCachedSize attributes, type and example
 ---
 ## Constructor: photoCachedSize  
 [Back to constructors index](index.md)

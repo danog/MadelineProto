@@ -1,5 +1,6 @@
 ---
 title: chatFull
+description: chatFull attributes, type and example
 ---
 ## Constructor: chatFull  
 [Back to constructors index](index.md)

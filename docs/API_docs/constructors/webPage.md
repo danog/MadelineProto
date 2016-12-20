@@ -1,5 +1,6 @@
 ---
 title: webPage
+description: webPage attributes, type and example
 ---
 ## Constructor: webPage  
 [Back to constructors index](index.md)

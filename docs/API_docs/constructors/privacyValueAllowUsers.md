@@ -1,5 +1,6 @@
 ---
 title: privacyValueAllowUsers
+description: privacyValueAllowUsers attributes, type and example
 ---
 ## Constructor: privacyValueAllowUsers  
 [Back to constructors index](index.md)

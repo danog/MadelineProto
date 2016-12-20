@@ -1,5 +1,6 @@
 ---
 title: MessageMedia
+description: constructors of type MessageMedia
 ---
 ## Type: MessageMedia  
 [Back to types index](index.md)

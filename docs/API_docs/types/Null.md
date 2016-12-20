@@ -1,5 +1,6 @@
 ---
 title: Null
+description: constructors of type Null
 ---
 ## Type: Null  
 [Back to types index](index.md)

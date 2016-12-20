@@ -1,5 +1,6 @@
 ---
 title: ContactLink
+description: constructors of type ContactLink
 ---
 ## Type: ContactLink  
 [Back to types index](index.md)

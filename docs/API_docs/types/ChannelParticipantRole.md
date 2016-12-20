@@ -1,5 +1,6 @@
 ---
 title: ChannelParticipantRole
+description: constructors of type ChannelParticipantRole
 ---
 ## Type: ChannelParticipantRole  
 [Back to types index](index.md)

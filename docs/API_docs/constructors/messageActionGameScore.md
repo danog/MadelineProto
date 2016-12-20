@@ -1,5 +1,6 @@
 ---
 title: messageActionGameScore
+description: messageActionGameScore attributes, type and example
 ---
 ## Constructor: messageActionGameScore  
 [Back to constructors index](index.md)

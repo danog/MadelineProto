@@ -1,5 +1,6 @@
 ---
 title: botInlineMessageMediaGeo
+description: botInlineMessageMediaGeo attributes, type and example
 ---
 ## Constructor: botInlineMessageMediaGeo  
 [Back to constructors index](index.md)

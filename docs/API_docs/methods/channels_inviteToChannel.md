@@ -1,5 +1,6 @@
 ---
 title: channels_inviteToChannel
+description: channels_inviteToChannel parameters, return type and example
 ---
 ## Method: channels\_inviteToChannel  
 [Back to methods index](index.md)

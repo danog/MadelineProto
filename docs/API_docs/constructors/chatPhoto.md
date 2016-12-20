@@ -1,5 +1,6 @@
 ---
 title: chatPhoto
+description: chatPhoto attributes, type and example
 ---
 ## Constructor: chatPhoto  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: contacts_Contacts
+description: constructors of type contacts_Contacts
 ---
 ## Type: contacts\_Contacts  
 [Back to types index](index.md)

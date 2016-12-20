@@ -1,5 +1,6 @@
 ---
 title: help_inviteText
+description: help_inviteText attributes, type and example
 ---
 ## Constructor: help\_inviteText  
 [Back to constructors index](index.md)

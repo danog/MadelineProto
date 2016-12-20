@@ -1,5 +1,6 @@
 ---
 title: messages_StickerSetInstallResult
+description: constructors of type messages_StickerSetInstallResult
 ---
 ## Type: messages\_StickerSetInstallResult  
 [Back to types index](index.md)

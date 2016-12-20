@@ -1,5 +1,6 @@
 ---
 title: inputMediaGifExternal
+description: inputMediaGifExternal attributes, type and example
 ---
 ## Constructor: inputMediaGifExternal  
 [Back to constructors index](index.md)

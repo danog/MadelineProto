@@ -1,5 +1,6 @@
 ---
 title: stickerSet
+description: stickerSet attributes, type and example
 ---
 ## Constructor: stickerSet  
 [Back to constructors index](index.md)

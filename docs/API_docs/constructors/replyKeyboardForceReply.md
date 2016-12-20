@@ -1,5 +1,6 @@
 ---
 title: replyKeyboardForceReply
+description: replyKeyboardForceReply attributes, type and example
 ---
 ## Constructor: replyKeyboardForceReply  
 [Back to constructors index](index.md)

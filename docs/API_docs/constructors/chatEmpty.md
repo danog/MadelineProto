@@ -1,5 +1,6 @@
 ---
 title: chatEmpty
+description: chatEmpty attributes, type and example
 ---
 ## Constructor: chatEmpty  
 [Back to constructors index](index.md)

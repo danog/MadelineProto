@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonRequestGeoLocation
+description: keyboardButtonRequestGeoLocation attributes, type and example
 ---
 ## Constructor: keyboardButtonRequestGeoLocation  
 [Back to constructors index](index.md)

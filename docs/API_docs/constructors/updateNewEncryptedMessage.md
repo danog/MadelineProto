@@ -1,5 +1,6 @@
 ---
 title: updateNewEncryptedMessage
+description: updateNewEncryptedMessage attributes, type and example
 ---
 ## Constructor: updateNewEncryptedMessage  
 [Back to constructors index](index.md)

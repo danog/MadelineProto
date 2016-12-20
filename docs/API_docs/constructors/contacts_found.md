@@ -1,5 +1,6 @@
 ---
 title: contacts_found
+description: contacts_found attributes, type and example
 ---
 ## Constructor: contacts\_found  
 [Back to constructors index](index.md)

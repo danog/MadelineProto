@@ -1,5 +1,6 @@
 ---
 title: account_reportPeer
+description: account_reportPeer parameters, return type and example
 ---
 ## Method: account\_reportPeer  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_savedGifs
+description: messages_savedGifs attributes, type and example
 ---
 ## Constructor: messages\_savedGifs  
 [Back to constructors index](index.md)

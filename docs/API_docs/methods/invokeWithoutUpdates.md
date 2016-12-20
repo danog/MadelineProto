@@ -1,5 +1,6 @@
 ---
 title: invokeWithoutUpdates
+description: invokeWithoutUpdates parameters, return type and example
 ---
 ## Method: invokeWithoutUpdates  
 [Back to methods index](index.md)

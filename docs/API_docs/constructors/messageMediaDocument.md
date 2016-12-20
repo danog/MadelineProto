@@ -1,5 +1,6 @@
 ---
 title: messageMediaDocument
+description: messageMediaDocument attributes, type and example
 ---
 ## Constructor: messageMediaDocument  
 [Back to constructors index](index.md)

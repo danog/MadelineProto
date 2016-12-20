@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonSwitchInline
+description: keyboardButtonSwitchInline attributes, type and example
 ---
 ## Constructor: keyboardButtonSwitchInline  
 [Back to constructors index](index.md)

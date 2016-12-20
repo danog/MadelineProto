@@ -1,5 +1,6 @@
 ---
 title: messageEntityBotCommand
+description: messageEntityBotCommand attributes, type and example
 ---
 ## Constructor: messageEntityBotCommand  
 [Back to constructors index](index.md)

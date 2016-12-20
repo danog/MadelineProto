@@ -1,5 +1,6 @@
 ---
 title: updateChannelPinnedMessage
+description: updateChannelPinnedMessage attributes, type and example
 ---
 ## Constructor: updateChannelPinnedMessage  
 [Back to constructors index](index.md)

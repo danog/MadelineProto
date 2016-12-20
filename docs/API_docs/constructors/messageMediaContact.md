@@ -1,5 +1,6 @@
 ---
 title: messageMediaContact
+description: messageMediaContact attributes, type and example
 ---
 ## Constructor: messageMediaContact  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: MessagesFilter
+description: constructors of type MessagesFilter
 ---
 ## Type: MessagesFilter  
 [Back to types index](index.md)

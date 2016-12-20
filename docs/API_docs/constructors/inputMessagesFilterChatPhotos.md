@@ -1,5 +1,6 @@
 ---
 title: inputMessagesFilterChatPhotos
+description: inputMessagesFilterChatPhotos attributes, type and example
 ---
 ## Constructor: inputMessagesFilterChatPhotos  
 [Back to constructors index](index.md)

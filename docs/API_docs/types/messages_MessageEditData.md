@@ -1,5 +1,6 @@
 ---
 title: messages_MessageEditData
+description: constructors of type messages_MessageEditData
 ---
 ## Type: messages\_MessageEditData  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: geoPoint
+description: geoPoint attributes, type and example
 ---
 ## Constructor: geoPoint  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_savedGifsNotModified
+description: messages_savedGifsNotModified attributes, type and example
 ---
 ## Constructor: messages\_savedGifsNotModified  
 [Back to constructors index](index.md)

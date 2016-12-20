@@ -1,5 +1,6 @@
 ---
 title: auth_checkedPhone
+description: auth_checkedPhone attributes, type and example
 ---
 ## Constructor: auth\_checkedPhone  
 [Back to constructors index](index.md)

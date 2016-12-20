@@ -1,5 +1,6 @@
 ---
 title: photos_uploadProfilePhoto
+description: photos_uploadProfilePhoto parameters, return type and example
 ---
 ## Method: photos\_uploadProfilePhoto  
 [Back to methods index](index.md)

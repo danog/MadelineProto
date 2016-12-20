@@ -1,5 +1,6 @@
 ---
 title: messageActionChannelCreate
+description: messageActionChannelCreate attributes, type and example
 ---
 ## Constructor: messageActionChannelCreate  
 [Back to constructors index](index.md)

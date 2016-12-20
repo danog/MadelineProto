@@ -1,5 +1,6 @@
 ---
 title: foundGif
+description: foundGif attributes, type and example
 ---
 ## Constructor: foundGif  
 [Back to constructors index](index.md)

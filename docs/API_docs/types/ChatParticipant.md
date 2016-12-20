@@ -1,5 +1,6 @@
 ---
 title: ChatParticipant
+description: constructors of type ChatParticipant
 ---
 ## Type: ChatParticipant  
 [Back to types index](index.md)

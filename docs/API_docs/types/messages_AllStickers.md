@@ -1,5 +1,6 @@
 ---
 title: messages_AllStickers
+description: constructors of type messages_AllStickers
 ---
 ## Type: messages\_AllStickers  
 [Back to types index](index.md)

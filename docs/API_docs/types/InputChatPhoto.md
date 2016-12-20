@@ -1,5 +1,6 @@
 ---
 title: InputChatPhoto
+description: constructors of type InputChatPhoto
 ---
 ## Type: InputChatPhoto  
 [Back to types index](index.md)

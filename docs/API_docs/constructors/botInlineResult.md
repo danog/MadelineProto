@@ -1,5 +1,6 @@
 ---
 title: botInlineResult
+description: botInlineResult attributes, type and example
 ---
 ## Constructor: botInlineResult  
 [Back to constructors index](index.md)

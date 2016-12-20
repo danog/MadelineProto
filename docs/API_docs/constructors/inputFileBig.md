@@ -1,5 +1,6 @@
 ---
 title: inputFileBig
+description: inputFileBig attributes, type and example
 ---
 ## Constructor: inputFileBig  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: documentAttributeImageSize
+description: documentAttributeImageSize attributes, type and example
 ---
 ## Constructor: documentAttributeImageSize  
 [Back to constructors index](index.md)

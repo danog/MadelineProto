@@ -1,5 +1,6 @@
 ---
 title: topPeer
+description: topPeer attributes, type and example
 ---
 ## Constructor: topPeer  
 [Back to constructors index](index.md)

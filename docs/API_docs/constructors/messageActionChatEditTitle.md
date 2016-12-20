@@ -1,5 +1,6 @@
 ---
 title: messageActionChatEditTitle
+description: messageActionChatEditTitle attributes, type and example
 ---
 ## Constructor: messageActionChatEditTitle  
 [Back to constructors index](index.md)

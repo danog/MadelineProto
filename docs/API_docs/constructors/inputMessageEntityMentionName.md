@@ -1,5 +1,6 @@
 ---
 title: inputMessageEntityMentionName
+description: inputMessageEntityMentionName attributes, type and example
 ---
 ## Constructor: inputMessageEntityMentionName  
 [Back to constructors index](index.md)

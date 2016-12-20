@@ -1,5 +1,6 @@
 ---
 title: updates_differenceSlice
+description: updates_differenceSlice attributes, type and example
 ---
 ## Constructor: updates\_differenceSlice  
 [Back to constructors index](index.md)

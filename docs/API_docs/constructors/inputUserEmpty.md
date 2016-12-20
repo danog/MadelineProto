@@ -1,5 +1,6 @@
 ---
 title: inputUserEmpty
+description: inputUserEmpty attributes, type and example
 ---
 ## Constructor: inputUserEmpty  
 [Back to constructors index](index.md)

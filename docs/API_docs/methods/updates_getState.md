@@ -1,5 +1,6 @@
 ---
 title: updates_getState
+description: updates_getState parameters, return type and example
 ---
 ## Method: updates\_getState  
 [Back to methods index](index.md)

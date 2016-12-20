@@ -1,5 +1,6 @@
 ---
 title: FoundGif
+description: constructors of type FoundGif
 ---
 ## Type: FoundGif  
 [Back to types index](index.md)

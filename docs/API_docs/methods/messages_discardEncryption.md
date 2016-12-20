@@ -1,5 +1,6 @@
 ---
 title: messages_discardEncryption
+description: messages_discardEncryption parameters, return type and example
 ---
 ## Method: messages\_discardEncryption  
 [Back to methods index](index.md)

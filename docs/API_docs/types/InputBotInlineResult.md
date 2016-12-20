@@ -1,5 +1,6 @@
 ---
 title: InputBotInlineResult
+description: constructors of type InputBotInlineResult
 ---
 ## Type: InputBotInlineResult  
 [Back to types index](index.md)

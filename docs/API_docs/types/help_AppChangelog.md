@@ -1,5 +1,6 @@
 ---
 title: help_AppChangelog
+description: constructors of type help_AppChangelog
 ---
 ## Type: help\_AppChangelog  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: userFull
+description: userFull attributes, type and example
 ---
 ## Constructor: userFull  
 [Back to constructors index](index.md)

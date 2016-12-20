@@ -1,5 +1,6 @@
 ---
 title: channels_getParticipants
+description: channels_getParticipants parameters, return type and example
 ---
 ## Method: channels\_getParticipants  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: privacyValueDisallowContacts
+description: privacyValueDisallowContacts attributes, type and example
 ---
 ## Constructor: privacyValueDisallowContacts  
 [Back to constructors index](index.md)

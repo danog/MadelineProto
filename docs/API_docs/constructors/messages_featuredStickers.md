@@ -1,5 +1,6 @@
 ---
 title: messages_featuredStickers
+description: messages_featuredStickers attributes, type and example
 ---
 ## Constructor: messages\_featuredStickers  
 [Back to constructors index](index.md)

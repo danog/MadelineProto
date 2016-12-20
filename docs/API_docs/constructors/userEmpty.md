@@ -1,5 +1,6 @@
 ---
 title: userEmpty
+description: userEmpty attributes, type and example
 ---
 ## Constructor: userEmpty  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: contacts_getStatuses
+description: contacts_getStatuses parameters, return type and example
 ---
 ## Method: contacts\_getStatuses  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: help_support
+description: help_support attributes, type and example
 ---
 ## Constructor: help\_support  
 [Back to constructors index](index.md)

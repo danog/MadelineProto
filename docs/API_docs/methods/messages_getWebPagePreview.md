@@ -1,5 +1,6 @@
 ---
 title: messages_getWebPagePreview
+description: messages_getWebPagePreview parameters, return type and example
 ---
 ## Method: messages\_getWebPagePreview  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateUserBlocked
+description: updateUserBlocked attributes, type and example
 ---
 ## Constructor: updateUserBlocked  
 [Back to constructors index](index.md)

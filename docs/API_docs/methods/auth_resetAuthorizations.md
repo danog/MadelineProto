@@ -1,5 +1,6 @@
 ---
 title: auth_resetAuthorizations
+description: auth_resetAuthorizations parameters, return type and example
 ---
 ## Method: auth\_resetAuthorizations  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_setBotCallbackAnswer
+description: messages_setBotCallbackAnswer parameters, return type and example
 ---
 ## Method: messages\_setBotCallbackAnswer  
 [Back to methods index](index.md)

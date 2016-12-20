@@ -1,5 +1,6 @@
 ---
 title: replyInlineMarkup
+description: replyInlineMarkup attributes, type and example
 ---
 ## Constructor: replyInlineMarkup  
 [Back to constructors index](index.md)

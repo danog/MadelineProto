@@ -1,5 +1,6 @@
 ---
 title: storage_fileJpeg
+description: storage_fileJpeg attributes, type and example
 ---
 ## Constructor: storage\_fileJpeg  
 [Back to constructors index](index.md)

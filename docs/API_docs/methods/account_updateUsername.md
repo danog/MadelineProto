@@ -1,5 +1,6 @@
 ---
 title: account_updateUsername
+description: account_updateUsername parameters, return type and example
 ---
 ## Method: account\_updateUsername  
 [Back to methods index](index.md)

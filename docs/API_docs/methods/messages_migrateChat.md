@@ -1,5 +1,6 @@
 ---
 title: messages_migrateChat
+description: messages_migrateChat parameters, return type and example
 ---
 ## Method: messages\_migrateChat  
 [Back to methods index](index.md)

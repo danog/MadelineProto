@@ -1,5 +1,6 @@
 ---
 title: error
+description: error attributes, type and example
 ---
 ## Constructor: error  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: chatForbidden
+description: chatForbidden attributes, type and example
 ---
 ## Constructor: chatForbidden  
 [Back to constructors index](index.md)

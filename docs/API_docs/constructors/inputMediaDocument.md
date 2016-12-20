@@ -1,5 +1,6 @@
 ---
 title: inputMediaDocument
+description: inputMediaDocument attributes, type and example
 ---
 ## Constructor: inputMediaDocument  
 [Back to constructors index](index.md)

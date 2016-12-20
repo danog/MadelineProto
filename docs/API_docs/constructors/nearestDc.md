@@ -1,5 +1,6 @@
 ---
 title: nearestDc
+description: nearestDc attributes, type and example
 ---
 ## Constructor: nearestDc  
 [Back to constructors index](index.md)

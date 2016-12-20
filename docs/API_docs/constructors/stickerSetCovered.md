@@ -1,5 +1,6 @@
 ---
 title: stickerSetCovered
+description: stickerSetCovered attributes, type and example
 ---
 ## Constructor: stickerSetCovered  
 [Back to constructors index](index.md)

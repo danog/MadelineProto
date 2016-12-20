@@ -1,5 +1,6 @@
 ---
 title: BotInlineResult
+description: constructors of type BotInlineResult
 ---
 ## Type: BotInlineResult  
 [Back to types index](index.md)

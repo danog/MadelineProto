@@ -1,5 +1,6 @@
 ---
 title: messageEntityHashtag
+description: messageEntityHashtag attributes, type and example
 ---
 ## Constructor: messageEntityHashtag  
 [Back to constructors index](index.md)

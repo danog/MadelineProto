@@ -1,5 +1,6 @@
 ---
 title: inputPhoneContact
+description: inputPhoneContact attributes, type and example
 ---
 ## Constructor: inputPhoneContact  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputPeerUser
+description: inputPeerUser attributes, type and example
 ---
 ## Constructor: inputPeerUser  
 [Back to constructors index](index.md)

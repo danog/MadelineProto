@@ -1,5 +1,6 @@
 ---
 title: storage_fileGif
+description: storage_fileGif attributes, type and example
 ---
 ## Constructor: storage\_fileGif  
 [Back to constructors index](index.md)

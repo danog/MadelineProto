@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonGame
+description: keyboardButtonGame attributes, type and example
 ---
 ## Constructor: keyboardButtonGame  
 [Back to constructors index](index.md)

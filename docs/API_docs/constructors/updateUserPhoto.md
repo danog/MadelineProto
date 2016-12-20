@@ -1,5 +1,6 @@
 ---
 title: updateUserPhoto
+description: updateUserPhoto attributes, type and example
 ---
 ## Constructor: updateUserPhoto  
 [Back to constructors index](index.md)

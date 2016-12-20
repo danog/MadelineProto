@@ -1,5 +1,6 @@
 ---
 title: updates_channelDifference
+description: updates_channelDifference attributes, type and example
 ---
 ## Constructor: updates\_channelDifference  
 [Back to constructors index](index.md)

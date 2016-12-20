@@ -1,5 +1,6 @@
 ---
 title: messages_toggleChatAdmins
+description: messages_toggleChatAdmins parameters, return type and example
 ---
 ## Method: messages\_toggleChatAdmins  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messageMediaVenue
+description: messageMediaVenue attributes, type and example
 ---
 ## Constructor: messageMediaVenue  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateNotifySettings
+description: updateNotifySettings attributes, type and example
 ---
 ## Constructor: updateNotifySettings  
 [Back to constructors index](index.md)

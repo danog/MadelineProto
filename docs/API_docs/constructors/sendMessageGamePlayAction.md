@@ -1,5 +1,6 @@
 ---
 title: sendMessageGamePlayAction
+description: sendMessageGamePlayAction attributes, type and example
 ---
 ## Constructor: sendMessageGamePlayAction  
 [Back to constructors index](index.md)

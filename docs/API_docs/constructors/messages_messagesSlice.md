@@ -1,5 +1,6 @@
 ---
 title: messages_messagesSlice
+description: messages_messagesSlice attributes, type and example
 ---
 ## Constructor: messages\_messagesSlice  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: account_getPassword
+description: account_getPassword parameters, return type and example
 ---
 ## Method: account\_getPassword  
 [Back to methods index](index.md)

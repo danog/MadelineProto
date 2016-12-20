@@ -1,5 +1,6 @@
 ---
 title: storage_filePdf
+description: storage_filePdf attributes, type and example
 ---
 ## Constructor: storage\_filePdf  
 [Back to constructors index](index.md)

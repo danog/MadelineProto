@@ -1,5 +1,6 @@
 ---
 title: upload_file
+description: upload_file attributes, type and example
 ---
 ## Constructor: upload\_file  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_Chats
+description: constructors of type messages_Chats
 ---
 ## Type: messages\_Chats  
 [Back to types index](index.md)

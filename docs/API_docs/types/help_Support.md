@@ -1,5 +1,6 @@
 ---
 title: help_Support
+description: constructors of type help_Support
 ---
 ## Type: help\_Support  
 [Back to types index](index.md)

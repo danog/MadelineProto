@@ -1,5 +1,6 @@
 ---
 title: peerSettings
+description: peerSettings attributes, type and example
 ---
 ## Constructor: peerSettings  
 [Back to constructors index](index.md)

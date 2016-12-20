@@ -1,5 +1,6 @@
 ---
 title: messages_saveRecentSticker
+description: messages_saveRecentSticker parameters, return type and example
 ---
 ## Method: messages\_saveRecentSticker  
 [Back to methods index](index.md)

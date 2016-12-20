@@ -1,5 +1,6 @@
 ---
 title: messageMediaGeo
+description: messageMediaGeo attributes, type and example
 ---
 ## Constructor: messageMediaGeo  
 [Back to constructors index](index.md)

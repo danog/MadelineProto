@@ -1,5 +1,6 @@
 ---
 title: privacyValueDisallowAll
+description: privacyValueDisallowAll attributes, type and example
 ---
 ## Constructor: privacyValueDisallowAll  
 [Back to constructors index](index.md)

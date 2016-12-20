@@ -1,5 +1,6 @@
 ---
 title: storage_fileWebp
+description: storage_fileWebp attributes, type and example
 ---
 ## Constructor: storage\_fileWebp  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: help_getConfig
+description: help_getConfig parameters, return type and example
 ---
 ## Method: help\_getConfig  
 [Back to methods index](index.md)

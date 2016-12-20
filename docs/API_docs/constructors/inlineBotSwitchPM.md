@@ -1,5 +1,6 @@
 ---
 title: inlineBotSwitchPM
+description: inlineBotSwitchPM attributes, type and example
 ---
 ## Constructor: inlineBotSwitchPM  
 [Back to constructors index](index.md)

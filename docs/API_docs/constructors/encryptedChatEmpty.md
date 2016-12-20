@@ -1,5 +1,6 @@
 ---
 title: encryptedChatEmpty
+description: encryptedChatEmpty attributes, type and example
 ---
 ## Constructor: encryptedChatEmpty  
 [Back to constructors index](index.md)

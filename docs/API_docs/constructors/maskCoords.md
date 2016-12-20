@@ -1,5 +1,6 @@
 ---
 title: maskCoords
+description: maskCoords attributes, type and example
 ---
 ## Constructor: maskCoords  
 [Back to constructors index](index.md)

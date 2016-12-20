@@ -1,5 +1,6 @@
 ---
 title: KeyboardButton
+description: constructors of type KeyboardButton
 ---
 ## Type: KeyboardButton  
 [Back to types index](index.md)

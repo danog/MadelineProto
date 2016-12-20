@@ -1,5 +1,6 @@
 ---
 title: peerChannel
+description: peerChannel attributes, type and example
 ---
 ## Constructor: peerChannel  
 [Back to constructors index](index.md)

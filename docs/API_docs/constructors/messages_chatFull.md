@@ -1,5 +1,6 @@
 ---
 title: messages_chatFull
+description: messages_chatFull attributes, type and example
 ---
 ## Constructor: messages\_chatFull  
 [Back to constructors index](index.md)

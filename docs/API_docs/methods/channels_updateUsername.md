@@ -1,5 +1,6 @@
 ---
 title: channels_updateUsername
+description: channels_updateUsername parameters, return type and example
 ---
 ## Method: channels\_updateUsername  
 [Back to methods index](index.md)

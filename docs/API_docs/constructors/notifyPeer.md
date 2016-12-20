@@ -1,5 +1,6 @@
 ---
 title: notifyPeer
+description: notifyPeer attributes, type and example
 ---
 ## Constructor: notifyPeer  
 [Back to constructors index](index.md)

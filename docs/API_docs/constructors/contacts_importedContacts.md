@@ -1,5 +1,6 @@
 ---
 title: contacts_importedContacts
+description: contacts_importedContacts attributes, type and example
 ---
 ## Constructor: contacts\_importedContacts  
 [Back to constructors index](index.md)

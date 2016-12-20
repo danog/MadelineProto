@@ -1,5 +1,6 @@
 ---
 title: InputChannel
+description: constructors of type InputChannel
 ---
 ## Type: InputChannel  
 [Back to types index](index.md)

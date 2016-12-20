@@ -1,5 +1,6 @@
 ---
 title: contacts_importContacts
+description: contacts_importContacts parameters, return type and example
 ---
 ## Method: contacts\_importContacts  
 [Back to methods index](index.md)

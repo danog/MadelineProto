@@ -1,5 +1,6 @@
 ---
 title: channelParticipant
+description: channelParticipant attributes, type and example
 ---
 ## Constructor: channelParticipant  
 [Back to constructors index](index.md)

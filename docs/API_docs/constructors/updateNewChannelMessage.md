@@ -1,5 +1,6 @@
 ---
 title: updateNewChannelMessage
+description: updateNewChannelMessage attributes, type and example
 ---
 ## Constructor: updateNewChannelMessage  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: botInfo
+description: botInfo attributes, type and example
 ---
 ## Constructor: botInfo  
 [Back to constructors index](index.md)

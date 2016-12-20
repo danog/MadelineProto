@@ -1,5 +1,6 @@
 ---
 title: messages_messages
+description: messages_messages attributes, type and example
 ---
 ## Constructor: messages\_messages  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_joinChannel
+description: channels_joinChannel parameters, return type and example
 ---
 ## Method: channels\_joinChannel  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: users_getUsers
+description: users_getUsers parameters, return type and example
 ---
 ## Method: users\_getUsers  
 [Back to methods index](index.md)

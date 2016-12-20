@@ -1,5 +1,6 @@
 ---
 title: auth_signUp
+description: auth_signUp parameters, return type and example
 ---
 ## Method: auth\_signUp  
 [Back to methods index](index.md)

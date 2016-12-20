@@ -1,5 +1,6 @@
 ---
 title: inputMediaPhotoExternal
+description: inputMediaPhotoExternal attributes, type and example
 ---
 ## Constructor: inputMediaPhotoExternal  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineMessageID
+description: inputBotInlineMessageID attributes, type and example
 ---
 ## Constructor: inputBotInlineMessageID  
 [Back to constructors index](index.md)

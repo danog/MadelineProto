@@ -1,5 +1,6 @@
 ---
 title: PrivacyKey
+description: constructors of type PrivacyKey
 ---
 ## Type: PrivacyKey  
 [Back to types index](index.md)

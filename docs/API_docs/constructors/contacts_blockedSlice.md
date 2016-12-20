@@ -1,5 +1,6 @@
 ---
 title: contacts_blockedSlice
+description: contacts_blockedSlice attributes, type and example
 ---
 ## Constructor: contacts\_blockedSlice  
 [Back to constructors index](index.md)

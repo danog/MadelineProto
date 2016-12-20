@@ -1,5 +1,6 @@
 ---
 title: storage_fileUnknown
+description: storage_fileUnknown attributes, type and example
 ---
 ## Constructor: storage\_fileUnknown  
 [Back to constructors index](index.md)

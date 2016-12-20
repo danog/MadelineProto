@@ -1,5 +1,6 @@
 ---
 title: messages_stickerSetInstallResultSuccess
+description: messages_stickerSetInstallResultSuccess attributes, type and example
 ---
 ## Constructor: messages\_stickerSetInstallResultSuccess  
 [Back to constructors index](index.md)

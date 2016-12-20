@@ -1,5 +1,6 @@
 ---
 title: messages_getRecentStickers
+description: messages_getRecentStickers parameters, return type and example
 ---
 ## Method: messages\_getRecentStickers  
 [Back to methods index](index.md)

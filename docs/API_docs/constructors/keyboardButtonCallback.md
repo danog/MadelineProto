@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonCallback
+description: keyboardButtonCallback attributes, type and example
 ---
 ## Constructor: keyboardButtonCallback  
 [Back to constructors index](index.md)

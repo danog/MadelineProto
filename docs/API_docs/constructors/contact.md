@@ -1,5 +1,6 @@
 ---
 title: contact
+description: contact attributes, type and example
 ---
 ## Constructor: contact  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: initConnection
+description: initConnection parameters, return type and example
 ---
 ## Method: initConnection  
 [Back to methods index](index.md)

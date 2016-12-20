@@ -1,5 +1,6 @@
 ---
 title: inputStickerSetEmpty
+description: inputStickerSetEmpty attributes, type and example
 ---
 ## Constructor: inputStickerSetEmpty  
 [Back to constructors index](index.md)

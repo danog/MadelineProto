@@ -1,5 +1,6 @@
 ---
 title: messages_importChatInvite
+description: messages_importChatInvite parameters, return type and example
 ---
 ## Method: messages\_importChatInvite  
 [Back to methods index](index.md)

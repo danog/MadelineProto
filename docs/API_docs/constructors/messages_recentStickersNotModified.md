@@ -1,5 +1,6 @@
 ---
 title: messages_recentStickersNotModified
+description: messages_recentStickersNotModified attributes, type and example
 ---
 ## Constructor: messages\_recentStickersNotModified  
 [Back to constructors index](index.md)

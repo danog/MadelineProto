@@ -1,5 +1,6 @@
 ---
 title: channelParticipantKicked
+description: channelParticipantKicked attributes, type and example
 ---
 ## Constructor: channelParticipantKicked  
 [Back to constructors index](index.md)

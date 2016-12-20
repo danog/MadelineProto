@@ -1,5 +1,6 @@
 ---
 title: updateUserStatus
+description: updateUserStatus attributes, type and example
 ---
 ## Constructor: updateUserStatus  
 [Back to constructors index](index.md)

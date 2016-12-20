@@ -1,5 +1,6 @@
 ---
 title: channels_editPhoto
+description: channels_editPhoto parameters, return type and example
 ---
 ## Method: channels\_editPhoto  
 [Back to methods index](index.md)

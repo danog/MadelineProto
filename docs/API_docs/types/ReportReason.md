@@ -1,5 +1,6 @@
 ---
 title: ReportReason
+description: constructors of type ReportReason
 ---
 ## Type: ReportReason  
 [Back to types index](index.md)

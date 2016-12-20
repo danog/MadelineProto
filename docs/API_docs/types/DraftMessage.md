@@ -1,5 +1,6 @@
 ---
 title: DraftMessage
+description: constructors of type DraftMessage
 ---
 ## Type: DraftMessage  
 [Back to types index](index.md)

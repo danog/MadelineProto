@@ -1,5 +1,6 @@
 ---
 title: TopPeerCategory
+description: constructors of type TopPeerCategory
 ---
 ## Type: TopPeerCategory  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: message
+description: message attributes, type and example
 ---
 ## Constructor: message  
 [Back to constructors index](index.md)

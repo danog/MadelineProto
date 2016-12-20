@@ -1,5 +1,6 @@
 ---
 title: account_deleteAccount
+description: account_deleteAccount parameters, return type and example
 ---
 ## Method: account\_deleteAccount  
 [Back to methods index](index.md)

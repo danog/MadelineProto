@@ -1,5 +1,6 @@
 ---
 title: sendMessageUploadPhotoAction
+description: sendMessageUploadPhotoAction attributes, type and example
 ---
 ## Constructor: sendMessageUploadPhotoAction  
 [Back to constructors index](index.md)

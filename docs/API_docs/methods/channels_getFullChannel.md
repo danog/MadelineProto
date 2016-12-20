@@ -1,5 +1,6 @@
 ---
 title: channels_getFullChannel
+description: channels_getFullChannel parameters, return type and example
 ---
 ## Method: channels\_getFullChannel  
 [Back to methods index](index.md)

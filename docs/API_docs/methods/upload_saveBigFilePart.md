@@ -1,5 +1,6 @@
 ---
 title: upload_saveBigFilePart
+description: upload_saveBigFilePart parameters, return type and example
 ---
 ## Method: upload\_saveBigFilePart  
 [Back to methods index](index.md)

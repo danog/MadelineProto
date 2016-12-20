@@ -1,5 +1,6 @@
 ---
 title: updateMessageID
+description: updateMessageID attributes, type and example
 ---
 ## Constructor: updateMessageID  
 [Back to constructors index](index.md)

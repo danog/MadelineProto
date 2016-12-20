@@ -1,5 +1,6 @@
 ---
 title: messages_SentEncryptedMessage
+description: constructors of type messages_SentEncryptedMessage
 ---
 ## Type: messages\_SentEncryptedMessage  
 [Back to types index](index.md)

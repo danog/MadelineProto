@@ -1,5 +1,6 @@
 ---
 title: channels_reportSpam
+description: channels_reportSpam parameters, return type and example
 ---
 ## Method: channels\_reportSpam  
 [Back to methods index](index.md)

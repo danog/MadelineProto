@@ -1,5 +1,6 @@
 ---
 title: PrivacyRule
+description: constructors of type PrivacyRule
 ---
 ## Type: PrivacyRule  
 [Back to types index](index.md)

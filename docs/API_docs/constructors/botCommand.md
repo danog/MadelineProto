@@ -1,5 +1,6 @@
 ---
 title: botCommand
+description: botCommand attributes, type and example
 ---
 ## Constructor: botCommand  
 [Back to constructors index](index.md)

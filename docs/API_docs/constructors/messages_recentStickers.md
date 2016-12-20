@@ -1,5 +1,6 @@
 ---
 title: messages_recentStickers
+description: messages_recentStickers attributes, type and example
 ---
 ## Constructor: messages\_recentStickers  
 [Back to constructors index](index.md)

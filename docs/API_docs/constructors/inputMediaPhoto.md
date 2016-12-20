@@ -1,5 +1,6 @@
 ---
 title: inputMediaPhoto
+description: inputMediaPhoto attributes, type and example
 ---
 ## Constructor: inputMediaPhoto  
 [Back to constructors index](index.md)

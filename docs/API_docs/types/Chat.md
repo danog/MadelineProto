@@ -1,5 +1,6 @@
 ---
 title: Chat
+description: constructors of type Chat
 ---
 ## Type: Chat  
 [Back to types index](index.md)

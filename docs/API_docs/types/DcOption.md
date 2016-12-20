@@ -1,5 +1,6 @@
 ---
 title: DcOption
+description: constructors of type DcOption
 ---
 ## Type: DcOption  
 [Back to types index](index.md)

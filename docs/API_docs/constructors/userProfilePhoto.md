@@ -1,5 +1,6 @@
 ---
 title: userProfilePhoto
+description: userProfilePhoto attributes, type and example
 ---
 ## Constructor: userProfilePhoto  
 [Back to constructors index](index.md)

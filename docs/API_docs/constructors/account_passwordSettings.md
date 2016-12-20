@@ -1,5 +1,6 @@
 ---
 title: account_passwordSettings
+description: account_passwordSettings attributes, type and example
 ---
 ## Constructor: account\_passwordSettings  
 [Back to constructors index](index.md)

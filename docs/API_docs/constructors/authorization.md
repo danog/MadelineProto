@@ -1,5 +1,6 @@
 ---
 title: authorization
+description: authorization attributes, type and example
 ---
 ## Constructor: authorization  
 [Back to constructors index](index.md)

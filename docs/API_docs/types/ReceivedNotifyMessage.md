@@ -1,5 +1,6 @@
 ---
 title: ReceivedNotifyMessage
+description: constructors of type ReceivedNotifyMessage
 ---
 ## Type: ReceivedNotifyMessage  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: contacts_ImportedContacts
+description: constructors of type contacts_ImportedContacts
 ---
 ## Type: contacts\_ImportedContacts  
 [Back to types index](index.md)

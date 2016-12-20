@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineMessageGame
+description: inputBotInlineMessageGame attributes, type and example
 ---
 ## Constructor: inputBotInlineMessageGame  
 [Back to constructors index](index.md)

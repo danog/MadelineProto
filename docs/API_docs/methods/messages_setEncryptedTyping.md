@@ -1,5 +1,6 @@
 ---
 title: messages_setEncryptedTyping
+description: messages_setEncryptedTyping parameters, return type and example
 ---
 ## Method: messages\_setEncryptedTyping  
 [Back to methods index](index.md)

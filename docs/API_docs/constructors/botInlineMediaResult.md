@@ -1,5 +1,6 @@
 ---
 title: botInlineMediaResult
+description: botInlineMediaResult attributes, type and example
 ---
 ## Constructor: botInlineMediaResult  
 [Back to constructors index](index.md)

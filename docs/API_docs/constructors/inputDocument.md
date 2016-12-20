@@ -1,5 +1,6 @@
 ---
 title: inputDocument
+description: inputDocument attributes, type and example
 ---
 ## Constructor: inputDocument  
 [Back to constructors index](index.md)

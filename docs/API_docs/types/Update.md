@@ -1,5 +1,6 @@
 ---
 title: Update
+description: constructors of type Update
 ---
 ## Type: Update  
 [Back to types index](index.md)

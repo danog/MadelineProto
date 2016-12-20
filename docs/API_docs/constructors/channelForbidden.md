@@ -1,5 +1,6 @@
 ---
 title: channelForbidden
+description: channelForbidden attributes, type and example
 ---
 ## Constructor: channelForbidden  
 [Back to constructors index](index.md)

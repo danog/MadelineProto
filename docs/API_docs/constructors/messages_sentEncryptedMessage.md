@@ -1,5 +1,6 @@
 ---
 title: messages_sentEncryptedMessage
+description: messages_sentEncryptedMessage attributes, type and example
 ---
 ## Constructor: messages\_sentEncryptedMessage  
 [Back to constructors index](index.md)

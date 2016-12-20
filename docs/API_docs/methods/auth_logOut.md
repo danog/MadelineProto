@@ -1,5 +1,6 @@
 ---
 title: auth_logOut
+description: auth_logOut parameters, return type and example
 ---
 ## Method: auth\_logOut  
 [Back to methods index](index.md)

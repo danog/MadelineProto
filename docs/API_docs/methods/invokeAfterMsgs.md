@@ -1,5 +1,6 @@
 ---
 title: invokeAfterMsgs
+description: invokeAfterMsgs parameters, return type and example
 ---
 ## Method: invokeAfterMsgs  
 [Back to methods index](index.md)

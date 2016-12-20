@@ -1,5 +1,6 @@
 ---
 title: updateEncryptedMessagesRead
+description: updateEncryptedMessagesRead attributes, type and example
 ---
 ## Constructor: updateEncryptedMessagesRead  
 [Back to constructors index](index.md)

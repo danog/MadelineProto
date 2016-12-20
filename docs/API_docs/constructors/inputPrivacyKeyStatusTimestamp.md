@@ -1,5 +1,6 @@
 ---
 title: inputPrivacyKeyStatusTimestamp
+description: inputPrivacyKeyStatusTimestamp attributes, type and example
 ---
 ## Constructor: inputPrivacyKeyStatusTimestamp  
 [Back to constructors index](index.md)

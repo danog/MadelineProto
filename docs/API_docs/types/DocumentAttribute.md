@@ -1,5 +1,6 @@
 ---
 title: DocumentAttribute
+description: constructors of type DocumentAttribute
 ---
 ## Type: DocumentAttribute  
 [Back to types index](index.md)

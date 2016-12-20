@@ -1,5 +1,6 @@
 ---
 title: account_getNotifySettings
+description: account_getNotifySettings parameters, return type and example
 ---
 ## Method: account\_getNotifySettings  
 [Back to methods index](index.md)

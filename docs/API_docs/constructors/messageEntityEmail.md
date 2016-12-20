@@ -1,5 +1,6 @@
 ---
 title: messageEntityEmail
+description: messageEntityEmail attributes, type and example
 ---
 ## Constructor: messageEntityEmail  
 [Back to constructors index](index.md)

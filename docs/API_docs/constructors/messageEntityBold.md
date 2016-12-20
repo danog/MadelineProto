@@ -1,5 +1,6 @@
 ---
 title: messageEntityBold
+description: messageEntityBold attributes, type and example
 ---
 ## Constructor: messageEntityBold  
 [Back to constructors index](index.md)

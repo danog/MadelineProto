@@ -1,5 +1,6 @@
 ---
 title: contacts_importCard
+description: contacts_importCard parameters, return type and example
 ---
 ## Method: contacts\_importCard  
 [Back to methods index](index.md)

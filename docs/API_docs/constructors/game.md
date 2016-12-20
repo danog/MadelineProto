@@ -1,5 +1,6 @@
 ---
 title: game
+description: game attributes, type and example
 ---
 ## Constructor: game  
 [Back to constructors index](index.md)

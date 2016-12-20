@@ -1,5 +1,6 @@
 ---
 title: updateWebPage
+description: updateWebPage attributes, type and example
 ---
 ## Constructor: updateWebPage  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineMessageMediaAuto
+description: inputBotInlineMessageMediaAuto attributes, type and example
 ---
 ## Constructor: inputBotInlineMessageMediaAuto  
 [Back to constructors index](index.md)

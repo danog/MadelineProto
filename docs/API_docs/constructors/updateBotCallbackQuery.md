@@ -1,5 +1,6 @@
 ---
 title: updateBotCallbackQuery
+description: updateBotCallbackQuery attributes, type and example
 ---
 ## Constructor: updateBotCallbackQuery  
 [Back to constructors index](index.md)

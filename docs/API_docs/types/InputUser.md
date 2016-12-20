@@ -1,5 +1,6 @@
 ---
 title: InputUser
+description: constructors of type InputUser
 ---
 ## Type: InputUser  
 [Back to types index](index.md)

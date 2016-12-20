@@ -1,5 +1,6 @@
 ---
 title: messages_dialogsSlice
+description: messages_dialogsSlice attributes, type and example
 ---
 ## Constructor: messages\_dialogsSlice  
 [Back to constructors index](index.md)

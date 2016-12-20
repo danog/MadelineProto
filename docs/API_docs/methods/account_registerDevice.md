@@ -1,5 +1,6 @@
 ---
 title: account_registerDevice
+description: account_registerDevice parameters, return type and example
 ---
 ## Method: account\_registerDevice  
 [Back to methods index](index.md)

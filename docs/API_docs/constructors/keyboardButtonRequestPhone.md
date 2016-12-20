@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonRequestPhone
+description: keyboardButtonRequestPhone attributes, type and example
 ---
 ## Constructor: keyboardButtonRequestPhone  
 [Back to constructors index](index.md)

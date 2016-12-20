@@ -1,5 +1,6 @@
 ---
 title: inputStickerSetID
+description: inputStickerSetID attributes, type and example
 ---
 ## Constructor: inputStickerSetID  
 [Back to constructors index](index.md)

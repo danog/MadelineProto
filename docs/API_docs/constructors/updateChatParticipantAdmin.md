@@ -1,5 +1,6 @@
 ---
 title: updateChatParticipantAdmin
+description: updateChatParticipantAdmin attributes, type and example
 ---
 ## Constructor: updateChatParticipantAdmin  
 [Back to constructors index](index.md)

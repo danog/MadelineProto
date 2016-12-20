@@ -1,5 +1,6 @@
 ---
 title: InputPrivacyRule
+description: constructors of type InputPrivacyRule
 ---
 ## Type: InputPrivacyRule  
 [Back to types index](index.md)

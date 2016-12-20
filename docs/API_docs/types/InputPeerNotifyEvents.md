@@ -1,5 +1,6 @@
 ---
 title: InputPeerNotifyEvents
+description: constructors of type InputPeerNotifyEvents
 ---
 ## Type: InputPeerNotifyEvents  
 [Back to types index](index.md)

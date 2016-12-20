@@ -1,5 +1,6 @@
 ---
 title: inputPeerEmpty
+description: inputPeerEmpty attributes, type and example
 ---
 ## Constructor: inputPeerEmpty  
 [Back to constructors index](index.md)

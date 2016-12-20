@@ -1,5 +1,6 @@
 ---
 title: help_getInviteText
+description: help_getInviteText parameters, return type and example
 ---
 ## Method: help\_getInviteText  
 [Back to methods index](index.md)

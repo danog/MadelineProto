@@ -1,5 +1,6 @@
 ---
 title: channels_exportMessageLink
+description: channels_exportMessageLink parameters, return type and example
 ---
 ## Method: channels\_exportMessageLink  
 [Back to methods index](index.md)

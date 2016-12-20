@@ -1,5 +1,6 @@
 ---
 title: contacts_topPeers
+description: contacts_topPeers attributes, type and example
 ---
 ## Constructor: contacts\_topPeers  
 [Back to constructors index](index.md)

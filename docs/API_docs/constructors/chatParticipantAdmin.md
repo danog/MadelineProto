@@ -1,5 +1,6 @@
 ---
 title: chatParticipantAdmin
+description: chatParticipantAdmin attributes, type and example
 ---
 ## Constructor: chatParticipantAdmin  
 [Back to constructors index](index.md)

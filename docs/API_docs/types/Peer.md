@@ -1,5 +1,6 @@
 ---
 title: Peer
+description: constructors of type Peer
 ---
 ## Type: Peer  
 [Back to types index](index.md)

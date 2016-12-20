@@ -1,5 +1,6 @@
 ---
 title: inputEncryptedChat
+description: inputEncryptedChat attributes, type and example
 ---
 ## Constructor: inputEncryptedChat  
 [Back to constructors index](index.md)

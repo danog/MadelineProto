@@ -1,5 +1,6 @@
 ---
 title: user
+description: user attributes, type and example
 ---
 ## Constructor: user  
 [Back to constructors index](index.md)

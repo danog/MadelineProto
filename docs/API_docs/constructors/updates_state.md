@@ -1,5 +1,6 @@
 ---
 title: updates_state
+description: updates_state attributes, type and example
 ---
 ## Constructor: updates\_state  
 [Back to constructors index](index.md)

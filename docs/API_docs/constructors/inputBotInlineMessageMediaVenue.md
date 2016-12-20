@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineMessageMediaVenue
+description: inputBotInlineMessageMediaVenue attributes, type and example
 ---
 ## Constructor: inputBotInlineMessageMediaVenue  
 [Back to constructors index](index.md)

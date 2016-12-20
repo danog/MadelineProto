@@ -1,5 +1,6 @@
 ---
 title: encryptedChatRequested
+description: encryptedChatRequested attributes, type and example
 ---
 ## Constructor: encryptedChatRequested  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: updateChannelTooLong
+description: updateChannelTooLong attributes, type and example
 ---
 ## Constructor: updateChannelTooLong  
 [Back to constructors index](index.md)

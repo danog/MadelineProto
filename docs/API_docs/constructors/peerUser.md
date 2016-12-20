@@ -1,5 +1,6 @@
 ---
 title: peerUser
+description: peerUser attributes, type and example
 ---
 ## Constructor: peerUser  
 [Back to constructors index](index.md)

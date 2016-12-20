@@ -1,5 +1,6 @@
 ---
 title: auth_cancelCode
+description: auth_cancelCode parameters, return type and example
 ---
 ## Method: auth\_cancelCode  
 [Back to methods index](index.md)

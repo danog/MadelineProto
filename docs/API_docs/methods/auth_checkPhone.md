@@ -1,5 +1,6 @@
 ---
 title: auth_checkPhone
+description: auth_checkPhone parameters, return type and example
 ---
 ## Method: auth\_checkPhone  
 [Back to methods index](index.md)

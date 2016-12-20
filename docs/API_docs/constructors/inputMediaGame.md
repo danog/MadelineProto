@@ -1,5 +1,6 @@
 ---
 title: inputMediaGame
+description: inputMediaGame attributes, type and example
 ---
 ## Constructor: inputMediaGame  
 [Back to constructors index](index.md)

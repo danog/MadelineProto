@@ -1,5 +1,6 @@
 ---
 title: channels_kickFromChannel
+description: channels_kickFromChannel parameters, return type and example
 ---
 ## Method: channels\_kickFromChannel  
 [Back to methods index](index.md)

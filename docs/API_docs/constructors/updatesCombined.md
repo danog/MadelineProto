@@ -1,5 +1,6 @@
 ---
 title: updatesCombined
+description: updatesCombined attributes, type and example
 ---
 ## Constructor: updatesCombined  
 [Back to constructors index](index.md)

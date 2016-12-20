@@ -1,5 +1,6 @@
 ---
 title: messages_getInlineBotResults
+description: messages_getInlineBotResults parameters, return type and example
 ---
 ## Method: messages\_getInlineBotResults  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_forwardMessage
+description: messages_forwardMessage parameters, return type and example
 ---
 ## Method: messages\_forwardMessage  
 [Back to methods index](index.md)

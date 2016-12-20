@@ -1,5 +1,6 @@
 ---
 title: messages_getMessages
+description: messages_getMessages parameters, return type and example
 ---
 ## Method: messages\_getMessages  
 [Back to methods index](index.md)

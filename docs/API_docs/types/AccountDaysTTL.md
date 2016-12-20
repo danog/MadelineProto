@@ -1,5 +1,6 @@
 ---
 title: AccountDaysTTL
+description: constructors of type AccountDaysTTL
 ---
 ## Type: AccountDaysTTL  
 [Back to types index](index.md)

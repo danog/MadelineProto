@@ -1,5 +1,6 @@
 ---
 title: messages_saveGif
+description: messages_saveGif parameters, return type and example
 ---
 ## Method: messages\_saveGif  
 [Back to methods index](index.md)

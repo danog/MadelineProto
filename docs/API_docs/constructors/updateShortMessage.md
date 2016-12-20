@@ -1,5 +1,6 @@
 ---
 title: updateShortMessage
+description: updateShortMessage attributes, type and example
 ---
 ## Constructor: updateShortMessage  
 [Back to constructors index](index.md)

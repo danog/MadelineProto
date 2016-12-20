@@ -1,5 +1,6 @@
 ---
 title: ChannelParticipantsFilter
+description: constructors of type ChannelParticipantsFilter
 ---
 ## Type: ChannelParticipantsFilter  
 [Back to types index](index.md)

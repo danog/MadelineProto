@@ -1,5 +1,6 @@
 ---
 title: messages_requestEncryption
+description: messages_requestEncryption parameters, return type and example
 ---
 ## Method: messages\_requestEncryption  
 [Back to methods index](index.md)

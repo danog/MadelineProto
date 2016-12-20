@@ -1,5 +1,6 @@
 ---
 title: inputFile
+description: inputFile attributes, type and example
 ---
 ## Constructor: inputFile  
 [Back to constructors index](index.md)

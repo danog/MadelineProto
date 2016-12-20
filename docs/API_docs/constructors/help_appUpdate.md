@@ -1,5 +1,6 @@
 ---
 title: help_appUpdate
+description: help_appUpdate attributes, type and example
 ---
 ## Constructor: help\_appUpdate  
 [Back to constructors index](index.md)

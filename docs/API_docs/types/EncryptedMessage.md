@@ -1,5 +1,6 @@
 ---
 title: EncryptedMessage
+description: constructors of type EncryptedMessage
 ---
 ## Type: EncryptedMessage  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: contacts_topPeersNotModified
+description: contacts_topPeersNotModified attributes, type and example
 ---
 ## Constructor: contacts\_topPeersNotModified  
 [Back to constructors index](index.md)

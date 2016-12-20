@@ -1,5 +1,6 @@
 ---
 title: inputGameShortName
+description: inputGameShortName attributes, type and example
 ---
 ## Constructor: inputGameShortName  
 [Back to constructors index](index.md)

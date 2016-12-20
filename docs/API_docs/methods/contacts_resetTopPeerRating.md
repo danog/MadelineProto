@@ -1,5 +1,6 @@
 ---
 title: contacts_resetTopPeerRating
+description: contacts_resetTopPeerRating parameters, return type and example
 ---
 ## Method: contacts\_resetTopPeerRating  
 [Back to methods index](index.md)

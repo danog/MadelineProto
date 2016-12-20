@@ -1,5 +1,6 @@
 ---
 title: auth_exportAuthorization
+description: auth_exportAuthorization parameters, return type and example
 ---
 ## Method: auth\_exportAuthorization  
 [Back to methods index](index.md)

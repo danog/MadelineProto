@@ -1,5 +1,6 @@
 ---
 title: messages_botResults
+description: messages_botResults attributes, type and example
 ---
 ## Constructor: messages\_botResults  
 [Back to constructors index](index.md)

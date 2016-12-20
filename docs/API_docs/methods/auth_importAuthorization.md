@@ -1,5 +1,6 @@
 ---
 title: auth_importAuthorization
+description: auth_importAuthorization parameters, return type and example
 ---
 ## Method: auth\_importAuthorization  
 [Back to methods index](index.md)

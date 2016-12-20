@@ -1,5 +1,6 @@
 ---
 title: messages_installStickerSet
+description: messages_installStickerSet parameters, return type and example
 ---
 ## Method: messages\_installStickerSet  
 [Back to methods index](index.md)

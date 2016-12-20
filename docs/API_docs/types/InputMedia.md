@@ -1,5 +1,6 @@
 ---
 title: InputMedia
+description: constructors of type InputMedia
 ---
 ## Type: InputMedia  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: auth_passwordRecovery
+description: auth_passwordRecovery attributes, type and example
 ---
 ## Constructor: auth\_passwordRecovery  
 [Back to constructors index](index.md)

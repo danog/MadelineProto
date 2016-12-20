@@ -1,5 +1,6 @@
 ---
 title: account_setAccountTTL
+description: account_setAccountTTL parameters, return type and example
 ---
 ## Method: account\_setAccountTTL  
 [Back to methods index](index.md)

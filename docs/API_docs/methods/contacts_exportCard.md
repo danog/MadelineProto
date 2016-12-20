@@ -1,5 +1,6 @@
 ---
 title: contacts_exportCard
+description: contacts_exportCard parameters, return type and example
 ---
 ## Method: contacts\_exportCard  
 [Back to methods index](index.md)

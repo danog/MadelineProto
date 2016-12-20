@@ -1,5 +1,6 @@
 ---
 title: auth_sentCodeTypeApp
+description: auth_sentCodeTypeApp attributes, type and example
 ---
 ## Constructor: auth\_sentCodeTypeApp  
 [Back to constructors index](index.md)

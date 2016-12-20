@@ -1,5 +1,6 @@
 ---
 title: messageActionChannelMigrateFrom
+description: messageActionChannelMigrateFrom attributes, type and example
 ---
 ## Constructor: messageActionChannelMigrateFrom  
 [Back to constructors index](index.md)

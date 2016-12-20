@@ -1,5 +1,6 @@
 ---
 title: messages_dhConfig
+description: messages_dhConfig attributes, type and example
 ---
 ## Constructor: messages\_dhConfig  
 [Back to constructors index](index.md)

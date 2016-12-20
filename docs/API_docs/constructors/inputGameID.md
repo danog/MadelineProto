@@ -1,5 +1,6 @@
 ---
 title: inputGameID
+description: inputGameID attributes, type and example
 ---
 ## Constructor: inputGameID  
 [Back to constructors index](index.md)

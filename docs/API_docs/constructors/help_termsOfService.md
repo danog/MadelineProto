@@ -1,5 +1,6 @@
 ---
 title: help_termsOfService
+description: help_termsOfService attributes, type and example
 ---
 ## Constructor: help\_termsOfService  
 [Back to constructors index](index.md)

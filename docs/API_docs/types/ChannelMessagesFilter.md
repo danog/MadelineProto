@@ -1,5 +1,6 @@
 ---
 title: ChannelMessagesFilter
+description: constructors of type ChannelMessagesFilter
 ---
 ## Type: ChannelMessagesFilter  
 [Back to types index](index.md)

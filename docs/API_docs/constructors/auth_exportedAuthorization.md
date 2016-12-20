@@ -1,5 +1,6 @@
 ---
 title: auth_exportedAuthorization
+description: auth_exportedAuthorization attributes, type and example
 ---
 ## Constructor: auth\_exportedAuthorization  
 [Back to constructors index](index.md)

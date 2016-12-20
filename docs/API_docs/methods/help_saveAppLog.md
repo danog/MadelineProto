@@ -1,5 +1,6 @@
 ---
 title: help_saveAppLog
+description: help_saveAppLog parameters, return type and example
 ---
 ## Method: help\_saveAppLog  
 [Back to methods index](index.md)

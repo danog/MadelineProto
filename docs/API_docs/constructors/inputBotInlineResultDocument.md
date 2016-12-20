@@ -1,5 +1,6 @@
 ---
 title: inputBotInlineResultDocument
+description: inputBotInlineResultDocument attributes, type and example
 ---
 ## Constructor: inputBotInlineResultDocument  
 [Back to constructors index](index.md)

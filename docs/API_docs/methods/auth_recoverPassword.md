@@ -1,5 +1,6 @@
 ---
 title: auth_recoverPassword
+description: auth_recoverPassword parameters, return type and example
 ---
 ## Method: auth\_recoverPassword  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_getMessagesViews
+description: messages_getMessagesViews parameters, return type and example
 ---
 ## Method: messages\_getMessagesViews  
 [Back to methods index](index.md)

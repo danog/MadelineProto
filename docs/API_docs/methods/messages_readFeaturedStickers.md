@@ -1,5 +1,6 @@
 ---
 title: messages_readFeaturedStickers
+description: messages_readFeaturedStickers parameters, return type and example
 ---
 ## Method: messages\_readFeaturedStickers  
 [Back to methods index](index.md)

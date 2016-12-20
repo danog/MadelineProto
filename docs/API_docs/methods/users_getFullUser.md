@@ -1,5 +1,6 @@
 ---
 title: users_getFullUser
+description: users_getFullUser parameters, return type and example
 ---
 ## Method: users\_getFullUser  
 [Back to methods index](index.md)

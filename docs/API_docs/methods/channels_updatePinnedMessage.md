@@ -1,5 +1,6 @@
 ---
 title: channels_updatePinnedMessage
+description: channels_updatePinnedMessage parameters, return type and example
 ---
 ## Method: channels\_updatePinnedMessage  
 [Back to methods index](index.md)

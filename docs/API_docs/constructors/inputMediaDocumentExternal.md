@@ -1,5 +1,6 @@
 ---
 title: inputMediaDocumentExternal
+description: inputMediaDocumentExternal attributes, type and example
 ---
 ## Constructor: inputMediaDocumentExternal  
 [Back to constructors index](index.md)

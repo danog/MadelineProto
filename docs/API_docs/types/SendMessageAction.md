@@ -1,5 +1,6 @@
 ---
 title: SendMessageAction
+description: constructors of type SendMessageAction
 ---
 ## Type: SendMessageAction  
 [Back to types index](index.md)

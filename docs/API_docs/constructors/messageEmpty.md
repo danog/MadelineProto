@@ -1,5 +1,6 @@
 ---
 title: messageEmpty
+description: messageEmpty attributes, type and example
 ---
 ## Constructor: messageEmpty  
 [Back to constructors index](index.md)

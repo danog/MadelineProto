@@ -1,5 +1,6 @@
 ---
 title: contacts_resolveUsername
+description: contacts_resolveUsername parameters, return type and example
 ---
 ## Method: contacts\_resolveUsername  
 [Back to methods index](index.md)

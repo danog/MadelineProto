@@ -1,5 +1,6 @@
 ---
 title: updateInlineBotCallbackQuery
+description: updateInlineBotCallbackQuery attributes, type and example
 ---
 ## Constructor: updateInlineBotCallbackQuery  
 [Back to constructors index](index.md)

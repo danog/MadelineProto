@@ -1,5 +1,6 @@
 ---
 title: WallPaper
+description: constructors of type WallPaper
 ---
 ## Type: WallPaper  
 [Back to types index](index.md)

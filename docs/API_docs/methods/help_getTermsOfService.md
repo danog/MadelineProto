@@ -1,5 +1,6 @@
 ---
 title: help_getTermsOfService
+description: help_getTermsOfService parameters, return type and example
 ---
 ## Method: help\_getTermsOfService  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: messages_searchGifs
+description: messages_searchGifs parameters, return type and example
 ---
 ## Method: messages\_searchGifs  
 [Back to methods index](index.md)

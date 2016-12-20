@@ -1,5 +1,6 @@
 ---
 title: account_password
+description: account_password attributes, type and example
 ---
 ## Constructor: account\_password  
 [Back to constructors index](index.md)

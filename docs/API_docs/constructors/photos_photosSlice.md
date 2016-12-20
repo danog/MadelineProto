@@ -1,5 +1,6 @@
 ---
 title: photos_photosSlice
+description: photos_photosSlice attributes, type and example
 ---
 ## Constructor: photos\_photosSlice  
 [Back to constructors index](index.md)

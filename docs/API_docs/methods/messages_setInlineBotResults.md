@@ -1,5 +1,6 @@
 ---
 title: messages_setInlineBotResults
+description: messages_setInlineBotResults parameters, return type and example
 ---
 ## Method: messages\_setInlineBotResults  
 [Back to methods index](index.md)

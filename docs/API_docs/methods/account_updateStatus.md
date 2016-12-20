@@ -1,5 +1,6 @@
 ---
 title: account_updateStatus
+description: account_updateStatus parameters, return type and example
 ---
 ## Method: account\_updateStatus  
 [Back to methods index](index.md)

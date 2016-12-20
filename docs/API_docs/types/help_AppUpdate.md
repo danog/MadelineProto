@@ -1,5 +1,6 @@
 ---
 title: help_AppUpdate
+description: constructors of type help_AppUpdate
 ---
 ## Type: help\_AppUpdate  
 [Back to types index](index.md)

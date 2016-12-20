@@ -1,5 +1,6 @@
 ---
 title: messages_highScores
+description: messages_highScores attributes, type and example
 ---
 ## Constructor: messages\_highScores  
 [Back to constructors index](index.md)

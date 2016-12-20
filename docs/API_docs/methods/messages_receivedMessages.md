@@ -1,5 +1,6 @@
 ---
 title: messages_receivedMessages
+description: messages_receivedMessages parameters, return type and example
 ---
 ## Method: messages\_receivedMessages  
 [Back to methods index](index.md)

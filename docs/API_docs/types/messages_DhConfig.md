@@ -1,5 +1,6 @@
 ---
 title: messages_DhConfig
+description: constructors of type messages_DhConfig
 ---
 ## Type: messages\_DhConfig  
 [Back to types index](index.md)

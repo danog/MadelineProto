@@ -1,5 +1,6 @@
 ---
 title: contacts_getContacts
+description: contacts_getContacts parameters, return type and example
 ---
 ## Method: contacts\_getContacts  
 [Back to methods index](index.md)

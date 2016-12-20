@@ -1,5 +1,6 @@
 ---
 title: updateDraftMessage
+description: updateDraftMessage attributes, type and example
 ---
 ## Constructor: updateDraftMessage  
 [Back to constructors index](index.md)

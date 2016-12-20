@@ -1,5 +1,6 @@
 ---
 title: photoEmpty
+description: photoEmpty attributes, type and example
 ---
 ## Constructor: photoEmpty  
 [Back to constructors index](index.md)

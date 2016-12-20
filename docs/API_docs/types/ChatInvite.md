@@ -1,5 +1,6 @@
 ---
 title: ChatInvite
+description: constructors of type ChatInvite
 ---
 ## Type: ChatInvite  
 [Back to types index](index.md)

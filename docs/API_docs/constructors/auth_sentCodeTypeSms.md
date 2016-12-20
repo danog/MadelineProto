@@ -1,5 +1,6 @@
 ---
 title: auth_sentCodeTypeSms
+description: auth_sentCodeTypeSms attributes, type and example
 ---
 ## Constructor: auth\_sentCodeTypeSms  
 [Back to constructors index](index.md)

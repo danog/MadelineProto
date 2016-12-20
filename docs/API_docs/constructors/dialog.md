@@ -1,5 +1,6 @@
 ---
 title: dialog
+description: dialog attributes, type and example
 ---
 ## Constructor: dialog  
 [Back to constructors index](index.md)

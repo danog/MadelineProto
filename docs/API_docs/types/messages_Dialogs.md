@@ -1,5 +1,6 @@
 ---
 title: messages_Dialogs
+description: constructors of type messages_Dialogs
 ---
 ## Type: messages\_Dialogs  
 [Back to types index](index.md)

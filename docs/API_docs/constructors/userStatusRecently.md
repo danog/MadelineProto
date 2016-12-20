@@ -1,5 +1,6 @@
 ---
 title: userStatusRecently
+description: userStatusRecently attributes, type and example
 ---
 ## Constructor: userStatusRecently  
 [Back to constructors index](index.md)

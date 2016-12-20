@@ -1,5 +1,6 @@
 ---
 title: account_Authorizations
+description: constructors of type account_Authorizations
 ---
 ## Type: account\_Authorizations  
 [Back to types index](index.md)

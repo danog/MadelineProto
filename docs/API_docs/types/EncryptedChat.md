@@ -1,5 +1,6 @@
 ---
 title: EncryptedChat
+description: constructors of type EncryptedChat
 ---
 ## Type: EncryptedChat  
 [Back to types index](index.md)

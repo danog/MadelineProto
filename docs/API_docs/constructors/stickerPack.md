@@ -1,5 +1,6 @@
 ---
 title: stickerPack
+description: stickerPack attributes, type and example
 ---
 ## Constructor: stickerPack  
 [Back to constructors index](index.md)

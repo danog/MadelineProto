@@ -1,5 +1,6 @@
 ---
 title: contacts_resolvedPeer
+description: contacts_resolvedPeer attributes, type and example
 ---
 ## Constructor: contacts\_resolvedPeer  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: inputMediaContact
+description: inputMediaContact attributes, type and example
 ---
 ## Constructor: inputMediaContact  
 [Back to constructors index](index.md)

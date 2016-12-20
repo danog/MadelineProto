@@ -1,5 +1,6 @@
 ---
 title: inputMediaUploadedThumbDocument
+description: inputMediaUploadedThumbDocument attributes, type and example
 ---
 ## Constructor: inputMediaUploadedThumbDocument  
 [Back to constructors index](index.md)

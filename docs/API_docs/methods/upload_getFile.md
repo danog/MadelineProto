@@ -1,5 +1,6 @@
 ---
 title: upload_getFile
+description: upload_getFile parameters, return type and example
 ---
 ## Method: upload\_getFile  
 [Back to methods index](index.md)

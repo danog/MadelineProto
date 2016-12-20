@@ -1,5 +1,6 @@
 ---
 title: inputChatPhoto
+description: inputChatPhoto attributes, type and example
 ---
 ## Constructor: inputChatPhoto  
 [Back to constructors index](index.md)

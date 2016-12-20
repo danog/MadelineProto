@@ -1,5 +1,6 @@
 ---
 title: updateEditMessage
+description: updateEditMessage attributes, type and example
 ---
 ## Constructor: updateEditMessage  
 [Back to constructors index](index.md)

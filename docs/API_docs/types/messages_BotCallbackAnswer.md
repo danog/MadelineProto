@@ -1,5 +1,6 @@
 ---
 title: messages_BotCallbackAnswer
+description: constructors of type messages_BotCallbackAnswer
 ---
 ## Type: messages\_BotCallbackAnswer  
 [Back to types index](index.md)

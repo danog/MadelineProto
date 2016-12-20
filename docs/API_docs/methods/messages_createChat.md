@@ -1,5 +1,6 @@
 ---
 title: messages_createChat
+description: messages_createChat parameters, return type and example
 ---
 ## Method: messages\_createChat  
 [Back to methods index](index.md)

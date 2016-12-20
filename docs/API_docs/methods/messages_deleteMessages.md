@@ -1,5 +1,6 @@
 ---
 title: messages_deleteMessages
+description: messages_deleteMessages parameters, return type and example
 ---
 ## Method: messages\_deleteMessages  
 [Back to methods index](index.md)

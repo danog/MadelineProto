@@ -1,5 +1,6 @@
 ---
 title: auth_sendCode
+description: auth_sendCode parameters, return type and example
 ---
 ## Method: auth\_sendCode  
 [Back to methods index](index.md)

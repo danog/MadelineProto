@@ -1,5 +1,6 @@
 ---
 title: auth_dropTempAuthKeys
+description: auth_dropTempAuthKeys parameters, return type and example
 ---
 ## Method: auth\_dropTempAuthKeys  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: channels_createChannel
+description: channels_createChannel parameters, return type and example
 ---
 ## Method: channels\_createChannel  
 [Back to methods index](index.md)

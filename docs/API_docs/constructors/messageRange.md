@@ -1,5 +1,6 @@
 ---
 title: messageRange
+description: messageRange attributes, type and example
 ---
 ## Constructor: messageRange  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: contacts_blocked
+description: contacts_blocked attributes, type and example
 ---
 ## Constructor: contacts\_blocked  
 [Back to constructors index](index.md)

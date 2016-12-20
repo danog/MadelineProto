@@ -1,5 +1,6 @@
 ---
 title: messageMediaWebPage
+description: messageMediaWebPage attributes, type and example
 ---
 ## Constructor: messageMediaWebPage  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: photos_updateProfilePhoto
+description: photos_updateProfilePhoto parameters, return type and example
 ---
 ## Method: photos\_updateProfilePhoto  
 [Back to methods index](index.md)

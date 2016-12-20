@@ -1,5 +1,6 @@
 ---
 title: auth_resendCode
+description: auth_resendCode parameters, return type and example
 ---
 ## Method: auth\_resendCode  
 [Back to methods index](index.md)

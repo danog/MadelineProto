@@ -1,5 +1,6 @@
 ---
 title: messages_getGameHighScores
+description: messages_getGameHighScores parameters, return type and example
 ---
 ## Method: messages\_getGameHighScores  
 [Back to methods index](index.md)

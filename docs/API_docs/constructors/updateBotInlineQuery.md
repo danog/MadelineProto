@@ -1,5 +1,6 @@
 ---
 title: updateBotInlineQuery
+description: updateBotInlineQuery attributes, type and example
 ---
 ## Constructor: updateBotInlineQuery  
 [Back to constructors index](index.md)

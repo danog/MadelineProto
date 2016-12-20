@@ -1,5 +1,6 @@
 ---
 title: messageActionChatMigrateTo
+description: messageActionChatMigrateTo attributes, type and example
 ---
 ## Constructor: messageActionChatMigrateTo  
 [Back to constructors index](index.md)

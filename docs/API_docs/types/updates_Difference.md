@@ -1,5 +1,6 @@
 ---
 title: updates_Difference
+description: constructors of type updates_Difference
 ---
 ## Type: updates\_Difference  
 [Back to types index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: notifyUsers
+description: notifyUsers attributes, type and example
 ---
 ## Constructor: notifyUsers  
 [Back to constructors index](index.md)

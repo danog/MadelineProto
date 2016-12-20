@@ -1,5 +1,6 @@
 ---
 title: updates
+description: updates attributes, type and example
 ---
 ## Constructor: updates  
 [Back to constructors index](index.md)

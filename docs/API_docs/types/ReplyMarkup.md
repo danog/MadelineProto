@@ -1,5 +1,6 @@
 ---
 title: ReplyMarkup
+description: constructors of type ReplyMarkup
 ---
 ## Type: ReplyMarkup  
 [Back to types index](index.md)

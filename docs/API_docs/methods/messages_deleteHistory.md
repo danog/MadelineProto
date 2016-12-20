@@ -1,5 +1,6 @@
 ---
 title: messages_deleteHistory
+description: messages_deleteHistory parameters, return type and example
 ---
 ## Method: messages\_deleteHistory  
 [Back to methods index](index.md)

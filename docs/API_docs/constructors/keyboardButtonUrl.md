@@ -1,5 +1,6 @@
 ---
 title: keyboardButtonUrl
+description: keyboardButtonUrl attributes, type and example
 ---
 ## Constructor: keyboardButtonUrl  
 [Back to constructors index](index.md)

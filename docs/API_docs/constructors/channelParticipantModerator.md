@@ -1,5 +1,6 @@
 ---
 title: channelParticipantModerator
+description: channelParticipantModerator attributes, type and example
 ---
 ## Constructor: channelParticipantModerator  
 [Back to constructors index](index.md)

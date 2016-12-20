@@ -1,5 +1,6 @@
 ---
 title: updatesTooLong
+description: updatesTooLong attributes, type and example
 ---
 ## Constructor: updatesTooLong  
 [Back to constructors index](index.md)

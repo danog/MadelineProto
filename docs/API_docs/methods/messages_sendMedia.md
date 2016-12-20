@@ -1,5 +1,6 @@
 ---
 title: messages_sendMedia
+description: messages_sendMedia parameters, return type and example
 ---
 ## Method: messages\_sendMedia  
 [Back to methods index](index.md)

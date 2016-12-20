@@ -1,5 +1,6 @@
 ---
 title: channelFull
+description: channelFull attributes, type and example
 ---
 ## Constructor: channelFull  
 [Back to constructors index](index.md)

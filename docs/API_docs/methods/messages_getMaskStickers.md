@@ -1,5 +1,6 @@
 ---
 title: messages_getMaskStickers
+description: messages_getMaskStickers parameters, return type and example
 ---
 ## Method: messages\_getMaskStickers  
 [Back to methods index](index.md)

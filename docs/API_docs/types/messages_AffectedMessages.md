@@ -1,5 +1,6 @@
 ---
 title: messages_AffectedMessages
+description: constructors of type messages_AffectedMessages
 ---
 ## Type: messages\_AffectedMessages  
 [Back to types index](index.md)

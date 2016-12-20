@@ -1,5 +1,6 @@
 ---
 title: documentAttributeFilename
+description: documentAttributeFilename attributes, type and example
 ---
 ## Constructor: documentAttributeFilename  
 [Back to constructors index](index.md)

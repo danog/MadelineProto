@@ -1,5 +1,6 @@
 ---
 title: messages_editChatAdmin
+description: messages_editChatAdmin parameters, return type and example
 ---
 ## Method: messages\_editChatAdmin  
 [Back to methods index](index.md)

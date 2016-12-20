@@ -1,5 +1,6 @@
 ---
 title: messageEntityCode
+description: messageEntityCode attributes, type and example
 ---
 ## Constructor: messageEntityCode  
 [Back to constructors index](index.md)

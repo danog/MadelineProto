@@ -1,5 +1,6 @@
 ---
 title: inputGeoPoint
+description: inputGeoPoint attributes, type and example
 ---
 ## Constructor: inputGeoPoint  
 [Back to constructors index](index.md)

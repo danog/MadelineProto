@@ -1,5 +1,6 @@
 ---
 title: inputReportReasonOther
+description: inputReportReasonOther attributes, type and example
 ---
 ## Constructor: inputReportReasonOther  
 [Back to constructors index](index.md)

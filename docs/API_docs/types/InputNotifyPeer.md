@@ -1,5 +1,6 @@
 ---
 title: InputNotifyPeer
+description: constructors of type InputNotifyPeer
 ---
 ## Type: InputNotifyPeer  
 [Back to types index](index.md)

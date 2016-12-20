@@ -1,5 +1,6 @@
 ---
 title: sendMessageRecordAudioAction
+description: sendMessageRecordAudioAction attributes, type and example
 ---
 ## Constructor: sendMessageRecordAudioAction  
 [Back to constructors index](index.md)

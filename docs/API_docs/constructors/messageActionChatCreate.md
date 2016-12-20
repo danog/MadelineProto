@@ -1,5 +1,6 @@
 ---
 title: messageActionChatCreate
+description: messageActionChatCreate attributes, type and example
 ---
 ## Constructor: messageActionChatCreate  
 [Back to constructors index](index.md)

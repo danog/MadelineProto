@@ -1,5 +1,6 @@
 ---
 title: InputPhoto
+description: constructors of type InputPhoto
 ---
 ## Type: InputPhoto  
 [Back to types index](index.md)

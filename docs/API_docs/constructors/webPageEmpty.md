@@ -1,5 +1,6 @@
 ---
 title: webPageEmpty
+description: webPageEmpty attributes, type and example
 ---
 ## Constructor: webPageEmpty  
 [Back to constructors index](index.md)

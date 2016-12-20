@@ -1,5 +1,6 @@
 ---
 title: help_noAppUpdate
+description: help_noAppUpdate attributes, type and example
 ---
 ## Constructor: help\_noAppUpdate  
 [Back to constructors index](index.md)

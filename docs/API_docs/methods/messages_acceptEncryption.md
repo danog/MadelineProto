@@ -1,5 +1,6 @@
 ---
 title: messages_acceptEncryption
+description: messages_acceptEncryption parameters, return type and example
 ---
 ## Method: messages\_acceptEncryption  
 [Back to methods index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: account_updateNotifySettings
+description: account_updateNotifySettings parameters, return type and example
 ---
 ## Method: account\_updateNotifySettings  
 [Back to methods index](index.md)

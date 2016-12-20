@@ -1,5 +1,6 @@
 ---
 title: auth_importBotAuthorization
+description: auth_importBotAuthorization parameters, return type and example
 ---
 ## Method: auth\_importBotAuthorization  
 [Back to methods index](index.md)

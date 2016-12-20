@@ -1,5 +1,6 @@
 ---
 title: help_appChangelog
+description: help_appChangelog attributes, type and example
 ---
 ## Constructor: help\_appChangelog  
 [Back to constructors index](index.md)

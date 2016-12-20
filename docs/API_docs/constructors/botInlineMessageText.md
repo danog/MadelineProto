@@ -1,5 +1,6 @@
 ---
 title: botInlineMessageText
+description: botInlineMessageText attributes, type and example
 ---
 ## Constructor: botInlineMessageText  
 [Back to constructors index](index.md)

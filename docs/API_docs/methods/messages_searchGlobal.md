@@ -1,5 +1,6 @@
 ---
 title: messages_searchGlobal
+description: messages_searchGlobal parameters, return type and example
 ---
 ## Method: messages\_searchGlobal  
 [Back to methods index](index.md)

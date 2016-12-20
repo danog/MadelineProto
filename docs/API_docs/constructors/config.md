@@ -1,5 +1,6 @@
 ---
 title: config
+description: config attributes, type and example
 ---
 ## Constructor: config  
 [Back to constructors index](index.md)

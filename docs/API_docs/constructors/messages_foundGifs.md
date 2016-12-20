@@ -1,5 +1,6 @@
 ---
 title: messages_foundGifs
+description: messages_foundGifs attributes, type and example
 ---
 ## Constructor: messages\_foundGifs  
 [Back to constructors index](index.md)

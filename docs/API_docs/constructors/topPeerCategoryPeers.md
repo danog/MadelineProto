@@ -1,5 +1,6 @@
 ---
 title: topPeerCategoryPeers
+description: topPeerCategoryPeers attributes, type and example
 ---
 ## Constructor: topPeerCategoryPeers  
 [Back to constructors index](index.md)

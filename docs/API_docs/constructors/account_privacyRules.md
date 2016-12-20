@@ -1,5 +1,6 @@
 ---
 title: account_privacyRules
+description: account_privacyRules attributes, type and example
 ---
 ## Constructor: account\_privacyRules  
 [Back to constructors index](index.md)

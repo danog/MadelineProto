@@ -1,5 +1,6 @@
 ---
 title: messages_SavedGifs
+description: constructors of type messages_SavedGifs
 ---
 ## Type: messages\_SavedGifs  
 [Back to types index](index.md)

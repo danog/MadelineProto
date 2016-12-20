@@ -1,5 +1,6 @@
 ---
 title: UserStatus
+description: constructors of type UserStatus
 ---
 ## Type: UserStatus  
 [Back to types index](index.md)

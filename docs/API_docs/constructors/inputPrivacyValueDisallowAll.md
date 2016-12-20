@@ -1,5 +1,6 @@
 ---
 title: inputPrivacyValueDisallowAll
+description: inputPrivacyValueDisallowAll attributes, type and example
 ---
 ## Constructor: inputPrivacyValueDisallowAll  
 [Back to constructors index](index.md)

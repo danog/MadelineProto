@@ -1,5 +1,6 @@
 ---
 title: inputPeerChannel
+description: inputPeerChannel attributes, type and example
 ---
 ## Constructor: inputPeerChannel  
 [Back to constructors index](index.md)

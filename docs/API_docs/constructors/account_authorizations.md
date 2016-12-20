@@ -1,5 +1,6 @@
 ---
 title: account_authorizations
+description: account_authorizations attributes, type and example
 ---
 ## Constructor: account\_authorizations  
 [Back to constructors index](index.md)

@@ -1,5 +1,6 @@
 ---
 title: chatInviteAlready
+description: chatInviteAlready attributes, type and example
 ---
 ## Constructor: chatInviteAlready  
 [Back to constructors index](index.md)

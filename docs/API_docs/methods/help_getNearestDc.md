@@ -1,5 +1,6 @@
 ---
 title: help_getNearestDc
+description: help_getNearestDc parameters, return type and example
 ---
 ## Method: help\_getNearestDc  
 [Back to methods index](index.md)

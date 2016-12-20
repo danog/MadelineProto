@@ -1,5 +1,6 @@
 ---
 title: messages_deleteChatUser
+description: messages_deleteChatUser parameters, return type and example
 ---
 ## Method: messages\_deleteChatUser  
 [Back to methods index](index.md)

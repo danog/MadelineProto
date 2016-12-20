@@ -1,5 +1,6 @@
 ---
 title: messages_channelMessages
+description: messages_channelMessages attributes, type and example
 ---
 ## Constructor: messages\_channelMessages  
 [Back to constructors index](index.md)

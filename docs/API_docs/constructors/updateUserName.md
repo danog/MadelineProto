@@ -1,5 +1,6 @@
 ---
 title: updateUserName
+description: updateUserName attributes, type and example
 ---
 ## Constructor: updateUserName  
 [Back to constructors index](index.md)

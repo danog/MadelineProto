@@ -1,5 +1,6 @@
 ---
 title: messages_peerDialogs
+description: messages_peerDialogs attributes, type and example
 ---
 ## Constructor: messages\_peerDialogs  
 [Back to constructors index](index.md)

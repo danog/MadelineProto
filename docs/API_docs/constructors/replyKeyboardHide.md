@@ -1,5 +1,6 @@
 ---
 title: replyKeyboardHide
+description: replyKeyboardHide attributes, type and example
 ---
 ## Constructor: replyKeyboardHide  
 [Back to constructors index](index.md)

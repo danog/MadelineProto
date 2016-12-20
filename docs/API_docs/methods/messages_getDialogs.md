@@ -1,5 +1,6 @@
 ---
 title: messages_getDialogs
+description: messages_getDialogs parameters, return type and example
 ---
 ## Method: messages\_getDialogs  
 [Back to methods index](index.md)
