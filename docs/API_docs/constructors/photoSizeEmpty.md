@@ -1,4 +1,10 @@
+---
+title: photoSizeEmpty
+---
 ## Constructor: photoSizeEmpty  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

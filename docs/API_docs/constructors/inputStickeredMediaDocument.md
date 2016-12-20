@@ -1,4 +1,10 @@
+---
+title: inputStickeredMediaDocument
+---
 ## Constructor: inputStickeredMediaDocument  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

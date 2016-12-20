@@ -1,4 +1,9 @@
+---
+title: messages_toggleChatAdmins
+---
 ## Method: messages\_toggleChatAdmins  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

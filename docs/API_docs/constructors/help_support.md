@@ -1,4 +1,10 @@
+---
+title: help_support
+---
 ## Constructor: help\_support  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

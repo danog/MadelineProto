@@ -1,4 +1,10 @@
+---
+title: messageActionChatDeleteUser
+---
 ## Constructor: messageActionChatDeleteUser  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: help_getSupport
+---
 ## Method: help\_getSupport  
+[Back to methods index](index.md)
+
 
 
 

@@ -1,4 +1,9 @@
+---
+title: auth_signUp
+---
 ## Method: auth\_signUp  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

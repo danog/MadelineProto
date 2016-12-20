@@ -1,4 +1,9 @@
+---
+title: messages_setTyping
+---
 ## Method: messages\_setTyping  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

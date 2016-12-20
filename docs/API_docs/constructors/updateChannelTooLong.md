@@ -1,4 +1,10 @@
+---
+title: updateChannelTooLong
+---
 ## Constructor: updateChannelTooLong  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

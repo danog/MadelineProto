@@ -1,4 +1,9 @@
+---
+title: help_saveAppLog
+---
 ## Method: help\_saveAppLog  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

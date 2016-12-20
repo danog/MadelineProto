@@ -1,4 +1,9 @@
+---
+title: channels_exportInvite
+---
 ## Method: channels\_exportInvite  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

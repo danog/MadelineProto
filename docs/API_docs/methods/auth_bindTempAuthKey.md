@@ -1,4 +1,9 @@
+---
+title: auth_bindTempAuthKey
+---
 ## Method: auth\_bindTempAuthKey  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

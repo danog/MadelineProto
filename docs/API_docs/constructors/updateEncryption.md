@@ -1,4 +1,10 @@
+---
+title: updateEncryption
+---
 ## Constructor: updateEncryption  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

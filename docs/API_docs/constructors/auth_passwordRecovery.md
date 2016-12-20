@@ -1,4 +1,10 @@
+---
+title: auth_passwordRecovery
+---
 ## Constructor: auth\_passwordRecovery  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

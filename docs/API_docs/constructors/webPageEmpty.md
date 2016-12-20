@@ -1,4 +1,10 @@
+---
+title: webPageEmpty
+---
 ## Constructor: webPageEmpty  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

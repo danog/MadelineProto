@@ -1,3 +1,7 @@
+---
+title: long
+---
 ## Type: long  
+[Back to constructor index](index.md)
 
-A 64 bit signed integer ranging from -9223372036854775807 to 9223372036854775807.
+A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.

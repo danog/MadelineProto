@@ -1,4 +1,10 @@
+---
+title: storage_filePdf
+---
 ## Constructor: storage\_filePdf  
+[Back to constructors index](index.md)
+
+
 
 
 

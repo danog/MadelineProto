@@ -1,4 +1,10 @@
+---
+title: messages_affectedHistory
+---
 ## Constructor: messages\_affectedHistory  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

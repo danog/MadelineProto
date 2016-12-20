@@ -1,4 +1,10 @@
+---
+title: authorization
+---
 ## Constructor: authorization  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

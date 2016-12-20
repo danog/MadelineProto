@@ -1,4 +1,10 @@
+---
+title: inputGameID
+---
 ## Constructor: inputGameID  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: help_inviteText
+---
 ## Constructor: help\_inviteText  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

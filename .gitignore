@@ -1,3 +1,5 @@
+_site
+
 # JetBrains IDE
 .idea/
 *.iml
@@ -61,7 +63,6 @@ target/
 .#*#
 *.swp
 vendor
-*save
 *bak
 number.php
 token.php

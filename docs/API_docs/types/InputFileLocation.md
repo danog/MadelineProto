@@ -1,4 +1,10 @@
+---
+title: InputFileLocation
+---
 ## Type: InputFileLocation  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,9 @@
+---
+title: channels_readHistory
+---
 ## Method: channels\_readHistory  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

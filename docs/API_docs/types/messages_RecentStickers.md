@@ -1,4 +1,10 @@
+---
+title: messages_RecentStickers
+---
 ## Type: messages\_RecentStickers  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

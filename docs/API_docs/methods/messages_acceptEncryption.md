@@ -1,4 +1,9 @@
+---
+title: messages_acceptEncryption
+---
 ## Method: messages\_acceptEncryption  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

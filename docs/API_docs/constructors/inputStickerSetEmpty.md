@@ -1,4 +1,10 @@
+---
+title: inputStickerSetEmpty
+---
 ## Constructor: inputStickerSetEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

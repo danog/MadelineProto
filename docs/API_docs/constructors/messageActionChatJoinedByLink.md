@@ -1,4 +1,10 @@
+---
+title: messageActionChatJoinedByLink
+---
 ## Constructor: messageActionChatJoinedByLink  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

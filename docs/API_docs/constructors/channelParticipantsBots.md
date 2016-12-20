@@ -1,4 +1,10 @@
+---
+title: channelParticipantsBots
+---
 ## Constructor: channelParticipantsBots  
+[Back to constructors index](index.md)
+
+
 
 
 

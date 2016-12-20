@@ -1,4 +1,10 @@
+---
+title: inputStickerSetShortName
+---
 ## Constructor: inputStickerSetShortName  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: channels_getChannels
+---
 ## Method: channels\_getChannels  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

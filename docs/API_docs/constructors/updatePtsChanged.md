@@ -1,4 +1,10 @@
+---
+title: updatePtsChanged
+---
 ## Constructor: updatePtsChanged  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: updates
+---
 ## Constructor: updates  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

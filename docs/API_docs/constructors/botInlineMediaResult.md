@@ -1,4 +1,10 @@
+---
+title: botInlineMediaResult
+---
 ## Constructor: botInlineMediaResult  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

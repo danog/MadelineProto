@@ -1,4 +1,10 @@
+---
+title: inputBotInlineResult
+---
 ## Constructor: inputBotInlineResult  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

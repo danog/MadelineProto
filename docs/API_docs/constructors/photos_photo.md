@@ -1,4 +1,10 @@
+---
+title: photos_photo
+---
 ## Constructor: photos\_photo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

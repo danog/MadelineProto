@@ -1,4 +1,10 @@
+---
+title: keyboardButtonSwitchInline
+---
 ## Constructor: keyboardButtonSwitchInline  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

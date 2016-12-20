@@ -1,4 +1,9 @@
+---
+title: help_getInviteText
+---
 ## Method: help\_getInviteText  
+[Back to methods index](index.md)
+
 
 
 

@@ -1,4 +1,9 @@
+---
+title: messages_clearRecentStickers
+---
 ## Method: messages\_clearRecentStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

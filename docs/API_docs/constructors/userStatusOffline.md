@@ -1,4 +1,10 @@
+---
+title: userStatusOffline
+---
 ## Constructor: userStatusOffline  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

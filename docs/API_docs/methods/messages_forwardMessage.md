@@ -1,4 +1,9 @@
+---
+title: messages_forwardMessage
+---
 ## Method: messages\_forwardMessage  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

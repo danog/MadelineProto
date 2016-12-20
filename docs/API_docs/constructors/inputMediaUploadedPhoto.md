@@ -1,4 +1,10 @@
+---
+title: inputMediaUploadedPhoto
+---
 ## Constructor: inputMediaUploadedPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

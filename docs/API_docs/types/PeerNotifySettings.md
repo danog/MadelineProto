@@ -1,4 +1,10 @@
+---
+title: PeerNotifySettings
+---
 ## Type: PeerNotifySettings  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

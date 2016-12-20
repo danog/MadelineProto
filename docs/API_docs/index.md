@@ -1,3 +1,6 @@
+---
+title: MadelineProto API documentation (layer 57)
+---
 # MadelineProto API documentation (layer 57) 
 
 [Methods](methods/)
@@ -6,3 +9,5 @@
 
 [Types](types/)
 
+
+[Back to main documentation](..)

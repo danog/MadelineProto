@@ -1,4 +1,9 @@
+---
+title: channels_toggleInvites
+---
 ## Method: channels\_toggleInvites  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

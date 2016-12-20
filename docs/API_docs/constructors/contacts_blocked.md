@@ -1,4 +1,10 @@
+---
+title: contacts_blocked
+---
 ## Constructor: contacts\_blocked  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

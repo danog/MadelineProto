@@ -1,4 +1,10 @@
+---
+title: updates_channelDifference
+---
 ## Constructor: updates\_channelDifference  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

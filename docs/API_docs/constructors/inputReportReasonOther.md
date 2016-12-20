@@ -1,4 +1,10 @@
+---
+title: inputReportReasonOther
+---
 ## Constructor: inputReportReasonOther  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

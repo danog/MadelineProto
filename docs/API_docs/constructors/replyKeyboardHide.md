@@ -1,4 +1,10 @@
+---
+title: replyKeyboardHide
+---
 ## Constructor: replyKeyboardHide  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

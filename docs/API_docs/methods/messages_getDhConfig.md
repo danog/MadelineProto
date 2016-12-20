@@ -1,4 +1,9 @@
+---
+title: messages_getDhConfig
+---
 ## Method: messages\_getDhConfig  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: message
+---
 ## Constructor: message  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

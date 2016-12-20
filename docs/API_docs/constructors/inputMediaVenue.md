@@ -1,4 +1,10 @@
+---
+title: inputMediaVenue
+---
 ## Constructor: inputMediaVenue  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

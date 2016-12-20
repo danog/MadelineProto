@@ -1,4 +1,9 @@
+---
+title: messages_requestEncryption
+---
 ## Method: messages\_requestEncryption  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: ChannelParticipantsFilter
+---
 ## Type: ChannelParticipantsFilter  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

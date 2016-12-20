@@ -1,4 +1,10 @@
+---
+title: DraftMessage
+---
 ## Type: DraftMessage  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

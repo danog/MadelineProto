@@ -1,4 +1,10 @@
+---
+title: messageEntityCode
+---
 ## Constructor: messageEntityCode  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

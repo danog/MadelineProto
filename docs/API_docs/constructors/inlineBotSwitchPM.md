@@ -1,4 +1,10 @@
+---
+title: inlineBotSwitchPM
+---
 ## Constructor: inlineBotSwitchPM  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

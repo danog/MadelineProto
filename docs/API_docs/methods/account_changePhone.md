@@ -1,4 +1,9 @@
+---
+title: account_changePhone
+---
 ## Method: account\_changePhone  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

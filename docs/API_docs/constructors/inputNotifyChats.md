@@ -1,4 +1,10 @@
+---
+title: inputNotifyChats
+---
 ## Constructor: inputNotifyChats  
+[Back to constructors index](index.md)
+
+
 
 
 

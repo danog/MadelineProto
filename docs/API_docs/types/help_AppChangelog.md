@@ -1,4 +1,10 @@
+---
+title: help_AppChangelog
+---
 ## Type: help\_AppChangelog  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,9 @@
+---
+title: account_checkUsername
+---
 ## Method: account\_checkUsername  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messages_BotCallbackAnswer
+---
 ## Type: messages\_BotCallbackAnswer  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

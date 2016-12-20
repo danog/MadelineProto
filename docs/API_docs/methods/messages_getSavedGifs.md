@@ -1,4 +1,9 @@
+---
+title: messages_getSavedGifs
+---
 ## Method: messages\_getSavedGifs  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

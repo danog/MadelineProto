@@ -1,4 +1,9 @@
+---
+title: messages_sendInlineBotResult
+---
 ## Method: messages\_sendInlineBotResult  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: chatParticipantsForbidden
+---
 ## Constructor: chatParticipantsForbidden  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

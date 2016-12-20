@@ -1,4 +1,10 @@
+---
+title: messageEntityMentionName
+---
 ## Constructor: messageEntityMentionName  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

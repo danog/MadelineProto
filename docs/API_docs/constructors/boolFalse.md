@@ -1,3 +1,7 @@
+---
+title: boolFalse
+---
 # boolFalse  
+[Back to constructor index](index.md)
 
-Represents boolean with value equal to `false`.
+Represents a boolean with value equal to `false`.

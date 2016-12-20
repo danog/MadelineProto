@@ -1,4 +1,9 @@
+---
+title: help_getConfig
+---
 ## Method: help\_getConfig  
+[Back to methods index](index.md)
+
 
 
 

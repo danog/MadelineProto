@@ -1,4 +1,10 @@
+---
+title: chatParticipantAdmin
+---
 ## Constructor: chatParticipantAdmin  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

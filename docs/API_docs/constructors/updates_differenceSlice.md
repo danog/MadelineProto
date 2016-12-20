@@ -1,4 +1,10 @@
+---
+title: updates_differenceSlice
+---
 ## Constructor: updates\_differenceSlice  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

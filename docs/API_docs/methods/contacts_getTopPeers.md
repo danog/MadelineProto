@@ -1,4 +1,9 @@
+---
+title: contacts_getTopPeers
+---
 ## Method: contacts\_getTopPeers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

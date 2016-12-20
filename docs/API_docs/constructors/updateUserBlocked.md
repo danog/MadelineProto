@@ -1,4 +1,10 @@
+---
+title: updateUserBlocked
+---
 ## Constructor: updateUserBlocked  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

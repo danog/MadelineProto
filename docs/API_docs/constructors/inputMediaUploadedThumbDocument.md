@@ -1,4 +1,10 @@
+---
+title: inputMediaUploadedThumbDocument
+---
 ## Constructor: inputMediaUploadedThumbDocument  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

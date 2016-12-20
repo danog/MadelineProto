@@ -1,4 +1,10 @@
+---
+title: inputStickeredMediaPhoto
+---
 ## Constructor: inputStickeredMediaPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

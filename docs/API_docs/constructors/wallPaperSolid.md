@@ -1,4 +1,10 @@
+---
+title: wallPaperSolid
+---
 ## Constructor: wallPaperSolid  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

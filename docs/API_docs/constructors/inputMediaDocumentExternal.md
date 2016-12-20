@@ -1,4 +1,10 @@
+---
+title: inputMediaDocumentExternal
+---
 ## Constructor: inputMediaDocumentExternal  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

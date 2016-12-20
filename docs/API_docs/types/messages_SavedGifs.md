@@ -1,4 +1,10 @@
+---
+title: messages_SavedGifs
+---
 ## Type: messages\_SavedGifs  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,10 @@
+---
+title: geoPoint
+---
 ## Constructor: geoPoint  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: messages_DhConfig
+---
 ## Type: messages\_DhConfig  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,9 @@
+---
+title: account_reportPeer
+---
 ## Method: account\_reportPeer  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

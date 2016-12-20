@@ -1,4 +1,10 @@
+---
+title: botCommand
+---
 ## Constructor: botCommand  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

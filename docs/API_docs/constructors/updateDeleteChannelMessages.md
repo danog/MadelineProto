@@ -1,4 +1,10 @@
+---
+title: updateDeleteChannelMessages
+---
 ## Constructor: updateDeleteChannelMessages  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

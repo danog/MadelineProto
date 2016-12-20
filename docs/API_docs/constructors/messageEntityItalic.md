@@ -1,4 +1,10 @@
+---
+title: messageEntityItalic
+---
 ## Constructor: messageEntityItalic  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

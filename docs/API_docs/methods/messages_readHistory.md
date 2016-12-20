@@ -1,4 +1,9 @@
+---
+title: messages_readHistory
+---
 ## Method: messages\_readHistory  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: messages_sendMessage
+---
 ## Method: messages\_sendMessage  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

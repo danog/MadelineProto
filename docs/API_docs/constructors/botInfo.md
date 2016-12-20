@@ -1,4 +1,10 @@
+---
+title: botInfo
+---
 ## Constructor: botInfo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

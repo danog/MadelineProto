@@ -1,4 +1,10 @@
+---
+title: updateNewEncryptedMessage
+---
 ## Constructor: updateNewEncryptedMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

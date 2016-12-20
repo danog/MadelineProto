@@ -1,4 +1,10 @@
+---
+title: updateShort
+---
 ## Constructor: updateShort  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

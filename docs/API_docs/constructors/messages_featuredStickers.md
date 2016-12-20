@@ -1,4 +1,10 @@
+---
+title: messages_featuredStickers
+---
 ## Constructor: messages\_featuredStickers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

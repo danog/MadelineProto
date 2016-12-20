@@ -1,4 +1,10 @@
+---
+title: messageActionChannelMigrateFrom
+---
 ## Constructor: messageActionChannelMigrateFrom  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

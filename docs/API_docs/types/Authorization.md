@@ -1,4 +1,10 @@
+---
+title: Authorization
+---
 ## Type: Authorization  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

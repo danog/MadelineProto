@@ -1,4 +1,9 @@
+---
+title: account_updateProfile
+---
 ## Method: account\_updateProfile  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

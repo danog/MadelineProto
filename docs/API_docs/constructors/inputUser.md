@@ -1,4 +1,10 @@
+---
+title: inputUser
+---
 ## Constructor: inputUser  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

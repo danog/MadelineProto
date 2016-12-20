@@ -1,4 +1,10 @@
+---
+title: auth_CheckedPhone
+---
 ## Type: auth\_CheckedPhone  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,10 @@
+---
+title: NotifyPeer
+---
 ## Type: NotifyPeer  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

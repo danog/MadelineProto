@@ -1,4 +1,9 @@
+---
+title: auth_checkPassword
+---
 ## Method: auth\_checkPassword  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

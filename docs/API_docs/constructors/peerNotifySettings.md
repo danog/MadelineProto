@@ -1,4 +1,10 @@
+---
+title: peerNotifySettings
+---
 ## Constructor: peerNotifySettings  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: channels_createChannel
+---
 ## Method: channels\_createChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

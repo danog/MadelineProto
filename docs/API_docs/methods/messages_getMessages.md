@@ -1,4 +1,9 @@
+---
+title: messages_getMessages
+---
 ## Method: messages\_getMessages  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

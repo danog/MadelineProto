@@ -1,4 +1,10 @@
+---
+title: inputAppEvent
+---
 ## Constructor: inputAppEvent  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

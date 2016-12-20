@@ -1,4 +1,10 @@
+---
+title: contactBlocked
+---
 ## Constructor: contactBlocked  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: messages_editChatTitle
+---
 ## Method: messages\_editChatTitle  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

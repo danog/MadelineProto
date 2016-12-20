@@ -1,4 +1,10 @@
+---
+title: PrivacyRule
+---
 ## Type: PrivacyRule  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

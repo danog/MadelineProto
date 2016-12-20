@@ -1,4 +1,10 @@
+---
+title: messages_AffectedHistory
+---
 ## Type: messages\_AffectedHistory  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

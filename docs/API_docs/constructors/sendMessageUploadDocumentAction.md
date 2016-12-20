@@ -1,4 +1,10 @@
+---
+title: sendMessageUploadDocumentAction
+---
 ## Constructor: sendMessageUploadDocumentAction  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

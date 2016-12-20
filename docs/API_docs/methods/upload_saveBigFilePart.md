@@ -1,4 +1,9 @@
+---
+title: upload_saveBigFilePart
+---
 ## Method: upload\_saveBigFilePart  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

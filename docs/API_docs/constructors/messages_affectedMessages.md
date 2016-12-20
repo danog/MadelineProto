@@ -1,4 +1,10 @@
+---
+title: messages_affectedMessages
+---
 ## Constructor: messages\_affectedMessages  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

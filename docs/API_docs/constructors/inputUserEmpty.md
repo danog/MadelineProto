@@ -1,4 +1,10 @@
+---
+title: inputUserEmpty
+---
 ## Constructor: inputUserEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

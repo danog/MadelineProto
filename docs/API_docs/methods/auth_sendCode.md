@@ -1,4 +1,9 @@
+---
+title: auth_sendCode
+---
 ## Method: auth\_sendCode  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

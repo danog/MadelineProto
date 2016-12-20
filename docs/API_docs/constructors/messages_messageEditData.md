@@ -1,4 +1,10 @@
+---
+title: messages_messageEditData
+---
 ## Constructor: messages\_messageEditData  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

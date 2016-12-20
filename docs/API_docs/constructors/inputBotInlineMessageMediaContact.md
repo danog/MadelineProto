@@ -1,4 +1,10 @@
+---
+title: inputBotInlineMessageMediaContact
+---
 ## Constructor: inputBotInlineMessageMediaContact  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

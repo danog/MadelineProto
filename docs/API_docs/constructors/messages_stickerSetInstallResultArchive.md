@@ -1,4 +1,10 @@
+---
+title: messages_stickerSetInstallResultArchive
+---
 ## Constructor: messages\_stickerSetInstallResultArchive  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

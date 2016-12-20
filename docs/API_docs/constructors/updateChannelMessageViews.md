@@ -1,4 +1,10 @@
+---
+title: updateChannelMessageViews
+---
 ## Constructor: updateChannelMessageViews  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

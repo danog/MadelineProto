@@ -1,4 +1,10 @@
+---
+title: MessageAction
+---
 ## Type: MessageAction  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

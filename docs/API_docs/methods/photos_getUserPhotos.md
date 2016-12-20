@@ -1,4 +1,9 @@
+---
+title: photos_getUserPhotos
+---
 ## Method: photos\_getUserPhotos  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

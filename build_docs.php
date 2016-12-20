@@ -23,13 +23,19 @@ $TL = new \danog\MadelineProto\TL\TL([
 
 \danog\MadelineProto\Logger::log('Copying readme...');
 
-copy('README.md', 'docs/index.md');
+file_put_contents('docs/index.md', '---
+title: MadelineProto documentation
+---
+'.file_get_contents('README.md'));
 
 chdir(__DIR__.'/docs/API_docs');
 
 \danog\MadelineProto\Logger::log('Generating documentation index...');
 
-file_put_contents('index.md', '# MadelineProto API documentation (layer 57) 
+file_put_contents('index.md', '---
+title: MadelineProto API documentation (layer 57)
+---
+# MadelineProto API documentation (layer 57) 
 
 [Methods](methods/)
 
@@ -37,6 +43,8 @@ file_put_contents('index.md', '# MadelineProto API documentation (layer 57)
 
 [Types](types/)
 
+
+[Back to main documentation](..)
 ');
 
 foreach (glob('methods/*') as $unlink) {
@@ -89,7 +97,7 @@ foreach ($TL->methods->method as $key => $method) {
     }
     $md_method = '['.str_replace('_', '->', $method).']('.$method.'.md)';
 
-    $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)  
+    $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)<a name="'.$method.'"></a>  
 
 ';
 
@@ -115,7 +123,12 @@ foreach ($TL->methods->method as $key => $method) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
     }
-    $header = '## Method: '.str_replace('_', '\_', $method).'  
+    $header = '---
+title: '.$method.'
+---
+## Method: '.str_replace('_', '\_', $method).'  
+[Back to methods index](index.md)
+
 
 ';
     $table .= '
@@ -150,7 +163,22 @@ $'.$type.' = $MadelineProto->'.$method.'(['.$params.']);
 \danog\MadelineProto\Logger::log('Generating methods index...');
 
 ksort($methods);
-file_put_contents('methods/index.md', '# Methods  
+$last_namespace = '';
+foreach ($methods as $method => &$value) {
+    $new_namespace = preg_replace('/_.*/', '', $method);
+    $br = $new_namespace != $last_namespace ? '***
+<br><br>' : '';
+    $value = $br.$value;
+    $last_namespace = $new_namespace;
+}
+
+file_put_contents('methods/index.md', '---
+title: Methods
+---
+# Methods  
+[Back to API documentation index](..)
+
+
 
 '.implode('', $methods));
 
@@ -169,10 +197,11 @@ $constructors = [];
 \danog\MadelineProto\Logger::log('Generating constructors documentation...');
 
 foreach ($TL->constructors->predicate as $key => $constructor) {
-    $constructor = str_replace('.', '_', $constructor);
-
     $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->constructors->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
+
+    $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $constructor);
+    $real_constructor = preg_replace('/.*_of_/', '', $constructor);
 
     $params = '';
     foreach ($TL->constructors->params[$key] as $param) {
@@ -203,8 +232,9 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 
         $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
     }
+    $md_constructor = str_replace('_', '\_', $constructor);
 
-    $constructors[$constructor] = '[$'.str_replace('_', '\_', $constructor).'](../constructors/'.$constructor.'.md) = \['.$params.'\];  
+    $constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$real_constructor.'.md) = \['.$params.'\];<a name="'.$constructor.'"></a>  
 
 ';
 
@@ -245,7 +275,13 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     }
     $params = "['_' => ".$constructor."', ".$params.']';
 
-    $header = '## Constructor: '.str_replace('_', '\_', $constructor).'  
+    $header = '---
+title: '.$constructor.'
+---
+## Constructor: '.str_replace('_', '\_', $constructor).'  
+[Back to constructors index](index.md)
+
+
 
 ';
     $table .= '
@@ -267,7 +303,18 @@ $'.$constructor.' = '.$params.';
 \danog\MadelineProto\Logger::log('Generating constructors index...');
 
 ksort($constructors);
+$last_namespace = '';
+foreach ($constructors as $method => &$value) {
+    $new_namespace = preg_replace('/_.*/', '', $method);
+    $br = $new_namespace != $last_namespace ? '***
+<br><br>' : '';
+    $value = $br.$value;
+    $last_namespace = $new_namespace;
+}
 file_put_contents('constructors/index.md', '# Constructors  
+[Back to API documentation index](..)
+
+
 
 '.implode('', $constructors));
 
@@ -285,69 +332,130 @@ $index = '';
 
 \danog\MadelineProto\Logger::log('Generating types documentation...');
 
+$old_namespace = '';
 foreach ($types as $type => $keys) {
+    $new_namespace = preg_replace('/_.*/', '', $method);
+    $br = $new_namespace != $last_namespace ? '***
+<br><br>' : '';
     $type = str_replace('.', '_', $type);
 
-    $index .= '['.str_replace('_', '\_', $type).']('.$type.'.md)  
+    $index .= $br.'['.str_replace('_', '\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
     $constructors = '';
     foreach ($keys as $key) {
         $predicate = str_replace('.', '_', $TL->constructors->predicate[$key]);
-        $constructors .= '['.str_replace('_', '\_', $predicate).'](../constructors/'.$predicate.'.md)  
+        $md_predicate = str_replace('_', '\_', $predicate);
+        $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
     }
-    $header = '## Type: '.str_replace('_', '\_', $type).'  
+    $header = '---
+title: '.$type.'
+---
+## Type: '.str_replace('_', '\_', $type).'  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 
 ';
     file_put_contents('types/'.$type.'.md', $header.$constructors);
+    $last_namespace = $new_namespace;
+
 }
 
 \danog\MadelineProto\Logger::log('Generating types index...');
 
-file_put_contents('types/index.md', '# Types  
+file_put_contents('types/index.md', '---
+title: Types
+---
+# Types  
+[Back to API documentation index](..)
+
 
 '.$index);
 
 \danog\MadelineProto\Logger::log('Generating additional types...');
 
-file_put_contents('types/string.md', '## Type: string  
+file_put_contents('types/string.md', '---
+title: string
+---
+## Type: string  
+[Back to constructor index](index.md)
+
+A string of variable length.');
+file_put_contents('types/bytes.md', '---
+title: bytes
+---
+## Type: bytes  
+[Back to constructor index](index.md)
 
 A string of variable length.');
 
-file_put_contents('types/bytes.md', '## Type: bytes  
+file_put_contents('types/int.md', '---
+title: integer
+---
+## Type: int  
+[Back to constructor index](index.md)
 
-A string of variable length.');
+A 32 bit signed integer ranging from `-2147483647` to `2147483647`.');
 
-file_put_contents('types/int.md', '## Type: int  
+file_put_contents('types/long.md', '---
+title: long
+---
+## Type: long  
+[Back to constructor index](index.md)
 
-A 32 bit signed integer ranging from -2147483647 to 2147483647.');
+A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.');
 
-file_put_contents('types/long.md', '## Type: long  
+file_put_contents('types/double.md', '---
+title: double
+---
+## Type: double  
+[Back to constructor index](index.md)
 
-A 64 bit signed integer ranging from -9223372036854775807 to 9223372036854775807.');
+A double precision floating point number, single precision can also be used (float).');
 
-file_put_contents('types/double.md', '## Type: double  
-
-A double precision number, single precision can also be used (float).');
-
-file_put_contents('types/!X.md', '## Type: !X  
+file_put_contents('types/!X.md', '---
+title: !X
+---
+## Type: !X  
+[Back to constructor index](index.md)
 
 Represents a TL serialized payload.');
 
-file_put_contents('types/X.md', '## Type: X  
+file_put_contents('types/X.md', '---
+title: X
+---
+## Type: X  
+[Back to constructor index](index.md)
 
 Represents a TL serialized payload.');
 
-file_put_contents('constructors/boolFalse.md', '# boolFalse  
+file_put_contents('constructors/boolFalse.md', '---
+title: boolFalse
+---
+# boolFalse  
+[Back to constructor index](index.md)
 
-Represents boolean with value equal to `false`.');
+Represents a boolean with value equal to `false`.');
 
-file_put_contents('constructors/boolTrue.md', '# boolTrue  
+file_put_contents('constructors/boolTrue.md', '---
+title: boolTrue
+---
+# boolTrue  
+[Back to constructor index](index.md)
 
-Represents boolean with value equal to `true`.');
+Represents a boolean with value equal to `true`.');
+
+file_put_contents('types/Bool.md', '---
+title: Bool
+---
+# Bool  
+[Back to types index](index.md)
+
+Represents a boolean.');
 
 \danog\MadelineProto\Logger::log('Done!');

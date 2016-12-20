@@ -1,4 +1,10 @@
+---
+title: auth_codeTypeSms
+---
 ## Constructor: auth\_codeTypeSms  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,9 @@
+---
+title: account_getAuthorizations
+---
 ## Method: account\_getAuthorizations  
+[Back to methods index](index.md)
+
 
 
 

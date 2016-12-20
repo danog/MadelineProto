@@ -1,4 +1,10 @@
+---
+title: messageActionChatEditPhoto
+---
 ## Constructor: messageActionChatEditPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

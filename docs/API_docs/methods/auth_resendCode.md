@@ -1,4 +1,9 @@
+---
+title: auth_resendCode
+---
 ## Method: auth\_resendCode  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

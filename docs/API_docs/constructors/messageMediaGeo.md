@@ -1,4 +1,10 @@
+---
+title: messageMediaGeo
+---
 ## Constructor: messageMediaGeo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

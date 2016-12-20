@@ -1,4 +1,10 @@
+---
+title: error
+---
 ## Constructor: error  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

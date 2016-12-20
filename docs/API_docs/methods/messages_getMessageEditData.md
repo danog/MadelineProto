@@ -1,4 +1,9 @@
+---
+title: messages_getMessageEditData
+---
 ## Method: messages\_getMessageEditData  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: ChannelParticipant
+---
 ## Type: ChannelParticipant  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

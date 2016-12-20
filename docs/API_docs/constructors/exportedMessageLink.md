@@ -1,4 +1,10 @@
+---
+title: exportedMessageLink
+---
 ## Constructor: exportedMessageLink  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

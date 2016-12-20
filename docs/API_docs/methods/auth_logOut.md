@@ -1,4 +1,9 @@
+---
+title: auth_logOut
+---
 ## Method: auth\_logOut  
+[Back to methods index](index.md)
+
 
 
 

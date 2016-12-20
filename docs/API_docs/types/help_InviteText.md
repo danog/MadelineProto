@@ -1,4 +1,10 @@
+---
+title: help_InviteText
+---
 ## Type: help\_InviteText  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

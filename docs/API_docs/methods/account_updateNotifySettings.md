@@ -1,4 +1,9 @@
+---
+title: account_updateNotifySettings
+---
 ## Method: account\_updateNotifySettings  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

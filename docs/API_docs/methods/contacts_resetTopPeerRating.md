@@ -1,4 +1,9 @@
+---
+title: contacts_resetTopPeerRating
+---
 ## Method: contacts\_resetTopPeerRating  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

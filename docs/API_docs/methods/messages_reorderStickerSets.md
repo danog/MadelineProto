@@ -1,4 +1,9 @@
+---
+title: messages_reorderStickerSets
+---
 ## Method: messages\_reorderStickerSets  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

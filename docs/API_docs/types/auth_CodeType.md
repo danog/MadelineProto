@@ -1,4 +1,10 @@
+---
+title: auth_CodeType
+---
 ## Type: auth\_CodeType  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

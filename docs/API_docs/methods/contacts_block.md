@@ -1,4 +1,9 @@
+---
+title: contacts_block
+---
 ## Method: contacts\_block  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

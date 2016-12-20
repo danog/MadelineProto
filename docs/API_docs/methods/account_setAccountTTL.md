@@ -1,4 +1,9 @@
+---
+title: account_setAccountTTL
+---
 ## Method: account\_setAccountTTL  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: channels_updatePinnedMessage
+---
 ## Method: channels\_updatePinnedMessage  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

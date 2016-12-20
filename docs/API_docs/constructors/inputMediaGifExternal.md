@@ -1,4 +1,10 @@
+---
+title: inputMediaGifExternal
+---
 ## Constructor: inputMediaGifExternal  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

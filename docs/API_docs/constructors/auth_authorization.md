@@ -1,4 +1,10 @@
+---
+title: auth_authorization
+---
 ## Constructor: auth\_authorization  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

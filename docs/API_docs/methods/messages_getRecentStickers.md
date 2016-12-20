@@ -1,4 +1,9 @@
+---
+title: messages_getRecentStickers
+---
 ## Method: messages\_getRecentStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

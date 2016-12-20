@@ -1,4 +1,10 @@
+---
+title: help_appUpdate
+---
 ## Constructor: help\_appUpdate  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

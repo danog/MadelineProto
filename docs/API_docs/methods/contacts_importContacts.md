@@ -1,4 +1,9 @@
+---
+title: contacts_importContacts
+---
 ## Method: contacts\_importContacts  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

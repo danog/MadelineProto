@@ -1,4 +1,10 @@
+---
+title: inputChatUploadedPhoto
+---
 ## Constructor: inputChatUploadedPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

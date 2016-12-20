@@ -1,4 +1,10 @@
+---
+title: auth_sentCodeTypeFlashCall
+---
 ## Constructor: auth\_sentCodeTypeFlashCall  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

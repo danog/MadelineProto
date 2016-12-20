@@ -1,4 +1,10 @@
+---
+title: sendMessageRecordVideoAction
+---
 ## Constructor: sendMessageRecordVideoAction  
+[Back to constructors index](index.md)
+
+
 
 
 

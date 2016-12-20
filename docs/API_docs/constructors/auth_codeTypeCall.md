@@ -1,4 +1,10 @@
+---
+title: auth_codeTypeCall
+---
 ## Constructor: auth\_codeTypeCall  
+[Back to constructors index](index.md)
+
+
 
 
 

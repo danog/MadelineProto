@@ -1,4 +1,9 @@
+---
+title: messages_checkChatInvite
+---
 ## Method: messages\_checkChatInvite  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

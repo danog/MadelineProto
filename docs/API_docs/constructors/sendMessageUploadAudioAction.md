@@ -1,4 +1,10 @@
+---
+title: sendMessageUploadAudioAction
+---
 ## Constructor: sendMessageUploadAudioAction  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

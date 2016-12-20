@@ -1,4 +1,10 @@
+---
+title: inputMediaGeoPoint
+---
 ## Constructor: inputMediaGeoPoint  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: inputBotInlineMessageGame
+---
 ## Constructor: inputBotInlineMessageGame  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

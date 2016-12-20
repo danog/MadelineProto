@@ -1,4 +1,10 @@
+---
+title: encryptedChatDiscarded
+---
 ## Constructor: encryptedChatDiscarded  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

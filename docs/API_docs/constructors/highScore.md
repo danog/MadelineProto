@@ -1,4 +1,10 @@
+---
+title: highScore
+---
 ## Constructor: highScore  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

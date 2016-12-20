@@ -1,4 +1,10 @@
+---
+title: InputGame
+---
 ## Type: InputGame  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

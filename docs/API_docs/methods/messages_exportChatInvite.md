@@ -1,4 +1,9 @@
+---
+title: messages_exportChatInvite
+---
 ## Method: messages\_exportChatInvite  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: ChannelMessagesFilter
+---
 ## Type: ChannelMessagesFilter  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

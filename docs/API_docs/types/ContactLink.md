@@ -1,4 +1,10 @@
+---
+title: ContactLink
+---
 ## Type: ContactLink  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

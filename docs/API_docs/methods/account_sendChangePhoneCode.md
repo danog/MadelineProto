@@ -1,4 +1,9 @@
+---
+title: account_sendChangePhoneCode
+---
 ## Method: account\_sendChangePhoneCode  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

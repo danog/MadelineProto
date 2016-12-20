@@ -1,4 +1,9 @@
+---
+title: auth_cancelCode
+---
 ## Method: auth\_cancelCode  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

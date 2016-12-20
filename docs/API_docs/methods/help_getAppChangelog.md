@@ -1,4 +1,9 @@
+---
+title: help_getAppChangelog
+---
 ## Method: help\_getAppChangelog  
+[Back to methods index](index.md)
+
 
 
 

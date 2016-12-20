@@ -1,4 +1,10 @@
+---
+title: messages_channelMessages
+---
 ## Constructor: messages\_channelMessages  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

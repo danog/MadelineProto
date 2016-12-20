@@ -1,4 +1,10 @@
+---
+title: storage_filePng
+---
 ## Constructor: storage\_filePng  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: photos_photosSlice
+---
 ## Constructor: photos\_photosSlice  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

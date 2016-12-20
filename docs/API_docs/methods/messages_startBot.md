@@ -1,4 +1,9 @@
+---
+title: messages_startBot
+---
 ## Method: messages\_startBot  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

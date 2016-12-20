@@ -1,4 +1,10 @@
+---
+title: inputPeerSelf
+---
 ## Constructor: inputPeerSelf  
+[Back to constructors index](index.md)
+
+
 
 
 

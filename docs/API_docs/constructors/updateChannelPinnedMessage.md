@@ -1,4 +1,10 @@
+---
+title: updateChannelPinnedMessage
+---
 ## Constructor: updateChannelPinnedMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

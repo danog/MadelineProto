@@ -1,4 +1,9 @@
+---
+title: messages_getFullChat
+---
 ## Method: messages\_getFullChat  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

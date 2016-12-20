@@ -1,4 +1,9 @@
+---
+title: messages_searchGifs
+---
 ## Method: messages\_searchGifs  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

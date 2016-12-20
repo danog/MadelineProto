@@ -1,4 +1,10 @@
+---
+title: auth_SentCodeType
+---
 ## Type: auth\_SentCodeType  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

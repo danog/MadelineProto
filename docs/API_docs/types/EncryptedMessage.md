@@ -1,4 +1,10 @@
+---
+title: EncryptedMessage
+---
 ## Type: EncryptedMessage  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

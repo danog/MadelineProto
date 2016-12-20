@@ -1,4 +1,10 @@
+---
+title: updateDcOptions
+---
 ## Constructor: updateDcOptions  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: channelForbidden
+---
 ## Constructor: channelForbidden  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

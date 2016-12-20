@@ -1,4 +1,10 @@
+---
+title: updateEditMessage
+---
 ## Constructor: updateEditMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

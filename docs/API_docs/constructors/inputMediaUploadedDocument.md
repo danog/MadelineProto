@@ -1,4 +1,10 @@
+---
+title: inputMediaUploadedDocument
+---
 ## Constructor: inputMediaUploadedDocument  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

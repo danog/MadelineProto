@@ -1,4 +1,9 @@
+---
+title: account_deleteAccount
+---
 ## Method: account\_deleteAccount  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

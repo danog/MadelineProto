@@ -1,4 +1,10 @@
+---
+title: contactLinkHasPhone
+---
 ## Constructor: contactLinkHasPhone  
+[Back to constructors index](index.md)
+
+
 
 
 

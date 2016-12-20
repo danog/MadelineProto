@@ -1,4 +1,10 @@
+---
+title: messageActionChatEditTitle
+---
 ## Constructor: messageActionChatEditTitle  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

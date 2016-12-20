@@ -1,4 +1,10 @@
+---
+title: updateUserTyping
+---
 ## Constructor: updateUserTyping  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

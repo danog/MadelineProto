@@ -1,4 +1,10 @@
+---
+title: botInlineMessageMediaGeo
+---
 ## Constructor: botInlineMessageMediaGeo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

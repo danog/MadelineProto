@@ -1,4 +1,10 @@
+---
+title: InputEncryptedFile
+---
 ## Type: InputEncryptedFile  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,9 @@
+---
+title: account_getPassword
+---
 ## Method: account\_getPassword  
+[Back to methods index](index.md)
+
 
 
 

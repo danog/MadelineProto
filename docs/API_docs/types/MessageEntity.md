@@ -1,4 +1,10 @@
+---
+title: MessageEntity
+---
 ## Type: MessageEntity  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

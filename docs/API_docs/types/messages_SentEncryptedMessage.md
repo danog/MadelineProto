@@ -1,4 +1,10 @@
+---
+title: messages_SentEncryptedMessage
+---
 ## Type: messages\_SentEncryptedMessage  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

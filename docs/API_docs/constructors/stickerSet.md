@@ -1,4 +1,10 @@
+---
+title: stickerSet
+---
 ## Constructor: stickerSet  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

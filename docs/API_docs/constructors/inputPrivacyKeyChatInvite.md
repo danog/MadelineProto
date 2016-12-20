@@ -1,4 +1,10 @@
+---
+title: inputPrivacyKeyChatInvite
+---
 ## Constructor: inputPrivacyKeyChatInvite  
+[Back to constructors index](index.md)
+
+
 
 
 

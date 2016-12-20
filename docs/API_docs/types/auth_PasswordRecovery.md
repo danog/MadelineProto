@@ -1,4 +1,10 @@
+---
+title: auth_PasswordRecovery
+---
 ## Type: auth\_PasswordRecovery  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

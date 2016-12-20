@@ -1,4 +1,10 @@
+---
+title: updateConfig
+---
 ## Constructor: updateConfig  
+[Back to constructors index](index.md)
+
+
 
 
 

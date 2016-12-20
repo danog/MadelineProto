@@ -1,4 +1,10 @@
+---
+title: userStatusOnline
+---
 ## Constructor: userStatusOnline  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: account_resetAuthorization
+---
 ## Method: account\_resetAuthorization  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

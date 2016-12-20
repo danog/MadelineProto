@@ -1,4 +1,10 @@
+---
+title: updateContactLink
+---
 ## Constructor: updateContactLink  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

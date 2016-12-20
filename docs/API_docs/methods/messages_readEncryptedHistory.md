@@ -1,4 +1,9 @@
+---
+title: messages_readEncryptedHistory
+---
 ## Method: messages\_readEncryptedHistory  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

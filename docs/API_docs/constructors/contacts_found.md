@@ -1,4 +1,10 @@
+---
+title: contacts_found
+---
 ## Constructor: contacts\_found  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

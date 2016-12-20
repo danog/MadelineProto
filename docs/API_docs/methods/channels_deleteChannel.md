@@ -1,4 +1,9 @@
+---
+title: channels_deleteChannel
+---
 ## Method: channels\_deleteChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

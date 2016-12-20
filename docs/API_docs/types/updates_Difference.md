@@ -1,4 +1,10 @@
+---
+title: updates_Difference
+---
 ## Type: updates\_Difference  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

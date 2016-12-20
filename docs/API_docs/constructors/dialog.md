@@ -1,4 +1,10 @@
+---
+title: dialog
+---
 ## Constructor: dialog  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

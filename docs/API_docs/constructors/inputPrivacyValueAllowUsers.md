@@ -1,4 +1,10 @@
+---
+title: inputPrivacyValueAllowUsers
+---
 ## Constructor: inputPrivacyValueAllowUsers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

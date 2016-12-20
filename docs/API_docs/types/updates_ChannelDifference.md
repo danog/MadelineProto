@@ -1,4 +1,10 @@
+---
+title: updates_ChannelDifference
+---
 ## Type: updates\_ChannelDifference  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

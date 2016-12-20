@@ -1,4 +1,9 @@
+---
+title: account_resetNotifySettings
+---
 ## Method: account\_resetNotifySettings  
+[Back to methods index](index.md)
+
 
 
 

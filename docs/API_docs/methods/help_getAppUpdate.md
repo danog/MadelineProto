@@ -1,4 +1,9 @@
+---
+title: help_getAppUpdate
+---
 ## Method: help\_getAppUpdate  
+[Back to methods index](index.md)
+
 
 
 

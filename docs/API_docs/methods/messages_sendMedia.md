@@ -1,4 +1,9 @@
+---
+title: messages_sendMedia
+---
 ## Method: messages\_sendMedia  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

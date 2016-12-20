@@ -1,4 +1,9 @@
+---
+title: users_getFullUser
+---
 ## Method: users\_getFullUser  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

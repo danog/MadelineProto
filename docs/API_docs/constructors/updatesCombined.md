@@ -1,4 +1,10 @@
+---
+title: updatesCombined
+---
 ## Constructor: updatesCombined  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

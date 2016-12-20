@@ -1,4 +1,10 @@
+---
+title: updateNotifySettings
+---
 ## Constructor: updateNotifySettings  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

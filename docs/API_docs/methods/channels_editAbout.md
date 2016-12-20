@@ -1,4 +1,9 @@
+---
+title: channels_editAbout
+---
 ## Method: channels\_editAbout  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

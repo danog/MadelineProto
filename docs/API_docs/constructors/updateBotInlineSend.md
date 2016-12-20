@@ -1,4 +1,10 @@
+---
+title: updateBotInlineSend
+---
 ## Constructor: updateBotInlineSend  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

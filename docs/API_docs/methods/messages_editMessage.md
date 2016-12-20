@@ -1,4 +1,9 @@
+---
+title: messages_editMessage
+---
 ## Method: messages\_editMessage  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

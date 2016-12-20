@@ -1,4 +1,10 @@
+---
+title: updateNewAuthorization
+---
 ## Constructor: updateNewAuthorization  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

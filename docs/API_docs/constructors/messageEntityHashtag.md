@@ -1,4 +1,10 @@
+---
+title: messageEntityHashtag
+---
 ## Constructor: messageEntityHashtag  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

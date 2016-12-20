@@ -1,4 +1,9 @@
+---
+title: messages_getPeerSettings
+---
 ## Method: messages\_getPeerSettings  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

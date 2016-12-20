@@ -1,4 +1,10 @@
+---
+title: storage_fileWebp
+---
 ## Constructor: storage\_fileWebp  
+[Back to constructors index](index.md)
+
+
 
 
 

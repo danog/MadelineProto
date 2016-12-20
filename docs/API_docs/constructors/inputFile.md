@@ -1,4 +1,10 @@
+---
+title: inputFile
+---
 ## Constructor: inputFile  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

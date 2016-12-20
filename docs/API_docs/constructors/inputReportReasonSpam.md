@@ -1,4 +1,10 @@
+---
+title: inputReportReasonSpam
+---
 ## Constructor: inputReportReasonSpam  
+[Back to constructors index](index.md)
+
+
 
 
 

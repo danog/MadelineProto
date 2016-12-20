@@ -1,4 +1,10 @@
+---
+title: PhotoSize
+---
 ## Type: PhotoSize  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

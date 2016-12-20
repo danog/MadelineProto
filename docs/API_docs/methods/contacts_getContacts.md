@@ -1,4 +1,9 @@
+---
+title: contacts_getContacts
+---
 ## Method: contacts\_getContacts  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

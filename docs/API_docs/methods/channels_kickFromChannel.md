@@ -1,4 +1,9 @@
+---
+title: channels_kickFromChannel
+---
 ## Method: channels\_kickFromChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

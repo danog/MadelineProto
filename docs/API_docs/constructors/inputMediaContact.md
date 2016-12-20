@@ -1,4 +1,10 @@
+---
+title: inputMediaContact
+---
 ## Constructor: inputMediaContact  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

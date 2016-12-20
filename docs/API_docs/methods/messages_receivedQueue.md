@@ -1,4 +1,9 @@
+---
+title: messages_receivedQueue
+---
 ## Method: messages\_receivedQueue  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: updateChatUserTyping
+---
 ## Constructor: updateChatUserTyping  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

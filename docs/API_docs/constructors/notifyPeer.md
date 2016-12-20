@@ -1,4 +1,10 @@
+---
+title: notifyPeer
+---
 ## Constructor: notifyPeer  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

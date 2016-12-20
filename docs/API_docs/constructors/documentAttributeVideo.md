@@ -1,4 +1,10 @@
+---
+title: documentAttributeVideo
+---
 ## Constructor: documentAttributeVideo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

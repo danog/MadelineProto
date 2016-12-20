@@ -1,4 +1,9 @@
+---
+title: messages_getInlineBotResults
+---
 ## Method: messages\_getInlineBotResults  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: help_getTermsOfService
+---
 ## Method: help\_getTermsOfService  
+[Back to methods index](index.md)
+
 
 
 

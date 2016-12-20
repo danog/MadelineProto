@@ -1,4 +1,10 @@
+---
+title: help_Support
+---
 ## Type: help\_Support  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

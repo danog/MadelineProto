@@ -1,4 +1,9 @@
+---
+title: account_updateStatus
+---
 ## Method: account\_updateStatus  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

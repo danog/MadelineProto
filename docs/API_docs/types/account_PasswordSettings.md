@@ -1,4 +1,10 @@
+---
+title: account_PasswordSettings
+---
 ## Type: account\_PasswordSettings  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

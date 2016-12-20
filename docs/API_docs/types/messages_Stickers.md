@@ -1,4 +1,10 @@
+---
+title: messages_Stickers
+---
 ## Type: messages\_Stickers  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

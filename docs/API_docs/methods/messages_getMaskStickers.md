@@ -1,4 +1,9 @@
+---
+title: messages_getMaskStickers
+---
 ## Method: messages\_getMaskStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: inputEncryptedFileEmpty
+---
 ## Constructor: inputEncryptedFileEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

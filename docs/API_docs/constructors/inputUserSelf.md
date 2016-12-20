@@ -1,4 +1,10 @@
+---
+title: inputUserSelf
+---
 ## Constructor: inputUserSelf  
+[Back to constructors index](index.md)
+
+
 
 
 

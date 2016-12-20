@@ -1,4 +1,10 @@
+---
+title: encryptedChatWaiting
+---
 ## Constructor: encryptedChatWaiting  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: channels_getParticipant
+---
 ## Method: channels\_getParticipant  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

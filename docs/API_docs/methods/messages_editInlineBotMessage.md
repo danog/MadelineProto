@@ -1,4 +1,9 @@
+---
+title: messages_editInlineBotMessage
+---
 ## Method: messages\_editInlineBotMessage  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: channels_channelParticipant
+---
 ## Constructor: channels\_channelParticipant  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

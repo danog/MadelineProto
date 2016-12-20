@@ -1,4 +1,10 @@
+---
+title: ReplyMarkup
+---
 ## Type: ReplyMarkup  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

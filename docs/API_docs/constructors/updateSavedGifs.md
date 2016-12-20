@@ -1,4 +1,10 @@
+---
+title: updateSavedGifs
+---
 ## Constructor: updateSavedGifs  
+[Back to constructors index](index.md)
+
+
 
 
 

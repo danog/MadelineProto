@@ -1,4 +1,9 @@
+---
+title: account_setPrivacy
+---
 ## Method: account\_setPrivacy  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

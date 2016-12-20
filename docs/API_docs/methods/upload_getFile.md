@@ -1,4 +1,9 @@
+---
+title: upload_getFile
+---
 ## Method: upload\_getFile  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

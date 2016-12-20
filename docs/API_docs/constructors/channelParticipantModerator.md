@@ -1,4 +1,10 @@
+---
+title: channelParticipantModerator
+---
 ## Constructor: channelParticipantModerator  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: inputDocumentEmpty
+---
 ## Constructor: inputDocumentEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

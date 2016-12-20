@@ -1,4 +1,10 @@
+---
+title: messages_stickers
+---
 ## Constructor: messages\_stickers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

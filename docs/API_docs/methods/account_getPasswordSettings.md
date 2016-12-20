@@ -1,4 +1,9 @@
+---
+title: account_getPasswordSettings
+---
 ## Method: account\_getPasswordSettings  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

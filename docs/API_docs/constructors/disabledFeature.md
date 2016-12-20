@@ -1,4 +1,10 @@
+---
+title: disabledFeature
+---
 ## Constructor: disabledFeature  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

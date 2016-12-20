@@ -1,4 +1,10 @@
+---
+title: channelParticipantsKicked
+---
 ## Constructor: channelParticipantsKicked  
+[Back to constructors index](index.md)
+
+
 
 
 

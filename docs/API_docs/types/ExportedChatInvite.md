@@ -1,4 +1,10 @@
+---
+title: ExportedChatInvite
+---
 ## Type: ExportedChatInvite  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

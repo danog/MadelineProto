@@ -1,4 +1,10 @@
+---
+title: messages_messagesSlice
+---
 ## Constructor: messages\_messagesSlice  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

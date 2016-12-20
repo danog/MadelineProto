@@ -1,4 +1,10 @@
+---
+title: inputPhotoEmpty
+---
 ## Constructor: inputPhotoEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

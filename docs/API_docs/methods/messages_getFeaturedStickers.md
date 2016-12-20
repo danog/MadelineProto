@@ -1,4 +1,9 @@
+---
+title: messages_getFeaturedStickers
+---
 ## Method: messages\_getFeaturedStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

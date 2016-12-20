@@ -1,4 +1,10 @@
+---
+title: updateReadChannelInbox
+---
 ## Constructor: updateReadChannelInbox  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

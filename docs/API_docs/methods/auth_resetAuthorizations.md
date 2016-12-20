@@ -1,4 +1,9 @@
+---
+title: auth_resetAuthorizations
+---
 ## Method: auth\_resetAuthorizations  
+[Back to methods index](index.md)
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: sendMessageRecordAudioAction
+---
 ## Constructor: sendMessageRecordAudioAction  
+[Back to constructors index](index.md)
+
+
 
 
 

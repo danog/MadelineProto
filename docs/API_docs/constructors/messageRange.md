@@ -1,4 +1,10 @@
+---
+title: messageRange
+---
 ## Constructor: messageRange  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

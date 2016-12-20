@@ -1,4 +1,10 @@
+---
+title: storage_filePartial
+---
 ## Constructor: storage\_filePartial  
+[Back to constructors index](index.md)
+
+
 
 
 

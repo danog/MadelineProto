@@ -1,4 +1,9 @@
+---
+title: messages_getAllDrafts
+---
 ## Method: messages\_getAllDrafts  
+[Back to methods index](index.md)
+
 
 
 

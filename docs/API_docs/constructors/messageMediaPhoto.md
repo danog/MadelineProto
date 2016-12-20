@@ -1,4 +1,10 @@
+---
+title: messageMediaPhoto
+---
 ## Constructor: messageMediaPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

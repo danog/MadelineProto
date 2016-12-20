@@ -1,4 +1,9 @@
+---
+title: channels_getMessages
+---
 ## Method: channels\_getMessages  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: contacts_exportCard
+---
 ## Method: contacts\_exportCard  
+[Back to methods index](index.md)
+
 
 
 

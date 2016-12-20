@@ -1,4 +1,10 @@
+---
+title: messageEntityUrl
+---
 ## Constructor: messageEntityUrl  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

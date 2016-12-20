@@ -1,4 +1,9 @@
+---
+title: messages_sendEncryptedService
+---
 ## Method: messages\_sendEncryptedService  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: sendMessageUploadVideoAction
+---
 ## Constructor: sendMessageUploadVideoAction  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

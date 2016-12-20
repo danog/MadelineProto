@@ -1,4 +1,10 @@
+---
+title: inputNotifyPeer
+---
 ## Constructor: inputNotifyPeer  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

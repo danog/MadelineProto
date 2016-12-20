@@ -1,4 +1,10 @@
+---
+title: channelParticipantsRecent
+---
 ## Constructor: channelParticipantsRecent  
+[Back to constructors index](index.md)
+
+
 
 
 

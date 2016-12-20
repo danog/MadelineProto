@@ -1,4 +1,10 @@
+---
+title: Photo
+---
 ## Type: Photo  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,9 @@
+---
+title: messages_installStickerSet
+---
 ## Method: messages\_installStickerSet  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

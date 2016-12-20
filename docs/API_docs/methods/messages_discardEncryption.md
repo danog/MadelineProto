@@ -1,4 +1,9 @@
+---
+title: messages_discardEncryption
+---
 ## Method: messages\_discardEncryption  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

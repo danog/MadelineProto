@@ -1,4 +1,10 @@
+---
+title: notifyChats
+---
 ## Constructor: notifyChats  
+[Back to constructors index](index.md)
+
+
 
 
 

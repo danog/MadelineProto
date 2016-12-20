@@ -1,4 +1,9 @@
+---
+title: channels_editPhoto
+---
 ## Method: channels\_editPhoto  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: messages_editChatAdmin
+---
 ## Method: messages\_editChatAdmin  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

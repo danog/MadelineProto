@@ -1,4 +1,9 @@
+---
+title: photos_deletePhotos
+---
 ## Method: photos\_deletePhotos  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

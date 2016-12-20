@@ -1,4 +1,9 @@
+---
+title: account_getWallPapers
+---
 ## Method: account\_getWallPapers  
+[Back to methods index](index.md)
+
 
 
 

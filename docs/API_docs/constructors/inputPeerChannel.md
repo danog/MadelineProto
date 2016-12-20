@@ -1,4 +1,10 @@
+---
+title: inputPeerChannel
+---
 ## Constructor: inputPeerChannel  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

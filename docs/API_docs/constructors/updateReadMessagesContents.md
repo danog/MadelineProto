@@ -1,4 +1,10 @@
+---
+title: updateReadMessagesContents
+---
 ## Constructor: updateReadMessagesContents  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

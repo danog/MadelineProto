@@ -1,4 +1,9 @@
+---
+title: auth_dropTempAuthKeys
+---
 ## Method: auth\_dropTempAuthKeys  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

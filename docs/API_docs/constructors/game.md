@@ -1,4 +1,10 @@
+---
+title: game
+---
 ## Constructor: game  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

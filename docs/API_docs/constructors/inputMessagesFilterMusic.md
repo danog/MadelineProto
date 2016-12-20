@@ -1,4 +1,10 @@
+---
+title: inputMessagesFilterMusic
+---
 ## Constructor: inputMessagesFilterMusic  
+[Back to constructors index](index.md)
+
+
 
 
 

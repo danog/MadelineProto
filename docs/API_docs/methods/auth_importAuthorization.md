@@ -1,4 +1,9 @@
+---
+title: auth_importAuthorization
+---
 ## Method: auth\_importAuthorization  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

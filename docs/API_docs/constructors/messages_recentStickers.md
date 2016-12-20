@@ -1,4 +1,10 @@
+---
+title: messages_recentStickers
+---
 ## Constructor: messages\_recentStickers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: account_passwordSettings
+---
 ## Constructor: account\_passwordSettings  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

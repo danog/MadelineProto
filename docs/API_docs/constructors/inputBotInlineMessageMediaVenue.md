@@ -1,4 +1,10 @@
+---
+title: inputBotInlineMessageMediaVenue
+---
 ## Constructor: inputBotInlineMessageMediaVenue  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

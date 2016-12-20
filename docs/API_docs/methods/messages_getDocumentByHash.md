@@ -1,4 +1,9 @@
+---
+title: messages_getDocumentByHash
+---
 ## Method: messages\_getDocumentByHash  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

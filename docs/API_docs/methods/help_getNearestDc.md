@@ -1,4 +1,9 @@
+---
+title: help_getNearestDc
+---
 ## Method: help\_getNearestDc  
+[Back to methods index](index.md)
+
 
 
 

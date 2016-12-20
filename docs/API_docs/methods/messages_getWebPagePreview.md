@@ -1,4 +1,9 @@
+---
+title: messages_getWebPagePreview
+---
 ## Method: messages\_getWebPagePreview  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

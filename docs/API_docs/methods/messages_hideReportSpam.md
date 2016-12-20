@@ -1,4 +1,9 @@
+---
+title: messages_hideReportSpam
+---
 ## Method: messages\_hideReportSpam  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,9 @@
+---
+title: channels_leaveChannel
+---
 ## Method: channels\_leaveChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

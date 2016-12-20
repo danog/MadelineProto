@@ -1,4 +1,10 @@
+---
+title: inputPeerUser
+---
 ## Constructor: inputPeerUser  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

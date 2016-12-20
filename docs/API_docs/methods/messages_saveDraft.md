@@ -1,4 +1,9 @@
+---
+title: messages_saveDraft
+---
 ## Method: messages\_saveDraft  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: updateReadFeaturedStickers
+---
 ## Constructor: updateReadFeaturedStickers  
+[Back to constructors index](index.md)
+
+
 
 
 

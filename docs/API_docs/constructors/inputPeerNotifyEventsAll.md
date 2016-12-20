@@ -1,4 +1,10 @@
+---
+title: inputPeerNotifyEventsAll
+---
 ## Constructor: inputPeerNotifyEventsAll  
+[Back to constructors index](index.md)
+
+
 
 
 

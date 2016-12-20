@@ -1,4 +1,9 @@
+---
+title: messages_receivedMessages
+---
 ## Method: messages\_receivedMessages  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

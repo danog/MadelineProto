@@ -1,4 +1,10 @@
+---
+title: updates_difference
+---
 ## Constructor: updates\_difference  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

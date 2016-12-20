@@ -1,4 +1,10 @@
+---
+title: keyboardButtonGame
+---
 ## Constructor: keyboardButtonGame  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

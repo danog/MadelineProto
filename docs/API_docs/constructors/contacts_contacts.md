@@ -1,4 +1,10 @@
+---
+title: contacts_contacts
+---
 ## Constructor: contacts\_contacts  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: documentAttributeImageSize
+---
 ## Constructor: documentAttributeImageSize  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

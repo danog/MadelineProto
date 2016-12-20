@@ -1,4 +1,10 @@
+---
+title: auth_ExportedAuthorization
+---
 ## Type: auth\_ExportedAuthorization  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

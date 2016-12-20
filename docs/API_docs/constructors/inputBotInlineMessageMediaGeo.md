@@ -1,4 +1,10 @@
+---
+title: inputBotInlineMessageMediaGeo
+---
 ## Constructor: inputBotInlineMessageMediaGeo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

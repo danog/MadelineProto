@@ -1,4 +1,10 @@
+---
+title: account_authorizations
+---
 ## Constructor: account\_authorizations  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

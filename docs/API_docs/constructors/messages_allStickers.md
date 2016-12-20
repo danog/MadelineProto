@@ -1,4 +1,10 @@
+---
+title: messages_allStickers
+---
 ## Constructor: messages\_allStickers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

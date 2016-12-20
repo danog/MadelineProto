@@ -1,4 +1,10 @@
+---
+title: storage_fileJpeg
+---
 ## Constructor: storage\_fileJpeg  
+[Back to constructors index](index.md)
+
+
 
 
 

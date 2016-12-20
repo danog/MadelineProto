@@ -1,4 +1,10 @@
+---
+title: inputPhoto
+---
 ## Constructor: inputPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: messages_setInlineGameScore
+---
 ## Method: messages\_setInlineGameScore  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

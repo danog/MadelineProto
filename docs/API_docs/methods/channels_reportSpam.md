@@ -1,4 +1,9 @@
+---
+title: channels_reportSpam
+---
 ## Method: channels\_reportSpam  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

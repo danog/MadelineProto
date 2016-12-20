@@ -1,3 +1,7 @@
+---
+title: boolTrue
+---
 # boolTrue  
+[Back to constructor index](index.md)
 
-Represents boolean with value equal to `true`.
+Represents a boolean with value equal to `true`.

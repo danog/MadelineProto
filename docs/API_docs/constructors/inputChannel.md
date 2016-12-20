@@ -1,4 +1,10 @@
+---
+title: inputChannel
+---
 ## Constructor: inputChannel  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: messages_highScores
+---
 ## Constructor: messages\_highScores  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

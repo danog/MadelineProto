@@ -1,4 +1,9 @@
+---
+title: channels_checkUsername
+---
 ## Method: channels\_checkUsername  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

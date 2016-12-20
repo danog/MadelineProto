@@ -1,4 +1,10 @@
+---
+title: importedContact
+---
 ## Constructor: importedContact  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

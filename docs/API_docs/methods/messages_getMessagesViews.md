@@ -1,4 +1,9 @@
+---
+title: messages_getMessagesViews
+---
 ## Method: messages\_getMessagesViews  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

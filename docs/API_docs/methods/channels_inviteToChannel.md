@@ -1,4 +1,9 @@
+---
+title: channels_inviteToChannel
+---
 ## Method: channels\_inviteToChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: Message
+---
 ## Type: Message  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,10 @@
+---
+title: foundGifCached
+---
 ## Constructor: foundGifCached  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

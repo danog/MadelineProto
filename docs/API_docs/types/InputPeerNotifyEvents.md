@@ -1,4 +1,10 @@
+---
+title: InputPeerNotifyEvents
+---
 ## Type: InputPeerNotifyEvents  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

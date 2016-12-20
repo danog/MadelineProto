@@ -1,4 +1,9 @@
+---
+title: messages_deleteMessages
+---
 ## Method: messages\_deleteMessages  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

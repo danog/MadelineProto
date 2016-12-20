@@ -1,4 +1,10 @@
+---
+title: sendMessageTypingAction
+---
 ## Constructor: sendMessageTypingAction  
+[Back to constructors index](index.md)
+
+
 
 
 

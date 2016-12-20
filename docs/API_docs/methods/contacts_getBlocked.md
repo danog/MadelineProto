@@ -1,4 +1,9 @@
+---
+title: contacts_getBlocked
+---
 ## Method: contacts\_getBlocked  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

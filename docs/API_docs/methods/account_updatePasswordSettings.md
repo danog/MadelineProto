@@ -1,4 +1,9 @@
+---
+title: account_updatePasswordSettings
+---
 ## Method: account\_updatePasswordSettings  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

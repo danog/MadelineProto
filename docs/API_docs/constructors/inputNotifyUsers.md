@@ -1,4 +1,10 @@
+---
+title: inputNotifyUsers
+---
 ## Constructor: inputNotifyUsers  
+[Back to constructors index](index.md)
+
+
 
 
 

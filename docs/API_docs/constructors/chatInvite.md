@@ -1,4 +1,10 @@
+---
+title: chatInvite
+---
 ## Constructor: chatInvite  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

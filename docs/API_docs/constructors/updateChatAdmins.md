@@ -1,4 +1,10 @@
+---
+title: updateChatAdmins
+---
 ## Constructor: updateChatAdmins  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

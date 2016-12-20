@@ -1,4 +1,9 @@
+---
+title: contacts_importCard
+---
 ## Method: contacts\_importCard  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

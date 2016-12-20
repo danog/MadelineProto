@@ -1,4 +1,10 @@
+---
+title: inputChannelEmpty
+---
 ## Constructor: inputChannelEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

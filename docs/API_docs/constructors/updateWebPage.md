@@ -1,4 +1,10 @@
+---
+title: updateWebPage
+---
 ## Constructor: updateWebPage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

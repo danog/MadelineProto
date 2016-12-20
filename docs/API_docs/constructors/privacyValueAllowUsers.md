@@ -1,4 +1,10 @@
+---
+title: privacyValueAllowUsers
+---
 ## Constructor: privacyValueAllowUsers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

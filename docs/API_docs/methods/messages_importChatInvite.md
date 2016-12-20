@@ -1,4 +1,9 @@
+---
+title: messages_importChatInvite
+---
 ## Method: messages\_importChatInvite  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: help_appChangelogEmpty
+---
 ## Constructor: help\_appChangelogEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

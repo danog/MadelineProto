@@ -1,4 +1,10 @@
+---
+title: updateUserPhoto
+---
 ## Constructor: updateUserPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

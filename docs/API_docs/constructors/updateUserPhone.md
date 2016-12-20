@@ -1,4 +1,10 @@
+---
+title: updateUserPhone
+---
 ## Constructor: updateUserPhone  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

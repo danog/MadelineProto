@@ -1,4 +1,10 @@
+---
+title: messages_botResults
+---
 ## Constructor: messages\_botResults  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

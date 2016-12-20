@@ -1,4 +1,10 @@
+---
+title: contacts_ResolvedPeer
+---
 ## Type: contacts\_ResolvedPeer  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

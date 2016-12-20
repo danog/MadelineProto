@@ -1,4 +1,10 @@
+---
+title: updates_state
+---
 ## Constructor: updates\_state  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: updates_getState
+---
 ## Method: updates\_getState  
+[Back to methods index](index.md)
+
 
 
 

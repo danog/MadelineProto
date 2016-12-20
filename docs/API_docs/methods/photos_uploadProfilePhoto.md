@@ -1,4 +1,9 @@
+---
+title: photos_uploadProfilePhoto
+---
 ## Method: photos\_uploadProfilePhoto  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messageEntityPre
+---
 ## Constructor: messageEntityPre  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

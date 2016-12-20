@@ -1,4 +1,10 @@
+---
+title: help_appChangelog
+---
 ## Constructor: help\_appChangelog  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

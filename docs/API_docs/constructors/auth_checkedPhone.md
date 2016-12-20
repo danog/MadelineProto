@@ -1,4 +1,10 @@
+---
+title: auth_checkedPhone
+---
 ## Constructor: auth\_checkedPhone  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: sendMessageGeoLocationAction
+---
 ## Constructor: sendMessageGeoLocationAction  
+[Back to constructors index](index.md)
+
+
 
 
 

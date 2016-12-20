@@ -1,4 +1,10 @@
+---
+title: receivedNotifyMessage
+---
 ## Constructor: receivedNotifyMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

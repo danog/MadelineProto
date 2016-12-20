@@ -1,4 +1,9 @@
+---
+title: messages_getBotCallbackAnswer
+---
 ## Method: messages\_getBotCallbackAnswer  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

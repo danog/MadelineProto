@@ -1,4 +1,10 @@
+---
+title: UserStatus
+---
 ## Type: UserStatus  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

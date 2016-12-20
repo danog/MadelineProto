@@ -1,4 +1,10 @@
+---
+title: messages_archivedStickers
+---
 ## Constructor: messages\_archivedStickers  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

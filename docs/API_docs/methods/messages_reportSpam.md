@@ -1,4 +1,9 @@
+---
+title: messages_reportSpam
+---
 ## Method: messages\_reportSpam  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

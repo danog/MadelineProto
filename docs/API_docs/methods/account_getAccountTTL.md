@@ -1,4 +1,9 @@
+---
+title: account_getAccountTTL
+---
 ## Method: account\_getAccountTTL  
+[Back to methods index](index.md)
+
 
 
 

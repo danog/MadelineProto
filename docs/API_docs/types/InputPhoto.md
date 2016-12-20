@@ -1,4 +1,10 @@
+---
+title: InputPhoto
+---
 ## Type: InputPhoto  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

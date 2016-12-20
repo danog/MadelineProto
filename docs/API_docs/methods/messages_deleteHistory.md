@@ -1,4 +1,9 @@
+---
+title: messages_deleteHistory
+---
 ## Method: messages\_deleteHistory  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

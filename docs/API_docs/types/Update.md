@@ -1,4 +1,10 @@
+---
+title: Update
+---
 ## Type: Update  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

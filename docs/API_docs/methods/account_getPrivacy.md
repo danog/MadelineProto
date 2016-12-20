@@ -1,4 +1,9 @@
+---
+title: account_getPrivacy
+---
 ## Method: account\_getPrivacy  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

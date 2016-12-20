@@ -1,4 +1,10 @@
+---
+title: messages_sentEncryptedFile
+---
 ## Constructor: messages\_sentEncryptedFile  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

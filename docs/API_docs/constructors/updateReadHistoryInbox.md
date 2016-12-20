@@ -1,4 +1,10 @@
+---
+title: updateReadHistoryInbox
+---
 ## Constructor: updateReadHistoryInbox  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

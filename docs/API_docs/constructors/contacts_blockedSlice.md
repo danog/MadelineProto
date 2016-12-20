@@ -1,4 +1,10 @@
+---
+title: contacts_blockedSlice
+---
 ## Constructor: contacts\_blockedSlice  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: messageActionPinMessage
+---
 ## Constructor: messageActionPinMessage  
+[Back to constructors index](index.md)
+
+
 
 
 

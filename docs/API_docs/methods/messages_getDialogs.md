@@ -1,4 +1,9 @@
+---
+title: messages_getDialogs
+---
 ## Method: messages\_getDialogs  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

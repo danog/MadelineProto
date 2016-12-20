@@ -1,4 +1,9 @@
+---
+title: contacts_resolveUsername
+---
 ## Method: contacts\_resolveUsername  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

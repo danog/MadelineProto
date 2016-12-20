@@ -1,4 +1,10 @@
+---
+title: help_noAppUpdate
+---
 ## Constructor: help\_noAppUpdate  
+[Back to constructors index](index.md)
+
+
 
 
 

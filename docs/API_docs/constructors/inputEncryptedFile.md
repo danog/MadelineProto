@@ -1,4 +1,10 @@
+---
+title: inputEncryptedFile
+---
 ## Constructor: inputEncryptedFile  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

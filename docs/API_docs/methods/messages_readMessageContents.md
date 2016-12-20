@@ -1,4 +1,9 @@
+---
+title: messages_readMessageContents
+---
 ## Method: messages\_readMessageContents  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

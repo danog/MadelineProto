@@ -1,4 +1,10 @@
+---
+title: messages_savedGifs
+---
 ## Constructor: messages\_savedGifs  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

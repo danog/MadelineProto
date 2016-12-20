@@ -1,4 +1,10 @@
+---
+title: encryptedMessage
+---
 ## Constructor: encryptedMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

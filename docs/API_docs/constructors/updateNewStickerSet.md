@@ -1,4 +1,10 @@
+---
+title: updateNewStickerSet
+---
 ## Constructor: updateNewStickerSet  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

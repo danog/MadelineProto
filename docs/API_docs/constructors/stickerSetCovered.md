@@ -1,4 +1,10 @@
+---
+title: stickerSetCovered
+---
 ## Constructor: stickerSetCovered  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

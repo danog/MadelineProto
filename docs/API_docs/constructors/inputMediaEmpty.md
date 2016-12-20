@@ -1,4 +1,10 @@
+---
+title: inputMediaEmpty
+---
 ## Constructor: inputMediaEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

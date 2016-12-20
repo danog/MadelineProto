@@ -1,4 +1,10 @@
+---
+title: inputPeerEmpty
+---
 ## Constructor: inputPeerEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

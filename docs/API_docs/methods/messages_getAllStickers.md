@@ -1,4 +1,9 @@
+---
+title: messages_getAllStickers
+---
 ## Method: messages\_getAllStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

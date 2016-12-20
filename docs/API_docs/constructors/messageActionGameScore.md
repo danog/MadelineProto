@@ -1,4 +1,10 @@
+---
+title: messageActionGameScore
+---
 ## Constructor: messageActionGameScore  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

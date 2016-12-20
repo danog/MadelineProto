@@ -1,4 +1,10 @@
+---
+title: ChatParticipant
+---
 ## Type: ChatParticipant  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

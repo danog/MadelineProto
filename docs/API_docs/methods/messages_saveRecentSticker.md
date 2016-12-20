@@ -1,4 +1,9 @@
+---
+title: messages_saveRecentSticker
+---
 ## Method: messages\_saveRecentSticker  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: auth_sentCode
+---
 ## Constructor: auth\_sentCode  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,10 @@
+---
+title: chatInviteExported
+---
 ## Constructor: chatInviteExported  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

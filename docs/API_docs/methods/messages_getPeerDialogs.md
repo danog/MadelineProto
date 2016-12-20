@@ -1,4 +1,9 @@
+---
+title: messages_getPeerDialogs
+---
 ## Method: messages\_getPeerDialogs  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

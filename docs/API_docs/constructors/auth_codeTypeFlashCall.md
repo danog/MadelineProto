@@ -1,4 +1,10 @@
+---
+title: auth_codeTypeFlashCall
+---
 ## Constructor: auth\_codeTypeFlashCall  
+[Back to constructors index](index.md)
+
+
 
 
 

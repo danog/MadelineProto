@@ -1,4 +1,10 @@
+---
+title: draftMessage
+---
 ## Constructor: draftMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

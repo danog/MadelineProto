@@ -1,4 +1,10 @@
+---
+title: upload_file
+---
 ## Constructor: upload\_file  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

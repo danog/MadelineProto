@@ -1,4 +1,9 @@
+---
+title: messages_migrateChat
+---
 ## Method: messages\_migrateChat  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

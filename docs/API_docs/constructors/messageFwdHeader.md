@@ -1,4 +1,10 @@
+---
+title: messageFwdHeader
+---
 ## Constructor: messageFwdHeader  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

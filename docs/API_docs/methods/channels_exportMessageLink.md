@@ -1,4 +1,9 @@
+---
+title: channels_exportMessageLink
+---
 ## Method: channels\_exportMessageLink  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messages_dhConfig
+---
 ## Constructor: messages\_dhConfig  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

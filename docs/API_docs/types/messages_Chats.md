@@ -1,4 +1,10 @@
+---
+title: messages_Chats
+---
 ## Type: messages\_Chats  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

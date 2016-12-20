@@ -1,4 +1,10 @@
+---
+title: inputBotInlineResultPhoto
+---
 ## Constructor: inputBotInlineResultPhoto  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

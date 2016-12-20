@@ -1,4 +1,10 @@
+---
+title: notifyUsers
+---
 ## Constructor: notifyUsers  
+[Back to constructors index](index.md)
+
+
 
 
 

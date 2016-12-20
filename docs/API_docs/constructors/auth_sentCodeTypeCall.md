@@ -1,4 +1,10 @@
+---
+title: auth_sentCodeTypeCall
+---
 ## Constructor: auth\_sentCodeTypeCall  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

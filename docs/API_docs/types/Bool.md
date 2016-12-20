@@ -1,8 +1,7 @@
-## Type: Bool  
+---
+title: Bool
+---
+# Bool  
+[Back to types index](index.md)
 
-### Possible values (constructors):
-
-[boolFalse](../constructors/boolFalse.md)  
-
-[boolTrue](../constructors/boolTrue.md)  
-
+Represents a boolean.

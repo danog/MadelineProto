@@ -1,4 +1,9 @@
+---
+title: channels_joinChannel
+---
 ## Method: channels\_joinChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: InputChannel
+---
 ## Type: InputChannel  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

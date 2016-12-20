@@ -1,4 +1,9 @@
+---
+title: messages_addChatUser
+---
 ## Method: messages\_addChatUser  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

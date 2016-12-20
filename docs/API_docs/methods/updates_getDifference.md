@@ -1,4 +1,9 @@
+---
+title: updates_getDifference
+---
 ## Method: updates\_getDifference  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

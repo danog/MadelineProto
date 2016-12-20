@@ -1,4 +1,10 @@
+---
+title: peerSettings
+---
 ## Constructor: peerSettings  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

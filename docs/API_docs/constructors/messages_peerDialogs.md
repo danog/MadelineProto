@@ -1,4 +1,10 @@
+---
+title: messages_peerDialogs
+---
 ## Constructor: messages\_peerDialogs  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

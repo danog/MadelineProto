@@ -1,4 +1,10 @@
+---
+title: inputStickerSetID
+---
 ## Constructor: inputStickerSetID  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

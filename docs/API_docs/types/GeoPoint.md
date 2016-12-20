@@ -1,4 +1,10 @@
+---
+title: GeoPoint
+---
 ## Type: GeoPoint  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

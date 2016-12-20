@@ -1,4 +1,10 @@
+---
+title: chatInviteEmpty
+---
 ## Constructor: chatInviteEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

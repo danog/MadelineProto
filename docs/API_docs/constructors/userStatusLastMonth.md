@@ -1,4 +1,10 @@
+---
+title: userStatusLastMonth
+---
 ## Constructor: userStatusLastMonth  
+[Back to constructors index](index.md)
+
+
 
 
 

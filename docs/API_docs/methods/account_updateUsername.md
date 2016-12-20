@@ -1,4 +1,9 @@
+---
+title: account_updateUsername
+---
 ## Method: account\_updateUsername  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

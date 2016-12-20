@@ -1,4 +1,10 @@
+---
+title: inputMediaGame
+---
 ## Constructor: inputMediaGame  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

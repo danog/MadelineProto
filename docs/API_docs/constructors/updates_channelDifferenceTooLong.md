@@ -1,4 +1,10 @@
+---
+title: updates_channelDifferenceTooLong
+---
 ## Constructor: updates\_channelDifferenceTooLong  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

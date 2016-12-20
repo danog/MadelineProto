@@ -1,4 +1,10 @@
+---
+title: inputMessagesFilterChatPhotos
+---
 ## Constructor: inputMessagesFilterChatPhotos  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,9 @@
+---
+title: auth_signIn
+---
 ## Method: auth\_signIn  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

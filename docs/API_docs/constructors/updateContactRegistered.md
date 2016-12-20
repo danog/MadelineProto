@@ -1,4 +1,10 @@
+---
+title: updateContactRegistered
+---
 ## Constructor: updateContactRegistered  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

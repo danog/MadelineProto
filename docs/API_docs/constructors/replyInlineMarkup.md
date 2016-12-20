@@ -1,4 +1,10 @@
+---
+title: replyInlineMarkup
+---
 ## Constructor: replyInlineMarkup  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

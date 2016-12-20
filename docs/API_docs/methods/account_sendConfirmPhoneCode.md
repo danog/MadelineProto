@@ -1,4 +1,9 @@
+---
+title: account_sendConfirmPhoneCode
+---
 ## Method: account\_sendConfirmPhoneCode  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

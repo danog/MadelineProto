@@ -1,4 +1,9 @@
+---
+title: contacts_search
+---
 ## Method: contacts\_search  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messages_dialogs
+---
 ## Constructor: messages\_dialogs  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

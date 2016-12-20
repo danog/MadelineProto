@@ -1,4 +1,9 @@
+---
+title: auth_sendInvites
+---
 ## Method: auth\_sendInvites  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

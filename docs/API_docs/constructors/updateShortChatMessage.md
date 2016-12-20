@@ -1,4 +1,10 @@
+---
+title: updateShortChatMessage
+---
 ## Constructor: updateShortChatMessage  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

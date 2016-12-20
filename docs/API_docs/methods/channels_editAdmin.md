@@ -1,4 +1,9 @@
+---
+title: channels_editAdmin
+---
 ## Method: channels\_editAdmin  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

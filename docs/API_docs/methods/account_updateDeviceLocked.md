@@ -1,4 +1,9 @@
+---
+title: account_updateDeviceLocked
+---
 ## Method: account\_updateDeviceLocked  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messageActionChatMigrateTo
+---
 ## Constructor: messageActionChatMigrateTo  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: auth_exportAuthorization
+---
 ## Method: auth\_exportAuthorization  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

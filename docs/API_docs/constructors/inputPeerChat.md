@@ -1,4 +1,10 @@
+---
+title: inputPeerChat
+---
 ## Constructor: inputPeerChat  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

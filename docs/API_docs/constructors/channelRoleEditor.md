@@ -1,4 +1,10 @@
+---
+title: channelRoleEditor
+---
 ## Constructor: channelRoleEditor  
+[Back to constructors index](index.md)
+
+
 
 
 

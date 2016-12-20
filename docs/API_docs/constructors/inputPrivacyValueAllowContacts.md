@@ -1,4 +1,10 @@
+---
+title: inputPrivacyValueAllowContacts
+---
 ## Constructor: inputPrivacyValueAllowContacts  
+[Back to constructors index](index.md)
+
+
 
 
 

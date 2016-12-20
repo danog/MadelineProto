@@ -1,4 +1,10 @@
+---
+title: document
+---
 ## Constructor: document  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

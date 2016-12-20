@@ -1,4 +1,10 @@
+---
+title: help_AppUpdate
+---
 ## Type: help\_AppUpdate  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

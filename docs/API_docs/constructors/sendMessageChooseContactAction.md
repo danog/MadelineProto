@@ -1,4 +1,10 @@
+---
+title: sendMessageChooseContactAction
+---
 ## Constructor: sendMessageChooseContactAction  
+[Back to constructors index](index.md)
+
+
 
 
 

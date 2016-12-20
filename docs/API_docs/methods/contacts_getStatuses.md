@@ -1,4 +1,9 @@
+---
+title: contacts_getStatuses
+---
 ## Method: contacts\_getStatuses  
+[Back to methods index](index.md)
+
 
 
 

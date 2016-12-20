@@ -1,4 +1,9 @@
+---
+title: auth_requestPasswordRecovery
+---
 ## Method: auth\_requestPasswordRecovery  
+[Back to methods index](index.md)
+
 
 
 

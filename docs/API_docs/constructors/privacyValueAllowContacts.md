@@ -1,4 +1,10 @@
+---
+title: privacyValueAllowContacts
+---
 ## Constructor: privacyValueAllowContacts  
+[Back to constructors index](index.md)
+
+
 
 
 

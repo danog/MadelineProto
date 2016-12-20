@@ -1,4 +1,10 @@
+---
+title: updateEncryptedChatTyping
+---
 ## Constructor: updateEncryptedChatTyping  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

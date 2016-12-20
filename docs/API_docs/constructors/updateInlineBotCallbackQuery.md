@@ -1,4 +1,10 @@
+---
+title: updateInlineBotCallbackQuery
+---
 ## Constructor: updateInlineBotCallbackQuery  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

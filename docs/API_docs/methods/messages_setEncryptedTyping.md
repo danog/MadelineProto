@@ -1,4 +1,9 @@
+---
+title: messages_setEncryptedTyping
+---
 ## Method: messages\_setEncryptedTyping  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

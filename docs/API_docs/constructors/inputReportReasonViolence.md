@@ -1,4 +1,10 @@
+---
+title: inputReportReasonViolence
+---
 ## Constructor: inputReportReasonViolence  
+[Back to constructors index](index.md)
+
+
 
 
 

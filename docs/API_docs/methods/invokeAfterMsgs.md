@@ -1,4 +1,9 @@
+---
+title: invokeAfterMsgs
+---
 ## Method: invokeAfterMsgs  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: messages_stickerSetInstallResultSuccess
+---
 ## Constructor: messages\_stickerSetInstallResultSuccess  
+[Back to constructors index](index.md)
+
+
 
 
 

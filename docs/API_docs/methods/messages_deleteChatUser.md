@@ -1,4 +1,9 @@
+---
+title: messages_deleteChatUser
+---
 ## Method: messages\_deleteChatUser  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

@@ -1,4 +1,10 @@
+---
+title: replyKeyboardForceReply
+---
 ## Constructor: replyKeyboardForceReply  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

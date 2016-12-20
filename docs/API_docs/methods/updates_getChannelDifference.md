@@ -1,4 +1,9 @@
+---
+title: updates_getChannelDifference
+---
 ## Method: updates\_getChannelDifference  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

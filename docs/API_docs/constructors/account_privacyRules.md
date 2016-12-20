@@ -1,4 +1,10 @@
+---
+title: account_privacyRules
+---
 ## Constructor: account\_privacyRules  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

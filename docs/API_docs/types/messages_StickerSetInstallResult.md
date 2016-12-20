@@ -1,4 +1,10 @@
+---
+title: messages_StickerSetInstallResult
+---
 ## Type: messages\_StickerSetInstallResult  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

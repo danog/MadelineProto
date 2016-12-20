@@ -1,4 +1,10 @@
+---
+title: sendMessageGamePlayAction
+---
 ## Constructor: sendMessageGamePlayAction  
+[Back to constructors index](index.md)
+
+
 
 
 

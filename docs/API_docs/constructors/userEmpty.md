@@ -1,4 +1,10 @@
+---
+title: userEmpty
+---
 ## Constructor: userEmpty  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

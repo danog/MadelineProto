@@ -1,4 +1,9 @@
+---
+title: auth_checkPhone
+---
 ## Method: auth\_checkPhone  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

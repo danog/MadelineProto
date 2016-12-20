@@ -1,4 +1,10 @@
+---
+title: documentAttributeSticker
+---
 ## Constructor: documentAttributeSticker  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

@@ -1,4 +1,9 @@
+---
+title: messages_searchGlobal
+---
 ## Method: messages\_searchGlobal  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

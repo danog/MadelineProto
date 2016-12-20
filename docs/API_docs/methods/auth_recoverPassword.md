@@ -1,4 +1,9 @@
+---
+title: auth_recoverPassword
+---
 ## Method: auth\_recoverPassword  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

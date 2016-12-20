@@ -1,4 +1,10 @@
+---
+title: geoPointEmpty
+---
 ## Constructor: geoPointEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: TopPeerCategory
+---
 ## Type: TopPeerCategory  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

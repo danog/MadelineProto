@@ -1,4 +1,10 @@
+---
+title: contacts_resolvedPeer
+---
 ## Constructor: contacts\_resolvedPeer  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

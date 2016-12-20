@@ -1,4 +1,10 @@
+---
+title: BotInlineMessage
+---
 ## Type: BotInlineMessage  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

@@ -1,4 +1,10 @@
+---
+title: messageMediaVenue
+---
 ## Constructor: messageMediaVenue  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

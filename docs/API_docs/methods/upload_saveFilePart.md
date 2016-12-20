@@ -1,4 +1,9 @@
+---
+title: upload_saveFilePart
+---
 ## Method: upload\_saveFilePart  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

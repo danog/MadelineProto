@@ -1,4 +1,10 @@
+---
+title: Game
+---
 ## Type: Game  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

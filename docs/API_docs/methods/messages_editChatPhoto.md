@@ -1,4 +1,9 @@
+---
+title: messages_editChatPhoto
+---
 ## Method: messages\_editChatPhoto  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

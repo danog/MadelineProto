@@ -1,4 +1,9 @@
+---
+title: contacts_deleteContact
+---
 ## Method: contacts\_deleteContact  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

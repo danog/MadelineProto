@@ -1,4 +1,9 @@
+---
+title: initConnection
+---
 ## Method: initConnection  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

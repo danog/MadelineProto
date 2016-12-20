@@ -1,4 +1,9 @@
+---
+title: messages_getArchivedStickers
+---
 ## Method: messages\_getArchivedStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

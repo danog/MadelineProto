@@ -1,4 +1,10 @@
+---
+title: config
+---
 ## Constructor: config  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

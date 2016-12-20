@@ -1,4 +1,9 @@
+---
+title: messages_getAttachedStickers
+---
 ## Method: messages\_getAttachedStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

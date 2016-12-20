@@ -1,4 +1,9 @@
+---
+title: messages_getInlineGameHighScores
+---
 ## Method: messages\_getInlineGameHighScores  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

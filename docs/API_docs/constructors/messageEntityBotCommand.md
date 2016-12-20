@@ -1,4 +1,10 @@
+---
+title: messageEntityBotCommand
+---
 ## Constructor: messageEntityBotCommand  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

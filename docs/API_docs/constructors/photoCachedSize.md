@@ -1,4 +1,10 @@
+---
+title: photoCachedSize
+---
 ## Constructor: photoCachedSize  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

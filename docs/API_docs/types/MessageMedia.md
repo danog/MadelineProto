@@ -1,4 +1,10 @@
+---
+title: MessageMedia
+---
 ## Type: MessageMedia  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

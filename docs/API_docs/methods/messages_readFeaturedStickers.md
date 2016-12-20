@@ -1,4 +1,9 @@
+---
+title: messages_readFeaturedStickers
+---
 ## Method: messages\_readFeaturedStickers  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

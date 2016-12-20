@@ -1,4 +1,9 @@
+---
+title: channels_getAdminedPublicChannels
+---
 ## Method: channels\_getAdminedPublicChannels  
+[Back to methods index](index.md)
+
 
 
 

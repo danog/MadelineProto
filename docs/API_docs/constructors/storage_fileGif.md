@@ -1,4 +1,10 @@
+---
+title: storage_fileGif
+---
 ## Constructor: storage\_fileGif  
+[Back to constructors index](index.md)
+
+
 
 
 

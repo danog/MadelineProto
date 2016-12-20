@@ -1,4 +1,9 @@
+---
+title: channels_deleteUserHistory
+---
 ## Method: channels\_deleteUserHistory  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

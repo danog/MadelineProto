@@ -1,4 +1,10 @@
+---
+title: inputPhoneContact
+---
 ## Constructor: inputPhoneContact  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

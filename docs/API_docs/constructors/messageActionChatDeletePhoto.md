@@ -1,4 +1,10 @@
+---
+title: messageActionChatDeletePhoto
+---
 ## Constructor: messageActionChatDeletePhoto  
+[Back to constructors index](index.md)
+
+
 
 
 

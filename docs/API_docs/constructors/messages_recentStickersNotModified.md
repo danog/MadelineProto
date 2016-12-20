@@ -1,4 +1,10 @@
+---
+title: messages_recentStickersNotModified
+---
 ## Constructor: messages\_recentStickersNotModified  
+[Back to constructors index](index.md)
+
+
 
 
 

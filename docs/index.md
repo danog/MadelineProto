@@ -1,3 +1,6 @@
+---
+title: MadelineProto documentation
+---
 # MadelineProto
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
 [![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
@@ -8,11 +11,11 @@ PHP implementation of MTProto, based on [telepy](https://github.com/griganton/te
 
 This project can run on PHP 7, PHP 5.6 and HHVM, only 64 bit systems are supported ATM.  
 
-Also note that MadelineProto will perform better if a big math extension like gmp o bcmath is installed.
+Also note that MadelineProto will perform better if a big math extension like gmp or bcmath is installed.
 
 This project is in beta state.  
 
-The API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
+The MadelineProto API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
 
 ## Usage
 
@@ -37,6 +40,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
 Here you can see the default values for the settings\ arrays and explanations for every setting:
+
 ```
 $settings = [
     'authorization' => [ // Authorization settings
@@ -137,6 +141,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
+
 ```
 $settings = [
     'authorization' => [ // Authorization settings
@@ -144,7 +149,9 @@ $settings = [
     ]
 ]
 ```
+
 Becomes:  
+
 ```
 $settings = [
     'authorization' => [ // Authorization settings
@@ -165,6 +172,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 Note that only settings arrays or values of a settings array will be set to default.
 
 The settings array can be accessed in the instantiated class like this:
+
 ```
 $MadelineProto = new \danog\MadelineProto\API();
 var_dump($MadelineProto->API->settings);
@@ -174,6 +182,7 @@ var_dump($MadelineProto->API->settings);
 
 The API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
 To call an MTProto method simply call it as if it is a method of the API class, substitute namespace sepators (.) with -> if needed:
+
 ```
 $MadelineProto = new \danog\MadelineProto\API();
 $checkedPhone = $MadelineProto->auth->checkPhone( // auth.checkPhone becomes auth->checkPhone
@@ -191,6 +200,7 @@ var_dump($sentMessage);
 ```
 
 The API class also provides some wrapper methods for logging in as a bot or as a normal user:
+
 ```
 $sentCode = $MadelineProto->phone_login($number); // Send code
 var_dump($sentCode);
@@ -225,8 +235,9 @@ MadelineProto can throw three different exceptions:
 [Here](https://github.com/danog/MadelineProto/projects/1) you can find this project's roadmap.
 
 You can use this scheme of the structure of this project to help yourself:
+
 ```
-build_docs.php - Builds API docs from TL scheme files
+build_docs.php - Builds API docs from TL scheme file
 src/danog/MadelineProto/
     MTProtoTools/
         AckHandler - Handles acknowledgement of incoming and outgoing mtproto messages

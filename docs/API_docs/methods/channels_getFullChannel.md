@@ -1,4 +1,9 @@
+---
+title: channels_getFullChannel
+---
 ## Method: channels\_getFullChannel  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

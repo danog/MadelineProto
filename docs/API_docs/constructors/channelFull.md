@@ -1,4 +1,10 @@
+---
+title: channelFull
+---
 ## Constructor: channelFull  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

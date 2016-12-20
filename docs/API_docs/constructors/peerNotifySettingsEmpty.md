@@ -1,4 +1,10 @@
+---
+title: peerNotifySettingsEmpty
+---
 ## Constructor: peerNotifySettingsEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

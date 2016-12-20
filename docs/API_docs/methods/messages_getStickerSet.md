@@ -1,4 +1,9 @@
+---
+title: messages_getStickerSet
+---
 ## Method: messages\_getStickerSet  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

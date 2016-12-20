@@ -1,4 +1,10 @@
+---
+title: InputBotInlineResult
+---
 ## Type: InputBotInlineResult  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

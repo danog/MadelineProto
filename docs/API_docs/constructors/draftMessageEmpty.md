@@ -1,4 +1,10 @@
+---
+title: draftMessageEmpty
+---
 ## Constructor: draftMessageEmpty  
+[Back to constructors index](index.md)
+
+
 
 
 

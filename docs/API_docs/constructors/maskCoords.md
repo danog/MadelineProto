@@ -1,4 +1,10 @@
+---
+title: maskCoords
+---
 ## Constructor: maskCoords  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

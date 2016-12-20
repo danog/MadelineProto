@@ -1,4 +1,10 @@
+---
+title: nearestDc
+---
 ## Constructor: nearestDc  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

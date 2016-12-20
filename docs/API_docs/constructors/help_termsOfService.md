@@ -1,4 +1,10 @@
+---
+title: help_termsOfService
+---
 ## Constructor: help\_termsOfService  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

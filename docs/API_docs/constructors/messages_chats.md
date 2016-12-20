@@ -1,4 +1,10 @@
+---
+title: messages_chats
+---
 ## Constructor: messages\_chats  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

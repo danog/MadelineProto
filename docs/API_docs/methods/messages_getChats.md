@@ -1,4 +1,9 @@
+---
+title: messages_getChats
+---
 ## Method: messages\_getChats  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

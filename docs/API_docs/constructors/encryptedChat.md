@@ -1,4 +1,10 @@
+---
+title: encryptedChat
+---
 ## Constructor: encryptedChat  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 

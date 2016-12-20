@@ -1,4 +1,9 @@
+---
+title: channels_toggleSignatures
+---
 ## Method: channels\_toggleSignatures  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

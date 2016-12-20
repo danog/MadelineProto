@@ -1,4 +1,9 @@
+---
+title: account_registerDevice
+---
 ## Method: account\_registerDevice  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

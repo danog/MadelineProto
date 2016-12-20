@@ -1,4 +1,9 @@
+---
+title: photos_updateProfilePhoto
+---
 ## Method: photos\_updateProfilePhoto  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

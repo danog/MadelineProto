@@ -1,4 +1,9 @@
+---
+title: messages_uninstallStickerSet
+---
 ## Method: messages\_uninstallStickerSet  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

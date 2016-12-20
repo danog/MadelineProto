@@ -1,4 +1,10 @@
+---
+title: updateRecentStickers
+---
 ## Constructor: updateRecentStickers  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: vector
+---
 ## Constructor: vector  
+[Back to constructors index](index.md)
+
+
 
 
 

@@ -1,4 +1,10 @@
+---
+title: messages_PeerDialogs
+---
 ## Type: messages\_PeerDialogs  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

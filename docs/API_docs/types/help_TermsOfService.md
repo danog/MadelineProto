@@ -1,4 +1,10 @@
+---
+title: help_TermsOfService
+---
 ## Type: help\_TermsOfService  
+[Back to types index](index.md)
+
+
 
 ### Possible values (constructors):
 

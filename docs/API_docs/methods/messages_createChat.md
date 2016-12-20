@@ -1,4 +1,9 @@
+---
+title: messages_createChat
+---
 ## Method: messages\_createChat  
+[Back to methods index](index.md)
+
 
 ### Parameters:
 

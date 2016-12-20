@@ -1,4 +1,10 @@
+---
+title: auth_exportedAuthorization
+---
 ## Constructor: auth\_exportedAuthorization  
+[Back to constructors index](index.md)
+
+
 
 ### Attributes:
 
