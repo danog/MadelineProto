@@ -363,7 +363,6 @@ title: '.$type.'
 ';
     file_put_contents('types/'.$type.'.md', $header.$constructors);
     $last_namespace = $new_namespace;
-
 }
 
 \danog\MadelineProto\Logger::log('Generating types index...');
