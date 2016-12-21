@@ -4,7 +4,7 @@
 
 Created by [Daniil Gentili](https://daniil.it), licensed under AGPLv3.
 
-<img src='https://daniil.it/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/logo-hover.png';" onmouseout="this.src='https://daniil.it/logo.png';" />
+<img src='https://daniil.it/MadelineProto/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/MadelineProto/logo-hover.png';" onmouseout="this.src='https://daniil.it/MadelineProto/logo.png';" />
 
 Logo created by [Matthew Hesketh](https://matthewhesketh.com) (thanks again!).  
 
