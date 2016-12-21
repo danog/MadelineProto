@@ -17,7 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait ResponseHandler
 {
-
     private $bad_msg_error_codes = [
         16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
         17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
@@ -32,24 +31,26 @@ trait ResponseHandler
         64 => 'invalid container.',
     ];
     private $msgs_info_flags = [
-        1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
-        2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
-        3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
-        4 => 'message received (note that this response is also at the same time a receipt acknowledgment)',
-        8 => ' and message already acknowledged',
-        16 => ' and message not requiring acknowledgment',
-        32 => ' and RPC query contained in message being processed or processing already complete',
-        64 => ' and content-related response to message already generated',
+        1   => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
+        2   => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
+        3   => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
+        4   => 'message received (note that this response is also at the same time a receipt acknowledgment)',
+        8   => ' and message already acknowledged',
+        16  => ' and message not requiring acknowledgment',
+        32  => ' and RPC query contained in message being processed or processing already complete',
+        64  => ' and content-related response to message already generated',
         128 => ' and other party knows for a fact that message is already received',
     ];
-    public function send_msgs_state_info($req_msg_id, $msg_ids) {
+
+    public function send_msgs_state_info($req_msg_id, $msg_ids)
+    {
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!in_array($msg_id, $this->datacenter->incoming_messages)) {
                 if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $msg_id) {
                     $cur_info |= 3;
-                } else if (((int) ((time() + $this->datacenter->time_delta - 300) << 32)) > $msg_id) {
+                } elseif (((int) ((time() + $this->datacenter->time_delta - 300) << 32)) > $msg_id) {
                     $cur_info |= 1;
                 } else {
                     $cur_info |= 2;
@@ -64,6 +65,7 @@ trait ResponseHandler
         }
         $this->datacenter->outgoing_messages[$this->object_call('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info])]['response'] = $req_msg_id;
     }
+
     public function handle_messages()
     {
         foreach ($this->datacenter->new_incoming as $current_msg_id) {
@@ -114,7 +116,7 @@ trait ResponseHandler
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
                 case 'msg_container':
-                    
+
                     \danog\MadelineProto\Logger::log($response['messages']);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     foreach ($response['messages'] as $message) {
@@ -139,7 +141,7 @@ trait ResponseHandler
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
                 case 'http_wait':
-                    
+
                     \danog\MadelineProto\Logger::log($response);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
@@ -154,7 +156,7 @@ trait ResponseHandler
                     break;
                 case 'msgs_all_info':
                     unset($this->datacenter->new_incoming[$current_msg_id]);
-                    
+
                     foreach ($response['msg_ids'] as $key => $msg_id) {
                         $status = 'Status for message id '.$msg_id.': ';
                         if (($response['info'][$key] & 4) == 1) {
@@ -170,7 +172,7 @@ trait ResponseHandler
                     break;
                 case 'msg_new_detailed_info':
                 case 'msg_detailed_info':
-                    
+
                     if (isset($this->datacenter->incoming_messages[$response['answer_msg_id']])) {
                         $this->ack_incoming_message_id($response['answer_msg_id']);
                     } else {
