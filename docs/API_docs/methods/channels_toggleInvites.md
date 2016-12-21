@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->channels_toggleInvites(['channel' => InputChannel, 'enabled' => Bool, ]);
+$Updates = $MadelineProto->channels->toggleInvites(['channel' => InputChannel, 'enabled' => Bool, ]);
 ```

@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AffectedHistory = $MadelineProto->messages_deleteHistory(['just_clear' => Bool, 'peer' => InputPeer, 'max_id' => int, ]);
+$messages_AffectedHistory = $MadelineProto->messages->deleteHistory(['just_clear' => Bool, 'peer' => InputPeer, 'max_id' => int, ]);
 ```

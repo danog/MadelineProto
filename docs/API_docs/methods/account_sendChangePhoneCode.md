@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_SentCode = $MadelineProto->account_sendChangePhoneCode(['allow_flashcall' => Bool, 'phone_number' => string, 'current_number' => Bool, ]);
+$auth_SentCode = $MadelineProto->account->sendChangePhoneCode(['allow_flashcall' => Bool, 'phone_number' => string, 'current_number' => Bool, ]);
 ```

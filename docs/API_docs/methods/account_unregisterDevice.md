@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_unregisterDevice(['token_type' => int, 'token' => string, ]);
+$Bool = $MadelineProto->account->unregisterDevice(['token_type' => int, 'token' => string, ]);
 ```

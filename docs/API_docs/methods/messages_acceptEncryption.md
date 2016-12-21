@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$EncryptedChat = $MadelineProto->messages_acceptEncryption(['peer' => InputEncryptedChat, 'g_b' => bytes, 'key_fingerprint' => long, ]);
+$EncryptedChat = $MadelineProto->messages->acceptEncryption(['peer' => InputEncryptedChat, 'g_b' => bytes, 'key_fingerprint' => long, ]);
 ```

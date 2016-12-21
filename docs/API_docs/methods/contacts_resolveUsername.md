@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_ResolvedPeer = $MadelineProto->contacts_resolveUsername(['username' => string, ]);
+$contacts_ResolvedPeer = $MadelineProto->contacts->resolveUsername(['username' => string, ]);
 ```

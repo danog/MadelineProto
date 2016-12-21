@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->channels_reportSpam(['channel' => InputChannel, 'user_id' => InputUser, 'id' => [int], ]);
+$Bool = $MadelineProto->channels->reportSpam(['channel' => InputChannel, 'user_id' => InputUser, 'id' => [int], ]);
 ```

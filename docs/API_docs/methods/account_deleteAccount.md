@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_deleteAccount(['reason' => string, ]);
+$Bool = $MadelineProto->account->deleteAccount(['reason' => string, ]);
 ```

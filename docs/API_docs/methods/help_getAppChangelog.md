@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_AppChangelog = $MadelineProto->help_getAppChangelog();
+$help_AppChangelog = $MadelineProto->help->getAppChangelog();
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_editChatPhoto(['chat_id' => int, 'photo' => InputChatPhoto, ]);
+$Updates = $MadelineProto->messages->editChatPhoto(['chat_id' => int, 'photo' => InputChatPhoto, ]);
 ```

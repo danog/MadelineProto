@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_setAccountTTL(['ttl' => AccountDaysTTL, ]);
+$Bool = $MadelineProto->account->setAccountTTL(['ttl' => AccountDaysTTL, ]);
 ```

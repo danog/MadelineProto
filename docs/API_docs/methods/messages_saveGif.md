@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_saveGif(['id' => InputDocument, 'unsave' => Bool, ]);
+$Bool = $MadelineProto->messages->saveGif(['id' => InputDocument, 'unsave' => Bool, ]);
 ```

@@ -39,5 +39,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->messages_getHistory(['peer' => InputPeer, 'offset_id' => int, 'offset_date' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
+$messages_Messages = $MadelineProto->messages->getHistory(['peer' => InputPeer, 'offset_id' => int, 'offset_date' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
 ```

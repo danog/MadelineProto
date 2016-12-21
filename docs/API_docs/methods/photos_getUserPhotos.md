@@ -36,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$photos_Photos = $MadelineProto->photos_getUserPhotos(['user_id' => InputUser, 'offset' => int, 'max_id' => long, 'limit' => int, ]);
+$photos_Photos = $MadelineProto->photos->getUserPhotos(['user_id' => InputUser, 'offset' => int, 'max_id' => long, 'limit' => int, ]);
 ```

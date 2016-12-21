@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$AccountDaysTTL = $MadelineProto->account_getAccountTTL();
+$AccountDaysTTL = $MadelineProto->account->getAccountTTL();
 ```

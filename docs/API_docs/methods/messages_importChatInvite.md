@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_importChatInvite(['hash' => string, ]);
+$Updates = $MadelineProto->messages->importChatInvite(['hash' => string, ]);
 ```

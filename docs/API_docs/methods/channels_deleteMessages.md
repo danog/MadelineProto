@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AffectedMessages = $MadelineProto->channels_deleteMessages(['channel' => InputChannel, 'id' => [int], ]);
+$messages_AffectedMessages = $MadelineProto->channels->deleteMessages(['channel' => InputChannel, 'id' => [int], ]);
 ```

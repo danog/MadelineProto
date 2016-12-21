@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_ArchivedStickers = $MadelineProto->messages_getArchivedStickers(['masks' => Bool, 'offset_id' => long, 'limit' => int, ]);
+$messages_ArchivedStickers = $MadelineProto->messages->getArchivedStickers(['masks' => Bool, 'offset_id' => long, 'limit' => int, ]);
 ```

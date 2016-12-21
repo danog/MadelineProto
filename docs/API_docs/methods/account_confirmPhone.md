@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_confirmPhone(['phone_code_hash' => string, 'phone_code' => string, ]);
+$Bool = $MadelineProto->account->confirmPhone(['phone_code_hash' => string, 'phone_code' => string, ]);
 ```

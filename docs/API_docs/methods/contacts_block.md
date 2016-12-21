@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->contacts_block(['id' => InputUser, ]);
+$Bool = $MadelineProto->contacts->block(['id' => InputUser, ]);
 ```

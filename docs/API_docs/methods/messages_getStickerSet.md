@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_StickerSet = $MadelineProto->messages_getStickerSet(['stickerset' => InputStickerSet, ]);
+$messages_StickerSet = $MadelineProto->messages->getStickerSet(['stickerset' => InputStickerSet, ]);
 ```

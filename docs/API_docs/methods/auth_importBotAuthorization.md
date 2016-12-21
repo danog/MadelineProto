@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth_importBotAuthorization(['api_id' => int, 'api_hash' => string, 'bot_auth_token' => string, ]);
+$auth_Authorization = $MadelineProto->auth->importBotAuthorization(['api_id' => int, 'api_hash' => string, 'bot_auth_token' => string, ]);
 ```

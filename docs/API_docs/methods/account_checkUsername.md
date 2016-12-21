@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_checkUsername(['username' => string, ]);
+$Bool = $MadelineProto->account->checkUsername(['username' => string, ]);
 ```

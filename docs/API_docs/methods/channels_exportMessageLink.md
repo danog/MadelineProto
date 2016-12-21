@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$ExportedMessageLink = $MadelineProto->channels_exportMessageLink(['channel' => InputChannel, 'id' => int, ]);
+$ExportedMessageLink = $MadelineProto->channels->exportMessageLink(['channel' => InputChannel, 'id' => int, ]);
 ```

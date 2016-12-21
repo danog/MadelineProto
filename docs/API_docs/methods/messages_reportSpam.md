@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_reportSpam(['peer' => InputPeer, ]);
+$Bool = $MadelineProto->messages->reportSpam(['peer' => InputPeer, ]);
 ```

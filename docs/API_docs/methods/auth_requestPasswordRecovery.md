@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_PasswordRecovery = $MadelineProto->auth_requestPasswordRecovery();
+$auth_PasswordRecovery = $MadelineProto->auth->requestPasswordRecovery();
 ```

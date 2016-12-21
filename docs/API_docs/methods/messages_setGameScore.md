@@ -37,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_setGameScore(['edit_message' => Bool, 'peer' => InputPeer, 'id' => int, 'user_id' => InputUser, 'score' => int, ]);
+$Updates = $MadelineProto->messages->setGameScore(['edit_message' => Bool, 'peer' => InputPeer, 'id' => int, 'user_id' => InputUser, 'score' => int, ]);
 ```

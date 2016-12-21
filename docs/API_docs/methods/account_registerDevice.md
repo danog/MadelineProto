@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_registerDevice(['token_type' => int, 'token' => string, ]);
+$Bool = $MadelineProto->account->registerDevice(['token_type' => int, 'token' => string, ]);
 ```

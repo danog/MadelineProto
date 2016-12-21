@@ -37,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth_signUp(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, 'first_name' => string, 'last_name' => string, ]);
+$auth_Authorization = $MadelineProto->auth->signUp(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, 'first_name' => string, 'last_name' => string, ]);
 ```

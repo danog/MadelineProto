@@ -36,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_startBot(['bot' => InputUser, 'peer' => InputPeer, 'random_id' => long, 'start_param' => string, ]);
+$Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'peer' => InputPeer, 'random_id' => long, 'start_param' => string, ]);
 ```

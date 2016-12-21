@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_resetAuthorization(['hash' => long, ]);
+$Bool = $MadelineProto->account->resetAuthorization(['hash' => long, ]);
 ```

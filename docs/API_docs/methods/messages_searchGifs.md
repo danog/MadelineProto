@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_FoundGifs = $MadelineProto->messages_searchGifs(['q' => string, 'offset' => int, ]);
+$messages_FoundGifs = $MadelineProto->messages->searchGifs(['q' => string, 'offset' => int, ]);
 ```

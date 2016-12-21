@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_updateStatus(['offline' => Bool, ]);
+$Bool = $MadelineProto->account->updateStatus(['offline' => Bool, ]);
 ```

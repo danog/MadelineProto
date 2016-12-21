@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_reorderStickerSets(['masks' => Bool, 'order' => [long], ]);
+$Bool = $MadelineProto->messages->reorderStickerSets(['masks' => Bool, 'order' => [long], ]);
 ```

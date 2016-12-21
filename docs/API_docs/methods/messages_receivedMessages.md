@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_ReceivedNotifyMessage = $MadelineProto->messages_receivedMessages(['max_id' => int, ]);
+$Vector_of_ReceivedNotifyMessage = $MadelineProto->messages->receivedMessages(['max_id' => int, ]);
 ```

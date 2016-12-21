@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->contacts_deleteContacts(['id' => [InputUser], ]);
+$Bool = $MadelineProto->contacts->deleteContacts(['id' => [InputUser], ]);
 ```

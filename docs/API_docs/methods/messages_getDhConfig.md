@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_DhConfig = $MadelineProto->messages_getDhConfig(['version' => int, 'random_length' => int, ]);
+$messages_DhConfig = $MadelineProto->messages->getDhConfig(['version' => int, 'random_length' => int, ]);
 ```

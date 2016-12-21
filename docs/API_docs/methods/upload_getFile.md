@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$upload_File = $MadelineProto->upload_getFile(['location' => InputFileLocation, 'offset' => int, 'limit' => int, ]);
+$upload_File = $MadelineProto->upload->getFile(['location' => InputFileLocation, 'offset' => int, 'limit' => int, ]);
 ```

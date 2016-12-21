@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$User = $MadelineProto->account_updateProfile(['first_name' => string, 'last_name' => string, 'about' => string, ]);
+$User = $MadelineProto->account->updateProfile(['first_name' => string, 'last_name' => string, 'about' => string, ]);
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AffectedMessages = $MadelineProto->messages_readHistory(['peer' => InputPeer, 'max_id' => int, ]);
+$messages_AffectedMessages = $MadelineProto->messages->readHistory(['peer' => InputPeer, 'max_id' => int, ]);
 ```

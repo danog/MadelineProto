@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_Found = $MadelineProto->contacts_search(['q' => string, 'limit' => int, ]);
+$contacts_Found = $MadelineProto->contacts->search(['q' => string, 'limit' => int, ]);
 ```

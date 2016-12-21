@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_PasswordSettings = $MadelineProto->account_getPasswordSettings(['current_password_hash' => bytes, ]);
+$account_PasswordSettings = $MadelineProto->account->getPasswordSettings(['current_password_hash' => bytes, ]);
 ```

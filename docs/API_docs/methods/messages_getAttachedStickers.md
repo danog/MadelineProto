@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_StickerSetCovered = $MadelineProto->messages_getAttachedStickers(['media' => InputStickeredMedia, ]);
+$Vector_of_StickerSetCovered = $MadelineProto->messages->getAttachedStickers(['media' => InputStickeredMedia, ]);
 ```

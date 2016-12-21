@@ -40,5 +40,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_sendInlineBotResult(['silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'random_id' => long, 'query_id' => long, 'id' => string, ]);
+$Updates = $MadelineProto->messages->sendInlineBotResult(['silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'random_id' => long, 'query_id' => long, 'id' => string, ]);
 ```

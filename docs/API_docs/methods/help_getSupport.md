@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_Support = $MadelineProto->help_getSupport();
+$help_Support = $MadelineProto->help->getSupport();
 ```

@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_TermsOfService = $MadelineProto->help_getTermsOfService();
+$help_TermsOfService = $MadelineProto->help->getTermsOfService();
 ```

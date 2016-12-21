@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_updatePasswordSettings(['current_password_hash' => bytes, 'new_settings' => account_PasswordInputSettings, ]);
+$Bool = $MadelineProto->account->updatePasswordSettings(['current_password_hash' => bytes, 'new_settings' => account_PasswordInputSettings, ]);
 ```

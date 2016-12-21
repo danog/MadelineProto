@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_User = $MadelineProto->users_getUsers(['id' => [InputUser], ]);
+$Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser], ]);
 ```

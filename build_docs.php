@@ -158,7 +158,7 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$'.$type.' = $MadelineProto->'.$method.'(['.$params.']);
+$'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
 ```');
     file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
 }

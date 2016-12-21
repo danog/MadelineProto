@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_PeerDialogs = $MadelineProto->messages_getPeerDialogs(['peers' => [InputPeer], ]);
+$messages_PeerDialogs = $MadelineProto->messages->getPeerDialogs(['peers' => [InputPeer], ]);
 ```

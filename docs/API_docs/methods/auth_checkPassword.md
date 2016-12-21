@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth_checkPassword(['password_hash' => bytes, ]);
+$auth_Authorization = $MadelineProto->auth->checkPassword(['password_hash' => bytes, ]);
 ```

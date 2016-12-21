@@ -42,5 +42,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_sendMessage(['no_webpage' => Bool, 'silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'random_id' => long, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
+$Updates = $MadelineProto->messages->sendMessage(['no_webpage' => Bool, 'silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'random_id' => long, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
 ```

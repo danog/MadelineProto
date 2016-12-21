@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_int = $MadelineProto->messages_getMessagesViews(['peer' => InputPeer, 'id' => [int], 'increment' => Bool, ]);
+$Vector_of_int = $MadelineProto->messages->getMessagesViews(['peer' => InputPeer, 'id' => [int], 'increment' => Bool, ]);
 ```

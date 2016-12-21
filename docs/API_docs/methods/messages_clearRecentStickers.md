@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_clearRecentStickers(['attached' => Bool, ]);
+$Bool = $MadelineProto->messages->clearRecentStickers(['attached' => Bool, ]);
 ```

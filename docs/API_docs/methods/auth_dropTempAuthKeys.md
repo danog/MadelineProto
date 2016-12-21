@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth_dropTempAuthKeys(['except_auth_keys' => [long], ]);
+$Bool = $MadelineProto->auth->dropTempAuthKeys(['except_auth_keys' => [long], ]);
 ```

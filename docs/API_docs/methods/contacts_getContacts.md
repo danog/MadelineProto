@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_Contacts = $MadelineProto->contacts_getContacts(['hash' => string, ]);
+$contacts_Contacts = $MadelineProto->contacts->getContacts(['hash' => string, ]);
 ```

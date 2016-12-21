@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_editChatTitle(['chat_id' => int, 'title' => string, ]);
+$Updates = $MadelineProto->messages->editChatTitle(['chat_id' => int, 'title' => string, ]);
 ```

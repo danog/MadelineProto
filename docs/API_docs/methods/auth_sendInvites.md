@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth_sendInvites(['phone_numbers' => [string], 'message' => string, ]);
+$Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => [string], 'message' => string, ]);
 ```

@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$ExportedChatInvite = $MadelineProto->channels_exportInvite(['channel' => InputChannel, ]);
+$ExportedChatInvite = $MadelineProto->channels->exportInvite(['channel' => InputChannel, ]);
 ```

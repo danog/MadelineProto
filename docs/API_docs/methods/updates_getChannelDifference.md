@@ -36,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$updates_ChannelDifference = $MadelineProto->updates_getChannelDifference(['channel' => InputChannel, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
+$updates_ChannelDifference = $MadelineProto->updates->getChannelDifference(['channel' => InputChannel, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_StickerSetInstallResult = $MadelineProto->messages_installStickerSet(['stickerset' => InputStickerSet, 'archived' => Bool, ]);
+$messages_StickerSetInstallResult = $MadelineProto->messages->installStickerSet(['stickerset' => InputStickerSet, 'archived' => Bool, ]);
 ```

@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$updates_State = $MadelineProto->updates_getState();
+$updates_State = $MadelineProto->updates->getState();
 ```

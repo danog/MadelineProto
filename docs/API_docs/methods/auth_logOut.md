@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth_logOut();
+$Bool = $MadelineProto->auth->logOut();
 ```

@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AllStickers = $MadelineProto->messages_getMaskStickers(['hash' => int, ]);
+$messages_AllStickers = $MadelineProto->messages->getMaskStickers(['hash' => int, ]);
 ```

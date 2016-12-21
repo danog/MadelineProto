@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$User = $MadelineProto->account_changePhone(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, ]);
+$User = $MadelineProto->account->changePhone(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, ]);
 ```

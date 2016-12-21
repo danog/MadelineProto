@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->help_saveAppLog(['events' => [InputAppEvent], ]);
+$Bool = $MadelineProto->help->saveAppLog(['events' => [InputAppEvent], ]);
 ```

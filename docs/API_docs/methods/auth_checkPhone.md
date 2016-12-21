@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_CheckedPhone = $MadelineProto->auth_checkPhone(['phone_number' => string, ]);
+$auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => string, ]);
 ```

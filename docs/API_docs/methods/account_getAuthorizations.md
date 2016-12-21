@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_Authorizations = $MadelineProto->account_getAuthorizations();
+$account_Authorizations = $MadelineProto->account->getAuthorizations();
 ```

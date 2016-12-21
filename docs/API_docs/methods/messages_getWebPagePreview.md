@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$MessageMedia = $MadelineProto->messages_getWebPagePreview(['message' => string, ]);
+$MessageMedia = $MadelineProto->messages->getWebPagePreview(['message' => string, ]);
 ```

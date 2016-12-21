@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth_cancelCode(['phone_number' => string, 'phone_code_hash' => string, ]);
+$Bool = $MadelineProto->auth->cancelCode(['phone_number' => string, 'phone_code_hash' => string, ]);
 ```

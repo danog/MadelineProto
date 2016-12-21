@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_discardEncryption(['chat_id' => int, ]);
+$Bool = $MadelineProto->messages->discardEncryption(['chat_id' => int, ]);
 ```

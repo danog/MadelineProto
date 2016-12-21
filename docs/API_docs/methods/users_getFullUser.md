@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$UserFull = $MadelineProto->users_getFullUser(['id' => InputUser, ]);
+$UserFull = $MadelineProto->users->getFullUser(['id' => InputUser, ]);
 ```

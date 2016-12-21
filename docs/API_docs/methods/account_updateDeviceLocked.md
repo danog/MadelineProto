@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account_updateDeviceLocked(['period' => int, ]);
+$Bool = $MadelineProto->account->updateDeviceLocked(['period' => int, ]);
 ```

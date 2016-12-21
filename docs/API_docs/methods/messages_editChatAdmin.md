@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_editChatAdmin(['chat_id' => int, 'user_id' => InputUser, 'is_admin' => Bool, ]);
+$Bool = $MadelineProto->messages->editChatAdmin(['chat_id' => int, 'user_id' => InputUser, 'is_admin' => Bool, ]);
 ```

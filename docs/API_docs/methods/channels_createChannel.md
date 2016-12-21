@@ -36,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->channels_createChannel(['broadcast' => Bool, 'megagroup' => Bool, 'title' => string, 'about' => string, ]);
+$Updates = $MadelineProto->channels->createChannel(['broadcast' => Bool, 'megagroup' => Bool, 'title' => string, 'about' => string, ]);
 ```

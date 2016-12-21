@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$User = $MadelineProto->contacts_importCard(['export_card' => [int], ]);
+$User = $MadelineProto->contacts->importCard(['export_card' => [int], ]);
 ```

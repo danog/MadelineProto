@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SavedGifs = $MadelineProto->messages_getSavedGifs(['hash' => int, ]);
+$messages_SavedGifs = $MadelineProto->messages->getSavedGifs(['hash' => int, ]);
 ```

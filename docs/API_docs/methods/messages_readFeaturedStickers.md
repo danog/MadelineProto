@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_readFeaturedStickers(['id' => [long], ]);
+$Bool = $MadelineProto->messages->readFeaturedStickers(['id' => [long], ]);
 ```

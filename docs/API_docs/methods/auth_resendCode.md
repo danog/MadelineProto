@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_SentCode = $MadelineProto->auth_resendCode(['phone_number' => string, 'phone_code_hash' => string, ]);
+$auth_SentCode = $MadelineProto->auth->resendCode(['phone_number' => string, 'phone_code_hash' => string, ]);
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_toggleChatAdmins(['chat_id' => int, 'enabled' => Bool, ]);
+$Updates = $MadelineProto->messages->toggleChatAdmins(['chat_id' => int, 'enabled' => Bool, ]);
 ```

@@ -37,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
+$Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
 ```

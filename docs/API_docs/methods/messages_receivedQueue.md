@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_long = $MadelineProto->messages_receivedQueue(['max_qts' => int, ]);
+$Vector_of_long = $MadelineProto->messages->receivedQueue(['max_qts' => int, ]);
 ```

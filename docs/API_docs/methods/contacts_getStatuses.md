@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_ContactStatus = $MadelineProto->contacts_getStatuses();
+$Vector_of_ContactStatus = $MadelineProto->contacts->getStatuses();
 ```

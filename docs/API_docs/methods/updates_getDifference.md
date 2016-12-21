@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$updates_Difference = $MadelineProto->updates_getDifference(['pts' => int, 'date' => int, 'qts' => int, ]);
+$updates_Difference = $MadelineProto->updates->getDifference(['pts' => int, 'date' => int, 'qts' => int, ]);
 ```

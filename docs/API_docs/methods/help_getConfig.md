@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Config = $MadelineProto->help_getConfig();
+$Config = $MadelineProto->help->getConfig();
 ```

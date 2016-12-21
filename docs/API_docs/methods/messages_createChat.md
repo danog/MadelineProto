@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_createChat(['users' => [InputUser], 'title' => string, ]);
+$Updates = $MadelineProto->messages->createChat(['users' => [InputUser], 'title' => string, ]);
 ```

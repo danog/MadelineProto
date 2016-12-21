@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_Password = $MadelineProto->account_getPassword();
+$account_Password = $MadelineProto->account->getPassword();
 ```

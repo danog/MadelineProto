@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_ExportedAuthorization = $MadelineProto->auth_exportAuthorization(['dc_id' => int, ]);
+$auth_ExportedAuthorization = $MadelineProto->auth->exportAuthorization(['dc_id' => int, ]);
 ```

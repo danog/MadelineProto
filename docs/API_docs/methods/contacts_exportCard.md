@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_int = $MadelineProto->contacts_exportCard();
+$Vector_of_int = $MadelineProto->contacts->exportCard();
 ```

@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$PeerNotifySettings = $MadelineProto->account_getNotifySettings(['peer' => InputNotifyPeer, ]);
+$PeerNotifySettings = $MadelineProto->account->getNotifySettings(['peer' => InputNotifyPeer, ]);
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_PrivacyRules = $MadelineProto->account_setPrivacy(['key' => InputPrivacyKey, 'rules' => [InputPrivacyRule], ]);
+$account_PrivacyRules = $MadelineProto->account->setPrivacy(['key' => InputPrivacyKey, 'rules' => [InputPrivacyRule], ]);
 ```

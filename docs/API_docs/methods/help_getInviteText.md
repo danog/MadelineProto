@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_InviteText = $MadelineProto->help_getInviteText();
+$help_InviteText = $MadelineProto->help->getInviteText();
 ```

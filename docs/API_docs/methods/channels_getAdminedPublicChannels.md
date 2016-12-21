@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Chats = $MadelineProto->channels_getAdminedPublicChannels();
+$messages_Chats = $MadelineProto->channels->getAdminedPublicChannels();
 ```

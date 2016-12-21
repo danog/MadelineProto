@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_Blocked = $MadelineProto->contacts_getBlocked(['offset' => int, 'limit' => int, ]);
+$contacts_Blocked = $MadelineProto->contacts->getBlocked(['offset' => int, 'limit' => int, ]);
 ```

@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_ChatFull = $MadelineProto->messages_getFullChat(['chat_id' => int, ]);
+$messages_ChatFull = $MadelineProto->messages->getFullChat(['chat_id' => int, ]);
 ```

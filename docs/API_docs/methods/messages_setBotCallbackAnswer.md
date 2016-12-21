@@ -36,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages_setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, ]);
+$Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, ]);
 ```

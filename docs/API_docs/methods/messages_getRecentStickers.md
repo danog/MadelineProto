@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_RecentStickers = $MadelineProto->messages_getRecentStickers(['attached' => Bool, 'hash' => int, ]);
+$messages_RecentStickers = $MadelineProto->messages->getRecentStickers(['attached' => Bool, 'hash' => int, ]);
 ```

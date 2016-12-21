@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_deleteChatUser(['chat_id' => int, 'user_id' => InputUser, ]);
+$Updates = $MadelineProto->messages->deleteChatUser(['chat_id' => int, 'user_id' => InputUser, ]);
 ```

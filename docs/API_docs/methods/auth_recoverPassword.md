@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth_recoverPassword(['code' => string, ]);
+$auth_Authorization = $MadelineProto->auth->recoverPassword(['code' => string, ]);
 ```

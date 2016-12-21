@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_HighScores = $MadelineProto->messages_getInlineGameHighScores(['id' => InputBotInlineMessageID, 'user_id' => InputUser, ]);
+$messages_HighScores = $MadelineProto->messages->getInlineGameHighScores(['id' => InputBotInlineMessageID, 'user_id' => InputUser, ]);
 ```

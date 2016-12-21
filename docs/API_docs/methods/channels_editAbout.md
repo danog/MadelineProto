@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->channels_editAbout(['channel' => InputChannel, 'about' => string, ]);
+$Bool = $MadelineProto->channels->editAbout(['channel' => InputChannel, 'about' => string, ]);
 ```

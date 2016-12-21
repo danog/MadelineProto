@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->upload_saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => bytes, ]);
+$Bool = $MadelineProto->upload->saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => bytes, ]);
 ```

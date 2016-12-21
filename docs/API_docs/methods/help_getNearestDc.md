@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$NearestDc = $MadelineProto->help_getNearestDc();
+$NearestDc = $MadelineProto->help->getNearestDc();
 ```

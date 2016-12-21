@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_migrateChat(['chat_id' => int, ]);
+$Updates = $MadelineProto->messages->migrateChat(['chat_id' => int, ]);
 ```

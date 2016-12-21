@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Document = $MadelineProto->messages_getDocumentByHash(['sha256' => bytes, 'size' => int, 'mime_type' => string, ]);
+$Document = $MadelineProto->messages->getDocumentByHash(['sha256' => bytes, 'size' => int, 'mime_type' => string, ]);
 ```

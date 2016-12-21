@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->channels_joinChannel(['channel' => InputChannel, ]);
+$Updates = $MadelineProto->channels->joinChannel(['channel' => InputChannel, ]);
 ```

@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_FeaturedStickers = $MadelineProto->messages_getFeaturedStickers(['hash' => int, ]);
+$messages_FeaturedStickers = $MadelineProto->messages->getFeaturedStickers(['hash' => int, ]);
 ```

@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_ImportedContacts = $MadelineProto->contacts_importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
+$contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
 ```

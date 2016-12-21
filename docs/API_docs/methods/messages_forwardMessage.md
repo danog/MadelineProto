@@ -35,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages_forwardMessage(['peer' => InputPeer, 'id' => int, 'random_id' => long, ]);
+$Updates = $MadelineProto->messages->forwardMessage(['peer' => InputPeer, 'id' => int, 'random_id' => long, ]);
 ```

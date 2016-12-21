@@ -28,5 +28,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_WallPaper = $MadelineProto->account_getWallPapers();
+$Vector_of_WallPaper = $MadelineProto->account->getWallPapers();
 ```

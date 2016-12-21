@@ -34,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_MessageEditData = $MadelineProto->messages_getMessageEditData(['peer' => InputPeer, 'id' => int, ]);
+$messages_MessageEditData = $MadelineProto->messages->getMessageEditData(['peer' => InputPeer, 'id' => int, ]);
 ```

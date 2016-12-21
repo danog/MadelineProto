@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_long = $MadelineProto->photos_deletePhotos(['id' => [InputPhoto], ]);
+$Vector_of_long = $MadelineProto->photos->deletePhotos(['id' => [InputPhoto], ]);
 ```

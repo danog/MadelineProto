@@ -33,5 +33,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$photos_Photo = $MadelineProto->photos_uploadProfilePhoto(['file' => InputFile, ]);
+$photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, ]);
 ```
