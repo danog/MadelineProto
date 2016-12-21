@@ -115,15 +115,15 @@ trait CallHandler
             try {
                 \danog\MadelineProto\Logger::log('Sending object (try number '.$count.' for '.$object.')...');
                 $int_message_id = $this->send_message($this->tl->serialize_object(['type' => $object], $args), $this->tl->content_related($object));
-                $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['object' => $object, 'args' => $args];
+                $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $object, 'args' => $args];
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...');
                 $this->datacenter->close_and_reopen();
                 continue;
             }
 
-            return;
+            return $int_message_id;
         }
-        throw new \danog\MadelineProto\Exception('An error occurred while calling object '.$object.'.');
+        throw new \danog\MadelineProto\Exception('An error occurred while sending object '.$object.'.');
     }
 }

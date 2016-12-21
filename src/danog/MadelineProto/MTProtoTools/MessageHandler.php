@@ -123,6 +123,7 @@ trait MessageHandler
         }
         $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->datacenter->incoming_messages[$message_id]['content'] = $deserialized;
+        $this->datacenter->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->new_incoming[$message_id] = $message_id;
     }
 }

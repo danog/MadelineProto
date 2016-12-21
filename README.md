@@ -4,9 +4,9 @@
 
 Created by [Daniil Gentili](https://daniil.it), licensed under AGPLv3.
 
-![MadelineProto logo](https://daniil.it/MadelineProto/logo.png)
+<img src='https://daniil.it/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/logo-hover.png';" onmouseout="this.src='https://daniil.it/logo.png';" />
 
-Logo created by [Matthew Hesketh](https://telegram.me/wrxck) (thanks again!).  
+Logo created by [Matthew Hesketh](https://matthewhesketh.com) (thanks again!).  
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 

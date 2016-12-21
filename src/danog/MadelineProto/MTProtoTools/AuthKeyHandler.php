@@ -469,6 +469,9 @@ trait AuthKeyHandler
                 \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+            } finally {
+                $this->datacenter->new_outgoing = [];
+                $this->datacenter->new_incoming = [];
             }
         }
 
