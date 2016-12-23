@@ -21,16 +21,17 @@ trait UpdateHandler
 
     public function update_state($data, $chat_id = 0)
     {
-       if (!isset($this->updates_state[$chat_id])) {
-           $this->updates_state[$chat_id] = ['date' => 0, 'pts' => 0, 'seq' => 0];
-       }
+        if (!isset($this->updates_state[$chat_id])) {
+            $this->updates_state[$chat_id] = ['date' => 0, 'pts' => 0, 'seq' => 0];
+        }
 
-       $this->updates_state[$chat_id]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->updates_state[$chat_id]['pts'] : $data['pts'];
-       $this->updates_state[$chat_id]['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->updates_state[$chat_id]['seq'] : $data['seq'];
-       $this->updates_state[$chat_id]['date'] = (!isset($data['date']) || $data['date'] < $this->updates_state[$chat_id]['date']) ? $this->updates_state[$chat_id]['date'] : $data['date'];
-
+        $this->updates_state[$chat_id]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->updates_state[$chat_id]['pts'] : $data['pts'];
+        $this->updates_state[$chat_id]['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->updates_state[$chat_id]['seq'] : $data['seq'];
+        $this->updates_state[$chat_id]['date'] = (!isset($data['date']) || $data['date'] < $this->updates_state[$chat_id]['date']) ? $this->updates_state[$chat_id]['date'] : $data['date'];
     }
-    public function get_updates_state() {
+
+    public function get_updates_state()
+    {
         if (empty($this->updates_state)) {
             return $this->update_state($this->method_call('updates.getState'));
         }
@@ -59,7 +60,9 @@ trait UpdateHandler
                 break;
         }
     }
-    public function handle_updates($updates) {
+
+    public function handle_updates($updates)
+    {
         switch ($updates['_']) {
             case 'updatesTooLong':
                 $this->get_updates_state();
@@ -87,10 +90,14 @@ trait UpdateHandler
                 break;
         }
     }
-    public function handle_other_updates($updates) {
+
+    public function handle_other_updates($updates)
+    {
         var_dump($updates);
     }
-    public function handle_update_messages($messages) {
+
+    public function handle_update_messages($messages)
+    {
         var_dump($messages);
     }
 }

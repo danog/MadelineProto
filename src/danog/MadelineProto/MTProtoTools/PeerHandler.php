@@ -13,19 +13,20 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Manages peers
+ * Manages peers.
  */
 trait PeerHandler
 {
     public $chats = [];
     public $users = [];
 
-    public function add_users($users) {
+    public function add_users($users)
+    {
         var_dump($users);
     }
-    public function add_chats($chats) {
+
+    public function add_chats($chats)
+    {
         var_dump($chats);
     }
 }
-
-?>
