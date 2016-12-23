@@ -45,7 +45,7 @@ trait PeerHandler
                 case 'channelEmpty':
                     break;
                 case 'channel':
-                    $this->chats[(int)('-100'.$chat['id'])] = $chat;
+                    $this->chats[(int) ('-100'.$chat['id'])] = $chat;
                     break;
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid chat provided at key '.$key.': '.var_export($chat, true));
@@ -54,7 +54,8 @@ trait PeerHandler
         }
     }
 
-    public function get_peer($id, $recursive = true) {
+    public function get_peer($id, $recursive = true)
+    {
         if (is_numeric($id)) {
             if (isset($this->chats[$id])) {
                 return $this->chats[$id];
@@ -71,16 +72,19 @@ trait PeerHandler
         }
         if ($recursive) {
             $this->resolve_username($id);
+
             return $this->get_peer($id, false);
         }
         throw new \danog\MadelineProto\Exception("Couldn't find peer by provided username ".$id);
     }
 
-    public function get_input_peer($id) {
+    public function get_input_peer($id)
+    {
         return $this->constructor2inputpeer($this->get_peer($id));
     }
 
-    public function constructor2inputpeer($peer) {
+    public function constructor2inputpeer($peer)
+    {
         switch ($peer['_']) {
             case 'user':
                 return $peer['self'] ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $peer['id'], 'access_hash' => $peer['access_hash']];
@@ -94,14 +98,15 @@ trait PeerHandler
         }
     }
 
-    public function resolve_username($username) {
+    public function resolve_username($username)
+    {
         $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)]);
         if ($res['_'] == 'contacts.resolvedPeer') {
             $this->add_users($res['users']);
             $this->add_chats($res['chats']);
+
             return $res;
         }
         throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($username, true));
     }
-
 }

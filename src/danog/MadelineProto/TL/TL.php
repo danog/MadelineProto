@@ -219,7 +219,7 @@ class TL extends \danog\MadelineProto\Tools
                             if ($method == 'messages.forwardMessages') {
                                 $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                                 $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
-                                $serialized .= \phpseclib\Crypt\Random::string(8*count($arguments['id']));
+                                $serialized .= \phpseclib\Crypt\Random::string(8 * count($arguments['id']));
                                 continue 2;
                             }
                     }

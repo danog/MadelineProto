@@ -49,7 +49,7 @@ $mention = $MadelineProto->API->constructor2inputpeer($mention); // Converts an 
 
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
     $peer = $MadelineProto->API->get_input_peer($peer); // Returns directly an inputPeer object, basically does the same thing I've done manually above
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message)+1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message) + 1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     var_dump($sentMessage);
 }
 
@@ -62,6 +62,6 @@ if (file_exists('token.php')) {
 }
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
     $peer = $MadelineProto->API->get_input_peer($peer);
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message)+1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message) + 1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     var_dump($sentMessage);
 }
