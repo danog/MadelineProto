@@ -207,20 +207,28 @@ trait ResponseHandler
                 default:
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
                     $response_type = $this->tl->constructors->find_by_predicate($response['_'])['type'];
-                    \danog\MadelineProto\Logger::log('Trying to assign a response of type '.$response_type.' to its request...');
-                    foreach ($this->datacenter->new_outgoing as $key => $expecting) {
-                        \danog\MadelineProto\Logger::log('Does the request of return type '.$expecting['type'].' and msg_id '.$expecting['msg_id'].' match?');
-                        if ($response_type == $expecting['type']) {
-                            \danog\MadelineProto\Logger::log('Yes');
-                            $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
-                            unset($this->datacenter->new_outgoing[$key]);
+                    switch ($response_type) {
+                        case 'Updates':
                             unset($this->datacenter->new_incoming[$current_msg_id]);
+                            $this->handle_updates($response);
+                            break;
+                        default:
+                            \danog\MadelineProto\Logger::log('Trying to assign a response of type '.$response_type.' to its request...');
+                            foreach ($this->datacenter->new_outgoing as $key => $expecting) {
+                                \danog\MadelineProto\Logger::log('Does the request of return type '.$expecting['type'].' and msg_id '.$expecting['msg_id'].' match?');
+                                if ($response_type == $expecting['type']) {
+                                    \danog\MadelineProto\Logger::log('Yes');
+                                    $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
+                                    unset($this->datacenter->new_outgoing[$key]);
+                                    unset($this->datacenter->new_incoming[$current_msg_id]);
 
-                            return;
-                        }
-                        \danog\MadelineProto\Logger::log('No');
+                                    return;
+                                }
+                                \danog\MadelineProto\Logger::log('No');
+                            }
+                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
+                            break;
                     }
-                    throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
                     break;
             }
         }

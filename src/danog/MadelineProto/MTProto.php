@@ -23,9 +23,11 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\Crypt;
     use \danog\MadelineProto\MTProtoTools\MessageHandler;
     use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
+    use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\ResponseHandler;
     use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
+    use \danog\MadelineProto\MTProtoTools\UpdateHandler;
 
     public $settings = [];
     public $config = ['expires' => -1];
@@ -207,6 +209,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         $this->setup_logger();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
+        if ($this->datacenter->authorized) {
+            $this->get_updates_state();
+        }
     }
 
     public function setup_logger()

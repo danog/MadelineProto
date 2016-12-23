@@ -1,5 +1,5 @@
 ---
-title: Types
+title: Constructors
 description: List of constructors
 ---
 # Constructors  

@@ -10,7 +10,7 @@ Created by [Daniil Gentili](https://daniil.it), licensed under AGPLv3.
 
 <img src='https://daniil.it/MadelineProto/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/MadelineProto/logo-hover.png';" onmouseout="this.src='https://daniil.it/MadelineProto/logo.png';" />
 
-Logo created by [Matthew Hesketh](https://matthewhesketh.com) (thanks again!).  
+Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).  
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 

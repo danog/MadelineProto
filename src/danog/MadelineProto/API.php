@@ -74,6 +74,7 @@ class API extends APIFactory
             ]
         );
         $this->API->datacenter->authorized = true;
+        $this->API->get_updates_state();
         \danog\MadelineProto\Logger::log('Logged in successfully!');
         restore_error_handler();
 
@@ -123,6 +124,7 @@ class API extends APIFactory
         );
         $this->API->datacenter->waiting_code = false;
         $this->API->datacenter->authorized = true;
+        $this->API->get_updates_state();
         \danog\MadelineProto\Logger::log('Logged in successfully!');
         restore_error_handler();
 

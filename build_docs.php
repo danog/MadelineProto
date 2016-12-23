@@ -317,7 +317,7 @@ foreach ($constructors as $method => &$value) {
     $last_namespace = $new_namespace;
 }
 file_put_contents('constructors/index.md', '---
-title: Types
+title: Constructors
 description: List of constructors
 ---
 # Constructors  
