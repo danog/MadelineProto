@@ -12,7 +12,6 @@ description: messages_forwardMessage parameters, return type and example
 |----------|:-------------:|---------:|
 |peer|[InputPeer](../types/InputPeer.md) | Required|
 |id|[int](../types/int.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -35,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->forwardMessage(['peer' => InputPeer, 'id' => int, 'random_id' => long, ]);
+$Updates = $MadelineProto->messages->forwardMessage(['peer' => InputPeer, 'id' => int, ]);
 ```

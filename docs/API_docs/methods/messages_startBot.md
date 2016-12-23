@@ -12,7 +12,6 @@ description: messages_startBot parameters, return type and example
 |----------|:-------------:|---------:|
 |bot|[InputUser](../types/InputUser.md) | Required|
 |peer|[InputPeer](../types/InputPeer.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 |start\_param|[string](../types/string.md) | Required|
 
 
@@ -36,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'peer' => InputPeer, 'random_id' => long, 'start_param' => string, ]);
+$Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'peer' => InputPeer, 'start_param' => string, ]);
 ```

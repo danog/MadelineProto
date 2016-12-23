@@ -12,7 +12,6 @@ description: updateMessageID attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |id|[int](../types/int.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 
 
 
@@ -22,5 +21,5 @@ description: updateMessageID attributes, type and example
 ### Example:
 
 ```
-$updateMessageID = ['_' => updateMessageID', 'id' => int, 'random_id' => long, ];
+$updateMessageID = ['_' => updateMessageID', 'id' => int, ];
 ```

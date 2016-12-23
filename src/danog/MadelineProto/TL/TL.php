@@ -207,6 +207,23 @@ class TL extends \danog\MadelineProto\Tools
                     //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
                     continue;
                 }
+                if ($current_argument['name'] == 'random_id') {
+                    switch ($current_argument['type']) {
+                        case 'long':
+                            $serialized .= \phpseclib\Crypt\Random::string(8);
+                            continue 2;
+                        case 'long':
+                            $serialized .= \phpseclib\Crypt\Random::string(4);
+                            continue 2;
+                        case 'Vector t':
+                            if ($method == 'messages.forwardMessages') {
+                                $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
+                                $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
+                                $serialized .= \phpseclib\Crypt\Random::string(8*count($arguments['id']));
+                                continue 2;
+                            }
+                    }
+                }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
             //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);

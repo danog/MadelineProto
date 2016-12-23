@@ -11,7 +11,6 @@ description: messages_requestEncryption parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |user\_id|[InputUser](../types/InputUser.md) | Required|
-|random\_id|[int](../types/int.md) | Required|
 |g\_a|[bytes](../types/bytes.md) | Required|
 
 
@@ -35,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'random_id' => int, 'g_a' => bytes, ]);
+$EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'g_a' => bytes, ]);
 ```

@@ -72,7 +72,7 @@ foreach ($TL->methods->method as $key => $method) {
 
     $params = '';
     foreach ($TL->methods->params[$key] as $param) {
-        if ($param['name'] == 'flags') {
+        if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
         $stype = 'type';
@@ -110,7 +110,7 @@ foreach ($TL->methods->method as $key => $method) {
 |----------|:-------------:|---------:|
 ';
     foreach ($TL->methods->params[$key] as $param) {
-        if ($param['name'] == 'flags') {
+        if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
         $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
@@ -209,7 +209,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 
     $params = '';
     foreach ($TL->constructors->params[$key] as $param) {
-        if ($param['name'] == 'flags') {
+        if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
         $stype = 'type';
@@ -255,7 +255,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 ';
     $params = '';
     foreach ($TL->constructors->params[$key] as $param) {
-        if ($param['name'] == 'flags') {
+        if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
         $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);

@@ -200,7 +200,7 @@ $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message'
 var_dump($sentMessage);
 ```
 
-The API class also provides some wrapper methods for logging in as a bot or as a normal user:
+The API class also provides some wrapper methods for logging in as a bot or as a normal user, and for getting inputPeer constructors to use in sendMessage and other methods:
 
 ```
 $sentCode = $MadelineProto->phone_login($number); // Send code
@@ -213,6 +213,19 @@ for ($x = 0; $x < $sentCode['type']['length']; $x++) {
 $authorization = $MadelineProto->complete_phone_login($code); // Complete authorization
 var_dump($authorization);
 
+var_dump($MadelineProto->API->resolve_username('@Palmas2012')); // Always use this method to resolve usernames, but you won't need to call this to get info about peers, as get_peer and get_input_peer will call it for you if needed
+
+$mention = $MadelineProto->API->get_peer('@veetaw'); // Returns an object of type User or Chat
+$mention = $MadelineProto->API->constructor2inputpeer($mention); // Converts an object of type User or Chat to an object of type inputPeer
+
+$message = "I've installed MadelineProto!";
+foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
+    $peer = $MadelineProto->API->get_input_peer($peer);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    var_dump($sentMessage);
+}
+
+// The above works with bots too
 $authorization = $MadelineProto->bot_login($token); // Note that every time you login as a bot or as a user MadelineProto will logout first, so now MadelineProto is logged in as the bot with token $token, not as the user with number $number
 var_dump($authorization);
 ```

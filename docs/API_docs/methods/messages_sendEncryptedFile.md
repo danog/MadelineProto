@@ -11,7 +11,6 @@ description: messages_sendEncryptedFile parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 |data|[bytes](../types/bytes.md) | Required|
 |file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Required|
 
@@ -36,5 +35,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedFile(['peer' => InputEncryptedChat, 'random_id' => long, 'data' => bytes, 'file' => InputEncryptedFile, ]);
+$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedFile(['peer' => InputEncryptedChat, 'data' => bytes, 'file' => InputEncryptedFile, ]);
 ```

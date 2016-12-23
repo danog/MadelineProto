@@ -11,7 +11,6 @@ description: messages_sendEncrypted parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 |data|[bytes](../types/bytes.md) | Required|
 
 
@@ -35,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncrypted(['peer' => InputEncryptedChat, 'random_id' => long, 'data' => bytes, ]);
+$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncrypted(['peer' => InputEncryptedChat, 'data' => bytes, ]);
 ```

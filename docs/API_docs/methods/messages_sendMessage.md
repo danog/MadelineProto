@@ -17,7 +17,6 @@ description: messages_sendMessage parameters, return type and example
 |peer|[InputPeer](../types/InputPeer.md) | Required|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |message|[string](../types/string.md) | Required|
-|random\_id|[long](../types/long.md) | Required|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 
@@ -42,5 +41,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->sendMessage(['no_webpage' => Bool, 'silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'random_id' => long, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
+$Updates = $MadelineProto->messages->sendMessage(['no_webpage' => Bool, 'silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], ]);
 ```

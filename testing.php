@@ -38,16 +38,18 @@ if (file_exists('number.php') && !file_exists('session.madeline')) {
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = unserialize(file_get_contents('session.madeline'));
 
-$message = (getenv('TRAVIS_COMMIT') == '') ? 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
-$peers = [];
-foreach (['pwrtelegramgroup', 'pwrtelegramgroupita'] as $user) {
-    $username = $MadelineProto->contacts->resolveUsername(['username' => $user]);
-    var_dump($username);
-    $peers[$user] = ['_' => 'inputPeerChannel', 'channel_id' => $username['peer']['channel_id'], 'access_hash' => $username['chats'][0]['access_hash']];
-}
+$message = (getenv('TRAVIS_COMMIT') == '') ? 'Message entities can be sent too (yay)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-foreach ($peers as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+$flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
+
+var_dump($MadelineProto->API->resolve_username('@Palmas2012')); // Always use this method to resolve usernames, but you won't need to call this to get info about peers, as get_peer and get_input_peer will call it for you if needed
+
+$mention = $MadelineProto->API->get_peer('@veetaw'); // Returns an object of type User or Chat
+$mention = $MadelineProto->API->constructor2inputpeer($mention); // Converts an object of type User or Chat to an object of type inputPeer
+
+foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
+    $peer = $MadelineProto->API->get_input_peer($peer); // Returns directly an inputPeer object, basically does the same thing I've done manually above
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message)+1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     var_dump($sentMessage);
 }
 
@@ -58,9 +60,8 @@ if (file_exists('token.php')) {
     $authorization = $MadelineProto->bot_login($token);
     var_dump($authorization);
 }
-/*
-foreach ($peers as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
+    $peer = $MadelineProto->API->get_input_peer($peer);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message)+1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     var_dump($sentMessage);
 }
-*/

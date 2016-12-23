@@ -15,7 +15,6 @@ description: messages_forwardMessages parameters, return type and example
 |with\_my\_score|[Bool](../types/Bool.md) | Optional|
 |from\_peer|[InputPeer](../types/InputPeer.md) | Required|
 |id|Array of [int](../types/int.md) | Required|
-|random\_id|Array of [long](../types/long.md) | Required|
 |to\_peer|[InputPeer](../types/InputPeer.md) | Required|
 
 
@@ -39,5 +38,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->forwardMessages(['silent' => Bool, 'background' => Bool, 'with_my_score' => Bool, 'from_peer' => InputPeer, 'id' => [int], 'random_id' => [long], 'to_peer' => InputPeer, ]);
+$Updates = $MadelineProto->messages->forwardMessages(['silent' => Bool, 'background' => Bool, 'with_my_score' => Bool, 'from_peer' => InputPeer, 'id' => [int], 'to_peer' => InputPeer, ]);
 ```

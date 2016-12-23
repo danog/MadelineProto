@@ -15,7 +15,6 @@ description: messages_sendInlineBotResult parameters, return type and example
 |clear\_draft|[Bool](../types/Bool.md) | Optional|
 |peer|[InputPeer](../types/InputPeer.md) | Required|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|random\_id|[long](../types/long.md) | Required|
 |query\_id|[long](../types/long.md) | Required|
 |id|[string](../types/string.md) | Required|
 
@@ -40,5 +39,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->sendInlineBotResult(['silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'random_id' => long, 'query_id' => long, 'id' => string, ]);
+$Updates = $MadelineProto->messages->sendInlineBotResult(['silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => string, ]);
 ```

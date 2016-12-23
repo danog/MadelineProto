@@ -11,7 +11,6 @@ description: encryptedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|random\_id|[long](../types/long.md) | Required|
 |chat\_id|[int](../types/int.md) | Required|
 |date|[int](../types/int.md) | Required|
 |bytes|[bytes](../types/bytes.md) | Required|
@@ -25,5 +24,5 @@ description: encryptedMessage attributes, type and example
 ### Example:
 
 ```
-$encryptedMessage = ['_' => encryptedMessage', 'random_id' => long, 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
+$encryptedMessage = ['_' => encryptedMessage', 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
 ```
