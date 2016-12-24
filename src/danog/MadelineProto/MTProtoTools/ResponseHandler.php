@@ -72,10 +72,18 @@ trait ResponseHandler
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
             \danog\MadelineProto\Logger::log('Received '.$response['_'].'.');
 
-            if (isset($response['users'])) $this->add_users($response['users']);
-            if (isset($response['chats'])) $this->add_chats($response['chats']);
-            if (isset($response['result']['users'])) $this->add_users($response['result']['users']);
-            if (isset($response['result']['chats'])) $this->add_chats($response['result']['chats']);
+            if (isset($response['users'])) {
+                $this->add_users($response['users']);
+            }
+            if (isset($response['chats'])) {
+                $this->add_chats($response['chats']);
+            }
+            if (isset($response['result']['users'])) {
+                $this->add_users($response['result']['users']);
+            }
+            if (isset($response['result']['chats'])) {
+                $this->add_chats($response['result']['chats']);
+            }
             switch ($response['_']) {
                 case 'msgs_ack':
                     foreach ($response['msg_ids'] as $msg_id) {
@@ -119,7 +127,9 @@ trait ResponseHandler
                     \danog\MadelineProto\Logger::log('new session created');
                     \danog\MadelineProto\Logger::log($response);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
-                    if ($this->datacenter->authorized) $this->get_updates_state();
+                    if ($this->datacenter->authorized) {
+                        $this->get_updates_state();
+                    }
                     break;
                 case 'msg_container':
 

@@ -70,7 +70,7 @@ trait UpdateHandler
             case 'updateShortMessage':
             case 'updateShortChatMessage':
             case 'updateShortSentMessage':
-                $update = ['_' => 'updateNewMessage',]; 
+                $update = ['_' => 'updateNewMessage'];
                 $this->handle_update_messages($update, ['date' => $updates['date']]);
                 break;
             case 'updateShort':

@@ -77,7 +77,6 @@ foreach ($TL->methods->method as $key => $method) {
         $types[$real_type]['methods'][] = $key;
     }
 
-
     $params = '';
     foreach ($TL->methods->params[$key] as $param) {
         if (in_array($param['name'], ['flags', 'random_id'])) {

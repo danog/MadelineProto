@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\Wrappers;
 
 /**
- * Manages logging in and out
+ * Manages logging in and out.
  */
 trait Login
 {
@@ -96,5 +96,4 @@ trait Login
 
         return $this->API->datacenter->authorization;
     }
-
 }
