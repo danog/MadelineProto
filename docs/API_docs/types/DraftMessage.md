@@ -1,6 +1,6 @@
 ---
 title: DraftMessage
-description: constructors of type DraftMessage
+description: constructors and methods of type DraftMessage
 ---
 ## Type: DraftMessage  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type DraftMessage
 [draftMessageEmpty](../constructors/draftMessageEmpty.md)  
 
 [draftMessage](../constructors/draftMessage.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

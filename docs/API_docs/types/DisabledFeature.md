@@ -1,6 +1,6 @@
 ---
 title: DisabledFeature
-description: constructors of type DisabledFeature
+description: constructors and methods of type DisabledFeature
 ---
 ## Type: DisabledFeature  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type DisabledFeature
 ### Possible values (constructors):
 
 [disabledFeature](../constructors/disabledFeature.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: MessageEntity
-description: constructors of type MessageEntity
+description: constructors and methods of type MessageEntity
 ---
 ## Type: MessageEntity  
 [Back to types index](index.md)
@@ -34,4 +34,10 @@ description: constructors of type MessageEntity
 [messageEntityMentionName](../constructors/messageEntityMentionName.md)  
 
 [inputMessageEntityMentionName](../constructors/inputMessageEntityMentionName.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

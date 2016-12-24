@@ -1,6 +1,6 @@
 ---
 title: BotInlineResult
-description: constructors of type BotInlineResult
+description: constructors and methods of type BotInlineResult
 ---
 ## Type: BotInlineResult  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type BotInlineResult
 [botInlineResult](../constructors/botInlineResult.md)  
 
 [botInlineMediaResult](../constructors/botInlineMediaResult.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

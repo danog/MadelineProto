@@ -1,6 +1,6 @@
 ---
 title: EncryptedMessage
-description: constructors of type EncryptedMessage
+description: constructors and methods of type EncryptedMessage
 ---
 ## Type: EncryptedMessage  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type EncryptedMessage
 [encryptedMessage](../constructors/encryptedMessage.md)  
 
 [encryptedMessageService](../constructors/encryptedMessageService.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: InputFileLocation
-description: constructors of type InputFileLocation
+description: constructors and methods of type InputFileLocation
 ---
 ## Type: InputFileLocation  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type InputFileLocation
 [inputEncryptedFileLocation](../constructors/inputEncryptedFileLocation.md)  
 
 [inputDocumentFileLocation](../constructors/inputDocumentFileLocation.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

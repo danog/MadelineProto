@@ -1,6 +1,6 @@
 ---
 title: NearestDc
-description: constructors of type NearestDc
+description: constructors and methods of type NearestDc
 ---
 ## Type: NearestDc  
 [Back to types index](index.md)
@@ -10,4 +10,12 @@ description: constructors of type NearestDc
 ### Possible values (constructors):
 
 [nearestDc](../constructors/nearestDc.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->help->getNearestDc](../methods/help_getNearestDc.md)  
+
+
 

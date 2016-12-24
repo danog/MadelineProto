@@ -1,6 +1,6 @@
 ---
 title: InputStickerSet
-description: constructors of type InputStickerSet
+description: constructors and methods of type InputStickerSet
 ---
 ## Type: InputStickerSet  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type InputStickerSet
 [inputStickerSetID](../constructors/inputStickerSetID.md)  
 
 [inputStickerSetShortName](../constructors/inputStickerSetShortName.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

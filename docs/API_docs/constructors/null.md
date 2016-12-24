@@ -1,20 +1,8 @@
 ---
 title: null
-description: null attributes, type and example
+description: Represents a null value
 ---
-## Constructor: null  
-[Back to constructors index](index.md)
+# null  
+[Back to constructor index](index.md)
 
-
-
-
-
-
-### Type: [Null](../types/Null.md)
-
-
-### Example:
-
-```
-$null = ['_' => null', ];
-```
+Represents a `null` value.

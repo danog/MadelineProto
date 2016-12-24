@@ -1,6 +1,6 @@
 ---
 title: Chat
-description: constructors of type Chat
+description: constructors and methods of type Chat
 ---
 ## Type: Chat  
 [Back to types index](index.md)
@@ -18,4 +18,10 @@ description: constructors of type Chat
 [channel](../constructors/channel.md)  
 
 [channelForbidden](../constructors/channelForbidden.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

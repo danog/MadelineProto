@@ -1,6 +1,6 @@
 ---
 title: MessageMedia
-description: constructors of type MessageMedia
+description: constructors and methods of type MessageMedia
 ---
 ## Type: MessageMedia  
 [Back to types index](index.md)
@@ -26,4 +26,12 @@ description: constructors of type MessageMedia
 [messageMediaVenue](../constructors/messageMediaVenue.md)  
 
 [messageMediaGame](../constructors/messageMediaGame.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->getWebPagePreview](../methods/messages_getWebPagePreview.md)  
+
+
 

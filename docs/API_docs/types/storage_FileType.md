@@ -1,6 +1,6 @@
 ---
 title: storage_FileType
-description: constructors of type storage_FileType
+description: constructors and methods of type storage_FileType
 ---
 ## Type: storage\_FileType  
 [Back to types index](index.md)
@@ -28,4 +28,10 @@ description: constructors of type storage_FileType
 [storage\_fileMp4](../constructors/storage_fileMp4.md)  
 
 [storage\_fileWebp](../constructors/storage_fileWebp.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

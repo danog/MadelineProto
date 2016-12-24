@@ -1,6 +1,6 @@
 ---
 title: BotInlineMessage
-description: constructors of type BotInlineMessage
+description: constructors and methods of type BotInlineMessage
 ---
 ## Type: BotInlineMessage  
 [Back to types index](index.md)
@@ -18,4 +18,10 @@ description: constructors of type BotInlineMessage
 [botInlineMessageMediaVenue](../constructors/botInlineMessageMediaVenue.md)  
 
 [botInlineMessageMediaContact](../constructors/botInlineMessageMediaContact.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

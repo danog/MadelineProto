@@ -1,6 +1,6 @@
 ---
 title: MessageRange
-description: constructors of type MessageRange
+description: constructors and methods of type MessageRange
 ---
 ## Type: MessageRange  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type MessageRange
 ### Possible values (constructors):
 
 [messageRange](../constructors/messageRange.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

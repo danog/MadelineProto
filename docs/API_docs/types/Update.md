@@ -1,6 +1,6 @@
 ---
 title: Update
-description: constructors of type Update
+description: constructors and methods of type Update
 ---
 ## Type: Update  
 [Back to types index](index.md)
@@ -114,4 +114,10 @@ description: constructors of type Update
 [updateConfig](../constructors/updateConfig.md)  
 
 [updatePtsChanged](../constructors/updatePtsChanged.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

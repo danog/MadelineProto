@@ -1,6 +1,6 @@
 ---
 title: PeerNotifySettings
-description: constructors of type PeerNotifySettings
+description: constructors and methods of type PeerNotifySettings
 ---
 ## Type: PeerNotifySettings  
 [Back to types index](index.md)
@@ -12,4 +12,12 @@ description: constructors of type PeerNotifySettings
 [peerNotifySettingsEmpty](../constructors/peerNotifySettingsEmpty.md)  
 
 [peerNotifySettings](../constructors/peerNotifySettings.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->account->getNotifySettings](../methods/account_getNotifySettings.md)  
+
+
 

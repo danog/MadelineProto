@@ -1,6 +1,6 @@
 ---
 title: ExportedChatInvite
-description: constructors of type ExportedChatInvite
+description: constructors and methods of type ExportedChatInvite
 ---
 ## Type: ExportedChatInvite  
 [Back to types index](index.md)
@@ -12,4 +12,14 @@ description: constructors of type ExportedChatInvite
 [chatInviteEmpty](../constructors/chatInviteEmpty.md)  
 
 [chatInviteExported](../constructors/chatInviteExported.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->exportChatInvite](../methods/messages_exportChatInvite.md)  
+
+[$MadelineProto->channels->exportInvite](../methods/channels_exportInvite.md)  
+
+
 

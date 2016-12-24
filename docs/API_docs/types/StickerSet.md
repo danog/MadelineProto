@@ -1,6 +1,6 @@
 ---
 title: StickerSet
-description: constructors of type StickerSet
+description: constructors and methods of type StickerSet
 ---
 ## Type: StickerSet  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type StickerSet
 ### Possible values (constructors):
 
 [stickerSet](../constructors/stickerSet.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: GeoPoint
-description: constructors of type GeoPoint
+description: constructors and methods of type GeoPoint
 ---
 ## Type: GeoPoint  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type GeoPoint
 [geoPointEmpty](../constructors/geoPointEmpty.md)  
 
 [geoPoint](../constructors/geoPoint.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

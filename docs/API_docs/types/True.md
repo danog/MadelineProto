@@ -1,6 +1,6 @@
 ---
 title: True
-description: constructors of type True
+description: constructors and methods of type True
 ---
 ## Type: True  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type True
 ### Possible values (constructors):
 
 [true](../constructors/true.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

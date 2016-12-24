@@ -1,6 +1,6 @@
 ---
 title: ChannelMessagesFilter
-description: constructors of type ChannelMessagesFilter
+description: constructors and methods of type ChannelMessagesFilter
 ---
 ## Type: ChannelMessagesFilter  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type ChannelMessagesFilter
 [channelMessagesFilterEmpty](../constructors/channelMessagesFilterEmpty.md)  
 
 [channelMessagesFilter](../constructors/channelMessagesFilter.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

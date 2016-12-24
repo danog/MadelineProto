@@ -1,6 +1,6 @@
 ---
 title: ReportReason
-description: constructors of type ReportReason
+description: constructors and methods of type ReportReason
 ---
 ## Type: ReportReason  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type ReportReason
 [inputReportReasonPornography](../constructors/inputReportReasonPornography.md)  
 
 [inputReportReasonOther](../constructors/inputReportReasonOther.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

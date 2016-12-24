@@ -1,6 +1,6 @@
 ---
 title: ReplyMarkup
-description: constructors of type ReplyMarkup
+description: constructors and methods of type ReplyMarkup
 ---
 ## Type: ReplyMarkup  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type ReplyMarkup
 [replyKeyboardMarkup](../constructors/replyKeyboardMarkup.md)  
 
 [replyInlineMarkup](../constructors/replyInlineMarkup.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

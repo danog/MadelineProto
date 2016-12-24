@@ -216,7 +216,7 @@ class TL extends \danog\MadelineProto\Tools
                             $serialized .= \phpseclib\Crypt\Random::string(4);
                             continue 2;
                         case 'Vector t':
-                            if ($method == 'messages.forwardMessages') {
+                            if (isset($argumenrs['id'])) {
                                 $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                                 $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
                                 $serialized .= \phpseclib\Crypt\Random::string(8 * count($arguments['id']));

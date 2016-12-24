@@ -1,6 +1,6 @@
 ---
 title: BotCommand
-description: constructors of type BotCommand
+description: constructors and methods of type BotCommand
 ---
 ## Type: BotCommand  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type BotCommand
 ### Possible values (constructors):
 
 [botCommand](../constructors/botCommand.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

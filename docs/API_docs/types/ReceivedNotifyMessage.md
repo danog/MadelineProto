@@ -1,6 +1,6 @@
 ---
 title: ReceivedNotifyMessage
-description: constructors of type ReceivedNotifyMessage
+description: constructors and methods of type ReceivedNotifyMessage
 ---
 ## Type: ReceivedNotifyMessage  
 [Back to types index](index.md)
@@ -10,4 +10,12 @@ description: constructors of type ReceivedNotifyMessage
 ### Possible values (constructors):
 
 [receivedNotifyMessage](../constructors/receivedNotifyMessage.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->receivedMessages](../methods/messages_receivedMessages.md)  
+
+
 

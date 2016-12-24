@@ -1,6 +1,6 @@
 ---
 title: SendMessageAction
-description: constructors of type SendMessageAction
+description: constructors and methods of type SendMessageAction
 ---
 ## Type: SendMessageAction  
 [Back to types index](index.md)
@@ -30,4 +30,10 @@ description: constructors of type SendMessageAction
 [sendMessageChooseContactAction](../constructors/sendMessageChooseContactAction.md)  
 
 [sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

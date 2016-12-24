@@ -1,6 +1,6 @@
 ---
 title: PeerNotifyEvents
-description: constructors of type PeerNotifyEvents
+description: constructors and methods of type PeerNotifyEvents
 ---
 ## Type: PeerNotifyEvents  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type PeerNotifyEvents
 [peerNotifyEventsEmpty](../constructors/peerNotifyEventsEmpty.md)  
 
 [peerNotifyEventsAll](../constructors/peerNotifyEventsAll.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

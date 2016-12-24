@@ -1,6 +1,6 @@
 ---
 title: InputNotifyPeer
-description: constructors of type InputNotifyPeer
+description: constructors and methods of type InputNotifyPeer
 ---
 ## Type: InputNotifyPeer  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type InputNotifyPeer
 [inputNotifyChats](../constructors/inputNotifyChats.md)  
 
 [inputNotifyAll](../constructors/inputNotifyAll.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

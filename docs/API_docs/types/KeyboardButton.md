@@ -1,6 +1,6 @@
 ---
 title: KeyboardButton
-description: constructors of type KeyboardButton
+description: constructors and methods of type KeyboardButton
 ---
 ## Type: KeyboardButton  
 [Back to types index](index.md)
@@ -22,4 +22,10 @@ description: constructors of type KeyboardButton
 [keyboardButtonSwitchInline](../constructors/keyboardButtonSwitchInline.md)  
 
 [keyboardButtonGame](../constructors/keyboardButtonGame.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

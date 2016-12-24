@@ -1,6 +1,6 @@
 ---
 title: FileLocation
-description: constructors of type FileLocation
+description: constructors and methods of type FileLocation
 ---
 ## Type: FileLocation  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type FileLocation
 [fileLocationUnavailable](../constructors/fileLocationUnavailable.md)  
 
 [fileLocation](../constructors/fileLocation.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

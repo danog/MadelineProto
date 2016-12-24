@@ -1,6 +1,6 @@
 ---
 title: ChannelParticipant
-description: constructors of type ChannelParticipant
+description: constructors and methods of type ChannelParticipant
 ---
 ## Type: ChannelParticipant  
 [Back to types index](index.md)
@@ -20,4 +20,10 @@ description: constructors of type ChannelParticipant
 [channelParticipantKicked](../constructors/channelParticipantKicked.md)  
 
 [channelParticipantCreator](../constructors/channelParticipantCreator.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

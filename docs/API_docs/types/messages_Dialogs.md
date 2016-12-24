@@ -1,6 +1,6 @@
 ---
 title: messages_Dialogs
-description: constructors of type messages_Dialogs
+description: constructors and methods of type messages_Dialogs
 ---
 ## Type: messages\_Dialogs  
 [Back to types index](index.md)
@@ -12,4 +12,12 @@ description: constructors of type messages_Dialogs
 [messages\_dialogs](../constructors/messages_dialogs.md)  
 
 [messages\_dialogsSlice](../constructors/messages_dialogsSlice.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->getDialogs](../methods/messages_getDialogs.md)  
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: InputBotInlineResult
-description: constructors of type InputBotInlineResult
+description: constructors and methods of type InputBotInlineResult
 ---
 ## Type: InputBotInlineResult  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type InputBotInlineResult
 [inputBotInlineResultDocument](../constructors/inputBotInlineResultDocument.md)  
 
 [inputBotInlineResultGame](../constructors/inputBotInlineResultGame.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

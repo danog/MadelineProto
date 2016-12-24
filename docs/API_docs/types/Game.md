@@ -1,6 +1,6 @@
 ---
 title: Game
-description: constructors of type Game
+description: constructors and methods of type Game
 ---
 ## Type: Game  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type Game
 ### Possible values (constructors):
 
 [game](../constructors/game.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

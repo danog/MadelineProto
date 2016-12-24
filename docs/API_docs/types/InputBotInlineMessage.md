@@ -1,6 +1,6 @@
 ---
 title: InputBotInlineMessage
-description: constructors of type InputBotInlineMessage
+description: constructors and methods of type InputBotInlineMessage
 ---
 ## Type: InputBotInlineMessage  
 [Back to types index](index.md)
@@ -20,4 +20,10 @@ description: constructors of type InputBotInlineMessage
 [inputBotInlineMessageMediaContact](../constructors/inputBotInlineMessageMediaContact.md)  
 
 [inputBotInlineMessageGame](../constructors/inputBotInlineMessageGame.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

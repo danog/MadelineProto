@@ -1,6 +1,6 @@
 ---
 title: TopPeer
-description: constructors of type TopPeer
+description: constructors and methods of type TopPeer
 ---
 ## Type: TopPeer  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type TopPeer
 ### Possible values (constructors):
 
 [topPeer](../constructors/topPeer.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: InputUser
-description: constructors of type InputUser
+description: constructors and methods of type InputUser
 ---
 ## Type: InputUser  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type InputUser
 [inputUserSelf](../constructors/inputUserSelf.md)  
 
 [inputUser](../constructors/inputUser.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

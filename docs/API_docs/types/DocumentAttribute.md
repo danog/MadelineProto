@@ -1,6 +1,6 @@
 ---
 title: DocumentAttribute
-description: constructors of type DocumentAttribute
+description: constructors and methods of type DocumentAttribute
 ---
 ## Type: DocumentAttribute  
 [Back to types index](index.md)
@@ -22,4 +22,10 @@ description: constructors of type DocumentAttribute
 [documentAttributeFilename](../constructors/documentAttributeFilename.md)  
 
 [documentAttributeHasStickers](../constructors/documentAttributeHasStickers.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

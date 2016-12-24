@@ -1,6 +1,6 @@
 ---
 title: MessageAction
-description: constructors of type MessageAction
+description: constructors and methods of type MessageAction
 ---
 ## Type: MessageAction  
 [Back to types index](index.md)
@@ -36,4 +36,10 @@ description: constructors of type MessageAction
 [messageActionHistoryClear](../constructors/messageActionHistoryClear.md)  
 
 [messageActionGameScore](../constructors/messageActionGameScore.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

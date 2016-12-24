@@ -1,6 +1,6 @@
 ---
 title: InputDocument
-description: constructors of type InputDocument
+description: constructors and methods of type InputDocument
 ---
 ## Type: InputDocument  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type InputDocument
 [inputDocumentEmpty](../constructors/inputDocumentEmpty.md)  
 
 [inputDocument](../constructors/inputDocument.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

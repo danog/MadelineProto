@@ -1,6 +1,6 @@
 ---
 title: PrivacyRule
-description: constructors of type PrivacyRule
+description: constructors and methods of type PrivacyRule
 ---
 ## Type: PrivacyRule  
 [Back to types index](index.md)
@@ -20,4 +20,10 @@ description: constructors of type PrivacyRule
 [privacyValueDisallowAll](../constructors/privacyValueDisallowAll.md)  
 
 [privacyValueDisallowUsers](../constructors/privacyValueDisallowUsers.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

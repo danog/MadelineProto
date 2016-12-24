@@ -220,6 +220,8 @@ description: List of types
 
 [WebPage](WebPage.md)<a name="WebPage"></a>  
 
+[X](X.md)<a name="X"></a>  
+
 [account\_Authorizations](account_Authorizations.md)<a name="account_Authorizations"></a>  
 
 [account\_Password](account_Password.md)<a name="account_Password"></a>  
@@ -271,6 +273,10 @@ description: List of types
 [help\_Support](help_Support.md)<a name="help_Support"></a>  
 
 [help\_TermsOfService](help_TermsOfService.md)<a name="help_TermsOfService"></a>  
+
+[int](int.md)<a name="int"></a>  
+
+[long](long.md)<a name="long"></a>  
 
 [messages\_AffectedHistory](messages_AffectedHistory.md)<a name="messages_AffectedHistory"></a>  
 

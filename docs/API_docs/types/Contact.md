@@ -1,6 +1,6 @@
 ---
 title: Contact
-description: constructors of type Contact
+description: constructors and methods of type Contact
 ---
 ## Type: Contact  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type Contact
 ### Possible values (constructors):
 
 [contact](../constructors/contact.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

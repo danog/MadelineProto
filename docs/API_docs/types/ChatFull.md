@@ -1,6 +1,6 @@
 ---
 title: ChatFull
-description: constructors of type ChatFull
+description: constructors and methods of type ChatFull
 ---
 ## Type: ChatFull  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type ChatFull
 [chatFull](../constructors/chatFull.md)  
 
 [channelFull](../constructors/channelFull.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

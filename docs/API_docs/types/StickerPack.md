@@ -1,6 +1,6 @@
 ---
 title: StickerPack
-description: constructors of type StickerPack
+description: constructors and methods of type StickerPack
 ---
 ## Type: StickerPack  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type StickerPack
 ### Possible values (constructors):
 
 [stickerPack](../constructors/stickerPack.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -20,6 +20,7 @@ $TL = new \danog\MadelineProto\TL\TL([
     //'mtproto'  => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json', // mtproto TL scheme
     'telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json', // telegram TL scheme
 ]);
+$types = [];
 
 \danog\MadelineProto\Logger::log('Copying readme...');
 
@@ -61,7 +62,6 @@ mkdir('methods');
 
 $methods = [];
 
-$types = [];
 \danog\MadelineProto\Logger::log('Generating methods documentation...');
 
 foreach ($TL->methods->method as $key => $method) {
@@ -69,6 +69,14 @@ foreach ($TL->methods->method as $key => $method) {
 
     $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->methods->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
+
+    if (!isset($types[$real_type])) {
+        $types[$real_type] = ['constructors' => [], 'methods' => []];
+    }
+    if (!in_array($key, $types[$real_type]['methods'])) {
+        $types[$real_type]['methods'][] = $key;
+    }
+
 
     $params = '';
     foreach ($TL->methods->params[$key] as $param) {
@@ -243,10 +251,10 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
 ';
 
     if (!isset($types[$real_type])) {
-        $types[$real_type] = [];
+        $types[$real_type] = ['constructors' => [], 'methods' => []];
     }
-    if (!in_array($key, $types[$real_type])) {
-        $types[$real_type][] = $key;
+    if (!in_array($key, $types[$real_type]['constructors'])) {
+        $types[$real_type]['constructors'][] = $key;
     }
     $table = empty($TL->constructors->params[$key]) ? '' : '### Attributes:
 
@@ -352,26 +360,44 @@ foreach ($types as $type => $keys) {
 
 ';
     $constructors = '';
-    foreach ($keys as $key) {
+    foreach ($keys['constructors'] as $key) {
         $predicate = str_replace('.', '_', $TL->constructors->predicate[$key]);
         $md_predicate = str_replace('_', '\_', $predicate);
         $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
     }
+
+    $methods = '';
+    foreach ($keys['methods'] as $key) {
+        $name = str_replace('.', '_', $TL->methods->method[$key]);
+        $md_name = str_replace('_', '->', $name);
+        $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
+
+';
+    }
+
     $header = '---
 title: '.$type.'
-description: constructors of type '.$type.'
+description: constructors and methods of type '.$type.'
 ---
 ## Type: '.str_replace('_', '\_', $type).'  
 [Back to types index](index.md)
 
 
 
-### Possible values (constructors):
+';
+    $constructors = '### Possible values (constructors):
+
+'.$constructors.'
 
 ';
-    file_put_contents('types/'.$type.'.md', $header.$constructors);
+    $methods = '### Methods that return an object of this type (methods):
+
+'.$methods.'
+
+';
+    file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
     $last_namespace = $new_namespace;
 }
 
@@ -468,6 +494,15 @@ description: Represents a boolean with value equal to true
 [Back to constructor index](index.md)
 
 Represents a boolean with value equal to `true`.');
+
+file_put_contents('constructors/null.md', '---
+title: null
+description: Represents a null value
+---
+# null  
+[Back to constructor index](index.md)
+
+Represents a `null` value.');
 
 file_put_contents('types/Bool.md', '---
 title: Bool

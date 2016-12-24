@@ -1,6 +1,6 @@
 ---
 title: MessagesFilter
-description: constructors of type MessagesFilter
+description: constructors and methods of type MessagesFilter
 ---
 ## Type: MessagesFilter  
 [Back to types index](index.md)
@@ -30,4 +30,10 @@ description: constructors of type MessagesFilter
 [inputMessagesFilterMusic](../constructors/inputMessagesFilterMusic.md)  
 
 [inputMessagesFilterChatPhotos](../constructors/inputMessagesFilterChatPhotos.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

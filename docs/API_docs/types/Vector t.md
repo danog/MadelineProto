@@ -1,6 +1,6 @@
 ---
 title: Vector t
-description: constructors of type Vector t
+description: constructors and methods of type Vector t
 ---
 ## Type: Vector t  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type Vector t
 ### Possible values (constructors):
 
 [vector](../constructors/vector.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

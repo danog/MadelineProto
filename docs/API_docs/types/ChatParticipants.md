@@ -1,6 +1,6 @@
 ---
 title: ChatParticipants
-description: constructors of type ChatParticipants
+description: constructors and methods of type ChatParticipants
 ---
 ## Type: ChatParticipants  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type ChatParticipants
 [chatParticipantsForbidden](../constructors/chatParticipantsForbidden.md)  
 
 [chatParticipants](../constructors/chatParticipants.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: Photo
-description: constructors of type Photo
+description: constructors and methods of type Photo
 ---
 ## Type: Photo  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type Photo
 [photoEmpty](../constructors/photoEmpty.md)  
 
 [photo](../constructors/photo.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

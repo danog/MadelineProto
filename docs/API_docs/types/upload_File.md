@@ -1,6 +1,6 @@
 ---
 title: upload_File
-description: constructors of type upload_File
+description: constructors and methods of type upload_File
 ---
 ## Type: upload\_File  
 [Back to types index](index.md)
@@ -10,4 +10,12 @@ description: constructors of type upload_File
 ### Possible values (constructors):
 
 [upload\_file](../constructors/upload_file.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->upload->getFile](../methods/upload_getFile.md)  
+
+
 

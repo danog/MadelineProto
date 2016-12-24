@@ -1,6 +1,6 @@
 ---
 title: InputMedia
-description: constructors of type InputMedia
+description: constructors and methods of type InputMedia
 ---
 ## Type: InputMedia  
 [Back to types index](index.md)
@@ -34,4 +34,10 @@ description: constructors of type InputMedia
 [inputMediaDocumentExternal](../constructors/inputMediaDocumentExternal.md)  
 
 [inputMediaGame](../constructors/inputMediaGame.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

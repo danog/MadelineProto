@@ -1,6 +1,6 @@
 ---
 title: ChannelParticipantRole
-description: constructors of type ChannelParticipantRole
+description: constructors and methods of type ChannelParticipantRole
 ---
 ## Type: ChannelParticipantRole  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type ChannelParticipantRole
 [channelRoleModerator](../constructors/channelRoleModerator.md)  
 
 [channelRoleEditor](../constructors/channelRoleEditor.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

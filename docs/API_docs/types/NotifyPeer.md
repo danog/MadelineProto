@@ -1,6 +1,6 @@
 ---
 title: NotifyPeer
-description: constructors of type NotifyPeer
+description: constructors and methods of type NotifyPeer
 ---
 ## Type: NotifyPeer  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type NotifyPeer
 [notifyChats](../constructors/notifyChats.md)  
 
 [notifyAll](../constructors/notifyAll.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

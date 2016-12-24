@@ -1,6 +1,6 @@
 ---
 title: InputPeerNotifySettings
-description: constructors of type InputPeerNotifySettings
+description: constructors and methods of type InputPeerNotifySettings
 ---
 ## Type: InputPeerNotifySettings  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type InputPeerNotifySettings
 ### Possible values (constructors):
 
 [inputPeerNotifySettings](../constructors/inputPeerNotifySettings.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

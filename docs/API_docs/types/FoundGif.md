@@ -1,6 +1,6 @@
 ---
 title: FoundGif
-description: constructors of type FoundGif
+description: constructors and methods of type FoundGif
 ---
 ## Type: FoundGif  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type FoundGif
 [foundGif](../constructors/foundGif.md)  
 
 [foundGifCached](../constructors/foundGifCached.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

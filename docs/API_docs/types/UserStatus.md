@@ -1,6 +1,6 @@
 ---
 title: UserStatus
-description: constructors of type UserStatus
+description: constructors and methods of type UserStatus
 ---
 ## Type: UserStatus  
 [Back to types index](index.md)
@@ -20,4 +20,10 @@ description: constructors of type UserStatus
 [userStatusLastWeek](../constructors/userStatusLastWeek.md)  
 
 [userStatusLastMonth](../constructors/userStatusLastMonth.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

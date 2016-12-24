@@ -1,6 +1,6 @@
 ---
 title: Config
-description: constructors of type Config
+description: constructors and methods of type Config
 ---
 ## Type: Config  
 [Back to types index](index.md)
@@ -10,4 +10,12 @@ description: constructors of type Config
 ### Possible values (constructors):
 
 [config](../constructors/config.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->help->getConfig](../methods/help_getConfig.md)  
+
+
 

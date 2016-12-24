@@ -1,6 +1,6 @@
 ---
 title: InputPrivacyKey
-description: constructors of type InputPrivacyKey
+description: constructors and methods of type InputPrivacyKey
 ---
 ## Type: InputPrivacyKey  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type InputPrivacyKey
 [inputPrivacyKeyStatusTimestamp](../constructors/inputPrivacyKeyStatusTimestamp.md)  
 
 [inputPrivacyKeyChatInvite](../constructors/inputPrivacyKeyChatInvite.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

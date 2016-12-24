@@ -1,6 +1,6 @@
 ---
 title: UserProfilePhoto
-description: constructors of type UserProfilePhoto
+description: constructors and methods of type UserProfilePhoto
 ---
 ## Type: UserProfilePhoto  
 [Back to types index](index.md)
@@ -12,4 +12,12 @@ description: constructors of type UserProfilePhoto
 [userProfilePhotoEmpty](../constructors/userProfilePhotoEmpty.md)  
 
 [userProfilePhoto](../constructors/userProfilePhoto.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->photos->updateProfilePhoto](../methods/photos_updateProfilePhoto.md)  
+
+
 

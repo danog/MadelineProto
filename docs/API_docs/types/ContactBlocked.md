@@ -1,6 +1,6 @@
 ---
 title: ContactBlocked
-description: constructors of type ContactBlocked
+description: constructors and methods of type ContactBlocked
 ---
 ## Type: ContactBlocked  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type ContactBlocked
 ### Possible values (constructors):
 
 [contactBlocked](../constructors/contactBlocked.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

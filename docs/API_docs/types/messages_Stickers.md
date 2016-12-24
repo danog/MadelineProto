@@ -1,6 +1,6 @@
 ---
 title: messages_Stickers
-description: constructors of type messages_Stickers
+description: constructors and methods of type messages_Stickers
 ---
 ## Type: messages\_Stickers  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type messages_Stickers
 [messages\_stickersNotModified](../constructors/messages_stickersNotModified.md)  
 
 [messages\_stickers](../constructors/messages_stickers.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: InputChannel
-description: constructors of type InputChannel
+description: constructors and methods of type InputChannel
 ---
 ## Type: InputChannel  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type InputChannel
 [inputChannelEmpty](../constructors/inputChannelEmpty.md)  
 
 [inputChannel](../constructors/inputChannel.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: InputEncryptedFile
-description: constructors of type InputEncryptedFile
+description: constructors and methods of type InputEncryptedFile
 ---
 ## Type: InputEncryptedFile  
 [Back to types index](index.md)
@@ -16,4 +16,10 @@ description: constructors of type InputEncryptedFile
 [inputEncryptedFile](../constructors/inputEncryptedFile.md)  
 
 [inputEncryptedFileBigUploaded](../constructors/inputEncryptedFileBigUploaded.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

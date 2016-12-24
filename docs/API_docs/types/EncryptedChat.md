@@ -1,6 +1,6 @@
 ---
 title: EncryptedChat
-description: constructors of type EncryptedChat
+description: constructors and methods of type EncryptedChat
 ---
 ## Type: EncryptedChat  
 [Back to types index](index.md)
@@ -18,4 +18,14 @@ description: constructors of type EncryptedChat
 [encryptedChat](../constructors/encryptedChat.md)  
 
 [encryptedChatDiscarded](../constructors/encryptedChatDiscarded.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->requestEncryption](../methods/messages_requestEncryption.md)  
+
+[$MadelineProto->messages->acceptEncryption](../methods/messages_acceptEncryption.md)  
+
+
 

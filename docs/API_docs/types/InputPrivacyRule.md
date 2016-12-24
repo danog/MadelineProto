@@ -1,6 +1,6 @@
 ---
 title: InputPrivacyRule
-description: constructors of type InputPrivacyRule
+description: constructors and methods of type InputPrivacyRule
 ---
 ## Type: InputPrivacyRule  
 [Back to types index](index.md)
@@ -20,4 +20,10 @@ description: constructors of type InputPrivacyRule
 [inputPrivacyValueDisallowAll](../constructors/inputPrivacyValueDisallowAll.md)  
 
 [inputPrivacyValueDisallowUsers](../constructors/inputPrivacyValueDisallowUsers.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: PhotoSize
-description: constructors of type PhotoSize
+description: constructors and methods of type PhotoSize
 ---
 ## Type: PhotoSize  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type PhotoSize
 [photoSize](../constructors/photoSize.md)  
 
 [photoCachedSize](../constructors/photoCachedSize.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

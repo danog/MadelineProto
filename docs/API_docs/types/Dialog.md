@@ -1,6 +1,6 @@
 ---
 title: Dialog
-description: constructors of type Dialog
+description: constructors and methods of type Dialog
 ---
 ## Type: Dialog  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type Dialog
 ### Possible values (constructors):
 
 [dialog](../constructors/dialog.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

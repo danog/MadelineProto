@@ -1,6 +1,6 @@
 ---
 title: InputPeerNotifyEvents
-description: constructors of type InputPeerNotifyEvents
+description: constructors and methods of type InputPeerNotifyEvents
 ---
 ## Type: InputPeerNotifyEvents  
 [Back to types index](index.md)
@@ -12,4 +12,10 @@ description: constructors of type InputPeerNotifyEvents
 [inputPeerNotifyEventsEmpty](../constructors/inputPeerNotifyEventsEmpty.md)  
 
 [inputPeerNotifyEventsAll](../constructors/inputPeerNotifyEventsAll.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

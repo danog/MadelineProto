@@ -1,6 +1,6 @@
 ---
 title: WebPage
-description: constructors of type WebPage
+description: constructors and methods of type WebPage
 ---
 ## Type: WebPage  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type WebPage
 [webPagePending](../constructors/webPagePending.md)  
 
 [webPage](../constructors/webPage.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

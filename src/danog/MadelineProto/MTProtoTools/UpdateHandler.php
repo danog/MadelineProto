@@ -41,18 +41,18 @@ trait UpdateHandler
                 $this->update_state($difference);
                 break;
             case 'updates.difference':
-                $this->update_state($difference['state']);
                 $this->add_users($difference['users']);
                 $this->add_chats($difference['chats']);
                 $this->handle_update_messages($difference['new_messages']);
-                $this->handle_other_updates($difference['other_updates']);
+                $this->handle_multiple_update($difference['other_updates']);
+                $this->update_state($difference['state']);
                 break;
             case 'updates.differenceSlice':
-                $this->update_state($difference['state']);
                 $this->add_users($difference['users']);
                 $this->add_chats($difference['chats']);
                 $this->handle_update_messages($difference['new_messages']);
-                $this->handle_other_updates($difference['other_updates']);
+                $this->handle_multiple_update($difference['other_updates']);
+                $this->update_state($difference['intermediate_state']);
                 $this->get_updates_state();
                 break;
             default:
@@ -70,20 +70,21 @@ trait UpdateHandler
             case 'updateShortMessage':
             case 'updateShortChatMessage':
             case 'updateShortSentMessage':
-                $this->handle_update_messages([$updates]);
+                $update = ['_' => 'updateNewMessage',]; 
+                $this->handle_update_messages($update, ['date' => $updates['date']]);
                 break;
             case 'updateShort':
-                $this->handle_other_updates([$updates['update']]);
+                $this->handle_update($updates['update'], ['date' => $updates['date']]);
                 break;
             case 'updatesCombined':
                 $this->add_users($updates['users']);
                 $this->add_chats($updates['chats']);
-                $this->handle_other_updates($updates['updates']);
+                $this->handle_multiple_update($updates['updates']);
                 break;
             case 'updates':
                 $this->add_users($updates['users']);
                 $this->add_chats($updates['chats']);
-                $this->handle_other_updates($updates['updates']);
+                $this->handle_multiple_update($updates['updates']);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update received: '.var_export($updates));
@@ -91,13 +92,22 @@ trait UpdateHandler
         }
     }
 
-    public function handle_other_updates($updates)
+    public function handle_update($update)
     {
-        var_dump($updates);
+        var_dump($update);
+    }
+
+    public function handle_multiple_update($updates)
+    {
+        foreach ($updates as $update) {
+            $this->handle_update($update);
+        }
     }
 
     public function handle_update_messages($messages)
     {
-        var_dump($messages);
+        foreach ($messages as $message) {
+            $this->handle_update(['_' => 'updateNewMessage', 'message' => $message, 'pts' => $this->updates_state[0]['pts'], 'pts_count' => 0]);
+        }
     }
 }

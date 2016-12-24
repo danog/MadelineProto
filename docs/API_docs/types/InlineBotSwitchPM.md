@@ -1,6 +1,6 @@
 ---
 title: InlineBotSwitchPM
-description: constructors of type InlineBotSwitchPM
+description: constructors and methods of type InlineBotSwitchPM
 ---
 ## Type: InlineBotSwitchPM  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type InlineBotSwitchPM
 ### Possible values (constructors):
 
 [inlineBotSwitchPM](../constructors/inlineBotSwitchPM.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

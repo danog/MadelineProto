@@ -1,6 +1,6 @@
 ---
 title: TopPeerCategory
-description: constructors of type TopPeerCategory
+description: constructors and methods of type TopPeerCategory
 ---
 ## Type: TopPeerCategory  
 [Back to types index](index.md)
@@ -18,4 +18,10 @@ description: constructors of type TopPeerCategory
 [topPeerCategoryGroups](../constructors/topPeerCategoryGroups.md)  
 
 [topPeerCategoryChannels](../constructors/topPeerCategoryChannels.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

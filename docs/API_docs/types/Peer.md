@@ -1,6 +1,6 @@
 ---
 title: Peer
-description: constructors of type Peer
+description: constructors and methods of type Peer
 ---
 ## Type: Peer  
 [Back to types index](index.md)
@@ -14,4 +14,10 @@ description: constructors of type Peer
 [peerChat](../constructors/peerChat.md)  
 
 [peerChannel](../constructors/peerChannel.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 

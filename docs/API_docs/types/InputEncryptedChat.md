@@ -1,6 +1,6 @@
 ---
 title: InputEncryptedChat
-description: constructors of type InputEncryptedChat
+description: constructors and methods of type InputEncryptedChat
 ---
 ## Type: InputEncryptedChat  
 [Back to types index](index.md)
@@ -10,4 +10,10 @@ description: constructors of type InputEncryptedChat
 ### Possible values (constructors):
 
 [inputEncryptedChat](../constructors/inputEncryptedChat.md)  
+
+
+
+### Methods that return an object of this type (methods):
+
+
 
