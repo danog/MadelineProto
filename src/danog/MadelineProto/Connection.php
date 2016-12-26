@@ -162,8 +162,12 @@ class Connection extends Tools
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                $packet = stream_get_contents($this->sock, $length);
+                if (strlen($packet) != $length) {
+                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).", read ".strlen($packet).")!");
+                }
 
-                return fread($this->sock, $length);
+                return $packet;
                 break;
             case 'http':
             case 'https':
@@ -193,19 +197,20 @@ class Connection extends Tools
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
+
                 $payload = $this->fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
                 break;
             case 'tcp_intermediate':
-                $packet_length_data = $this->sock->read(4);
+                $packet_length_data = $this->read(4);
                 if (strlen($packet_length_data) < 4) {
                     throw new Exception('Nothing in the socket!');
                 }
                 $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
-                $packet = $this->sock->read($packet_length);
+                $packet = $this->read($packet_length);
                 $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
             case 'tcp_abridged':
-                $packet_length_data = $this->sock->read(1);
+                $packet_length_data = $this->read(1);
                 if (strlen($packet_length_data) < 1) {
                     throw new Exception('Nothing in the socket!');
                 }
@@ -213,10 +218,10 @@ class Connection extends Tools
                 if ($packet_length < 127) {
                     $packet_length <<= 2;
                 } else {
-                    $packet_length_data = $this->sock->read(3);
+                    $packet_length_data = $this->read(3);
                     $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
-                $packet = $this->sock->read($packet_length);
+                $packet = $this->read($packet_length);
                 $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
                 break;
             case 'http':

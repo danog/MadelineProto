@@ -24,7 +24,10 @@ trait Login
         }
         $this->API->datacenter->authorized = false;
         $this->API->datacenter->authorization = null;
+        $this->API->updates = [];
         \danog\MadelineProto\Logger::log('Logged out successfully!');
+
+        $this->API->should_serialize = true;
 
         return true;
     }
@@ -45,7 +48,12 @@ trait Login
             ]
         );
         $this->API->datacenter->authorized = true;
-        $this->API->get_updates_state();
+        $this->API->get_updates_difference();
+        
+
+        $this->API->should_serialize = true;
+        
+        $this->API->updates = [];
         \danog\MadelineProto\Logger::log('Logged in successfully!');
 
         return $this->API->datacenter->authorization;
@@ -70,6 +78,9 @@ trait Login
         );
         $this->API->datacenter->authorization['phone_number'] = $number;
         $this->API->datacenter->waiting_code = true;
+        $this->API->should_serialize = true;
+        $this->API->updates = [];
+
         \danog\MadelineProto\Logger::log('Code sent successfully! Once you receive the code you should use the complete_phone_login function.');
 
         return $this->API->datacenter->authorization;
@@ -91,7 +102,9 @@ trait Login
         );
         $this->API->datacenter->waiting_code = false;
         $this->API->datacenter->authorized = true;
-        $this->API->get_updates_state();
+        $this->API->get_updates_difference();
+        $this->API->should_serialize = true;
+
         \danog\MadelineProto\Logger::log('Logged in successfully!');
 
         return $this->API->datacenter->authorization;

@@ -16,6 +16,7 @@ class API extends APIFactory
 {
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\PeerHandler;
+    use \danog\MadelineProto\Wrappers\SettingsManager;
 
     public $API;
     public $settings;
@@ -23,6 +24,11 @@ class API extends APIFactory
 
     public function __construct($params = [])
     {
+        // Detect 64 bit
+        if (PHP_INT_SIZE < 8) {
+            throw new Exception('MadelineProto supports only 64 bit systems ATM');
+        }
+
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
 
@@ -45,6 +51,7 @@ class API extends APIFactory
 
     public function __wakeup()
     {
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->APIFactory();
     }
 

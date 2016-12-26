@@ -32,14 +32,42 @@ class MTProto extends PrimeModule
     public $settings = [];
     public $config = ['expires' => -1];
     public $ipv6 = false;
-
+    public $should_serialize = true;
+    
     public function __construct($settings = [])
     {
-        // Detect 64 bit
-        if (PHP_INT_SIZE < 8) {
-            throw new Exception('MadelineProto supports only 64 bit systems ATM');
-        }
+        // Parse settings
+        $this->parse_settings($settings);
 
+        // Setup logger
+        $this->setup_logger();
+
+        // Connect to servers
+        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
+        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+
+        // Load rsa key
+        \danog\MadelineProto\Logger::log('Loading RSA key...');
+        $this->key = new RSA($settings['authorization']['rsa_key']);
+
+        // Istantiate TL class
+        \danog\MadelineProto\Logger::log('Translating tl schemas...');
+        $this->tl = new TL\TL($this->settings['tl_schema']['src']);
+
+        $this->switch_dc(2, true);
+        $this->get_config();
+    }
+
+    public function __wakeup()
+    {
+        $this->setup_logger();
+        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $this->reset_session();
+        if ($this->datacenter->authorized) {
+            $this->get_updates_difference();
+        }
+    }
+    public function parse_settings($settings) {
         // Detect ipv6
         $google = '';
         try {
@@ -161,9 +189,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'response'      => 5, // How many times should I try to get a response of a query before throwing an exception
             ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-                'incoming' => 30,
-                'outgoing' => 30,
+                'incoming' => 100,
+                'outgoing' => 100,
             ],
+            'updates'   => [
+                'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback
+                'callback' => [$this, 'get_updates_update_handler'] // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+            ]
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -184,36 +216,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             unset($settings['connection_settings']['all']);
         }
         $this->settings = $settings;
-
-        // Setup logger
-        $this->setup_logger();
-
-        // Connect to servers
-        \danog\MadelineProto\Logger::log('Istantiating DataCenter...');
-        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
-
-        // Load rsa key
-        \danog\MadelineProto\Logger::log('Loading RSA key...');
-        $this->key = new RSA($settings['authorization']['rsa_key']);
-
-        // Istantiate TL class
-        \danog\MadelineProto\Logger::log('Translating tl schemas...');
-        $this->tl = new TL\TL($this->settings['tl_schema']['src']);
-
-        $this->switch_dc(2, true);
-        $this->get_config();
     }
-
-    public function __wakeup()
-    {
-        $this->setup_logger();
-        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
-        $this->reset_session();
-        if ($this->datacenter->authorized) {
-            $this->get_updates_state();
-        }
-    }
-
     public function setup_logger()
     {
         if (!\danog\MadelineProto\Logger::$constructed) {
@@ -243,15 +246,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if (!isset($this->datacenter->sockets[$new_dc])) {
             $this->datacenter->dc_connect($new_dc);
             $this->init_authorization();
-            $this->config = $this->write_client_info('help.getConfig');
-            $this->parse_config();
-
+            $this->get_config($this->write_client_info('help.getConfig'));
             $this->get_nearest_dc($allow_nearest_dc_switch);
         }
         if (
             (isset($this->datacenter->sockets[$old_dc]->authorized) && $this->datacenter->sockets[$old_dc]->authorized) &&
             !(isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] === $this->datacenter->sockets[$old_dc]->authorization['user']['id'])
         ) {
+            $this->should_serialize = true;
             $this->datacenter->curdc = $old_dc;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
             $this->datacenter->curdc = $new_dc;
@@ -273,6 +275,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($this->datacenter->auth_key == null) {
                 \danog\MadelineProto\Logger::log('Generating permanent authorization key...');
                 $this->datacenter->auth_key = $this->create_auth_key(-1);
+                $this->should_serialize = true;
             }
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
@@ -306,21 +309,22 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
             $this->switch_dc($nearest_dc['nearest_dc']);
             $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
+            $this->should_serialize = true;
         }
     }
 
-    public function get_config()
+    public function get_config($config = [])
     {
         if ($this->config['expires'] > time()) {
             return;
         }
-        $this->config = $this->method_call('help.getConfig');
+        $this->config = empty($config) ? $this->method_call('help.getConfig') : $config;
+        $this->should_serialize = true;
         $this->parse_config();
     }
 
     public function parse_config()
     {
-        \danog\MadelineProto\Logger::log('Received config!', $this->config);
         foreach ($this->config['dc_options'] as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
@@ -329,5 +333,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         unset($this->config['dc_options']);
+        \danog\MadelineProto\Logger::log('Updated config!', $this->config);
     }
 }

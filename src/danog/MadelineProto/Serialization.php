@@ -10,22 +10,22 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto;
 
 /**
- * Manages peers.
+ * Manages serialization of the MadelineProto instance
  */
-trait PeerHandler
-{
-    public function get_info($id, $recursive = true) {
-        return $this->API->get_info($id, $recursive);
+class Serialization {
+
+    public static function serialize($filename, $instance, $force = false) {
+        if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
+            $instance->API->should_serialize = false;
+            return file_put_contents($filename, serialize($instance));
+        }
+        return false;
     }
 
-    public function gen_all($constructor) {
-        return $this->API->gen_all($constructor);
-    }
-
-    public function resolve_username($username) {
-        return $this->API->resolve_username($username);
+    public static function deserialize($filename) {
+        return file_exists($filename) ? unserialize(file_get_contents($filename)) : false;
     }
 }

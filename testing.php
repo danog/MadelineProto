@@ -12,10 +12,16 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require_once 'vendor/autoload.php';
+$settings = [];
+if (file_exists('web_data.php')) {
+    require_once('web_data.php');
+}
 
-if (file_exists('number.php') && !file_exists('session.madeline')) {
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+
+if (file_exists('number.php') && $MadelineProto === false) {
     include_once 'number.php';
-    $MadelineProto = new \danog\MadelineProto\API();
+    $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
@@ -33,35 +39,36 @@ if (file_exists('number.php') && !file_exists('session.madeline')) {
     $authorization = $MadelineProto->complete_phone_login($code);
     \danog\MadelineProto\Logger::log($authorization);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-    echo 'Wrote '.file_put_contents('session.madeline', serialize($MadelineProto)).' bytes'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-$MadelineProto = unserialize(file_get_contents('session.madeline'));
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
-$message = (getenv('TRAVIS_COMMIT') == '') ? 'Message entities can be sent too (yay)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
+$message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
 $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
 
-\danog\MadelineProto\Logger::log($MadelineProto->resolve_username('@Palmas2012')); // Always use this method to resolve usernames, but you won't need to call this to get info about peers, as get_peer and get_input_peer will call it for you if needed
-
-$mention = $MadelineProto->get_peer('@veetaw'); // Returns an object of type User or Chat
-$mention = $MadelineProto->constructor2inputpeer($mention); // Converts an object of type User or Chat to an object of type inputPeer
+$mention = $MadelineProto->get_info('@giuseppe_la_gaipa_2'); // Returns the following array: ['constructor' => $constructor, 'inputPeer' => $inputPeer, 'inputType' => $inputType, 'Peer' => $Peer, 'id' => $id, 'botApiId' => $bot_api_id]
+$mention = $mention['inputType']; // Selects only the inputType object
 
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_input_peer($peer); // Returns directly an inputPeer object, basically does the same thing I've done manually above
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message) + 1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }
+
+sleep(5);
+$MadelineProto->API->get_updates_difference();
 
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
 if (file_exists('token.php')) {
     include_once 'token.php';
-    $MadelineProto = new \danog\MadelineProto\API();
+    $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($token);
     \danog\MadelineProto\Logger::log($authorization);
 }
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_input_peer($peer);
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message.' & pony', 'entities' => [['_' => 'messageEntityUrl', 'offset' => strlen($message) + 1, 'length' => 6, 'url' => $flutter], ['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }

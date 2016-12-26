@@ -55,7 +55,7 @@ trait MessageHandler
     {
         $payload = $this->datacenter->read_message();
         if (fstat($payload)['size'] == 4) {
-            $error = \danog\PHP\Struct::unpack('<i', fread($payload, 4))[0];
+            $error = \danog\PHP\Struct::unpack('<i', stream_get_contents($payload, 4))[0];
             if ($error == -404) {
                 if ($this->datacenter->temp_auth_key != null) {
                     \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...');
@@ -68,13 +68,13 @@ trait MessageHandler
             }
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
-        $auth_key_id = fread($payload, 8);
+        $auth_key_id = stream_get_contents($payload, 8);
         if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
-            list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', fread($payload, 12));
+            list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', stream_get_contents($payload, 12));
             $this->check_message_id($message_id, false);
-            $message_data = fread($payload, $message_length);
+            $message_data = stream_get_contents($payload, $message_length);
         } elseif ($auth_key_id == $this->datacenter->temp_auth_key['id']) {
-            $message_key = fread($payload, 16);
+            $message_key = stream_get_contents($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key'], 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);

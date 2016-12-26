@@ -87,7 +87,6 @@ class TL extends \danog\MadelineProto\Tools
                 return \danog\PHP\Struct::pack('<I', $object);
             case 'long':
                 if (!is_numeric($object)) {
-                    var_dump($object);
                     throw new Exception("given value isn't numeric");
                 }
 
@@ -252,42 +251,42 @@ class TL extends \danog\MadelineProto\Tools
                 throw new Exception('An invalid bytes_io handle was provided.');
             }
         }
-        //\danog\MadelineProto\Logger::log('Deserializing '.$type['type'].'/'.$subtype.' at byte '.ftell($bytes_io));
+        //\danog\MadelineProto\Logger::log('Deserializing '.$type['type'].' at byte '.ftell($bytes_io));
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserialize_bool(fread($bytes_io, 4));
+                return $this->deserialize_bool(stream_get_contents($bytes_io, 4));
             case 'int':
-                return \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
+                return \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
             case '#':
-                return \danog\PHP\Struct::unpack('<I', fread($bytes_io, 4))[0];
+                return \danog\PHP\Struct::unpack('<I', stream_get_contents($bytes_io, 4))[0];
             case 'long':
-                return \danog\PHP\Struct::unpack('<q', fread($bytes_io, 8))[0];
+                return \danog\PHP\Struct::unpack('<q', stream_get_contents($bytes_io, 8))[0];
             case 'double':
-                return \danog\PHP\Struct::unpack('<d', fread($bytes_io, 8))[0];
+                return \danog\PHP\Struct::unpack('<d', stream_get_contents($bytes_io, 8))[0];
             case 'int128':
-                return fread($bytes_io, 16);
+                return stream_get_contents($bytes_io, 16);
             case 'int256':
-                return fread($bytes_io, 32);
+                return stream_get_contents($bytes_io, 32);
             case 'int512':
-                return fread($bytes_io, 32);
+                return stream_get_contents($bytes_io, 32);
             case 'string':
             case 'bytes':
-                $l = \danog\PHP\Struct::unpack('<B', fread($bytes_io, 1))[0];
+                $l = \danog\PHP\Struct::unpack('<B', stream_get_contents($bytes_io, 1))[0];
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l == 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', fread($bytes_io, 3).$this->string2bin('\x00'))[0];
-                    $x = fread($bytes_io, $long_len);
+                    $long_len = \danog\PHP\Struct::unpack('<I', stream_get_contents($bytes_io, 3).$this->string2bin('\x00'))[0];
+                    $x = stream_get_contents($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        fread($bytes_io, $resto);
+                        stream_get_contents($bytes_io, $resto);
                     }
                 } else {
-                    $x = fread($bytes_io, $l);
+                    $x = stream_get_contents($bytes_io, $l);
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        fread($bytes_io, $resto);
+                        stream_get_contents($bytes_io, $resto);
                     }
                 }
                 if (!is_string($x)) {
@@ -298,14 +297,14 @@ class TL extends \danog\MadelineProto\Tools
             case 'true':
                 return true;
             case 'Vector t':
-                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'string'])));
+                        return $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', gzdecode($this->deserialize($bytes_io, ['type' => 'string']))));
                     case 'Vector t':
                     case 'vector':
                         break;
@@ -313,7 +312,7 @@ class TL extends \danog\MadelineProto\Tools
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             case 'vector':
-                $count = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
+                $count = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
                     $result[] = $this->deserialize($bytes_io, ['type' => $type['subtype']]);
@@ -330,7 +329,7 @@ class TL extends \danog\MadelineProto\Tools
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
-                $id = \danog\PHP\Struct::unpack('<i', fread($bytes_io, 4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
@@ -338,7 +337,7 @@ class TL extends \danog\MadelineProto\Tools
             }
         }
         if ($constructorData['predicate'] == 'gzip_packed') {
-            return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'string'])));
+            return $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', gzdecode($this->deserialize($bytes_io, ['type' => 'string']))));
         }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {
@@ -365,7 +364,6 @@ class TL extends \danog\MadelineProto\Tools
         if (isset($x['flags'])) { // I don't think we need this anymore
             unset($x['flags']);
         }
-
         return $x;
     }
 

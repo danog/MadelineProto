@@ -125,15 +125,9 @@ trait ResponseHandler
                     $this->datacenter->temp_auth_key['server_salt'] = $response['server_salt'];
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
                     \danog\MadelineProto\Logger::log('new session created');
-                    \danog\MadelineProto\Logger::log($response);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
-                    if ($this->datacenter->authorized) {
-                        $this->get_updates_state();
-                    }
                     break;
                 case 'msg_container':
-
-                    \danog\MadelineProto\Logger::log($response['messages']);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     foreach ($response['messages'] as $message) {
                         $this->check_message_id($message['msg_id'], false, true);
@@ -191,8 +185,6 @@ trait ResponseHandler
 
                     if (isset($this->datacenter->incoming_messages[$response['answer_msg_id']])) {
                         $this->ack_incoming_message_id($response['answer_msg_id']);
-                    } else {
-                        $this->object_call('msg_resend_req', ['msg_ids' => [$response['answer_msg_id']]]);
                     }
                     break;
                 case 'msg_resend_req':

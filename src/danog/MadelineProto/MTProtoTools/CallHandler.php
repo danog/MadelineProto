@@ -25,6 +25,7 @@ trait CallHandler
         foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
                 \danog\MadelineProto\Logger::log('Calling method (try number '.$count.' for '.$method.')...');
+                
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
@@ -35,7 +36,7 @@ trait CallHandler
                     \danog\MadelineProto\Logger::log('Getting response (try number '.$res_count.' for '.$method.')...');
                     $this->recv_message();
                     $this->handle_messages();
-                    if (!isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) {
+                    if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) {
                         continue;
                     }
                     $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'];
@@ -94,6 +95,7 @@ trait CallHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 $this->datacenter->close_and_reopen();
+                sleep(1); // To avoid flooding
                 continue;
             }
             if ($server_answer == null) {
@@ -113,7 +115,7 @@ trait CallHandler
 
         foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
-                \danog\MadelineProto\Logger::log('Sending object (try number '.$count.' for '.$object.')...');
+                \danog\MadelineProto\Logger::log($object == 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...');
                 $int_message_id = $this->send_message($this->tl->serialize_object(['type' => $object], $args), $this->tl->content_related($object));
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $object, 'args' => $args];
             } catch (Exception $e) {

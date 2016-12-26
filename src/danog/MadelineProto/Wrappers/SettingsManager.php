@@ -13,19 +13,13 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\Wrappers;
 
 /**
- * Manages peers.
+ * Manages changing API instance settings.
  */
-trait PeerHandler
-{
-    public function get_info($id, $recursive = true) {
-        return $this->API->get_info($id, $recursive);
+trait SettingsManager {
+    public function get_settings() {
+        return $this->API->settings;
     }
-
-    public function gen_all($constructor) {
-        return $this->API->gen_all($constructor);
-    }
-
-    public function resolve_username($username) {
-        return $this->API->resolve_username($username);
+    public function update_settings($settings) {
+        $this->API->parse_settings($settings);
     }
 }

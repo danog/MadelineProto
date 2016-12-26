@@ -35,7 +35,7 @@ class Tools
     {
         $pos = ftell($handle);
         fseek($handle, 0);
-        $content = fread($handle, fstat($handle)['size']);
+        $content = stream_get_contents($handle, fstat($handle)['size']);
         fseek($handle, $pos);
 
         return $content;

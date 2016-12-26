@@ -215,14 +215,15 @@ var_dump($authorization);
 
 var_dump($MadelineProto->resolve_username('@Palmas2012')); // Always use this method to resolve usernames, but you won't need to call this to get info about peers, as get_peer and get_input_peer will call it for you if needed
 
-$mention = $MadelineProto->get_peer('@veetaw'); // Returns an object of type User or Chat
-$mention = $MadelineProto->constructor2inputpeer($mention); // Converts an object of type User or Chat to an object of type inputPeer
-
 $message = "I've installed MadelineProto!";
+
+$mention = $MadelineProto->get_info('@@NonSonoGioTech'); // Returns the following array: ['constructor' => $constructor, 'inputPeer' => $inputPeer, 'inputType' => $inputType, 'Peer' => $Peer, 'id' => $id, 'botApiId' => $bot_api_id]
+$mention = $mention['inputType']; // Selects only the inputType object
+
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_input_peer($peer);
+    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
-    var_dump($sentMessage);
+    \danog\MadelineProto\Logger::log($sentMessage);
 }
 
 // The above works with bots too
