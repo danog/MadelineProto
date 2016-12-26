@@ -25,7 +25,7 @@ trait CallHandler
         foreach (range(1, $this->settings['max_tries']['query']) as $count) {
             try {
                 \danog\MadelineProto\Logger::log('Calling method (try number '.$count.' for '.$method.')...');
-                
+
                 $args = $this->tl->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->tl->serialize_method($method, $args), $this->tl->content_related($method), $message_id);
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];

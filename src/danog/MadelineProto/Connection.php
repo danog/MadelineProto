@@ -164,7 +164,7 @@ class Connection extends Tools
                 }
                 $packet = stream_get_contents($this->sock, $length);
                 if (strlen($packet) != $length) {
-                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).", read ".strlen($packet).")!");
+                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
                 return $packet;

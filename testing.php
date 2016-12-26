@@ -14,7 +14,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require_once 'vendor/autoload.php';
 $settings = [];
 if (file_exists('web_data.php')) {
-    require_once('web_data.php');
+    require_once 'web_data.php';
 }
 
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');

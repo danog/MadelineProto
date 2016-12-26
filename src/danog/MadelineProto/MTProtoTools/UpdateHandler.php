@@ -22,7 +22,8 @@ trait UpdateHandler
 
     public $updates = [];
 
-    public function get_updates_update_handler($update) {
+    public function get_updates_update_handler($update)
+    {
         if (count($this->updates) > $this->settings['updates']['updates_array_limit']) {
             array_shift($this->updates);
         }
@@ -30,7 +31,8 @@ trait UpdateHandler
         \danog\MadelineProto\Logger::log('Stored ', $update);
     }
 
-    public function get_updates($offset, $limit = null, $timeout = 0) {
+    public function get_updates($offset, $limit = null, $timeout = 0)
+    {
         sleep($timeout);
         $this->get_updates_difference();
         $result = array_slice($this->updates, $offset, $limit, true);
@@ -39,15 +41,19 @@ trait UpdateHandler
             $updates[] = ['update_id' => $key, 'update' => $value];
             unset($this->updates[$key]);
         }
+
         return $updates;
     }
 
-    public function &get_channel_state($channel, $pts = 0) {
+    public function &get_channel_state($channel, $pts = 0)
+    {
         if (!isset($this->channels_state[$channel])) {
             $this->channels_state[$channel] = ['pts' => $pts, 'pop_pts' => [], 'pending_seq_updates' =>[]];
         }
+
         return $this->channels_state[$channel];
     }
+
     public function update_channel_state($channel, $data)
     {
         $this->get_channel_state($channel);
@@ -59,7 +65,7 @@ trait UpdateHandler
     {
         $this->get_channel_state($channel);
 
-        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $this->get_info('channel#'.$channel)['inputType'], 'filter' => ['_' => 'channelMessagesFilterEmpty'],'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $this->get_info('channel#'.$channel)['inputType'], 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
                 $this->update_channel_state($difference);
@@ -81,6 +87,7 @@ trait UpdateHandler
                 break;
         }
     }
+
     public function update_state($data)
     {
         if (empty($this->updates_state)) {
@@ -91,7 +98,6 @@ trait UpdateHandler
         $this->updates_state['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->updates_state['seq'] : $data['seq'];
         $this->updates_state['date'] = (!isset($data['date']) || $data['date'] < $this->updates_state['date']) ? $this->updates_state['date'] : $data['date'];
     }
-
 
     public function get_updates_difference()
     {
@@ -149,7 +155,7 @@ trait UpdateHandler
                 $this->add_chats($updates['chats']);
                 $this->handle_multiple_update($updates['updates'], ['date' => $updates['date'], 'seq' => $updates['seq'], 'seq_start' => $updates['seq_start']]);
                 break;
-                
+
             case 'updates':
                 $this->add_users($updates['users']);
                 $this->add_chats($updates['chats']);
@@ -177,6 +183,7 @@ trait UpdateHandler
                 if (!isset($this->channels_state[$channel_id])) {
                     return false;
                 }
+
                 return $this->get_channel_difference($channel_id);
                 break;
         }
@@ -195,14 +202,14 @@ trait UpdateHandler
                     !isset($this->get_info($message['to_id'])['bot_api_info'])) {
 
                     \danog\MadelineProto\Logger::log('Not enough data for message update');
-                    
+
                     if ($channel_id !== false && isset($this->chats[$channel_id])) {
                         $this->get_channel_difference($channel_id);
                     } else {
                         $this->get_updates_difference();
                     }
                     return false;
-                    
+
                 }
                 break;
             default:
@@ -216,7 +223,7 @@ trait UpdateHandler
             $new_pts = $cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0);
             if ($new_pts < $update['pts']) {
                 \danog\MadelineProto\Logger::log('Pts hole', $cur_state, $update, $this->get_info($channel_id));
-                
+
                 $this->cur_state['pop_pts'][] = $update;
 
                 if ($channel_id && isset($this->chats[$channel_id])) {
@@ -289,7 +296,8 @@ trait UpdateHandler
         }
     }
 
-    public function save_update($update) {
+    public function save_update($update)
+    {
         $this->settings['updates']['callback']($update);
     }
 }

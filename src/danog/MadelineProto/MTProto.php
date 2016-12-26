@@ -33,7 +33,7 @@ class MTProto extends PrimeModule
     public $config = ['expires' => -1];
     public $ipv6 = false;
     public $should_serialize = true;
-    
+
     public function __construct($settings = [])
     {
         // Parse settings
@@ -67,7 +67,9 @@ class MTProto extends PrimeModule
             $this->get_updates_difference();
         }
     }
-    public function parse_settings($settings) {
+
+    public function parse_settings($settings)
+    {
         // Detect ipv6
         $google = '';
         try {
@@ -194,8 +196,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'updates'   => [
                 'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback
-                'callback' => [$this, 'get_updates_update_handler'] // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
-            ]
+                'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+            ],
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -217,6 +219,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         $this->settings = $settings;
     }
+
     public function setup_logger()
     {
         if (!\danog\MadelineProto\Logger::$constructed) {

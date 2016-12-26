@@ -364,6 +364,7 @@ class TL extends \danog\MadelineProto\Tools
         if (isset($x['flags'])) { // I don't think we need this anymore
             unset($x['flags']);
         }
+
         return $x;
     }
 

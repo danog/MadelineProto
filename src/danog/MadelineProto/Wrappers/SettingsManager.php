@@ -15,11 +15,15 @@ namespace danog\MadelineProto\Wrappers;
 /**
  * Manages changing API instance settings.
  */
-trait SettingsManager {
-    public function get_settings() {
+trait SettingsManager
+{
+    public function get_settings()
+    {
         return $this->API->settings;
     }
-    public function update_settings($settings) {
+
+    public function update_settings($settings)
+    {
         $this->API->parse_settings($settings);
     }
 }

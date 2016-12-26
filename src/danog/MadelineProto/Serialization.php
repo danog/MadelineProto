@@ -13,19 +13,23 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 /**
- * Manages serialization of the MadelineProto instance
+ * Manages serialization of the MadelineProto instance.
  */
-class Serialization {
-
-    public static function serialize($filename, $instance, $force = false) {
+class Serialization
+{
+    public static function serialize($filename, $instance, $force = false)
+    {
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
             $instance->API->should_serialize = false;
+
             return file_put_contents($filename, serialize($instance));
         }
+
         return false;
     }
 
-    public static function deserialize($filename) {
+    public static function deserialize($filename)
+    {
         return file_exists($filename) ? unserialize(file_get_contents($filename)) : false;
     }
 }

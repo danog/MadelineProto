@@ -49,10 +49,9 @@ trait Login
         );
         $this->API->datacenter->authorized = true;
         $this->API->get_updates_difference();
-        
 
         $this->API->should_serialize = true;
-        
+
         $this->API->updates = [];
         \danog\MadelineProto\Logger::log('Logged in successfully!');
 

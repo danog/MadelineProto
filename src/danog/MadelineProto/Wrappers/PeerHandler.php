@@ -17,15 +17,18 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait PeerHandler
 {
-    public function get_info($id, $recursive = true) {
+    public function get_info($id, $recursive = true)
+    {
         return $this->API->get_info($id, $recursive);
     }
 
-    public function gen_all($constructor) {
+    public function gen_all($constructor)
+    {
         return $this->API->gen_all($constructor);
     }
 
-    public function resolve_username($username) {
+    public function resolve_username($username)
+    {
         return $this->API->resolve_username($username);
     }
 }

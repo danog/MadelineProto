@@ -65,7 +65,6 @@ trait PeerHandler
         $this->should_serialize = true;
     }
 
-
     public function get_info($id, $recursive = true)
     {
         if (is_array($id)) {
@@ -100,18 +99,23 @@ trait PeerHandler
                     $id = '-100'.$id['channel_id'];
                     break;
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid constructor given ' . var_export($id, true));
+                    throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
                     break;
             }
-
         }
-        
-        if (preg_match('/^channel#/', $id)) $id = str_replace('channel#', '-100', $id);
-        if (preg_match('/^chat#/', $id)) $id = str_replace('chat#', '-', $id);
-        if (preg_match('/^user#/', $id)) $id = str_replace('user#', '', $id);
+
+        if (preg_match('/^channel#/', $id)) {
+            $id = str_replace('channel#', '-100', $id);
+        }
+        if (preg_match('/^chat#/', $id)) {
+            $id = str_replace('chat#', '-', $id);
+        }
+        if (preg_match('/^user#/', $id)) {
+            $id = str_replace('user#', '', $id);
+        }
 
         if (is_numeric($id)) {
-            $id = (int)$id;
+            $id = (int) $id;
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
             }
@@ -134,7 +138,8 @@ trait PeerHandler
         throw new \danog\MadelineProto\Exception("Couldn't find peer by provided username ".$id);
     }
 
-    public function gen_all($constructor) {
+    public function gen_all($constructor)
+    {
         switch ($constructor['_']) {
             case 'user':
                 $inputPeer = $constructor['self'] ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
@@ -155,13 +160,13 @@ trait PeerHandler
                 $inputType = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $Peer = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $id = $constructor['id'];
-                $bot_api_id = (int)('-100'.$constructor['id']);
+                $bot_api_id = (int) ('-100'.$constructor['id']);
                 break;
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor given ' . var_export($constructor, true));
+                throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
                 break;
         }
-        
+
         return ['constructor' => $constructor, 'inputPeer' => $inputPeer, 'inputType' => $inputType, 'Peer' => $Peer, 'id' => $id, 'botApiId' => $bot_api_id];
     }
 
