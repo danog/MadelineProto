@@ -70,11 +70,9 @@ $message = 'yay';
 $mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
-
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }
 sleep(5);
 var_dump($MadelineProto->API->get_updates());
-

@@ -65,7 +65,8 @@ trait PeerHandler
         $this->should_serialize = true;
     }
 
-    public function peer_isset($id) {
+    public function peer_isset($id)
+    {
         try {
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
@@ -73,26 +74,36 @@ trait PeerHandler
         }
     }
 
-    public function entities_peer_isset($entities) {
+    public function entities_peer_isset($entities)
+    {
         try {
             foreach ($entities as $entity) {
                 if ($entity['_'] == 'messageEntityMentionName' || $entity['_'] == 'inputMessageEntityMentionName') {
-                    if (!$this->peer_isset($entity['user_id'])) return false;
+                    if (!$this->peer_isset($entity['user_id'])) {
+                        return false;
+                    }
                 }
             }
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         }
+
         return true;
     }
 
-    public function fwd_peer_isset($fwd) {
+    public function fwd_peer_isset($fwd)
+    {
         try {
-            if (isset($fwd['user_id']) && !$this->peer_isset($fwd['user_id'])) return false;
-            if (isset($fwd['channel_id']) && !$this->peer_isset('channel#'.$fwd['channel_id'])) return false;
+            if (isset($fwd['user_id']) && !$this->peer_isset($fwd['user_id'])) {
+                return false;
+            }
+            if (isset($fwd['channel_id']) && !$this->peer_isset('channel#'.$fwd['channel_id'])) {
+                return false;
+            }
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         }
+
         return true;
     }
 
@@ -187,7 +198,7 @@ trait PeerHandler
                 $res['bot_api_id'] = -$constructor['id'];
                 break;
             case 'channel':
-                $res['InputPeer']= ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];

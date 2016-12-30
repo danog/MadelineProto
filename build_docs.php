@@ -284,7 +284,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
     }
-    $params = "['_' => ".$constructor.", ".$params.']';
+    $params = "['_' => ".$constructor.', '.$params.']';
 
     $header = '---
 title: '.$constructor.'

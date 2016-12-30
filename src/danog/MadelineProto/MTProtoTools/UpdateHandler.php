@@ -34,13 +34,17 @@ trait UpdateHandler
     public function get_updates($params = [])
     {
         $this->force_get_updates_difference();
-        if (empty($this->updates)) return [];
+        if (empty($this->updates)) {
+            return [];
+        }
         $default_params = ['offset' => array_keys($this->updates)[0], 'limit' => null, 'timeout' => 0];
         foreach ($default_params as $key => $default) {
-            if (!isset($params[$key])) $params[$key] = $default;
+            if (!isset($params[$key])) {
+                $params[$key] = $default;
+            }
         }
         $time = microtime(true);
-        $params['timeout'] = (int)($params['timeout'] - (microtime(true) - $time));
+        $params['timeout'] = (int) ($params['timeout'] - (microtime(true) - $time));
         sleep($params['timeout'] > 0 ? $params['timeout'] : 0);
         $result = array_slice($this->updates, $params['offset'], $params['limit'], true);
         $updates = [];
@@ -51,7 +55,6 @@ trait UpdateHandler
 
         return $updates;
     }
-
 
     public function &get_channel_state($channel, $pts = 0)
     {
@@ -99,12 +102,12 @@ trait UpdateHandler
         }
     }
 
-
     public function set_update_state($data)
     {
         $this->get_update_state()['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_update_state()['pts'] : $data['pts'];
         $this->get_update_state()['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->get_update_state()['seq'] : $data['seq'];
         $this->get_update_state()['date'] = (!isset($data['date']) || $data['date'] < $this->get_update_state()['date']) ? $this->get_update_state()['date'] : $data['date'];
+
         return $this->get_update_state();
     }
 
@@ -113,8 +116,11 @@ trait UpdateHandler
         return $this->updates_state;
     }
 
-    public function force_get_updates_difference() {
-        if (!$this->get_update_state()['sync_loading']) $this->get_updates_difference();
+    public function force_get_updates_difference()
+    {
+        if (!$this->get_update_state()['sync_loading']) {
+            $this->get_updates_difference();
+        }
     }
 
     public function get_updates_difference()
@@ -148,7 +154,9 @@ trait UpdateHandler
                 break;
         }
     }
-    public function get_updates_state() {
+
+    public function get_updates_state()
+    {
         $this->updates_state['sync_loading'] = false;
         $this->getting_state = true;
         $this->set_update_state($this->method_call('updates.getState'));
@@ -167,6 +175,7 @@ trait UpdateHandler
             case 'updateEditChannelMessage':
                 if ($update['message']['_'] == 'messageEmpty') {
                     \danog\MadelineProto\Logger::log('Got message empty, saving...');
+
                     return $this->save_update($update);
                 }
                 $channel_id = $update['message']['to_id']['channel_id'];
@@ -179,14 +188,15 @@ trait UpdateHandler
                 \danog\MadelineProto\Logger::log('Update channel too long');
                 if (!isset($this->channels_state[$channel_id])) {
                     \danog\MadelineProto\Logger::log('I do not have the channel in the states');
+
                     return false;
                 }
                 break;
         }
         if ($channel_id === false) {
-            $cur_state =& $this->get_update_state();
+            $cur_state = &$this->get_update_state();
         } else {
-            $cur_state =& $this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0)-(isset($update['pts_count']) ? $update['pts_count'] : 0));
+            $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
 /*
         if ($cur_state['sync_loading']) {
@@ -198,6 +208,7 @@ trait UpdateHandler
             case 'updateChannelTooLong':
                 \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
                 $this->get_channel_difference($channel_id);
+
                 return false;
             case 'updateNewMessage':
             case 'updateEditMessage':
@@ -209,7 +220,6 @@ trait UpdateHandler
                     (isset($message['via_bot_id']) && !$this->peer_isset($message['via_bot_id'])) ||
                     (isset($message['entities']) && !$this->entities_peer_isset($message['entities'])) ||
                     (isset($message['fwd_from']) && !$this->fwd_peer_isset($message['fwd_from']))) {
-
                     \danog\MadelineProto\Logger::log('Not enough data for message update, getting difference...');
 
                     if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
@@ -217,13 +227,14 @@ trait UpdateHandler
                     } else {
                         $this->force_get_updates_difference();
                     }
-                    return false;
 
+                    return false;
                 }
                 break;
             default:
                 if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
                     \danog\MadelineProto\Logger::log('Skipping update, I do not have the channel id '.$channel_id);
+
                     return false;
                 }
                 break;
@@ -249,14 +260,15 @@ trait UpdateHandler
             if ($update['pts'] > $cur_state['pts']) {
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
-            } else if (isset($update['pts_count'])) {
+            } elseif (isset($update['pts_count'])) {
                 \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
+
                 return false;
             }
             if ($channel_id !== false && isset($options['date']) && $this->get_update_state()['date'] < $options['date']) {
                 $this->get_update_state()['date'] = $options['date'];
             }
-       } else if ($channel_id === false && isset($options['seq']) && $options['seq'] > 0) {
+        } elseif ($channel_id === false && isset($options['seq']) && $options['seq'] > 0) {
             $seq = $options['seq'];
             $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
             if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
@@ -267,6 +279,7 @@ trait UpdateHandler
                 }
                 $cur_state['pending_seq_updates'][$seq_start]['updates'][] = $update;
                 $this->get_updates_difference();
+
                 return false;
             }
 
@@ -283,14 +296,17 @@ trait UpdateHandler
 
         if ($pop_pts) {
             $this->pop_pending_pts_update($channel_id);
-        } else if ($pop_seq) {
+        } elseif ($pop_seq) {
             $this->pop_pending_seq_update();
         }
     }
 
-    public function pop_pending_seq_update() {
+    public function pop_pending_seq_update()
+    {
         $next_seq = $this->get_update_state()['seq'] + 1;
-        if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) return false;
+        if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) {
+            return false;
+        }
         foreach ($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'] as $update) {
             $this->save_update($update);
         }
@@ -304,11 +320,12 @@ trait UpdateHandler
         return true;
     }
 
-    public function pop_pending_pts_update($channel_id) {
+    public function pop_pending_pts_update($channel_id)
+    {
         if ($channel_id === false) {
-            $cur_state =& $this->get_update_state();
+            $cur_state = &$this->get_update_state();
         } else {
-            $cur_state =& $this->get_channel_state($channel_id);
+            $cur_state = &$this->get_channel_state($channel_id);
         }
         if (empty($cur_state['pending_pts_updates'])) {
             return false;
@@ -324,12 +341,14 @@ trait UpdateHandler
                 $good_index = $i;
             }
         }
-        if (!$good_pts) return false;
+        if (!$good_pts) {
+            return false;
+        }
         $cur_state['pts'] = $good_pts;
         for ($i = 0; $i <= $good_index; $i++) {
             $this->save_update($cur_state['pending_pts_updates'][$i]);
         }
-        array_splice($cur_state['pending_pts_updates'], 0, $good_index+1);
+        array_splice($cur_state['pending_pts_updates'], 0, $good_index + 1);
     }
 
     public function handle_multiple_update($updates, $options = [], $channel = false)
