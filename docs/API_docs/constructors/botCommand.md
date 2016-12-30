@@ -22,5 +22,5 @@ description: botCommand attributes, type and example
 ### Example:
 
 ```
-$botCommand = ['_' => botCommand', 'command' => string, 'description' => string, ];
+$botCommand = ['_' => botCommand, 'command' => string, 'description' => string, ];
 ```

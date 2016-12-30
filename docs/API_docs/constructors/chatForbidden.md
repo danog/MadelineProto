@@ -22,5 +22,5 @@ description: chatForbidden attributes, type and example
 ### Example:
 
 ```
-$chatForbidden = ['_' => chatForbidden', 'id' => int, 'title' => string, ];
+$chatForbidden = ['_' => chatForbidden, 'id' => int, 'title' => string, ];
 ```

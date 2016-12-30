@@ -16,5 +16,5 @@ description: storage_filePartial attributes, type and example
 ### Example:
 
 ```
-$storage_filePartial = ['_' => storage_filePartial', ];
+$storage_filePartial = ['_' => storage_filePartial, ];
 ```

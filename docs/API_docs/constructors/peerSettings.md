@@ -21,5 +21,5 @@ description: peerSettings attributes, type and example
 ### Example:
 
 ```
-$peerSettings = ['_' => peerSettings', 'report_spam' => true, ];
+$peerSettings = ['_' => peerSettings, 'report_spam' => true, ];
 ```

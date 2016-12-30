@@ -22,5 +22,5 @@ description: inputEncryptedFile attributes, type and example
 ### Example:
 
 ```
-$inputEncryptedFile = ['_' => inputEncryptedFile', 'id' => long, 'access_hash' => long, ];
+$inputEncryptedFile = ['_' => inputEncryptedFile, 'id' => long, 'access_hash' => long, ];
 ```

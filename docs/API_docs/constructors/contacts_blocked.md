@@ -22,5 +22,5 @@ description: contacts_blocked attributes, type and example
 ### Example:
 
 ```
-$contacts_blocked = ['_' => contacts_blocked', 'blocked' => [Vector t], 'users' => [Vector t], ];
+$contacts_blocked = ['_' => contacts_blocked, 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```

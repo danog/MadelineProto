@@ -23,5 +23,5 @@ description: updateContactLink attributes, type and example
 ### Example:
 
 ```
-$updateContactLink = ['_' => updateContactLink', 'user_id' => int, 'my_link' => ContactLink, 'foreign_link' => ContactLink, ];
+$updateContactLink = ['_' => updateContactLink, 'user_id' => int, 'my_link' => ContactLink, 'foreign_link' => ContactLink, ];
 ```

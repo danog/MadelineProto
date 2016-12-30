@@ -21,5 +21,5 @@ description: photoEmpty attributes, type and example
 ### Example:
 
 ```
-$photoEmpty = ['_' => photoEmpty', 'id' => long, ];
+$photoEmpty = ['_' => photoEmpty, 'id' => long, ];
 ```

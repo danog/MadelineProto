@@ -16,5 +16,5 @@ description: sendMessageGeoLocationAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageGeoLocationAction = ['_' => sendMessageGeoLocationAction', ];
+$sendMessageGeoLocationAction = ['_' => sendMessageGeoLocationAction, ];
 ```

@@ -16,5 +16,5 @@ description: privacyValueAllowContacts attributes, type and example
 ### Example:
 
 ```
-$privacyValueAllowContacts = ['_' => privacyValueAllowContacts', ];
+$privacyValueAllowContacts = ['_' => privacyValueAllowContacts, ];
 ```

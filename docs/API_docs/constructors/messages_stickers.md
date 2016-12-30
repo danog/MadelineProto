@@ -22,5 +22,5 @@ description: messages_stickers attributes, type and example
 ### Example:
 
 ```
-$messages_stickers = ['_' => messages_stickers', 'hash' => string, 'stickers' => [Vector t], ];
+$messages_stickers = ['_' => messages_stickers, 'hash' => string, 'stickers' => [Vector t], ];
 ```

@@ -24,5 +24,5 @@ description: updateReadHistoryInbox attributes, type and example
 ### Example:
 
 ```
-$updateReadHistoryInbox = ['_' => updateReadHistoryInbox', 'peer' => Peer, 'max_id' => int, 'pts' => int, 'pts_count' => int, ];
+$updateReadHistoryInbox = ['_' => updateReadHistoryInbox, 'peer' => Peer, 'max_id' => int, 'pts' => int, 'pts_count' => int, ];
 ```

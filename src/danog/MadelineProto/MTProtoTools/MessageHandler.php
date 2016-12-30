@@ -121,9 +121,10 @@ trait MessageHandler
         } else {
             throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
         }
-        $deserialized = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
+        $deserialized = $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
         $this->datacenter->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->new_incoming[$message_id] = $message_id;
+        $this->handle_messages();
     }
 }

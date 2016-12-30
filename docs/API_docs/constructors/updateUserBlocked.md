@@ -22,5 +22,5 @@ description: updateUserBlocked attributes, type and example
 ### Example:
 
 ```
-$updateUserBlocked = ['_' => updateUserBlocked', 'user_id' => int, 'blocked' => Bool, ];
+$updateUserBlocked = ['_' => updateUserBlocked, 'user_id' => int, 'blocked' => Bool, ];
 ```

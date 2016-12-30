@@ -21,5 +21,5 @@ description: chatInviteExported attributes, type and example
 ### Example:
 
 ```
-$chatInviteExported = ['_' => chatInviteExported', 'link' => string, ];
+$chatInviteExported = ['_' => chatInviteExported, 'link' => string, ];
 ```

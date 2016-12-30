@@ -21,5 +21,5 @@ description: chatEmpty attributes, type and example
 ### Example:
 
 ```
-$chatEmpty = ['_' => chatEmpty', 'id' => int, ];
+$chatEmpty = ['_' => chatEmpty, 'id' => int, ];
 ```

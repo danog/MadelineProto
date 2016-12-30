@@ -21,5 +21,5 @@ description: photoSizeEmpty attributes, type and example
 ### Example:
 
 ```
-$photoSizeEmpty = ['_' => photoSizeEmpty', 'type' => string, ];
+$photoSizeEmpty = ['_' => photoSizeEmpty, 'type' => string, ];
 ```

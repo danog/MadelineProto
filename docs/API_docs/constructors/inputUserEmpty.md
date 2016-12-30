@@ -16,5 +16,5 @@ description: inputUserEmpty attributes, type and example
 ### Example:
 
 ```
-$inputUserEmpty = ['_' => inputUserEmpty', ];
+$inputUserEmpty = ['_' => inputUserEmpty, ];
 ```

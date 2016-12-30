@@ -22,5 +22,5 @@ description: stickerPack attributes, type and example
 ### Example:
 
 ```
-$stickerPack = ['_' => stickerPack', 'emoticon' => string, 'documents' => [Vector t], ];
+$stickerPack = ['_' => stickerPack, 'emoticon' => string, 'documents' => [Vector t], ];
 ```

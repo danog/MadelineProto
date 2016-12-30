@@ -16,5 +16,5 @@ description: contacts_topPeersNotModified attributes, type and example
 ### Example:
 
 ```
-$contacts_topPeersNotModified = ['_' => contacts_topPeersNotModified', ];
+$contacts_topPeersNotModified = ['_' => contacts_topPeersNotModified, ];
 ```

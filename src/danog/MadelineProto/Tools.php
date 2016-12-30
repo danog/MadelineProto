@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Some tools.
  */
-class Tools
+trait Tools
 {
     /**
      * posmod(numeric,numeric) : numeric

@@ -23,5 +23,5 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedPhoto = ['_' => inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => string, 'stickers' => [Vector t], ];
+$inputMediaUploadedPhoto = ['_' => inputMediaUploadedPhoto, 'file' => InputFile, 'caption' => string, 'stickers' => [Vector t], ];
 ```

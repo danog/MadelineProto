@@ -21,5 +21,5 @@ description: userEmpty attributes, type and example
 ### Example:
 
 ```
-$userEmpty = ['_' => userEmpty', 'id' => int, ];
+$userEmpty = ['_' => userEmpty, 'id' => int, ];
 ```

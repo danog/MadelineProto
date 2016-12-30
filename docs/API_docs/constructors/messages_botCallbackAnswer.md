@@ -24,5 +24,5 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Example:
 
 ```
-$messages_botCallbackAnswer = ['_' => messages_botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, ];
+$messages_botCallbackAnswer = ['_' => messages_botCallbackAnswer, 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, ];
 ```

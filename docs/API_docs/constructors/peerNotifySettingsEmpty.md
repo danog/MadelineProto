@@ -16,5 +16,5 @@ description: peerNotifySettingsEmpty attributes, type and example
 ### Example:
 
 ```
-$peerNotifySettingsEmpty = ['_' => peerNotifySettingsEmpty', ];
+$peerNotifySettingsEmpty = ['_' => peerNotifySettingsEmpty, ];
 ```

@@ -24,6 +24,6 @@ trait SettingsManager
 
     public function update_settings($settings)
     {
-        $this->API->parse_settings($settings);
+        $this->API->__construct($settings);
     }
 }

@@ -26,5 +26,5 @@ description: foundGif attributes, type and example
 ### Example:
 
 ```
-$foundGif = ['_' => foundGif', 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, ];
+$foundGif = ['_' => foundGif, 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, ];
 ```

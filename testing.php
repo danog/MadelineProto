@@ -47,28 +47,34 @@ $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeli
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
 $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
-
-$mention = $MadelineProto->get_info('@giuseppe_la_gaipa_2'); // Returns the following array: ['constructor' => $constructor, 'inputPeer' => $inputPeer, 'inputType' => $inputType, 'Peer' => $Peer, 'id' => $id, 'botApiId' => $bot_api_id]
-$mention = $mention['inputType']; // Selects only the inputType object
+$mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $mention['user_id']; // Selects only the numeric user id
 
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }
 
 sleep(5);
-$MadelineProto->API->get_updates_difference();
+var_dump($MadelineProto->API->get_updates());
 
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
+
 if (file_exists('token.php')) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($token);
     \danog\MadelineProto\Logger::log($authorization);
 }
+$message = 'yay';
+$mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $mention['user_id']; // Selects only the numeric user id
+
+
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }
+sleep(5);
+var_dump($MadelineProto->API->get_updates());
+

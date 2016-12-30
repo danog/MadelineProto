@@ -21,5 +21,5 @@ description: auth_sentCodeTypeApp attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeApp = ['_' => auth_sentCodeTypeApp', 'length' => int, ];
+$auth_sentCodeTypeApp = ['_' => auth_sentCodeTypeApp, 'length' => int, ];
 ```

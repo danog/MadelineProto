@@ -16,5 +16,5 @@ description: messages_stickerSetInstallResultSuccess attributes, type and exampl
 ### Example:
 
 ```
-$messages_stickerSetInstallResultSuccess = ['_' => messages_stickerSetInstallResultSuccess', ];
+$messages_stickerSetInstallResultSuccess = ['_' => messages_stickerSetInstallResultSuccess, ];
 ```

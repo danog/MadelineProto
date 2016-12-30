@@ -21,5 +21,5 @@ description: updateDcOptions attributes, type and example
 ### Example:
 
 ```
-$updateDcOptions = ['_' => updateDcOptions', 'dc_options' => [Vector t], ];
+$updateDcOptions = ['_' => updateDcOptions, 'dc_options' => [Vector t], ];
 ```

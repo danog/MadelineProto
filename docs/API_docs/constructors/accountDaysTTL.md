@@ -21,5 +21,5 @@ description: accountDaysTTL attributes, type and example
 ### Example:
 
 ```
-$accountDaysTTL = ['_' => accountDaysTTL', 'days' => int, ];
+$accountDaysTTL = ['_' => accountDaysTTL, 'days' => int, ];
 ```

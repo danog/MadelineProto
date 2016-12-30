@@ -16,5 +16,5 @@ description: peerNotifyEventsAll attributes, type and example
 ### Example:
 
 ```
-$peerNotifyEventsAll = ['_' => peerNotifyEventsAll', ];
+$peerNotifyEventsAll = ['_' => peerNotifyEventsAll, ];
 ```

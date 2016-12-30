@@ -141,6 +141,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         'incoming' => 30,
         'outgoing' => 30,
     ],
+    'updates'   => [
+        'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback
+        'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+    ],
 ];
 ```
 
@@ -180,13 +184,142 @@ The settings array can be accessed in the instantiated class like this:
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-var_dump($MadelineProto->API->settings);
+var_dump($MadelineProto->get_settings());
 ```
+
+The settings array can be modified in the instantiated class like this:
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+$settings = $MadelineProto->get_settings();
+// Make changes to $settings
+$MadelineProto->update_settings($settings);
+```
+
+### Handling updates
+
+When an update is received, the update callback function (see settings) is called. By default, the get_updates_update_handler MadelineProto method is called. This method stores all incoming updates into an array (its size limit is specified by the updates\_array\_limit parameter in the settings) and can be fetched by running the `get_updates` method.  
+This method accepts an array of options as the first parameter, and returns an array of updates. Example:  
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+// Login or deserialize
+
+$offset = 0;
+while (true) {
+    $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 1]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+    foreach ($updates as $update) {
+        $offset = $update['update_id'] // Just like in the bot API, the offset must be set to the last update_id
+        // Parse $update['update'], that is an object of type Update
+    }
+    var_dump($update);
+}
+
+array(3) {
+  [0]=>
+  array(2) {
+    ["update_id"]=>
+    int(0)
+    ["update"]=>
+    array(5) {
+      ["_"]=>
+      string(22) "updateNewAuthorization"
+      ["auth_key_id"]=>
+      int(-8182897590766478746)
+      ["date"]=>
+      int(1483110797)
+      ["device"]=>
+      string(3) "Web"
+      ["location"]=>
+      string(25) "IT, 05 (IP = 79.2.51.203)"
+    }
+  }
+  [1]=>
+  array(2) {
+    ["update_id"]=>
+    int(1)
+    ["update"]=>
+    array(3) {
+      ["_"]=>
+      string(23) "updateReadChannelOutbox"
+      ["channel_id"]=>
+      int(1049295266)
+      ["max_id"]=>
+      int(8288)
+    }
+  }
+  [2]=>
+  array(2) {
+    ["update_id"]=>
+    int(2)
+    ["update"]=>
+    array(4) {
+      ["_"]=>
+      string(23) "updateNewChannelMessage"
+      ["message"]=>
+      array(12) {
+        ["_"]=>
+        string(7) "message"
+        ["out"]=>
+        bool(false)
+        ["mentioned"]=>
+        bool(false)
+        ["media_unread"]=>
+        bool(false)
+        ["silent"]=>
+        bool(false)
+        ["post"]=>
+        bool(false)
+        ["id"]=>
+        int(11521)
+        ["from_id"]=>
+        int(262946027)
+        ["to_id"]=>
+        array(2) {
+          ["_"]=>
+          string(11) "peerChannel"
+          ["channel_id"]=>
+          int(1066910227)
+        }
+        ["date"]=>
+        int(1483110798)
+        ["message"]=>
+        string(3) "yay"
+        ["entities"]=>
+        array(1) {
+          [0]=>
+          array(4) {
+            ["_"]=>
+            string(24) "messageEntityMentionName"
+            ["offset"]=>
+            int(0)
+            ["length"]=>
+            int(3)
+            ["user_id"]=>
+            int(101374607)
+          }
+        }
+      }
+      ["pts"]=>
+      int(13010)
+      ["pts_count"]=>
+      int(1)
+    }
+  }
+}
+
+
+```
+
+To specify a custom callback change the correct value in the settings. The specified callable must accept one parameter for the update.
+
+
 
 ### Calling mtproto methods and available wrappers
 
 The API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
-To call an MTProto method simply call it as if it is a method of the API class, substitute namespace sepators (.) with -> if needed:
+To call an MTProto method simply call it as if it is a method of the API class, substitute namespace sepators (.) with -> if needed.
+Also, an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username or bot API id.  
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
@@ -197,10 +330,7 @@ $checkedPhone = $MadelineProto->auth->checkPhone( // auth.checkPhone becomes aut
 );
 $ping = $MadelineProto->ping([3]); // parameter names can be omitted as long as the order specified by the TL scheme is respected
 $message = "Hey! I'm sending this message with MadelineProto!";
-$username = $MadelineProto->contacts->resolveUsername(['username' => 'pwrtelegramgroup']);
-var_dump($username);
-$peer = ['_' => 'inputPeerChannel', 'channel_id' => $username['peer']['channel_id'], 'access_hash' => $username['chats'][0]['access_hash']];
-$sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'random_id' => \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0]]);
+$sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $message]);
 var_dump($sentMessage);
 ```
 
@@ -217,20 +347,6 @@ for ($x = 0; $x < $sentCode['type']['length']; $x++) {
 $authorization = $MadelineProto->complete_phone_login($code); // Complete authorization
 var_dump($authorization);
 
-var_dump($MadelineProto->resolve_username('@Palmas2012')); // Always use this method to resolve usernames, but you won't need to call this to get info about peers, as get_peer and get_input_peer will call it for you if needed
-
-$message = "I've installed MadelineProto!";
-
-$mention = $MadelineProto->get_info('@@NonSonoGioTech'); // Returns the following array: ['constructor' => $constructor, 'inputPeer' => $inputPeer, 'inputType' => $inputType, 'Peer' => $Peer, 'id' => $id, 'botApiId' => $bot_api_id]
-$mention = $mention['inputType']; // Selects only the inputType object
-
-foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
-    $peer = $MadelineProto->get_info($peer)['inputPeer']; // Select the inputPeerType (alias inputPeer) object
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log($sentMessage);
-}
-
-// The above works with bots too
 $authorization = $MadelineProto->bot_login($token); // Note that every time you login as a bot or as a user MadelineProto will logout first, so now MadelineProto is logged in as the bot with token $token, not as the user with number $number
 var_dump($authorization);
 ```
@@ -279,6 +395,7 @@ src/danog/MadelineProto/
     Wrappers/
         Login - Handles logging in as a bot or a user, logging out
         PeerHandler - Eases getting of input peer objects using usernames or bot API chat ids
+        SettingsManager - Eases updating settings
     API - Wrapper class that instantiates the MTProto class, sets the error handler, provides a wrapper for calling mtproto methods directly as class submethods, and uses the simplified wrappers from Wrappers/
     APIFactory - Provides a wrapper for calling namespaced mtproto methods directly as class submethods
     Connection - Handles tcp/udp/http connections and wrapping payloads generated by MTProtoTools/MessageHandler into the right message according to the protocol, stores authorization keys, session id and sequence number

@@ -16,5 +16,5 @@ description: inputMessagesFilterDocument attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterDocument = ['_' => inputMessagesFilterDocument', ];
+$inputMessagesFilterDocument = ['_' => inputMessagesFilterDocument, ];
 ```

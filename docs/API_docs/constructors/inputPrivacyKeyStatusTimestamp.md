@@ -16,5 +16,5 @@ description: inputPrivacyKeyStatusTimestamp attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyKeyStatusTimestamp = ['_' => inputPrivacyKeyStatusTimestamp', ];
+$inputPrivacyKeyStatusTimestamp = ['_' => inputPrivacyKeyStatusTimestamp, ];
 ```

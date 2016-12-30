@@ -24,5 +24,5 @@ description: wallPaperSolid attributes, type and example
 ### Example:
 
 ```
-$wallPaperSolid = ['_' => wallPaperSolid', 'id' => int, 'title' => string, 'bg_color' => int, 'color' => int, ];
+$wallPaperSolid = ['_' => wallPaperSolid, 'id' => int, 'title' => string, 'bg_color' => int, 'color' => int, ];
 ```

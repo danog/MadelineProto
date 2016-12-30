@@ -16,5 +16,5 @@ description: auth_codeTypeCall attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeCall = ['_' => auth_codeTypeCall', ];
+$auth_codeTypeCall = ['_' => auth_codeTypeCall, ];
 ```

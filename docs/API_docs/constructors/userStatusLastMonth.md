@@ -16,5 +16,5 @@ description: userStatusLastMonth attributes, type and example
 ### Example:
 
 ```
-$userStatusLastMonth = ['_' => userStatusLastMonth', ];
+$userStatusLastMonth = ['_' => userStatusLastMonth, ];
 ```

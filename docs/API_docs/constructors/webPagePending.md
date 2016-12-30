@@ -22,5 +22,5 @@ description: webPagePending attributes, type and example
 ### Example:
 
 ```
-$webPagePending = ['_' => webPagePending', 'id' => long, 'date' => int, ];
+$webPagePending = ['_' => webPagePending, 'id' => long, 'date' => int, ];
 ```

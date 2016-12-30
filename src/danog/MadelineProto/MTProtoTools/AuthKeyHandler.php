@@ -114,7 +114,7 @@ trait AuthKeyHandler
                     'new_nonce'       => $new_nonce,
                     'expires_in'      => $expires_in,
                 ];
-                $p_q_inner_data = $this->tl->serialize_object(['type' => 'p_q_inner_data'.(($expires_in < 0) ? '' : '_temp')], $data_unserialized);
+                $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.(($expires_in < 0) ? '' : '_temp')], $data_unserialized);
 
                 /*
                 * ***********************************************************************
@@ -211,13 +211,13 @@ trait AuthKeyHandler
                 * 		int			$server_time
                 * ]
                 */
-                $server_DH_inner_data = $this->tl->deserialize($this->fopen_and_write('php://memory', 'rw+b', $answer));
+                $server_DH_inner_data = $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', $answer));
 
                 /*
                 * ***********************************************************************
                 * Do some checks
                 */
-                $server_DH_inner_data_length = $this->tl->get_length($this->fopen_and_write('php://memory', 'rw+b', $answer));
+                $server_DH_inner_data_length = $this->get_length($this->fopen_and_write('php://memory', 'rw+b', $answer));
                 if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new \danog\MadelineProto\Exception('answer_hash mismatch.');
                 }
@@ -347,7 +347,7 @@ trait AuthKeyHandler
                     * 		string		$g_b							: g^b mod dh_prime
                     * ]
                     */
-                    $data = $this->tl->serialize_object(
+                    $data = $this->serialize_object(
                         ['type' => 'client_DH_inner_data'],
                         [
                             'nonce'           => $nonce,
@@ -486,7 +486,7 @@ trait AuthKeyHandler
         $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
         $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->auth_key['id'])[0];
         $temp_session_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->session_id)[0];
-        $message_data = $this->tl->serialize_object(['type' => 'bind_auth_key_inner'],
+        $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'],
             [
                 'nonce'                       => $nonce,
                 'temp_auth_key_id'            => $temp_auth_key_id,

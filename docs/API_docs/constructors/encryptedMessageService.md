@@ -23,5 +23,5 @@ description: encryptedMessageService attributes, type and example
 ### Example:
 
 ```
-$encryptedMessageService = ['_' => encryptedMessageService', 'chat_id' => int, 'date' => int, 'bytes' => bytes, ];
+$encryptedMessageService = ['_' => encryptedMessageService, 'chat_id' => int, 'date' => int, 'bytes' => bytes, ];
 ```

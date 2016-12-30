@@ -16,5 +16,5 @@ description: messageMediaUnsupported attributes, type and example
 ### Example:
 
 ```
-$messageMediaUnsupported = ['_' => messageMediaUnsupported', ];
+$messageMediaUnsupported = ['_' => messageMediaUnsupported, ];
 ```

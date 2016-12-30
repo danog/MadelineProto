@@ -23,5 +23,5 @@ description: inputBotInlineMessageID attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageID = ['_' => inputBotInlineMessageID', 'dc_id' => int, 'id' => long, 'access_hash' => long, ];
+$inputBotInlineMessageID = ['_' => inputBotInlineMessageID, 'dc_id' => int, 'id' => long, 'access_hash' => long, ];
 ```

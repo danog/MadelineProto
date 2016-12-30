@@ -22,5 +22,5 @@ description: error attributes, type and example
 ### Example:
 
 ```
-$error = ['_' => error', 'code' => int, 'text' => string, ];
+$error = ['_' => error, 'code' => int, 'text' => string, ];
 ```

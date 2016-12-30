@@ -21,5 +21,5 @@ description: help_appChangelog attributes, type and example
 ### Example:
 
 ```
-$help_appChangelog = ['_' => help_appChangelog', 'text' => string, ];
+$help_appChangelog = ['_' => help_appChangelog, 'text' => string, ];
 ```

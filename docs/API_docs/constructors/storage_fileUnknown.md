@@ -16,5 +16,5 @@ description: storage_fileUnknown attributes, type and example
 ### Example:
 
 ```
-$storage_fileUnknown = ['_' => storage_fileUnknown', ];
+$storage_fileUnknown = ['_' => storage_fileUnknown, ];
 ```

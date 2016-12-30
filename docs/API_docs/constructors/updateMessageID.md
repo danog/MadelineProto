@@ -21,5 +21,5 @@ description: updateMessageID attributes, type and example
 ### Example:
 
 ```
-$updateMessageID = ['_' => updateMessageID', 'id' => int, ];
+$updateMessageID = ['_' => updateMessageID, 'id' => int, ];
 ```

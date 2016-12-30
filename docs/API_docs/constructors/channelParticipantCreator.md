@@ -21,5 +21,5 @@ description: channelParticipantCreator attributes, type and example
 ### Example:
 
 ```
-$channelParticipantCreator = ['_' => channelParticipantCreator', 'user_id' => int, ];
+$channelParticipantCreator = ['_' => channelParticipantCreator, 'user_id' => int, ];
 ```

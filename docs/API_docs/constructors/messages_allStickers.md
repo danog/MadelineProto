@@ -22,5 +22,5 @@ description: messages_allStickers attributes, type and example
 ### Example:
 
 ```
-$messages_allStickers = ['_' => messages_allStickers', 'hash' => int, 'sets' => [Vector t], ];
+$messages_allStickers = ['_' => messages_allStickers, 'hash' => int, 'sets' => [Vector t], ];
 ```

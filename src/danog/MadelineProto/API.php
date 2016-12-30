@@ -62,7 +62,7 @@ class API extends APIFactory
 
     public function APIFactory()
     {
-        foreach ($this->API->tl->methods->method_namespace as $namespace) {
+        foreach ($this->API->methods->method_namespace as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }

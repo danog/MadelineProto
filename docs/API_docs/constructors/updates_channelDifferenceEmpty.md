@@ -23,5 +23,5 @@ description: updates_channelDifferenceEmpty attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceEmpty = ['_' => updates_channelDifferenceEmpty', 'final' => true, 'pts' => int, 'timeout' => int, ];
+$updates_channelDifferenceEmpty = ['_' => updates_channelDifferenceEmpty, 'final' => true, 'pts' => int, 'timeout' => int, ];
 ```

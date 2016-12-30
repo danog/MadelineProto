@@ -21,5 +21,5 @@ description: messageActionChatEditTitle attributes, type and example
 ### Example:
 
 ```
-$messageActionChatEditTitle = ['_' => messageActionChatEditTitle', 'title' => string, ];
+$messageActionChatEditTitle = ['_' => messageActionChatEditTitle, 'title' => string, ];
 ```

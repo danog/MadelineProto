@@ -16,5 +16,5 @@ description: inputMessagesFilterUrl attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterUrl = ['_' => inputMessagesFilterUrl', ];
+$inputMessagesFilterUrl = ['_' => inputMessagesFilterUrl, ];
 ```

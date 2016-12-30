@@ -22,5 +22,5 @@ description: messageEntityBold attributes, type and example
 ### Example:
 
 ```
-$messageEntityBold = ['_' => messageEntityBold', 'offset' => int, 'length' => int, ];
+$messageEntityBold = ['_' => messageEntityBold, 'offset' => int, 'length' => int, ];
 ```

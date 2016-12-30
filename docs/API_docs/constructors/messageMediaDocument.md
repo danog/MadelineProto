@@ -22,5 +22,5 @@ description: messageMediaDocument attributes, type and example
 ### Example:
 
 ```
-$messageMediaDocument = ['_' => messageMediaDocument', 'document' => Document, 'caption' => string, ];
+$messageMediaDocument = ['_' => messageMediaDocument, 'document' => Document, 'caption' => string, ];
 ```

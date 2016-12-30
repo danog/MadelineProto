@@ -16,5 +16,5 @@ description: messageActionPinMessage attributes, type and example
 ### Example:
 
 ```
-$messageActionPinMessage = ['_' => messageActionPinMessage', ];
+$messageActionPinMessage = ['_' => messageActionPinMessage, ];
 ```

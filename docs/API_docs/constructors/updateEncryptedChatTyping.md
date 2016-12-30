@@ -21,5 +21,5 @@ description: updateEncryptedChatTyping attributes, type and example
 ### Example:
 
 ```
-$updateEncryptedChatTyping = ['_' => updateEncryptedChatTyping', 'chat_id' => int, ];
+$updateEncryptedChatTyping = ['_' => updateEncryptedChatTyping, 'chat_id' => int, ];
 ```

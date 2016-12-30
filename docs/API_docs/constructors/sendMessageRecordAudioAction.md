@@ -16,5 +16,5 @@ description: sendMessageRecordAudioAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageRecordAudioAction = ['_' => sendMessageRecordAudioAction', ];
+$sendMessageRecordAudioAction = ['_' => sendMessageRecordAudioAction, ];
 ```

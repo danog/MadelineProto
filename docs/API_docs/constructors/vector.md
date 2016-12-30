@@ -16,5 +16,5 @@ description: vector attributes, type and example
 ### Example:
 
 ```
-$vector = ['_' => vector', ];
+$vector = ['_' => vector, ];
 ```

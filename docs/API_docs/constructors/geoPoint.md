@@ -22,5 +22,5 @@ description: geoPoint attributes, type and example
 ### Example:
 
 ```
-$geoPoint = ['_' => geoPoint', 'long' => double, 'lat' => double, ];
+$geoPoint = ['_' => geoPoint, 'long' => double, 'lat' => double, ];
 ```

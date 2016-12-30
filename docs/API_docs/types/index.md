@@ -10,6 +10,10 @@ description: List of types
 
 [Authorization](Authorization.md)<a name="Authorization"></a>  
 
+[BadMsgNotification](BadMsgNotification.md)<a name="BadMsgNotification"></a>  
+
+[BindAuthKeyInner](BindAuthKeyInner.md)<a name="BindAuthKeyInner"></a>  
+
 [Bool](Bool.md)<a name="Bool"></a>  
 
 [BotCommand](BotCommand.md)<a name="BotCommand"></a>  
@@ -40,6 +44,8 @@ description: List of types
 
 [ChatPhoto](ChatPhoto.md)<a name="ChatPhoto"></a>  
 
+[Client\_DH\_Inner\_Data](Client_DH_Inner_Data.md)<a name="Client_DH_Inner_Data"></a>  
+
 [Config](Config.md)<a name="Config"></a>  
 
 [Contact](Contact.md)<a name="Contact"></a>  
@@ -51,6 +57,8 @@ description: List of types
 [ContactStatus](ContactStatus.md)<a name="ContactStatus"></a>  
 
 [DcOption](DcOption.md)<a name="DcOption"></a>  
+
+[DestroySessionRes](DestroySessionRes.md)<a name="DestroySessionRes"></a>  
 
 [Dialog](Dialog.md)<a name="Dialog"></a>  
 
@@ -78,11 +86,17 @@ description: List of types
 
 [FoundGif](FoundGif.md)<a name="FoundGif"></a>  
 
+[FutureSalt](FutureSalt.md)<a name="FutureSalt"></a>  
+
+[FutureSalts](FutureSalts.md)<a name="FutureSalts"></a>  
+
 [Game](Game.md)<a name="Game"></a>  
 
 [GeoPoint](GeoPoint.md)<a name="GeoPoint"></a>  
 
 [HighScore](HighScore.md)<a name="HighScore"></a>  
+
+[HttpWait](HttpWait.md)<a name="HttpWait"></a>  
 
 [ImportedContact](ImportedContact.md)<a name="ImportedContact"></a>  
 
@@ -148,6 +162,10 @@ description: List of types
 
 [MessageAction](MessageAction.md)<a name="MessageAction"></a>  
 
+[MessageContainer](MessageContainer.md)<a name="MessageContainer"></a>  
+
+[MessageCopy](MessageCopy.md)<a name="MessageCopy"></a>  
+
 [MessageEntity](MessageEntity.md)<a name="MessageEntity"></a>  
 
 [MessageFwdHeader](MessageFwdHeader.md)<a name="MessageFwdHeader"></a>  
@@ -158,11 +176,29 @@ description: List of types
 
 [MessagesFilter](MessagesFilter.md)<a name="MessagesFilter"></a>  
 
+[MsgDetailedInfo](MsgDetailedInfo.md)<a name="MsgDetailedInfo"></a>  
+
+[MsgResendReq](MsgResendReq.md)<a name="MsgResendReq"></a>  
+
+[MsgsAck](MsgsAck.md)<a name="MsgsAck"></a>  
+
+[MsgsAllInfo](MsgsAllInfo.md)<a name="MsgsAllInfo"></a>  
+
+[MsgsStateInfo](MsgsStateInfo.md)<a name="MsgsStateInfo"></a>  
+
+[MsgsStateReq](MsgsStateReq.md)<a name="MsgsStateReq"></a>  
+
 [NearestDc](NearestDc.md)<a name="NearestDc"></a>  
+
+[NewSession](NewSession.md)<a name="NewSession"></a>  
 
 [NotifyPeer](NotifyPeer.md)<a name="NotifyPeer"></a>  
 
 [Null](Null.md)<a name="Null"></a>  
+
+[Object](Object.md)<a name="Object"></a>  
+
+[P\_Q\_inner\_data](P_Q_inner_data.md)<a name="P_Q_inner_data"></a>  
 
 [Peer](Peer.md)<a name="Peer"></a>  
 
@@ -176,6 +212,8 @@ description: List of types
 
 [PhotoSize](PhotoSize.md)<a name="PhotoSize"></a>  
 
+[Pong](Pong.md)<a name="Pong"></a>  
+
 [PrivacyKey](PrivacyKey.md)<a name="PrivacyKey"></a>  
 
 [PrivacyRule](PrivacyRule.md)<a name="PrivacyRule"></a>  
@@ -186,7 +224,21 @@ description: List of types
 
 [ReportReason](ReportReason.md)<a name="ReportReason"></a>  
 
+[ResPQ](ResPQ.md)<a name="ResPQ"></a>  
+
+[RpcDropAnswer](RpcDropAnswer.md)<a name="RpcDropAnswer"></a>  
+
+[RpcError](RpcError.md)<a name="RpcError"></a>  
+
+[RpcResult](RpcResult.md)<a name="RpcResult"></a>  
+
 [SendMessageAction](SendMessageAction.md)<a name="SendMessageAction"></a>  
+
+[Server\_DH\_Params](Server_DH_Params.md)<a name="Server_DH_Params"></a>  
+
+[Server\_DH\_inner\_data](Server_DH_inner_data.md)<a name="Server_DH_inner_data"></a>  
+
+[Set\_client\_DH\_params\_answer](Set_client_DH_params_answer.md)<a name="Set_client_DH_params_answer"></a>  
 
 [StickerPack](StickerPack.md)<a name="StickerPack"></a>  
 

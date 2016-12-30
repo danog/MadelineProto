@@ -21,5 +21,5 @@ description: inputChatPhoto attributes, type and example
 ### Example:
 
 ```
-$inputChatPhoto = ['_' => inputChatPhoto', 'id' => InputPhoto, ];
+$inputChatPhoto = ['_' => inputChatPhoto, 'id' => InputPhoto, ];
 ```

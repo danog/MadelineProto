@@ -22,5 +22,5 @@ description: updateEncryption attributes, type and example
 ### Example:
 
 ```
-$updateEncryption = ['_' => updateEncryption', 'chat' => EncryptedChat, 'date' => int, ];
+$updateEncryption = ['_' => updateEncryption, 'chat' => EncryptedChat, 'date' => int, ];
 ```

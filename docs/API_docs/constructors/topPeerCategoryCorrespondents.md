@@ -16,5 +16,5 @@ description: topPeerCategoryCorrespondents attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryCorrespondents = ['_' => topPeerCategoryCorrespondents', ];
+$topPeerCategoryCorrespondents = ['_' => topPeerCategoryCorrespondents, ];
 ```

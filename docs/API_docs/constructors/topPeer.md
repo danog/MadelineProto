@@ -22,5 +22,5 @@ description: topPeer attributes, type and example
 ### Example:
 
 ```
-$topPeer = ['_' => topPeer', 'peer' => Peer, 'rating' => double, ];
+$topPeer = ['_' => topPeer, 'peer' => Peer, 'rating' => double, ];
 ```

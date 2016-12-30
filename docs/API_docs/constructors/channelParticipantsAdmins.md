@@ -16,5 +16,5 @@ description: channelParticipantsAdmins attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsAdmins = ['_' => channelParticipantsAdmins', ];
+$channelParticipantsAdmins = ['_' => channelParticipantsAdmins, ];
 ```

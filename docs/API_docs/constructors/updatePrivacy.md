@@ -22,5 +22,5 @@ description: updatePrivacy attributes, type and example
 ### Example:
 
 ```
-$updatePrivacy = ['_' => updatePrivacy', 'key' => PrivacyKey, 'rules' => [Vector t], ];
+$updatePrivacy = ['_' => updatePrivacy, 'key' => PrivacyKey, 'rules' => [Vector t], ];
 ```

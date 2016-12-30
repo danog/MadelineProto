@@ -27,5 +27,5 @@ description: userFull attributes, type and example
 ### Example:
 
 ```
-$userFull = ['_' => userFull', 'blocked' => true, 'user' => User, 'about' => string, 'link' => contacts.Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, ];
+$userFull = ['_' => userFull, 'blocked' => true, 'user' => User, 'about' => string, 'link' => contacts.Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, ];
 ```

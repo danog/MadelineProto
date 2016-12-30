@@ -16,5 +16,5 @@ description: inputNotifyUsers attributes, type and example
 ### Example:
 
 ```
-$inputNotifyUsers = ['_' => inputNotifyUsers', ];
+$inputNotifyUsers = ['_' => inputNotifyUsers, ];
 ```

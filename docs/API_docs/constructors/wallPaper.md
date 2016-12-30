@@ -24,5 +24,5 @@ description: wallPaper attributes, type and example
 ### Example:
 
 ```
-$wallPaper = ['_' => wallPaper', 'id' => int, 'title' => string, 'sizes' => [Vector t], 'color' => int, ];
+$wallPaper = ['_' => wallPaper, 'id' => int, 'title' => string, 'sizes' => [Vector t], 'color' => int, ];
 ```

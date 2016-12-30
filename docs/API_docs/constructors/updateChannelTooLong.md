@@ -22,5 +22,5 @@ description: updateChannelTooLong attributes, type and example
 ### Example:
 
 ```
-$updateChannelTooLong = ['_' => updateChannelTooLong', 'channel_id' => int, 'pts' => int, ];
+$updateChannelTooLong = ['_' => updateChannelTooLong, 'channel_id' => int, 'pts' => int, ];
 ```

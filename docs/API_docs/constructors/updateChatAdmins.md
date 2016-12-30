@@ -23,5 +23,5 @@ description: updateChatAdmins attributes, type and example
 ### Example:
 
 ```
-$updateChatAdmins = ['_' => updateChatAdmins', 'chat_id' => int, 'enabled' => Bool, 'version' => int, ];
+$updateChatAdmins = ['_' => updateChatAdmins, 'chat_id' => int, 'enabled' => Bool, 'version' => int, ];
 ```

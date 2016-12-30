@@ -16,10 +16,10 @@ require_once 'vendor/autoload.php';
 $mode = 3;
 \danog\MadelineProto\Logger::constructor($mode);
 
-$TL = new \danog\MadelineProto\TL\TL([
+$TL = new \danog\MadelineProto\MTProto(['tl' => [
     //'mtproto'  => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json', // mtproto TL scheme
     'telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json', // telegram TL scheme
-]);
+]]);
 $types = [];
 
 \danog\MadelineProto\Logger::log('Copying readme...');
@@ -284,7 +284,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
     }
-    $params = "['_' => ".$constructor."', ".$params.']';
+    $params = "['_' => ".$constructor.", ".$params.']';
 
     $header = '---
 title: '.$constructor.'

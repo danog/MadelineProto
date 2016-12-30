@@ -21,5 +21,5 @@ description: account_authorizations attributes, type and example
 ### Example:
 
 ```
-$account_authorizations = ['_' => account_authorizations', 'authorizations' => [Vector t], ];
+$account_authorizations = ['_' => account_authorizations, 'authorizations' => [Vector t], ];
 ```

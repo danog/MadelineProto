@@ -22,5 +22,5 @@ description: replyKeyboardForceReply attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardForceReply = ['_' => replyKeyboardForceReply', 'single_use' => true, 'selective' => true, ];
+$replyKeyboardForceReply = ['_' => replyKeyboardForceReply, 'single_use' => true, 'selective' => true, ];
 ```

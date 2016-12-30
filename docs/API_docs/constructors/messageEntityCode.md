@@ -22,5 +22,5 @@ description: messageEntityCode attributes, type and example
 ### Example:
 
 ```
-$messageEntityCode = ['_' => messageEntityCode', 'offset' => int, 'length' => int, ];
+$messageEntityCode = ['_' => messageEntityCode, 'offset' => int, 'length' => int, ];
 ```

@@ -15,8 +15,10 @@ namespace danog\MadelineProto;
 /**
  * Manages datacenters.
  */
-class DataCenter extends Tools
+class DataCenter
 {
+    use \danog\MadelineProto\Tools;
+
     public $sockets;
     public $curdc = 0;
     public $dclist = [];

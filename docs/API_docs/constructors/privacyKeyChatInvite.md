@@ -16,5 +16,5 @@ description: privacyKeyChatInvite attributes, type and example
 ### Example:
 
 ```
-$privacyKeyChatInvite = ['_' => privacyKeyChatInvite', ];
+$privacyKeyChatInvite = ['_' => privacyKeyChatInvite, ];
 ```

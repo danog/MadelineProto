@@ -30,6 +30,7 @@ class Serialization
 
     public static function deserialize($filename)
     {
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         return file_exists($filename) ? unserialize(file_get_contents($filename)) : false;
     }
 }

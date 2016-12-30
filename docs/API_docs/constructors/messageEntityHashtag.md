@@ -22,5 +22,5 @@ description: messageEntityHashtag attributes, type and example
 ### Example:
 
 ```
-$messageEntityHashtag = ['_' => messageEntityHashtag', 'offset' => int, 'length' => int, ];
+$messageEntityHashtag = ['_' => messageEntityHashtag, 'offset' => int, 'length' => int, ];
 ```

@@ -25,5 +25,5 @@ description: messages_peerDialogs attributes, type and example
 ### Example:
 
 ```
-$messages_peerDialogs = ['_' => messages_peerDialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$messages_peerDialogs = ['_' => messages_peerDialogs, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```

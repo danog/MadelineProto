@@ -21,5 +21,5 @@ description: messageActionChatEditPhoto attributes, type and example
 ### Example:
 
 ```
-$messageActionChatEditPhoto = ['_' => messageActionChatEditPhoto', 'photo' => Photo, ];
+$messageActionChatEditPhoto = ['_' => messageActionChatEditPhoto, 'photo' => Photo, ];
 ```

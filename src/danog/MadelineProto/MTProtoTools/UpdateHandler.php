@@ -17,10 +17,10 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait UpdateHandler
 {
-    public $updates_state = [];
+    public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0];
     public $channels_state = [];
-
     public $updates = [];
+    private $getting_state = false;
 
     public function get_updates_update_handler($update)
     {
@@ -28,14 +28,21 @@ trait UpdateHandler
             array_shift($this->updates);
         }
         $this->updates[] = $update;
-        \danog\MadelineProto\Logger::log('Stored ', $update);
+        //\danog\MadelineProto\Logger::log('Stored ', $update);
     }
 
-    public function get_updates($offset, $limit = null, $timeout = 0)
+    public function get_updates($params = [])
     {
-        sleep($timeout);
-        $this->get_updates_difference();
-        $result = array_slice($this->updates, $offset, $limit, true);
+        $this->force_get_updates_difference();
+        if (empty($this->updates)) return [];
+        $default_params = ['offset' => array_keys($this->updates)[0], 'limit' => null, 'timeout' => 0];
+        foreach ($default_params as $key => $default) {
+            if (!isset($params[$key])) $params[$key] = $default;
+        }
+        $time = microtime(true);
+        $params['timeout'] = (int)($params['timeout'] - (microtime(true) - $time));
+        sleep($params['timeout'] > 0 ? $params['timeout'] : 0);
+        $result = array_slice($this->updates, $params['offset'], $params['limit'], true);
         $updates = [];
         foreach ($result as $key => $value) {
             $updates[] = ['update_id' => $key, 'update' => $value];
@@ -45,134 +52,123 @@ trait UpdateHandler
         return $updates;
     }
 
+
     public function &get_channel_state($channel, $pts = 0)
     {
         if (!isset($this->channels_state[$channel])) {
-            $this->channels_state[$channel] = ['pts' => $pts, 'pop_pts' => [], 'pending_seq_updates' =>[]];
+            $this->channels_state[$channel] = ['pts' => $pts, 'pending_pts_updates' => [], 'sync_loading' => false];
         }
 
         return $this->channels_state[$channel];
     }
 
-    public function update_channel_state($channel, $data)
+    public function set_channel_state($channel, $data)
     {
-        $this->get_channel_state($channel);
-
-        $this->channels_state[$channel]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
+        $this->get_channel_state($channel)[$channel]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
     }
 
     public function get_channel_difference($channel)
     {
-        $this->get_channel_state($channel);
-
-        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $this->get_info('channel#'.$channel)['inputType'], 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+        if (!$this->get_channel_state($channel)['sync_loading']) {
+            $this->get_channel_state($channel)['sync_loading'] = true;
+            $this->get_channel_state($channel)['pending_pts_updates'] = [];
+        }
+        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $this->get_info('channel#'.$channel)['InputChannel'], 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+        \danog\MadelineProto\Logger::log('Got '.$difference['_']);
+        $this->get_channel_state($channel)['sync_loading'] = false;
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
-                $this->update_channel_state($difference);
+                $this->set_channel_state($channel, $difference);
                 break;
-            case 'updates.difference':
+            case 'updates.channelDifference':
                 $this->handle_update_messages($difference['new_messages'], $channel);
-                $this->handle_multiple_update($difference['other_updates']);
-                $this->update_channel_state($difference);
+                $this->handle_multiple_update($difference['other_updates'], [], $channel);
+                $this->set_channel_state($channel, $difference);
                 if (!$difference['final']) {
                     $this->get_channel_difference($channel);
                 }
                 break;
-            case 'updates.differenceTooLong':
+            case 'updates.channelDifferenceTooLong':
                 unset($this->channels_state[$channel]);
-                \danog\MadelineProto\Logger::log('Got updates.differenceTooLong: ', $difference);
+                //unset($this->chats[$this->get_info('channel#'.$channel)['bot_api_id']]);
+                //$this->handle_update_messages($difference['messages'], $channel);
                 break;
             default:
-                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference));
+                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
     }
 
-    public function update_state($data)
-    {
-        if (empty($this->updates_state)) {
-            $this->updates_state = ['date' => 0, 'pts' => 0, 'seq' => 0, 'pending_seq_updates' => []];
-        }
 
-        $this->updates_state['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->updates_state['pts'] : $data['pts'];
-        $this->updates_state['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->updates_state['seq'] : $data['seq'];
-        $this->updates_state['date'] = (!isset($data['date']) || $data['date'] < $this->updates_state['date']) ? $this->updates_state['date'] : $data['date'];
+    public function set_update_state($data)
+    {
+        $this->get_update_state()['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_update_state()['pts'] : $data['pts'];
+        $this->get_update_state()['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->get_update_state()['seq'] : $data['seq'];
+        $this->get_update_state()['date'] = (!isset($data['date']) || $data['date'] < $this->get_update_state()['date']) ? $this->get_update_state()['date'] : $data['date'];
+        return $this->get_update_state();
+    }
+
+    public function &get_update_state()
+    {
+        return $this->updates_state;
+    }
+
+    public function force_get_updates_difference() {
+        if (!$this->get_update_state()['sync_loading']) $this->get_updates_difference();
     }
 
     public function get_updates_difference()
     {
-        if (empty($this->updates_state)) {
-            return $this->update_state($this->method_call('updates.getState'));
+        if (!$this->get_update_state()['sync_loading']) {
+            $this->get_update_state()['sync_loading'] = true;
+            $this->get_update_state()['pending_pts_updates'] = [];
+            $this->get_update_state()['pending_seq_updates'] = [];
         }
-        $difference = $this->method_call('updates.getDifference', ['pts' => $this->updates_state['pts'], 'date' => $this->updates_state['date'], 'qts' => -1]);
+
+        $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => -1]);
+        \danog\MadelineProto\Logger::log('Got '.$difference['_']);
+        $this->get_update_state()['sync_loading'] = false;
         switch ($difference['_']) {
             case 'updates.differenceEmpty':
-                $this->update_state($difference);
+                $this->set_update_state($difference);
                 break;
             case 'updates.difference':
-                $this->handle_update_messages($difference['new_messages']);
                 $this->handle_multiple_update($difference['other_updates']);
-                $this->update_state($difference['state']);
+                $this->handle_update_messages($difference['new_messages']);
+                $this->set_update_state($difference['state']);
                 break;
             case 'updates.differenceSlice':
-                $this->handle_update_messages($difference['new_messages']);
                 $this->handle_multiple_update($difference['other_updates']);
-                $this->update_state($difference['intermediate_state']);
+                $this->handle_update_messages($difference['new_messages']);
+                $this->set_update_state($difference['intermediate_state']);
                 $this->get_updates_difference();
                 break;
             default:
-                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference));
+                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
     }
-
-    public function handle_updates($updates)
-    {
-        switch ($updates['_']) {
-            case 'updatesTooLong':
-                $this->get_updates_difference();
-                break;
-            case 'updateShortMessage':
-            case 'updateShortChatMessage':
-//            case 'updateShortSentMessage':
-                $fromID = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->datacenter->authorization['user']['id'] : $updates['user_id']);
-                $toID = isset($updates['chat_id'])
-                    ? $updates['chat_id']
-                    : ($updates['out'] ? $updates['user_id'] : $this->datacenter->authorization['user']['id']);
-
-                $message = $updates;
-                $message['_'] = 'message';
-                $message['to_id'] = $toID;
-                $message['from_id'] = $this->get_info($fromID)['Peer'];
-                $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $this->handle_update($update, ['date' => $updates['date']]);
-                break;
-            case 'updateShort':
-                $this->handle_update($updates['update'], ['date' => $updates['date']]);
-                break;
-            case 'updatesCombined':
-                $this->add_users($updates['users']);
-                $this->add_chats($updates['chats']);
-                $this->handle_multiple_update($updates['updates'], ['date' => $updates['date'], 'seq' => $updates['seq'], 'seq_start' => $updates['seq_start']]);
-                break;
-
-            case 'updates':
-                $this->add_users($updates['users']);
-                $this->add_chats($updates['chats']);
-                $this->handle_multiple_update($updates['updates'], ['date' => $updates['date'], 'seq' => $updates['seq']]);
-                break;
-            default:
-                throw new \danog\MadelineProto\Exception('Unrecognized update received: '.var_export($updates));
-                break;
-        }
+    public function get_updates_state() {
+        $this->updates_state['sync_loading'] = false;
+        $this->getting_state = true;
+        $this->set_update_state($this->method_call('updates.getState'));
+        $this->getting_state = false;
+        $this->handle_pending_updates();
     }
 
     public function handle_update($update, $options = [])
     {
+        \danog\MadelineProto\Logger::log('Handling an update of type '.$update['_'].'...');
+        //var_dump($update, $options);
+
         $channel_id = false;
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
+                if ($update['message']['_'] == 'messageEmpty') {
+                    \danog\MadelineProto\Logger::log('Got message empty, saving...');
+                    return $this->save_update($update);
+                }
                 $channel_id = $update['message']['to_id']['channel_id'];
                 break;
             case 'updateDeleteChannelMessages':
@@ -180,53 +176,69 @@ trait UpdateHandler
                 break;
             case 'updateChannelTooLong':
                 $channel_id = $update['channel_id'];
+                \danog\MadelineProto\Logger::log('Update channel too long');
                 if (!isset($this->channels_state[$channel_id])) {
+                    \danog\MadelineProto\Logger::log('I do not have the channel in the states');
                     return false;
                 }
-
-                return $this->get_channel_difference($channel_id);
                 break;
         }
-
-        $this->save_update($update);
-        /*
+        if ($channel_id === false) {
+            $cur_state =& $this->get_update_state();
+        } else {
+            $cur_state =& $this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0)-(isset($update['pts_count']) ? $update['pts_count'] : 0));
+        }
+/*
+        if ($cur_state['sync_loading']) {
+            \danog\MadelineProto\Logger::log('Sync loading, not handling update');
+            return false;
+        }
+*/
         switch ($update['_']) {
+            case 'updateChannelTooLong':
+                \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
+                $this->get_channel_difference($channel_id);
+                return false;
             case 'updateNewMessage':
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
                 $message = $update['message'];
-                if (isset($message['from_id']) && !isset($this->chats[$message['from_id']]) ||
-                    isset($message['fwd_from']['from_id']) && !isset($this->chats[$message['fwd_from']['from_id']]) ||
-                    isset($message['fwd_from']['channel_id']) && !isset($this->chats[(int)('-100'.$message['fwd_from']['channel_id'])]) ||
-                    !isset($this->get_info($message['to_id'])['bot_api_info'])) {
+                if ((isset($message['from_id']) && !$this->peer_isset($message['from_id'])) ||
+                    !$this->peer_isset($message['to_id']) ||
+                    (isset($message['via_bot_id']) && !$this->peer_isset($message['via_bot_id'])) ||
+                    (isset($message['entities']) && !$this->entities_peer_isset($message['entities'])) ||
+                    (isset($message['fwd_from']) && !$this->fwd_peer_isset($message['fwd_from']))) {
 
-                    \danog\MadelineProto\Logger::log('Not enough data for message update');
+                    \danog\MadelineProto\Logger::log('Not enough data for message update, getting difference...');
 
-                    if ($channel_id !== false && isset($this->chats[$channel_id])) {
+                    if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
                         $this->get_channel_difference($channel_id);
                     } else {
-                        $this->get_updates_difference();
+                        $this->force_get_updates_difference();
                     }
                     return false;
 
                 }
                 break;
             default:
-                if ($channel_id !== false && isset($this->chats[$channel_id])) {
+                if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
+                    \danog\MadelineProto\Logger::log('Skipping update, I do not have the channel id '.$channel_id);
                     return false;
                 }
                 break;
         }
         $pop_pts = false;
-        if ($update['pts']) {
+        $pop_seq = false;
+
+        if (isset($update['pts'])) {
             $new_pts = $cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0);
             if ($new_pts < $update['pts']) {
-                \danog\MadelineProto\Logger::log('Pts hole', $cur_state, $update, $this->get_info($channel_id));
+                \danog\MadelineProto\Logger::log('Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id);
 
-                $this->cur_state['pop_pts'][] = $update;
+                $this->cur_state['pending_pts_updates'][] = $update;
 
-                if ($channel_id && isset($this->chats[$channel_id])) {
+                if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
                     $this->get_channel_difference($channel_id);
                 } else {
                     $this->get_updates_difference();
@@ -234,70 +246,122 @@ trait UpdateHandler
 
                 return false;
             }
-            if ($new_pts > $update['pts']) {
+            if ($update['pts'] > $cur_state['pts']) {
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
-            } else if ($update['pts_count']) {
+            } else if (isset($update['pts_count'])) {
+                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
                 return false;
             }
-        } else if (!$channel_id && isset($options['seq']) && $options['seq'] > 0) {
+            if ($channel_id !== false && isset($options['date']) && $this->get_update_state()['date'] < $options['date']) {
+                $this->get_update_state()['date'] = $options['date'];
+            }
+       } else if ($channel_id === false && isset($options['seq']) && $options['seq'] > 0) {
             $seq = $options['seq'];
             $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
+            if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
+                \danog\MadelineProto\Logger::log('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1');
 
-
-            if ($seq_start != $cur_state['seq'] + 1) {
-                if ($seq_start > $cur_state['seq']) {
-                    \danog\MadelineProto\Logger::('Seq hole', $cur_state);
-
-                    if (!isset($cur_state['pending_seq_updates'][$seq_start])) {
-                        $cur_state['pending_seq_updates'][$seq_start] = ['seq' => $seq, 'date': $options['date'], 'updates' => []];
-                    }
-                    $cur_state['pending_seq_updates'][$seq_start][] = $update;
-
-                    if (!$cur_state.syncPending.seqAwaiting ||
-                    $cur_state.syncPending.seqAwaiting < $seq_start) {
-                    $cur_state.syncPending.seqAwaiting = $seq_start
+                if (!isset($cur_state['pending_seq_updates'][$seq_start])) {
+                    $cur_state['pending_seq_updates'][$seq_start] = ['seq' => $seq, 'date' => $options['date'], 'updates' => []];
                 }
+                $cur_state['pending_seq_updates'][$seq_start]['updates'][] = $update;
+                $this->get_updates_difference();
                 return false;
+            }
+
+            if ($cur_state['seq'] != $seq) {
+                $cur_state['seq'] = $seq;
+                if (isset($options['date']) && $cur_state['date'] < $options['date']) {
+                    $cur_state['date'] = $options['date'];
+                }
+                $pop_seq = true;
             }
         }
 
+        $this->save_update($update);
 
-        if (curState.seq != seq) {
-          curState.seq = seq
-          if (options.date && curState.date < options.date) {
-            curState.date = options.date
-          }
-          popSeq = true
+        if ($pop_pts) {
+            $this->pop_pending_pts_update($channel_id);
+        } else if ($pop_seq) {
+            $this->pop_pending_seq_update();
         }
-      }
-
-      saveUpdate(update)
-
-      if (popPts) {
-        popPendingPtsUpdate(channelID)
-      }
-      else if (popSeq) {
-        popPendingSeqUpdate()
-}*/
     }
 
-    public function handle_multiple_update($updates, $options = [])
+    public function pop_pending_seq_update() {
+        $next_seq = $this->get_update_state()['seq'] + 1;
+        if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) return false;
+        foreach ($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'] as $update) {
+            $this->save_update($update);
+        }
+        $this->get_update_state()['seq'] = $this->get_update_state()['pending_seq_updates'][$next_seq]['seq'];
+        if (isset($this->get_update_state()['pending_seq_updates'][$next_seq]['date']) && $this->get_update_state()['date'] < $this->get_update_state()['pending_seq_updates'][$next_seq]['date']) {
+            $this->get_update_state()['date'] = $this->get_update_state()['pending_seq_updates'][$next_seq]['date'];
+        }
+        unset($this->get_update_state()['pending_seq_updates'][$next_seq]);
+        $this->pop_pending_seq_update();
+
+        return true;
+    }
+
+    public function pop_pending_pts_update($channel_id) {
+        if ($channel_id === false) {
+            $cur_state =& $this->get_update_state();
+        } else {
+            $cur_state =& $this->get_channel_state($channel_id);
+        }
+        if (empty($cur_state['pending_pts_updates'])) {
+            return false;
+        }
+        sort($cur_state['pending_pts_updates']);
+        $cur_pts = $cur_state['pts'];
+        $good_pts = false;
+        $good_index = false;
+        foreach ($cur_state['pending_pts_updates'] as $i => $update) {
+            $cur_pts += $update['pts_count'];
+            if ($cur_pts >= $update['pts']) {
+                $good_pts = $update['pts'];
+                $good_index = $i;
+            }
+        }
+        if (!$good_pts) return false;
+        $cur_state['pts'] = $good_pts;
+        for ($i = 0; $i <= $good_index; $i++) {
+            $this->save_update($cur_state['pending_pts_updates'][$i]);
+        }
+        array_splice($cur_state['pending_pts_updates'], 0, $good_index+1);
+    }
+
+    public function handle_multiple_update($updates, $options = [], $channel = false)
     {
-        foreach ($updates as $update) {
-            $this->handle_update($update, $options);
+        if ($channel == false) {
+            foreach ($updates as $update) {
+                switch ($update['_']) {
+                    case 'updateChannelTooLong':
+                    case 'updateNewChannelMessage':
+                    case 'updateEditChannelMessage':
+                        $this->handle_update($update, $options);
+                        continue 2;
+                }
+                $this->save_update($update);
+            }
+        } else {
+            foreach ($updates as $update) {
+                $this->save_update($update);
+            }
         }
     }
 
     public function handle_update_messages($messages, $channel = false)
     {
         foreach ($messages as $message) {
-            $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->updates_state['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
+            $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 
     public function save_update($update)
     {
+        \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
         $this->settings['updates']['callback']($update);
     }
 }

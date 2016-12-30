@@ -16,5 +16,5 @@ description: storage_fileGif attributes, type and example
 ### Example:
 
 ```
-$storage_fileGif = ['_' => storage_fileGif', ];
+$storage_fileGif = ['_' => storage_fileGif, ];
 ```

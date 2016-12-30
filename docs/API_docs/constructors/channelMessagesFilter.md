@@ -22,5 +22,5 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => channelMessagesFilter', 'exclude_new_messages' => true, 'ranges' => [Vector t], ];
+$channelMessagesFilter = ['_' => channelMessagesFilter, 'exclude_new_messages' => true, 'ranges' => [Vector t], ];
 ```

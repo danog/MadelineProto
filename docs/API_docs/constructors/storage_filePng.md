@@ -16,5 +16,5 @@ description: storage_filePng attributes, type and example
 ### Example:
 
 ```
-$storage_filePng = ['_' => storage_filePng', ];
+$storage_filePng = ['_' => storage_filePng, ];
 ```

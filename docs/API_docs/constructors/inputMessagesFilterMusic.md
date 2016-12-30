@@ -16,5 +16,5 @@ description: inputMessagesFilterMusic attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterMusic = ['_' => inputMessagesFilterMusic', ];
+$inputMessagesFilterMusic = ['_' => inputMessagesFilterMusic, ];
 ```

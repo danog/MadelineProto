@@ -23,5 +23,5 @@ description: messages_chatFull attributes, type and example
 ### Example:
 
 ```
-$messages_chatFull = ['_' => messages_chatFull', 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_chatFull = ['_' => messages_chatFull, 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

@@ -21,5 +21,5 @@ description: messages_stickerSetInstallResultArchive attributes, type and exampl
 ### Example:
 
 ```
-$messages_stickerSetInstallResultArchive = ['_' => messages_stickerSetInstallResultArchive', 'sets' => [Vector t], ];
+$messages_stickerSetInstallResultArchive = ['_' => messages_stickerSetInstallResultArchive, 'sets' => [Vector t], ];
 ```

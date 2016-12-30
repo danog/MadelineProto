@@ -16,5 +16,5 @@ description: inputDocumentEmpty attributes, type and example
 ### Example:
 
 ```
-$inputDocumentEmpty = ['_' => inputDocumentEmpty', ];
+$inputDocumentEmpty = ['_' => inputDocumentEmpty, ];
 ```

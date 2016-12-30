@@ -16,5 +16,5 @@ description: inputMessagesFilterChatPhotos attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterChatPhotos = ['_' => inputMessagesFilterChatPhotos', ];
+$inputMessagesFilterChatPhotos = ['_' => inputMessagesFilterChatPhotos, ];
 ```

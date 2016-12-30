@@ -21,5 +21,5 @@ description: inputMediaGame attributes, type and example
 ### Example:
 
 ```
-$inputMediaGame = ['_' => inputMediaGame', 'id' => InputGame, ];
+$inputMediaGame = ['_' => inputMediaGame, 'id' => InputGame, ];
 ```

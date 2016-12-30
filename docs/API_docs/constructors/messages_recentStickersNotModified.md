@@ -16,5 +16,5 @@ description: messages_recentStickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_recentStickersNotModified = ['_' => messages_recentStickersNotModified', ];
+$messages_recentStickersNotModified = ['_' => messages_recentStickersNotModified, ];
 ```

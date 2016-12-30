@@ -23,5 +23,5 @@ description: contacts_found attributes, type and example
 ### Example:
 
 ```
-$contacts_found = ['_' => contacts_found', 'results' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$contacts_found = ['_' => contacts_found, 'results' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

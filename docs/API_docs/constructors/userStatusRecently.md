@@ -16,5 +16,5 @@ description: userStatusRecently attributes, type and example
 ### Example:
 
 ```
-$userStatusRecently = ['_' => userStatusRecently', ];
+$userStatusRecently = ['_' => userStatusRecently, ];
 ```

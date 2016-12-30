@@ -22,5 +22,5 @@ description: inputPeerChannel attributes, type and example
 ### Example:
 
 ```
-$inputPeerChannel = ['_' => inputPeerChannel', 'channel_id' => int, 'access_hash' => long, ];
+$inputPeerChannel = ['_' => inputPeerChannel, 'channel_id' => int, 'access_hash' => long, ];
 ```

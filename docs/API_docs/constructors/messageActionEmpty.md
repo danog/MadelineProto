@@ -16,5 +16,5 @@ description: messageActionEmpty attributes, type and example
 ### Example:
 
 ```
-$messageActionEmpty = ['_' => messageActionEmpty', ];
+$messageActionEmpty = ['_' => messageActionEmpty, ];
 ```

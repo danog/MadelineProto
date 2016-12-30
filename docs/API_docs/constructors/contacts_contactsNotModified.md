@@ -16,5 +16,5 @@ description: contacts_contactsNotModified attributes, type and example
 ### Example:
 
 ```
-$contacts_contactsNotModified = ['_' => contacts_contactsNotModified', ];
+$contacts_contactsNotModified = ['_' => contacts_contactsNotModified, ];
 ```

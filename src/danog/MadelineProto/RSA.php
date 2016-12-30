@@ -12,8 +12,11 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class RSA extends TL\TL
+class RSA
 {
+    use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\Tools;
+
     public $n; // phpseclib\Math\BigInteger class
     public $e; // phpseclib\Math\BigInteger class
     public $fp; // phpseclib\Math\BigInteger class

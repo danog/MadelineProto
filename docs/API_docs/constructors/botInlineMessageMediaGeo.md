@@ -22,5 +22,5 @@ description: botInlineMessageMediaGeo attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageMediaGeo = ['_' => botInlineMessageMediaGeo', 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
+$botInlineMessageMediaGeo = ['_' => botInlineMessageMediaGeo, 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
 ```

@@ -12,9 +12,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TL extends \danog\MadelineProto\Tools
+trait TL
 {
-    public function __construct($files)
+    public function construct_tl($files)
     {
         \danog\MadelineProto\Logger::log('Loading TL schemes...');
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
@@ -134,6 +134,9 @@ class TL extends \danog\MadelineProto\Tools
 
         }
         $auto = false;
+        if (!is_array($object) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+            $object = $this->get_info($object)[$type['type']];
+        }
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
@@ -211,11 +214,11 @@ class TL extends \danog\MadelineProto\Tools
                         case 'long':
                             $serialized .= \phpseclib\Crypt\Random::string(8);
                             continue 2;
-                        case 'long':
+                        case 'int':
                             $serialized .= \phpseclib\Crypt\Random::string(4);
                             continue 2;
                         case 'Vector t':
-                            if (isset($argumenrs['id'])) {
+                            if (isset($arguments['id'])) {
                                 $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                                 $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
                                 $serialized .= \phpseclib\Crypt\Random::string(8 * count($arguments['id']));
@@ -349,11 +352,13 @@ class TL extends \danog\MadelineProto\Tools
                         continue 2;
                         break;
                     case 'Bool':
-                        $default = false;
-                    default:
-                        $default = null;
                         if (($x['flags'] & $arg['pow']) == 0) {
-                            $x[$arg['name']] = $default;
+                            $x[$arg['name']] = false;
+                            continue 2;
+                        }
+                    default:
+                        if (($x['flags'] & $arg['pow']) == 0) {
+                            //$x[$arg['name']] = $default;
                             continue 2;
                         }
                         break;

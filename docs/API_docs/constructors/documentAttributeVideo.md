@@ -23,5 +23,5 @@ description: documentAttributeVideo attributes, type and example
 ### Example:
 
 ```
-$documentAttributeVideo = ['_' => documentAttributeVideo', 'duration' => int, 'w' => int, 'h' => int, ];
+$documentAttributeVideo = ['_' => documentAttributeVideo, 'duration' => int, 'w' => int, 'h' => int, ];
 ```

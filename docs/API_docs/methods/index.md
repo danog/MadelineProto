@@ -180,6 +180,12 @@ $MadelineProto->[contacts->search](contacts_search.md)(\['q' => [string](../type
 $MadelineProto->[contacts->unblock](contacts_unblock.md)(\['id' => [InputUser](../types/InputUser.md), \]) == [$Bool](../types/Bool.md)<a name="contacts_unblock"></a>  
 
 ***
+<br><br>$MadelineProto->[destroy->session](destroy_session.md)(\['session_id' => [long](../types/long.md), \]) == [$DestroySessionRes](../types/DestroySessionRes.md)<a name="destroy_session"></a>  
+
+***
+<br><br>$MadelineProto->[get->future->salts](get_future_salts.md)(\['num' => [int](../types/int.md), \]) == [$FutureSalts](../types/FutureSalts.md)<a name="get_future_salts"></a>  
+
+***
 <br><br>$MadelineProto->[help->getAppChangelog](help_getAppChangelog.md)(\[\]) == [$help\_AppChangelog](../types/help_AppChangelog.md)<a name="help_getAppChangelog"></a>  
 
 $MadelineProto->[help->getAppUpdate](help_getAppUpdate.md)(\[\]) == [$help\_AppUpdate](../types/help_AppUpdate.md)<a name="help_getAppUpdate"></a>  
@@ -195,6 +201,9 @@ $MadelineProto->[help->getSupport](help_getSupport.md)(\[\]) == [$help\_Support]
 $MadelineProto->[help->getTermsOfService](help_getTermsOfService.md)(\[\]) == [$help\_TermsOfService](../types/help_TermsOfService.md)<a name="help_getTermsOfService"></a>  
 
 $MadelineProto->[help->saveAppLog](help_saveAppLog.md)(\['events' => \[[InputAppEvent](../types/InputAppEvent.md)\], \]) == [$Bool](../types/Bool.md)<a name="help_saveAppLog"></a>  
+
+***
+<br><br>$MadelineProto->[http->wait](http_wait.md)(\['max_delay' => [int](../types/int.md), 'wait_after' => [int](../types/int.md), 'max_wait' => [int](../types/int.md), \]) == [$HttpWait](../types/HttpWait.md)<a name="http_wait"></a>  
 
 ***
 <br><br>$MadelineProto->[initConnection](initConnection.md)(\['api_id' => [int](../types/int.md), 'device_model' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), 'query' => [!X](../types/!X.md), \]) == [$X](../types/X.md)<a name="initConnection"></a>  
@@ -372,6 +381,22 @@ $MadelineProto->[photos->getUserPhotos](photos_getUserPhotos.md)(\['user_id' => 
 $MadelineProto->[photos->updateProfilePhoto](photos_updateProfilePhoto.md)(\['id' => [InputPhoto](../types/InputPhoto.md), \]) == [$UserProfilePhoto](../types/UserProfilePhoto.md)<a name="photos_updateProfilePhoto"></a>  
 
 $MadelineProto->[photos->uploadProfilePhoto](photos_uploadProfilePhoto.md)(\['file' => [InputFile](../types/InputFile.md), \]) == [$photos\_Photo](../types/photos_Photo.md)<a name="photos_uploadProfilePhoto"></a>  
+
+***
+<br><br>$MadelineProto->[ping](ping.md)(\['ping_id' => [long](../types/long.md), \]) == [$Pong](../types/Pong.md)<a name="ping"></a>  
+
+$MadelineProto->[ping->delay->disconnect](ping_delay_disconnect.md)(\['ping_id' => [long](../types/long.md), 'disconnect_delay' => [int](../types/int.md), \]) == [$Pong](../types/Pong.md)<a name="ping_delay_disconnect"></a>  
+
+***
+<br><br>$MadelineProto->[req->DH->params](req_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'p' => [bytes](../types/bytes.md), 'q' => [bytes](../types/bytes.md), 'public_key_fingerprint' => [long](../types/long.md), 'encrypted_data' => [bytes](../types/bytes.md), \]) == [$Server\_DH\_Params](../types/Server_DH_Params.md)<a name="req_DH_params"></a>  
+
+$MadelineProto->[req->pq](req_pq.md)(\['nonce' => [int128](../types/int128.md), \]) == [$ResPQ](../types/ResPQ.md)<a name="req_pq"></a>  
+
+***
+<br><br>$MadelineProto->[rpc->drop->answer](rpc_drop_answer.md)(\['req_msg_id' => [long](../types/long.md), \]) == [$RpcDropAnswer](../types/RpcDropAnswer.md)<a name="rpc_drop_answer"></a>  
+
+***
+<br><br>$MadelineProto->[set->client->DH->params](set_client_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'encrypted_data' => [bytes](../types/bytes.md), \]) == [$Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)<a name="set_client_DH_params"></a>  
 
 ***
 <br><br>$MadelineProto->[updates->getChannelDifference](updates_getChannelDifference.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'filter' => [ChannelMessagesFilter](../types/ChannelMessagesFilter.md), 'pts' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) == [$updates\_ChannelDifference](../types/updates_ChannelDifference.md)<a name="updates_getChannelDifference"></a>  

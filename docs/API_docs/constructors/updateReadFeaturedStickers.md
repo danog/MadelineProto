@@ -16,5 +16,5 @@ description: updateReadFeaturedStickers attributes, type and example
 ### Example:
 
 ```
-$updateReadFeaturedStickers = ['_' => updateReadFeaturedStickers', ];
+$updateReadFeaturedStickers = ['_' => updateReadFeaturedStickers, ];
 ```

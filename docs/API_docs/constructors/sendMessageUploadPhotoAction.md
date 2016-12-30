@@ -21,5 +21,5 @@ description: sendMessageUploadPhotoAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageUploadPhotoAction = ['_' => sendMessageUploadPhotoAction', 'progress' => int, ];
+$sendMessageUploadPhotoAction = ['_' => sendMessageUploadPhotoAction, 'progress' => int, ];
 ```

@@ -16,5 +16,5 @@ description: channelParticipantsRecent attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsRecent = ['_' => channelParticipantsRecent', ];
+$channelParticipantsRecent = ['_' => channelParticipantsRecent, ];
 ```

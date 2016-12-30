@@ -16,5 +16,5 @@ description: contactLinkContact attributes, type and example
 ### Example:
 
 ```
-$contactLinkContact = ['_' => contactLinkContact', ];
+$contactLinkContact = ['_' => contactLinkContact, ];
 ```

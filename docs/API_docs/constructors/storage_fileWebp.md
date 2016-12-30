@@ -16,5 +16,5 @@ description: storage_fileWebp attributes, type and example
 ### Example:
 
 ```
-$storage_fileWebp = ['_' => storage_fileWebp', ];
+$storage_fileWebp = ['_' => storage_fileWebp, ];
 ```

@@ -22,5 +22,5 @@ description: messageEntityEmail attributes, type and example
 ### Example:
 
 ```
-$messageEntityEmail = ['_' => messageEntityEmail', 'offset' => int, 'length' => int, ];
+$messageEntityEmail = ['_' => messageEntityEmail, 'offset' => int, 'length' => int, ];
 ```

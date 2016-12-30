@@ -16,5 +16,5 @@ description: messages_savedGifsNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifsNotModified = ['_' => messages_savedGifsNotModified', ];
+$messages_savedGifsNotModified = ['_' => messages_savedGifsNotModified, ];
 ```

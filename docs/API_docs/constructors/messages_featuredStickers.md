@@ -23,5 +23,5 @@ description: messages_featuredStickers attributes, type and example
 ### Example:
 
 ```
-$messages_featuredStickers = ['_' => messages_featuredStickers', 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
+$messages_featuredStickers = ['_' => messages_featuredStickers, 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
 ```

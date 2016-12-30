@@ -16,5 +16,5 @@ description: privacyValueDisallowAll attributes, type and example
 ### Example:
 
 ```
-$privacyValueDisallowAll = ['_' => privacyValueDisallowAll', ];
+$privacyValueDisallowAll = ['_' => privacyValueDisallowAll, ];
 ```

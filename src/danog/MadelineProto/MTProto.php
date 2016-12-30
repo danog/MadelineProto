@@ -28,6 +28,8 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
+    use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\Tools;
 
     public $settings = [];
     public $config = ['expires' => -1];
@@ -52,7 +54,7 @@ class MTProto extends PrimeModule
 
         // Istantiate TL class
         \danog\MadelineProto\Logger::log('Translating tl schemas...');
-        $this->tl = new TL\TL($this->settings['tl_schema']['src']);
+        $this->construct_TL($this->settings['tl_schema']['src']);
 
         $this->switch_dc(2, true);
         $this->get_config();
@@ -64,6 +66,7 @@ class MTProto extends PrimeModule
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
         if ($this->datacenter->authorized) {
+            \danog\MadelineProto\Logger::log('Getting updates after deserialization...');
             $this->get_updates_difference();
         }
     }
@@ -294,10 +297,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'invokeWithLayer',
             [
                 'layer' => $this->settings['tl_schema']['layer'],
-                'query' => $this->tl->serialize_method('initConnection',
+                'query' => $this->serialize_method('initConnection',
                     array_merge(
                         $this->settings['app_info'],
-                        ['query' => $this->tl->serialize_method($method, $arguments)]
+                        ['query' => $this->serialize_method($method, $arguments)]
                     )
                 ),
             ]

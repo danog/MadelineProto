@@ -16,5 +16,5 @@ description: updateConfig attributes, type and example
 ### Example:
 
 ```
-$updateConfig = ['_' => updateConfig', ];
+$updateConfig = ['_' => updateConfig, ];
 ```

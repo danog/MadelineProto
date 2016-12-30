@@ -16,5 +16,5 @@ description: documentAttributeAnimated attributes, type and example
 ### Example:
 
 ```
-$documentAttributeAnimated = ['_' => documentAttributeAnimated', ];
+$documentAttributeAnimated = ['_' => documentAttributeAnimated, ];
 ```

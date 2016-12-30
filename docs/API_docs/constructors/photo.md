@@ -25,5 +25,5 @@ description: photo attributes, type and example
 ### Example:
 
 ```
-$photo = ['_' => photo', 'has_stickers' => true, 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [Vector t], ];
+$photo = ['_' => photo, 'has_stickers' => true, 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [Vector t], ];
 ```

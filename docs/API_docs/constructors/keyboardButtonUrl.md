@@ -22,5 +22,5 @@ description: keyboardButtonUrl attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonUrl = ['_' => keyboardButtonUrl', 'text' => string, 'url' => string, ];
+$keyboardButtonUrl = ['_' => keyboardButtonUrl, 'text' => string, 'url' => string, ];
 ```

@@ -24,5 +24,5 @@ description: updateUserName attributes, type and example
 ### Example:
 
 ```
-$updateUserName = ['_' => updateUserName', 'user_id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, ];
+$updateUserName = ['_' => updateUserName, 'user_id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, ];
 ```

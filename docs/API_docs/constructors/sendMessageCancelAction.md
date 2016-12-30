@@ -16,5 +16,5 @@ description: sendMessageCancelAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageCancelAction = ['_' => sendMessageCancelAction', ];
+$sendMessageCancelAction = ['_' => sendMessageCancelAction, ];
 ```

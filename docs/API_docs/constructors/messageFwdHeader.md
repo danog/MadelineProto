@@ -24,5 +24,5 @@ description: messageFwdHeader attributes, type and example
 ### Example:
 
 ```
-$messageFwdHeader = ['_' => messageFwdHeader', 'from_id' => int, 'date' => int, 'channel_id' => int, 'channel_post' => int, ];
+$messageFwdHeader = ['_' => messageFwdHeader, 'from_id' => int, 'date' => int, 'channel_id' => int, 'channel_post' => int, ];
 ```

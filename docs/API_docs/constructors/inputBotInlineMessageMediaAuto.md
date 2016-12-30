@@ -22,5 +22,5 @@ description: inputBotInlineMessageMediaAuto attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageMediaAuto = ['_' => inputBotInlineMessageMediaAuto', 'caption' => string, 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageMediaAuto = ['_' => inputBotInlineMessageMediaAuto, 'caption' => string, 'reply_markup' => ReplyMarkup, ];
 ```

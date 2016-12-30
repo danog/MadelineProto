@@ -21,5 +21,5 @@ description: documentEmpty attributes, type and example
 ### Example:
 
 ```
-$documentEmpty = ['_' => documentEmpty', 'id' => long, ];
+$documentEmpty = ['_' => documentEmpty, 'id' => long, ];
 ```

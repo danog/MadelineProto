@@ -16,5 +16,5 @@ description: messageMediaEmpty attributes, type and example
 ### Example:
 
 ```
-$messageMediaEmpty = ['_' => messageMediaEmpty', ];
+$messageMediaEmpty = ['_' => messageMediaEmpty, ];
 ```

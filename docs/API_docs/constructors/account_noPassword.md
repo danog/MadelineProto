@@ -22,5 +22,5 @@ description: account_noPassword attributes, type and example
 ### Example:
 
 ```
-$account_noPassword = ['_' => account_noPassword', 'new_salt' => bytes, 'email_unconfirmed_pattern' => string, ];
+$account_noPassword = ['_' => account_noPassword, 'new_salt' => bytes, 'email_unconfirmed_pattern' => string, ];
 ```

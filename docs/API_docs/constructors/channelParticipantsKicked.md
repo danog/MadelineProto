@@ -16,5 +16,5 @@ description: channelParticipantsKicked attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsKicked = ['_' => channelParticipantsKicked', ];
+$channelParticipantsKicked = ['_' => channelParticipantsKicked, ];
 ```

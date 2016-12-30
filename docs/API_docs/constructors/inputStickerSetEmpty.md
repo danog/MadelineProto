@@ -16,5 +16,5 @@ description: inputStickerSetEmpty attributes, type and example
 ### Example:
 
 ```
-$inputStickerSetEmpty = ['_' => inputStickerSetEmpty', ];
+$inputStickerSetEmpty = ['_' => inputStickerSetEmpty, ];
 ```

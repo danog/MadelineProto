@@ -22,5 +22,5 @@ description: messages_sentEncryptedFile attributes, type and example
 ### Example:
 
 ```
-$messages_sentEncryptedFile = ['_' => messages_sentEncryptedFile', 'date' => int, 'file' => EncryptedFile, ];
+$messages_sentEncryptedFile = ['_' => messages_sentEncryptedFile, 'date' => int, 'file' => EncryptedFile, ];
 ```

@@ -22,5 +22,5 @@ description: messages_recentStickers attributes, type and example
 ### Example:
 
 ```
-$messages_recentStickers = ['_' => messages_recentStickers', 'hash' => int, 'stickers' => [Vector t], ];
+$messages_recentStickers = ['_' => messages_recentStickers, 'hash' => int, 'stickers' => [Vector t], ];
 ```

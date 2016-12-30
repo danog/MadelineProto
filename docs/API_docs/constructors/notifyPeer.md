@@ -21,5 +21,5 @@ description: notifyPeer attributes, type and example
 ### Example:
 
 ```
-$notifyPeer = ['_' => notifyPeer', 'peer' => Peer, ];
+$notifyPeer = ['_' => notifyPeer, 'peer' => Peer, ];
 ```

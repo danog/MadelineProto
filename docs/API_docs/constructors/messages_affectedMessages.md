@@ -22,5 +22,5 @@ description: messages_affectedMessages attributes, type and example
 ### Example:
 
 ```
-$messages_affectedMessages = ['_' => messages_affectedMessages', 'pts' => int, 'pts_count' => int, ];
+$messages_affectedMessages = ['_' => messages_affectedMessages, 'pts' => int, 'pts_count' => int, ];
 ```

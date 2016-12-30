@@ -22,5 +22,5 @@ description: messages_archivedStickers attributes, type and example
 ### Example:
 
 ```
-$messages_archivedStickers = ['_' => messages_archivedStickers', 'count' => int, 'sets' => [Vector t], ];
+$messages_archivedStickers = ['_' => messages_archivedStickers, 'count' => int, 'sets' => [Vector t], ];
 ```

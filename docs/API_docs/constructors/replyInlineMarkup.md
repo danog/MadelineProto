@@ -21,5 +21,5 @@ description: replyInlineMarkup attributes, type and example
 ### Example:
 
 ```
-$replyInlineMarkup = ['_' => replyInlineMarkup', 'rows' => [Vector t], ];
+$replyInlineMarkup = ['_' => replyInlineMarkup, 'rows' => [Vector t], ];
 ```

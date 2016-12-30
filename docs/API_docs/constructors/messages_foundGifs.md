@@ -22,5 +22,5 @@ description: messages_foundGifs attributes, type and example
 ### Example:
 
 ```
-$messages_foundGifs = ['_' => messages_foundGifs', 'next_offset' => int, 'results' => [Vector t], ];
+$messages_foundGifs = ['_' => messages_foundGifs, 'next_offset' => int, 'results' => [Vector t], ];
 ```

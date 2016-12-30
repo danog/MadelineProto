@@ -16,5 +16,5 @@ description: draftMessageEmpty attributes, type and example
 ### Example:
 
 ```
-$draftMessageEmpty = ['_' => draftMessageEmpty', ];
+$draftMessageEmpty = ['_' => draftMessageEmpty, ];
 ```

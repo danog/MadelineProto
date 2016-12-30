@@ -21,5 +21,5 @@ description: messageActionChatJoinedByLink attributes, type and example
 ### Example:
 
 ```
-$messageActionChatJoinedByLink = ['_' => messageActionChatJoinedByLink', 'inviter_id' => int, ];
+$messageActionChatJoinedByLink = ['_' => messageActionChatJoinedByLink, 'inviter_id' => int, ];
 ```

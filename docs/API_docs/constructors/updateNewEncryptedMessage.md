@@ -22,5 +22,5 @@ description: updateNewEncryptedMessage attributes, type and example
 ### Example:
 
 ```
-$updateNewEncryptedMessage = ['_' => updateNewEncryptedMessage', 'message' => EncryptedMessage, 'qts' => int, ];
+$updateNewEncryptedMessage = ['_' => updateNewEncryptedMessage, 'message' => EncryptedMessage, 'qts' => int, ];
 ```

@@ -21,5 +21,5 @@ description: auth_sentCodeTypeFlashCall attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeFlashCall = ['_' => auth_sentCodeTypeFlashCall', 'pattern' => string, ];
+$auth_sentCodeTypeFlashCall = ['_' => auth_sentCodeTypeFlashCall, 'pattern' => string, ];
 ```

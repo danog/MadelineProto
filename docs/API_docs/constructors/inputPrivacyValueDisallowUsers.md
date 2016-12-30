@@ -21,5 +21,5 @@ description: inputPrivacyValueDisallowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueDisallowUsers = ['_' => inputPrivacyValueDisallowUsers', 'users' => [Vector t], ];
+$inputPrivacyValueDisallowUsers = ['_' => inputPrivacyValueDisallowUsers, 'users' => [Vector t], ];
 ```

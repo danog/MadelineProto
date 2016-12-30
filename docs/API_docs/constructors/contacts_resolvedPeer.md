@@ -23,5 +23,5 @@ description: contacts_resolvedPeer attributes, type and example
 ### Example:
 
 ```
-$contacts_resolvedPeer = ['_' => contacts_resolvedPeer', 'peer' => Peer, 'chats' => [Vector t], 'users' => [Vector t], ];
+$contacts_resolvedPeer = ['_' => contacts_resolvedPeer, 'peer' => Peer, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

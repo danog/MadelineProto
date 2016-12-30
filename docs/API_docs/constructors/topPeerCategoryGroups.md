@@ -16,5 +16,5 @@ description: topPeerCategoryGroups attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryGroups = ['_' => topPeerCategoryGroups', ];
+$topPeerCategoryGroups = ['_' => topPeerCategoryGroups, ];
 ```

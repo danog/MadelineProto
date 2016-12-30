@@ -26,5 +26,5 @@ description: chatFull attributes, type and example
 ### Example:
 
 ```
-$chatFull = ['_' => chatFull', 'id' => int, 'participants' => ChatParticipants, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [Vector t], ];
+$chatFull = ['_' => chatFull, 'id' => int, 'participants' => ChatParticipants, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [Vector t], ];
 ```

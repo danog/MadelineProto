@@ -16,5 +16,5 @@ description: help_appChangelogEmpty attributes, type and example
 ### Example:
 
 ```
-$help_appChangelogEmpty = ['_' => help_appChangelogEmpty', ];
+$help_appChangelogEmpty = ['_' => help_appChangelogEmpty, ];
 ```

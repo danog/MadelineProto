@@ -16,5 +16,5 @@ description: channelRoleModerator attributes, type and example
 ### Example:
 
 ```
-$channelRoleModerator = ['_' => channelRoleModerator', ];
+$channelRoleModerator = ['_' => channelRoleModerator, ];
 ```

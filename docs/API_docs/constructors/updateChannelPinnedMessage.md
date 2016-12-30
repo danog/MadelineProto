@@ -22,5 +22,5 @@ description: updateChannelPinnedMessage attributes, type and example
 ### Example:
 
 ```
-$updateChannelPinnedMessage = ['_' => updateChannelPinnedMessage', 'channel_id' => int, 'id' => int, ];
+$updateChannelPinnedMessage = ['_' => updateChannelPinnedMessage, 'channel_id' => int, 'id' => int, ];
 ```

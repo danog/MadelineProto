@@ -16,5 +16,5 @@ description: userStatusEmpty attributes, type and example
 ### Example:
 
 ```
-$userStatusEmpty = ['_' => userStatusEmpty', ];
+$userStatusEmpty = ['_' => userStatusEmpty, ];
 ```

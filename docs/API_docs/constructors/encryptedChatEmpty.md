@@ -21,5 +21,5 @@ description: encryptedChatEmpty attributes, type and example
 ### Example:
 
 ```
-$encryptedChatEmpty = ['_' => encryptedChatEmpty', 'id' => int, ];
+$encryptedChatEmpty = ['_' => encryptedChatEmpty, 'id' => int, ];
 ```

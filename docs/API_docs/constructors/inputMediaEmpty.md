@@ -16,5 +16,5 @@ description: inputMediaEmpty attributes, type and example
 ### Example:
 
 ```
-$inputMediaEmpty = ['_' => inputMediaEmpty', ];
+$inputMediaEmpty = ['_' => inputMediaEmpty, ];
 ```

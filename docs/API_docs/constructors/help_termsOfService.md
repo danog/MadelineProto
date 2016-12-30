@@ -21,5 +21,5 @@ description: help_termsOfService attributes, type and example
 ### Example:
 
 ```
-$help_termsOfService = ['_' => help_termsOfService', 'text' => string, ];
+$help_termsOfService = ['_' => help_termsOfService, 'text' => string, ];
 ```

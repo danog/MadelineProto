@@ -16,5 +16,5 @@ description: inputPeerEmpty attributes, type and example
 ### Example:
 
 ```
-$inputPeerEmpty = ['_' => inputPeerEmpty', ];
+$inputPeerEmpty = ['_' => inputPeerEmpty, ];
 ```

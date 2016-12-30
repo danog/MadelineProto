@@ -21,5 +21,5 @@ description: privacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$privacyValueAllowUsers = ['_' => privacyValueAllowUsers', 'users' => [Vector t], ];
+$privacyValueAllowUsers = ['_' => privacyValueAllowUsers, 'users' => [Vector t], ];
 ```

@@ -23,5 +23,5 @@ description: inputEncryptedFileBigUploaded attributes, type and example
 ### Example:
 
 ```
-$inputEncryptedFileBigUploaded = ['_' => inputEncryptedFileBigUploaded', 'id' => long, 'parts' => int, 'key_fingerprint' => int, ];
+$inputEncryptedFileBigUploaded = ['_' => inputEncryptedFileBigUploaded, 'id' => long, 'parts' => int, 'key_fingerprint' => int, ];
 ```

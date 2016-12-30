@@ -37,5 +37,5 @@ description: channelFull attributes, type and example
 ### Example:
 
 ```
-$channelFull = ['_' => channelFull', 'can_view_participants' => true, 'can_set_username' => true, 'id' => int, 'about' => string, 'participants_count' => int, 'admins_count' => int, 'kicked_count' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [Vector t], 'migrated_from_chat_id' => int, 'migrated_from_max_id' => int, 'pinned_msg_id' => int, ];
+$channelFull = ['_' => channelFull, 'can_view_participants' => true, 'can_set_username' => true, 'id' => int, 'about' => string, 'participants_count' => int, 'admins_count' => int, 'kicked_count' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [Vector t], 'migrated_from_chat_id' => int, 'migrated_from_max_id' => int, 'pinned_msg_id' => int, ];
 ```

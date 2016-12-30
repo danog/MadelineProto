@@ -21,5 +21,5 @@ description: encryptedChatDiscarded attributes, type and example
 ### Example:
 
 ```
-$encryptedChatDiscarded = ['_' => encryptedChatDiscarded', 'id' => int, ];
+$encryptedChatDiscarded = ['_' => encryptedChatDiscarded, 'id' => int, ];
 ```

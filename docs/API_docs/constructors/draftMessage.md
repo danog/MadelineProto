@@ -25,5 +25,5 @@ description: draftMessage attributes, type and example
 ### Example:
 
 ```
-$draftMessage = ['_' => draftMessage', 'no_webpage' => true, 'reply_to_msg_id' => int, 'message' => string, 'entities' => [Vector t], 'date' => int, ];
+$draftMessage = ['_' => draftMessage, 'no_webpage' => true, 'reply_to_msg_id' => int, 'message' => string, 'entities' => [Vector t], 'date' => int, ];
 ```

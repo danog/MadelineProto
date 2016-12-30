@@ -24,5 +24,5 @@ description: messages_dialogs attributes, type and example
 ### Example:
 
 ```
-$messages_dialogs = ['_' => messages_dialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_dialogs = ['_' => messages_dialogs, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

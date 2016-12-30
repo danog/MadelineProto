@@ -22,5 +22,5 @@ description: keyboardButtonCallback attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonCallback = ['_' => keyboardButtonCallback', 'text' => string, 'data' => bytes, ];
+$keyboardButtonCallback = ['_' => keyboardButtonCallback, 'text' => string, 'data' => bytes, ];
 ```

@@ -21,5 +21,5 @@ description: keyboardButton attributes, type and example
 ### Example:
 
 ```
-$keyboardButton = ['_' => keyboardButton', 'text' => string, ];
+$keyboardButton = ['_' => keyboardButton, 'text' => string, ];
 ```

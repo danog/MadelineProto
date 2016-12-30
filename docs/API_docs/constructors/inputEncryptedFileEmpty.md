@@ -16,5 +16,5 @@ description: inputEncryptedFileEmpty attributes, type and example
 ### Example:
 
 ```
-$inputEncryptedFileEmpty = ['_' => inputEncryptedFileEmpty', ];
+$inputEncryptedFileEmpty = ['_' => inputEncryptedFileEmpty, ];
 ```

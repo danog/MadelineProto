@@ -23,5 +23,5 @@ description: topPeerCategoryPeers attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryPeers = ['_' => topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [Vector t], ];
+$topPeerCategoryPeers = ['_' => topPeerCategoryPeers, 'category' => TopPeerCategory, 'count' => int, 'peers' => [Vector t], ];
 ```

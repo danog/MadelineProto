@@ -17,6 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait ResponseHandler
 {
+    private $pending_updates = [];
     private $bad_msg_error_codes = [
         16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
         17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
@@ -124,7 +125,7 @@ trait ResponseHandler
                 case 'new_session_created':
                     $this->datacenter->temp_auth_key['server_salt'] = $response['server_salt'];
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
-                    \danog\MadelineProto\Logger::log('new session created');
+                    if ($this->datacenter->authorized) $this->force_get_updates_difference();
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
                 case 'msg_container':
@@ -214,7 +215,7 @@ trait ResponseHandler
                     break;
                 default:
                     $this->ack_incoming_message_id($current_msg_id); // Acknowledge that I received the server's response
-                    $response_type = $this->tl->constructors->find_by_predicate($response['_'])['type'];
+                    $response_type = $this->constructors->find_by_predicate($response['_'])['type'];
                     switch ($response_type) {
                         case 'Updates':
                             unset($this->datacenter->new_incoming[$current_msg_id]);
@@ -241,4 +242,68 @@ trait ResponseHandler
             }
         }
     }
+    public function handle_pending_updates() {
+        \danog\MadelineProto\Logger::log('Parsing pending updates...');
+        foreach ($this->pending_updates as $updates) {
+            $this->handle_updates($updates);
+        }
+    }
+    public function handle_updates($updates)
+    {
+        \danog\MadelineProto\Logger::log('Parsing updates received via the socket...');
+        if ($this->getting_state) {
+            \danog\MadelineProto\Logger::log('Getting state, handle later');
+            $this->pending_updates[] = $updates;
+            return false;
+        }
+        $opts = [];
+        foreach (['date', 'seq', 'seq_start'] as $key) {
+            if (isset($updates[$key])) $opts[$key] = $updates[$key];
+        }
+        switch ($updates['_']) {
+            case 'updates':
+            case 'updatesCombined':
+                foreach ($updates['updates'] as $update) {
+                    $this->handle_update($update, $opts);
+                }
+                break;
+            case 'updateShort':
+                $this->handle_update($updates['update'], $opts);
+                break;
+            case 'updateShortMessage':
+            case 'updateShortChatMessage':
+                $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->datacenter->authorization['user']['id'] : $updates['user_id']);
+                $to_id = isset($updates['chat_id'])
+                    ? -$updates['chat_id']
+                    : ($updates['out'] ? $updates['user_id'] : $this->datacenter->authorization['user']['id']);
+
+                if (!$this->peer_isset($from_id) ||
+                    !$this->peer_isset($to_id) ||
+                    (isset($updates['via_bot_id']) && !$this->peer_isset($updates['via_bot_id']))
+                    (isset($updates['entities']) && !$this->entities_peer_isset($updates['entites']))
+                    (isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from']))) {
+                    \danog\MadelineProto\Logger::log('getDifference: good - getting user for updateShortMessage');
+                    return $this->get_updates_difference();
+                }
+
+
+                $message = $updates;
+                $message['_'] = 'message';
+                $message['from_id'] = $from_id;
+                $message['to_id'] = $this->get_info($to_id)['Peer'];
+                $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
+                $this->handle_update($update, $opts);
+                break;
+            case 'updateShortSentMessage':
+                //$this->set_update_state(['date' => $updates['date']]);
+                break;
+            case 'updatesTooLong':
+                $this->force_get_updates_difference();
+                break;
+            default:
+                throw new \danog\MadelineProto\Exception('Unrecognized update received: '.var_export($updates));
+                break;
+        }
+    }
+
 }

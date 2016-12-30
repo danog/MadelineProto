@@ -25,5 +25,5 @@ description: auth_sentCode attributes, type and example
 ### Example:
 
 ```
-$auth_sentCode = ['_' => auth_sentCode', 'phone_registered' => true, 'type' => auth.SentCodeType, 'phone_code_hash' => string, 'next_type' => auth.CodeType, 'timeout' => int, ];
+$auth_sentCode = ['_' => auth_sentCode, 'phone_registered' => true, 'type' => auth.SentCodeType, 'phone_code_hash' => string, 'next_type' => auth.CodeType, 'timeout' => int, ];
 ```

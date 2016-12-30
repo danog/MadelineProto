@@ -21,5 +21,5 @@ description: chatInviteAlready attributes, type and example
 ### Example:
 
 ```
-$chatInviteAlready = ['_' => chatInviteAlready', 'chat' => Chat, ];
+$chatInviteAlready = ['_' => chatInviteAlready, 'chat' => Chat, ];
 ```

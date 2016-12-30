@@ -21,5 +21,5 @@ description: keyboardButtonRequestGeoLocation attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonRequestGeoLocation = ['_' => keyboardButtonRequestGeoLocation', 'text' => string, ];
+$keyboardButtonRequestGeoLocation = ['_' => keyboardButtonRequestGeoLocation, 'text' => string, ];
 ```

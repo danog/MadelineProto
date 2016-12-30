@@ -16,5 +16,5 @@ description: messages_featuredStickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_featuredStickersNotModified = ['_' => messages_featuredStickersNotModified', ];
+$messages_featuredStickersNotModified = ['_' => messages_featuredStickersNotModified, ];
 ```

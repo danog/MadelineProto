@@ -16,5 +16,5 @@ description: inputMessagesFilterVoice attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterVoice = ['_' => inputMessagesFilterVoice', ];
+$inputMessagesFilterVoice = ['_' => inputMessagesFilterVoice, ];
 ```

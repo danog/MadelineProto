@@ -15,8 +15,9 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class Connection extends Tools
+class Connection
 {
+    use \danog\MadelineProto\Tools;
     public $sock = null;
 
     public $protocol = null;

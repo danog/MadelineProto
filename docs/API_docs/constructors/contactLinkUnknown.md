@@ -16,5 +16,5 @@ description: contactLinkUnknown attributes, type and example
 ### Example:
 
 ```
-$contactLinkUnknown = ['_' => contactLinkUnknown', ];
+$contactLinkUnknown = ['_' => contactLinkUnknown, ];
 ```

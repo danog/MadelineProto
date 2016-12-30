@@ -23,5 +23,5 @@ description: userProfilePhoto attributes, type and example
 ### Example:
 
 ```
-$userProfilePhoto = ['_' => userProfilePhoto', 'photo_id' => long, 'photo_small' => FileLocation, 'photo_big' => FileLocation, ];
+$userProfilePhoto = ['_' => userProfilePhoto, 'photo_id' => long, 'photo_small' => FileLocation, 'photo_big' => FileLocation, ];
 ```

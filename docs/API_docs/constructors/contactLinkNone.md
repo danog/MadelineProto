@@ -16,5 +16,5 @@ description: contactLinkNone attributes, type and example
 ### Example:
 
 ```
-$contactLinkNone = ['_' => contactLinkNone', ];
+$contactLinkNone = ['_' => contactLinkNone, ];
 ```

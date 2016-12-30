@@ -21,5 +21,5 @@ description: userStatusOffline attributes, type and example
 ### Example:
 
 ```
-$userStatusOffline = ['_' => userStatusOffline', 'was_online' => int, ];
+$userStatusOffline = ['_' => userStatusOffline, 'was_online' => int, ];
 ```

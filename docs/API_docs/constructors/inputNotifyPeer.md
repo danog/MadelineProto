@@ -21,5 +21,5 @@ description: inputNotifyPeer attributes, type and example
 ### Example:
 
 ```
-$inputNotifyPeer = ['_' => inputNotifyPeer', 'peer' => InputPeer, ];
+$inputNotifyPeer = ['_' => inputNotifyPeer, 'peer' => InputPeer, ];
 ```

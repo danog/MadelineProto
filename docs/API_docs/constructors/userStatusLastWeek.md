@@ -16,5 +16,5 @@ description: userStatusLastWeek attributes, type and example
 ### Example:
 
 ```
-$userStatusLastWeek = ['_' => userStatusLastWeek', ];
+$userStatusLastWeek = ['_' => userStatusLastWeek, ];
 ```

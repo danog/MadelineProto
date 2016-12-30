@@ -11,6 +11,8 @@ description: constructors and methods of type Vector t
 
 [vector](../constructors/vector.md)  
 
+[vector](../constructors/vector.md)  
+
 
 
 ### Methods that return an object of this type (methods):

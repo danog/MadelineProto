@@ -21,5 +21,5 @@ description: updateChatParticipants attributes, type and example
 ### Example:
 
 ```
-$updateChatParticipants = ['_' => updateChatParticipants', 'participants' => ChatParticipants, ];
+$updateChatParticipants = ['_' => updateChatParticipants, 'participants' => ChatParticipants, ];
 ```

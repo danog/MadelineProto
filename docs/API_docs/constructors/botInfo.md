@@ -23,5 +23,5 @@ description: botInfo attributes, type and example
 ### Example:
 
 ```
-$botInfo = ['_' => botInfo', 'user_id' => int, 'description' => string, 'commands' => [Vector t], ];
+$botInfo = ['_' => botInfo, 'user_id' => int, 'description' => string, 'commands' => [Vector t], ];
 ```
