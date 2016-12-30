@@ -481,7 +481,6 @@ description: A 512 bit signed integer
 
 A 512 bit signed integer represented in little-endian base256 (`string`) format.');
 
-
 file_put_contents('types/double.md', '---
 title: double
 description: A double precision floating point number
@@ -544,6 +543,5 @@ description: Represents a boolean.
 [Back to types index](index.md)
 
 Represents a boolean.');
-
 
 \danog\MadelineProto\Logger::log('Done!');

@@ -189,6 +189,7 @@ trait UpdateHandler
                 if (!isset($this->channels_state[$channel_id])) {
                     if (!isset($update['pts'])) {
                         \danog\MadelineProto\Logger::log('I do not have the channel in the states');
+
                         return false;
                     }
                 }
