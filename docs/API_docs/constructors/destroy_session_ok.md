@@ -21,5 +21,5 @@ description: destroy_session_ok attributes, type and example
 ### Example:
 
 ```
-$destroy_session_ok = ['_' => destroy_session_ok, 'session_id' => long, ];
+$destroy_session_ok = ['_' => 'destroy_session_ok', 'session_id' => long, ];
 ```

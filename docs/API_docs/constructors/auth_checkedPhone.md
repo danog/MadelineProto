@@ -21,5 +21,5 @@ description: auth_checkedPhone attributes, type and example
 ### Example:
 
 ```
-$auth_checkedPhone = ['_' => auth_checkedPhone, 'phone_registered' => Bool, ];
+$auth_checkedPhone = ['_' => 'auth_checkedPhone', 'phone_registered' => Bool, ];
 ```

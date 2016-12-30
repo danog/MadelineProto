@@ -19,8 +19,9 @@ trait MsgIdHandler
 {
     public function check_message_id($new_message_id, $outgoing, $container = false)
     {
-        if (((int) ((time() + $this->datacenter->time_delta - 300) << 32)) > $new_message_id) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too old.');
+        $min_message_id = ((int) ((time() + $this->datacenter->time_delta - 300) << 32));
+        if ($min_message_id > $new_message_id) {
+            \danog\MadelineProto\Logger::log('Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').');
         }
         /*
         if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $new_message_id) {

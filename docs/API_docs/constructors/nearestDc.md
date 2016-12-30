@@ -23,5 +23,5 @@ description: nearestDc attributes, type and example
 ### Example:
 
 ```
-$nearestDc = ['_' => nearestDc, 'country' => string, 'this_dc' => int, 'nearest_dc' => int, ];
+$nearestDc = ['_' => 'nearestDc', 'country' => string, 'this_dc' => int, 'nearest_dc' => int, ];
 ```

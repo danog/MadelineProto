@@ -21,5 +21,5 @@ description: account_passwordSettings attributes, type and example
 ### Example:
 
 ```
-$account_passwordSettings = ['_' => account_passwordSettings, 'email' => string, ];
+$account_passwordSettings = ['_' => 'account_passwordSettings', 'email' => string, ];
 ```

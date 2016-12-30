@@ -22,5 +22,5 @@ description: documentAttributeImageSize attributes, type and example
 ### Example:
 
 ```
-$documentAttributeImageSize = ['_' => documentAttributeImageSize, 'w' => int, 'h' => int, ];
+$documentAttributeImageSize = ['_' => 'documentAttributeImageSize', 'w' => int, 'h' => int, ];
 ```

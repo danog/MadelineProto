@@ -24,5 +24,5 @@ description: encryptedMessage attributes, type and example
 ### Example:
 
 ```
-$encryptedMessage = ['_' => encryptedMessage, 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
+$encryptedMessage = ['_' => 'encryptedMessage', 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
 ```

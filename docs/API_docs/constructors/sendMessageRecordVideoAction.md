@@ -16,5 +16,5 @@ description: sendMessageRecordVideoAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageRecordVideoAction = ['_' => sendMessageRecordVideoAction, ];
+$sendMessageRecordVideoAction = ['_' => 'sendMessageRecordVideoAction', ];
 ```

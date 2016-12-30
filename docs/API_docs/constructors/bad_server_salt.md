@@ -24,5 +24,5 @@ description: bad_server_salt attributes, type and example
 ### Example:
 
 ```
-$bad_server_salt = ['_' => bad_server_salt, 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int, 'new_server_salt' => long, ];
+$bad_server_salt = ['_' => 'bad_server_salt', 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int, 'new_server_salt' => long, ];
 ```

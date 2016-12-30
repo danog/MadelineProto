@@ -21,5 +21,5 @@ description: messageEmpty attributes, type and example
 ### Example:
 
 ```
-$messageEmpty = ['_' => messageEmpty, 'id' => int, ];
+$messageEmpty = ['_' => 'messageEmpty', 'id' => int, ];
 ```

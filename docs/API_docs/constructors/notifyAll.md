@@ -16,5 +16,5 @@ description: notifyAll attributes, type and example
 ### Example:
 
 ```
-$notifyAll = ['_' => notifyAll, ];
+$notifyAll = ['_' => 'notifyAll', ];
 ```

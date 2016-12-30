@@ -21,5 +21,5 @@ description: inputStickerSetShortName attributes, type and example
 ### Example:
 
 ```
-$inputStickerSetShortName = ['_' => inputStickerSetShortName, 'short_name' => string, ];
+$inputStickerSetShortName = ['_' => 'inputStickerSetShortName', 'short_name' => string, ];
 ```

@@ -22,5 +22,5 @@ description: messages_savedGifs attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifs = ['_' => messages_savedGifs, 'hash' => int, 'gifs' => [Vector t], ];
+$messages_savedGifs = ['_' => 'messages_savedGifs', 'hash' => int, 'gifs' => [Vector t], ];
 ```

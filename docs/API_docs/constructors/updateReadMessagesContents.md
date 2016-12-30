@@ -23,5 +23,5 @@ description: updateReadMessagesContents attributes, type and example
 ### Example:
 
 ```
-$updateReadMessagesContents = ['_' => updateReadMessagesContents, 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
+$updateReadMessagesContents = ['_' => 'updateReadMessagesContents', 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
 ```

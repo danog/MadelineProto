@@ -26,5 +26,5 @@ description: updatesCombined attributes, type and example
 ### Example:
 
 ```
-$updatesCombined = ['_' => updatesCombined, 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq_start' => int, 'seq' => int, ];
+$updatesCombined = ['_' => 'updatesCombined', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq_start' => int, 'seq' => int, ];
 ```

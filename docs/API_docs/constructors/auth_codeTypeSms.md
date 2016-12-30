@@ -16,5 +16,5 @@ description: auth_codeTypeSms attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeSms = ['_' => auth_codeTypeSms, ];
+$auth_codeTypeSms = ['_' => 'auth_codeTypeSms', ];
 ```

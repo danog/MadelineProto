@@ -22,5 +22,5 @@ description: updateDraftMessage attributes, type and example
 ### Example:
 
 ```
-$updateDraftMessage = ['_' => updateDraftMessage, 'peer' => Peer, 'draft' => DraftMessage, ];
+$updateDraftMessage = ['_' => 'updateDraftMessage', 'peer' => Peer, 'draft' => DraftMessage, ];
 ```

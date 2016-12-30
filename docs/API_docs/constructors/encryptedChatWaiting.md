@@ -25,5 +25,5 @@ description: encryptedChatWaiting attributes, type and example
 ### Example:
 
 ```
-$encryptedChatWaiting = ['_' => encryptedChatWaiting, 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, ];
+$encryptedChatWaiting = ['_' => 'encryptedChatWaiting', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, ];
 ```

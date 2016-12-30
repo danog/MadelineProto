@@ -22,5 +22,5 @@ description: inputMediaDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaDocument = ['_' => inputMediaDocument, 'id' => InputDocument, 'caption' => string, ];
+$inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument, 'caption' => string, ];
 ```

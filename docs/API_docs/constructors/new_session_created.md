@@ -23,5 +23,5 @@ description: new_session_created attributes, type and example
 ### Example:
 
 ```
-$new_session_created = ['_' => new_session_created, 'first_msg_id' => long, 'unique_id' => long, 'server_salt' => long, ];
+$new_session_created = ['_' => 'new_session_created', 'first_msg_id' => long, 'unique_id' => long, 'server_salt' => long, ];
 ```

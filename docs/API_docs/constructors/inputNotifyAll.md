@@ -16,5 +16,5 @@ description: inputNotifyAll attributes, type and example
 ### Example:
 
 ```
-$inputNotifyAll = ['_' => inputNotifyAll, ];
+$inputNotifyAll = ['_' => 'inputNotifyAll', ];
 ```

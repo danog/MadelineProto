@@ -16,5 +16,5 @@ description: topPeerCategoryBotsPM attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryBotsPM = ['_' => topPeerCategoryBotsPM, ];
+$topPeerCategoryBotsPM = ['_' => 'topPeerCategoryBotsPM', ];
 ```

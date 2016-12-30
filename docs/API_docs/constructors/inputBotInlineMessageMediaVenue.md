@@ -26,5 +26,5 @@ description: inputBotInlineMessageMediaVenue attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageMediaVenue = ['_' => inputBotInlineMessageMediaVenue, 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageMediaVenue = ['_' => 'inputBotInlineMessageMediaVenue', 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, 'reply_markup' => ReplyMarkup, ];
 ```

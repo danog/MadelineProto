@@ -23,5 +23,5 @@ description: foundGifCached attributes, type and example
 ### Example:
 
 ```
-$foundGifCached = ['_' => foundGifCached, 'url' => string, 'photo' => Photo, 'document' => Document, ];
+$foundGifCached = ['_' => 'foundGifCached', 'url' => string, 'photo' => Photo, 'document' => Document, ];
 ```

@@ -194,8 +194,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'response'      => 5, // How many times should I try to get a response of a query before throwing an exception
             ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-                'incoming' => 100,
-                'outgoing' => 100,
+                'incoming' => 1000,
+                'outgoing' => 1000,
             ],
             'updates'   => [
                 'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback

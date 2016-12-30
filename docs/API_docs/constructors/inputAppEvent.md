@@ -24,5 +24,5 @@ description: inputAppEvent attributes, type and example
 ### Example:
 
 ```
-$inputAppEvent = ['_' => inputAppEvent, 'time' => double, 'type' => string, 'peer' => long, 'data' => string, ];
+$inputAppEvent = ['_' => 'inputAppEvent', 'time' => double, 'type' => string, 'peer' => long, 'data' => string, ];
 ```

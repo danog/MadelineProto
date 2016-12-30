@@ -22,5 +22,5 @@ description: messageMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$messageMediaPhoto = ['_' => messageMediaPhoto, 'photo' => Photo, 'caption' => string, ];
+$messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo, 'caption' => string, ];
 ```

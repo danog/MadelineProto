@@ -21,5 +21,5 @@ description: userStatusOnline attributes, type and example
 ### Example:
 
 ```
-$userStatusOnline = ['_' => userStatusOnline, 'expires' => int, ];
+$userStatusOnline = ['_' => 'userStatusOnline', 'expires' => int, ];
 ```

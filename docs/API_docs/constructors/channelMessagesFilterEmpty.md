@@ -16,5 +16,5 @@ description: channelMessagesFilterEmpty attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilterEmpty = ['_' => channelMessagesFilterEmpty, ];
+$channelMessagesFilterEmpty = ['_' => 'channelMessagesFilterEmpty', ];
 ```

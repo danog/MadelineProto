@@ -22,5 +22,5 @@ description: messageEntityUnknown attributes, type and example
 ### Example:
 
 ```
-$messageEntityUnknown = ['_' => messageEntityUnknown, 'offset' => int, 'length' => int, ];
+$messageEntityUnknown = ['_' => 'messageEntityUnknown', 'offset' => int, 'length' => int, ];
 ```

@@ -24,5 +24,5 @@ description: updateNewAuthorization attributes, type and example
 ### Example:
 
 ```
-$updateNewAuthorization = ['_' => updateNewAuthorization, 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
+$updateNewAuthorization = ['_' => 'updateNewAuthorization', 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
 ```

@@ -16,5 +16,5 @@ description: updatesTooLong attributes, type and example
 ### Example:
 
 ```
-$updatesTooLong = ['_' => updatesTooLong, ];
+$updatesTooLong = ['_' => 'updatesTooLong', ];
 ```

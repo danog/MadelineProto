@@ -21,5 +21,5 @@ description: exportedMessageLink attributes, type and example
 ### Example:
 
 ```
-$exportedMessageLink = ['_' => exportedMessageLink, 'link' => string, ];
+$exportedMessageLink = ['_' => 'exportedMessageLink', 'link' => string, ];
 ```

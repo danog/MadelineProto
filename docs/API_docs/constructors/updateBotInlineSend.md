@@ -25,5 +25,5 @@ description: updateBotInlineSend attributes, type and example
 ### Example:
 
 ```
-$updateBotInlineSend = ['_' => updateBotInlineSend, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'id' => string, 'msg_id' => InputBotInlineMessageID, ];
+$updateBotInlineSend = ['_' => 'updateBotInlineSend', 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'id' => string, 'msg_id' => InputBotInlineMessageID, ];
 ```

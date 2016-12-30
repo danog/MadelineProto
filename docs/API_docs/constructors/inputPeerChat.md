@@ -21,5 +21,5 @@ description: inputPeerChat attributes, type and example
 ### Example:
 
 ```
-$inputPeerChat = ['_' => inputPeerChat, 'chat_id' => int, ];
+$inputPeerChat = ['_' => 'inputPeerChat', 'chat_id' => int, ];
 ```

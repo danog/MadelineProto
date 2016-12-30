@@ -21,5 +21,5 @@ description: keyboardButtonGame attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonGame = ['_' => keyboardButtonGame, 'text' => string, ];
+$keyboardButtonGame = ['_' => 'keyboardButtonGame', 'text' => string, ];
 ```

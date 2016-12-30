@@ -22,5 +22,5 @@ description: updateUserStatus attributes, type and example
 ### Example:
 
 ```
-$updateUserStatus = ['_' => updateUserStatus, 'user_id' => int, 'status' => UserStatus, ];
+$updateUserStatus = ['_' => 'updateUserStatus', 'user_id' => int, 'status' => UserStatus, ];
 ```

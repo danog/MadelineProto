@@ -16,5 +16,5 @@ description: inputMessagesFilterPhotos attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterPhotos = ['_' => inputMessagesFilterPhotos, ];
+$inputMessagesFilterPhotos = ['_' => 'inputMessagesFilterPhotos', ];
 ```

@@ -16,5 +16,5 @@ description: messageActionHistoryClear attributes, type and example
 ### Example:
 
 ```
-$messageActionHistoryClear = ['_' => messageActionHistoryClear, ];
+$messageActionHistoryClear = ['_' => 'messageActionHistoryClear', ];
 ```

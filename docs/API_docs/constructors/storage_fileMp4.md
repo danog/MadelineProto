@@ -16,5 +16,5 @@ description: storage_fileMp4 attributes, type and example
 ### Example:
 
 ```
-$storage_fileMp4 = ['_' => storage_fileMp4, ];
+$storage_fileMp4 = ['_' => 'storage_fileMp4', ];
 ```

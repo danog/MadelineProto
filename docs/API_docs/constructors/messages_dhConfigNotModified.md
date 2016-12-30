@@ -21,5 +21,5 @@ description: messages_dhConfigNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_dhConfigNotModified = ['_' => messages_dhConfigNotModified, 'random' => bytes, ];
+$messages_dhConfigNotModified = ['_' => 'messages_dhConfigNotModified', 'random' => bytes, ];
 ```

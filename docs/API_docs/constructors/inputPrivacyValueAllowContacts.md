@@ -16,5 +16,5 @@ description: inputPrivacyValueAllowContacts attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowContacts = ['_' => inputPrivacyValueAllowContacts, ];
+$inputPrivacyValueAllowContacts = ['_' => 'inputPrivacyValueAllowContacts', ];
 ```

@@ -21,5 +21,5 @@ description: messageMediaGeo attributes, type and example
 ### Example:
 
 ```
-$messageMediaGeo = ['_' => messageMediaGeo, 'geo' => GeoPoint, ];
+$messageMediaGeo = ['_' => 'messageMediaGeo', 'geo' => GeoPoint, ];
 ```

@@ -16,5 +16,5 @@ description: privacyKeyStatusTimestamp attributes, type and example
 ### Example:
 
 ```
-$privacyKeyStatusTimestamp = ['_' => privacyKeyStatusTimestamp, ];
+$privacyKeyStatusTimestamp = ['_' => 'privacyKeyStatusTimestamp', ];
 ```

@@ -16,5 +16,5 @@ description: sendMessageGamePlayAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageGamePlayAction = ['_' => sendMessageGamePlayAction, ];
+$sendMessageGamePlayAction = ['_' => 'sendMessageGamePlayAction', ];
 ```

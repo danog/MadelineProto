@@ -21,5 +21,5 @@ description: peerChannel attributes, type and example
 ### Example:
 
 ```
-$peerChannel = ['_' => peerChannel, 'channel_id' => int, ];
+$peerChannel = ['_' => 'peerChannel', 'channel_id' => int, ];
 ```

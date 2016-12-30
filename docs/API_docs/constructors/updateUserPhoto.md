@@ -24,5 +24,5 @@ description: updateUserPhoto attributes, type and example
 ### Example:
 
 ```
-$updateUserPhoto = ['_' => updateUserPhoto, 'user_id' => int, 'date' => int, 'photo' => UserProfilePhoto, 'previous' => Bool, ];
+$updateUserPhoto = ['_' => 'updateUserPhoto', 'user_id' => int, 'date' => int, 'photo' => UserProfilePhoto, 'previous' => Bool, ];
 ```

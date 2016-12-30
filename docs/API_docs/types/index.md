@@ -156,6 +156,8 @@ description: List of types
 
 [KeyboardButtonRow](KeyboardButtonRow.md)<a name="KeyboardButtonRow"></a>  
 
+[MTMessage](MTMessage.md)<a name="MTMessage"></a>  
+
 [MaskCoords](MaskCoords.md)<a name="MaskCoords"></a>  
 
 [Message](Message.md)<a name="Message"></a>  

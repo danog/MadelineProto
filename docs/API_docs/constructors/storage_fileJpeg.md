@@ -16,5 +16,5 @@ description: storage_fileJpeg attributes, type and example
 ### Example:
 
 ```
-$storage_fileJpeg = ['_' => storage_fileJpeg, ];
+$storage_fileJpeg = ['_' => 'storage_fileJpeg', ];
 ```

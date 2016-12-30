@@ -9,8 +9,6 @@ description: constructors and methods of type Message
 
 ### Possible values (constructors):
 
-[MTmessage](../constructors/MTmessage.md)  
-
 [messageEmpty](../constructors/messageEmpty.md)  
 
 [message](../constructors/message.md)  

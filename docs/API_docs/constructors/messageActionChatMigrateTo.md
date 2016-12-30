@@ -21,5 +21,5 @@ description: messageActionChatMigrateTo attributes, type and example
 ### Example:
 
 ```
-$messageActionChatMigrateTo = ['_' => messageActionChatMigrateTo, 'channel_id' => int, ];
+$messageActionChatMigrateTo = ['_' => 'messageActionChatMigrateTo', 'channel_id' => int, ];
 ```

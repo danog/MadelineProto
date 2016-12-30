@@ -16,5 +16,5 @@ description: messageActionChatDeletePhoto attributes, type and example
 ### Example:
 
 ```
-$messageActionChatDeletePhoto = ['_' => messageActionChatDeletePhoto, ];
+$messageActionChatDeletePhoto = ['_' => 'messageActionChatDeletePhoto', ];
 ```

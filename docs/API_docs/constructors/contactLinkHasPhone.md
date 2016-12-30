@@ -16,5 +16,5 @@ description: contactLinkHasPhone attributes, type and example
 ### Example:
 
 ```
-$contactLinkHasPhone = ['_' => contactLinkHasPhone, ];
+$contactLinkHasPhone = ['_' => 'contactLinkHasPhone', ];
 ```

@@ -24,5 +24,5 @@ description: updateChatParticipantAdmin attributes, type and example
 ### Example:
 
 ```
-$updateChatParticipantAdmin = ['_' => updateChatParticipantAdmin, 'chat_id' => int, 'user_id' => int, 'is_admin' => Bool, 'version' => int, ];
+$updateChatParticipantAdmin = ['_' => 'updateChatParticipantAdmin', 'chat_id' => int, 'user_id' => int, 'is_admin' => Bool, 'version' => int, ];
 ```

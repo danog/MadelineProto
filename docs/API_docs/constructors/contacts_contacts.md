@@ -22,5 +22,5 @@ description: contacts_contacts attributes, type and example
 ### Example:
 
 ```
-$contacts_contacts = ['_' => contacts_contacts, 'contacts' => [Vector t], 'users' => [Vector t], ];
+$contacts_contacts = ['_' => 'contacts_contacts', 'contacts' => [Vector t], 'users' => [Vector t], ];
 ```

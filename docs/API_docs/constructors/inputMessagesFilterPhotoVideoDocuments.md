@@ -16,5 +16,5 @@ description: inputMessagesFilterPhotoVideoDocuments attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterPhotoVideoDocuments = ['_' => inputMessagesFilterPhotoVideoDocuments, ];
+$inputMessagesFilterPhotoVideoDocuments = ['_' => 'inputMessagesFilterPhotoVideoDocuments', ];
 ```

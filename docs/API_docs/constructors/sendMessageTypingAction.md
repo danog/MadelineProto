@@ -16,5 +16,5 @@ description: sendMessageTypingAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageTypingAction = ['_' => sendMessageTypingAction, ];
+$sendMessageTypingAction = ['_' => 'sendMessageTypingAction', ];
 ```

@@ -16,5 +16,5 @@ description: topPeerCategoryChannels attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryChannels = ['_' => topPeerCategoryChannels, ];
+$topPeerCategoryChannels = ['_' => 'topPeerCategoryChannels', ];
 ```

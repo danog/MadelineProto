@@ -25,5 +25,5 @@ description: messageMediaVenue attributes, type and example
 ### Example:
 
 ```
-$messageMediaVenue = ['_' => messageMediaVenue, 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
+$messageMediaVenue = ['_' => 'messageMediaVenue', 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```

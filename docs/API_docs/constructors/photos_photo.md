@@ -22,5 +22,5 @@ description: photos_photo attributes, type and example
 ### Example:
 
 ```
-$photos_photo = ['_' => photos_photo, 'photo' => Photo, 'users' => [Vector t], ];
+$photos_photo = ['_' => 'photos_photo', 'photo' => Photo, 'users' => [Vector t], ];
 ```

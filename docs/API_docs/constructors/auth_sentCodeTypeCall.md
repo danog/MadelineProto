@@ -21,5 +21,5 @@ description: auth_sentCodeTypeCall attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeCall = ['_' => auth_sentCodeTypeCall, 'length' => int, ];
+$auth_sentCodeTypeCall = ['_' => 'auth_sentCodeTypeCall', 'length' => int, ];
 ```

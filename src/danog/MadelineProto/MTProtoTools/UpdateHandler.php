@@ -187,9 +187,10 @@ trait UpdateHandler
                 $channel_id = $update['channel_id'];
                 \danog\MadelineProto\Logger::log('Update channel too long');
                 if (!isset($this->channels_state[$channel_id])) {
-                    \danog\MadelineProto\Logger::log('I do not have the channel in the states');
-
-                    return false;
+                    if (!isset($update['pts'])) {
+                        \danog\MadelineProto\Logger::log('I do not have the channel in the states');
+                        return false;
+                    }
                 }
                 break;
         }

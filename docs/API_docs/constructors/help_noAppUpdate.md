@@ -16,5 +16,5 @@ description: help_noAppUpdate attributes, type and example
 ### Example:
 
 ```
-$help_noAppUpdate = ['_' => help_noAppUpdate, ];
+$help_noAppUpdate = ['_' => 'help_noAppUpdate', ];
 ```

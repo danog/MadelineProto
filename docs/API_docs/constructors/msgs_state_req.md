@@ -21,5 +21,5 @@ description: msgs_state_req attributes, type and example
 ### Example:
 
 ```
-$msgs_state_req = ['_' => msgs_state_req, 'msg_ids' => [Vector t], ];
+$msgs_state_req = ['_' => 'msgs_state_req', 'msg_ids' => [Vector t], ];
 ```

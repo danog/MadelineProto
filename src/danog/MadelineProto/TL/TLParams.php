@@ -34,8 +34,10 @@ class TLParams
                     $param['type'] = 'Vector t';
                 }
                 $param['subtype'] = (($mtproto && $param['subtype'] == 'Message') ? 'MT' : '').$param['subtype'];
+                $param['subtype'] = (($mtproto && $param['subtype'] == '%Message') ? '%MTMessage' : $param['subtype']);
             }
             $param['type'] = (($mtproto && $param['type'] == 'Message') ? 'MT' : '').$param['type'];
+            $param['type'] = (($mtproto && $param['type'] == '%Message') ? '%MTMessage' : $param['type']);
         }
     }
 }

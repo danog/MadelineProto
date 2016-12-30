@@ -22,5 +22,5 @@ description: inputEncryptedChat attributes, type and example
 ### Example:
 
 ```
-$inputEncryptedChat = ['_' => inputEncryptedChat, 'chat_id' => int, 'access_hash' => long, ];
+$inputEncryptedChat = ['_' => 'inputEncryptedChat', 'chat_id' => int, 'access_hash' => long, ];
 ```

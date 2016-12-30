@@ -22,5 +22,5 @@ description: msgs_state_info attributes, type and example
 ### Example:
 
 ```
-$msgs_state_info = ['_' => msgs_state_info, 'req_msg_id' => long, 'info' => bytes, ];
+$msgs_state_info = ['_' => 'msgs_state_info', 'req_msg_id' => long, 'info' => bytes, ];
 ```

@@ -23,5 +23,5 @@ description: updateChatParticipantDelete attributes, type and example
 ### Example:
 
 ```
-$updateChatParticipantDelete = ['_' => updateChatParticipantDelete, 'chat_id' => int, 'user_id' => int, 'version' => int, ];
+$updateChatParticipantDelete = ['_' => 'updateChatParticipantDelete', 'chat_id' => int, 'user_id' => int, 'version' => int, ];
 ```

@@ -22,5 +22,5 @@ description: inputGameShortName attributes, type and example
 ### Example:
 
 ```
-$inputGameShortName = ['_' => inputGameShortName, 'bot_id' => InputUser, 'short_name' => string, ];
+$inputGameShortName = ['_' => 'inputGameShortName', 'bot_id' => InputUser, 'short_name' => string, ];
 ```

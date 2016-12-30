@@ -21,5 +21,5 @@ description: webPageEmpty attributes, type and example
 ### Example:
 
 ```
-$webPageEmpty = ['_' => webPageEmpty, 'id' => long, ];
+$webPageEmpty = ['_' => 'webPageEmpty', 'id' => long, ];
 ```

@@ -13,13 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'vendor/autoload.php';
 
-$mode = 3;
-\danog\MadelineProto\Logger::constructor($mode);
-
-$TL = new \danog\MadelineProto\MTProto(['tl' => [
-    //'mtproto'  => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json', // mtproto TL scheme
-    'telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json', // telegram TL scheme
-]]);
+$TL = new \danog\MadelineProto\API();
 $types = [];
 
 \danog\MadelineProto\Logger::log('Copying readme...');
@@ -64,10 +58,10 @@ $methods = [];
 
 \danog\MadelineProto\Logger::log('Generating methods documentation...');
 
-foreach ($TL->methods->method as $key => $method) {
+foreach ($TL->API->methods->method as $key => $method) {
     $method = str_replace('.', '_', $method);
 
-    $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->methods->type[$key]);
+    $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->API->methods->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
 
     if (!isset($types[$real_type])) {
@@ -78,7 +72,7 @@ foreach ($TL->methods->method as $key => $method) {
     }
 
     $params = '';
-    foreach ($TL->methods->params[$key] as $param) {
+    foreach ($TL->API->methods->params[$key] as $param) {
         if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
@@ -111,12 +105,12 @@ foreach ($TL->methods->method as $key => $method) {
 ';
 
     $params = '';
-    $table = empty($TL->methods->params[$key]) ? '' : '### Parameters:
+    $table = empty($TL->API->methods->params[$key]) ? '' : '### Parameters:
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
-    foreach ($TL->methods->params[$key] as $param) {
+    foreach ($TL->API->methods->params[$key] as $param) {
         if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
@@ -207,15 +201,19 @@ $constructors = [];
 
 \danog\MadelineProto\Logger::log('Generating constructors documentation...');
 
-foreach ($TL->constructors->predicate as $key => $constructor) {
-    $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->constructors->type[$key]);
+foreach ($TL->API->constructors->predicate as $key => $constructor) {
+    if (preg_match('/%/', $type)) {
+        $type = $TL->API->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
+    }
+    $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $TL->API->constructors->type[$key]);
     $real_type = preg_replace('/.*_of_/', '', $type);
 
     $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $constructor);
+
     $real_constructor = preg_replace('/.*_of_/', '', $constructor);
 
     $params = '';
-    foreach ($TL->constructors->params[$key] as $param) {
+    foreach ($TL->API->constructors->params[$key] as $param) {
         if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
@@ -233,6 +231,9 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             case 'true':
             case 'false':
                 $ptype = 'Bool';
+        }
+        if (preg_match('/%/', $ptype)) {
+            $ptype = $TL->API->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
         }
 
         $params .= "'".$param['name']."' => ";
@@ -255,13 +256,13 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
     if (!in_array($key, $types[$real_type]['constructors'])) {
         $types[$real_type]['constructors'][] = $key;
     }
-    $table = empty($TL->constructors->params[$key]) ? '' : '### Attributes:
+    $table = empty($TL->API->constructors->params[$key]) ? '' : '### Attributes:
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
     $params = '';
-    foreach ($TL->constructors->params[$key] as $param) {
+    foreach ($TL->API->constructors->params[$key] as $param) {
         if (in_array($param['name'], ['flags', 'random_id'])) {
             continue;
         }
@@ -272,6 +273,9 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
             if ($param['type'] == 'vector') {
                 $link_type = 'constructors';
             }
+        }
+        if (preg_match('/%/', $ptype)) {
+            $ptype = $TL->API->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
         }
         switch ($ptype) {
             case 'true':
@@ -284,7 +288,7 @@ foreach ($TL->constructors->predicate as $key => $constructor) {
         $params .= "'".$param['name']."' => ";
         $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
     }
-    $params = "['_' => ".$constructor.', '.$params.']';
+    $params = "['_' => '".$constructor."', ".$params.']';
 
     $header = '---
 title: '.$constructor.'
@@ -309,6 +313,7 @@ description: '.$constructor.' attributes, type and example
 ```
 $'.$constructor.' = '.$params.';
 ```';
+
     file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
 }
 
@@ -360,7 +365,7 @@ foreach ($types as $type => $keys) {
 ';
     $constructors = '';
     foreach ($keys['constructors'] as $key) {
-        $predicate = str_replace('.', '_', $TL->constructors->predicate[$key]);
+        $predicate = str_replace('.', '_', $TL->API->constructors->predicate[$key]);
         $md_predicate = str_replace('_', '\_', $predicate);
         $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
@@ -369,7 +374,7 @@ foreach ($types as $type => $keys) {
 
     $methods = '';
     foreach ($keys['methods'] as $key) {
-        $name = str_replace('.', '_', $TL->methods->method[$key]);
+        $name = str_replace('.', '_', $TL->API->methods->method[$key]);
         $md_name = str_replace('_', '->', $name);
         $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
 
@@ -449,6 +454,34 @@ description: A 32 bit signed integer ranging from -9223372036854775807 to 922337
 
 A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.');
 
+file_put_contents('types/int128.md', '---
+title: int128
+description: A 128 bit signed integer
+---
+## Type: int128  
+[Back to constructor index](index.md)
+
+A 128 bit signed integer represented in little-endian base256 (`string`) format.');
+
+file_put_contents('types/int256.md', '---
+title: int256
+description: A 256 bit signed integer
+---
+## Type: int256
+[Back to constructor index](index.md)
+
+A 256 bit signed integer represented in little-endian base256 (`string`) format.');
+
+file_put_contents('types/int512.md', '---
+title: int512
+description: A 512 bit signed integer
+---
+## Type: int512  
+[Back to constructor index](index.md)
+
+A 512 bit signed integer represented in little-endian base256 (`string`) format.');
+
+
 file_put_contents('types/double.md', '---
 title: double
 description: A double precision floating point number
@@ -511,5 +544,6 @@ description: Represents a boolean.
 [Back to types index](index.md)
 
 Represents a boolean.');
+
 
 \danog\MadelineProto\Logger::log('Done!');

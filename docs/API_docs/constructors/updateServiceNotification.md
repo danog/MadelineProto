@@ -24,5 +24,5 @@ description: updateServiceNotification attributes, type and example
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => updateServiceNotification, 'type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
 ```

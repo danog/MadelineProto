@@ -23,5 +23,5 @@ description: updateChannelMessageViews attributes, type and example
 ### Example:
 
 ```
-$updateChannelMessageViews = ['_' => updateChannelMessageViews, 'channel_id' => int, 'id' => int, 'views' => int, ];
+$updateChannelMessageViews = ['_' => 'updateChannelMessageViews', 'channel_id' => int, 'id' => int, 'views' => int, ];
 ```

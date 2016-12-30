@@ -22,5 +22,5 @@ description: stickerSetCovered attributes, type and example
 ### Example:
 
 ```
-$stickerSetCovered = ['_' => stickerSetCovered, 'set' => StickerSet, 'cover' => Document, ];
+$stickerSetCovered = ['_' => 'stickerSetCovered', 'set' => StickerSet, 'cover' => Document, ];
 ```

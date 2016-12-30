@@ -16,5 +16,5 @@ description: inputPeerSelf attributes, type and example
 ### Example:
 
 ```
-$inputPeerSelf = ['_' => inputPeerSelf, ];
+$inputPeerSelf = ['_' => 'inputPeerSelf', ];
 ```

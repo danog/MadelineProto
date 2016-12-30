@@ -16,5 +16,5 @@ description: topPeerCategoryBotsInline attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryBotsInline = ['_' => topPeerCategoryBotsInline, ];
+$topPeerCategoryBotsInline = ['_' => 'topPeerCategoryBotsInline', ];
 ```

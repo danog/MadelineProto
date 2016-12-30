@@ -23,5 +23,5 @@ description: msg_new_detailed_info attributes, type and example
 ### Example:
 
 ```
-$msg_new_detailed_info = ['_' => msg_new_detailed_info, 'answer_msg_id' => long, 'bytes' => int, 'status' => int, ];
+$msg_new_detailed_info = ['_' => 'msg_new_detailed_info', 'answer_msg_id' => long, 'bytes' => int, 'status' => int, ];
 ```

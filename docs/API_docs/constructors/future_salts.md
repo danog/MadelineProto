@@ -23,5 +23,5 @@ description: future_salts attributes, type and example
 ### Example:
 
 ```
-$future_salts = ['_' => future_salts, 'req_msg_id' => long, 'now' => int, 'salts' => [vector], ];
+$future_salts = ['_' => 'future_salts', 'req_msg_id' => long, 'now' => int, 'salts' => [vector], ];
 ```

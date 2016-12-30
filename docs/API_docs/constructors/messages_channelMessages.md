@@ -25,5 +25,5 @@ description: messages_channelMessages attributes, type and example
 ### Example:
 
 ```
-$messages_channelMessages = ['_' => messages_channelMessages, 'pts' => int, 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_channelMessages = ['_' => 'messages_channelMessages', 'pts' => int, 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

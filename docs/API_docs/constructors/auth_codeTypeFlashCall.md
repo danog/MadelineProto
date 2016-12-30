@@ -16,5 +16,5 @@ description: auth_codeTypeFlashCall attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeFlashCall = ['_' => auth_codeTypeFlashCall, ];
+$auth_codeTypeFlashCall = ['_' => 'auth_codeTypeFlashCall', ];
 ```

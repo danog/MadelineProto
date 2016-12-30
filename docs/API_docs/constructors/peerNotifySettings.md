@@ -24,5 +24,5 @@ description: peerNotifySettings attributes, type and example
 ### Example:
 
 ```
-$peerNotifySettings = ['_' => peerNotifySettings, 'show_previews' => true, 'silent' => true, 'mute_until' => int, 'sound' => string, ];
+$peerNotifySettings = ['_' => 'peerNotifySettings', 'show_previews' => true, 'silent' => true, 'mute_until' => int, 'sound' => string, ];
 ```

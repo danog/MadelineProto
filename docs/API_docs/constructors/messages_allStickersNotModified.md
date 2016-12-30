@@ -16,5 +16,5 @@ description: messages_allStickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_allStickersNotModified = ['_' => messages_allStickersNotModified, ];
+$messages_allStickersNotModified = ['_' => 'messages_allStickersNotModified', ];
 ```

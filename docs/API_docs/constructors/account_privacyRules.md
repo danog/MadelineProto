@@ -22,5 +22,5 @@ description: account_privacyRules attributes, type and example
 ### Example:
 
 ```
-$account_privacyRules = ['_' => account_privacyRules, 'rules' => [Vector t], 'users' => [Vector t], ];
+$account_privacyRules = ['_' => 'account_privacyRules', 'rules' => [Vector t], 'users' => [Vector t], ];
 ```

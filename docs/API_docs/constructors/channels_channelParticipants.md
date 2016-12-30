@@ -23,5 +23,5 @@ description: channels_channelParticipants attributes, type and example
 ### Example:
 
 ```
-$channels_channelParticipants = ['_' => channels_channelParticipants, 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
+$channels_channelParticipants = ['_' => 'channels_channelParticipants', 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
 ```

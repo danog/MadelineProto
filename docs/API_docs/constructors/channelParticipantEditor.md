@@ -23,5 +23,5 @@ description: channelParticipantEditor attributes, type and example
 ### Example:
 
 ```
-$channelParticipantEditor = ['_' => channelParticipantEditor, 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$channelParticipantEditor = ['_' => 'channelParticipantEditor', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```

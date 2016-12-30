@@ -16,5 +16,5 @@ description: chatInviteEmpty attributes, type and example
 ### Example:
 
 ```
-$chatInviteEmpty = ['_' => chatInviteEmpty, ];
+$chatInviteEmpty = ['_' => 'chatInviteEmpty', ];
 ```

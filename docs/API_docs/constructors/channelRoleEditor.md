@@ -16,5 +16,5 @@ description: channelRoleEditor attributes, type and example
 ### Example:
 
 ```
-$channelRoleEditor = ['_' => channelRoleEditor, ];
+$channelRoleEditor = ['_' => 'channelRoleEditor', ];
 ```

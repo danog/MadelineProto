@@ -16,5 +16,5 @@ description: channelRoleEmpty attributes, type and example
 ### Example:
 
 ```
-$channelRoleEmpty = ['_' => channelRoleEmpty, ];
+$channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
 ```

@@ -22,5 +22,5 @@ description: messageRange attributes, type and example
 ### Example:
 
 ```
-$messageRange = ['_' => messageRange, 'min_id' => int, 'max_id' => int, ];
+$messageRange = ['_' => 'messageRange', 'min_id' => int, 'max_id' => int, ];
 ```

@@ -22,5 +22,5 @@ description: channelParticipant attributes, type and example
 ### Example:
 
 ```
-$channelParticipant = ['_' => channelParticipant, 'user_id' => int, 'date' => int, ];
+$channelParticipant = ['_' => 'channelParticipant', 'user_id' => int, 'date' => int, ];
 ```

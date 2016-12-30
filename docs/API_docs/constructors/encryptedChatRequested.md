@@ -26,5 +26,5 @@ description: encryptedChatRequested attributes, type and example
 ### Example:
 
 ```
-$encryptedChatRequested = ['_' => encryptedChatRequested, 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, ];
+$encryptedChatRequested = ['_' => 'encryptedChatRequested', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, ];
 ```

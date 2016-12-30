@@ -21,5 +21,5 @@ description: sendMessageUploadDocumentAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageUploadDocumentAction = ['_' => sendMessageUploadDocumentAction, 'progress' => int, ];
+$sendMessageUploadDocumentAction = ['_' => 'sendMessageUploadDocumentAction', 'progress' => int, ];
 ```

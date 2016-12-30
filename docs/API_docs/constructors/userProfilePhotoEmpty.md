@@ -16,5 +16,5 @@ description: userProfilePhotoEmpty attributes, type and example
 ### Example:
 
 ```
-$userProfilePhotoEmpty = ['_' => userProfilePhotoEmpty, ];
+$userProfilePhotoEmpty = ['_' => 'userProfilePhotoEmpty', ];
 ```

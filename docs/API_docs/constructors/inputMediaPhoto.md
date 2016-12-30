@@ -22,5 +22,5 @@ description: inputMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaPhoto = ['_' => inputMediaPhoto, 'id' => InputPhoto, 'caption' => string, ];
+$inputMediaPhoto = ['_' => 'inputMediaPhoto', 'id' => InputPhoto, 'caption' => string, ];
 ```

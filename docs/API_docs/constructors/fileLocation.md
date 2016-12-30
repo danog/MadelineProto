@@ -24,5 +24,5 @@ description: fileLocation attributes, type and example
 ### Example:
 
 ```
-$fileLocation = ['_' => fileLocation, 'dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
+$fileLocation = ['_' => 'fileLocation', 'dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
 ```

@@ -22,5 +22,5 @@ description: updateReadChannelInbox attributes, type and example
 ### Example:
 
 ```
-$updateReadChannelInbox = ['_' => updateReadChannelInbox, 'channel_id' => int, 'max_id' => int, ];
+$updateReadChannelInbox = ['_' => 'updateReadChannelInbox', 'channel_id' => int, 'max_id' => int, ];
 ```

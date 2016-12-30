@@ -16,5 +16,5 @@ description: inputChannelEmpty attributes, type and example
 ### Example:
 
 ```
-$inputChannelEmpty = ['_' => inputChannelEmpty, ];
+$inputChannelEmpty = ['_' => 'inputChannelEmpty', ];
 ```

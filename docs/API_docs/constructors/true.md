@@ -16,5 +16,5 @@ description: true attributes, type and example
 ### Example:
 
 ```
-$true = ['_' => true, ];
+$true = ['_' => 'true', ];
 ```

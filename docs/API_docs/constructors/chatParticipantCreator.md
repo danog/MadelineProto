@@ -21,5 +21,5 @@ description: chatParticipantCreator attributes, type and example
 ### Example:
 
 ```
-$chatParticipantCreator = ['_' => chatParticipantCreator, 'user_id' => int, ];
+$chatParticipantCreator = ['_' => 'chatParticipantCreator', 'user_id' => int, ];
 ```

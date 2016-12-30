@@ -23,5 +23,5 @@ description: contacts_importedContacts attributes, type and example
 ### Example:
 
 ```
-$contacts_importedContacts = ['_' => contacts_importedContacts, 'imported' => [Vector t], 'retry_contacts' => [Vector t], 'users' => [Vector t], ];
+$contacts_importedContacts = ['_' => 'contacts_importedContacts', 'imported' => [Vector t], 'retry_contacts' => [Vector t], 'users' => [Vector t], ];
 ```

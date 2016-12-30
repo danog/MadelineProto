@@ -22,5 +22,5 @@ description: importedContact attributes, type and example
 ### Example:
 
 ```
-$importedContact = ['_' => importedContact, 'user_id' => int, 'client_id' => long, ];
+$importedContact = ['_' => 'importedContact', 'user_id' => int, 'client_id' => long, ];
 ```

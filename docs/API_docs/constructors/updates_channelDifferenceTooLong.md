@@ -30,5 +30,5 @@ description: updates_channelDifferenceTooLong attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceTooLong = ['_' => updates_channelDifferenceTooLong, 'final' => true, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$updates_channelDifferenceTooLong = ['_' => 'updates_channelDifferenceTooLong', 'final' => true, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

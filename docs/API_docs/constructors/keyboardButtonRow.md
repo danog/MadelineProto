@@ -21,5 +21,5 @@ description: keyboardButtonRow attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonRow = ['_' => keyboardButtonRow, 'buttons' => [Vector t], ];
+$keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [Vector t], ];
 ```

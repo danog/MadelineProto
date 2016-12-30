@@ -161,7 +161,6 @@ trait PeerHandler
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
             }
-            debug_print_backtrace();
 //            if ($recursive) {
 //            }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);

@@ -23,5 +23,5 @@ description: messages_stickerSet attributes, type and example
 ### Example:
 
 ```
-$messages_stickerSet = ['_' => messages_stickerSet, 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
+$messages_stickerSet = ['_' => 'messages_stickerSet', 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
 ```

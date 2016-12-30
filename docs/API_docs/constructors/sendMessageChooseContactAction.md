@@ -16,5 +16,5 @@ description: sendMessageChooseContactAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageChooseContactAction = ['_' => sendMessageChooseContactAction, ];
+$sendMessageChooseContactAction = ['_' => 'sendMessageChooseContactAction', ];
 ```

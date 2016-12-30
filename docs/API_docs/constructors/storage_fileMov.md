@@ -16,5 +16,5 @@ description: storage_fileMov attributes, type and example
 ### Example:
 
 ```
-$storage_fileMov = ['_' => storage_fileMov, ];
+$storage_fileMov = ['_' => 'storage_fileMov', ];
 ```

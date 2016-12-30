@@ -18,11 +18,11 @@ description: MTmessage attributes, type and example
 
 
 
-### Type: [Message](../types/Message.md)
+### Type: [MTMessage](../types/MTMessage.md)
 
 
 ### Example:
 
 ```
-$MTmessage = ['_' => MTmessage, 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object, ];
+$MTmessage = ['_' => 'MTmessage', 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object, ];
 ```

@@ -22,5 +22,5 @@ description: inputGeoPoint attributes, type and example
 ### Example:
 
 ```
-$inputGeoPoint = ['_' => inputGeoPoint, 'lat' => double, 'long' => double, ];
+$inputGeoPoint = ['_' => 'inputGeoPoint', 'lat' => double, 'long' => double, ];
 ```

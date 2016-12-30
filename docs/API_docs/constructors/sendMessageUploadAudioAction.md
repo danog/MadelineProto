@@ -21,5 +21,5 @@ description: sendMessageUploadAudioAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageUploadAudioAction = ['_' => sendMessageUploadAudioAction, 'progress' => int, ];
+$sendMessageUploadAudioAction = ['_' => 'sendMessageUploadAudioAction', 'progress' => int, ];
 ```

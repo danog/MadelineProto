@@ -21,5 +21,5 @@ description: replyKeyboardHide attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardHide = ['_' => replyKeyboardHide, 'selective' => true, ];
+$replyKeyboardHide = ['_' => 'replyKeyboardHide', 'selective' => true, ];
 ```

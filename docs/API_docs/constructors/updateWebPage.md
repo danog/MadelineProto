@@ -23,5 +23,5 @@ description: updateWebPage attributes, type and example
 ### Example:
 
 ```
-$updateWebPage = ['_' => updateWebPage, 'webpage' => WebPage, 'pts' => int, 'pts_count' => int, ];
+$updateWebPage = ['_' => 'updateWebPage', 'webpage' => WebPage, 'pts' => int, 'pts_count' => int, ];
 ```

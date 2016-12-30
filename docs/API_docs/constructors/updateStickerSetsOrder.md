@@ -22,5 +22,5 @@ description: updateStickerSetsOrder attributes, type and example
 ### Example:
 
 ```
-$updateStickerSetsOrder = ['_' => updateStickerSetsOrder, 'masks' => true, 'order' => [Vector t], ];
+$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => true, 'order' => [Vector t], ];
 ```

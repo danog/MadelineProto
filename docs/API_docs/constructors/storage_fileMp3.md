@@ -16,5 +16,5 @@ description: storage_fileMp3 attributes, type and example
 ### Example:
 
 ```
-$storage_fileMp3 = ['_' => storage_fileMp3, ];
+$storage_fileMp3 = ['_' => 'storage_fileMp3', ];
 ```

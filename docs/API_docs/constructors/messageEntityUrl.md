@@ -22,5 +22,5 @@ description: messageEntityUrl attributes, type and example
 ### Example:
 
 ```
-$messageEntityUrl = ['_' => messageEntityUrl, 'offset' => int, 'length' => int, ];
+$messageEntityUrl = ['_' => 'messageEntityUrl', 'offset' => int, 'length' => int, ];
 ```

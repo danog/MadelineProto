@@ -16,5 +16,5 @@ description: inputPrivacyValueAllowAll attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowAll = ['_' => inputPrivacyValueAllowAll, ];
+$inputPrivacyValueAllowAll = ['_' => 'inputPrivacyValueAllowAll', ];
 ```

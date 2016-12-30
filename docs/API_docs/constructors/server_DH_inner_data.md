@@ -26,5 +26,5 @@ description: server_DH_inner_data attributes, type and example
 ### Example:
 
 ```
-$server_DH_inner_data = ['_' => server_DH_inner_data, 'nonce' => int128, 'server_nonce' => int128, 'g' => int, 'dh_prime' => bytes, 'g_a' => bytes, 'server_time' => int, ];
+$server_DH_inner_data = ['_' => 'server_DH_inner_data', 'nonce' => int128, 'server_nonce' => int128, 'g' => int, 'dh_prime' => bytes, 'g_a' => bytes, 'server_time' => int, ];
 ```

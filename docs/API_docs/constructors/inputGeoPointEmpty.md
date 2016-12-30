@@ -16,5 +16,5 @@ description: inputGeoPointEmpty attributes, type and example
 ### Example:
 
 ```
-$inputGeoPointEmpty = ['_' => inputGeoPointEmpty, ];
+$inputGeoPointEmpty = ['_' => 'inputGeoPointEmpty', ];
 ```

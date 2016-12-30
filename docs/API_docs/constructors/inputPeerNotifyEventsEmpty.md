@@ -16,5 +16,5 @@ description: inputPeerNotifyEventsEmpty attributes, type and example
 ### Example:
 
 ```
-$inputPeerNotifyEventsEmpty = ['_' => inputPeerNotifyEventsEmpty, ];
+$inputPeerNotifyEventsEmpty = ['_' => 'inputPeerNotifyEventsEmpty', ];
 ```

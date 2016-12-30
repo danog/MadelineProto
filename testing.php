@@ -58,6 +58,8 @@ foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
 sleep(5);
 var_dump($MadelineProto->API->get_updates());
 
+echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
+echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
 
 if (file_exists('token.php')) {

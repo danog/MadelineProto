@@ -21,5 +21,5 @@ description: messageActionChatAddUser attributes, type and example
 ### Example:
 
 ```
-$messageActionChatAddUser = ['_' => messageActionChatAddUser, 'users' => [Vector t], ];
+$messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [Vector t], ];
 ```

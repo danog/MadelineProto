@@ -16,5 +16,5 @@ description: updateSavedGifs attributes, type and example
 ### Example:
 
 ```
-$updateSavedGifs = ['_' => updateSavedGifs, ];
+$updateSavedGifs = ['_' => 'updateSavedGifs', ];
 ```

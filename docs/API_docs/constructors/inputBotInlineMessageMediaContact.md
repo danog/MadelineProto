@@ -24,5 +24,5 @@ description: inputBotInlineMessageMediaContact attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageMediaContact = ['_' => inputBotInlineMessageMediaContact, 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageMediaContact = ['_' => 'inputBotInlineMessageMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'reply_markup' => ReplyMarkup, ];
 ```

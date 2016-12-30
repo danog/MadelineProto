@@ -23,5 +23,5 @@ description: messages_messages attributes, type and example
 ### Example:
 
 ```
-$messages_messages = ['_' => messages_messages, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_messages = ['_' => 'messages_messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

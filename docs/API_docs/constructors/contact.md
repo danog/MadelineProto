@@ -22,5 +22,5 @@ description: contact attributes, type and example
 ### Example:
 
 ```
-$contact = ['_' => contact, 'user_id' => int, 'mutual' => Bool, ];
+$contact = ['_' => 'contact', 'user_id' => int, 'mutual' => Bool, ];
 ```

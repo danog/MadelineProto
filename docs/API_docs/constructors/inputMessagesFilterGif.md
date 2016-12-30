@@ -16,5 +16,5 @@ description: inputMessagesFilterGif attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterGif = ['_' => inputMessagesFilterGif, ];
+$inputMessagesFilterGif = ['_' => 'inputMessagesFilterGif', ];
 ```

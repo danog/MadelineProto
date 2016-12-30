@@ -22,5 +22,5 @@ description: updateUserTyping attributes, type and example
 ### Example:
 
 ```
-$updateUserTyping = ['_' => updateUserTyping, 'user_id' => int, 'action' => SendMessageAction, ];
+$updateUserTyping = ['_' => 'updateUserTyping', 'user_id' => int, 'action' => SendMessageAction, ];
 ```

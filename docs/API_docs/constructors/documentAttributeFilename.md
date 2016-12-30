@@ -21,5 +21,5 @@ description: documentAttributeFilename attributes, type and example
 ### Example:
 
 ```
-$documentAttributeFilename = ['_' => documentAttributeFilename, 'file_name' => string, ];
+$documentAttributeFilename = ['_' => 'documentAttributeFilename', 'file_name' => string, ];
 ```

@@ -16,5 +16,5 @@ description: notifyUsers attributes, type and example
 ### Example:
 
 ```
-$notifyUsers = ['_' => notifyUsers, ];
+$notifyUsers = ['_' => 'notifyUsers', ];
 ```

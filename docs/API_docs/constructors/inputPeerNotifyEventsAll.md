@@ -16,5 +16,5 @@ description: inputPeerNotifyEventsAll attributes, type and example
 ### Example:
 
 ```
-$inputPeerNotifyEventsAll = ['_' => inputPeerNotifyEventsAll, ];
+$inputPeerNotifyEventsAll = ['_' => 'inputPeerNotifyEventsAll', ];
 ```

@@ -21,5 +21,5 @@ description: receivedNotifyMessage attributes, type and example
 ### Example:
 
 ```
-$receivedNotifyMessage = ['_' => receivedNotifyMessage, 'id' => int, ];
+$receivedNotifyMessage = ['_' => 'receivedNotifyMessage', 'id' => int, ];
 ```

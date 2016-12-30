@@ -22,5 +22,5 @@ description: messageEntityMention attributes, type and example
 ### Example:
 
 ```
-$messageEntityMention = ['_' => messageEntityMention, 'offset' => int, 'length' => int, ];
+$messageEntityMention = ['_' => 'messageEntityMention', 'offset' => int, 'length' => int, ];
 ```

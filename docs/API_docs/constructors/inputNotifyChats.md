@@ -16,5 +16,5 @@ description: inputNotifyChats attributes, type and example
 ### Example:
 
 ```
-$inputNotifyChats = ['_' => inputNotifyChats, ];
+$inputNotifyChats = ['_' => 'inputNotifyChats', ];
 ```

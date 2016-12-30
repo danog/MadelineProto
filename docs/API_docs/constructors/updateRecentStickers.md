@@ -16,5 +16,5 @@ description: updateRecentStickers attributes, type and example
 ### Example:
 
 ```
-$updateRecentStickers = ['_' => updateRecentStickers, ];
+$updateRecentStickers = ['_' => 'updateRecentStickers', ];
 ```

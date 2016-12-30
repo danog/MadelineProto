@@ -21,5 +21,5 @@ description: inputReportReasonOther attributes, type and example
 ### Example:
 
 ```
-$inputReportReasonOther = ['_' => inputReportReasonOther, 'text' => string, ];
+$inputReportReasonOther = ['_' => 'inputReportReasonOther', 'text' => string, ];
 ```

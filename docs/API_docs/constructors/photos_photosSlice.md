@@ -23,5 +23,5 @@ description: photos_photosSlice attributes, type and example
 ### Example:
 
 ```
-$photos_photosSlice = ['_' => photos_photosSlice, 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];
+$photos_photosSlice = ['_' => 'photos_photosSlice', 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];
 ```

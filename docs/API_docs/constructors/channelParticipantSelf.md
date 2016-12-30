@@ -23,5 +23,5 @@ description: channelParticipantSelf attributes, type and example
 ### Example:
 
 ```
-$channelParticipantSelf = ['_' => channelParticipantSelf, 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$channelParticipantSelf = ['_' => 'channelParticipantSelf', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```

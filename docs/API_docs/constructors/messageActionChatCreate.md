@@ -22,5 +22,5 @@ description: messageActionChatCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChatCreate = ['_' => messageActionChatCreate, 'title' => string, 'users' => [Vector t], ];
+$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => string, 'users' => [Vector t], ];
 ```

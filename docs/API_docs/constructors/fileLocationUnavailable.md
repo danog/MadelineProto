@@ -23,5 +23,5 @@ description: fileLocationUnavailable attributes, type and example
 ### Example:
 
 ```
-$fileLocationUnavailable = ['_' => fileLocationUnavailable, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
+$fileLocationUnavailable = ['_' => 'fileLocationUnavailable', 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
 ```

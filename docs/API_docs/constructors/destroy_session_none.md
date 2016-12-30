@@ -21,5 +21,5 @@ description: destroy_session_none attributes, type and example
 ### Example:
 
 ```
-$destroy_session_none = ['_' => destroy_session_none, 'session_id' => long, ];
+$destroy_session_none = ['_' => 'destroy_session_none', 'session_id' => long, ];
 ```

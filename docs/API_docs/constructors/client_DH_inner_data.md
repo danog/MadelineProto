@@ -24,5 +24,5 @@ description: client_DH_inner_data attributes, type and example
 ### Example:
 
 ```
-$client_DH_inner_data = ['_' => client_DH_inner_data, 'nonce' => int128, 'server_nonce' => int128, 'retry_id' => long, 'g_b' => bytes, ];
+$client_DH_inner_data = ['_' => 'client_DH_inner_data', 'nonce' => int128, 'server_nonce' => int128, 'retry_id' => long, 'g_b' => bytes, ];
 ```

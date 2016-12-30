@@ -21,5 +21,5 @@ description: gzip_packed attributes, type and example
 ### Example:
 
 ```
-$gzip_packed = ['_' => gzip_packed, 'packed_data' => bytes, ];
+$gzip_packed = ['_' => 'gzip_packed', 'packed_data' => bytes, ];
 ```

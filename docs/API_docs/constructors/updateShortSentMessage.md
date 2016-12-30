@@ -27,5 +27,5 @@ description: updateShortSentMessage attributes, type and example
 ### Example:
 
 ```
-$updateShortSentMessage = ['_' => updateShortSentMessage, 'out' => true, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [Vector t], ];
+$updateShortSentMessage = ['_' => 'updateShortSentMessage', 'out' => true, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [Vector t], ];
 ```

@@ -21,5 +21,5 @@ description: keyboardButtonRequestPhone attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonRequestPhone = ['_' => keyboardButtonRequestPhone, 'text' => string, ];
+$keyboardButtonRequestPhone = ['_' => 'keyboardButtonRequestPhone', 'text' => string, ];
 ```

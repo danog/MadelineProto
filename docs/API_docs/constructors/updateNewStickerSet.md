@@ -21,5 +21,5 @@ description: updateNewStickerSet attributes, type and example
 ### Example:
 
 ```
-$updateNewStickerSet = ['_' => updateNewStickerSet, 'stickerset' => messages.StickerSet, ];
+$updateNewStickerSet = ['_' => 'updateNewStickerSet', 'stickerset' => messages.StickerSet, ];
 ```

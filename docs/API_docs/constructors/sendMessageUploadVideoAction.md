@@ -21,5 +21,5 @@ description: sendMessageUploadVideoAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageUploadVideoAction = ['_' => sendMessageUploadVideoAction, 'progress' => int, ];
+$sendMessageUploadVideoAction = ['_' => 'sendMessageUploadVideoAction', 'progress' => int, ];
 ```

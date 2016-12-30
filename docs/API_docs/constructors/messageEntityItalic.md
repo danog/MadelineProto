@@ -22,5 +22,5 @@ description: messageEntityItalic attributes, type and example
 ### Example:
 
 ```
-$messageEntityItalic = ['_' => messageEntityItalic, 'offset' => int, 'length' => int, ];
+$messageEntityItalic = ['_' => 'messageEntityItalic', 'offset' => int, 'length' => int, ];
 ```

@@ -16,5 +16,5 @@ description: inputMessagesFilterEmpty attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterEmpty = ['_' => inputMessagesFilterEmpty, ];
+$inputMessagesFilterEmpty = ['_' => 'inputMessagesFilterEmpty', ];
 ```

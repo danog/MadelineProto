@@ -24,5 +24,5 @@ description: inputBotInlineMessageText attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageText = ['_' => inputBotInlineMessageText, 'no_webpage' => true, 'message' => string, 'entities' => [Vector t], 'reply_markup' => ReplyMarkup, ];
+$inputBotInlineMessageText = ['_' => 'inputBotInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [Vector t], 'reply_markup' => ReplyMarkup, ];
 ```

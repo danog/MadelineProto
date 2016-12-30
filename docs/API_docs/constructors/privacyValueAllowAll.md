@@ -16,5 +16,5 @@ description: privacyValueAllowAll attributes, type and example
 ### Example:
 
 ```
-$privacyValueAllowAll = ['_' => privacyValueAllowAll, ];
+$privacyValueAllowAll = ['_' => 'privacyValueAllowAll', ];
 ```

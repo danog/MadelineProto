@@ -16,5 +16,5 @@ description: inputChatPhotoEmpty attributes, type and example
 ### Example:
 
 ```
-$inputChatPhotoEmpty = ['_' => inputChatPhotoEmpty, ];
+$inputChatPhotoEmpty = ['_' => 'inputChatPhotoEmpty', ];
 ```

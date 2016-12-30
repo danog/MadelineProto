@@ -22,5 +22,5 @@ description: updateContactRegistered attributes, type and example
 ### Example:
 
 ```
-$updateContactRegistered = ['_' => updateContactRegistered, 'user_id' => int, 'date' => int, ];
+$updateContactRegistered = ['_' => 'updateContactRegistered', 'user_id' => int, 'date' => int, ];
 ```

@@ -23,5 +23,5 @@ description: chatParticipantAdmin attributes, type and example
 ### Example:
 
 ```
-$chatParticipantAdmin = ['_' => chatParticipantAdmin, 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$chatParticipantAdmin = ['_' => 'chatParticipantAdmin', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```

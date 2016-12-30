@@ -16,5 +16,5 @@ description: inputUserSelf attributes, type and example
 ### Example:
 
 ```
-$inputUserSelf = ['_' => inputUserSelf, ];
+$inputUserSelf = ['_' => 'inputUserSelf', ];
 ```

@@ -23,5 +23,5 @@ description: contacts_blockedSlice attributes, type and example
 ### Example:
 
 ```
-$contacts_blockedSlice = ['_' => contacts_blockedSlice, 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
+$contacts_blockedSlice = ['_' => 'contacts_blockedSlice', 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```

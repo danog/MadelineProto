@@ -22,5 +22,5 @@ description: msgs_all_info attributes, type and example
 ### Example:
 
 ```
-$msgs_all_info = ['_' => msgs_all_info, 'msg_ids' => [Vector t], 'info' => bytes, ];
+$msgs_all_info = ['_' => 'msgs_all_info', 'msg_ids' => [Vector t], 'info' => bytes, ];
 ```

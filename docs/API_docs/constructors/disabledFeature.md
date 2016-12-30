@@ -22,5 +22,5 @@ description: disabledFeature attributes, type and example
 ### Example:
 
 ```
-$disabledFeature = ['_' => disabledFeature, 'feature' => string, 'description' => string, ];
+$disabledFeature = ['_' => 'disabledFeature', 'feature' => string, 'description' => string, ];
 ```

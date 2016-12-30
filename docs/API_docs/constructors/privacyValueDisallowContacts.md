@@ -16,5 +16,5 @@ description: privacyValueDisallowContacts attributes, type and example
 ### Example:
 
 ```
-$privacyValueDisallowContacts = ['_' => privacyValueDisallowContacts, ];
+$privacyValueDisallowContacts = ['_' => 'privacyValueDisallowContacts', ];
 ```

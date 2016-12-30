@@ -22,5 +22,5 @@ description: contactBlocked attributes, type and example
 ### Example:
 
 ```
-$contactBlocked = ['_' => contactBlocked, 'user_id' => int, 'date' => int, ];
+$contactBlocked = ['_' => 'contactBlocked', 'user_id' => int, 'date' => int, ];
 ```

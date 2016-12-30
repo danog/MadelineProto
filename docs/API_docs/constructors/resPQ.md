@@ -24,5 +24,5 @@ description: resPQ attributes, type and example
 ### Example:
 
 ```
-$resPQ = ['_' => resPQ, 'nonce' => int128, 'server_nonce' => int128, 'pq' => bytes, 'server_public_key_fingerprints' => [Vector t], ];
+$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => bytes, 'server_public_key_fingerprints' => [Vector t], ];
 ```

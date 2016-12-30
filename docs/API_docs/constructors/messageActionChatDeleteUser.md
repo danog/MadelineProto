@@ -21,5 +21,5 @@ description: messageActionChatDeleteUser attributes, type and example
 ### Example:
 
 ```
-$messageActionChatDeleteUser = ['_' => messageActionChatDeleteUser, 'user_id' => int, ];
+$messageActionChatDeleteUser = ['_' => 'messageActionChatDeleteUser', 'user_id' => int, ];
 ```

@@ -16,5 +16,5 @@ description: inputReportReasonSpam attributes, type and example
 ### Example:
 
 ```
-$inputReportReasonSpam = ['_' => inputReportReasonSpam, ];
+$inputReportReasonSpam = ['_' => 'inputReportReasonSpam', ];
 ```

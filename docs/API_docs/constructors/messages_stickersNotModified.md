@@ -16,5 +16,5 @@ description: messages_stickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_stickersNotModified = ['_' => messages_stickersNotModified, ];
+$messages_stickersNotModified = ['_' => 'messages_stickersNotModified', ];
 ```

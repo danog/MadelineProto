@@ -16,5 +16,5 @@ description: inputReportReasonViolence attributes, type and example
 ### Example:
 
 ```
-$inputReportReasonViolence = ['_' => inputReportReasonViolence, ];
+$inputReportReasonViolence = ['_' => 'inputReportReasonViolence', ];
 ```

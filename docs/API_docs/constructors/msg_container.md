@@ -11,7 +11,7 @@ description: msg_container attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|messages|Array of [%Message](../constructors/%Message.md) | Required|
+|messages|Array of [MTmessage](../constructors/MTmessage.md) | Required|
 
 
 
@@ -21,5 +21,5 @@ description: msg_container attributes, type and example
 ### Example:
 
 ```
-$msg_container = ['_' => msg_container, 'messages' => [vector], ];
+$msg_container = ['_' => 'msg_container', 'messages' => [vector], ];
 ```

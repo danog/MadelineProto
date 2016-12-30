@@ -881,7 +881,7 @@ description: List of constructors
 [$messages\_stickersNotModified](../constructors/messages_stickersNotModified.md) = \[\];<a name="messages_stickersNotModified"></a>  
 
 ***
-<br><br>[$msg\_container](../constructors/msg_container.md) = \['messages' => \[[%Message](../constructors/%Message.md)\], \];<a name="msg_container"></a>  
+<br><br>[$msg\_container](../constructors/msg_container.md) = \['messages' => \[[MTmessage](../constructors/MTmessage.md)\], \];<a name="msg_container"></a>  
 
 [$msg\_copy](../constructors/msg_copy.md) = \['orig_message' => [MTMessage](../types/MTMessage.md), \];<a name="msg_copy"></a>  
 

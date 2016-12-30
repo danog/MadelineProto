@@ -26,5 +26,5 @@ description: updates_difference attributes, type and example
 ### Example:
 
 ```
-$updates_difference = ['_' => updates_difference, 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$updates_difference = ['_' => 'updates_difference', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```

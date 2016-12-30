@@ -23,5 +23,5 @@ description: upload_file attributes, type and example
 ### Example:
 
 ```
-$upload_file = ['_' => upload_file, 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];
+$upload_file = ['_' => 'upload_file', 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];
 ```

@@ -16,5 +16,5 @@ description: rpc_answer_unknown attributes, type and example
 ### Example:
 
 ```
-$rpc_answer_unknown = ['_' => rpc_answer_unknown, ];
+$rpc_answer_unknown = ['_' => 'rpc_answer_unknown', ];
 ```

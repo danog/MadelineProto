@@ -21,5 +21,5 @@ description: messageActionChannelCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChannelCreate = ['_' => messageActionChannelCreate, 'title' => string, ];
+$messageActionChannelCreate = ['_' => 'messageActionChannelCreate', 'title' => string, ];
 ```

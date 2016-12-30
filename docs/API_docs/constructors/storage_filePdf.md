@@ -16,5 +16,5 @@ description: storage_filePdf attributes, type and example
 ### Example:
 
 ```
-$storage_filePdf = ['_' => storage_filePdf, ];
+$storage_filePdf = ['_' => 'storage_filePdf', ];
 ```

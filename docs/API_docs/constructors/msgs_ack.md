@@ -21,5 +21,5 @@ description: msgs_ack attributes, type and example
 ### Example:
 
 ```
-$msgs_ack = ['_' => msgs_ack, 'msg_ids' => [Vector t], ];
+$msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [Vector t], ];
 ```

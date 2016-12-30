@@ -22,5 +22,5 @@ description: messageEntityBotCommand attributes, type and example
 ### Example:
 
 ```
-$messageEntityBotCommand = ['_' => messageEntityBotCommand, 'offset' => int, 'length' => int, ];
+$messageEntityBotCommand = ['_' => 'messageEntityBotCommand', 'offset' => int, 'length' => int, ];
 ```

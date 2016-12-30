@@ -16,5 +16,5 @@ description: channelParticipantsBots attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsBots = ['_' => channelParticipantsBots, ];
+$channelParticipantsBots = ['_' => 'channelParticipantsBots', ];
 ```

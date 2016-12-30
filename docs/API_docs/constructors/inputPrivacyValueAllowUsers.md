@@ -21,5 +21,5 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowUsers = ['_' => inputPrivacyValueAllowUsers, 'users' => [Vector t], ];
+$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [Vector t], ];
 ```

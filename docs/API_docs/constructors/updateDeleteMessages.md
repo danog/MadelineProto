@@ -23,5 +23,5 @@ description: updateDeleteMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteMessages = ['_' => updateDeleteMessages, 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
+$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
 ```

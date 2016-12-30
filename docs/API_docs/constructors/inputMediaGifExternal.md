@@ -22,5 +22,5 @@ description: inputMediaGifExternal attributes, type and example
 ### Example:
 
 ```
-$inputMediaGifExternal = ['_' => inputMediaGifExternal, 'url' => string, 'q' => string, ];
+$inputMediaGifExternal = ['_' => 'inputMediaGifExternal', 'url' => string, 'q' => string, ];
 ```

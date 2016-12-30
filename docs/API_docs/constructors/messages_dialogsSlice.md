@@ -25,5 +25,5 @@ description: messages_dialogsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_dialogsSlice = ['_' => messages_dialogsSlice, 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_dialogsSlice = ['_' => 'messages_dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```

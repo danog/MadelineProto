@@ -25,5 +25,5 @@ description: updates attributes, type and example
 ### Example:
 
 ```
-$updates = ['_' => updates, 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq' => int, ];
+$updates = ['_' => 'updates', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq' => int, ];
 ```

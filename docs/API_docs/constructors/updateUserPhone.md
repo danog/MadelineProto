@@ -22,5 +22,5 @@ description: updateUserPhone attributes, type and example
 ### Example:
 
 ```
-$updateUserPhone = ['_' => updateUserPhone, 'user_id' => int, 'phone' => string, ];
+$updateUserPhone = ['_' => 'updateUserPhone', 'user_id' => int, 'phone' => string, ];
 ```
