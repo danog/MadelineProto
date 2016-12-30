@@ -355,7 +355,16 @@ See testing.php for more examples.
 
 ### Storing sessions
 
-An istance of MadelineProto can be safely serialized or unserialized.  
+An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, usage of the `\danog\MadelineProto\Serialization` class is recommended:
+
+```  
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+// Do stuff
+\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
+```  
+
+That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true.
+The same operation should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 
 ### Exceptions
 
