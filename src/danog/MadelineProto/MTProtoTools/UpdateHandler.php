@@ -92,9 +92,9 @@ trait UpdateHandler
                 }
                 break;
             case 'updates.channelDifferenceTooLong':
-                unset($this->channels_state[$channel]);
+                //unset($this->channels_state[$channel]);
                 //unset($this->chats[$this->get_info('channel#'.$channel)['bot_api_id']]);
-                //$this->handle_update_messages($difference['messages'], $channel);
+                $this->handle_update_messages($difference['messages'], $channel);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
@@ -200,12 +200,12 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-/*
+
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
             return false;
         }
-*/
+
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');

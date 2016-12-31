@@ -24,7 +24,7 @@ trait PeerHandler
         foreach ($users as $key => $user) {
             switch ($user['_']) {
                 case 'user':
-                    if (!isset($this->chats[$user['id']])) {
+                    if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                         $this->chats[$user['id']] = $user;
                         $this->should_serialize = true;
                     }
@@ -43,7 +43,7 @@ trait PeerHandler
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
-                    if (!isset($this->chats[-$chat['id']])) {
+                    if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
                         $this->should_serialize = true;
                         $this->chats[-$chat['id']] = $chat;
                     }
@@ -52,7 +52,7 @@ trait PeerHandler
                 case 'channelEmpty':
                     break;
                 case 'channel':
-                    if (!isset($this->chats[(int) ('-100'.$chat['id'])])) {
+                    if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])] !== $chat) {
                         $this->should_serialize = true;
                         $this->chats[(int) ('-100'.$chat['id'])] = $chat;
                     }
@@ -184,8 +184,13 @@ trait PeerHandler
         $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
             case 'user':
-                $res['InputPeer'] = $constructor['self'] ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                $res['InputUser'] = $constructor['self'] ? ['_' => 'inputUserSelf'] : ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                if ($constructor['self']) {
+                    $res['InputPeer'] = ['_' => 'inputPeerSelf'];
+                    $res['InputUser'] = ['_' => 'inputUserSelf'];
+                } else if (isset($constructor['access_hash'])) {
+                    $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                    $res['InputUser'] =  ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
                 $res['user_id'] = $constructor['id'];
                 $res['bot_api_id'] = $constructor['id'];
@@ -197,8 +202,10 @@ trait PeerHandler
                 $res['bot_api_id'] = -$constructor['id'];
                 break;
             case 'channel':
-                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                if (isset($constructor['access_hash'])) {
+                    $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                    $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                }
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = (int) ('-100'.$constructor['id']);
