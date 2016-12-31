@@ -203,6 +203,7 @@ trait UpdateHandler
 
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
+
             return false;
         }
 

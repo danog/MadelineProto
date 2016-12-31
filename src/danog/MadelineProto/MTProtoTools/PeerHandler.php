@@ -187,9 +187,9 @@ trait PeerHandler
                 if ($constructor['self']) {
                     $res['InputPeer'] = ['_' => 'inputPeerSelf'];
                     $res['InputUser'] = ['_' => 'inputUserSelf'];
-                } else if (isset($constructor['access_hash'])) {
+                } elseif (isset($constructor['access_hash'])) {
                     $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputUser'] =  ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                    $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
                 $res['user_id'] = $constructor['id'];
