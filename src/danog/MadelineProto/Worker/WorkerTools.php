@@ -13,17 +13,21 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\Worker;
 
 /**
- * Tools for the worker
+ * Tools for the worker.
  */
 trait WorkerTools
 {
-    public function check_all_workers() {
+    public function check_all_workers()
+    {
         $result = ['ok' => true, 'result' => []];
         foreach (glob($this->sessions_dir.'*') as $session) {
-            if (stripos($session, '.log') !== false) continue;
+            if (stripos($session, '.log') !== false) {
+                continue;
+            }
             $session = basename($session);
             $result['result'][] = $this->check_worker($session);
         }
+
         return $result;
     }
 
@@ -31,10 +35,12 @@ trait WorkerTools
     {
         shell_exec('curl '.escapeshellarg($this->settings['other']['endpoint'].$worker.'/start_worker_sync').'  > /dev/null 2> /dev/null & ');
         sleep(30);
+
         return $this->check_worker($worker, $recursive);
     }
-    
-    public function check_worker($worker, $recursive = true) {
+
+    public function check_worker($worker, $recursive = true)
+    {
         $this->lock_file = fopen($this->sessions_dir.$worker, 'c+');
         $got_lock = flock($this->lock_file, LOCK_EX | LOCK_NB, $wouldblock);
         if ($this->lock_file === false || (!$got_lock && !$wouldblock)) {
@@ -46,6 +52,7 @@ trait WorkerTools
         if ($recursive) { // If worker is turned off and $recursive
             return $this->start_worker_async($worker, false);
         }
+
         return ['ok' => true, 'result' => ['active' => false]];
     }
 }

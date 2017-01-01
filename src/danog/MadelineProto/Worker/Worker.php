@@ -13,13 +13,13 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\Worker;
 
 /**
- * worker
+ * worker.
  */
 trait Worker
 {
     public $last_serialization = 0;
 
-    public function start_worker_sync($worker) 
+    public function start_worker_sync($worker)
     {
         $this->db_connect();
         set_time_limit(0);
@@ -30,12 +30,12 @@ trait Worker
             return ['ok' => false, 'error_code' => 400, "Couldn't open/lock session file"];
         }
         if (!$got_lock && $wouldblock) {
-            return ['ok' => true, 'result' => "This worker is already running"];
+            return ['ok' => true, 'result' => 'This worker is already running'];
         }
         // Deserialize contents if needed
         fseek($this->lock_file, 0);
         $result = stream_get_contents($this->lock_file);
-        
+
         if ($result !== '') {
             try {
                 $this->MadelineProto = unserialize($result);
@@ -54,7 +54,7 @@ trait Worker
         */
         while (true) {
             $actions = $this->pdo->prepare('SELECT * FROM worker_jobs WHERE worker = ? AND processed = ?');
-            $actions->execute([$worker, (int)false]);
+            $actions->execute([$worker, (int) false]);
             $actions = $actions->fetchAll();
             foreach ($actions as $action) {
                 $result = ['ok' => false, 'error_code' => 404, 'error_description' => 'The method '.$this->method.' does not exist'];
@@ -75,7 +75,7 @@ trait Worker
                             $result = ['ok' => true, 'result' => $this->MadelineProto->complete_phone_login($settings['other']['params']['code'])];
                             break;
                         default:
-                            
+
                             if ($this->MadelineProto->API->methods->find_by_method($this->method) !== false) {
                                 $result = ['ok' => true, 'result' => $this->MadelineProto->API->method_call($this->method, $settings['other']['params'])];
                             }
@@ -91,14 +91,14 @@ trait Worker
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $result = ['ok' => false, 'error_code' => $e->getCode(), 'error_description' => $e->getMessage().' on line '.$e->getLine().' of '.basename($e->getFile())];
                     error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
-                    error_log($e->getTraceAsString());    
+                    error_log($e->getTraceAsString());
                 } catch (\danog\MadelineProto\TL\Exception $e) {
                     $result = ['ok' => false, 'error_code' => 400, 'error_description' => $e->getMessage().' on line '.$e->getLine().' of '.basename($e->getFile())];
                     error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
                     error_log($e->getTraceAsString());
                 }
                 $result['req_id'] = $action;
-                $this->pdo->prepare('UPDATE worker_jobs SET response=?, processed=? WHERE request_id=?')->execute([json_encode($result), (int)true, $action['request_id']]);
+                $this->pdo->prepare('UPDATE worker_jobs SET response=?, processed=? WHERE request_id=?')->execute([json_encode($result), (int) true, $action['request_id']]);
             }
             try {
                 $this->MadelineProto->API->recv_message();
@@ -107,36 +107,47 @@ trait Worker
                 error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
                 error_log($e->getTraceAsString());
             } catch (\danog\MadelineProto\Exception $e) {
-                if (preg_match('/Wrong length was read/', $e->getMessage())) continue;
+                if (preg_match('/Wrong length was read/', $e->getMessage())) {
+                    continue;
+                }
                 echo json_encode(['ok' => false, 'error_code' => 400, 'error_description' => $e->getMessage().' on line '.$e->getLine().' of '.basename($e->getFile())]);
                 error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
                 error_log($e->getTraceAsString());
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 echo json_encode(['ok' => false, 'error_code' => $e->getCode(), 'error_description' => $e->getMessage().' on line '.$e->getLine().' of '.basename($e->getFile())]);
                 error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
-                error_log($e->getTraceAsString());    
+                error_log($e->getTraceAsString());
             } catch (\danog\MadelineProto\TL\Exception $e) {
                 echo json_encode(['ok' => false, 'error_code' => 400, 'error_description' => $e->getMessage().' on line '.$e->getLine().' of '.basename($e->getFile())]);
                 error_log('Exception thrown in worker '.$worker.': '.$e->getMessage());
                 error_log($e->getTraceAsString());
             }
             $this->serialize_worker();
-            if (empty($actions)) usleep(250000);
-            if ($stop) break;
+            if (empty($actions)) {
+                usleep(250000);
+            }
+            if ($stop) {
+                break;
+            }
         }
 
         flock($this->lock_file, LOCK_UN);
         fclose($this->lock_file);
+
         return ['ok' => true, 'result' => 'Worker stopped successfully!'];
     }
 
-    public function serialize_worker() {
-        if (time() - $this->last_serialization < $this->settings['workers']['serialization_interval']) return false;
+    public function serialize_worker()
+    {
+        if (time() - $this->last_serialization < $this->settings['workers']['serialization_interval']) {
+            return false;
+        }
         ftruncate($this->lock_file, 0);
         rewind($this->lock_file);
         $serialized = serialize($this->MadelineProto);
         fwrite($this->lock_file, $serialized);
         $this->last_serialization = time();
+
         return true;
     }
 }
