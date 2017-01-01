@@ -12,9 +12,10 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 
-$id = "AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC";
+$id = 'AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC';
 
-function foreach_offset_length($string, $callback) {
+function foreach_offset_length($string, $callback)
+{
     $strlen = strlen($string);
     for ($offset = 0; $offset < strlen($string); $offset++) {
         for ($length = $strlen - $offset; $length > 0; $length--) {
@@ -27,10 +28,11 @@ function foreach_offset_length($string, $callback) {
 
 $base256 = base64url_decode($id);
 foreach_offset_length($base256, function ($s) {
-    $int = (string)(new \phpseclib\Math\BigInteger(strrev($s), 256));
+    $int = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
     echo $int.PHP_EOL;
 });
 
-function base64url_decode($data) {
-  return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+function base64url_decode($data)
+{
+    return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
 }
