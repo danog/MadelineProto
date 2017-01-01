@@ -79,6 +79,5 @@ sleep(5);
 var_dump($MadelineProto->API->get_updates());
 
 while (true) {
-        $sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
-
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
 }

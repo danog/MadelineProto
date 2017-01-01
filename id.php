@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 
-$id = ['AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC', "BQADBAADhQEAAo_aCgZOb3LWhOazMQI"];
+$id = ['AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC', 'BQADBAADhQEAAo_aCgZOb3LWhOazMQI'];
 
 function foreach_offset_length($string)
 {
@@ -22,9 +22,10 @@ function foreach_offset_length($string)
         for ($length = $strlen - $offset; $length > 0; $length--) {
             $s = substr($string, $offset, $length);
             $number = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
-            $res []= ['number' => $number, 'offset' => $offset, 'length' => $length];
+            $res[] = ['number' => $number, 'offset' => $offset, 'length' => $length];
         }
     }
+
     return $res;
 }
 $res = [];

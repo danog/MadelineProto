@@ -35,14 +35,13 @@ trait CallHandler
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response']) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log('Getting response (try number '.$res_count.' for '.$method.')...');
-                        $this->recv_message(); // This method receives data from the socket, and parses stuff 
+                        $this->recv_message(); // This method receives data from the socket, and parses stuff
 
                         if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
 
                             continue;
                         }
                         $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content']; // continue was not called, so I got a response
-
                     } catch (\danog\MadelineProto\Exception $e) {
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...');
                         continue;

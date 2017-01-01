@@ -194,6 +194,7 @@ trait UpdateHandler
                 \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
                 if (!isset($this->channels_state[$channel_id]) && !isset($update['pts'])) {
                     \danog\MadelineProto\Logger::log('I do not have the channel in the states and the pts is not set.');
+
                     return;
                 }
                 break;
