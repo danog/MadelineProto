@@ -49,13 +49,13 @@ trait MsgIdHandler
             if ($container) {
                 asort($keys);
                 if ($new_message_id >= end($keys)) {
-                    throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
+                    \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').');
                 }
             } else {
                 asort($keys);
                 foreach ($keys as $message_id) {
                     if ($new_message_id <= $message_id) {
-                        throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').');
+                        \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').');
                     }
                 }
             }

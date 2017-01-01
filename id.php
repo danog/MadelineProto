@@ -12,25 +12,35 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 
-$id = 'AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC';
+$id = ['AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC', "BQADBAADhQEAAo_aCgZOb3LWhOazMQI"];
 
-function foreach_offset_length($string, $callback)
+function foreach_offset_length($string)
 {
+    $res = [];
     $strlen = strlen($string);
     for ($offset = 0; $offset < strlen($string); $offset++) {
         for ($length = $strlen - $offset; $length > 0; $length--) {
             $s = substr($string, $offset, $length);
-            echo 'Offset: '.$offset.', length: '.$length.', res: ';
-            $callback($s);
+            $number = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
+            $res []= ['number' => $number, 'offset' => $offset, 'length' => $length];
+        }
+    }
+    return $res;
+}
+$res = [];
+foreach ($id as $file_id) {
+    $base256 = base64url_decode($file_id);
+    $res = foreach_offset_length($base256);
+    if (!isset($same)) {
+        $same = $res;
+    } else {
+        foreach ($same as $key => $s) {
+            if (!in_array($s, $res)) {
+                unset($same[$key]);
+            }
         }
     }
 }
-
-$base256 = base64url_decode($id);
-foreach_offset_length($base256, function ($s) {
-    $int = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
-    echo $int.PHP_EOL;
-});
 
 function base64url_decode($data)
 {

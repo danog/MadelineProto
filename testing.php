@@ -43,7 +43,6 @@ if (file_exists('number.php') && $MadelineProto === false) {
 }
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
 $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
@@ -78,3 +77,8 @@ foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
 }
 sleep(5);
 var_dump($MadelineProto->API->get_updates());
+
+while (true) {
+        $sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+
+}

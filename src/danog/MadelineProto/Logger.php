@@ -48,13 +48,13 @@ class Logger
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
-            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16).((self::$mode == 3) ? "\t" : '').$param;
+            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16)."\t".$param;
             switch (self::$mode) {
                 case 1:
                     error_log($param);
                     break;
                 case 2:
-                    error_log($param, 3, self::$optional);
+                    error_log($param.PHP_EOL, 3, self::$optional);
                     break;
                 case 3:
                     echo $param.PHP_EOL;

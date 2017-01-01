@@ -25,7 +25,7 @@ class Exception extends \Exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
         }
-        $e = new self($errstr, $errno);
+        $e = new \danog\MadelineProto\Exception($errstr, $errno);
         $e->file = $errfile;
         $e->line = $errline;
         throw $e;

@@ -20,6 +20,7 @@ trait UpdateHandler
     public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0];
     public $channels_state = [];
     public $updates = [];
+    public $updates_key = 0;
     private $getting_state = false;
 
     public function get_updates_update_handler($update)
@@ -27,7 +28,7 @@ trait UpdateHandler
         if (count($this->updates) > $this->settings['updates']['updates_array_limit']) {
             array_shift($this->updates);
         }
-        $this->updates[] = $update;
+        $this->updates[$this->updates_key++] = $update;
         //\danog\MadelineProto\Logger::log('Stored ', $update);
     }
 
@@ -76,7 +77,12 @@ trait UpdateHandler
             $this->get_channel_state($channel)['sync_loading'] = true;
             $this->get_channel_state($channel)['pending_pts_updates'] = [];
         }
-        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $this->get_info('channel#'.$channel)['InputChannel'], 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+        try {
+            $input = $this->get_info('channel#'.$channel)['InputChannel'];
+        } catch (\danog\MadelineProto\Exception $e) {
+            return false;
+        }
+        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
         \danog\MadelineProto\Logger::log('Got '.$difference['_']);
         $this->get_channel_state($channel)['sync_loading'] = false;
         switch ($difference['_']) {
@@ -185,13 +191,10 @@ trait UpdateHandler
                 break;
             case 'updateChannelTooLong':
                 $channel_id = $update['channel_id'];
-                \danog\MadelineProto\Logger::log('Update channel too long');
-                if (!isset($this->channels_state[$channel_id])) {
-                    if (!isset($update['pts'])) {
-                        \danog\MadelineProto\Logger::log('I do not have the channel in the states');
-
-                        return false;
-                    }
+                \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
+                if (!isset($this->channels_state[$channel_id]) && !isset($update['pts'])) {
+                    \danog\MadelineProto\Logger::log('I do not have the channel in the states and the pts is not set.');
+                    return;
                 }
                 break;
         }
@@ -200,16 +203,15 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-
+        /*
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
 
             return false;
         }
-
+        */
         switch ($update['_']) {
             case 'updateChannelTooLong':
-                \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
                 $this->get_channel_difference($channel_id);
 
                 return false;
@@ -263,7 +265,7 @@ trait UpdateHandler
             if ($update['pts'] > $cur_state['pts']) {
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
-            } elseif (isset($update['pts_count'])) {
+            } elseif (isset($update['pts_count']) && $update['pts_count']) {
                 \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
 
                 return false;

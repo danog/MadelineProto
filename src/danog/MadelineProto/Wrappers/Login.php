@@ -49,6 +49,7 @@ trait Login
         );
         $this->API->datacenter->authorized = true;
         $this->API->updates = [];
+        $this->API->updates_key = 0;
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
 
@@ -78,6 +79,7 @@ trait Login
         $this->API->datacenter->waiting_code = true;
         $this->API->should_serialize = true;
         $this->API->updates = [];
+        $this->API->updates_key = 0;
 
         \danog\MadelineProto\Logger::log('Code sent successfully! Once you receive the code you should use the complete_phone_login function.');
 

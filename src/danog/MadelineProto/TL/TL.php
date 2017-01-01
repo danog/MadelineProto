@@ -172,7 +172,7 @@ trait TL
     {
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
-            throw new Exception('Could not extract type: '.$method);
+            throw new Exception('Could not find method: '.$method);
         }
 
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
