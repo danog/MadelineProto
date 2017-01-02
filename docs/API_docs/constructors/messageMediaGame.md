@@ -22,4 +22,5 @@ description: messageMediaGame attributes, type and example
 
 ```
 $messageMediaGame = ['_' => 'messageMediaGame', 'game' => Game, ];
-```
+```  
+

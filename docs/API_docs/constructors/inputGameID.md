@@ -23,4 +23,5 @@ description: inputGameID attributes, type and example
 
 ```
 $inputGameID = ['_' => 'inputGameID', 'id' => long, 'access_hash' => long, ];
-```
+```  
+

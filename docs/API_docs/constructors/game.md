@@ -28,4 +28,5 @@ description: game attributes, type and example
 
 ```
 $game = ['_' => 'game', 'id' => long, 'access_hash' => long, 'short_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'document' => Document, ];
-```
+```  
+

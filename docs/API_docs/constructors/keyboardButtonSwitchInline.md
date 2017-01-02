@@ -24,4 +24,5 @@ description: keyboardButtonSwitchInline attributes, type and example
 
 ```
 $keyboardButtonSwitchInline = ['_' => 'keyboardButtonSwitchInline', 'same_peer' => true, 'text' => string, 'query' => string, ];
-```
+```  
+

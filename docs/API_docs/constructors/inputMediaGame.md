@@ -22,4 +22,5 @@ description: inputMediaGame attributes, type and example
 
 ```
 $inputMediaGame = ['_' => 'inputMediaGame', 'id' => InputGame, ];
-```
+```  
+

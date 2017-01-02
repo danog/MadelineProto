@@ -26,4 +26,5 @@ description: bind_auth_key_inner attributes, type and example
 
 ```
 $bind_auth_key_inner = ['_' => 'bind_auth_key_inner', 'nonce' => long, 'temp_auth_key_id' => long, 'perm_auth_key_id' => long, 'temp_session_id' => long, 'expires_at' => int, ];
-```
+```  
+

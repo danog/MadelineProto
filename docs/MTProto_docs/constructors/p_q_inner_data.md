@@ -27,4 +27,5 @@ description: p_q_inner_data attributes, type and example
 
 ```
 $p_q_inner_data = ['_' => 'p_q_inner_data', 'pq' => bytes, 'p' => bytes, 'q' => bytes, 'nonce' => int128, 'server_nonce' => int128, 'new_nonce' => int256, ];
-```
+```  
+

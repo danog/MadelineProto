@@ -17,4 +17,5 @@ description: updatePtsChanged attributes, type and example
 
 ```
 $updatePtsChanged = ['_' => 'updatePtsChanged', ];
-```
+```  
+

@@ -23,4 +23,5 @@ description: rpc_error attributes, type and example
 
 ```
 $rpc_error = ['_' => 'rpc_error', 'error_code' => int, 'error_message' => string, ];
-```
+```  
+

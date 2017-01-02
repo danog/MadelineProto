@@ -24,4 +24,5 @@ description: highScore attributes, type and example
 
 ```
 $highScore = ['_' => 'highScore', 'pos' => int, 'user_id' => int, 'score' => int, ];
-```
+```  
+

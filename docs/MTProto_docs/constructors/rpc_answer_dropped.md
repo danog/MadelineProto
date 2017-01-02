@@ -24,4 +24,5 @@ description: rpc_answer_dropped attributes, type and example
 
 ```
 $rpc_answer_dropped = ['_' => 'rpc_answer_dropped', 'msg_id' => long, 'seq_no' => int, 'bytes' => int, ];
-```
+```  
+

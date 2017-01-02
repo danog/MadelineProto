@@ -23,4 +23,5 @@ description: messages_highScores attributes, type and example
 
 ```
 $messages_highScores = ['_' => 'messages_highScores', 'scores' => [Vector t], 'users' => [Vector t], ];
-```
+```  
+

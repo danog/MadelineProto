@@ -22,4 +22,5 @@ description: inputBotInlineMessageGame attributes, type and example
 
 ```
 $inputBotInlineMessageGame = ['_' => 'inputBotInlineMessageGame', 'reply_markup' => ReplyMarkup, ];
-```
+```  
+

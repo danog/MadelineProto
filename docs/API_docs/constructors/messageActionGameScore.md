@@ -23,4 +23,5 @@ description: messageActionGameScore attributes, type and example
 
 ```
 $messageActionGameScore = ['_' => 'messageActionGameScore', 'game_id' => long, 'score' => int, ];
-```
+```  
+

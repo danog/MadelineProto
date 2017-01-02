@@ -31,4 +31,5 @@ description: stickerSet attributes, type and example
 
 ```
 $stickerSet = ['_' => 'stickerSet', 'installed' => true, 'archived' => true, 'official' => true, 'masks' => true, 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
-```
+```  
+

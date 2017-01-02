@@ -314,8 +314,24 @@ description: '.$constructor.' attributes, type and example
 
 ```
 $'.$constructor.' = '.$params.';
-```';
+```  
 
+';
+            if (in_array($this->constructors->type[$key], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+                $example .= 'The following syntaxes can also be used:
+
+```
+$'.$constructor." = '@username'; // Username
+
+$".$constructor.' = 44700; // bot API id (users)
+$'.$constructor.' = -492772765; // bot API id (chats)
+$'.$constructor.' = -10038575794; // bot API id (channels)
+
+$'.$constructor." = 'user#44700'; // tg-cli style id (users)
+$".$constructor." = 'chat#492772765'; // tg-cli style id (chats)
+$".$constructor." = 'channel#38575794'; // tg-cli style id (channels)
+```";
+            } 
             file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
         }
 

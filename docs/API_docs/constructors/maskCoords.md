@@ -25,4 +25,5 @@ description: maskCoords attributes, type and example
 
 ```
 $maskCoords = ['_' => 'maskCoords', 'n' => int, 'x' => double, 'y' => double, 'zoom' => double, ];
-```
+```  
+

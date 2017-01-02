@@ -24,4 +24,5 @@ description: dh_gen_retry attributes, type and example
 
 ```
 $dh_gen_retry = ['_' => 'dh_gen_retry', 'nonce' => int128, 'server_nonce' => int128, 'new_nonce_hash2' => int128, ];
-```
+```  
+

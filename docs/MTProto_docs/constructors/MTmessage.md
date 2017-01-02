@@ -25,4 +25,5 @@ description: MTmessage attributes, type and example
 
 ```
 $MTmessage = ['_' => 'MTmessage', 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object, ];
-```
+```  
+

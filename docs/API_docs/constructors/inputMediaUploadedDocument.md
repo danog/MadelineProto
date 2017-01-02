@@ -26,4 +26,5 @@ description: inputMediaUploadedDocument attributes, type and example
 
 ```
 $inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [Vector t], 'caption' => string, 'stickers' => [Vector t], ];
-```
+```  
+

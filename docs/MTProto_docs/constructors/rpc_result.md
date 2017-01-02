@@ -23,4 +23,5 @@ description: rpc_result attributes, type and example
 
 ```
 $rpc_result = ['_' => 'rpc_result', 'req_msg_id' => long, 'result' => Object, ];
-```
+```  
+

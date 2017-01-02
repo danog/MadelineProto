@@ -16,11 +16,11 @@ Also note that MadelineProto will perform better if a big math extension like gm
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here](https://daniil.it/MadelineProto/API_docs/).  
+The MadelineProto API documentation can be found [here (layer 57)](https://daniil.it/MadelineProto/API_docs/).  
 
 The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
 
-The MadelineProto API documentations (old layers) can be found [here (layer 46)](https://daniil.it/MadelineProto/API_docs_46/), [here (layer 55)](https://daniil.it/MadelineProto/API_docs_55/).  
+The MadelineProto API documentations (old layers) can be found [here](https://daniil.it/MadelineProto/old/).  
 
 ## Usage
 

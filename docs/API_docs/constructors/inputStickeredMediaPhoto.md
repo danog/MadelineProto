@@ -22,4 +22,5 @@ description: inputStickeredMediaPhoto attributes, type and example
 
 ```
 $inputStickeredMediaPhoto = ['_' => 'inputStickeredMediaPhoto', 'id' => InputPhoto, ];
-```
+```  
+

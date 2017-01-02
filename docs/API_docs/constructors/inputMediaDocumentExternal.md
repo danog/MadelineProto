@@ -23,4 +23,5 @@ description: inputMediaDocumentExternal attributes, type and example
 
 ```
 $inputMediaDocumentExternal = ['_' => 'inputMediaDocumentExternal', 'url' => string, 'caption' => string, ];
-```
+```  
+

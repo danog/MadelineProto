@@ -24,4 +24,5 @@ description: future_salt attributes, type and example
 
 ```
 $future_salt = ['_' => 'future_salt', 'valid_since' => int, 'valid_until' => int, 'salt' => long, ];
-```
+```  
+

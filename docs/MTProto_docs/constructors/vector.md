@@ -17,4 +17,5 @@ description: vector attributes, type and example
 
 ```
 $vector = ['_' => 'vector', ];
-```
+```  
+

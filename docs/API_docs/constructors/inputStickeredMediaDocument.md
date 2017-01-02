@@ -22,4 +22,5 @@ description: inputStickeredMediaDocument attributes, type and example
 
 ```
 $inputStickeredMediaDocument = ['_' => 'inputStickeredMediaDocument', 'id' => InputDocument, ];
-```
+```  
+

@@ -25,4 +25,5 @@ description: documentAttributeSticker attributes, type and example
 
 ```
 $documentAttributeSticker = ['_' => 'documentAttributeSticker', 'mask' => true, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
-```
+```  
+

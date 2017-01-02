@@ -24,4 +24,5 @@ description: bad_msg_notification attributes, type and example
 
 ```
 $bad_msg_notification = ['_' => 'bad_msg_notification', 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int, ];
-```
+```  
+

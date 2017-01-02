@@ -24,4 +24,5 @@ description: inputBotInlineResultGame attributes, type and example
 
 ```
 $inputBotInlineResultGame = ['_' => 'inputBotInlineResultGame', 'id' => string, 'short_name' => string, 'send_message' => InputBotInlineMessage, ];
-```
+```  
+

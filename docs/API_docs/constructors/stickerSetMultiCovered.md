@@ -23,4 +23,5 @@ description: stickerSetMultiCovered attributes, type and example
 
 ```
 $stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Vector t], ];
-```
+```  
+

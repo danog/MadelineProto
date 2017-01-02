@@ -22,4 +22,5 @@ description: msg_resend_req attributes, type and example
 
 ```
 $msg_resend_req = ['_' => 'msg_resend_req', 'msg_ids' => [Vector t], ];
-```
+```  
+

@@ -22,4 +22,5 @@ description: destroy_session_ok attributes, type and example
 
 ```
 $destroy_session_ok = ['_' => 'destroy_session_ok', 'session_id' => long, ];
-```
+```  
+

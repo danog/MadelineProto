@@ -24,4 +24,5 @@ description: server_DH_params_fail attributes, type and example
 
 ```
 $server_DH_params_fail = ['_' => 'server_DH_params_fail', 'nonce' => int128, 'server_nonce' => int128, 'new_nonce_hash' => int128, ];
-```
+```  
+

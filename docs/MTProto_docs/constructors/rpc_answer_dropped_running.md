@@ -17,4 +17,5 @@ description: rpc_answer_dropped_running attributes, type and example
 
 ```
 $rpc_answer_dropped_running = ['_' => 'rpc_answer_dropped_running', ];
-```
+```  
+

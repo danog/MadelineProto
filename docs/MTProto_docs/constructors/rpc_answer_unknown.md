@@ -17,4 +17,5 @@ description: rpc_answer_unknown attributes, type and example
 
 ```
 $rpc_answer_unknown = ['_' => 'rpc_answer_unknown', ];
-```
+```  
+

@@ -22,4 +22,5 @@ description: msg_copy attributes, type and example
 
 ```
 $msg_copy = ['_' => 'msg_copy', 'orig_message' => MTMessage, ];
-```
+```  
+

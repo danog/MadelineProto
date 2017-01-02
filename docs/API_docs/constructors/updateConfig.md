@@ -17,4 +17,5 @@ description: updateConfig attributes, type and example
 
 ```
 $updateConfig = ['_' => 'updateConfig', ];
-```
+```  
+

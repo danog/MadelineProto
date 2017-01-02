@@ -22,4 +22,5 @@ description: msg_container attributes, type and example
 
 ```
 $msg_container = ['_' => 'msg_container', 'messages' => [vector], ];
-```
+```  
+

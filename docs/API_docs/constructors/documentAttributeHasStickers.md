@@ -17,4 +17,5 @@ description: documentAttributeHasStickers attributes, type and example
 
 ```
 $documentAttributeHasStickers = ['_' => 'documentAttributeHasStickers', ];
-```
+```  
+

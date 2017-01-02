@@ -22,4 +22,5 @@ description: keyboardButtonGame attributes, type and example
 
 ```
 $keyboardButtonGame = ['_' => 'keyboardButtonGame', 'text' => string, ];
-```
+```  
+

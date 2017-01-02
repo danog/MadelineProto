@@ -35,20 +35,27 @@ $docs = [
         'description' => 'MadelineProto API documentation (layer 57)',
         'output_dir'  => __DIR__.'/docs/API_docs',
     ],
-    [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v55.json'],
-        'title'       => 'MadelineProto API documentation (layer 55)',
-        'description' => 'MadelineProto API documentation (layer 55)',
-        'output_dir'  => __DIR__.'/docs/API_docs_55',
-    ],
-    [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v46.tl'],
-        'title'       => 'MadelineProto API documentation (layer 46)',
-        'description' => 'MadelineProto API documentation (layer 46)',
-        'output_dir'  => __DIR__.'/docs/API_docs_46',
-    ],
 ];
+$layer_list = '';
+foreach (array_slice(glob(__DIR__.'/src/danog/MadelineProto/TL_telegram_*'), 0, -1) as $file) {
+    $layer = preg_replace(['/.*telegram_/', '/\..+/'], '', $file);
+    $docs []= [
+        'tl_schema'   => ['telegram' => $file],
+        'title'       => 'MadelineProto API documentation (layer '.$layer.')',
+        'description' => 'MadelineProto API documentation (layer '.$layer.')',
+        'output_dir'  => __DIR__.'/docs/old/API_docs_'.$layer,
+    ];
+    $layer_list = '[Layer '.$layer.'](API_docs_'.$layer.'/)  
+';
+}
 
+file_put_contents('docs/old/index.md', '---
+title: Documentations of old mtproto layers
+description: Documentation of old mtproto layers
+---
+# Documentation of old mtproto layers  
+
+'.$layer_list);
 foreach ($docs as $settings) {
     $doc = new \danog\MadelineProto\DocsBuilder($settings);
     $doc->mk_docs();

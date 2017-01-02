@@ -23,4 +23,5 @@ description: pong attributes, type and example
 
 ```
 $pong = ['_' => 'pong', 'msg_id' => long, 'ping_id' => long, ];
-```
+```  
+

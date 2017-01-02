@@ -23,4 +23,5 @@ description: inputMediaPhotoExternal attributes, type and example
 
 ```
 $inputMediaPhotoExternal = ['_' => 'inputMediaPhotoExternal', 'url' => string, 'caption' => string, ];
-```
+```  
+

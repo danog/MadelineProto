@@ -27,4 +27,5 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 
 ```
 $inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => string, 'attributes' => [Vector t], 'caption' => string, 'stickers' => [Vector t], ];
-```
+```  
+
