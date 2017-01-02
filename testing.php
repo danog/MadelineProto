@@ -32,10 +32,7 @@ if (file_exists('number.php') && $MadelineProto === false) {
     $sentCode = $MadelineProto->phone_login($number);
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
+    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5)+1);
     $authorization = $MadelineProto->complete_phone_login($code);
     \danog\MadelineProto\Logger::log($authorization);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
@@ -78,6 +75,31 @@ foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
 sleep(5);
 var_dump($MadelineProto->API->get_updates());
 
-while (true) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session_old.madeline');
+
+if (file_exists('number.php') && $MadelineProto === false) {
+    include_once 'number.php';
+    $settings['tl_schema'] = ['layer' => 46, 'src' => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v46.tl']];
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+
+    $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
+        [
+            'phone_number'     => $number,
+        ]
+    );
+    \danog\MadelineProto\Logger::log($checkedPhone);
+    $sentCode = $MadelineProto->phone_login($number);
+    \danog\MadelineProto\Logger::log($sentCode);
+    echo 'Enter the code you received: ';
+    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5)+1);
+
+    $authorization = $MadelineProto->complete_phone_login($code);
+    \danog\MadelineProto\Logger::log($authorization);
+    echo 'Serializing MadelineProto to session_old.madeline...'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session_old.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
+echo 'Deserializing MadelineProto from session_old.madeline...'.PHP_EOL;
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session_old.madeline');
+
+
+

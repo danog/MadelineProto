@@ -1,0 +1,28 @@
+---
+title: updateBotInlineQuery
+description: updateBotInlineQuery attributes, type and example
+---
+## Constructor: updateBotInlineQuery  
+[Back to constructors index](index.md)
+
+
+
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|query\_id|[long](../types/long.md) | Required|
+|user\_id|[int](../types/int.md) | Required|
+|query|[string](../types/string.md) | Required|
+|offset|[string](../types/string.md) | Required|
+
+
+
+### Type: [Update](../types/Update.md)
+
+
+### Example:
+
+```
+$updateBotInlineQuery = ['_' => 'updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'offset' => string, ];
+```

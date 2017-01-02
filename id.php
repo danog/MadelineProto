@@ -11,17 +11,21 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require 'vendor/autoload.php';
+require '../db_id.php';
 
-$id = ['AgADBAADcKoxG4_aCgYKET2oLMua7pxRaRkABKoeLWY9bpazGdcCAAEC', 'BQADBAADhQEAAo_aCgZOb3LWhOazMQI'];
+$select = $pdo->prepare('SELECT * FROM ul');
+$select->execute();
+$pdores = $select->fetchAll(PDO::FETCH_ASSOC);
 
 function foreach_offset_length($string)
 {
     $res = [];
     $strlen = strlen($string);
     for ($offset = 0; $offset < strlen($string); $offset++) {
-        for ($length = $strlen - $offset; $length > 0; $length--) {
+        for ($length = 1; $length > 0; $length--) {
             $s = substr($string, $offset, $length);
-            $number = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
+            //$number = (string) (new \phpseclib\Math\BigInteger(strrev($s), 256));
+            $number = ord($s);
             $res[] = ['number' => $number, 'offset' => $offset, 'length' => $length];
         }
     }
@@ -29,8 +33,8 @@ function foreach_offset_length($string)
     return $res;
 }
 $res = [];
-foreach ($id as $file_id) {
-    $base256 = base64url_decode($file_id);
+foreach ($pdores as $r) {
+    $base256 = base64url_decode($r['file_id']);
     $res = foreach_offset_length($base256);
     if (!isset($same)) {
         $same = $res;
@@ -42,7 +46,7 @@ foreach ($id as $file_id) {
         }
     }
 }
-
+var_dump($same);
 function base64url_decode($data)
 {
     return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));

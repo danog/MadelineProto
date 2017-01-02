@@ -21,8 +21,32 @@ trait TL
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
         foreach ($files as $type => $file) {
             $type = $type === 'mtproto';
-            $TL_dict = json_decode(file_get_contents($file), true);
-
+            $filec = file_get_contents($file);
+            $TL_dict = json_decode($filec, true);
+            if ($TL_dict == false) {
+                $TL_dict = [];
+                $type = 'constructors';
+                $tl_file = explode("\n", $filec);
+                $key = 0;
+                foreach ($tl_file as $line) {
+                    if ($line == '') continue;
+                    if ($line == '---functions---') { $type = 'methods'; continue; }
+                    if (!preg_match('/^[^\s]+#/', $line)) continue;
+                    if (preg_match('/^vector#/', $line)) continue;
+                    $TL_dict[$type][$key][$type == 'constructors' ? 'predicate' : 'method'] = preg_replace('/#.*/', '', $line);
+                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line))))[0];
+                    $TL_dict[$type][$key]['params'] = [];
+                    $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
+                    foreach (explode(' ', preg_replace(['/^[^\s]+\s/', '/=\s[^\s]+/', '/\s$/'], '', $line)) as $param) {
+                        if ($param == '') continue;
+                        if ($param[0] == '{') continue;
+                        $explode = explode(':', $param);
+                        $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
+                    }
+                    $key++;
+                }
+            }
+            if (empty($TL_dict) || empty($TL_dict['constructors']) || empty($TL_dict['methods'])) throw new Exception('Invalid source file was provided: '.$file);
             \danog\MadelineProto\Logger::log('Translating objects...');
             foreach ($TL_dict['constructors'] as $elem) {
                 $this->constructors->add($elem, $type);
@@ -149,7 +173,8 @@ trait TL
 
         $constructorData = $this->constructors->find_by_predicate($predicate);
         if ($constructorData === false) {
-            throw new Exception('Could not extract type: '.$object);
+            \danog\MadelineProto\Logger::log($object);
+            throw new Exception('Could not extract type');
         }
 
         if ($bare = ($type['type'] != '' && $type['type'][0] == '%')) {
