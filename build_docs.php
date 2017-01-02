@@ -24,28 +24,28 @@ description: PHP implementation of telegram\'s MTProto protocol
 
 $docs = [
     [
-        'tl_schema' => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],
-        'title' => 'MadelineProto API documentation (mtproto)',
+        'tl_schema'   => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],
+        'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
-        'output_dir' => __DIR__.'/docs/MTProto_docs'
+        'output_dir'  => __DIR__.'/docs/MTProto_docs',
     ],
     [
-        'tl_schema' => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json'],
-        'title' => 'MadelineProto API documentation (layer 57)',
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json'],
+        'title'       => 'MadelineProto API documentation (layer 57)',
         'description' => 'MadelineProto API documentation (layer 57)',
-        'output_dir' => __DIR__.'/docs/API_docs'
+        'output_dir'  => __DIR__.'/docs/API_docs',
     ],
     [
-        'tl_schema' => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v55.json'],
-        'title' => 'MadelineProto API documentation (layer 55)',
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v55.json'],
+        'title'       => 'MadelineProto API documentation (layer 55)',
         'description' => 'MadelineProto API documentation (layer 55)',
-        'output_dir' => __DIR__.'/docs/API_docs_55'
+        'output_dir'  => __DIR__.'/docs/API_docs_55',
     ],
     [
-        'tl_schema' => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v46.tl'],
-        'title' => 'MadelineProto API documentation (layer 46)',
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v46.tl'],
+        'title'       => 'MadelineProto API documentation (layer 46)',
         'description' => 'MadelineProto API documentation (layer 46)',
-        'output_dir' => __DIR__.'/docs/API_docs_46'
+        'output_dir'  => __DIR__.'/docs/API_docs_46',
     ],
 ];
 

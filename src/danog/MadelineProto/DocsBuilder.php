@@ -15,14 +15,19 @@ namespace danog\MadelineProto;
 class DocsBuilder
 {
     use \danog\MadelineProto\TL\TL;
-    public function __construct($settings) {
+
+    public function __construct($settings)
+    {
         $this->construct_TL($settings['tl_schema']);
         $this->settings = $settings;
-        if (!file_exists($this->settings['output_dir'])) mkdir($this->settings['output_dir']);
+        if (!file_exists($this->settings['output_dir'])) {
+            mkdir($this->settings['output_dir']);
+        }
         chdir($this->settings['output_dir']);
-
     }
-    public function mk_docs() {
+
+    public function mk_docs()
+    {
         $types = [];
 
         \danog\MadelineProto\Logger::log('Generating documentation index...');
@@ -69,7 +74,7 @@ description: '.$this->settings['description'].'
             if (!in_array($key, $types[$real_type]['methods'])) {
                 $types[$real_type]['methods'][] = $key;
             }
-    
+
             $params = '';
             foreach ($this->methods->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id'])) {
@@ -94,15 +99,15 @@ description: '.$this->settings['description'].'
                     '['.
                      str_replace('_', '\_', $ptype).
                     '](../'.$link_type.'/'.$ptype.'.md)';
-    
+
                 $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
             }
             $md_method = '['.$real_method.']('.$method.'.md)';
-    
+
             $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-    
+
             $params = '';
             $table = empty($this->methods->params[$key]) ? '' : '### Parameters:
 
@@ -206,10 +211,8 @@ description: List of methods
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->constructors->type[$key]);
             $real_type = preg_replace('/.*_of_/', '', $type);
 
-
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $constructor);
             $real_constructor = preg_replace('/.*_of_/', '', $constructor);
-
 
             $params = '';
             foreach ($this->constructors->params[$key] as $param) {
@@ -234,17 +237,17 @@ description: List of methods
                 if (preg_match('/%/', $ptype)) {
                     $ptype = $this->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
                 }
-        
+
                 $params .= "'".$param['name']."' => ";
                 $ptype =
                     '['.
                     str_replace('_', '\_', $ptype).
                     '](../'.$link_type.'/'.$ptype.'.md)';
-        
+
                 $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
             }
             $md_constructor = str_replace('_', '\_', $constructor);
-        
+
             $constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$real_constructor.'.md) = \['.$params.'\];<a name="'.$constructor.'"></a>  
 
 ';
@@ -266,7 +269,7 @@ description: List of methods
                     continue;
                 }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
-        
+
                 $link_type = 'types';
                 if (isset($param['subtype'])) {
                     if ($param['type'] == 'vector') {
@@ -543,6 +546,6 @@ description: Represents a boolean.
 
 Represents a boolean.');
 
-\danog\MadelineProto\Logger::log('Done!');
+        \danog\MadelineProto\Logger::log('Done!');
     }
 }

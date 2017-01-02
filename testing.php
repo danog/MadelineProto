@@ -32,7 +32,7 @@ if (file_exists('number.php') && $MadelineProto === false) {
     $sentCode = $MadelineProto->phone_login($number);
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
-    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5)+1);
+    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
     $authorization = $MadelineProto->complete_phone_login($code);
     \danog\MadelineProto\Logger::log($authorization);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
@@ -91,7 +91,7 @@ if (file_exists('number.php') && $MadelineProto === false) {
     $sentCode = $MadelineProto->phone_login($number);
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
-    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5)+1);
+    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
 
     $authorization = $MadelineProto->complete_phone_login($code);
     \danog\MadelineProto\Logger::log($authorization);
@@ -100,6 +100,3 @@ if (file_exists('number.php') && $MadelineProto === false) {
 }
 echo 'Deserializing MadelineProto from session_old.madeline...'.PHP_EOL;
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session_old.madeline');
-
-
-
