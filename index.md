@@ -1,8 +1,8 @@
 ---
-title: MadelineProto API documentation (mtproto)
-description: MadelineProto API documentation (mtproto)
+title: MadelineProto API documentation (layer v27)
+description: MadelineProto API documentation (layer v27)
 ---
-# MadelineProto API documentation (mtproto)  
+# MadelineProto API documentation (layer v27)  
 
 [Methods](methods/)
 

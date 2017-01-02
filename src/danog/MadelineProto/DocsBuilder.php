@@ -24,6 +24,7 @@ class DocsBuilder
             mkdir($this->settings['output_dir']);
         }
         chdir($this->settings['output_dir']);
+        $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
 
     public function mk_docs()
@@ -32,7 +33,7 @@ class DocsBuilder
 
         \danog\MadelineProto\Logger::log('Generating documentation index...');
 
-        file_put_contents('index.md', '---
+        file_put_contents($this->index, '---
 title: '.$this->settings['title'].'
 description: '.$this->settings['description'].'
 ---
@@ -180,7 +181,7 @@ $'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
             $last_namespace = $new_namespace;
         }
 
-        file_put_contents('methods/index.md', '---
+        file_put_contents('methods/'.$this->index, '---
 title: Methods
 description: List of methods
 ---
@@ -346,7 +347,7 @@ $".$constructor." = 'channel#38575794'; // tg-cli style id (channels)
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('constructors/index.md', '---
+        file_put_contents('constructors/'.$this->index, '---
 title: Constructors
 description: List of constructors
 ---
@@ -425,7 +426,7 @@ description: constructors and methods of type '.$type.'
 
         \danog\MadelineProto\Logger::log('Generating types index...');
 
-        file_put_contents('types/index.md', '---
+        file_put_contents('types/'.$this->index, '---
 title: Types
 description: List of types
 ---

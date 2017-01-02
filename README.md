@@ -20,7 +20,7 @@ The MadelineProto API documentation can be found [here (layer 57)](https://danii
 
 The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
 
-The MadelineProto API documentations (old layers) can be found [here](https://daniil.it/MadelineProto/old/).  
+The MadelineProto API documentations (old layers) can be found [here](https://github.com/danog/MadelineProto/tree/master/old_docs).  
 
 ## Usage
 
