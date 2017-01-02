@@ -331,7 +331,7 @@ $'.$constructor." = 'user#44700'; // tg-cli style id (users)
 $".$constructor." = 'chat#492772765'; // tg-cli style id (chats)
 $".$constructor." = 'channel#38575794'; // tg-cli style id (channels)
 ```";
-            } 
+            }
             file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
         }
 

@@ -39,7 +39,7 @@ $docs = [
 $layer_list = '';
 foreach (array_slice(glob(__DIR__.'/src/danog/MadelineProto/TL_telegram_*'), 0, -1) as $file) {
     $layer = preg_replace(['/.*telegram_/', '/\..+/'], '', $file);
-    $docs []= [
+    $docs[] = [
         'tl_schema'   => ['telegram' => $file],
         'title'       => 'MadelineProto API documentation (layer '.$layer.')',
         'description' => 'MadelineProto API documentation (layer '.$layer.')',
