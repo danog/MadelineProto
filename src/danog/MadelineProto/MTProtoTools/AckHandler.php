@@ -33,7 +33,7 @@ trait AckHandler
     {
         // I let the server know that I received its message
         if (!isset($this->datacenter->incoming_messages[$message_id])) {
-            \danog\MadelineProto\Logger::log("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?');
+            \danog\MadelineProto\Logger::log("WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?');
             //throw new \danog\MadelineProto\Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
         if ($this->datacenter->temp_auth_key['id'] === null || $this->datacenter->temp_auth_key['id'] == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00') || (isset($this->datacenter->incoming_messages[$message_id]['ack']) && $this->datacenter->incoming_messages[$message_id]['ack'])) {

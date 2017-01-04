@@ -209,10 +209,10 @@ $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 1]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {
-        $offset = $update['update_id'] // Just like in the bot API, the offset must be set to the last update_id
+        $offset = $update['update_id']; // Just like in the bot API, the offset must be set to the last update_id
         // Parse $update['update'], that is an object of type Update
     }
-    var_dump($update);
+    var_dump($updates);
 }
 
 array(3) {

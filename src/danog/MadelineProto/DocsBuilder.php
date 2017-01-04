@@ -63,8 +63,8 @@ description: '.$this->settings['description'].'
 
         \danog\MadelineProto\Logger::log('Generating methods documentation...');
 
-        foreach ($this->methods->method as $key => $method) {
-            $method = str_replace('.', '_', $method);
+        foreach ($this->methods->method as $key => $rmethod) {
+            $method = str_replace('.', '_', $rmethod);
             $real_method = str_replace('.', '->', $method);
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->methods->type[$key]);
             $real_type = preg_replace('/.*_of_/', '', $type);

@@ -25,35 +25,34 @@ trait UpdateHandler
 
     public function get_updates_update_handler($update)
     {
-        if (count($this->updates) > $this->settings['updates']['updates_array_limit']) {
-            array_shift($this->updates);
-        }
         $this->updates[$this->updates_key++] = $update;
         //\danog\MadelineProto\Logger::log('Stored ', $update);
     }
 
     public function get_updates($params = [])
     {
+        $time = microtime(true);
         $this->force_get_updates_difference();
-        if (empty($this->updates)) {
-            return [];
-        }
-        $default_params = ['offset' => array_keys($this->updates)[0], 'limit' => null, 'timeout' => 0];
+        $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
         foreach ($default_params as $key => $default) {
             if (!isset($params[$key])) {
                 $params[$key] = $default;
             }
         }
-        $time = microtime(true);
-        $params['timeout'] = (int) ($params['timeout'] - (microtime(true) - $time));
-        sleep($params['timeout'] > 0 ? $params['timeout'] : 0);
-        $result = array_slice($this->updates, $params['offset'], $params['limit'], true);
-        $updates = [];
-        foreach ($result as $key => $value) {
-            $updates[] = ['update_id' => $key, 'update' => $value];
-            unset($this->updates[$key]);
+        $params['timeout'] = (int) ($params['timeout']*1000000 - (microtime(true) - $time));
+        usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
+        if (empty($this->updates)) {
+            return [];
         }
-
+        if ($params['offset'] < 0) $params['offset'] = array_reverse(array_keys($this->updates))[abs($params['offset'])-1];
+        $updates = [];
+        foreach ($this->updates as $key => $value) {
+            if ($params['offset'] > $key) {
+                unset($this->updates[$key]);
+            } else if ($params['limit'] == null || count($updates) < $params['limit']) {
+                $updates[] = ['update_id' => $key, 'update' => $value];
+            }
+        }
         return $updates;
     }
 
@@ -204,13 +203,13 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        /*
+        
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
 
             return false;
         }
-        */
+        
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 $this->get_channel_difference($channel_id);
@@ -220,7 +219,7 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $message = $update['message'];
+                $message = &$update['message'];
                 if ((isset($message['from_id']) && !$this->peer_isset($message['from_id'])) ||
                     !$this->peer_isset($message['to_id']) ||
                     (isset($message['via_bot_id']) && !$this->peer_isset($message['via_bot_id'])) ||
@@ -236,6 +235,7 @@ trait UpdateHandler
 
                     return false;
                 }
+                if ($message['from_id'] == $this->datacenter->authorization['user']['id']) { $message['out'] = true; }
                 break;
             default:
                 if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
@@ -267,7 +267,7 @@ trait UpdateHandler
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
             } elseif (isset($update['pts_count']) && $update['pts_count']) {
-                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
+                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id, $update);
 
                 return false;
             }
@@ -359,7 +359,7 @@ trait UpdateHandler
 
     public function handle_multiple_update($updates, $options = [], $channel = false)
     {
-        if ($channel == false) {
+        if ($channel === false) {
             foreach ($updates as $update) {
                 switch ($update['_']) {
                     case 'updateChannelTooLong':
@@ -368,11 +368,11 @@ trait UpdateHandler
                         $this->handle_update($update, $options);
                         continue 2;
                 }
-                $this->save_update($update);
+                $this->handle_update($update);
             }
         } else {
             foreach ($updates as $update) {
-                $this->save_update($update);
+                $this->handle_update($update);
             }
         }
     }
@@ -380,12 +380,13 @@ trait UpdateHandler
     public function handle_update_messages($messages, $channel = false)
     {
         foreach ($messages as $message) {
-            $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
+            $this->handle_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 
     public function save_update($update)
     {
+        if (!$this->settings['updates']['handle_updates']) return;
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
         $this->settings['updates']['callback']($update);
     }

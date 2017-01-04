@@ -198,7 +198,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'outgoing' => 1000,
             ],
             'updates'   => [
-                'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback
+                'handle_updates' => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
         ];

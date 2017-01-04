@@ -37,10 +37,11 @@ trait MsgIdHandler
             if ($new_message_id <= end($keys)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.end($keys).').', 1);
             }
-            $this->datacenter->outgoing_messages[$new_message_id] = [];
             if (count($this->datacenter->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
-                array_shift($this->datacenter->outgoing_messages);
+                reset($this->datacenter->outgoing_messages);
+                unset($this->datacenter->outgoing_messages[key($this->datacenter->outgoing_messages)]);
             }
+            $this->datacenter->outgoing_messages[$new_message_id] = [];
         } else {
             if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
@@ -59,10 +60,11 @@ trait MsgIdHandler
                     }
                 }
             }
-            $this->datacenter->incoming_messages[$new_message_id] = [];
             if (count($this->datacenter->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
-                array_shift($this->datacenter->incoming_messages);
+                reset($this->datacenter->outgoing_messages);
+                unset($this->datacenter->outgoing_messages[key($this->datacenter->outgoing_messages)]);
             }
+            $this->datacenter->incoming_messages[$new_message_id] = [];
             ksort($this->datacenter->incoming_messages);
         }
     }

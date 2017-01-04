@@ -82,8 +82,8 @@ trait ResponseHandler
             if (isset($response['result']['users'])) {
                 $this->add_users($response['result']['users']);
             }
-            if (isset($response['result']['chats'])) {
-                $this->add_chats($response['result']['chats']);
+            if (isset($response['result']['_']) && $this->constructors->find_by_predicate($response['result']['_'])['type'] == 'Update') {
+                $this->handle_update($response['result']);
             }
             switch ($response['_']) {
                 case 'msgs_ack':
@@ -255,6 +255,7 @@ trait ResponseHandler
 
     public function handle_updates($updates)
     {
+        if (!$this->settings['updates']['handle_updates']) return;
         \danog\MadelineProto\Logger::log('Parsing updates received via the socket...');
         if ($this->getting_state) {
             \danog\MadelineProto\Logger::log('Getting state, handle later');
