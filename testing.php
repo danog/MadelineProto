@@ -80,8 +80,6 @@ $inputFile = $MadelineProto->upload('60', 'magic'); // This gets an inputFile ob
 var_dump(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
-
-
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);

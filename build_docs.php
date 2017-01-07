@@ -28,14 +28,14 @@ $docs = [
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
         'output_dir'  => __DIR__.'/docs/MTProto_docs',
-        'readme' => false
+        'readme'      => false,
     ],
     [
         'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json'],
         'title'       => 'MadelineProto API documentation (layer 57)',
         'description' => 'MadelineProto API documentation (layer 57)',
         'output_dir'  => __DIR__.'/docs/API_docs',
-        'readme' => false
+        'readme'      => false,
     ],
 ];
 
@@ -47,7 +47,7 @@ foreach (array_slice(glob(__DIR__.'/src/danog/MadelineProto/TL_telegram_*'), 0, 
         'title'       => 'MadelineProto API documentation (layer '.$layer.')',
         'description' => 'MadelineProto API documentation (layer '.$layer.')',
         'output_dir'  => __DIR__.'/old_docs/API_docs_'.$layer,
-        'readme' => true
+        'readme'      => true,
     ];
     $layer_list = '[Layer '.$layer.'](API_docs_'.$layer.'/)  
 ';

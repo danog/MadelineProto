@@ -102,7 +102,7 @@ trait ResponseHandler
                     break;
 
                     case 'channelFull':
-                    $this->chats[(int)('-100'.$response['result']['channel']['id'])] = $response['result'];
+                    $this->chats[(int) ('-100'.$response['result']['channel']['id'])] = $response['result'];
                     $this->should_serialize = true;
                     break;
                 }
@@ -277,7 +277,9 @@ trait ResponseHandler
 
     public function handle_updates($updates)
     {
-        if (!$this->settings['updates']['handle_updates']) return;
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         \danog\MadelineProto\Logger::log('Parsing updates received via the socket...');
         if ($this->getting_state) {
             \danog\MadelineProto\Logger::log('Getting state, handle later');

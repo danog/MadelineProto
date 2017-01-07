@@ -39,20 +39,23 @@ trait UpdateHandler
                 $params[$key] = $default;
             }
         }
-        $params['timeout'] = (int) ($params['timeout']*1000000 - (microtime(true) - $time));
+        $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
         usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
         if (empty($this->updates)) {
             return [];
         }
-        if ($params['offset'] < 0) $params['offset'] = array_reverse(array_keys($this->updates))[abs($params['offset'])-1];
+        if ($params['offset'] < 0) {
+            $params['offset'] = array_reverse(array_keys($this->updates))[abs($params['offset']) - 1];
+        }
         $updates = [];
         foreach ($this->updates as $key => $value) {
             if ($params['offset'] > $key) {
                 unset($this->updates[$key]);
-            } else if ($params['limit'] == null || count($updates) < $params['limit']) {
+            } elseif ($params['limit'] == null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
+
         return $updates;
     }
 
@@ -235,7 +238,9 @@ trait UpdateHandler
 
                     return false;
                 }
-                if (isset($message['from_id']) && $message['from_id'] == $this->datacenter->authorization['user']['id']) { $message['out'] = true; }
+                if (isset($message['from_id']) && $message['from_id'] == $this->datacenter->authorization['user']['id']) {
+                    $message['out'] = true;
+                }
                 break;
             default:
                 if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
@@ -386,7 +391,9 @@ trait UpdateHandler
 
     public function save_update($update)
     {
-        if (!$this->settings['updates']['handle_updates']) return;
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
         $this->settings['updates']['callback']($update);
     }

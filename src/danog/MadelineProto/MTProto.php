@@ -198,7 +198,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'outgoing' => 1000,
             ],
             'updates'   => [
-                'handle_updates' => true, // Should I handle updates?
+                'handle_updates'      => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
         ];
