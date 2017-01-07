@@ -46,9 +46,48 @@ $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp
 $mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
+$media = [];
+
+// Photo uploaded as document
+$inputFile = $MadelineProto->upload('faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
+$media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]];
+
+// Photo
+$media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];
+
+// GIF
+$inputFile = $MadelineProto->upload('pony.mp4');
+$media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('pony.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAnimated']]];
+
+// Sticker
+$inputFile = $MadelineProto->upload('lel.webp');
+$media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('lel.webp'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]];
+
+// Video
+$inputFile = $MadelineProto->upload('swing.mp4');
+$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
+
+// audio
+$inputFile = $MadelineProto->upload('mosconi.mp3');
+$media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
+
+// voice
+$media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
+
+// Document
+$time = time();
+$inputFile = $MadelineProto->upload('60', 'magic'); // This gets an inputFile object with file name magic
+var_dump(time() - $time);
+$media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
+
+
+
 foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
+    foreach ($media as $type => $inputMedia) {
+        \danog\MadelineProto\Logger::log($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia]));
+    }
 }
 
 sleep(5);

@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fc800fb5f8bf5490499819d3b4b2330d",
     "content-hash": "3a10bc147a48cd4573bcc9654d3be153",
     "packages": [
         {
@@ -58,7 +57,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-11-14 15:09:50"
+            "time": "2016-11-14T15:09:50+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -119,7 +118,7 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-07-11 20:32:06"
+            "time": "2016-07-11T20:32:06+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -167,7 +166,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-11-07 23:38:38"
+            "time": "2016-11-07T23:38:38+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -259,7 +258,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2016-10-04 00:57:04"
+            "time": "2016-10-04T00:57:04+00:00"
         }
     ],
     "packages-dev": [],

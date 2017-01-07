@@ -16,6 +16,7 @@ class API extends APIFactory
 {
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\PeerHandler;
+    use \danog\MadelineProto\Wrappers\FilesHandler;
     use \danog\MadelineProto\Wrappers\SettingsManager;
 
     public $API;

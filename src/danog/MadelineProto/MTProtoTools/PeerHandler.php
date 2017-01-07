@@ -24,8 +24,9 @@ trait PeerHandler
         foreach ($users as $key => $user) {
             switch ($user['_']) {
                 case 'user':
-                    if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
-                        $this->chats[$user['id']] = $user;
+                    if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']]['user'] !== $user) {
+                        //$this->method_call('users.getFullUser', ['id' => $user]);
+                        $this->chats[$user['id']] = ['_' => 'userFull', 'user' => $user];
                         $this->should_serialize = true;
                     }
                 case 'userEmpty':
@@ -43,18 +44,21 @@ trait PeerHandler
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
-                    if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
+                    if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']]['chat'] !== $chat) {
+                        //$this->method_call('messages.getFullChat', ['chat_id' => $chat['id']]);
+                        $this->chats[-$chat['id']] = ['_' => 'chatFull', 'chat' => $chat];
                         $this->should_serialize = true;
-                        $this->chats[-$chat['id']] = $chat;
+
                     }
 
                 case 'chatForbidden':
                 case 'channelEmpty':
                     break;
                 case 'channel':
-                    if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])] !== $chat) {
+                    if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])]['channel'] !== $chat) {
+                        $this->chats[(int)('-100'.$chat['id'])] = ['_' => 'channelFull', 'channel' => $chat];
                         $this->should_serialize = true;
-                        $this->chats[(int) ('-100'.$chat['id'])] = $chat;
+                        //$this->method_call('channels.getFullChannel', ['channel' => $chat]);
                     }
                     break;
                 default:
@@ -62,7 +66,6 @@ trait PeerHandler
                     break;
             }
         }
-        $this->should_serialize = true;
     }
 
     public function peer_isset($id)
@@ -111,12 +114,15 @@ trait PeerHandler
     {
         if (is_array($id)) {
             switch ($id['_']) {
-                case 'inputPeerSelf':
+                case 'inputUserSelf':
                 case 'inputPeerSelf':
                     $id = $this->datacenter->authorization['user']['id'];
                     break;
                 case 'user':
                     $id = $id['id'];
+                    break;
+                case 'userFull':
+                    $id = $id['user']['id'];
                     break;
                 case 'inputPeerUser':
                 case 'inputUser':
@@ -127,6 +133,9 @@ trait PeerHandler
                 case 'chat':
                     $id = -$id['id'];
                     break;
+                case 'chatFull':
+                    $id = -$id['chat']['id'];
+                    break;
                 case 'inputPeerChat':
                 case 'peerChat':
                     $id = -$id['chat_id'];
@@ -135,6 +144,10 @@ trait PeerHandler
                 case 'channel':
                     $id = '-100'.$id['id'];
                     break;
+                case 'channelFull':
+                    $id = '-100'.$id['channel']['id'];
+                    break;
+
                 case 'inputPeerChannel':
                 case 'inputChannel':
                 case 'peerChannel':
@@ -161,14 +174,14 @@ trait PeerHandler
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
             }
-//            if ($recursive) {
-//            }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }
         $id = str_replace('@', '', $id);
         foreach ($this->chats as $chat) {
-            if (isset($chat['username']) && strtolower($chat['username']) == strtolower($id)) {
-                return $this->gen_all($chat);
+            foreach (['user', 'chat', 'channel'] as $wut) {
+                if (isset($chat[$wut]['username']) && strtolower($chat[$wut]['username']) == strtolower($id)) {
+                    return $this->gen_all($chat);
+                }
             }
         }
         if ($recursive) {
@@ -183,32 +196,35 @@ trait PeerHandler
     {
         $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
-            case 'user':
-                if ($constructor['self']) {
+            case 'userFull':
+                $res['User'] = $constructor['user'];
+                if ($constructor['user']['self']) {
                     $res['InputPeer'] = ['_' => 'inputPeerSelf'];
                     $res['InputUser'] = ['_' => 'inputUserSelf'];
-                } elseif (isset($constructor['access_hash'])) {
-                    $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                } elseif (isset($constructor['user']['access_hash'])) {
+                    $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['user']['id'], 'access_hash' => $constructor['user']['access_hash']];
+                    $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['user']['id'], 'access_hash' => $constructor['user']['access_hash']];
                 }
-                $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
-                $res['user_id'] = $constructor['id'];
-                $res['bot_api_id'] = $constructor['id'];
+                $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['user']['id']];
+                $res['user_id'] = $constructor['user']['id'];
+                $res['bot_api_id'] = $constructor['user']['id'];
                 break;
-            case 'chat':
-                $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
-                $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
-                $res['chat_id'] = $constructor['id'];
-                $res['bot_api_id'] = -$constructor['id'];
+            case 'chatFull':
+                $res['Chat'] = $constructor['chat'];
+                $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['chat']['id']];
+                $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['chat']['id']];
+                $res['chat_id'] = $constructor['chat']['id'];
+                $res['bot_api_id'] = -$constructor['chat']['id'];
                 break;
-            case 'channel':
-                if (isset($constructor['access_hash'])) {
-                    $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+            case 'channelFull':
+                $res['Channel'] = $constructor['channel'];
+                if (isset($constructor['channel']['access_hash'])) {
+                    $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['channel']['id'], 'access_hash' => $constructor['channel']['access_hash']];
+                    $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['channel']['id'], 'access_hash' => $constructor['channel']['access_hash']];
                 }
-                $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
-                $res['channel_id'] = $constructor['id'];
-                $res['bot_api_id'] = (int) ('-100'.$constructor['id']);
+                $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['channel']['id']];
+                $res['channel_id'] = $constructor['channel']['id'];
+                $res['bot_api_id'] = (int) ('-100'.$constructor['channel']['id']);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));

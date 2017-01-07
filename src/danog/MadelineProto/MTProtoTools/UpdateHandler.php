@@ -83,7 +83,6 @@ trait UpdateHandler
         }
         $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
         \danog\MadelineProto\Logger::log('Got '.$difference['_']);
-        $this->get_channel_state($channel)['sync_loading'] = false;
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
                 $this->set_channel_state($channel, $difference);
@@ -105,6 +104,7 @@ trait UpdateHandler
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
+        $this->get_channel_state($channel)['sync_loading'] = false;
     }
 
     public function set_update_state($data)
@@ -138,7 +138,6 @@ trait UpdateHandler
 
         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => -1]);
         \danog\MadelineProto\Logger::log('Got '.$difference['_']);
-        $this->get_update_state()['sync_loading'] = false;
         switch ($difference['_']) {
             case 'updates.differenceEmpty':
                 $this->set_update_state($difference);
@@ -158,6 +157,7 @@ trait UpdateHandler
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
+        $this->get_update_state()['sync_loading'] = false;
     }
 
     public function get_updates_state()
@@ -203,13 +203,13 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        
+        /*
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
 
             return false;
         }
-        
+        */
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 $this->get_channel_difference($channel_id);
@@ -235,7 +235,7 @@ trait UpdateHandler
 
                     return false;
                 }
-                if ($message['from_id'] == $this->datacenter->authorization['user']['id']) { $message['out'] = true; }
+                if (isset($message['from_id']) && $message['from_id'] == $this->datacenter->authorization['user']['id']) { $message['out'] = true; }
                 break;
             default:
                 if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
@@ -266,7 +266,7 @@ trait UpdateHandler
             if ($update['pts'] > $cur_state['pts']) {
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
-            } elseif (isset($update['pts_count']) && $update['pts_count']) {
+            } elseif (isset($update['pts_count'])) {
                 \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id, $update);
 
                 return false;

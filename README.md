@@ -199,7 +199,7 @@ $MadelineProto->update_settings($settings);
 ### Handling updates
 
 When an update is received, the update callback function (see settings) is called. By default, the get_updates_update_handler MadelineProto method is called. This method stores all incoming updates into an array (its size limit is specified by the updates\_array\_limit parameter in the settings) and can be fetched by running the `get_updates` method.  
-This method accepts an array of options as the first parameter, and returns an array of updates. Example:  
+This method accepts an array of options as the first parameter, and returns an array of updates (an array containing the update id and an object of type [Update](https://daniil.it/MadelineProto/API_docs/types/Updates.html)). Example:  
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
@@ -313,6 +313,36 @@ array(3) {
 
 To specify a custom callback change the correct value in the settings. The specified callable must accept one parameter for the update.
 
+
+### Uploading and downloading files
+
+MadelineProto provides wrapper methods to upload and download files.
+
+Every method described in this section accepts a last optional paramater with a callable function that will be called during the upload/download using the first parameter to pass a floating point number indicating the upload/download status in percentage.  
+
+The upload method returns an [InputFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) object that must be used to generate an [InputMedia](https://daniil.it/MadelineProto/API_docs/types/InputMedia.html) object, that can be later sent using the [sendmedia method](https://daniil.it/MadelineProto/API_docs/methods/messages_sendMedia.html).  
+
+
+```
+$inputFile = $MadelineProto->upload('file', 'optional new file name.ext');
+// Generate an inputMedia object and store it in $inputMedia, see testing.php
+$MadelineProto->messages->sendMedia(['peer' => '@pwrtelegramgroup', 'media' => $inputMedia]);
+```
+
+
+See testing.php for more examples.
+
+
+There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
+The first parameter of these functions must always be a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object. These objects are usually received in updates, see `bot.php` for examples
+
+
+```
+$output_file_name = $MadelineProto->download_to_dir($message_media, '/tmp/dldir');
+$custom_output_file_name = $MadelineProto->download_to_file($message_media, '/tmp/dldir/customname.ext');
+$stream = fopen('php://output', 'w'); // Stream to browser like with echo
+$MadelineProto->download_to_stream($message_media, $stream);
+```
 
 
 ### Calling mtproto methods and available wrappers

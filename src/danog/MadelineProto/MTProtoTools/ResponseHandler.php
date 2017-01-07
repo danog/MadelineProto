@@ -82,8 +82,30 @@ trait ResponseHandler
             if (isset($response['result']['users'])) {
                 $this->add_users($response['result']['users']);
             }
-            if (isset($response['result']['_']) && $this->constructors->find_by_predicate($response['result']['_'])['type'] == 'Update') {
-                $this->handle_update($response['result']);
+            if (isset($response['result']['chats'])) {
+                $this->add_chats($response['result']['chats']);
+            }
+            if (isset($response['result']['_'])) {
+                switch ($this->constructors->find_by_predicate($response['result']['_'])['type']) {
+                    case 'Update':
+                    $this->handle_update($response['result']);
+                    break;
+
+                    case 'userFull':
+                    $this->chats[$response['result']['user']['id']] = $response['result'];
+                    $this->should_serialize = true;
+                    break;
+
+                    case 'chatFull':
+                    $this->chats[-$response['result']['chat']['id']] = $response['result'];
+                    $this->should_serialize = true;
+                    break;
+
+                    case 'channelFull':
+                    $this->chats[(int)('-100'.$response['result']['channel']['id'])] = $response['result'];
+                    $this->should_serialize = true;
+                    break;
+                }
             }
             switch ($response['_']) {
                 case 'msgs_ack':
