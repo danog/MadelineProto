@@ -428,7 +428,7 @@ trait FilesHandler
         $f = fopen($file, 'r');
         fseek($f, 0);
         while (ftell($f) !== $file_size) {
-            if (!$this->API->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => stream_get_contents($f, $part_size)])) {
+            if (!$this->API->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => stream_get_contents($f, $part_size)], null, true)) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
@@ -531,7 +531,7 @@ trait FilesHandler
         $info = $this->get_download_info($message_media);
         $offset = ftell($stream);
         $part_size = 512 * 1024;
-        while (fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset += $part_size, 'limit' => $part_size])['bytes']) != false) {
+        while (fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset += $part_size, 'limit' => $part_size], null, true)['bytes']) != false) {
             $cb(ftell($stream) * 100 / $info['size']);
         }
 

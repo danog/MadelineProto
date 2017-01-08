@@ -70,6 +70,7 @@ trait ResponseHandler
     public function handle_messages()
     {
         foreach ($this->datacenter->new_incoming as $current_msg_id) {
+            $this->only_updates = false;
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
             \danog\MadelineProto\Logger::log('Received '.$response['_'].'.');
 
@@ -244,6 +245,7 @@ trait ResponseHandler
                         case 'Updates':
                             unset($this->datacenter->new_incoming[$current_msg_id]);
                             $this->handle_updates($response);
+                            $this->only_updates = true;
                             break;
                         default:
                             \danog\MadelineProto\Logger::log('Trying to assign a response of type '.$response_type.' to its request...');

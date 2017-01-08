@@ -182,9 +182,8 @@ trait UpdateHandler
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
                 if ($update['message']['_'] == 'messageEmpty') {
-                    \danog\MadelineProto\Logger::log('Got message empty, saving...');
-
-                    return $this->save_update($update);
+                    \danog\MadelineProto\Logger::log('Got message empty, not saving');
+                    return false;
                 }
                 $channel_id = $update['message']['to_id']['channel_id'];
                 break;
@@ -206,13 +205,13 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        /*
+        
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
 
             return false;
         }
-        */
+        
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 $this->get_channel_difference($channel_id);
@@ -222,12 +221,11 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $message = &$update['message'];
-                if ((isset($message['from_id']) && !$this->peer_isset($message['from_id'])) ||
-                    !$this->peer_isset($message['to_id']) ||
-                    (isset($message['via_bot_id']) && !$this->peer_isset($message['via_bot_id'])) ||
-                    (isset($message['entities']) && !$this->entities_peer_isset($message['entities'])) ||
-                    (isset($message['fwd_from']) && !$this->fwd_peer_isset($message['fwd_from']))) {
+                if ((isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
+                    !$this->peer_isset($update['message']['to_id']) ||
+                    (isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id'])) ||
+                    (isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities'])) ||
+                    (isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from']))) {
                     \danog\MadelineProto\Logger::log('Not enough data for message update, getting difference...');
 
                     if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
@@ -237,9 +235,6 @@ trait UpdateHandler
                     }
 
                     return false;
-                }
-                if (isset($message['from_id']) && $message['from_id'] == $this->datacenter->authorization['user']['id']) {
-                    $message['out'] = true;
                 }
                 break;
             default:
@@ -373,11 +368,11 @@ trait UpdateHandler
                         $this->handle_update($update, $options);
                         continue 2;
                 }
-                $this->handle_update($update);
+                $this->save_update($update);
             }
         } else {
             foreach ($updates as $update) {
-                $this->handle_update($update);
+                $this->save_update($update);
             }
         }
     }
@@ -385,7 +380,7 @@ trait UpdateHandler
     public function handle_update_messages($messages, $channel = false)
     {
         foreach ($messages as $message) {
-            $this->handle_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
+            $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 
@@ -393,6 +388,9 @@ trait UpdateHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
+        }
+        if (isset($update['message']['from_id']) && $update['message']['from_id'] == $this->datacenter->authorization['user']['id']) {
+            $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
         $this->settings['updates']['callback']($update);

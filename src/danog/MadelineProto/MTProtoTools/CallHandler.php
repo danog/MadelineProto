@@ -17,7 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait CallHandler
 {
-    public function method_call($method, $args = [], $message_id = null)
+    public function method_call($method, $args = [], $message_id = null, $heavy = false)
     {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
@@ -38,10 +38,13 @@ trait CallHandler
                         $this->recv_message(); // This method receives data from the socket, and parses stuff
 
                         if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
-
+                            if ($this->only_updates) $res_count--;
                             continue;
                         }
                         $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content']; // continue was not called, so I got a response
+                        if ($heavy) {
+                            unset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]);
+                        }
                     } catch (\danog\MadelineProto\Exception $e) {
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...');
                         continue;
@@ -105,6 +108,10 @@ trait CallHandler
                 $this->datacenter->close_and_reopen();
                 sleep(1); // To avoid flooding
                 continue;
+            } finally {
+                if ($heavy) {
+                    unset($this->datacenter->outgoing_messages[$int_message_id]);
+                }
             }
             if ($server_answer == null) {
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
