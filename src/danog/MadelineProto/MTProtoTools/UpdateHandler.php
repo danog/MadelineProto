@@ -183,6 +183,7 @@ trait UpdateHandler
             case 'updateEditChannelMessage':
                 if ($update['message']['_'] == 'messageEmpty') {
                     \danog\MadelineProto\Logger::log('Got message empty, not saving');
+
                     return false;
                 }
                 $channel_id = $update['message']['to_id']['channel_id'];
@@ -205,13 +206,13 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        
+
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log('Sync loading, not handling update');
 
             return false;
         }
-        
+
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 $this->get_channel_difference($channel_id);

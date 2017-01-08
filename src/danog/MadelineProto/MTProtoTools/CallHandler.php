@@ -38,7 +38,9 @@ trait CallHandler
                         $this->recv_message(); // This method receives data from the socket, and parses stuff
 
                         if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
-                            if ($this->only_updates) $res_count--;
+                            if ($this->only_updates) {
+                                $res_count--;
+                            }
                             continue;
                         }
                         $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content']; // continue was not called, so I got a response
