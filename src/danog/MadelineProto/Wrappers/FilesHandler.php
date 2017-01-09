@@ -498,7 +498,7 @@ trait FilesHandler
             return $res;
 
             default:
-            throw \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
+            throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
         }
     }
 
