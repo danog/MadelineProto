@@ -44,16 +44,17 @@ trait PeerHandler
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
+                case 'chatForbidden':
                     if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']]['chat'] !== $chat) {
                         //$this->method_call('messages.getFullChat', ['chat_id' => $chat['id']]);
                         $this->chats[-$chat['id']] = ['_' => 'chatFull', 'chat' => $chat];
                         $this->should_serialize = true;
                     }
 
-                case 'chatForbidden':
                 case 'channelEmpty':
                     break;
                 case 'channel':
+                case 'channelForbidden':
                     if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])]['channel'] !== $chat) {
                         $this->chats[(int) ('-100'.$chat['id'])] = ['_' => 'channelFull', 'channel' => $chat];
                         $this->should_serialize = true;

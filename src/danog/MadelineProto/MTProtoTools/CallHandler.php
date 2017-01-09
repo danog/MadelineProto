@@ -45,7 +45,7 @@ trait CallHandler
                         }
                         $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content']; // continue was not called, so I got a response
                         if ($heavy) {
-                            unset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]);
+                            $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'] = [];
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...');
@@ -112,7 +112,7 @@ trait CallHandler
                 continue;
             } finally {
                 if ($heavy) {
-                    unset($this->datacenter->outgoing_messages[$int_message_id]);
+                    $this->datacenter->outgoing_messages[$int_message_id]['args'] = [];
                 }
             }
             if ($server_answer == null) {
