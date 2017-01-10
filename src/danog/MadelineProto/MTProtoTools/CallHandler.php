@@ -111,7 +111,7 @@ trait CallHandler
                 sleep(1); // To avoid flooding
                 continue;
             } finally {
-                if ($heavy) {
+                if ($heavy && isset($int_message_id)) {
                     $this->datacenter->outgoing_messages[$int_message_id]['args'] = [];
                 }
             }

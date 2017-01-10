@@ -114,19 +114,19 @@ trait TL
         switch ($type['type']) {
             case 'int':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value isn't numeric");
+                    throw new Exception("given value (".$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<i', $object);
             case '#':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value isn't numeric");
+                    throw new Exception("given value (".$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<I', $object);
             case 'long':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value isn't numeric");
+                    throw new Exception("given value (".$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<q', $object);
@@ -141,7 +141,7 @@ trait TL
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
-                    $concat .= \danog\PHP\Struct::pack('<b', $l);
+                    $concat .= \danog\PHP\Struct::pack('<B', $l);
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod((-$l - 1), 4));
                 } else {
@@ -246,7 +246,7 @@ trait TL
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
                 if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) == 0)) {
-                    //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
+                    //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
                 if ($current_argument['name'] == 'random_id') {
@@ -268,7 +268,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type'].'/'.$current_argument['subtype']);
+            \danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']]);
         }
 

@@ -65,7 +65,7 @@ class MTProto extends PrimeModule
         $this->setup_logger();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
-        if ($this->datacenter->authorized) {
+        if ($this->datacenter->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log('Getting updates after deserialization...');
             $this->get_updates_difference();
         }
