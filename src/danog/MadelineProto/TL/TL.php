@@ -114,19 +114,19 @@ trait TL
         switch ($type['type']) {
             case 'int':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value (".$object.") isn't numeric");
+                    throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<i', $object);
             case '#':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value (".$object.") isn't numeric");
+                    throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<I', $object);
             case 'long':
                 if (!is_numeric($object)) {
-                    throw new Exception("given value (".$object.") isn't numeric");
+                    throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
                 return \danog\PHP\Struct::pack('<q', $object);
