@@ -65,7 +65,7 @@ description: '.$this->settings['description'].'
 
         foreach ($this->methods->method as $key => $rmethod) {
             $method = str_replace('.', '_', $rmethod);
-            $real_method = str_replace('.', '->', $method);
+            $real_method = str_replace('.', '->', $rmethod);
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->methods->type[$key]);
             $real_type = preg_replace('/.*_of_/', '', $type);
 
