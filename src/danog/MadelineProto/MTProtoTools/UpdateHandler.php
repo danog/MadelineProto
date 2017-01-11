@@ -174,6 +174,9 @@ trait UpdateHandler
 
     public function handle_update($update, $options = [])
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         \danog\MadelineProto\Logger::log('Handling an update of type '.$update['_'].'...');
         //var_dump($update, $options);
 
