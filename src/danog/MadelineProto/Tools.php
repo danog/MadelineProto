@@ -23,7 +23,7 @@ trait Tools
             return '';
         }
 
-        return \danog\MadelineProto\Tools::random($length);
+        return \phpseclib\Crypt\Random::string($length);
     }
 
     /**
