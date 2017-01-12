@@ -451,7 +451,9 @@ trait FilesHandler
 
     public function get_download_info($message_media)
     {
-        if (!isset($message_media['_']) && isset($message_media['InputFileLocation']) && isset($message_media['size'])) return $message_media;
+        if (!isset($message_media['_']) && isset($message_media['InputFileLocation']) && isset($message_media['size'])) {
+            return $message_media;
+        }
         $res = [];
         switch ($message_media['_']) {
             case 'messageMediaPhoto':
@@ -519,7 +521,6 @@ trait FilesHandler
         $stream = fopen($file, 'w');
         $info = $this->get_download_info($message_media);
 
-
         $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
 
         return $file;
@@ -533,16 +534,20 @@ trait FilesHandler
             };
         }
         $info = $this->get_download_info($message_media);
-        if ($end === -1) $end = $info['size'];
-        if (stream_get_meta_data($stream)['seekable']) fseek($stream, $offset);
+        if ($end === -1) {
+            $end = $info['size'];
+        }
+        if (stream_get_meta_data($stream)['seekable']) {
+            fseek($stream, $offset);
+        }
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
-\danog\MadelineProto\Logger::log($real_part_size, $offset);
+            \danog\MadelineProto\Logger::log($real_part_size, $offset);
             fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true)['bytes']);
-\danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
+            \danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
             $cb($percent = ($offset += $real_part_size) * 100 / $size);
         }
 

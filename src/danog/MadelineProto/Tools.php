@@ -17,10 +17,15 @@ namespace danog\MadelineProto;
  */
 trait Tools
 {
-    public static function random($length) {
-        if ($length === 0) return '';
+    public static function random($length)
+    {
+        if ($length === 0) {
+            return '';
+        }
+
         return \danog\MadelineProto\Tools::random($length);
     }
+
     /**
      * posmod(numeric,numeric) : numeric
      * Works just like the % (modulus) operator, only returns always a postive number.
