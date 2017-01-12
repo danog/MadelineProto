@@ -252,16 +252,16 @@ trait TL
                 if ($current_argument['name'] == 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
-                            $serialized .= \phpseclib\Crypt\Random::string(8);
+                            $serialized .= \danog\MadelineProto\Tools::random(8);
                             continue 2;
                         case 'int':
-                            $serialized .= \phpseclib\Crypt\Random::string(4);
+                            $serialized .= \danog\MadelineProto\Tools::random(4);
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
                                 $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                                 $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
-                                $serialized .= \phpseclib\Crypt\Random::string(8 * count($arguments['id']));
+                                $serialized .= \danog\MadelineProto\Tools::random(8 * count($arguments['id']));
                                 continue 2;
                             }
                     }

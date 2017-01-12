@@ -25,12 +25,18 @@ trait UpdateHandler
 
     public function get_updates_update_handler($update)
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         $this->updates[$this->updates_key++] = $update;
         //\danog\MadelineProto\Logger::log('Stored ', $update);
     }
 
     public function get_updates($params = [])
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         $time = microtime(true);
         $this->force_get_updates_difference();
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
@@ -75,6 +81,9 @@ trait UpdateHandler
 
     public function get_channel_difference($channel)
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         if (!$this->get_channel_state($channel)['sync_loading']) {
             $this->get_channel_state($channel)['sync_loading'] = true;
             $this->get_channel_state($channel)['pending_pts_updates'] = [];
@@ -133,6 +142,9 @@ trait UpdateHandler
 
     public function get_updates_difference()
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         if (!$this->get_update_state()['sync_loading']) {
             $this->get_update_state()['sync_loading'] = true;
             $this->get_update_state()['pending_pts_updates'] = [];
@@ -313,6 +325,9 @@ trait UpdateHandler
 
     public function pop_pending_seq_update()
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         $next_seq = $this->get_update_state()['seq'] + 1;
         if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) {
             return false;
@@ -332,6 +347,9 @@ trait UpdateHandler
 
     public function pop_pending_pts_update($channel_id)
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         if ($channel_id === false) {
             $cur_state = &$this->get_update_state();
         } else {
@@ -363,6 +381,9 @@ trait UpdateHandler
 
     public function handle_multiple_update($updates, $options = [], $channel = false)
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         if ($channel === false) {
             foreach ($updates as $update) {
                 switch ($update['_']) {
@@ -383,6 +404,9 @@ trait UpdateHandler
 
     public function handle_update_messages($messages, $channel = false)
     {
+        if (!$this->settings['updates']['handle_updates']) {
+            return;
+        }
         foreach ($messages as $message) {
             $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }

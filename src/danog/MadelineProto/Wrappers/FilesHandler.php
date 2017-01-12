@@ -424,7 +424,7 @@ trait FilesHandler
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = $file_size > 10 * 1024 * 1024 ? 'inputFileBig' : 'inputFile';
-        $file_id = \danog\PHP\Struct::unpack('<q', \phpseclib\Crypt\Random::string(8))[0];
+        $file_id = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
         $f = fopen($file, 'r');
         fseek($f, 0);
         while (ftell($f) !== $file_size) {
@@ -451,6 +451,7 @@ trait FilesHandler
 
     public function get_download_info($message_media)
     {
+        if (!isset($message_media['_']) && isset($message_media['InputFileLocation']) && isset($message_media['size'])) return $message_media;
         $res = [];
         switch ($message_media['_']) {
             case 'messageMediaPhoto':
@@ -460,6 +461,7 @@ trait FilesHandler
             $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
             $res['size'] = $photo['size'];
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret']];
+            $res['mime'] = 'image/jpeg';
 
             return $res;
 
@@ -492,7 +494,7 @@ trait FilesHandler
             }
             $res['name'] .= '_'.$message_media['document']['id'];
             $res['size'] = $message_media['document']['size'];
-
+            $res['mime'] = $message_media['document']['mime_type'];
             $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => $message_media['document']['version']];
 
             return $res;
@@ -506,7 +508,7 @@ trait FilesHandler
     {
         $info = $this->get_download_info($message_media);
 
-        return $this->download_to_file($message_media, $dir.'/'.$info['name'].$info['ext'], $cb);
+        return $this->download_to_file($info, $dir.'/'.$info['name'].$info['ext'], $cb);
     }
 
     public function download_to_file($message_media, $file, $cb = null)
@@ -515,13 +517,15 @@ trait FilesHandler
             touch($file);
         }
         $stream = fopen($file, 'w');
-        fseek($stream, filesize($file));
-        $this->download_to_stream($message_media, $stream, $cb);
+        $info = $this->get_download_info($message_media);
+
+
+        $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
 
         return $file;
     }
 
-    public function download_to_stream($message_media, $stream, $cb = null)
+    public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         if ($cb === null) {
             $cb = function ($percent) {
@@ -529,10 +533,17 @@ trait FilesHandler
             };
         }
         $info = $this->get_download_info($message_media);
-        $offset = ftell($stream);
+        if ($end === -1) $end = $info['size'];
+        if (stream_get_meta_data($stream)['seekable']) fseek($stream, $offset);
+        $size = $end - $offset;
         $part_size = 512 * 1024;
-        while (fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset += $part_size, 'limit' => $part_size], null, true)['bytes']) != false) {
-            $cb(ftell($stream) * 100 / $info['size']);
+        $percent = 0;
+        while ($percent < 100) {
+            $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
+\danog\MadelineProto\Logger::log($real_part_size, $offset);
+            fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true)['bytes']);
+\danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
+            $cb($percent = ($offset += $real_part_size) * 100 / $size);
         }
 
         return true;

@@ -341,7 +341,7 @@ The first parameter of these functions must always be a [messageMediaPhoto](http
 $output_file_name = $MadelineProto->download_to_dir($message_media, '/tmp/dldir');
 $custom_output_file_name = $MadelineProto->download_to_file($message_media, '/tmp/dldir/customname.ext');
 $stream = fopen('php://output', 'w'); // Stream to browser like with echo
-$MadelineProto->download_to_stream($message_media, $stream);
+$MadelineProto->download_to_stream($message_media, $stream, $cb, $offset, $endoffset); // offset and endoffset are optional parameters that specify the byte from which to start downloading and the byte where to stop downloading (the latter non-inclusive), if not specified default to 0 and the size of the file
 ```
 
 

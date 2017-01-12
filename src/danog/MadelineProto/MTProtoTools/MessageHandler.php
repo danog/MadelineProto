@@ -37,7 +37,7 @@ trait MessageHandler
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = \danog\PHP\Struct::pack('<q', $this->datacenter->temp_auth_key['server_salt']).$this->datacenter->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = \phpseclib\Crypt\Random::string($this->posmod(-strlen($encrypted_data), 16));
+            $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key']);
             $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->datacenter->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;

@@ -235,7 +235,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         foreach ($this->datacenter->sockets as $id => &$socket) {
             \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
-            $socket->session_id = \phpseclib\Crypt\Random::string(8);
+            $socket->session_id = \danog\MadelineProto\Tools::random(8);
             $socket->seq_no = 0;
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
@@ -275,7 +275,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function init_authorization()
     {
         if ($this->datacenter->session_id == null) {
-            $this->datacenter->session_id = \phpseclib\Crypt\Random::string(8);
+            $this->datacenter->session_id = \danog\MadelineProto\Tools::random(8);
         }
         if ($this->datacenter->temp_auth_key == null || $this->datacenter->auth_key == null) {
             if ($this->datacenter->auth_key == null) {
