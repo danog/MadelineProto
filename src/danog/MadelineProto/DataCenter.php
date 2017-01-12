@@ -63,6 +63,7 @@ class DataCenter
         \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.')...');
 
         $this->sockets[$dc_number] = new Connection($address, $port, $settings['protocol'], $settings['timeout']);
+
         return true;
     }
 
