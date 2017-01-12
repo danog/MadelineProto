@@ -1,3 +1,7 @@
+---
+title: MadelineProto documentation
+description: PHP implementation of telegram's MTProto protocol
+---
 # MadelineProto
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
 [![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
