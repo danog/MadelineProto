@@ -201,7 +201,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
-            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false]
+            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {

@@ -239,7 +239,9 @@ trait PeerHandler
 
         return $res;
     }
-    public function get_full_info($id) {
+
+    public function get_full_info($id)
+    {
         $partial = $this->get_info($id);
         switch ($partial['type']) {
             case 'user':
@@ -258,21 +260,31 @@ trait PeerHandler
         }
         $partial = $this->get_info($id);
         $partial['full'] = $full;
+
         return $partial;
     }
 
-    public function get_pwr_chat($id, $fullfetch = true, $send = true) {
+    public function get_pwr_chat($id, $fullfetch = true, $send = true)
+    {
         $full = $fullfetch ? $this->get_full_info($id) : $this->get_info($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
         switch ($full['type']) {
             case 'user':
             case 'bot':
                 foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone'] as $key) {
-                   if (isset($full['User'][$key])) $res[$key] = $full['User'][$key];
+                    if (isset($full['User'][$key])) {
+                        $res[$key] = $full['User'][$key];
+                    }
                 }
-                if (isset($full['full']['about'])) $res['about'] = $full['full']['about'];
-                if (isset($full['full']['bot_info'])) $res['bot_info'] = $full['full']['bot_info'];
-                if (isset($full['full']['profile_photo']['sizes'])) $res['photo'] = end($full['full']['profile_photo']['sizes']);
+                if (isset($full['full']['about'])) {
+                    $res['about'] = $full['full']['about'];
+                }
+                if (isset($full['full']['bot_info'])) {
+                    $res['bot_info'] = $full['full']['bot_info'];
+                }
+                if (isset($full['full']['profile_photo']['sizes'])) {
+                    $res['photo'] = end($full['full']['profile_photo']['sizes']);
+                }
                 $bio = '';
                 if ($full['type'] == 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
                     if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
@@ -287,32 +299,54 @@ trait PeerHandler
                 break;
             case 'chat':
                 foreach (['title', 'participants_count', 'admin', 'admins_enabled'] as $key) {
-                    if (isset($full['Chat'][$key])) $res[$key] = $full['Chat'][$key];
+                    if (isset($full['Chat'][$key])) {
+                        $res[$key] = $full['Chat'][$key];
+                    }
                 }
 
-                if (isset($full['full']['chat_photo']['sizes'])) $res['photo'] = end($full['full']['chat_photo']['sizes']);
-                if (isset($full['full']['exported_invite']['link'])) $res['invite'] = $full['full']['exported_invite']['link'];
-                if (isset($full['full']['participants']['participants'])) $res['participants'] = $full['full']['participants']['participants'];
+                if (isset($full['full']['chat_photo']['sizes'])) {
+                    $res['photo'] = end($full['full']['chat_photo']['sizes']);
+                }
+                if (isset($full['full']['exported_invite']['link'])) {
+                    $res['invite'] = $full['full']['exported_invite']['link'];
+                }
+                if (isset($full['full']['participants']['participants'])) {
+                    $res['participants'] = $full['full']['participants']['participants'];
+                }
                 break;
             case 'channel':
             case 'supergroup':
                 foreach (['title', 'democracy', 'restricted', 'restriction_reason', 'access_hash', 'username', 'signatures'] as $key) {
-                    if (isset($full['Chat'][$key])) $res[$key] = $full['Chat'][$key];
+                    if (isset($full['Chat'][$key])) {
+                        $res[$key] = $full['Chat'][$key];
+                    }
                 }
                 foreach (['can_view_participants', 'can_set_username', 'participants_count', 'admins_count', 'kicked_count', 'migrated_from_chat_id', 'migrated_from_max_id', 'pinned_msg_id', 'about'] as $key) {
-                    if (isset($full['full'][$key])) $res[$key] = $full['full'][$key];
+                    if (isset($full['full'][$key])) {
+                        $res[$key] = $full['full'][$key];
+                    }
                 }
 
-                if (isset($full['full']['chat_photo']['sizes'])) $res['photo'] = end($full['full']['chat_photo']['sizes']);
-                if (isset($full['full']['exported_invite']['link'])) $res['invite'] = $full['full']['exported_invite']['link'];
-                if (isset($full['full']['participants']['participants'])) $res['participants'] = $full['full']['participants']['participants'];
+                if (isset($full['full']['chat_photo']['sizes'])) {
+                    $res['photo'] = end($full['full']['chat_photo']['sizes']);
+                }
+                if (isset($full['full']['exported_invite']['link'])) {
+                    $res['invite'] = $full['full']['exported_invite']['link'];
+                }
+                if (isset($full['full']['participants']['participants'])) {
+                    $res['participants'] = $full['full']['participants']['participants'];
+                }
                 break;
         }
         if (isset($res['participants'])) {
             foreach ($res['participants'] as $key => $participant) {
                 $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
-                if (isset($participant['inviter_id'])) $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
-                if (isset($participant['date'])) $newres['date'] = $participant['date'];
+                if (isset($participant['inviter_id'])) {
+                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+                }
+                if (isset($participant['date'])) {
+                    $newres['date'] = $participant['date'];
+                }
                 switch ($participant['_']) {
                     case 'chatParticipant':
                     $newres['role'] = 'user';
@@ -340,8 +374,12 @@ trait PeerHandler
                 foreach ($gres['participants'] as $participant) {
                     $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
                     $key++;
-                    if (isset($participant['inviter_id'])) $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
-                    if (isset($participant['date'])) $newres['date'] = $participant['date'];
+                    if (isset($participant['inviter_id'])) {
+                        $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+                    }
+                    if (isset($participant['date'])) {
+                        $newres['date'] = $participant['date'];
+                    }
                     switch ($participant['_']) {
                         case 'channelParticipant':
                         $newres['role'] = 'user';
@@ -376,28 +414,40 @@ trait PeerHandler
         return $res;
     }
 
-    public function store_db($res, $force = false) {
+    public function store_db($res, $force = false)
+    {
         if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false) {
             try {
-                if (isset($res['username'])) shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
-            } catch (\danog\MadelineProto\Exception $e) { \danog\MadelineProto\Logger::log($e->getMessage()); };
+                if (isset($res['username'])) {
+                    shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
+                }
+            } catch (\danog\MadelineProto\Exception $e) {
+                \danog\MadelineProto\Logger::log($e->getMessage());
+            }
+
             return;
         }
         if (!empty($res)) {
-            if (isset($res['participants'])) unset($res['participants']);
-            $this->qres []= $res;
+            if (isset($res['participants'])) {
+                unset($res['participants']);
+            }
+            $this->qres[] = $res;
         }
         if ($this->last_stored < time() && !$force) {
             return false;
         }
-        if (empty($this->qres)) return false;
+        if (empty($this->qres)) {
+            return false;
+        }
         try {
             $payload = json_encode($this->qres);
             $path = '/tmp/ids'.hash('sha256', $payload);
             file_put_contents($path, $payload);
             $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls').' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
             \danog\MadelineProto\Logger::log($result);
-        } catch (\danog\MadelineProto\Exception $e) { \danog\MadelineProto\Logger::log($e->getMessage()); };
+        } catch (\danog\MadelineProto\Exception $e) {
+            \danog\MadelineProto\Logger::log($e->getMessage());
+        }
         $this->qres = [];
         $this->last_stored = time() + 5;
     }

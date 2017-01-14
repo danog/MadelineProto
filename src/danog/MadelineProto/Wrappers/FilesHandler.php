@@ -530,6 +530,7 @@ trait FilesHandler
         $info = $this->get_download_info($message_media);
         $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
         fclose($stream);
+
         return $file;
     }
 
