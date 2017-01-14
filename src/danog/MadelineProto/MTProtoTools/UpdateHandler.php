@@ -22,14 +22,24 @@ trait UpdateHandler
     public $updates = [];
     public $updates_key = 0;
     private $getting_state = false;
+    public $full_chats;
 
+
+    public function full_chat_last_updated($id) {
+        $id = $this->get_info($id)['bot_api_id'];
+        return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
+    }
     public function pwr_update_handler($update)
     {
-        if (isset($update['message']['to_id'])) {
+        if (isset($update['message']['to_id']) && time() - $this->full_chat_last_updated($update['message']['to_id']) <= 600) {
             $full_chat = $this->get_pwr_chat($update['message']['to_id']);
+            $full_chat['last_update'] = time();
+            $this->full_chats[$full_chat['id']] = $full_chat;
         }
-        if (isset($update['message']['from_id'])) {
+        if (isset($update['message']['from_id']) && time() - $this->full_chat_last_updated($update['message']['from_id']) <= 600) {
             $full_chat = $this->get_pwr_chat($update['message']['from_id']);
+            $full_chat['last_update'] = time();
+            $this->full_chats[$full_chat['id']] = $full_chat;
         }
     }
 

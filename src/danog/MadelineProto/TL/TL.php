@@ -268,7 +268,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            \danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
+            //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']]);
         }
 

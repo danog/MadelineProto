@@ -226,10 +226,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function setup_logger()
     {
-        if (!\danog\MadelineProto\Logger::$constructed) {
+        //if (!\danog\MadelineProto\Logger::$constructed) {
             // Set up logger class
-            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param']);
-        }
+            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->datacenter->authorization['user']) ? (isset($this->datacenter->authorization['user']['username']) ? $this->datacenter->authorization['user']['username'] : $this->datacenter->authorization['user']['id']) : '');
+        //}
     }
 
     public function reset_session()

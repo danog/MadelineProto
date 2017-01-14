@@ -20,6 +20,7 @@ class Logger
     public static $mode = null;
     public static $optional = null;
     public static $constructed = false;
+    public static $prefix = '';
 
     /*
      * Constructor function
@@ -29,7 +30,7 @@ class Logger
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public static function constructor(&$mode, &$optional = null)
+    public static function constructor(&$mode, &$optional = null, $prefix = '')
     {
         if ($mode == null) {
             throw new Exception('No mode was specified!');
@@ -37,6 +38,7 @@ class Logger
         self::$mode = &$mode;
         self::$optional = &$optional;
         self::$constructed = true;
+        self::$prefix = $prefix === '' ? '' : ', '.$prefix;
     }
 
     public static function log(...$params)
@@ -48,7 +50,7 @@ class Logger
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
-            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').': ', 16)."\t".$param;
+            $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').self::$prefix.': ', 16+strlen(self::$prefix))."\t".$param;
             switch (self::$mode) {
                 case 1:
                     error_log($param);

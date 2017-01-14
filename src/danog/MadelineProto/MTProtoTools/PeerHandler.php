@@ -29,7 +29,13 @@ trait PeerHandler
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                         $this->chats[$user['id']] = $user;
                         $this->should_serialize = true;
-                        $this->get_pwr_chat($user['id'], false, true);
+                        try {
+                            $this->get_pwr_chat($user['id'], false, true);
+                        } catch (\danog\MadelineProto\Exception $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        }
                     }
                 case 'userEmpty':
                     break;
@@ -50,7 +56,13 @@ trait PeerHandler
                     if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
                         $this->chats[-$chat['id']] = $chat;
                         $this->should_serialize = true;
-                        $this->get_pwr_chat(-$chat['id'], true, true);
+                        try {
+                            $this->get_pwr_chat(-$chat['id'], true, true);
+                        } catch (\danog\MadelineProto\Exception $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        }
                     }
 
                 case 'channelEmpty':
@@ -60,7 +72,13 @@ trait PeerHandler
                     if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])] !== $chat) {
                         $this->chats[(int) ('-100'.$chat['id'])] = $chat;
                         $this->should_serialize = true;
-                        $this->get_pwr_chat('-100'.$chat['id'], true, true);
+                        try {
+                            $this->get_pwr_chat('-100'.$chat['id'], true, true);
+                        } catch (\danog\MadelineProto\Exception $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage());
+                        }
                     }
                     break;
                 default:

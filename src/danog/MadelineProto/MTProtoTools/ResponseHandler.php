@@ -74,38 +74,12 @@ trait ResponseHandler
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
             \danog\MadelineProto\Logger::log('Received '.$response['_'].'.');
 
-            if (isset($response['users'])) {
-                $this->add_users($response['users']);
-            }
-            if (isset($response['chats'])) {
-                $this->add_chats($response['chats']);
-            }
-            if (isset($response['result']['users'])) {
-                $this->add_users($response['result']['users']);
-            }
-            if (isset($response['result']['chats'])) {
-                $this->add_chats($response['result']['chats']);
-            }
             if (isset($response['result']['_'])) {
                 switch ($this->constructors->find_by_predicate($response['result']['_'])['type']) {
                     case 'Update':
                     $this->handle_update($response['result']);
                     break;
 
-                    case 'userFull':
-                    $this->chats[$response['result']['user']['id']] = $response['result'];
-                    $this->should_serialize = true;
-                    break;
-
-                    case 'chatFull':
-                    $this->chats[-$response['result']['chat']['id']] = $response['result'];
-                    $this->should_serialize = true;
-                    break;
-
-                    case 'channelFull':
-                    $this->chats[(int) ('-100'.$response['result']['channel']['id'])] = $response['result'];
-                    $this->should_serialize = true;
-                    break;
                 }
             }
             switch ($response['_']) {
@@ -265,6 +239,18 @@ trait ResponseHandler
                             break;
                     }
                     break;
+            }
+            if (isset($response['users'])) {
+                $this->add_users($response['users']);
+            }
+            if (isset($response['chats'])) {
+                $this->add_chats($response['chats']);
+            }
+            if (isset($response['result']['users'])) {
+                $this->add_users($response['result']['users']);
+            }
+            if (isset($response['result']['chats'])) {
+                $this->add_chats($response['result']['chats']);
             }
         }
     }
