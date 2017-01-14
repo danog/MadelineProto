@@ -23,6 +23,16 @@ trait UpdateHandler
     public $updates_key = 0;
     private $getting_state = false;
 
+    public function pwr_update_handler($update) {
+        if (isset($update['message']['to_id'])) {
+            $full_chat = $this->get_pwr_chat($update['message']['to_id']);
+        }
+        if (isset($update['message']['from_id'])) {
+            $full_chat = $this->get_pwr_chat($update['message']['from_id']);
+        }
+    }
+
+
     public function get_updates_update_handler($update)
     {
         if (!$this->settings['updates']['handle_updates']) {
@@ -421,6 +431,6 @@ trait UpdateHandler
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
-        $this->settings['updates']['callback']($update);
+        if ($this->settings['pwr']['strict']) $this->pwr_update_handler($update); else $this->settings['updates']['callback']($update);
     }
 }

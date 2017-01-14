@@ -22,6 +22,16 @@ trait PeerHandler
         return $this->API->get_info($id, $recursive);
     }
 
+    public function get_pwr_chat($id)
+    {
+        return $this->API->get_pwr_chat($id);
+    }
+
+    public function peer_isset($id)
+    {
+        return $this->API->peer_isset($id);
+    }
+
     public function gen_all($constructor)
     {
         return $this->API->gen_all($constructor);

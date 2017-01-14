@@ -162,8 +162,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
-                'api_id'          => 25628,
-                'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
+                'api_id'          => 65536,
+                'api_hash'        => '4251a2777e179232705e2462706f4143',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // 🌚
@@ -201,6 +201,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
+            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false]
         ];
         foreach ($default_settings as $key => $param) {
             if (!isset($settings[$key])) {
@@ -247,18 +248,20 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     // Switches to a new datacenter and if necessary creates authorization keys, binds them and writes client info
     public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
-        \danog\MadelineProto\Logger::log('Switching to DC '.$new_dc.'...');
         $old_dc = $this->datacenter->curdc;
+        \danog\MadelineProto\Logger::log('Switching from DC '.$old_dc.' to DC '.$new_dc.'...');
         if (!isset($this->datacenter->sockets[$new_dc])) {
             $this->datacenter->dc_connect($new_dc);
             $this->init_authorization();
             $this->get_config($this->write_client_info('help.getConfig'));
             $this->get_nearest_dc($allow_nearest_dc_switch);
         }
+        $this->datacenter->curdc = $new_dc;
         if (
             (isset($this->datacenter->sockets[$old_dc]->authorized) && $this->datacenter->sockets[$old_dc]->authorized) &&
             !(isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] === $this->datacenter->sockets[$old_dc]->authorization['user']['id'])
         ) {
+            \danog\MadelineProto\Logger::log('Copying authorization...');
             $this->should_serialize = true;
             $this->datacenter->curdc = $old_dc;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
@@ -269,6 +272,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
             $this->datacenter->authorized = true;
         }
+        \danog\MadelineProto\Logger::log('Done! Current DC is '.$this->datacenter->curdc);
     }
 
     // Creates authorization keys

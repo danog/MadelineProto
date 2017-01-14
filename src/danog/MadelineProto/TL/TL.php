@@ -388,7 +388,7 @@ trait TL
                 switch ($arg['type']) {
                     case 'true':
                     case 'false':
-                        $x[$arg['name']] = ($x['flags'] & $arg['pow']) == 1;
+                        $x[$arg['name']] = ($x['flags'] & $arg['pow']) !== 0;
                         continue 2;
                         break;
                     case 'Bool':

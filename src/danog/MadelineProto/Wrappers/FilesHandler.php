@@ -467,13 +467,23 @@ trait FilesHandler
 
             return $res;
 
+            case 'photoSize':
+            case 'photoCachedSize':
+            $res['ext'] = '.jpg';
+            $res['name'] = $message_media['location']['volume_id'].'_'.$message_media['location']['local_id'];
+            $res['size'] = $message_media['size'];
+            $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret']];
+            $res['mime'] = 'image/jpeg';
+
+            return $res;
+
             case 'messageMediaDocument':
             $res['caption'] = $message_media['caption'];
             foreach ($message_media['document']['attributes'] as $attribute) {
                 switch ($attribute['_']) {
                     case 'documentAttributeFilename':
                     $pathinfo = pathinfo($attribute['file_name']);
-                    $res['ext'] = '.'.$pathinfo['extension'];
+                    $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
                     $res['name'] = $pathinfo['filename'];
                     break;
 
@@ -515,14 +525,11 @@ trait FilesHandler
 
     public function download_to_file($message_media, $file, $cb = null)
     {
-        if (!file_exists($file)) {
-            touch($file);
-        }
-        $stream = fopen($file, 'w');
+        $file = str_replace('//', '/', $file);
+        $stream = fopen($file, 'wb');
         $info = $this->get_download_info($message_media);
-
         $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
-
+        fclose($stream);
         return $file;
     }
 
@@ -546,7 +553,7 @@ trait FilesHandler
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             \danog\MadelineProto\Logger::log($real_part_size, $offset);
-            fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true)['bytes']);
+            \danog\MadelineProto\Logger::log(fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true)['bytes']));
             \danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
             $cb($percent = ($offset += $real_part_size) * 100 / $size);
         }

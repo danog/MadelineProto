@@ -3,6 +3,7 @@
 
 require 'vendor/autoload.php';
 $settings = [];
+
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 
 if (file_exists('token.php') && $MadelineProto === false) {
