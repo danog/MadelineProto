@@ -24,11 +24,13 @@ trait UpdateHandler
     private $getting_state = false;
     public $full_chats;
 
-
-    public function full_chat_last_updated($id) {
+    public function full_chat_last_updated($id)
+    {
         $id = $this->get_info($id)['bot_api_id'];
+
         return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
     }
+
     public function pwr_update_handler($update)
     {
         if (isset($update['message']['to_id']) && time() - $this->full_chat_last_updated($update['message']['to_id']) <= 600) {
