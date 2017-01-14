@@ -78,13 +78,16 @@ trait CallHandler
                                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                                         break;
                                 }
-/*
+
                             case 420:
-                                $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
-                                \danog\MadelineProto\Logger::log('Flood, waiting '.$seconds.' seconds...');
-                                sleep($seconds);
-                                throw new \danog\MadelineProto\Exception('Re-executing query...');
-*/
+                                if ($this->settings['pwr']['pwr']) {
+                                    $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+                                    if (is_numeric($seconds) && $seconds < 20) {
+                                        \danog\MadelineProto\Logger::log('Flood, waiting '.$seconds.' seconds...');
+                                        sleep($seconds);
+                                        throw new \danog\MadelineProto\Exception('Re-executing query...');
+                                    }
+                                }
                             default:
                                 throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                                 break;
