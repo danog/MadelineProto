@@ -234,6 +234,7 @@ trait PeerHandler
                 $res['type'] = $constructor['bot'] ? 'bot' : 'user';
                 break;
             case 'chat':
+            case 'chatForbidden':
                 $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
                 $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
                 $res['chat_id'] = $constructor['id'];
