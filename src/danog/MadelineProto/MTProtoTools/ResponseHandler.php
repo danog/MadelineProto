@@ -74,14 +74,6 @@ trait ResponseHandler
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
             \danog\MadelineProto\Logger::log('Received '.$response['_'].'.');
 
-            if (isset($response['result']['_'])) {
-                switch ($this->constructors->find_by_predicate($response['result']['_'])['type']) {
-                    case 'Update':
-                    $this->handle_update($response['result']);
-                    break;
-
-                }
-            }
             switch ($response['_']) {
                 case 'msgs_ack':
                     foreach ($response['msg_ids'] as $msg_id) {
@@ -180,12 +172,18 @@ trait ResponseHandler
                         \danog\MadelineProto\Logger::log($status);
                     }
                     break;
-                case 'msg_new_detailed_info':
                 case 'msg_detailed_info':
-
+                    if (isset($this->datacenter->outgoing_messages[$response['msg_id']])) {
+                        if (isset($this->datacenter->incoming_messages[$response['answer_msg_id']])) {
+                            $this->datacenter->outgoing_messages[$response['msg_id']]['response'] = $response['answer_msg_id'];
+                            unset($this->datacenter->new_outgoing[$response['msg_id']]);
+                        }
+                    }
+                case 'msg_new_detailed_info':
                     if (isset($this->datacenter->incoming_messages[$response['answer_msg_id']])) {
                         $this->ack_incoming_message_id($response['answer_msg_id']);
                     }
+                    unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
                 case 'msg_resend_req':
                     $ok = true;
@@ -251,6 +249,14 @@ trait ResponseHandler
             }
             if (isset($response['result']['chats'])) {
                 $this->add_chats($response['result']['chats']);
+            }
+            if (isset($response['result']['_'])) {
+                switch ($this->constructors->find_by_predicate($response['result']['_'])['type']) {
+                    case 'Update':
+                    $this->handle_update($response['result']);
+                    break;
+
+                }
             }
         }
     }
