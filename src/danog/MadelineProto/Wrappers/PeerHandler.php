@@ -22,9 +22,9 @@ trait PeerHandler
         return $this->API->get_info($id, $recursive);
     }
 
-    public function get_pwr_chat($id)
+    public function get_pwr_chat($id, $full = true, $save = true)
     {
-        return $this->API->get_pwr_chat($id);
+        return $this->API->get_pwr_chat($id, $full, $save);
     }
 
     public function peer_isset($id)

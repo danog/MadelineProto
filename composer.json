@@ -10,7 +10,8 @@
         "phpseclib/phpseclib": "^2.0",
         "paragonie/constant_time_encoding": "^1|^2",
         "paragonie/random_compat": "^2.0",
-        "php": ">=5.6.0"
+        "php": ">=5.6.0",
+        "vlucas/phpdotenv": "^2.4"
     },
     "authors": [
         {
