@@ -54,6 +54,7 @@ class DataCenter
         $test = $settings['test_mode'] ? 'test' : 'main';
         $ipv6 = $settings['ipv6'] ? 'ipv6' : 'ipv4';
         $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+        $address = $settings['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($settings['protocol'] == 'https') {
             $subdomain = $this->dclist['ssl_subdomains'][$dc_number].($settings['upload'] ? '-1' : '');

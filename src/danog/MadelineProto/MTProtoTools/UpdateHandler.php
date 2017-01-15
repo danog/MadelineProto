@@ -455,7 +455,7 @@ trait UpdateHandler
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
-        if ($this->settings['pwr']['strict']) {
+        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
             $this->pwr_update_handler($update);
         } else {
             $this->settings['updates']['callback']($update);
