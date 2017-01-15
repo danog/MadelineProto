@@ -12,25 +12,29 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require_once 'vendor/autoload.php';
-$settings = [];
 if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
 
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
-if (file_exists('number.php') && $MadelineProto === false) {
+if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(__DIR__);
     $dotenv->load();
+    $settings = json_decode(getenv('MTPROTO_SETTINGS'), true)?:[];
+}
+
+if ($MadelineProto === false) {
+
     $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
-            'phone_number'     => getenv('NUMBER'),
+            'phone_number'     => getenv('MTPROTO_NUMBER'),
         ]
     );
     \danog\MadelineProto\Logger::log($checkedPhone);
-    $sentCode = $MadelineProto->phone_login(getenv('NUMBER'));
+    $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
     $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
