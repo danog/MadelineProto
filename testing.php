@@ -22,7 +22,7 @@ if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(__DIR__);
     $dotenv->load();
 }
-$settings = json_decode(getenv('MTPROTO_SETTINGS'), true)?:[];
+$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 if ($MadelineProto === false) {
 
