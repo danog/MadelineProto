@@ -38,22 +38,22 @@ trait UpdateHandler
                 $full_chat = $this->get_pwr_chat($update['message']['to_id']);
                 $full_chat['last_update'] = time();
                 $this->full_chats[$full_chat['id']] = $full_chat;
-                        } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage());
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage());
-                        }
+            } catch (\danog\MadelineProto\Exception $e) {
+                \danog\MadelineProto\Logger::log($e->getMessage());
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                \danog\MadelineProto\Logger::log($e->getMessage());
+            }
         }
         if (isset($update['message']['from_id']) && time() - $this->full_chat_last_updated($update['message']['from_id']) <= 600) {
             try {
                 $full_chat = $this->get_pwr_chat($update['message']['from_id']);
                 $full_chat['last_update'] = time();
                 $this->full_chats[$full_chat['id']] = $full_chat;
-                        } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage());
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage());
-                        }
+            } catch (\danog\MadelineProto\Exception $e) {
+                \danog\MadelineProto\Logger::log($e->getMessage());
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                \danog\MadelineProto\Logger::log($e->getMessage());
+            }
         }
     }
 
