@@ -20,16 +20,17 @@ if (file_exists('web_data.php')) {
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
 if (file_exists('number.php') && $MadelineProto === false) {
-    include_once 'number.php';
+    $dotenv = new Dotenv\Dotenv(__DIR__);
+    $dotenv->load();
     $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
-            'phone_number'     => $number,
+            'phone_number'     => getenv('NUMBER'),
         ]
     );
     \danog\MadelineProto\Logger::log($checkedPhone);
-    $sentCode = $MadelineProto->phone_login($number);
+    $sentCode = $MadelineProto->phone_login(getenv('NUMBER'));
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
     $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
