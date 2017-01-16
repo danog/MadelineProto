@@ -22,7 +22,7 @@ class Serialization
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
             $instance->API->should_serialize = false;
 
-            return file_put_contents($filename, serialize($instance));
+            return file_put_contents($filename, serialize($instance), LOCK_EX);
         }
 
         return false;

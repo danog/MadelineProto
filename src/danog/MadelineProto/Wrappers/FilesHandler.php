@@ -554,7 +554,9 @@ trait FilesHandler
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             \danog\MadelineProto\Logger::log($real_part_size, $offset);
-            \danog\MadelineProto\Logger::log(fwrite($stream, $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true)['bytes']));
+            $res = $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true);
+            //\danog\MadelineProto\Logger::log($res);
+            \danog\MadelineProto\Logger::log(fwrite($stream, $res['bytes']));
             \danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
             $cb($percent = ($offset += $real_part_size) * 100 / $size);
         }
