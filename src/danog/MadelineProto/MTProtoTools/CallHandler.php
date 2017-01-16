@@ -48,6 +48,7 @@ trait CallHandler
                             $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'] = [];
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
+                        if ($e->getMessage() == 'I had to recreate the temporary authorization key') continue 2;
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...');
                         continue;
                     }
@@ -98,8 +99,7 @@ trait CallHandler
                         switch ($server_answer['error_code']) {
                             case 48:
                                 $this->datacenter->temp_auth_key['server_salt'] = $server_answer['new_server_salt'];
-                                throw new \danog\MadelineProto\Exception('New server salt stored, re-executing query');
-                                break;
+                                continue 3;
                         }
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
                         break;
