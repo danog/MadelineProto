@@ -48,7 +48,9 @@ trait CallHandler
                             $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'] = [];
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
-                        if ($e->getMessage() == 'I had to recreate the temporary authorization key') continue 2;
+                        if ($e->getMessage() == 'I had to recreate the temporary authorization key') {
+                            continue 2;
+                        }
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...');
                         continue;
                     }
