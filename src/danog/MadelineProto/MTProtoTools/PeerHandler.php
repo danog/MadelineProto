@@ -195,7 +195,7 @@ trait PeerHandler
                 return $this->gen_all($this->chats[$id]);
             }
             if ($id < 0 && !preg_match('/^-100/', $id)) {
-                $this->method_call('messages.getFullChat', ['chat_id' => $id]);
+                $this->method_call('messages.getFullChat', ['chat_id' => -$id]);
                 if (isset($this->chats[$id])) {
                     return $this->gen_all($this->chats[$id]);
                 }
