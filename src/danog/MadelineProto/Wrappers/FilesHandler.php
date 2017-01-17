@@ -531,6 +531,7 @@ trait FilesHandler
         $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
         fclose($stream);
         clearstatcache();
+
         return $file;
     }
 
