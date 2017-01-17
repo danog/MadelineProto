@@ -535,7 +535,7 @@ trait FilesHandler
         return $file;
     }
 
-    public function download_to_stream($message_media, &$stream, $cb = null, $offset = 0, $end = -1)
+    public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         if ($cb === null) {
             $cb = function ($percent) {
