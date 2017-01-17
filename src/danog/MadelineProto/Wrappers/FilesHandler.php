@@ -526,15 +526,15 @@ trait FilesHandler
     public function download_to_file($message_media, $file, $cb = null)
     {
         $file = str_replace('//', '/', $file);
-        $stream = fopen($file, 'wb');
         $info = $this->get_download_info($message_media);
+        $stream = fopen($file, 'wb');
         $this->download_to_stream($info, $stream, $cb, filesize($file), $info['size']);
         fclose($stream);
-
+        clearstatcache();
         return $file;
     }
 
-    public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    public function download_to_stream($message_media, &$stream, $cb = null, $offset = 0, $end = -1)
     {
         if ($cb === null) {
             $cb = function ($percent) {
@@ -555,7 +555,6 @@ trait FilesHandler
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             \danog\MadelineProto\Logger::log($real_part_size, $offset);
             $res = $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true);
-            //\danog\MadelineProto\Logger::log($res);
             \danog\MadelineProto\Logger::log(fwrite($stream, $res['bytes']));
             \danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
             $cb($percent = ($offset += $real_part_size) * 100 / $size);
