@@ -431,6 +431,7 @@ trait PeerHandler
         if ($fullfetch || $send) {
             $this->store_db($res);
         }
+
         return $res;
     }
 
