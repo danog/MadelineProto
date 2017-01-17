@@ -72,7 +72,6 @@ target/
 *.swp
 vendor
 *bak
-number.php
 token.php
 *~uploading*
 session.mad
