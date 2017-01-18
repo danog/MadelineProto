@@ -232,12 +232,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         //}
     }
 
-    public function reset_session()
+    public function reset_session($de = true)
     {
         foreach ($this->datacenter->sockets as $id => &$socket) {
-            \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
-            $socket->session_id = \danog\MadelineProto\Tools::random(8);
-            $socket->seq_no = 0;
+            if ($de) {
+                \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
+                $socket->session_id = \danog\MadelineProto\Tools::random(8);
+                $socket->seq_no = 0;
+            }
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];
