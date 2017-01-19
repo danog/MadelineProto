@@ -480,6 +480,8 @@ trait AuthKeyHandler
 
     public function bind_temp_auth_key($expires_in)
     {
+        for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
+            try {
         \danog\MadelineProto\Logger::log('Binding authorization keys...');
         $nonce = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
         $expires_at = time() + $expires_in;
@@ -504,12 +506,22 @@ trait AuthKeyHandler
         $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->auth_key['auth_key']);
         $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-
-        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id) === true) {
+        $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id);
+        var_dump($res);
+        if ($res === true) {
             \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
 
             return true;
         }
-        throw new \danog\MadelineProto\Exception('An error occurred while binding temporary and permanent authorization keys.');
+          } catch (\danog\MadelineProto\Exception $e) {
+              \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+          } catch (\danog\MadelineProto\RPCErrorException $e) {
+              \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+          } finally {
+              $this->datacenter->new_outgoing = [];
+              $this->datacenter->new_incoming = [];
+          }
+      }
+      throw new \danog\MadelineProto\Exception('An error occurred while binding temporary and permanent authorization keys.');
     }
 }

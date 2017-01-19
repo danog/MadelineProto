@@ -102,6 +102,15 @@ trait CallHandler
                             case 48:
                                 $this->datacenter->temp_auth_key['server_salt'] = $server_answer['new_server_salt'];
                                 continue 3;
+                            case 16:
+                            case 17:
+                                \danog\MadelineProto\Logger::log('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']]);
+                                $this->datacenter->timedelta = ($this->datacenter->outgoing_messages[$int_message_id]['response'] >> 32) - time();
+                                \danog\MadelineProto\Logger::log('Set time delta to '.$this->datacenter->timedelta);
+                                $this->reset_session();
+$this->datacenter->temp_auth_key = null;
+$this->init_authorization();
+                                throw new \danog\MadelineProto\Exception('Resend message');
                         }
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
                         break;
