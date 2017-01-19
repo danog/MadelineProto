@@ -139,7 +139,7 @@ trait UpdateHandler
                 $this->set_channel_state($channel, $difference);
                 if (!$difference['final']) {
                     unset($difference);
-					unset($input);
+                    unset($input);
                     $this->get_channel_difference($channel);
                 }
                 break;
