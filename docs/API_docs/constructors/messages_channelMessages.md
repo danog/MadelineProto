@@ -1,8 +1,8 @@
 ---
-title: messages_channelMessages
+title: messages.channelMessages
 description: messages_channelMessages attributes, type and example
 ---
-## Constructor: messages\_channelMessages  
+## Constructor: messages.channelMessages  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: messages_channelMessages attributes, type and example
 ### Example:
 
 ```
-$messages_channelMessages = ['_' => 'messages_channelMessages', 'pts' => int, 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_channelMessages = ['_' => 'messages.channelMessages', 'pts' => int, 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

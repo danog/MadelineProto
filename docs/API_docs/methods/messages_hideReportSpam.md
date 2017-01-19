@@ -1,8 +1,8 @@
 ---
-title: messages_hideReportSpam
-description: messages_hideReportSpam parameters, return type and example
+title: messages.hideReportSpam
+description: messages.hideReportSpam parameters, return type and example
 ---
-## Method: messages\_hideReportSpam  
+## Method: messages.hideReportSpam  
 [Back to methods index](index.md)
 
 

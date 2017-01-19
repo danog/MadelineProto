@@ -1,8 +1,8 @@
 ---
-title: users_getUsers
-description: users_getUsers parameters, return type and example
+title: users.getUsers
+description: users.getUsers parameters, return type and example
 ---
-## Method: users\_getUsers  
+## Method: users.getUsers  
 [Back to methods index](index.md)
 
 

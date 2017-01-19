@@ -1,8 +1,8 @@
 ---
-title: upload_file
+title: upload.file
 description: upload_file attributes, type and example
 ---
-## Constructor: upload\_file  
+## Constructor: upload.file  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: upload_file attributes, type and example
 ### Example:
 
 ```
-$upload_file = ['_' => 'upload_file', 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];
+$upload_file = ['_' => 'upload.file', 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];
 ```  
 

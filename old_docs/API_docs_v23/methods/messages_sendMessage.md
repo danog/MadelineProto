@@ -1,8 +1,8 @@
 ---
-title: messages_sendMessage
-description: messages_sendMessage parameters, return type and example
+title: messages.sendMessage
+description: messages.sendMessage parameters, return type and example
 ---
-## Method: messages\_sendMessage  
+## Method: messages.sendMessage  
 [Back to methods index](index.md)
 
 

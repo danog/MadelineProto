@@ -1,8 +1,8 @@
 ---
-title: auth_codeTypeCall
+title: auth.codeTypeCall
 description: auth_codeTypeCall attributes, type and example
 ---
-## Constructor: auth\_codeTypeCall  
+## Constructor: auth.codeTypeCall  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: auth_codeTypeCall attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeCall = ['_' => 'auth_codeTypeCall', ];
+$auth_codeTypeCall = ['_' => 'auth.codeTypeCall', ];
 ```  
 

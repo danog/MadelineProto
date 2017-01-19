@@ -1,8 +1,8 @@
 ---
-title: updates_channelDifferenceEmpty
+title: updates.channelDifferenceEmpty
 description: updates_channelDifferenceEmpty attributes, type and example
 ---
-## Constructor: updates\_channelDifferenceEmpty  
+## Constructor: updates.channelDifferenceEmpty  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: updates_channelDifferenceEmpty attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceEmpty = ['_' => 'updates_channelDifferenceEmpty', 'pts' => int, 'timeout' => int, ];
+$updates_channelDifferenceEmpty = ['_' => 'updates.channelDifferenceEmpty', 'pts' => int, 'timeout' => int, ];
 ```  
 

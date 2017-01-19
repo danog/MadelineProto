@@ -1,8 +1,8 @@
 ---
-title: account_getNotifySettings
-description: account_getNotifySettings parameters, return type and example
+title: account.getNotifySettings
+description: account.getNotifySettings parameters, return type and example
 ---
-## Method: account\_getNotifySettings  
+## Method: account.getNotifySettings  
 [Back to methods index](index.md)
 
 

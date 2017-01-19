@@ -1,8 +1,8 @@
 ---
-title: help_termsOfService
+title: help.termsOfService
 description: help_termsOfService attributes, type and example
 ---
-## Constructor: help\_termsOfService  
+## Constructor: help.termsOfService  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: help_termsOfService attributes, type and example
 ### Example:
 
 ```
-$help_termsOfService = ['_' => 'help_termsOfService', 'text' => string, ];
+$help_termsOfService = ['_' => 'help.termsOfService', 'text' => string, ];
 ```  
 

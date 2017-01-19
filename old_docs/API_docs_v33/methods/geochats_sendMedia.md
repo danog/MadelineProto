@@ -1,8 +1,8 @@
 ---
-title: geochats_sendMedia
-description: geochats_sendMedia parameters, return type and example
+title: geochats.sendMedia
+description: geochats.sendMedia parameters, return type and example
 ---
-## Method: geochats\_sendMedia  
+## Method: geochats.sendMedia  
 [Back to methods index](index.md)
 
 

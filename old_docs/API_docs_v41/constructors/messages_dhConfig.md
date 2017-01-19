@@ -1,8 +1,8 @@
 ---
-title: messages_dhConfig
+title: messages.dhConfig
 description: messages_dhConfig attributes, type and example
 ---
-## Constructor: messages\_dhConfig  
+## Constructor: messages.dhConfig  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: messages_dhConfig attributes, type and example
 ### Example:
 
 ```
-$messages_dhConfig = ['_' => 'messages_dhConfig', 'g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];
+$messages_dhConfig = ['_' => 'messages.dhConfig', 'g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];
 ```  
 

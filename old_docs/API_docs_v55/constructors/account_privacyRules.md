@@ -1,8 +1,8 @@
 ---
-title: account_privacyRules
+title: account.privacyRules
 description: account_privacyRules attributes, type and example
 ---
-## Constructor: account\_privacyRules  
+## Constructor: account.privacyRules  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: account_privacyRules attributes, type and example
 ### Example:
 
 ```
-$account_privacyRules = ['_' => 'account_privacyRules', 'rules' => [Vector t], 'users' => [Vector t], ];
+$account_privacyRules = ['_' => 'account.privacyRules', 'rules' => [Vector t], 'users' => [Vector t], ];
 ```  
 

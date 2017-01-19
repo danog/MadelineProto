@@ -1,8 +1,8 @@
 ---
-title: messages_savedGifs
+title: messages.savedGifs
 description: messages_savedGifs attributes, type and example
 ---
-## Constructor: messages\_savedGifs  
+## Constructor: messages.savedGifs  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_savedGifs attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifs = ['_' => 'messages_savedGifs', 'hash' => int, 'gifs' => [Vector t], ];
+$messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Vector t], ];
 ```  
 

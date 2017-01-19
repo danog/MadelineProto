@@ -1,8 +1,8 @@
 ---
-title: messages_searchGlobal
-description: messages_searchGlobal parameters, return type and example
+title: messages.searchGlobal
+description: messages.searchGlobal parameters, return type and example
 ---
-## Method: messages\_searchGlobal  
+## Method: messages.searchGlobal  
 [Back to methods index](index.md)
 
 

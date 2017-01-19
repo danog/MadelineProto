@@ -1,8 +1,8 @@
 ---
-title: messages_startBot
-description: messages_startBot parameters, return type and example
+title: messages.startBot
+description: messages.startBot parameters, return type and example
 ---
-## Method: messages\_startBot  
+## Method: messages.startBot  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_installStickerSet
-description: messages_installStickerSet parameters, return type and example
+title: messages.installStickerSet
+description: messages.installStickerSet parameters, return type and example
 ---
-## Method: messages\_installStickerSet  
+## Method: messages.installStickerSet  
 [Back to methods index](index.md)
 
 

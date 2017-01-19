@@ -1,8 +1,8 @@
 ---
-title: contacts_foreignLinkRequested
+title: contacts.foreignLinkRequested
 description: contacts_foreignLinkRequested attributes, type and example
 ---
-## Constructor: contacts\_foreignLinkRequested  
+## Constructor: contacts.foreignLinkRequested  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: contacts_foreignLinkRequested attributes, type and example
 ### Example:
 
 ```
-$contacts_foreignLinkRequested = ['_' => 'contacts_foreignLinkRequested', 'has_phone' => Bool, ];
+$contacts_foreignLinkRequested = ['_' => 'contacts.foreignLinkRequested', 'has_phone' => Bool, ];
 ```  
 

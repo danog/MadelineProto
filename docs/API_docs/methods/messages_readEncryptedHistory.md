@@ -1,8 +1,8 @@
 ---
-title: messages_readEncryptedHistory
-description: messages_readEncryptedHistory parameters, return type and example
+title: messages.readEncryptedHistory
+description: messages.readEncryptedHistory parameters, return type and example
 ---
-## Method: messages\_readEncryptedHistory  
+## Method: messages.readEncryptedHistory  
 [Back to methods index](index.md)
 
 

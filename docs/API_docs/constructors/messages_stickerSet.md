@@ -1,8 +1,8 @@
 ---
-title: messages_stickerSet
+title: messages.stickerSet
 description: messages_stickerSet attributes, type and example
 ---
-## Constructor: messages\_stickerSet  
+## Constructor: messages.stickerSet  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_stickerSet attributes, type and example
 ### Example:
 
 ```
-$messages_stickerSet = ['_' => 'messages_stickerSet', 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
+$messages_stickerSet = ['_' => 'messages.stickerSet', 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
 ```  
 

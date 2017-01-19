@@ -1,8 +1,8 @@
 ---
-title: messages_botCallbackAnswer
+title: messages.botCallbackAnswer
 description: messages_botCallbackAnswer attributes, type and example
 ---
-## Constructor: messages\_botCallbackAnswer  
+## Constructor: messages.botCallbackAnswer  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Example:
 
 ```
-$messages_botCallbackAnswer = ['_' => 'messages_botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, ];
+$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, ];
 ```  
 

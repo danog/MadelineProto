@@ -1,8 +1,8 @@
 ---
-title: auth_sendInvites
-description: auth_sendInvites parameters, return type and example
+title: auth.sendInvites
+description: auth.sendInvites parameters, return type and example
 ---
-## Method: auth\_sendInvites  
+## Method: auth.sendInvites  
 [Back to methods index](index.md)
 
 

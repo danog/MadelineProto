@@ -1,8 +1,8 @@
 ---
-title: channels_readHistory
-description: channels_readHistory parameters, return type and example
+title: channels.readHistory
+description: channels.readHistory parameters, return type and example
 ---
-## Method: channels\_readHistory  
+## Method: channels.readHistory  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: updates_state
+title: updates.state
 description: updates_state attributes, type and example
 ---
-## Constructor: updates\_state  
+## Constructor: updates.state  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: updates_state attributes, type and example
 ### Example:
 
 ```
-$updates_state = ['_' => 'updates_state', 'pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
+$updates_state = ['_' => 'updates.state', 'pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
 ```  
 

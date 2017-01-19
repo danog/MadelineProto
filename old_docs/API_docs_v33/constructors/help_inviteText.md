@@ -1,8 +1,8 @@
 ---
-title: help_inviteText
+title: help.inviteText
 description: help_inviteText attributes, type and example
 ---
-## Constructor: help\_inviteText  
+## Constructor: help.inviteText  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: help_inviteText attributes, type and example
 ### Example:
 
 ```
-$help_inviteText = ['_' => 'help_inviteText', 'message' => string, ];
+$help_inviteText = ['_' => 'help.inviteText', 'message' => string, ];
 ```  
 

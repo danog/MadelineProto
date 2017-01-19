@@ -1,8 +1,8 @@
 ---
-title: messages_getStickers
-description: messages_getStickers parameters, return type and example
+title: messages.getStickers
+description: messages.getStickers parameters, return type and example
 ---
-## Method: messages\_getStickers  
+## Method: messages.getStickers  
 [Back to methods index](index.md)
 
 

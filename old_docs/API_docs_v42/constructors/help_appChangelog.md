@@ -1,8 +1,8 @@
 ---
-title: help_appChangelog
+title: help.appChangelog
 description: help_appChangelog attributes, type and example
 ---
-## Constructor: help\_appChangelog  
+## Constructor: help.appChangelog  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: help_appChangelog attributes, type and example
 ### Example:
 
 ```
-$help_appChangelog = ['_' => 'help_appChangelog', 'text' => string, ];
+$help_appChangelog = ['_' => 'help.appChangelog', 'text' => string, ];
 ```  
 

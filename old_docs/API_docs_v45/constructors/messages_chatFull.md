@@ -1,8 +1,8 @@
 ---
-title: messages_chatFull
+title: messages.chatFull
 description: messages_chatFull attributes, type and example
 ---
-## Constructor: messages\_chatFull  
+## Constructor: messages.chatFull  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_chatFull attributes, type and example
 ### Example:
 
 ```
-$messages_chatFull = ['_' => 'messages_chatFull', 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_chatFull = ['_' => 'messages.chatFull', 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

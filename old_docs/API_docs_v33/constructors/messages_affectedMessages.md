@@ -1,8 +1,8 @@
 ---
-title: messages_affectedMessages
+title: messages.affectedMessages
 description: messages_affectedMessages attributes, type and example
 ---
-## Constructor: messages\_affectedMessages  
+## Constructor: messages.affectedMessages  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_affectedMessages attributes, type and example
 ### Example:
 
 ```
-$messages_affectedMessages = ['_' => 'messages_affectedMessages', 'pts' => int, 'pts_count' => int, ];
+$messages_affectedMessages = ['_' => 'messages.affectedMessages', 'pts' => int, 'pts_count' => int, ];
 ```  
 

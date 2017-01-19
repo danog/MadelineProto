@@ -1,8 +1,8 @@
 ---
-title: contacts_contacts
+title: contacts.contacts
 description: contacts_contacts attributes, type and example
 ---
-## Constructor: contacts\_contacts  
+## Constructor: contacts.contacts  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: contacts_contacts attributes, type and example
 ### Example:
 
 ```
-$contacts_contacts = ['_' => 'contacts_contacts', 'contacts' => [Vector t], 'users' => [Vector t], ];
+$contacts_contacts = ['_' => 'contacts.contacts', 'contacts' => [Vector t], 'users' => [Vector t], ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: geochats_setTyping
-description: geochats_setTyping parameters, return type and example
+title: geochats.setTyping
+description: geochats.setTyping parameters, return type and example
 ---
-## Method: geochats\_setTyping  
+## Method: geochats.setTyping  
 [Back to methods index](index.md)
 
 

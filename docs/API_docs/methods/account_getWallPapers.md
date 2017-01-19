@@ -1,8 +1,8 @@
 ---
-title: account_getWallPapers
-description: account_getWallPapers parameters, return type and example
+title: account.getWallPapers
+description: account.getWallPapers parameters, return type and example
 ---
-## Method: account\_getWallPapers  
+## Method: account.getWallPapers  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: account_reportPeer
-description: account_reportPeer parameters, return type and example
+title: account.reportPeer
+description: account.reportPeer parameters, return type and example
 ---
-## Method: account\_reportPeer  
+## Method: account.reportPeer  
 [Back to methods index](index.md)
 
 

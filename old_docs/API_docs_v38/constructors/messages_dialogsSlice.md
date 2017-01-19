@@ -1,8 +1,8 @@
 ---
-title: messages_dialogsSlice
+title: messages.dialogsSlice
 description: messages_dialogsSlice attributes, type and example
 ---
-## Constructor: messages\_dialogsSlice  
+## Constructor: messages.dialogsSlice  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: messages_dialogsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_dialogsSlice = ['_' => 'messages_dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_dialogsSlice = ['_' => 'messages.dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

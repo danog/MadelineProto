@@ -1,8 +1,8 @@
 ---
-title: geochats_getRecents
-description: geochats_getRecents parameters, return type and example
+title: geochats.getRecents
+description: geochats.getRecents parameters, return type and example
 ---
-## Method: geochats\_getRecents  
+## Method: geochats.getRecents  
 [Back to methods index](index.md)
 
 

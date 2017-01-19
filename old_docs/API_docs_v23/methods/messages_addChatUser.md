@@ -1,8 +1,8 @@
 ---
-title: messages_addChatUser
-description: messages_addChatUser parameters, return type and example
+title: messages.addChatUser
+description: messages.addChatUser parameters, return type and example
 ---
-## Method: messages\_addChatUser  
+## Method: messages.addChatUser  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: storage_fileMov
+title: storage.fileMov
 description: storage_fileMov attributes, type and example
 ---
-## Constructor: storage\_fileMov  
+## Constructor: storage.fileMov  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_fileMov attributes, type and example
 ### Example:
 
 ```
-$storage_fileMov = ['_' => 'storage_fileMov', ];
+$storage_fileMov = ['_' => 'storage.fileMov', ];
 ```  
 

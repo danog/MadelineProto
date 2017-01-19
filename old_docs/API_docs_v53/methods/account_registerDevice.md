@@ -1,8 +1,8 @@
 ---
-title: account_registerDevice
-description: account_registerDevice parameters, return type and example
+title: account.registerDevice
+description: account.registerDevice parameters, return type and example
 ---
-## Method: account\_registerDevice  
+## Method: account.registerDevice  
 [Back to methods index](index.md)
 
 

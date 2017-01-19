@@ -1,8 +1,8 @@
 ---
-title: messages_createChat
-description: messages_createChat parameters, return type and example
+title: messages.createChat
+description: messages.createChat parameters, return type and example
 ---
-## Method: messages\_createChat  
+## Method: messages.createChat  
 [Back to methods index](index.md)
 
 

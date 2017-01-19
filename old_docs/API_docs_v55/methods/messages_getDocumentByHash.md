@@ -1,8 +1,8 @@
 ---
-title: messages_getDocumentByHash
-description: messages_getDocumentByHash parameters, return type and example
+title: messages.getDocumentByHash
+description: messages.getDocumentByHash parameters, return type and example
 ---
-## Method: messages\_getDocumentByHash  
+## Method: messages.getDocumentByHash  
 [Back to methods index](index.md)
 
 

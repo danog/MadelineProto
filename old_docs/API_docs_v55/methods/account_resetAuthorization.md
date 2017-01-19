@@ -1,8 +1,8 @@
 ---
-title: account_resetAuthorization
-description: account_resetAuthorization parameters, return type and example
+title: account.resetAuthorization
+description: account.resetAuthorization parameters, return type and example
 ---
-## Method: account\_resetAuthorization  
+## Method: account.resetAuthorization  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_setGameScore
-description: messages_setGameScore parameters, return type and example
+title: messages.setGameScore
+description: messages.setGameScore parameters, return type and example
 ---
-## Method: messages\_setGameScore  
+## Method: messages.setGameScore  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: storage_fileMp3
+title: storage.fileMp3
 description: storage_fileMp3 attributes, type and example
 ---
-## Constructor: storage\_fileMp3  
+## Constructor: storage.fileMp3  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_fileMp3 attributes, type and example
 ### Example:
 
 ```
-$storage_fileMp3 = ['_' => 'storage_fileMp3', ];
+$storage_fileMp3 = ['_' => 'storage.fileMp3', ];
 ```  
 

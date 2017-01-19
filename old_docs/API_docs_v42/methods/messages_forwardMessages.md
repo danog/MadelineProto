@@ -1,8 +1,8 @@
 ---
-title: messages_forwardMessages
-description: messages_forwardMessages parameters, return type and example
+title: messages.forwardMessages
+description: messages.forwardMessages parameters, return type and example
 ---
-## Method: messages\_forwardMessages  
+## Method: messages.forwardMessages  
 [Back to methods index](index.md)
 
 

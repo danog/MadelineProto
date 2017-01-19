@@ -1,8 +1,8 @@
 ---
-title: auth_passwordRecovery
+title: auth.passwordRecovery
 description: auth_passwordRecovery attributes, type and example
 ---
-## Constructor: auth\_passwordRecovery  
+## Constructor: auth.passwordRecovery  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: auth_passwordRecovery attributes, type and example
 ### Example:
 
 ```
-$auth_passwordRecovery = ['_' => 'auth_passwordRecovery', 'email_pattern' => string, ];
+$auth_passwordRecovery = ['_' => 'auth.passwordRecovery', 'email_pattern' => string, ];
 ```  
 

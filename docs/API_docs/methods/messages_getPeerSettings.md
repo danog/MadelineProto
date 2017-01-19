@@ -1,8 +1,8 @@
 ---
-title: messages_getPeerSettings
-description: messages_getPeerSettings parameters, return type and example
+title: messages.getPeerSettings
+description: messages.getPeerSettings parameters, return type and example
 ---
-## Method: messages\_getPeerSettings  
+## Method: messages.getPeerSettings  
 [Back to methods index](index.md)
 
 

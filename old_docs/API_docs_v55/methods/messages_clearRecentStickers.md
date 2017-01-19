@@ -1,8 +1,8 @@
 ---
-title: messages_clearRecentStickers
-description: messages_clearRecentStickers parameters, return type and example
+title: messages.clearRecentStickers
+description: messages.clearRecentStickers parameters, return type and example
 ---
-## Method: messages\_clearRecentStickers  
+## Method: messages.clearRecentStickers  
 [Back to methods index](index.md)
 
 

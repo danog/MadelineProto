@@ -1,8 +1,8 @@
 ---
-title: account_getAccountTTL
-description: account_getAccountTTL parameters, return type and example
+title: account.getAccountTTL
+description: account.getAccountTTL parameters, return type and example
 ---
-## Method: account\_getAccountTTL  
+## Method: account.getAccountTTL  
 [Back to methods index](index.md)
 
 

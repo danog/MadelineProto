@@ -1,8 +1,8 @@
 ---
-title: messages_setInlineBotResults
-description: messages_setInlineBotResults parameters, return type and example
+title: messages.setInlineBotResults
+description: messages.setInlineBotResults parameters, return type and example
 ---
-## Method: messages\_setInlineBotResults  
+## Method: messages.setInlineBotResults  
 [Back to methods index](index.md)
 
 

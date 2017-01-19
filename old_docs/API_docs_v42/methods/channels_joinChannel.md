@@ -1,8 +1,8 @@
 ---
-title: channels_joinChannel
-description: channels_joinChannel parameters, return type and example
+title: channels.joinChannel
+description: channels.joinChannel parameters, return type and example
 ---
-## Method: channels\_joinChannel  
+## Method: channels.joinChannel  
 [Back to methods index](index.md)
 
 

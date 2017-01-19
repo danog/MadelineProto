@@ -1,8 +1,8 @@
 ---
-title: channels_channelParticipants
+title: channels.channelParticipants
 description: channels_channelParticipants attributes, type and example
 ---
-## Constructor: channels\_channelParticipants  
+## Constructor: channels.channelParticipants  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: channels_channelParticipants attributes, type and example
 ### Example:
 
 ```
-$channels_channelParticipants = ['_' => 'channels_channelParticipants', 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
+$channels_channelParticipants = ['_' => 'channels.channelParticipants', 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: messages_receivedQueue
-description: messages_receivedQueue parameters, return type and example
+title: messages.receivedQueue
+description: messages.receivedQueue parameters, return type and example
 ---
-## Method: messages\_receivedQueue  
+## Method: messages.receivedQueue  
 [Back to methods index](index.md)
 
 

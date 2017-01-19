@@ -1,8 +1,8 @@
 ---
-title: messages_sendEncryptedFile
-description: messages_sendEncryptedFile parameters, return type and example
+title: messages.sendEncryptedFile
+description: messages.sendEncryptedFile parameters, return type and example
 ---
-## Method: messages\_sendEncryptedFile  
+## Method: messages.sendEncryptedFile  
 [Back to methods index](index.md)
 
 

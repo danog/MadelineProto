@@ -1,8 +1,8 @@
 ---
-title: auth_signUp
-description: auth_signUp parameters, return type and example
+title: auth.signUp
+description: auth.signUp parameters, return type and example
 ---
-## Method: auth\_signUp  
+## Method: auth.signUp  
 [Back to methods index](index.md)
 
 

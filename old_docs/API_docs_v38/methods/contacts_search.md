@@ -1,8 +1,8 @@
 ---
-title: contacts_search
-description: contacts_search parameters, return type and example
+title: contacts.search
+description: contacts.search parameters, return type and example
 ---
-## Method: contacts\_search  
+## Method: contacts.search  
 [Back to methods index](index.md)
 
 

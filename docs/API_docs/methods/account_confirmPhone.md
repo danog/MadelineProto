@@ -1,8 +1,8 @@
 ---
-title: account_confirmPhone
-description: account_confirmPhone parameters, return type and example
+title: account.confirmPhone
+description: account.confirmPhone parameters, return type and example
 ---
-## Method: account\_confirmPhone  
+## Method: account.confirmPhone  
 [Back to methods index](index.md)
 
 

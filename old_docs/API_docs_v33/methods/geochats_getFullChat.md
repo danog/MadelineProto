@@ -1,8 +1,8 @@
 ---
-title: geochats_getFullChat
-description: geochats_getFullChat parameters, return type and example
+title: geochats.getFullChat
+description: geochats.getFullChat parameters, return type and example
 ---
-## Method: geochats\_getFullChat  
+## Method: geochats.getFullChat  
 [Back to methods index](index.md)
 
 

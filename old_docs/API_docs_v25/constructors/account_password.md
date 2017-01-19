@@ -1,8 +1,8 @@
 ---
-title: account_password
+title: account.password
 description: account_password attributes, type and example
 ---
-## Constructor: account\_password  
+## Constructor: account.password  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: account_password attributes, type and example
 ### Example:
 
 ```
-$account_password = ['_' => 'account_password', 'current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, ];
+$account_password = ['_' => 'account.password', 'current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, ];
 ```  
 

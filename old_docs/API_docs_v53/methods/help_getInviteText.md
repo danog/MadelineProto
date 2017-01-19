@@ -1,8 +1,8 @@
 ---
-title: help_getInviteText
-description: help_getInviteText parameters, return type and example
+title: help.getInviteText
+description: help.getInviteText parameters, return type and example
 ---
-## Method: help\_getInviteText  
+## Method: help.getInviteText  
 [Back to methods index](index.md)
 
 

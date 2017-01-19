@@ -1,8 +1,8 @@
 ---
-title: contacts_resolvedPeer
+title: contacts.resolvedPeer
 description: contacts_resolvedPeer attributes, type and example
 ---
-## Constructor: contacts\_resolvedPeer  
+## Constructor: contacts.resolvedPeer  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: contacts_resolvedPeer attributes, type and example
 ### Example:
 
 ```
-$contacts_resolvedPeer = ['_' => 'contacts_resolvedPeer', 'peer' => Peer, 'chats' => [Vector t], 'users' => [Vector t], ];
+$contacts_resolvedPeer = ['_' => 'contacts.resolvedPeer', 'peer' => Peer, 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

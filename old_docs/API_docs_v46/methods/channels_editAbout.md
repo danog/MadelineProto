@@ -1,8 +1,8 @@
 ---
-title: channels_editAbout
-description: channels_editAbout parameters, return type and example
+title: channels.editAbout
+description: channels.editAbout parameters, return type and example
 ---
-## Method: channels\_editAbout  
+## Method: channels.editAbout  
 [Back to methods index](index.md)
 
 

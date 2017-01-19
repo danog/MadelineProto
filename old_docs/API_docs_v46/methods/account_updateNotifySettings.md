@@ -1,8 +1,8 @@
 ---
-title: account_updateNotifySettings
-description: account_updateNotifySettings parameters, return type and example
+title: account.updateNotifySettings
+description: account.updateNotifySettings parameters, return type and example
 ---
-## Method: account\_updateNotifySettings  
+## Method: account.updateNotifySettings  
 [Back to methods index](index.md)
 
 

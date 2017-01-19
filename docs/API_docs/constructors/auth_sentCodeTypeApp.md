@@ -1,8 +1,8 @@
 ---
-title: auth_sentCodeTypeApp
+title: auth.sentCodeTypeApp
 description: auth_sentCodeTypeApp attributes, type and example
 ---
-## Constructor: auth\_sentCodeTypeApp  
+## Constructor: auth.sentCodeTypeApp  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: auth_sentCodeTypeApp attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeApp = ['_' => 'auth_sentCodeTypeApp', 'length' => int, ];
+$auth_sentCodeTypeApp = ['_' => 'auth.sentCodeTypeApp', 'length' => int, ];
 ```  
 
