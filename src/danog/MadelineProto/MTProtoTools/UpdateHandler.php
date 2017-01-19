@@ -110,7 +110,7 @@ trait UpdateHandler
 
     public function set_channel_state($channel, $data)
     {
-        $this->get_channel_state($channel)[$channel]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
+        $this->get_channel_state($channel)['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
     }
 
     public function get_channel_difference($channel)
