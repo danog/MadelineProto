@@ -1,8 +1,8 @@
 ---
-title: account_unregisterDevice
-description: account_unregisterDevice parameters, return type and example
+title: account.unregisterDevice
+description: account.unregisterDevice parameters, return type and example
 ---
-## Method: account\_unregisterDevice  
+## Method: account.unregisterDevice  
 [Back to methods index](index.md)
 
 

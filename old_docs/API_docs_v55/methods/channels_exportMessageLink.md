@@ -1,8 +1,8 @@
 ---
-title: channels_exportMessageLink
-description: channels_exportMessageLink parameters, return type and example
+title: channels.exportMessageLink
+description: channels.exportMessageLink parameters, return type and example
 ---
-## Method: channels\_exportMessageLink  
+## Method: channels.exportMessageLink  
 [Back to methods index](index.md)
 
 

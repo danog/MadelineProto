@@ -1,8 +1,8 @@
 ---
-title: messages_setTyping
-description: messages_setTyping parameters, return type and example
+title: messages.setTyping
+description: messages.setTyping parameters, return type and example
 ---
-## Method: messages\_setTyping  
+## Method: messages.setTyping  
 [Back to methods index](index.md)
 
 

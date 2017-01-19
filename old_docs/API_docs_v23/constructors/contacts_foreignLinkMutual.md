@@ -1,8 +1,8 @@
 ---
-title: contacts_foreignLinkMutual
+title: contacts.foreignLinkMutual
 description: contacts_foreignLinkMutual attributes, type and example
 ---
-## Constructor: contacts\_foreignLinkMutual  
+## Constructor: contacts.foreignLinkMutual  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: contacts_foreignLinkMutual attributes, type and example
 ### Example:
 
 ```
-$contacts_foreignLinkMutual = ['_' => 'contacts_foreignLinkMutual', ];
+$contacts_foreignLinkMutual = ['_' => 'contacts.foreignLinkMutual', ];
 ```  
 

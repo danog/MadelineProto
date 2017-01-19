@@ -1,8 +1,8 @@
 ---
-title: messages_getImportantHistory
-description: messages_getImportantHistory parameters, return type and example
+title: messages.getImportantHistory
+description: messages.getImportantHistory parameters, return type and example
 ---
-## Method: messages\_getImportantHistory  
+## Method: messages.getImportantHistory  
 [Back to methods index](index.md)
 
 

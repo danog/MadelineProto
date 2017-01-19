@@ -1,8 +1,8 @@
 ---
-title: messages_setEncryptedTyping
-description: messages_setEncryptedTyping parameters, return type and example
+title: messages.setEncryptedTyping
+description: messages.setEncryptedTyping parameters, return type and example
 ---
-## Method: messages\_setEncryptedTyping  
+## Method: messages.setEncryptedTyping  
 [Back to methods index](index.md)
 
 

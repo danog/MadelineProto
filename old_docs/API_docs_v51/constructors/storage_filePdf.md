@@ -1,8 +1,8 @@
 ---
-title: storage_filePdf
+title: storage.filePdf
 description: storage_filePdf attributes, type and example
 ---
-## Constructor: storage\_filePdf  
+## Constructor: storage.filePdf  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_filePdf attributes, type and example
 ### Example:
 
 ```
-$storage_filePdf = ['_' => 'storage_filePdf', ];
+$storage_filePdf = ['_' => 'storage.filePdf', ];
 ```  
 

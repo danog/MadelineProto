@@ -1,8 +1,8 @@
 ---
-title: messages_getMessages
-description: messages_getMessages parameters, return type and example
+title: messages.getMessages
+description: messages.getMessages parameters, return type and example
 ---
-## Method: messages\_getMessages  
+## Method: messages.getMessages  
 [Back to methods index](index.md)
 
 

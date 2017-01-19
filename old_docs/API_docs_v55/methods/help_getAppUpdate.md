@@ -1,8 +1,8 @@
 ---
-title: help_getAppUpdate
-description: help_getAppUpdate parameters, return type and example
+title: help.getAppUpdate
+description: help.getAppUpdate parameters, return type and example
 ---
-## Method: help\_getAppUpdate  
+## Method: help.getAppUpdate  
 [Back to methods index](index.md)
 
 

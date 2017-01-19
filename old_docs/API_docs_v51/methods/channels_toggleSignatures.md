@@ -1,8 +1,8 @@
 ---
-title: channels_toggleSignatures
-description: channels_toggleSignatures parameters, return type and example
+title: channels.toggleSignatures
+description: channels.toggleSignatures parameters, return type and example
 ---
-## Method: channels\_toggleSignatures  
+## Method: channels.toggleSignatures  
 [Back to methods index](index.md)
 
 

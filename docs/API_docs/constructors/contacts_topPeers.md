@@ -1,8 +1,8 @@
 ---
-title: contacts_topPeers
+title: contacts.topPeers
 description: contacts_topPeers attributes, type and example
 ---
-## Constructor: contacts\_topPeers  
+## Constructor: contacts.topPeers  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: contacts_topPeers attributes, type and example
 ### Example:
 
 ```
-$contacts_topPeers = ['_' => 'contacts_topPeers', 'categories' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$contacts_topPeers = ['_' => 'contacts.topPeers', 'categories' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

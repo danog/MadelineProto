@@ -1,8 +1,8 @@
 ---
-title: auth_sendSms
-description: auth_sendSms parameters, return type and example
+title: auth.sendSms
+description: auth.sendSms parameters, return type and example
 ---
-## Method: auth\_sendSms  
+## Method: auth.sendSms  
 [Back to methods index](index.md)
 
 

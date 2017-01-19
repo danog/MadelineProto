@@ -1,8 +1,8 @@
 ---
-title: messages_statedMessage
+title: messages.statedMessage
 description: messages_statedMessage attributes, type and example
 ---
-## Constructor: messages\_statedMessage  
+## Constructor: messages.statedMessage  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: messages_statedMessage attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessage = ['_' => 'messages_statedMessage', 'message' => Message, 'chats' => [Vector t], 'users' => [Vector t], 'pts' => int, 'seq' => int, ];
+$messages_statedMessage = ['_' => 'messages.statedMessage', 'message' => Message, 'chats' => [Vector t], 'users' => [Vector t], 'pts' => int, 'seq' => int, ];
 ```  
 

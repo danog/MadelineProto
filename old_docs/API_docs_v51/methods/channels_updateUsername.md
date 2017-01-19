@@ -1,8 +1,8 @@
 ---
-title: channels_updateUsername
-description: channels_updateUsername parameters, return type and example
+title: channels.updateUsername
+description: channels.updateUsername parameters, return type and example
 ---
-## Method: channels\_updateUsername  
+## Method: channels.updateUsername  
 [Back to methods index](index.md)
 
 

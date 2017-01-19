@@ -1,8 +1,8 @@
 ---
-title: messages_saveDraft
-description: messages_saveDraft parameters, return type and example
+title: messages.saveDraft
+description: messages.saveDraft parameters, return type and example
 ---
-## Method: messages\_saveDraft  
+## Method: messages.saveDraft  
 [Back to methods index](index.md)
 
 

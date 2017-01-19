@@ -1,8 +1,8 @@
 ---
-title: auth_sentAppCode
+title: auth.sentAppCode
 description: auth_sentAppCode attributes, type and example
 ---
-## Constructor: auth\_sentAppCode  
+## Constructor: auth.sentAppCode  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: auth_sentAppCode attributes, type and example
 ### Example:
 
 ```
-$auth_sentAppCode = ['_' => 'auth_sentAppCode', 'phone_registered' => Bool, 'phone_code_hash' => string, 'send_call_timeout' => int, 'is_password' => Bool, ];
+$auth_sentAppCode = ['_' => 'auth.sentAppCode', 'phone_registered' => Bool, 'phone_code_hash' => string, 'send_call_timeout' => int, 'is_password' => Bool, ];
 ```  
 

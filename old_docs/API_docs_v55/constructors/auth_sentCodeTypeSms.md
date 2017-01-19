@@ -1,8 +1,8 @@
 ---
-title: auth_sentCodeTypeSms
+title: auth.sentCodeTypeSms
 description: auth_sentCodeTypeSms attributes, type and example
 ---
-## Constructor: auth\_sentCodeTypeSms  
+## Constructor: auth.sentCodeTypeSms  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: auth_sentCodeTypeSms attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeSms = ['_' => 'auth_sentCodeTypeSms', 'length' => int, ];
+$auth_sentCodeTypeSms = ['_' => 'auth.sentCodeTypeSms', 'length' => int, ];
 ```  
 

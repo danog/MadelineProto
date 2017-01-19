@@ -1,8 +1,8 @@
 ---
-title: messages_statedMessagesLinks
+title: messages.statedMessagesLinks
 description: messages_statedMessagesLinks attributes, type and example
 ---
-## Constructor: messages\_statedMessagesLinks  
+## Constructor: messages.statedMessagesLinks  
 [Back to constructors index](index.md)
 
 
@@ -27,6 +27,6 @@ description: messages_statedMessagesLinks attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessagesLinks = ['_' => 'messages_statedMessagesLinks', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'pts' => int, 'pts_count' => int, 'links' => [Vector t], 'seq' => int, ];
+$messages_statedMessagesLinks = ['_' => 'messages.statedMessagesLinks', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'pts' => int, 'pts_count' => int, 'links' => [Vector t], 'seq' => int, ];
 ```  
 

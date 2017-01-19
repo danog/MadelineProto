@@ -1,8 +1,8 @@
 ---
-title: channels_getFullChannel
-description: channels_getFullChannel parameters, return type and example
+title: channels.getFullChannel
+description: channels.getFullChannel parameters, return type and example
 ---
-## Method: channels\_getFullChannel  
+## Method: channels.getFullChannel  
 [Back to methods index](index.md)
 
 

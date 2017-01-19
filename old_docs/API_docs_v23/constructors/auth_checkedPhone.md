@@ -1,8 +1,8 @@
 ---
-title: auth_checkedPhone
+title: auth.checkedPhone
 description: auth_checkedPhone attributes, type and example
 ---
-## Constructor: auth\_checkedPhone  
+## Constructor: auth.checkedPhone  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: auth_checkedPhone attributes, type and example
 ### Example:
 
 ```
-$auth_checkedPhone = ['_' => 'auth_checkedPhone', 'phone_registered' => Bool, 'phone_invited' => Bool, ];
+$auth_checkedPhone = ['_' => 'auth.checkedPhone', 'phone_registered' => Bool, 'phone_invited' => Bool, ];
 ```  
 

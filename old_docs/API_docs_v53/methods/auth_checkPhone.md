@@ -1,8 +1,8 @@
 ---
-title: auth_checkPhone
-description: auth_checkPhone parameters, return type and example
+title: auth.checkPhone
+description: auth.checkPhone parameters, return type and example
 ---
-## Method: auth\_checkPhone  
+## Method: auth.checkPhone  
 [Back to methods index](index.md)
 
 

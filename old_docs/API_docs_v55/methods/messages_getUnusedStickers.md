@@ -1,8 +1,8 @@
 ---
-title: messages_getUnusedStickers
-description: messages_getUnusedStickers parameters, return type and example
+title: messages.getUnusedStickers
+description: messages.getUnusedStickers parameters, return type and example
 ---
-## Method: messages\_getUnusedStickers  
+## Method: messages.getUnusedStickers  
 [Back to methods index](index.md)
 
 

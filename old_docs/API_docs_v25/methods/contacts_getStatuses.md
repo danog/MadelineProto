@@ -1,8 +1,8 @@
 ---
-title: contacts_getStatuses
-description: contacts_getStatuses parameters, return type and example
+title: contacts.getStatuses
+description: contacts.getStatuses parameters, return type and example
 ---
-## Method: contacts\_getStatuses  
+## Method: contacts.getStatuses  
 [Back to methods index](index.md)
 
 

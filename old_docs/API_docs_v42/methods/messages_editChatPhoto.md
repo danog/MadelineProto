@@ -1,8 +1,8 @@
 ---
-title: messages_editChatPhoto
-description: messages_editChatPhoto parameters, return type and example
+title: messages.editChatPhoto
+description: messages.editChatPhoto parameters, return type and example
 ---
-## Method: messages\_editChatPhoto  
+## Method: messages.editChatPhoto  
 [Back to methods index](index.md)
 
 

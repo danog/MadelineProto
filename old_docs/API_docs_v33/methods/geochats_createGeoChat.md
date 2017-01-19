@@ -1,8 +1,8 @@
 ---
-title: geochats_createGeoChat
-description: geochats_createGeoChat parameters, return type and example
+title: geochats.createGeoChat
+description: geochats.createGeoChat parameters, return type and example
 ---
-## Method: geochats\_createGeoChat  
+## Method: geochats.createGeoChat  
 [Back to methods index](index.md)
 
 

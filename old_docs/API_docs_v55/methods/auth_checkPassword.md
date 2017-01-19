@@ -1,8 +1,8 @@
 ---
-title: auth_checkPassword
-description: auth_checkPassword parameters, return type and example
+title: auth.checkPassword
+description: auth.checkPassword parameters, return type and example
 ---
-## Method: auth\_checkPassword  
+## Method: auth.checkPassword  
 [Back to methods index](index.md)
 
 

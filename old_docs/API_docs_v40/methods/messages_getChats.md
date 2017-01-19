@@ -1,8 +1,8 @@
 ---
-title: messages_getChats
-description: messages_getChats parameters, return type and example
+title: messages.getChats
+description: messages.getChats parameters, return type and example
 ---
-## Method: messages\_getChats  
+## Method: messages.getChats  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: channels_editAdmin
-description: channels_editAdmin parameters, return type and example
+title: channels.editAdmin
+description: channels.editAdmin parameters, return type and example
 ---
-## Method: channels\_editAdmin  
+## Method: channels.editAdmin  
 [Back to methods index](index.md)
 
 

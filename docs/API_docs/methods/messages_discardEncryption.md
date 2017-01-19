@@ -1,8 +1,8 @@
 ---
-title: messages_discardEncryption
-description: messages_discardEncryption parameters, return type and example
+title: messages.discardEncryption
+description: messages.discardEncryption parameters, return type and example
 ---
-## Method: messages\_discardEncryption  
+## Method: messages.discardEncryption  
 [Back to methods index](index.md)
 
 

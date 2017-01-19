@@ -1,8 +1,8 @@
 ---
-title: channels_getDialogs
-description: channels_getDialogs parameters, return type and example
+title: channels.getDialogs
+description: channels.getDialogs parameters, return type and example
 ---
-## Method: channels\_getDialogs  
+## Method: channels.getDialogs  
 [Back to methods index](index.md)
 
 

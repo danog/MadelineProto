@@ -1,8 +1,8 @@
 ---
-title: messages_acceptEncryption
-description: messages_acceptEncryption parameters, return type and example
+title: messages.acceptEncryption
+description: messages.acceptEncryption parameters, return type and example
 ---
-## Method: messages\_acceptEncryption  
+## Method: messages.acceptEncryption  
 [Back to methods index](index.md)
 
 

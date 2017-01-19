@@ -1,8 +1,8 @@
 ---
-title: upload_saveFilePart
-description: upload_saveFilePart parameters, return type and example
+title: upload.saveFilePart
+description: upload.saveFilePart parameters, return type and example
 ---
-## Method: upload\_saveFilePart  
+## Method: upload.saveFilePart  
 [Back to methods index](index.md)
 
 

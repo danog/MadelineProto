@@ -1,8 +1,8 @@
 ---
-title: photos_updateProfilePhoto
-description: photos_updateProfilePhoto parameters, return type and example
+title: photos.updateProfilePhoto
+description: photos.updateProfilePhoto parameters, return type and example
 ---
-## Method: photos\_updateProfilePhoto  
+## Method: photos.updateProfilePhoto  
 [Back to methods index](index.md)
 
 

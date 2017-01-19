@@ -1,8 +1,8 @@
 ---
-title: messages_sentEncryptedMessage
+title: messages.sentEncryptedMessage
 description: messages_sentEncryptedMessage attributes, type and example
 ---
-## Constructor: messages\_sentEncryptedMessage  
+## Constructor: messages.sentEncryptedMessage  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: messages_sentEncryptedMessage attributes, type and example
 ### Example:
 
 ```
-$messages_sentEncryptedMessage = ['_' => 'messages_sentEncryptedMessage', 'date' => int, ];
+$messages_sentEncryptedMessage = ['_' => 'messages.sentEncryptedMessage', 'date' => int, ];
 ```  
 

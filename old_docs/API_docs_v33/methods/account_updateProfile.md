@@ -1,8 +1,8 @@
 ---
-title: account_updateProfile
-description: account_updateProfile parameters, return type and example
+title: account.updateProfile
+description: account.updateProfile parameters, return type and example
 ---
-## Method: account\_updateProfile  
+## Method: account.updateProfile  
 [Back to methods index](index.md)
 
 

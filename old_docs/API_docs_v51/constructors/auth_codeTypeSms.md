@@ -1,8 +1,8 @@
 ---
-title: auth_codeTypeSms
+title: auth.codeTypeSms
 description: auth_codeTypeSms attributes, type and example
 ---
-## Constructor: auth\_codeTypeSms  
+## Constructor: auth.codeTypeSms  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: auth_codeTypeSms attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeSms = ['_' => 'auth_codeTypeSms', ];
+$auth_codeTypeSms = ['_' => 'auth.codeTypeSms', ];
 ```  
 

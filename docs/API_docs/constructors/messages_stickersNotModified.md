@@ -1,8 +1,8 @@
 ---
-title: messages_stickersNotModified
+title: messages.stickersNotModified
 description: messages_stickersNotModified attributes, type and example
 ---
-## Constructor: messages\_stickersNotModified  
+## Constructor: messages.stickersNotModified  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: messages_stickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_stickersNotModified = ['_' => 'messages_stickersNotModified', ];
+$messages_stickersNotModified = ['_' => 'messages.stickersNotModified', ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: messages_getPeerDialogs
-description: messages_getPeerDialogs parameters, return type and example
+title: messages.getPeerDialogs
+description: messages.getPeerDialogs parameters, return type and example
 ---
-## Method: messages\_getPeerDialogs  
+## Method: messages.getPeerDialogs  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: account_getPrivacy
-description: account_getPrivacy parameters, return type and example
+title: account.getPrivacy
+description: account.getPrivacy parameters, return type and example
 ---
-## Method: account\_getPrivacy  
+## Method: account.getPrivacy  
 [Back to methods index](index.md)
 
 

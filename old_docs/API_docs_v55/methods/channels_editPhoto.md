@@ -1,8 +1,8 @@
 ---
-title: channels_editPhoto
-description: channels_editPhoto parameters, return type and example
+title: channels.editPhoto
+description: channels.editPhoto parameters, return type and example
 ---
-## Method: channels\_editPhoto  
+## Method: channels.editPhoto  
 [Back to methods index](index.md)
 
 

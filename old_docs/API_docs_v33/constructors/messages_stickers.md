@@ -1,8 +1,8 @@
 ---
-title: messages_stickers
+title: messages.stickers
 description: messages_stickers attributes, type and example
 ---
-## Constructor: messages\_stickers  
+## Constructor: messages.stickers  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_stickers attributes, type and example
 ### Example:
 
 ```
-$messages_stickers = ['_' => 'messages_stickers', 'hash' => string, 'stickers' => [Vector t], ];
+$messages_stickers = ['_' => 'messages.stickers', 'hash' => string, 'stickers' => [Vector t], ];
 ```  
 

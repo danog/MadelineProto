@@ -1,8 +1,8 @@
 ---
-title: auth_recoverPassword
-description: auth_recoverPassword parameters, return type and example
+title: auth.recoverPassword
+description: auth.recoverPassword parameters, return type and example
 ---
-## Method: auth\_recoverPassword  
+## Method: auth.recoverPassword  
 [Back to methods index](index.md)
 
 

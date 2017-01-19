@@ -1,8 +1,8 @@
 ---
-title: auth_cancelCode
-description: auth_cancelCode parameters, return type and example
+title: auth.cancelCode
+description: auth.cancelCode parameters, return type and example
 ---
-## Method: auth\_cancelCode  
+## Method: auth.cancelCode  
 [Back to methods index](index.md)
 
 

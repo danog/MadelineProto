@@ -1,8 +1,8 @@
 ---
-title: messages_savedGifsNotModified
+title: messages.savedGifsNotModified
 description: messages_savedGifsNotModified attributes, type and example
 ---
-## Constructor: messages\_savedGifsNotModified  
+## Constructor: messages.savedGifsNotModified  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: messages_savedGifsNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifsNotModified = ['_' => 'messages_savedGifsNotModified', ];
+$messages_savedGifsNotModified = ['_' => 'messages.savedGifsNotModified', ];
 ```  
 

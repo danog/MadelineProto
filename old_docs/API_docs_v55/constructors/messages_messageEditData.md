@@ -1,8 +1,8 @@
 ---
-title: messages_messageEditData
+title: messages.messageEditData
 description: messages_messageEditData attributes, type and example
 ---
-## Constructor: messages\_messageEditData  
+## Constructor: messages.messageEditData  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: messages_messageEditData attributes, type and example
 ### Example:
 
 ```
-$messages_messageEditData = ['_' => 'messages_messageEditData', 'caption' => true, ];
+$messages_messageEditData = ['_' => 'messages.messageEditData', 'caption' => true, ];
 ```  
 

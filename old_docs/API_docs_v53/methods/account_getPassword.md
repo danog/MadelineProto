@@ -1,8 +1,8 @@
 ---
-title: account_getPassword
-description: account_getPassword parameters, return type and example
+title: account.getPassword
+description: account.getPassword parameters, return type and example
 ---
-## Method: account\_getPassword  
+## Method: account.getPassword  
 [Back to methods index](index.md)
 
 

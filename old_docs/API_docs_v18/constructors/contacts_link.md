@@ -1,8 +1,8 @@
 ---
-title: contacts_link
+title: contacts.link
 description: contacts_link attributes, type and example
 ---
-## Constructor: contacts\_link  
+## Constructor: contacts.link  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: contacts_link attributes, type and example
 ### Example:
 
 ```
-$contacts_link = ['_' => 'contacts_link', 'my_link' => contacts.MyLink, 'foreign_link' => contacts.ForeignLink, 'user' => User, ];
+$contacts_link = ['_' => 'contacts.link', 'my_link' => contacts.MyLink, 'foreign_link' => contacts.ForeignLink, 'user' => User, ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: storage_fileGif
+title: storage.fileGif
 description: storage_fileGif attributes, type and example
 ---
-## Constructor: storage\_fileGif  
+## Constructor: storage.fileGif  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_fileGif attributes, type and example
 ### Example:
 
 ```
-$storage_fileGif = ['_' => 'storage_fileGif', ];
+$storage_fileGif = ['_' => 'storage.fileGif', ];
 ```  
 

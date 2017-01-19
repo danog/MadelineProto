@@ -1,8 +1,8 @@
 ---
-title: updates_getState
-description: updates_getState parameters, return type and example
+title: updates.getState
+description: updates.getState parameters, return type and example
 ---
-## Method: updates\_getState  
+## Method: updates.getState  
 [Back to methods index](index.md)
 
 

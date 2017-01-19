@@ -1,8 +1,8 @@
 ---
-title: messages_highScores
+title: messages.highScores
 description: messages_highScores attributes, type and example
 ---
-## Constructor: messages\_highScores  
+## Constructor: messages.highScores  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_highScores attributes, type and example
 ### Example:
 
 ```
-$messages_highScores = ['_' => 'messages_highScores', 'scores' => [Vector t], 'users' => [Vector t], ];
+$messages_highScores = ['_' => 'messages.highScores', 'scores' => [Vector t], 'users' => [Vector t], ];
 ```  
 

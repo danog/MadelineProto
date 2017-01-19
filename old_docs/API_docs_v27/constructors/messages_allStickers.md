@@ -1,8 +1,8 @@
 ---
-title: messages_allStickers
+title: messages.allStickers
 description: messages_allStickers attributes, type and example
 ---
-## Constructor: messages\_allStickers  
+## Constructor: messages.allStickers  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_allStickers attributes, type and example
 ### Example:
 
 ```
-$messages_allStickers = ['_' => 'messages_allStickers', 'hash' => string, 'packs' => [Vector t], 'documents' => [Vector t], ];
+$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => string, 'packs' => [Vector t], 'documents' => [Vector t], ];
 ```  
 

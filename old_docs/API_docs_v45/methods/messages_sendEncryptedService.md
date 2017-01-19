@@ -1,8 +1,8 @@
 ---
-title: messages_sendEncryptedService
-description: messages_sendEncryptedService parameters, return type and example
+title: messages.sendEncryptedService
+description: messages.sendEncryptedService parameters, return type and example
 ---
-## Method: messages\_sendEncryptedService  
+## Method: messages.sendEncryptedService  
 [Back to methods index](index.md)
 
 

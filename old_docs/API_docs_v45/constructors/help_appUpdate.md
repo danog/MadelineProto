@@ -1,8 +1,8 @@
 ---
-title: help_appUpdate
+title: help.appUpdate
 description: help_appUpdate attributes, type and example
 ---
-## Constructor: help\_appUpdate  
+## Constructor: help.appUpdate  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: help_appUpdate attributes, type and example
 ### Example:
 
 ```
-$help_appUpdate = ['_' => 'help_appUpdate', 'id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
+$help_appUpdate = ['_' => 'help.appUpdate', 'id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
 ```  
 

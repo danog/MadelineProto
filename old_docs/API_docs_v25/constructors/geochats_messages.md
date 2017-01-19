@@ -1,8 +1,8 @@
 ---
-title: geochats_messages
+title: geochats.messages
 description: geochats_messages attributes, type and example
 ---
-## Constructor: geochats\_messages  
+## Constructor: geochats.messages  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: geochats_messages attributes, type and example
 ### Example:
 
 ```
-$geochats_messages = ['_' => 'geochats_messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$geochats_messages = ['_' => 'geochats.messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

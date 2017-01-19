@@ -1,8 +1,8 @@
 ---
-title: help_getSupport
-description: help_getSupport parameters, return type and example
+title: help.getSupport
+description: help.getSupport parameters, return type and example
 ---
-## Method: help\_getSupport  
+## Method: help.getSupport  
 [Back to methods index](index.md)
 
 

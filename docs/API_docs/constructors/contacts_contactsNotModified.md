@@ -1,8 +1,8 @@
 ---
-title: contacts_contactsNotModified
+title: contacts.contactsNotModified
 description: contacts_contactsNotModified attributes, type and example
 ---
-## Constructor: contacts\_contactsNotModified  
+## Constructor: contacts.contactsNotModified  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: contacts_contactsNotModified attributes, type and example
 ### Example:
 
 ```
-$contacts_contactsNotModified = ['_' => 'contacts_contactsNotModified', ];
+$contacts_contactsNotModified = ['_' => 'contacts.contactsNotModified', ];
 ```  
 

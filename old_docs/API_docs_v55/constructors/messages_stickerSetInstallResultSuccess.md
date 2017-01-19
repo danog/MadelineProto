@@ -1,8 +1,8 @@
 ---
-title: messages_stickerSetInstallResultSuccess
+title: messages.stickerSetInstallResultSuccess
 description: messages_stickerSetInstallResultSuccess attributes, type and example
 ---
-## Constructor: messages\_stickerSetInstallResultSuccess  
+## Constructor: messages.stickerSetInstallResultSuccess  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: messages_stickerSetInstallResultSuccess attributes, type and exampl
 ### Example:
 
 ```
-$messages_stickerSetInstallResultSuccess = ['_' => 'messages_stickerSetInstallResultSuccess', ];
+$messages_stickerSetInstallResultSuccess = ['_' => 'messages.stickerSetInstallResultSuccess', ];
 ```  
 

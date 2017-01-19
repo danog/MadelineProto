@@ -1,8 +1,8 @@
 ---
-title: messages_getStickerSet
-description: messages_getStickerSet parameters, return type and example
+title: messages.getStickerSet
+description: messages.getStickerSet parameters, return type and example
 ---
-## Method: messages\_getStickerSet  
+## Method: messages.getStickerSet  
 [Back to methods index](index.md)
 
 

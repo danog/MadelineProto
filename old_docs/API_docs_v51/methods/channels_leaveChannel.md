@@ -1,8 +1,8 @@
 ---
-title: channels_leaveChannel
-description: channels_leaveChannel parameters, return type and example
+title: channels.leaveChannel
+description: channels.leaveChannel parameters, return type and example
 ---
-## Method: channels\_leaveChannel  
+## Method: channels.leaveChannel  
 [Back to methods index](index.md)
 
 

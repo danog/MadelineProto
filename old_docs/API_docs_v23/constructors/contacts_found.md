@@ -1,8 +1,8 @@
 ---
-title: contacts_found
+title: contacts.found
 description: contacts_found attributes, type and example
 ---
-## Constructor: contacts\_found  
+## Constructor: contacts.found  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: contacts_found attributes, type and example
 ### Example:
 
 ```
-$contacts_found = ['_' => 'contacts_found', 'results' => [Vector t], 'users' => [Vector t], ];
+$contacts_found = ['_' => 'contacts.found', 'results' => [Vector t], 'users' => [Vector t], ];
 ```  
 

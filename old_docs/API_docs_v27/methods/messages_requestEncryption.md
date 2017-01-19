@@ -1,8 +1,8 @@
 ---
-title: messages_requestEncryption
-description: messages_requestEncryption parameters, return type and example
+title: messages.requestEncryption
+description: messages.requestEncryption parameters, return type and example
 ---
-## Method: messages\_requestEncryption  
+## Method: messages.requestEncryption  
 [Back to methods index](index.md)
 
 

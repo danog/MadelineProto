@@ -1,8 +1,8 @@
 ---
-title: geochats_sendMessage
-description: geochats_sendMessage parameters, return type and example
+title: geochats.sendMessage
+description: geochats.sendMessage parameters, return type and example
 ---
-## Method: geochats\_sendMessage  
+## Method: geochats.sendMessage  
 [Back to methods index](index.md)
 
 

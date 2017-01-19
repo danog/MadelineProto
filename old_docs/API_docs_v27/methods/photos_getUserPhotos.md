@@ -1,8 +1,8 @@
 ---
-title: photos_getUserPhotos
-description: photos_getUserPhotos parameters, return type and example
+title: photos.getUserPhotos
+description: photos.getUserPhotos parameters, return type and example
 ---
-## Method: photos\_getUserPhotos  
+## Method: photos.getUserPhotos  
 [Back to methods index](index.md)
 
 

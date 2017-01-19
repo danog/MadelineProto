@@ -1,8 +1,8 @@
 ---
-title: messages_createChannel
-description: messages_createChannel parameters, return type and example
+title: messages.createChannel
+description: messages.createChannel parameters, return type and example
 ---
-## Method: messages\_createChannel  
+## Method: messages.createChannel  
 [Back to methods index](index.md)
 
 

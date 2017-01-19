@@ -1,8 +1,8 @@
 ---
-title: account_sendChangePhoneCode
-description: account_sendChangePhoneCode parameters, return type and example
+title: account.sendChangePhoneCode
+description: account.sendChangePhoneCode parameters, return type and example
 ---
-## Method: account\_sendChangePhoneCode  
+## Method: account.sendChangePhoneCode  
 [Back to methods index](index.md)
 
 
