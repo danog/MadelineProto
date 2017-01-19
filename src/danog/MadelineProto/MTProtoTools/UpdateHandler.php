@@ -110,7 +110,7 @@ trait UpdateHandler
 
     public function set_channel_state($channel, $data)
     {
-        $this->get_channel_state($channel)[$channel]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
+        $this->get_channel_state($channel)['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
     }
 
     public function get_channel_difference($channel)
@@ -138,6 +138,8 @@ trait UpdateHandler
                 $this->handle_multiple_update($difference['other_updates'], [], $channel);
                 $this->set_channel_state($channel, $difference);
                 if (!$difference['final']) {
+                    unset($difference);
+                    unset($input);
                     $this->get_channel_difference($channel);
                 }
                 break;
@@ -200,6 +202,7 @@ trait UpdateHandler
                 $this->handle_multiple_update($difference['other_updates']);
                 $this->handle_update_messages($difference['new_messages']);
                 $this->set_update_state($difference['intermediate_state']);
+                unset($difference);
                 $this->get_updates_difference();
                 break;
             default:
