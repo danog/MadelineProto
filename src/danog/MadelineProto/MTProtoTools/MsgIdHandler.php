@@ -61,8 +61,8 @@ trait MsgIdHandler
                 }
             }
             if (count($this->datacenter->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
-                reset($this->datacenter->outgoing_messages);
-                unset($this->datacenter->outgoing_messages[key($this->datacenter->outgoing_messages)]);
+                reset($this->datacenter->incoming_messages);
+                unset($this->datacenter->incoming_messages[key($this->datacenter->incoming_messages)]);
             }
             $this->datacenter->incoming_messages[$new_message_id] = [];
             ksort($this->datacenter->incoming_messages);
