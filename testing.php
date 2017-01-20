@@ -25,10 +25,6 @@ if (file_exists('.env')) {
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 if ($MadelineProto === false) {
-<<<<<<< HEAD
-
-=======
->>>>>>> madeline/master
     $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
