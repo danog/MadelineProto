@@ -147,6 +147,10 @@ trait UpdateHandler
                 //unset($this->channels_state[$channel]);
                 //unset($this->chats[$this->get_info('channel#'.$channel)['bot_api_id']]);
                 $this->handle_update_messages($difference['messages'], $channel);
+                $this->set_channel_state($channel, $difference);
+                unset($difference);
+                unset($input);
+                $this->get_channel_difference($channel);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));

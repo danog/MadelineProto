@@ -32,6 +32,7 @@ trait CallHandler
                 $this->datacenter->new_outgoing[$int_message_id] = ['msg_id' => $int_message_id, 'method' => $method, 'type' => $this->methods->find_by_method($method)['type']];
                 $res_count = 0;
                 $server_answer = null;
+                $update_count = 0;
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response']) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log('Getting response (try number '.$res_count.' for '.$method.')...');
@@ -39,7 +40,9 @@ trait CallHandler
 
                         if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($this->only_updates) {
+                                if ($update_count > 50) { $update_count = 0; continue; }
                                 $res_count--;
+                                $update_count++;
                             }
                             continue;
                         }
@@ -108,9 +111,9 @@ trait CallHandler
                                 $this->datacenter->timedelta = ($this->datacenter->outgoing_messages[$int_message_id]['response'] >> 32) - time();
                                 \danog\MadelineProto\Logger::log('Set time delta to '.$this->datacenter->timedelta);
                                 $this->reset_session();
-$this->datacenter->temp_auth_key = null;
-$this->init_authorization();
-                                throw new \danog\MadelineProto\Exception('Resend message');
+                                $this->datacenter->temp_auth_key = null;
+                                $this->init_authorization();
+                                continue 3;
                         }
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
                         break;
