@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e220f48be9907b7881feacec0528a3e8",
+    "hash": "d06bfa2723677a8dab0625365d056249",
+    "content-hash": "ec3e1ca82cd0d8b845aa306cf6b2f86d",
     "packages": [
         {
             "name": "danog/phpstruct",
@@ -57,7 +58,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-11-14T15:09:50+00:00"
+            "time": "2016-11-14 15:09:50"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -118,7 +119,7 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-07-11T20:32:06+00:00"
+            "time": "2016-07-11 20:32:06"
         },
         {
             "name": "paragonie/random_compat",
@@ -166,24 +167,26 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-11-07T23:38:38+00:00"
+            "time": "2016-11-07 23:38:38"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "ab8028c93c03cc8d9c824efa75dc94f1db2369bf"
+                "reference": "74abcb45ed9de9508c61ab15371f1bc40292b9fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/ab8028c93c03cc8d9c824efa75dc94f1db2369bf",
-                "reference": "ab8028c93c03cc8d9c824efa75dc94f1db2369bf",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/74abcb45ed9de9508c61ab15371f1bc40292b9fd",
+                "reference": "74abcb45ed9de9508c61ab15371f1bc40292b9fd",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/random_compat": "^1.4|^2.0",
+                "php": ">=7.0"
             },
             "require-dev": {
                 "phing/phing": "~2.7",
@@ -258,7 +261,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2016-10-04T00:57:04+00:00"
+            "time": "2016-12-25 15:50:17"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -308,13 +311,15 @@
                 "env",
                 "environment"
             ],
-            "time": "2016-09-01T10:05:43+00:00"
+            "time": "2016-09-01 10:05:43"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "phpseclib/phpseclib": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
