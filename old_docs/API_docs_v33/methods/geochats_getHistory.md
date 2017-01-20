@@ -1,8 +1,8 @@
 ---
-title: geochats_getHistory
-description: geochats_getHistory parameters, return type and example
+title: geochats.getHistory
+description: geochats.getHistory parameters, return type and example
 ---
-## Method: geochats\_getHistory  
+## Method: geochats.getHistory  
 [Back to methods index](index.md)
 
 

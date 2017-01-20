@@ -1,8 +1,8 @@
 ---
-title: updates_getDifference
-description: updates_getDifference parameters, return type and example
+title: updates.getDifference
+description: updates.getDifference parameters, return type and example
 ---
-## Method: updates\_getDifference  
+## Method: updates.getDifference  
 [Back to methods index](index.md)
 
 

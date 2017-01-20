@@ -1,8 +1,8 @@
 ---
-title: account_updateStatus
-description: account_updateStatus parameters, return type and example
+title: account.updateStatus
+description: account.updateStatus parameters, return type and example
 ---
-## Method: account\_updateStatus  
+## Method: account.updateStatus  
 [Back to methods index](index.md)
 
 

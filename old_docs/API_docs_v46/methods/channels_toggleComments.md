@@ -1,8 +1,8 @@
 ---
-title: channels_toggleComments
-description: channels_toggleComments parameters, return type and example
+title: channels.toggleComments
+description: channels.toggleComments parameters, return type and example
 ---
-## Method: channels\_toggleComments  
+## Method: channels.toggleComments  
 [Back to methods index](index.md)
 
 

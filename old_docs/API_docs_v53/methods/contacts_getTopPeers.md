@@ -1,8 +1,8 @@
 ---
-title: contacts_getTopPeers
-description: contacts_getTopPeers parameters, return type and example
+title: contacts.getTopPeers
+description: contacts.getTopPeers parameters, return type and example
 ---
-## Method: contacts\_getTopPeers  
+## Method: contacts.getTopPeers  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: auth_importAuthorization
-description: auth_importAuthorization parameters, return type and example
+title: auth.importAuthorization
+description: auth.importAuthorization parameters, return type and example
 ---
-## Method: auth\_importAuthorization  
+## Method: auth.importAuthorization  
 [Back to methods index](index.md)
 
 

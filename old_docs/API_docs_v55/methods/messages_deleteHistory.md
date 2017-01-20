@@ -1,8 +1,8 @@
 ---
-title: messages_deleteHistory
-description: messages_deleteHistory parameters, return type and example
+title: messages.deleteHistory
+description: messages.deleteHistory parameters, return type and example
 ---
-## Method: messages\_deleteHistory  
+## Method: messages.deleteHistory  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_search
-description: messages_search parameters, return type and example
+title: messages.search
+description: messages.search parameters, return type and example
 ---
-## Method: messages\_search  
+## Method: messages.search  
 [Back to methods index](index.md)
 
 

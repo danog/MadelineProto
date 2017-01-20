@@ -1,8 +1,8 @@
 ---
-title: auth_sentCodeTypeCall
+title: auth.sentCodeTypeCall
 description: auth_sentCodeTypeCall attributes, type and example
 ---
-## Constructor: auth\_sentCodeTypeCall  
+## Constructor: auth.sentCodeTypeCall  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: auth_sentCodeTypeCall attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeCall = ['_' => 'auth_sentCodeTypeCall', 'length' => int, ];
+$auth_sentCodeTypeCall = ['_' => 'auth.sentCodeTypeCall', 'length' => int, ];
 ```  
 

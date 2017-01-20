@@ -1,8 +1,8 @@
 ---
-title: contacts_exportCard
-description: contacts_exportCard parameters, return type and example
+title: contacts.exportCard
+description: contacts.exportCard parameters, return type and example
 ---
-## Method: contacts\_exportCard  
+## Method: contacts.exportCard  
 [Back to methods index](index.md)
 
 

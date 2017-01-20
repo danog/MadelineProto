@@ -1,8 +1,8 @@
 ---
-title: messages_getFullChat
-description: messages_getFullChat parameters, return type and example
+title: messages.getFullChat
+description: messages.getFullChat parameters, return type and example
 ---
-## Method: messages\_getFullChat  
+## Method: messages.getFullChat  
 [Back to methods index](index.md)
 
 

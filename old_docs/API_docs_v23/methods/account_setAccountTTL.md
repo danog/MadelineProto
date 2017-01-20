@@ -1,8 +1,8 @@
 ---
-title: account_setAccountTTL
-description: account_setAccountTTL parameters, return type and example
+title: account.setAccountTTL
+description: account.setAccountTTL parameters, return type and example
 ---
-## Method: account\_setAccountTTL  
+## Method: account.setAccountTTL  
 [Back to methods index](index.md)
 
 

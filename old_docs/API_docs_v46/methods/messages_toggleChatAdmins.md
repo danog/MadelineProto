@@ -1,8 +1,8 @@
 ---
-title: messages_toggleChatAdmins
-description: messages_toggleChatAdmins parameters, return type and example
+title: messages.toggleChatAdmins
+description: messages.toggleChatAdmins parameters, return type and example
 ---
-## Method: messages\_toggleChatAdmins  
+## Method: messages.toggleChatAdmins  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: help_getAppChangelog
-description: help_getAppChangelog parameters, return type and example
+title: help.getAppChangelog
+description: help.getAppChangelog parameters, return type and example
 ---
-## Method: help\_getAppChangelog  
+## Method: help.getAppChangelog  
 [Back to methods index](index.md)
 
 

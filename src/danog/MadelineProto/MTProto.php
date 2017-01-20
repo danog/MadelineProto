@@ -158,7 +158,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
                     'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 5, // timeout for sockets
+                    'timeout'      => 3, // timeout for sockets
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -232,12 +232,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         //}
     }
 
-    public function reset_session()
+    public function reset_session($de = true)
     {
         foreach ($this->datacenter->sockets as $id => &$socket) {
-            \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
-            $socket->session_id = \danog\MadelineProto\Tools::random(8);
-            $socket->seq_no = 0;
+            if ($de) {
+                \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
+                $socket->session_id = \danog\MadelineProto\Tools::random(8);
+                $socket->seq_no = 0;
+            }
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];

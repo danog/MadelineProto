@@ -1,8 +1,8 @@
 ---
-title: channels_getImportantHistory
-description: channels_getImportantHistory parameters, return type and example
+title: channels.getImportantHistory
+description: channels.getImportantHistory parameters, return type and example
 ---
-## Method: channels\_getImportantHistory  
+## Method: channels.getImportantHistory  
 [Back to methods index](index.md)
 
 

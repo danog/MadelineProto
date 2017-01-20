@@ -1,8 +1,8 @@
 ---
-title: account_sentChangePhoneCode
+title: account.sentChangePhoneCode
 description: account_sentChangePhoneCode attributes, type and example
 ---
-## Constructor: account\_sentChangePhoneCode  
+## Constructor: account.sentChangePhoneCode  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: account_sentChangePhoneCode attributes, type and example
 ### Example:
 
 ```
-$account_sentChangePhoneCode = ['_' => 'account_sentChangePhoneCode', 'phone_code_hash' => string, 'send_call_timeout' => int, ];
+$account_sentChangePhoneCode = ['_' => 'account.sentChangePhoneCode', 'phone_code_hash' => string, 'send_call_timeout' => int, ];
 ```  
 

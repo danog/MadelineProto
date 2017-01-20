@@ -1,8 +1,8 @@
 ---
-title: geochats_located
+title: geochats.located
 description: geochats_located attributes, type and example
 ---
-## Constructor: geochats\_located  
+## Constructor: geochats.located  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: geochats_located attributes, type and example
 ### Example:
 
 ```
-$geochats_located = ['_' => 'geochats_located', 'results' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$geochats_located = ['_' => 'geochats.located', 'results' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

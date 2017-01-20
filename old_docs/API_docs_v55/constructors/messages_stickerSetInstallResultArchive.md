@@ -1,8 +1,8 @@
 ---
-title: messages_stickerSetInstallResultArchive
+title: messages.stickerSetInstallResultArchive
 description: messages_stickerSetInstallResultArchive attributes, type and example
 ---
-## Constructor: messages\_stickerSetInstallResultArchive  
+## Constructor: messages.stickerSetInstallResultArchive  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: messages_stickerSetInstallResultArchive attributes, type and exampl
 ### Example:
 
 ```
-$messages_stickerSetInstallResultArchive = ['_' => 'messages_stickerSetInstallResultArchive', 'sets' => [Vector t], ];
+$messages_stickerSetInstallResultArchive = ['_' => 'messages.stickerSetInstallResultArchive', 'sets' => [Vector t], ];
 ```  
 

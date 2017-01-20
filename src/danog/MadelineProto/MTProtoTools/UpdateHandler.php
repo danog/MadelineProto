@@ -110,7 +110,7 @@ trait UpdateHandler
 
     public function set_channel_state($channel, $data)
     {
-        $this->get_channel_state($channel)[$channel]['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
+        $this->get_channel_state($channel)['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
     }
 
     public function get_channel_difference($channel)
@@ -138,6 +138,8 @@ trait UpdateHandler
                 $this->handle_multiple_update($difference['other_updates'], [], $channel);
                 $this->set_channel_state($channel, $difference);
                 if (!$difference['final']) {
+                    unset($difference);
+                    unset($input);
                     $this->get_channel_difference($channel);
                 }
                 break;
@@ -145,6 +147,10 @@ trait UpdateHandler
                 //unset($this->channels_state[$channel]);
                 //unset($this->chats[$this->get_info('channel#'.$channel)['bot_api_id']]);
                 $this->handle_update_messages($difference['messages'], $channel);
+                $this->set_channel_state($channel, $difference);
+                unset($difference);
+                unset($input);
+                $this->get_channel_difference($channel);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
@@ -200,6 +206,7 @@ trait UpdateHandler
                 $this->handle_multiple_update($difference['other_updates']);
                 $this->handle_update_messages($difference['new_messages']);
                 $this->set_update_state($difference['intermediate_state']);
+                unset($difference);
                 $this->get_updates_difference();
                 break;
             default:
@@ -317,7 +324,7 @@ trait UpdateHandler
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
             } elseif (isset($update['pts_count'])) {
-                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id, $update);
+                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
 
                 return false;
             }

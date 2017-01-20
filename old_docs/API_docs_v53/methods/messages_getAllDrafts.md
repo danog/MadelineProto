@@ -1,8 +1,8 @@
 ---
-title: messages_getAllDrafts
-description: messages_getAllDrafts parameters, return type and example
+title: messages.getAllDrafts
+description: messages.getAllDrafts parameters, return type and example
 ---
-## Method: messages\_getAllDrafts  
+## Method: messages.getAllDrafts  
 [Back to methods index](index.md)
 
 

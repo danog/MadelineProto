@@ -1,8 +1,8 @@
 ---
-title: messages_peerDialogs
+title: messages.peerDialogs
 description: messages_peerDialogs attributes, type and example
 ---
-## Constructor: messages\_peerDialogs  
+## Constructor: messages.peerDialogs  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: messages_peerDialogs attributes, type and example
 ### Example:
 
 ```
-$messages_peerDialogs = ['_' => 'messages_peerDialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$messages_peerDialogs = ['_' => 'messages.peerDialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: messages_deleteChannelMessages
-description: messages_deleteChannelMessages parameters, return type and example
+title: messages.deleteChannelMessages
+description: messages.deleteChannelMessages parameters, return type and example
 ---
-## Method: messages\_deleteChannelMessages  
+## Method: messages.deleteChannelMessages  
 [Back to methods index](index.md)
 
 

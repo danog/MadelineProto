@@ -1,8 +1,8 @@
 ---
-title: messages_editMessage
-description: messages_editMessage parameters, return type and example
+title: messages.editMessage
+description: messages.editMessage parameters, return type and example
 ---
-## Method: messages\_editMessage  
+## Method: messages.editMessage  
 [Back to methods index](index.md)
 
 

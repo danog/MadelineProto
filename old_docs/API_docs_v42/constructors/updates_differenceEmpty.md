@@ -1,8 +1,8 @@
 ---
-title: updates_differenceEmpty
+title: updates.differenceEmpty
 description: updates_differenceEmpty attributes, type and example
 ---
-## Constructor: updates\_differenceEmpty  
+## Constructor: updates.differenceEmpty  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: updates_differenceEmpty attributes, type and example
 ### Example:
 
 ```
-$updates_differenceEmpty = ['_' => 'updates_differenceEmpty', 'date' => int, 'seq' => int, ];
+$updates_differenceEmpty = ['_' => 'updates.differenceEmpty', 'date' => int, 'seq' => int, ];
 ```  
 

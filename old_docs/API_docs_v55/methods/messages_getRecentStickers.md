@@ -1,8 +1,8 @@
 ---
-title: messages_getRecentStickers
-description: messages_getRecentStickers parameters, return type and example
+title: messages.getRecentStickers
+description: messages.getRecentStickers parameters, return type and example
 ---
-## Method: messages\_getRecentStickers  
+## Method: messages.getRecentStickers  
 [Back to methods index](index.md)
 
 

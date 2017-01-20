@@ -1,8 +1,8 @@
 ---
-title: messages_dhConfigNotModified
+title: messages.dhConfigNotModified
 description: messages_dhConfigNotModified attributes, type and example
 ---
-## Constructor: messages\_dhConfigNotModified  
+## Constructor: messages.dhConfigNotModified  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: messages_dhConfigNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_dhConfigNotModified = ['_' => 'messages_dhConfigNotModified', 'random' => bytes, ];
+$messages_dhConfigNotModified = ['_' => 'messages.dhConfigNotModified', 'random' => bytes, ];
 ```  
 

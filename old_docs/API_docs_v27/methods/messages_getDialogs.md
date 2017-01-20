@@ -1,8 +1,8 @@
 ---
-title: messages_getDialogs
-description: messages_getDialogs parameters, return type and example
+title: messages.getDialogs
+description: messages.getDialogs parameters, return type and example
 ---
-## Method: messages\_getDialogs  
+## Method: messages.getDialogs  
 [Back to methods index](index.md)
 
 

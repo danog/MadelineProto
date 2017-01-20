@@ -1,8 +1,8 @@
 ---
-title: help_support
+title: help.support
 description: help_support attributes, type and example
 ---
-## Constructor: help\_support  
+## Constructor: help.support  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: help_support attributes, type and example
 ### Example:
 
 ```
-$help_support = ['_' => 'help_support', 'phone_number' => string, 'user' => User, ];
+$help_support = ['_' => 'help.support', 'phone_number' => string, 'user' => User, ];
 ```  
 

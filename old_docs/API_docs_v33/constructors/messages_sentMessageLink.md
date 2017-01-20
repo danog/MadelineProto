@@ -1,8 +1,8 @@
 ---
-title: messages_sentMessageLink
+title: messages.sentMessageLink
 description: messages_sentMessageLink attributes, type and example
 ---
-## Constructor: messages\_sentMessageLink  
+## Constructor: messages.sentMessageLink  
 [Back to constructors index](index.md)
 
 
@@ -27,6 +27,6 @@ description: messages_sentMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_sentMessageLink = ['_' => 'messages_sentMessageLink', 'id' => int, 'date' => int, 'media' => MessageMedia, 'pts' => int, 'pts_count' => int, 'links' => [Vector t], 'seq' => int, ];
+$messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'media' => MessageMedia, 'pts' => int, 'pts_count' => int, 'links' => [Vector t], 'seq' => int, ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: geochats_getLocated
-description: geochats_getLocated parameters, return type and example
+title: geochats.getLocated
+description: geochats.getLocated parameters, return type and example
 ---
-## Method: geochats\_getLocated  
+## Method: geochats.getLocated  
 [Back to methods index](index.md)
 
 

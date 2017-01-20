@@ -1,8 +1,8 @@
 ---
-title: auth_sendCall
-description: auth_sendCall parameters, return type and example
+title: auth.sendCall
+description: auth.sendCall parameters, return type and example
 ---
-## Method: auth\_sendCall  
+## Method: auth.sendCall  
 [Back to methods index](index.md)
 
 

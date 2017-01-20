@@ -1,8 +1,8 @@
 ---
-title: account_updatePasswordSettings
-description: account_updatePasswordSettings parameters, return type and example
+title: account.updatePasswordSettings
+description: account.updatePasswordSettings parameters, return type and example
 ---
-## Method: account\_updatePasswordSettings  
+## Method: account.updatePasswordSettings  
 [Back to methods index](index.md)
 
 

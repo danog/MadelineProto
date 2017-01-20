@@ -1,8 +1,8 @@
 ---
-title: account_authorizations
+title: account.authorizations
 description: account_authorizations attributes, type and example
 ---
-## Constructor: account\_authorizations  
+## Constructor: account.authorizations  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: account_authorizations attributes, type and example
 ### Example:
 
 ```
-$account_authorizations = ['_' => 'account_authorizations', 'authorizations' => [Vector t], ];
+$account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Vector t], ];
 ```  
 

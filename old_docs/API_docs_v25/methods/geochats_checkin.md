@@ -1,8 +1,8 @@
 ---
-title: geochats_checkin
-description: geochats_checkin parameters, return type and example
+title: geochats.checkin
+description: geochats.checkin parameters, return type and example
 ---
-## Method: geochats\_checkin  
+## Method: geochats.checkin  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: account_passwordInputSettings
+title: account.passwordInputSettings
 description: account_passwordInputSettings attributes, type and example
 ---
-## Constructor: account\_passwordInputSettings  
+## Constructor: account.passwordInputSettings  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: account_passwordInputSettings attributes, type and example
 ### Example:
 
 ```
-$account_passwordInputSettings = ['_' => 'account_passwordInputSettings', 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
+$account_passwordInputSettings = ['_' => 'account.passwordInputSettings', 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
 ```  
 

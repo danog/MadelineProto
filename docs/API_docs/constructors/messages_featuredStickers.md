@@ -1,8 +1,8 @@
 ---
-title: messages_featuredStickers
+title: messages.featuredStickers
 description: messages_featuredStickers attributes, type and example
 ---
-## Constructor: messages\_featuredStickers  
+## Constructor: messages.featuredStickers  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_featuredStickers attributes, type and example
 ### Example:
 
 ```
-$messages_featuredStickers = ['_' => 'messages_featuredStickers', 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
+$messages_featuredStickers = ['_' => 'messages.featuredStickers', 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
 ```  
 

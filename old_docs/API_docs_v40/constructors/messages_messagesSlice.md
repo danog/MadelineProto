@@ -1,8 +1,8 @@
 ---
-title: messages_messagesSlice
+title: messages.messagesSlice
 description: messages_messagesSlice attributes, type and example
 ---
-## Constructor: messages\_messagesSlice  
+## Constructor: messages.messagesSlice  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: messages_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$messages_messagesSlice = ['_' => 'messages_messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_messagesSlice = ['_' => 'messages.messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

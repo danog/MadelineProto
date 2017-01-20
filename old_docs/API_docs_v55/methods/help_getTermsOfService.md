@@ -1,8 +1,8 @@
 ---
-title: help_getTermsOfService
-description: help_getTermsOfService parameters, return type and example
+title: help.getTermsOfService
+description: help.getTermsOfService parameters, return type and example
 ---
-## Method: help\_getTermsOfService  
+## Method: help.getTermsOfService  
 [Back to methods index](index.md)
 
 

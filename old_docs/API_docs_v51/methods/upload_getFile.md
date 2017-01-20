@@ -1,8 +1,8 @@
 ---
-title: upload_getFile
-description: upload_getFile parameters, return type and example
+title: upload.getFile
+description: upload.getFile parameters, return type and example
 ---
-## Method: upload\_getFile  
+## Method: upload.getFile  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: contacts_importCard
-description: contacts_importCard parameters, return type and example
+title: contacts.importCard
+description: contacts.importCard parameters, return type and example
 ---
-## Method: contacts\_importCard  
+## Method: contacts.importCard  
 [Back to methods index](index.md)
 
 

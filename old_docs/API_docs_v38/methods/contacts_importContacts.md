@@ -1,8 +1,8 @@
 ---
-title: contacts_importContacts
-description: contacts_importContacts parameters, return type and example
+title: contacts.importContacts
+description: contacts.importContacts parameters, return type and example
 ---
-## Method: contacts\_importContacts  
+## Method: contacts.importContacts  
 [Back to methods index](index.md)
 
 

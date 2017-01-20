@@ -1,8 +1,8 @@
 ---
-title: contacts_blockedSlice
+title: contacts.blockedSlice
 description: contacts_blockedSlice attributes, type and example
 ---
-## Constructor: contacts\_blockedSlice  
+## Constructor: contacts.blockedSlice  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: contacts_blockedSlice attributes, type and example
 ### Example:
 
 ```
-$contacts_blockedSlice = ['_' => 'contacts_blockedSlice', 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
+$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```  
 

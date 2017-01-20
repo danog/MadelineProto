@@ -1,8 +1,8 @@
 ---
-title: messages_readChannelHistory
-description: messages_readChannelHistory parameters, return type and example
+title: messages.readChannelHistory
+description: messages.readChannelHistory parameters, return type and example
 ---
-## Method: messages\_readChannelHistory  
+## Method: messages.readChannelHistory  
 [Back to methods index](index.md)
 
 

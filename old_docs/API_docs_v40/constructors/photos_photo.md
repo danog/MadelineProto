@@ -1,8 +1,8 @@
 ---
-title: photos_photo
+title: photos.photo
 description: photos_photo attributes, type and example
 ---
-## Constructor: photos\_photo  
+## Constructor: photos.photo  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: photos_photo attributes, type and example
 ### Example:
 
 ```
-$photos_photo = ['_' => 'photos_photo', 'photo' => Photo, 'users' => [Vector t], ];
+$photos_photo = ['_' => 'photos.photo', 'photo' => Photo, 'users' => [Vector t], ];
 ```  
 

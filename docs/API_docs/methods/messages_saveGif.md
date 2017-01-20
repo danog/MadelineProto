@@ -1,8 +1,8 @@
 ---
-title: messages_saveGif
-description: messages_saveGif parameters, return type and example
+title: messages.saveGif
+description: messages.saveGif parameters, return type and example
 ---
-## Method: messages\_saveGif  
+## Method: messages.saveGif  
 [Back to methods index](index.md)
 
 

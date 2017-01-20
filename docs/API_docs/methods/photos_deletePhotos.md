@@ -1,8 +1,8 @@
 ---
-title: photos_deletePhotos
-description: photos_deletePhotos parameters, return type and example
+title: photos.deletePhotos
+description: photos.deletePhotos parameters, return type and example
 ---
-## Method: photos\_deletePhotos  
+## Method: photos.deletePhotos  
 [Back to methods index](index.md)
 
 

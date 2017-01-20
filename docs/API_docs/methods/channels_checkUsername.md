@@ -1,8 +1,8 @@
 ---
-title: channels_checkUsername
-description: channels_checkUsername parameters, return type and example
+title: channels.checkUsername
+description: channels.checkUsername parameters, return type and example
 ---
-## Method: channels\_checkUsername  
+## Method: channels.checkUsername  
 [Back to methods index](index.md)
 
 

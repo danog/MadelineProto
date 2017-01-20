@@ -1,8 +1,8 @@
 ---
-title: geochats_statedMessage
+title: geochats.statedMessage
 description: geochats_statedMessage attributes, type and example
 ---
-## Constructor: geochats\_statedMessage  
+## Constructor: geochats.statedMessage  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: geochats_statedMessage attributes, type and example
 ### Example:
 
 ```
-$geochats_statedMessage = ['_' => 'geochats_statedMessage', 'message' => GeoChatMessage, 'chats' => [Vector t], 'users' => [Vector t], 'seq' => int, ];
+$geochats_statedMessage = ['_' => 'geochats.statedMessage', 'message' => GeoChatMessage, 'chats' => [Vector t], 'users' => [Vector t], 'seq' => int, ];
 ```  
 

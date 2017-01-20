@@ -480,13 +480,15 @@ trait AuthKeyHandler
 
     public function bind_temp_auth_key($expires_in)
     {
-        \danog\MadelineProto\Logger::log('Binding authorization keys...');
-        $nonce = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
-        $expires_at = time() + $expires_in;
-        $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
-        $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->auth_key['id'])[0];
-        $temp_session_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->session_id)[0];
-        $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'],
+        for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
+            try {
+                \danog\MadelineProto\Logger::log('Binding authorization keys...');
+                $nonce = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
+                $expires_at = time() + $expires_in;
+                $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
+                $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->auth_key['id'])[0];
+                $temp_session_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->session_id)[0];
+                $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'],
             [
                 'nonce'                       => $nonce,
                 'temp_auth_key_id'            => $temp_auth_key_id,
@@ -495,20 +497,29 @@ trait AuthKeyHandler
                 'expires_at'                  => $expires_at,
             ]
         );
-        $int_message_id = $this->generate_message_id();
+                $int_message_id = $this->generate_message_id();
 
-        $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
-        $seq_no = 0;
-        $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
-        $message_key = substr(sha1($encrypted_data, true), -16);
-        $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
-        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->auth_key['auth_key']);
-        $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
+                $seq_no = 0;
+                $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+                $message_key = substr(sha1($encrypted_data, true), -16);
+                $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
+                list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->auth_key['auth_key']);
+                $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id);
+                if ($res === true) {
+                    \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
 
-        if ($this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id) === true) {
-            \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
-
-            return true;
+                    return true;
+                }
+            } catch (\danog\MadelineProto\Exception $e) {
+                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+            } finally {
+                $this->datacenter->new_outgoing = [];
+                $this->datacenter->new_incoming = [];
+            }
         }
         throw new \danog\MadelineProto\Exception('An error occurred while binding temporary and permanent authorization keys.');
     }

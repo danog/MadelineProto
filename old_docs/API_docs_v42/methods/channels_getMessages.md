@@ -1,8 +1,8 @@
 ---
-title: channels_getMessages
-description: channels_getMessages parameters, return type and example
+title: channels.getMessages
+description: channels.getMessages parameters, return type and example
 ---
-## Method: channels\_getMessages  
+## Method: channels.getMessages  
 [Back to methods index](index.md)
 
 

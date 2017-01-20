@@ -1,8 +1,8 @@
 ---
-title: storage_filePartial
+title: storage.filePartial
 description: storage_filePartial attributes, type and example
 ---
-## Constructor: storage\_filePartial  
+## Constructor: storage.filePartial  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_filePartial attributes, type and example
 ### Example:
 
 ```
-$storage_filePartial = ['_' => 'storage_filePartial', ];
+$storage_filePartial = ['_' => 'storage.filePartial', ];
 ```  
 

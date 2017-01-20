@@ -1,8 +1,8 @@
 ---
-title: contacts_block
-description: contacts_block parameters, return type and example
+title: contacts.block
+description: contacts.block parameters, return type and example
 ---
-## Method: contacts\_block  
+## Method: contacts.block  
 [Back to methods index](index.md)
 
 

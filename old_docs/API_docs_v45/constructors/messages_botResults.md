@@ -1,8 +1,8 @@
 ---
-title: messages_botResults
+title: messages.botResults
 description: messages_botResults attributes, type and example
 ---
-## Constructor: messages\_botResults  
+## Constructor: messages.botResults  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages_botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'results' => [Vector t], ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'results' => [Vector t], ];
 ```  
 

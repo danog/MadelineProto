@@ -1,8 +1,8 @@
 ---
-title: messages_migrateChat
-description: messages_migrateChat parameters, return type and example
+title: messages.migrateChat
+description: messages.migrateChat parameters, return type and example
 ---
-## Method: messages\_migrateChat  
+## Method: messages.migrateChat  
 [Back to methods index](index.md)
 
 

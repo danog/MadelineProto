@@ -1,8 +1,8 @@
 ---
-title: contacts_getSuggested
-description: contacts_getSuggested parameters, return type and example
+title: contacts.getSuggested
+description: contacts.getSuggested parameters, return type and example
 ---
-## Method: contacts\_getSuggested  
+## Method: contacts.getSuggested  
 [Back to methods index](index.md)
 
 

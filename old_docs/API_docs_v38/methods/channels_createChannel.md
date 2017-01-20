@@ -1,8 +1,8 @@
 ---
-title: channels_createChannel
-description: channels_createChannel parameters, return type and example
+title: channels.createChannel
+description: channels.createChannel parameters, return type and example
 ---
-## Method: channels\_createChannel  
+## Method: channels.createChannel  
 [Back to methods index](index.md)
 
 

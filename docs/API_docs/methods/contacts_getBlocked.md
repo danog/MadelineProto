@@ -1,8 +1,8 @@
 ---
-title: contacts_getBlocked
-description: contacts_getBlocked parameters, return type and example
+title: contacts.getBlocked
+description: contacts.getBlocked parameters, return type and example
 ---
-## Method: contacts\_getBlocked  
+## Method: contacts.getBlocked  
 [Back to methods index](index.md)
 
 

@@ -195,7 +195,7 @@ trait PeerHandler
                 return $this->gen_all($this->chats[$id]);
             }
             if ($id < 0 && !preg_match('/^-100/', $id)) {
-                $this->method_call('messages.getFullChat', ['chat_id' => $id]);
+                $this->method_call('messages.getFullChat', ['chat_id' => -$id]);
                 if (isset($this->chats[$id])) {
                     return $this->gen_all($this->chats[$id]);
                 }
@@ -359,6 +359,7 @@ trait PeerHandler
         }
         if (isset($res['participants'])) {
             foreach ($res['participants'] as $key => $participant) {
+                $newres = [];
                 $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
                 if (isset($participant['inviter_id'])) {
                     $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
@@ -384,13 +385,14 @@ trait PeerHandler
         }
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants']) {
             $res['participants'] = [];
-            $limit = 200;
+            $limit = 400;
             $offset = -$limit;
             $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => 200]);
             $count = $gres['count'];
-            $key = 0;
+            $key = -1;
             while ($offset <= $count) {
                 foreach ($gres['participants'] as $participant) {
+                    $newres = [];
                     $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
                     $key++;
                     if (isset($participant['inviter_id'])) {
@@ -423,7 +425,7 @@ trait PeerHandler
                     }
                     $res['participants'][$key] = $newres;
                 }
-                $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => 200]);
+                $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit]);
             }
         }
         if ($fullfetch || $send) {
@@ -468,7 +470,7 @@ trait PeerHandler
             \danog\MadelineProto\Logger::log($e->getMessage());
         }
         $this->qres = [];
-        $this->last_stored = time() + 5;
+        $this->last_stored = time() + 10;
     }
 
     public function resolve_username($username)

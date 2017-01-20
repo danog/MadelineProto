@@ -1,8 +1,8 @@
 ---
-title: contacts_myLinkContact
+title: contacts.myLinkContact
 description: contacts_myLinkContact attributes, type and example
 ---
-## Constructor: contacts\_myLinkContact  
+## Constructor: contacts.myLinkContact  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: contacts_myLinkContact attributes, type and example
 ### Example:
 
 ```
-$contacts_myLinkContact = ['_' => 'contacts_myLinkContact', ];
+$contacts_myLinkContact = ['_' => 'contacts.myLinkContact', ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: geochats_editChatTitle
-description: geochats_editChatTitle parameters, return type and example
+title: geochats.editChatTitle
+description: geochats.editChatTitle parameters, return type and example
 ---
-## Method: geochats\_editChatTitle  
+## Method: geochats.editChatTitle  
 [Back to methods index](index.md)
 
 

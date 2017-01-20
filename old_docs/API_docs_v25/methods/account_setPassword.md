@@ -1,8 +1,8 @@
 ---
-title: account_setPassword
-description: account_setPassword parameters, return type and example
+title: account.setPassword
+description: account.setPassword parameters, return type and example
 ---
-## Method: account\_setPassword  
+## Method: account.setPassword  
 [Back to methods index](index.md)
 
 
