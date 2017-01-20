@@ -40,7 +40,10 @@ trait CallHandler
 
                         if (!isset($this->datacenter->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($this->only_updates) {
-                                if ($update_count > 50) { $update_count = 0; continue; }
+                                if ($update_count > 50) {
+                                    $update_count = 0;
+                                    continue;
+                                }
                                 $res_count--;
                                 $update_count++;
                             }
