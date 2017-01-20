@@ -82,17 +82,17 @@ class MTProto extends PrimeModule
         $this->ipv6 = strlen($google) > 0;
 
         // Detect device model
-        $device_model = 'Web server';
         try {
             $device_model = php_uname('s');
         } catch (Exception $e) {
+            $device_model = 'Web server';
         }
 
         // Detect system version
-        $system_version = phpversion();
         try {
             $system_version = php_uname('r');
         } catch (Exception $e) {
+            $system_version = phpversion();
         }
 
         // Set default settings
@@ -203,16 +203,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
-        foreach ($default_settings as $key => $param) {
-            if (!isset($settings[$key])) {
-                $settings[$key] = $param;
-            }
-            foreach ($param as $subkey => $subparam) {
-                if (!isset($settings[$key][$subkey])) {
-                    $settings[$key][$subkey] = $subparam;
-                }
-            }
-        }
+        $settings = array_replace_recursive($default_settings, $settings);
         if (isset($settings['connection_settings']['all'])) {
             foreach ($this->range(1, 6) as $n) {
                 if (!isset($settings['connection_settings'][$n])) {
