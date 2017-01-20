@@ -28,7 +28,7 @@ class RSA
         $key = new \phpseclib\Crypt\RSA();
 
         \danog\MadelineProto\Logger::log('Loading key...');
-        $key->loadKey($rsa_key);
+        $key->load($rsa_key);
         $this->n = $key->modulus;
         $this->e = $key->exponent;
 
