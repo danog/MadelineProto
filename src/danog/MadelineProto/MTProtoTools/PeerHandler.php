@@ -438,6 +438,7 @@ trait PeerHandler
     public function store_db($res, $force = false)
     {
         if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false) {
+            /*
             try {
                 if (isset($res['username'])) {
                     shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
@@ -445,7 +446,7 @@ trait PeerHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log($e->getMessage());
             }
-
+            */
             return;
         }
         if (!empty($res)) {
