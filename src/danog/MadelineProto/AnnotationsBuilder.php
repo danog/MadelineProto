@@ -130,7 +130,7 @@ class AnnotationsBuilder
                 }
                 fwrite($handle, ");\n");
             }
-            fwrite($handle, "\n}\n");
+            fwrite($handle, "}\n");
         }
         fclose($handle);
     }

@@ -168,7 +168,6 @@ interface auth
      * @return bool
      */
     public function dropTempAuthKeys(array $params);
-
 }
 
 interface account
@@ -401,7 +400,6 @@ interface account
      * @return bool
      */
     public function confirmPhone(array $params);
-
 }
 
 interface users
@@ -423,7 +421,6 @@ interface users
      * @return UserFull
      */
     public function getFullUser(array $params);
-
 }
 
 interface contacts
@@ -556,7 +553,6 @@ interface contacts
      * @return bool
      */
     public function resetTopPeerRating(array $params);
-
 }
 
 interface messages
@@ -1364,7 +1360,6 @@ interface messages
      * @return messages_HighScores
      */
     public function getInlineGameHighScores(array $params);
-
 }
 
 interface updates
@@ -1396,7 +1391,6 @@ interface updates
      * @return updates_ChannelDifference
      */
     public function getChannelDifference(array $params);
-
 }
 
 interface photos
@@ -1439,7 +1433,6 @@ interface photos
      * @return photos_Photos
      */
     public function getUserPhotos(array $params);
-
 }
 
 interface upload
@@ -1477,7 +1470,6 @@ interface upload
      * @return bool
      */
     public function saveBigFilePart(array $params);
-
 }
 
 interface help
@@ -1525,7 +1517,6 @@ interface help
      * @return help_TermsOfService
      */
     public function getTermsOfService();
-
 }
 
 interface channels
@@ -1796,5 +1787,4 @@ interface channels
      * @return messages_Chats
      */
     public function getAdminedPublicChannels();
-
 }
