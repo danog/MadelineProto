@@ -10,7 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
+chdir(dirname(__FILE__).'/../');
 require_once 'vendor/autoload.php';
 if (file_exists('web_data.php')) {
     require_once 'web_data.php';
@@ -20,7 +20,7 @@ echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
 if (file_exists('.env')) {
-    $dotenv = new Dotenv\Dotenv(__DIR__);
+    $dotenv = new Dotenv\Dotenv(getcwd());
     $dotenv->load();
 }
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
@@ -52,34 +52,34 @@ $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];
 
 // Photo uploaded as document
-$inputFile = $MadelineProto->upload('faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
-$media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]];
+$inputFile = $MadelineProto->upload('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
+$media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]];
 
 // Photo
-$media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];
+$media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];
 
 // GIF
-$inputFile = $MadelineProto->upload('pony.mp4');
-$media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('pony.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAnimated']]];
+$inputFile = $MadelineProto->upload('tests/pony.mp4');
+$media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAnimated']]];
 
 // Sticker
-$inputFile = $MadelineProto->upload('lel.webp');
-$media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('lel.webp'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]];
+$inputFile = $MadelineProto->upload('tests/lel.webp');
+$media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/lel.webp'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]];
 
 // Video
-$inputFile = $MadelineProto->upload('swing.mp4');
-$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
+$inputFile = $MadelineProto->upload('tests/swing.mp4');
+$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
 
 // audio
-$inputFile = $MadelineProto->upload('mosconi.mp3');
-$media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
+$inputFile = $MadelineProto->upload('tests/mosconi.mp3');
+$media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
 
 // voice
-$media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
+$media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO', 'performer' => 'IL DIO GERARDO MOSCONI']]];
 
 // Document
 $time = time();
-$inputFile = $MadelineProto->upload('60', 'magic'); // This gets an inputFile object with file name magic
+$inputFile = $MadelineProto->upload('tests/60', 'magic'); // This gets an inputFile object with file name magic
 var_dump(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
