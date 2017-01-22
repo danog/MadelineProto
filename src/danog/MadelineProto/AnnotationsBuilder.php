@@ -122,6 +122,7 @@ class AnnotationsBuilder
                     fwrite($handle, "     *              ]\n");
                     fwrite($handle, "     *\n");
                 }
+                fwrite($handle, "     *\n");
                 fwrite($handle, "     * @return {$properties['return']}\n");
                 fwrite($handle, "     */\n");
                 fwrite($handle, "    public function $method(");

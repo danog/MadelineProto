@@ -14,6 +14,7 @@ interface auth
      *               string phone_number,
      *              ]
      *
+     *
      * @return auth_CheckedPhone
      */
     public function checkPhone(array $params);
@@ -26,6 +27,7 @@ interface auth
      *               int api_id,
      *               string api_hash,
      *              ]
+     *
      *
      * @return auth_SentCode
      */
@@ -40,6 +42,7 @@ interface auth
      *               string last_name,
      *              ]
      *
+     *
      * @return auth_Authorization
      */
     public function signUp(array $params);
@@ -51,16 +54,19 @@ interface auth
      *               string phone_code,
      *              ]
      *
+     *
      * @return auth_Authorization
      */
     public function signIn(array $params);
 
     /**
+     *
      * @return bool
      */
     public function logOut();
 
     /**
+     *
      * @return bool
      */
     public function resetAuthorizations();
@@ -71,6 +77,7 @@ interface auth
      *               string message,
      *              ]
      *
+     *
      * @return bool
      */
     public function sendInvites(array $params);
@@ -79,6 +86,7 @@ interface auth
      * @param array params [
      *               int dc_id,
      *              ]
+     *
      *
      * @return auth_ExportedAuthorization
      */
@@ -89,6 +97,7 @@ interface auth
      *               int id,
      *               bytes bytes,
      *              ]
+     *
      *
      * @return auth_Authorization
      */
@@ -102,6 +111,7 @@ interface auth
      *               bytes encrypted_message,
      *              ]
      *
+     *
      * @return bool
      */
     public function bindTempAuthKey(array $params);
@@ -113,6 +123,7 @@ interface auth
      *               string bot_auth_token,
      *              ]
      *
+     *
      * @return auth_Authorization
      */
     public function importBotAuthorization(array $params);
@@ -122,11 +133,13 @@ interface auth
      *               bytes password_hash,
      *              ]
      *
+     *
      * @return auth_Authorization
      */
     public function checkPassword(array $params);
 
     /**
+     *
      * @return auth_PasswordRecovery
      */
     public function requestPasswordRecovery();
@@ -135,6 +148,7 @@ interface auth
      * @param array params [
      *               string code,
      *              ]
+     *
      *
      * @return auth_Authorization
      */
@@ -146,6 +160,7 @@ interface auth
      *               string phone_code_hash,
      *              ]
      *
+     *
      * @return auth_SentCode
      */
     public function resendCode(array $params);
@@ -156,6 +171,7 @@ interface auth
      *               string phone_code_hash,
      *              ]
      *
+     *
      * @return bool
      */
     public function cancelCode(array $params);
@@ -164,6 +180,7 @@ interface auth
      * @param array params [
      *               long except_auth_keys,
      *              ]
+     *
      *
      * @return bool
      */
@@ -180,6 +197,7 @@ interface account
      *               string token,
      *              ]
      *
+     *
      * @return bool
      */
     public function registerDevice(array $params);
@@ -189,6 +207,7 @@ interface account
      *               int token_type,
      *               string token,
      *              ]
+     *
      *
      * @return bool
      */
@@ -200,6 +219,7 @@ interface account
      *               InputPeerNotifySettings settings,
      *              ]
      *
+     *
      * @return bool
      */
     public function updateNotifySettings(array $params);
@@ -209,11 +229,13 @@ interface account
      *               InputNotifyPeer peer,
      *              ]
      *
+     *
      * @return PeerNotifySettings
      */
     public function getNotifySettings(array $params);
 
     /**
+     *
      * @return bool
      */
     public function resetNotifySettings();
@@ -225,6 +247,7 @@ interface account
      *               string about,
      *              ]
      *
+     *
      * @return User
      */
     public function updateProfile(array $params);
@@ -234,11 +257,13 @@ interface account
      *               Bool offline,
      *              ]
      *
+     *
      * @return bool
      */
     public function updateStatus(array $params);
 
     /**
+     *
      * @return Vector_of_WallPaper
      */
     public function getWallPapers();
@@ -249,6 +274,7 @@ interface account
      *               ReportReason reason,
      *              ]
      *
+     *
      * @return bool
      */
     public function reportPeer(array $params);
@@ -257,6 +283,7 @@ interface account
      * @param array params [
      *               string username,
      *              ]
+     *
      *
      * @return bool
      */
@@ -267,6 +294,7 @@ interface account
      *               string username,
      *              ]
      *
+     *
      * @return User
      */
     public function updateUsername(array $params);
@@ -275,6 +303,7 @@ interface account
      * @param array params [
      *               InputPrivacyKey key,
      *              ]
+     *
      *
      * @return account_PrivacyRules
      */
@@ -286,6 +315,7 @@ interface account
      *               InputPrivacyRule rules,
      *              ]
      *
+     *
      * @return account_PrivacyRules
      */
     public function setPrivacy(array $params);
@@ -295,11 +325,13 @@ interface account
      *               string reason,
      *              ]
      *
+     *
      * @return bool
      */
     public function deleteAccount(array $params);
 
     /**
+     *
      * @return AccountDaysTTL
      */
     public function getAccountTTL();
@@ -308,6 +340,7 @@ interface account
      * @param array params [
      *               AccountDaysTTL ttl,
      *              ]
+     *
      *
      * @return bool
      */
@@ -320,6 +353,7 @@ interface account
      *               Bool current_number,
      *              ]
      *
+     *
      * @return auth_SentCode
      */
     public function sendChangePhoneCode(array $params);
@@ -331,6 +365,7 @@ interface account
      *               string phone_code,
      *              ]
      *
+     *
      * @return User
      */
     public function changePhone(array $params);
@@ -340,11 +375,13 @@ interface account
      *               int period,
      *              ]
      *
+     *
      * @return bool
      */
     public function updateDeviceLocked(array $params);
 
     /**
+     *
      * @return account_Authorizations
      */
     public function getAuthorizations();
@@ -354,11 +391,13 @@ interface account
      *               long hash,
      *              ]
      *
+     *
      * @return bool
      */
     public function resetAuthorization(array $params);
 
     /**
+     *
      * @return account_Password
      */
     public function getPassword();
@@ -367,6 +406,7 @@ interface account
      * @param array params [
      *               bytes current_password_hash,
      *              ]
+     *
      *
      * @return account_PasswordSettings
      */
@@ -377,6 +417,7 @@ interface account
      *               bytes current_password_hash,
      *               account_PasswordInputSettings new_settings,
      *              ]
+     *
      *
      * @return bool
      */
@@ -389,6 +430,7 @@ interface account
      *               Bool current_number,
      *              ]
      *
+     *
      * @return auth_SentCode
      */
     public function sendConfirmPhoneCode(array $params);
@@ -398,6 +440,7 @@ interface account
      *               string phone_code_hash,
      *               string phone_code,
      *              ]
+     *
      *
      * @return bool
      */
@@ -413,6 +456,7 @@ interface users
      *               InputUser id,
      *              ]
      *
+     *
      * @return Vector_of_User
      */
     public function getUsers(array $params);
@@ -421,6 +465,7 @@ interface users
      * @param array params [
      *               InputUser id,
      *              ]
+     *
      *
      * @return UserFull
      */
@@ -432,6 +477,7 @@ interface users
 interface contacts
 {
     /**
+     *
      * @return Vector_of_ContactStatus
      */
     public function getStatuses();
@@ -440,6 +486,7 @@ interface contacts
      * @param array params [
      *               string hash,
      *              ]
+     *
      *
      * @return contacts_Contacts
      */
@@ -451,6 +498,7 @@ interface contacts
      *               Bool replace,
      *              ]
      *
+     *
      * @return contacts_ImportedContacts
      */
     public function importContacts(array $params);
@@ -459,6 +507,7 @@ interface contacts
      * @param array params [
      *               InputUser id,
      *              ]
+     *
      *
      * @return contacts_Link
      */
@@ -469,6 +518,7 @@ interface contacts
      *               InputUser id,
      *              ]
      *
+     *
      * @return bool
      */
     public function deleteContacts(array $params);
@@ -478,6 +528,7 @@ interface contacts
      *               InputUser id,
      *              ]
      *
+     *
      * @return bool
      */
     public function block(array $params);
@@ -486,6 +537,7 @@ interface contacts
      * @param array params [
      *               InputUser id,
      *              ]
+     *
      *
      * @return bool
      */
@@ -497,11 +549,13 @@ interface contacts
      *               int limit,
      *              ]
      *
+     *
      * @return contacts_Blocked
      */
     public function getBlocked(array $params);
 
     /**
+     *
      * @return Vector_of_int
      */
     public function exportCard();
@@ -510,6 +564,7 @@ interface contacts
      * @param array params [
      *               int export_card,
      *              ]
+     *
      *
      * @return User
      */
@@ -521,6 +576,7 @@ interface contacts
      *               int limit,
      *              ]
      *
+     *
      * @return contacts_Found
      */
     public function search(array $params);
@@ -529,6 +585,7 @@ interface contacts
      * @param array params [
      *               string username,
      *              ]
+     *
      *
      * @return contacts_ResolvedPeer
      */
@@ -546,6 +603,7 @@ interface contacts
      *               int hash,
      *              ]
      *
+     *
      * @return contacts_TopPeers
      */
     public function getTopPeers(array $params);
@@ -555,6 +613,7 @@ interface contacts
      *               TopPeerCategory category,
      *               InputPeer peer,
      *              ]
+     *
      *
      * @return bool
      */
@@ -570,6 +629,7 @@ interface messages
      *               int id,
      *              ]
      *
+     *
      * @return messages_Messages
      */
     public function getMessages(array $params);
@@ -581,6 +641,7 @@ interface messages
      *               InputPeer offset_peer,
      *               int limit,
      *              ]
+     *
      *
      * @return messages_Dialogs
      */
@@ -596,6 +657,7 @@ interface messages
      *               int max_id,
      *               int min_id,
      *              ]
+     *
      *
      * @return messages_Messages
      */
@@ -613,6 +675,7 @@ interface messages
      *               int limit,
      *              ]
      *
+     *
      * @return messages_Messages
      */
     public function search(array $params);
@@ -622,6 +685,7 @@ interface messages
      *               InputPeer peer,
      *               int max_id,
      *              ]
+     *
      *
      * @return messages_AffectedMessages
      */
@@ -634,6 +698,7 @@ interface messages
      *               int max_id,
      *              ]
      *
+     *
      * @return messages_AffectedHistory
      */
     public function deleteHistory(array $params);
@@ -642,6 +707,7 @@ interface messages
      * @param array params [
      *               int id,
      *              ]
+     *
      *
      * @return messages_AffectedMessages
      */
@@ -652,6 +718,7 @@ interface messages
      *               int max_id,
      *              ]
      *
+     *
      * @return Vector_of_ReceivedNotifyMessage
      */
     public function receivedMessages(array $params);
@@ -661,6 +728,7 @@ interface messages
      *               InputPeer peer,
      *               SendMessageAction action,
      *              ]
+     *
      *
      * @return bool
      */
@@ -679,6 +747,7 @@ interface messages
      *               MessageEntity entities,
      *              ]
      *
+     *
      * @return Updates
      */
     public function sendMessage(array $params);
@@ -694,6 +763,7 @@ interface messages
      *               ReplyMarkup reply_markup,
      *              ]
      *
+     *
      * @return Updates
      */
     public function sendMedia(array $params);
@@ -708,6 +778,7 @@ interface messages
      *               InputPeer to_peer,
      *              ]
      *
+     *
      * @return Updates
      */
     public function forwardMessages(array $params);
@@ -716,6 +787,7 @@ interface messages
      * @param array params [
      *               InputPeer peer,
      *              ]
+     *
      *
      * @return bool
      */
@@ -726,6 +798,7 @@ interface messages
      *               InputPeer peer,
      *              ]
      *
+     *
      * @return bool
      */
     public function hideReportSpam(array $params);
@@ -734,6 +807,7 @@ interface messages
      * @param array params [
      *               InputPeer peer,
      *              ]
+     *
      *
      * @return PeerSettings
      */
@@ -744,6 +818,7 @@ interface messages
      *               int id,
      *              ]
      *
+     *
      * @return messages_Chats
      */
     public function getChats(array $params);
@@ -752,6 +827,7 @@ interface messages
      * @param array params [
      *               int chat_id,
      *              ]
+     *
      *
      * @return messages_ChatFull
      */
@@ -763,6 +839,7 @@ interface messages
      *               string title,
      *              ]
      *
+     *
      * @return Updates
      */
     public function editChatTitle(array $params);
@@ -772,6 +849,7 @@ interface messages
      *               int chat_id,
      *               InputChatPhoto photo,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -784,6 +862,7 @@ interface messages
      *               int fwd_limit,
      *              ]
      *
+     *
      * @return Updates
      */
     public function addChatUser(array $params);
@@ -793,6 +872,7 @@ interface messages
      *               int chat_id,
      *               InputUser user_id,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -804,6 +884,7 @@ interface messages
      *               string title,
      *              ]
      *
+     *
      * @return Updates
      */
     public function createChat(array $params);
@@ -813,6 +894,7 @@ interface messages
      *               InputPeer peer,
      *               int id,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -824,6 +906,7 @@ interface messages
      *               int random_length,
      *              ]
      *
+     *
      * @return messages_DhConfig
      */
     public function getDhConfig(array $params);
@@ -833,6 +916,7 @@ interface messages
      *               InputUser user_id,
      *               bytes g_a,
      *              ]
+     *
      *
      * @return EncryptedChat
      */
@@ -845,6 +929,7 @@ interface messages
      *               long key_fingerprint,
      *              ]
      *
+     *
      * @return EncryptedChat
      */
     public function acceptEncryption(array $params);
@@ -853,6 +938,7 @@ interface messages
      * @param array params [
      *               int chat_id,
      *              ]
+     *
      *
      * @return bool
      */
@@ -864,6 +950,7 @@ interface messages
      *               Bool typing,
      *              ]
      *
+     *
      * @return bool
      */
     public function setEncryptedTyping(array $params);
@@ -874,6 +961,7 @@ interface messages
      *               int max_date,
      *              ]
      *
+     *
      * @return bool
      */
     public function readEncryptedHistory(array $params);
@@ -883,6 +971,7 @@ interface messages
      *               InputEncryptedChat peer,
      *               bytes data,
      *              ]
+     *
      *
      * @return messages_SentEncryptedMessage
      */
@@ -895,6 +984,7 @@ interface messages
      *               InputEncryptedFile file,
      *              ]
      *
+     *
      * @return messages_SentEncryptedMessage
      */
     public function sendEncryptedFile(array $params);
@@ -905,6 +995,7 @@ interface messages
      *               bytes data,
      *              ]
      *
+     *
      * @return messages_SentEncryptedMessage
      */
     public function sendEncryptedService(array $params);
@@ -913,6 +1004,7 @@ interface messages
      * @param array params [
      *               int max_qts,
      *              ]
+     *
      *
      * @return Vector_of_long
      */
@@ -923,6 +1015,7 @@ interface messages
      *               int id,
      *              ]
      *
+     *
      * @return messages_AffectedMessages
      */
     public function readMessageContents(array $params);
@@ -931,6 +1024,7 @@ interface messages
      * @param array params [
      *               int hash,
      *              ]
+     *
      *
      * @return messages_AllStickers
      */
@@ -941,6 +1035,7 @@ interface messages
      *               string message,
      *              ]
      *
+     *
      * @return MessageMedia
      */
     public function getWebPagePreview(array $params);
@@ -949,6 +1044,7 @@ interface messages
      * @param array params [
      *               int chat_id,
      *              ]
+     *
      *
      * @return ExportedChatInvite
      */
@@ -959,6 +1055,7 @@ interface messages
      *               string hash,
      *              ]
      *
+     *
      * @return ChatInvite
      */
     public function checkChatInvite(array $params);
@@ -968,6 +1065,7 @@ interface messages
      *               string hash,
      *              ]
      *
+     *
      * @return Updates
      */
     public function importChatInvite(array $params);
@@ -976,6 +1074,7 @@ interface messages
      * @param array params [
      *               InputStickerSet stickerset,
      *              ]
+     *
      *
      * @return messages_StickerSet
      */
@@ -987,6 +1086,7 @@ interface messages
      *               Bool archived,
      *              ]
      *
+     *
      * @return messages_StickerSetInstallResult
      */
     public function installStickerSet(array $params);
@@ -995,6 +1095,7 @@ interface messages
      * @param array params [
      *               InputStickerSet stickerset,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1007,6 +1108,7 @@ interface messages
      *               string start_param,
      *              ]
      *
+     *
      * @return Updates
      */
     public function startBot(array $params);
@@ -1018,6 +1120,7 @@ interface messages
      *               Bool increment,
      *              ]
      *
+     *
      * @return Vector_of_int
      */
     public function getMessagesViews(array $params);
@@ -1027,6 +1130,7 @@ interface messages
      *               int chat_id,
      *               Bool enabled,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1039,6 +1143,7 @@ interface messages
      *               Bool is_admin,
      *              ]
      *
+     *
      * @return bool
      */
     public function editChatAdmin(array $params);
@@ -1047,6 +1152,7 @@ interface messages
      * @param array params [
      *               int chat_id,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1061,6 +1167,7 @@ interface messages
      *               int limit,
      *              ]
      *
+     *
      * @return messages_Messages
      */
     public function searchGlobal(array $params);
@@ -1070,6 +1177,7 @@ interface messages
      *               boolean masks,
      *               long order,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1082,6 +1190,7 @@ interface messages
      *               string mime_type,
      *              ]
      *
+     *
      * @return Document
      */
     public function getDocumentByHash(array $params);
@@ -1092,6 +1201,7 @@ interface messages
      *               int offset,
      *              ]
      *
+     *
      * @return messages_FoundGifs
      */
     public function searchGifs(array $params);
@@ -1100,6 +1210,7 @@ interface messages
      * @param array params [
      *               int hash,
      *              ]
+     *
      *
      * @return messages_SavedGifs
      */
@@ -1110,6 +1221,7 @@ interface messages
      *               InputDocument id,
      *               Bool unsave,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1123,6 +1235,7 @@ interface messages
      *               string query,
      *               string offset,
      *              ]
+     *
      *
      * @return messages_BotResults
      */
@@ -1139,6 +1252,7 @@ interface messages
      *               InlineBotSwitchPM switch_pm,
      *              ]
      *
+     *
      * @return bool
      */
     public function setInlineBotResults(array $params);
@@ -1154,6 +1268,7 @@ interface messages
      *               string id,
      *              ]
      *
+     *
      * @return Updates
      */
     public function sendInlineBotResult(array $params);
@@ -1163,6 +1278,7 @@ interface messages
      *               InputPeer peer,
      *               int id,
      *              ]
+     *
      *
      * @return messages_MessageEditData
      */
@@ -1178,6 +1294,7 @@ interface messages
      *               MessageEntity entities,
      *              ]
      *
+     *
      * @return Updates
      */
     public function editMessage(array $params);
@@ -1191,6 +1308,7 @@ interface messages
      *               MessageEntity entities,
      *              ]
      *
+     *
      * @return bool
      */
     public function editInlineBotMessage(array $params);
@@ -1202,6 +1320,7 @@ interface messages
      *               int msg_id,
      *               bytes data,
      *              ]
+     *
      *
      * @return messages_BotCallbackAnswer
      */
@@ -1215,6 +1334,7 @@ interface messages
      *               string url,
      *              ]
      *
+     *
      * @return bool
      */
     public function setBotCallbackAnswer(array $params);
@@ -1223,6 +1343,7 @@ interface messages
      * @param array params [
      *               InputPeer peers,
      *              ]
+     *
      *
      * @return messages_PeerDialogs
      */
@@ -1237,11 +1358,13 @@ interface messages
      *               MessageEntity entities,
      *              ]
      *
+     *
      * @return bool
      */
     public function saveDraft(array $params);
 
     /**
+     *
      * @return Updates
      */
     public function getAllDrafts();
@@ -1250,6 +1373,7 @@ interface messages
      * @param array params [
      *               int hash,
      *              ]
+     *
      *
      * @return messages_FeaturedStickers
      */
@@ -1260,6 +1384,7 @@ interface messages
      *               long id,
      *              ]
      *
+     *
      * @return bool
      */
     public function readFeaturedStickers(array $params);
@@ -1269,6 +1394,7 @@ interface messages
      *               boolean attached,
      *               int hash,
      *              ]
+     *
      *
      * @return messages_RecentStickers
      */
@@ -1281,6 +1407,7 @@ interface messages
      *               Bool unsave,
      *              ]
      *
+     *
      * @return bool
      */
     public function saveRecentSticker(array $params);
@@ -1289,6 +1416,7 @@ interface messages
      * @param array params [
      *               boolean attached,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1301,6 +1429,7 @@ interface messages
      *               int limit,
      *              ]
      *
+     *
      * @return messages_ArchivedStickers
      */
     public function getArchivedStickers(array $params);
@@ -1310,6 +1439,7 @@ interface messages
      *               int hash,
      *              ]
      *
+     *
      * @return messages_AllStickers
      */
     public function getMaskStickers(array $params);
@@ -1318,6 +1448,7 @@ interface messages
      * @param array params [
      *               InputStickeredMedia media,
      *              ]
+     *
      *
      * @return Vector_of_StickerSetCovered
      */
@@ -1332,6 +1463,7 @@ interface messages
      *               int score,
      *              ]
      *
+     *
      * @return Updates
      */
     public function setGameScore(array $params);
@@ -1344,6 +1476,7 @@ interface messages
      *               int score,
      *              ]
      *
+     *
      * @return bool
      */
     public function setInlineGameScore(array $params);
@@ -1355,6 +1488,7 @@ interface messages
      *               InputUser user_id,
      *              ]
      *
+     *
      * @return messages_HighScores
      */
     public function getGameHighScores(array $params);
@@ -1364,6 +1498,7 @@ interface messages
      *               InputBotInlineMessageID id,
      *               InputUser user_id,
      *              ]
+     *
      *
      * @return messages_HighScores
      */
@@ -1375,6 +1510,7 @@ interface messages
 interface updates
 {
     /**
+     *
      * @return updates_State
      */
     public function getState();
@@ -1385,6 +1521,7 @@ interface updates
      *               int date,
      *               int qts,
      *              ]
+     *
      *
      * @return updates_Difference
      */
@@ -1397,6 +1534,7 @@ interface updates
      *               int pts,
      *               int limit,
      *              ]
+     *
      *
      * @return updates_ChannelDifference
      */
@@ -1412,6 +1550,7 @@ interface photos
      *               InputPhoto id,
      *              ]
      *
+     *
      * @return UserProfilePhoto
      */
     public function updateProfilePhoto(array $params);
@@ -1421,6 +1560,7 @@ interface photos
      *               InputFile file,
      *              ]
      *
+     *
      * @return photos_Photo
      */
     public function uploadProfilePhoto(array $params);
@@ -1429,6 +1569,7 @@ interface photos
      * @param array params [
      *               InputPhoto id,
      *              ]
+     *
      *
      * @return Vector_of_long
      */
@@ -1441,6 +1582,7 @@ interface photos
      *               long max_id,
      *               int limit,
      *              ]
+     *
      *
      * @return photos_Photos
      */
@@ -1458,6 +1600,7 @@ interface upload
      *               bytes bytes,
      *              ]
      *
+     *
      * @return bool
      */
     public function saveFilePart(array $params);
@@ -1468,6 +1611,7 @@ interface upload
      *               int offset,
      *               int limit,
      *              ]
+     *
      *
      * @return upload_File
      */
@@ -1481,6 +1625,7 @@ interface upload
      *               bytes bytes,
      *              ]
      *
+     *
      * @return bool
      */
     public function saveBigFilePart(array $params);
@@ -1491,16 +1636,19 @@ interface upload
 interface help
 {
     /**
+     *
      * @return Config
      */
     public function getConfig();
 
     /**
+     *
      * @return NearestDc
      */
     public function getNearestDc();
 
     /**
+     *
      * @return help_AppUpdate
      */
     public function getAppUpdate();
@@ -1510,26 +1658,31 @@ interface help
      *               InputAppEvent events,
      *              ]
      *
+     *
      * @return bool
      */
     public function saveAppLog(array $params);
 
     /**
+     *
      * @return help_InviteText
      */
     public function getInviteText();
 
     /**
+     *
      * @return help_Support
      */
     public function getSupport();
 
     /**
+     *
      * @return help_AppChangelog
      */
     public function getAppChangelog();
 
     /**
+     *
      * @return help_TermsOfService
      */
     public function getTermsOfService();
@@ -1545,6 +1698,7 @@ interface channels
      *               int max_id,
      *              ]
      *
+     *
      * @return bool
      */
     public function readHistory(array $params);
@@ -1555,6 +1709,7 @@ interface channels
      *               int id,
      *              ]
      *
+     *
      * @return messages_AffectedMessages
      */
     public function deleteMessages(array $params);
@@ -1564,6 +1719,7 @@ interface channels
      *               InputChannel channel,
      *               InputUser user_id,
      *              ]
+     *
      *
      * @return messages_AffectedHistory
      */
@@ -1576,6 +1732,7 @@ interface channels
      *               int id,
      *              ]
      *
+     *
      * @return bool
      */
     public function reportSpam(array $params);
@@ -1585,6 +1742,7 @@ interface channels
      *               InputChannel channel,
      *               int id,
      *              ]
+     *
      *
      * @return messages_Messages
      */
@@ -1598,6 +1756,7 @@ interface channels
      *               int limit,
      *              ]
      *
+     *
      * @return channels_ChannelParticipants
      */
     public function getParticipants(array $params);
@@ -1608,6 +1767,7 @@ interface channels
      *               InputUser user_id,
      *              ]
      *
+     *
      * @return channels_ChannelParticipant
      */
     public function getParticipant(array $params);
@@ -1617,6 +1777,7 @@ interface channels
      *               InputChannel id,
      *              ]
      *
+     *
      * @return messages_Chats
      */
     public function getChannels(array $params);
@@ -1625,6 +1786,7 @@ interface channels
      * @param array params [
      *               InputChannel channel,
      *              ]
+     *
      *
      * @return messages_ChatFull
      */
@@ -1638,6 +1800,7 @@ interface channels
      *               string about,
      *              ]
      *
+     *
      * @return Updates
      */
     public function createChannel(array $params);
@@ -1647,6 +1810,7 @@ interface channels
      *               InputChannel channel,
      *               string about,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1659,6 +1823,7 @@ interface channels
      *               ChannelParticipantRole role,
      *              ]
      *
+     *
      * @return Updates
      */
     public function editAdmin(array $params);
@@ -1668,6 +1833,7 @@ interface channels
      *               InputChannel channel,
      *               string title,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1679,6 +1845,7 @@ interface channels
      *               InputChatPhoto photo,
      *              ]
      *
+     *
      * @return Updates
      */
     public function editPhoto(array $params);
@@ -1688,6 +1855,7 @@ interface channels
      *               InputChannel channel,
      *               string username,
      *              ]
+     *
      *
      * @return bool
      */
@@ -1699,6 +1867,7 @@ interface channels
      *               string username,
      *              ]
      *
+     *
      * @return bool
      */
     public function updateUsername(array $params);
@@ -1707,6 +1876,7 @@ interface channels
      * @param array params [
      *               InputChannel channel,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1717,6 +1887,7 @@ interface channels
      *               InputChannel channel,
      *              ]
      *
+     *
      * @return Updates
      */
     public function leaveChannel(array $params);
@@ -1726,6 +1897,7 @@ interface channels
      *               InputChannel channel,
      *               InputUser users,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1738,6 +1910,7 @@ interface channels
      *               Bool kicked,
      *              ]
      *
+     *
      * @return Updates
      */
     public function kickFromChannel(array $params);
@@ -1747,6 +1920,7 @@ interface channels
      *               InputChannel channel,
      *              ]
      *
+     *
      * @return ExportedChatInvite
      */
     public function exportInvite(array $params);
@@ -1755,6 +1929,7 @@ interface channels
      * @param array params [
      *               InputChannel channel,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1766,6 +1941,7 @@ interface channels
      *               Bool enabled,
      *              ]
      *
+     *
      * @return Updates
      */
     public function toggleInvites(array $params);
@@ -1776,6 +1952,7 @@ interface channels
      *               int id,
      *              ]
      *
+     *
      * @return ExportedMessageLink
      */
     public function exportMessageLink(array $params);
@@ -1785,6 +1962,7 @@ interface channels
      *               InputChannel channel,
      *               Bool enabled,
      *              ]
+     *
      *
      * @return Updates
      */
@@ -1797,11 +1975,13 @@ interface channels
      *               int id,
      *              ]
      *
+     *
      * @return Updates
      */
     public function updatePinnedMessage(array $params);
 
     /**
+     *
      * @return messages_Chats
      */
     public function getAdminedPublicChannels();
