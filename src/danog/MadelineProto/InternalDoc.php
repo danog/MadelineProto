@@ -9,7 +9,6 @@ namespace danog\MadelineProto;
 
 interface auth
 {
-
     /**
      * @param array params [
      *               string phone_number,
@@ -174,7 +173,6 @@ interface auth
 
 interface account
 {
-
     /**
      * @param array params [
      *               int token_type,
@@ -408,7 +406,6 @@ interface account
 
 interface users
 {
-
     /**
      * @param array params [
      *               InputUser id,
@@ -431,7 +428,6 @@ interface users
 
 interface contacts
 {
-
     /**
      * @return Vector_of_ContactStatus
      */
@@ -565,7 +561,6 @@ interface contacts
 
 interface messages
 {
-
     /**
      * @param array params [
      *               int id,
@@ -1374,7 +1369,6 @@ interface messages
 
 interface updates
 {
-
     /**
      * @return updates_State
      */
@@ -1407,7 +1401,6 @@ interface updates
 
 interface photos
 {
-
     /**
      * @param array params [
      *               InputPhoto id,
@@ -1451,7 +1444,6 @@ interface photos
 
 interface upload
 {
-
     /**
      * @param array params [
      *               long file_id,
@@ -1490,7 +1482,6 @@ interface upload
 
 interface help
 {
-
     /**
      * @return Config
      */
@@ -1539,7 +1530,6 @@ interface help
 
 interface channels
 {
-
     /**
      * @param array params [
      *               InputChannel channel,

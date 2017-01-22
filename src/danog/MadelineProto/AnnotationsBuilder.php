@@ -111,7 +111,7 @@ class AnnotationsBuilder
         fwrite($handle, " */\n\n");
         fwrite($handle, "namespace danog\MadelineProto;\n");
         foreach ($internalDoc as $namespace => $methods) {
-            fwrite($handle, "\ninterface $namespace\n{\n");
+            fwrite($handle, "\ninterface $namespace\n{");
             foreach ($methods as $method => $properties) {
                 fwrite($handle, "\n    /**\n");
                 if (isset($properties['attr'])) {
