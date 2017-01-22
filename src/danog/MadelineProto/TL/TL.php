@@ -78,7 +78,7 @@ trait TL
     {
         $tl_method = $this->methods->find_by_method($method);
         if ($tl_method === false) {
-            throw new Exception('Could not extract type: '.$method);
+            throw new Exception('Could not extract method: '.$method);
         }
 
         if (count(array_filter(array_keys($arguments), 'is_string')) == 0) {
