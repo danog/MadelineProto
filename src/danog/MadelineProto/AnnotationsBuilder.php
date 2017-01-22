@@ -46,7 +46,7 @@ class AnnotationsBuilder
             if ($raw_docblock = $property->getDocComment()) {
                 $docblock = $fixture->create($raw_docblock);
                 if ($docblock->hasTag('internal')) {
-                    $content = str_replace("\n    ".$raw_docblock."\n    public $".$property->getName().";", '', $content);
+                    $content = str_replace("\n    ".$raw_docblock."\n    public $".$property->getName().';', '', $content);
                 }
             }
         }
@@ -113,7 +113,7 @@ class AnnotationsBuilder
         foreach ($internalDoc as $namespace => $methods) {
             fwrite($handle, "\ninterface $namespace\n{\n");
             foreach ($methods as $method => $properties) {
-                fwrite($handle, "    /**\n");
+                fwrite($handle, "\n    /**\n");
                 if (isset($properties['attr'])) {
                     fwrite($handle, "     * @param array params [\n");
                     foreach ($properties['attr'] as $name => $type) {
@@ -128,7 +128,7 @@ class AnnotationsBuilder
                 if (isset($properties['attr'])) {
                     fwrite($handle, 'array $params');
                 }
-                fwrite($handle, ");\n\n");
+                fwrite($handle, ");\n");
             }
             fwrite($handle, "\n}\n");
         }

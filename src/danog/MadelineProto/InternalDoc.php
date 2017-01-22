@@ -9,6 +9,7 @@ namespace danog\MadelineProto;
 
 interface auth
 {
+
     /**
      * @param array params [
      *               string phone_number,
@@ -169,11 +170,11 @@ interface auth
      */
     public function dropTempAuthKeys(array $params);
 
-
 }
 
 interface account
 {
+
     /**
      * @param array params [
      *               int token_type,
@@ -403,11 +404,11 @@ interface account
      */
     public function confirmPhone(array $params);
 
-
 }
 
 interface users
 {
+
     /**
      * @param array params [
      *               InputUser id,
@@ -426,11 +427,11 @@ interface users
      */
     public function getFullUser(array $params);
 
-
 }
 
 interface contacts
 {
+
     /**
      * @return Vector_of_ContactStatus
      */
@@ -560,11 +561,11 @@ interface contacts
      */
     public function resetTopPeerRating(array $params);
 
-
 }
 
 interface messages
 {
+
     /**
      * @param array params [
      *               int id,
@@ -1369,11 +1370,11 @@ interface messages
      */
     public function getInlineGameHighScores(array $params);
 
-
 }
 
 interface updates
 {
+
     /**
      * @return updates_State
      */
@@ -1402,11 +1403,11 @@ interface updates
      */
     public function getChannelDifference(array $params);
 
-
 }
 
 interface photos
 {
+
     /**
      * @param array params [
      *               InputPhoto id,
@@ -1446,11 +1447,11 @@ interface photos
      */
     public function getUserPhotos(array $params);
 
-
 }
 
 interface upload
 {
+
     /**
      * @param array params [
      *               long file_id,
@@ -1485,11 +1486,11 @@ interface upload
      */
     public function saveBigFilePart(array $params);
 
-
 }
 
 interface help
 {
+
     /**
      * @return Config
      */
@@ -1534,11 +1535,11 @@ interface help
      */
     public function getTermsOfService();
 
-
 }
 
 interface channels
 {
+
     /**
      * @param array params [
      *               InputChannel channel,
@@ -1805,6 +1806,5 @@ interface channels
      * @return messages_Chats
      */
     public function getAdminedPublicChannels();
-
 
 }
