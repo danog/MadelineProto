@@ -1,8 +1,8 @@
 ---
-title: messages_getBotCallbackAnswer
-description: messages_getBotCallbackAnswer parameters, return type and example
+title: messages.getBotCallbackAnswer
+description: messages.getBotCallbackAnswer parameters, return type and example
 ---
-## Method: messages\_getBotCallbackAnswer  
+## Method: messages.getBotCallbackAnswer  
 [Back to methods index](index.md)
 
 

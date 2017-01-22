@@ -1,8 +1,8 @@
 ---
-title: messages_readFeaturedStickers
-description: messages_readFeaturedStickers parameters, return type and example
+title: messages.readFeaturedStickers
+description: messages.readFeaturedStickers parameters, return type and example
 ---
-## Method: messages\_readFeaturedStickers  
+## Method: messages.readFeaturedStickers  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_recentStickers
+title: messages.recentStickers
 description: messages_recentStickers attributes, type and example
 ---
-## Constructor: messages\_recentStickers  
+## Constructor: messages.recentStickers  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_recentStickers attributes, type and example
 ### Example:
 
 ```
-$messages_recentStickers = ['_' => 'messages_recentStickers', 'hash' => int, 'stickers' => [Vector t], ];
+$messages_recentStickers = ['_' => 'messages.recentStickers', 'hash' => int, 'stickers' => [Vector t], ];
 ```  
 

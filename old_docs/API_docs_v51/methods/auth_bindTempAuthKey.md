@@ -1,8 +1,8 @@
 ---
-title: auth_bindTempAuthKey
-description: auth_bindTempAuthKey parameters, return type and example
+title: auth.bindTempAuthKey
+description: auth.bindTempAuthKey parameters, return type and example
 ---
-## Method: auth\_bindTempAuthKey  
+## Method: auth.bindTempAuthKey  
 [Back to methods index](index.md)
 
 

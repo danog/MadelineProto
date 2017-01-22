@@ -1,8 +1,8 @@
 ---
-title: messages_sentMessage
+title: messages.sentMessage
 description: messages_sentMessage attributes, type and example
 ---
-## Constructor: messages\_sentMessage  
+## Constructor: messages.sentMessage  
 [Back to constructors index](index.md)
 
 
@@ -25,6 +25,6 @@ description: messages_sentMessage attributes, type and example
 ### Example:
 
 ```
-$messages_sentMessage = ['_' => 'messages_sentMessage', 'id' => int, 'date' => int, 'media' => MessageMedia, 'pts' => int, 'pts_count' => int, ];
+$messages_sentMessage = ['_' => 'messages.sentMessage', 'id' => int, 'date' => int, 'media' => MessageMedia, 'pts' => int, 'pts_count' => int, ];
 ```  
 

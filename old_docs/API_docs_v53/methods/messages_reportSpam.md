@@ -1,8 +1,8 @@
 ---
-title: messages_reportSpam
-description: messages_reportSpam parameters, return type and example
+title: messages.reportSpam
+description: messages.reportSpam parameters, return type and example
 ---
-## Method: messages\_reportSpam  
+## Method: messages.reportSpam  
 [Back to methods index](index.md)
 
 

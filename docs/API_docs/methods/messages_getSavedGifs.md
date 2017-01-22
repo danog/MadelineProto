@@ -1,8 +1,8 @@
 ---
-title: messages_getSavedGifs
-description: messages_getSavedGifs parameters, return type and example
+title: messages.getSavedGifs
+description: messages.getSavedGifs parameters, return type and example
 ---
-## Method: messages\_getSavedGifs  
+## Method: messages.getSavedGifs  
 [Back to methods index](index.md)
 
 

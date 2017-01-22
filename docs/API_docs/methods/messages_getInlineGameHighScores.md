@@ -1,8 +1,8 @@
 ---
-title: messages_getInlineGameHighScores
-description: messages_getInlineGameHighScores parameters, return type and example
+title: messages.getInlineGameHighScores
+description: messages.getInlineGameHighScores parameters, return type and example
 ---
-## Method: messages\_getInlineGameHighScores  
+## Method: messages.getInlineGameHighScores  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_editInlineBotMessage
-description: messages_editInlineBotMessage parameters, return type and example
+title: messages.editInlineBotMessage
+description: messages.editInlineBotMessage parameters, return type and example
 ---
-## Method: messages\_editInlineBotMessage  
+## Method: messages.editInlineBotMessage  
 [Back to methods index](index.md)
 
 

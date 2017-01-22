@@ -1,8 +1,8 @@
 ---
-title: messages_getFeaturedStickers
-description: messages_getFeaturedStickers parameters, return type and example
+title: messages.getFeaturedStickers
+description: messages.getFeaturedStickers parameters, return type and example
 ---
-## Method: messages\_getFeaturedStickers  
+## Method: messages.getFeaturedStickers  
 [Back to methods index](index.md)
 
 

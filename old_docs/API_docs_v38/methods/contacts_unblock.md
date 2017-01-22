@@ -1,8 +1,8 @@
 ---
-title: contacts_unblock
-description: contacts_unblock parameters, return type and example
+title: contacts.unblock
+description: contacts.unblock parameters, return type and example
 ---
-## Method: contacts\_unblock  
+## Method: contacts.unblock  
 [Back to methods index](index.md)
 
 

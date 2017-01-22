@@ -1,8 +1,8 @@
 ---
-title: messages_messages
+title: messages.messages
 description: messages_messages attributes, type and example
 ---
-## Constructor: messages\_messages  
+## Constructor: messages.messages  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_messages attributes, type and example
 ### Example:
 
 ```
-$messages_messages = ['_' => 'messages_messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_messages = ['_' => 'messages.messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

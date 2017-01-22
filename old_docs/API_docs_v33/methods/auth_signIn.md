@@ -1,8 +1,8 @@
 ---
-title: auth_signIn
-description: auth_signIn parameters, return type and example
+title: auth.signIn
+description: auth.signIn parameters, return type and example
 ---
-## Method: auth\_signIn  
+## Method: auth.signIn  
 [Back to methods index](index.md)
 
 

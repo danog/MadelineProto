@@ -1,8 +1,8 @@
 ---
-title: users_getFullUser
-description: users_getFullUser parameters, return type and example
+title: users.getFullUser
+description: users.getFullUser parameters, return type and example
 ---
-## Method: users\_getFullUser  
+## Method: users.getFullUser  
 [Back to methods index](index.md)
 
 

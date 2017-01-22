@@ -1,8 +1,8 @@
 ---
-title: channels_deleteUserHistory
-description: channels_deleteUserHistory parameters, return type and example
+title: channels.deleteUserHistory
+description: channels.deleteUserHistory parameters, return type and example
 ---
-## Method: channels\_deleteUserHistory  
+## Method: channels.deleteUserHistory  
 [Back to methods index](index.md)
 
 

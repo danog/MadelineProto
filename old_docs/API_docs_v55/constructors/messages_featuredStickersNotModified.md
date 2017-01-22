@@ -1,8 +1,8 @@
 ---
-title: messages_featuredStickersNotModified
+title: messages.featuredStickersNotModified
 description: messages_featuredStickersNotModified attributes, type and example
 ---
-## Constructor: messages\_featuredStickersNotModified  
+## Constructor: messages.featuredStickersNotModified  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: messages_featuredStickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_featuredStickersNotModified = ['_' => 'messages_featuredStickersNotModified', ];
+$messages_featuredStickersNotModified = ['_' => 'messages.featuredStickersNotModified', ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: messages_getInlineBotResults
-description: messages_getInlineBotResults parameters, return type and example
+title: messages.getInlineBotResults
+description: messages.getInlineBotResults parameters, return type and example
 ---
-## Method: messages\_getInlineBotResults  
+## Method: messages.getInlineBotResults  
 [Back to methods index](index.md)
 
 

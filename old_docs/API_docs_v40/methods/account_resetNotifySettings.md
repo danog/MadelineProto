@@ -1,8 +1,8 @@
 ---
-title: account_resetNotifySettings
-description: account_resetNotifySettings parameters, return type and example
+title: account.resetNotifySettings
+description: account.resetNotifySettings parameters, return type and example
 ---
-## Method: account\_resetNotifySettings  
+## Method: account.resetNotifySettings  
 [Back to methods index](index.md)
 
 

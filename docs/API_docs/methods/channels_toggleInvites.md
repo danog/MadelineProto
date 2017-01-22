@@ -1,8 +1,8 @@
 ---
-title: channels_toggleInvites
-description: channels_toggleInvites parameters, return type and example
+title: channels.toggleInvites
+description: channels.toggleInvites parameters, return type and example
 ---
-## Method: channels\_toggleInvites  
+## Method: channels.toggleInvites  
 [Back to methods index](index.md)
 
 

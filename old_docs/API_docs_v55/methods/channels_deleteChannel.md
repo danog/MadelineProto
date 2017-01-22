@@ -1,8 +1,8 @@
 ---
-title: channels_deleteChannel
-description: channels_deleteChannel parameters, return type and example
+title: channels.deleteChannel
+description: channels.deleteChannel parameters, return type and example
 ---
-## Method: channels\_deleteChannel  
+## Method: channels.deleteChannel  
 [Back to methods index](index.md)
 
 

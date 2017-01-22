@@ -1,8 +1,8 @@
 ---
-title: messages_sendBroadcast
-description: messages_sendBroadcast parameters, return type and example
+title: messages.sendBroadcast
+description: messages.sendBroadcast parameters, return type and example
 ---
-## Method: messages\_sendBroadcast  
+## Method: messages.sendBroadcast  
 [Back to methods index](index.md)
 
 

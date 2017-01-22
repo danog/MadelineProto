@@ -1,8 +1,8 @@
 ---
-title: account_updateDeviceLocked
-description: account_updateDeviceLocked parameters, return type and example
+title: account.updateDeviceLocked
+description: account.updateDeviceLocked parameters, return type and example
 ---
-## Method: account\_updateDeviceLocked  
+## Method: account.updateDeviceLocked  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: messages_sendMedia
-description: messages_sendMedia parameters, return type and example
+title: messages.sendMedia
+description: messages.sendMedia parameters, return type and example
 ---
-## Method: messages\_sendMedia  
+## Method: messages.sendMedia  
 [Back to methods index](index.md)
 
 

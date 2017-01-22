@@ -1,8 +1,8 @@
 ---
-title: channels_kickFromChannel
-description: channels_kickFromChannel parameters, return type and example
+title: channels.kickFromChannel
+description: channels.kickFromChannel parameters, return type and example
 ---
-## Method: channels\_kickFromChannel  
+## Method: channels.kickFromChannel  
 [Back to methods index](index.md)
 
 

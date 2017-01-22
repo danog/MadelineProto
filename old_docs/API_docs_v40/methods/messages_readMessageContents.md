@@ -1,8 +1,8 @@
 ---
-title: messages_readMessageContents
-description: messages_readMessageContents parameters, return type and example
+title: messages.readMessageContents
+description: messages.readMessageContents parameters, return type and example
 ---
-## Method: messages\_readMessageContents  
+## Method: messages.readMessageContents  
 [Back to methods index](index.md)
 
 

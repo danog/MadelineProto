@@ -1,8 +1,8 @@
 ---
-title: updates_getChannelDifference
-description: updates_getChannelDifference parameters, return type and example
+title: updates.getChannelDifference
+description: updates.getChannelDifference parameters, return type and example
 ---
-## Method: updates\_getChannelDifference  
+## Method: updates.getChannelDifference  
 [Back to methods index](index.md)
 
 

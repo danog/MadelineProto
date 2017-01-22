@@ -1,8 +1,8 @@
 ---
-title: messages_setInlineGameScore
-description: messages_setInlineGameScore parameters, return type and example
+title: messages.setInlineGameScore
+description: messages.setInlineGameScore parameters, return type and example
 ---
-## Method: messages\_setInlineGameScore  
+## Method: messages.setInlineGameScore  
 [Back to methods index](index.md)
 
 

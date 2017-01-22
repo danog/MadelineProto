@@ -1,8 +1,8 @@
 ---
-title: channels_getParticipant
-description: channels_getParticipant parameters, return type and example
+title: channels.getParticipant
+description: channels.getParticipant parameters, return type and example
 ---
-## Method: channels\_getParticipant  
+## Method: channels.getParticipant  
 [Back to methods index](index.md)
 
 

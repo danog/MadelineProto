@@ -1,8 +1,8 @@
 ---
-title: geochats_search
-description: geochats_search parameters, return type and example
+title: geochats.search
+description: geochats.search parameters, return type and example
 ---
-## Method: geochats\_search  
+## Method: geochats.search  
 [Back to methods index](index.md)
 
 

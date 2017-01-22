@@ -1,8 +1,8 @@
 ---
-title: account_updateUsername
-description: account_updateUsername parameters, return type and example
+title: account.updateUsername
+description: account.updateUsername parameters, return type and example
 ---
-## Method: account\_updateUsername  
+## Method: account.updateUsername  
 [Back to methods index](index.md)
 
 

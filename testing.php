@@ -12,24 +12,29 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require_once 'vendor/autoload.php';
-$settings = [];
 if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
 
+echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
-if (file_exists('number.php') && $MadelineProto === false) {
-    include_once 'number.php';
+if (file_exists('.env')) {
+    $dotenv = new Dotenv\Dotenv(__DIR__);
+    $dotenv->load();
+}
+$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
+
+if ($MadelineProto === false) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
         [
-            'phone_number'     => $number,
+            'phone_number'     => getenv('MTPROTO_NUMBER'),
         ]
     );
     \danog\MadelineProto\Logger::log($checkedPhone);
-    $sentCode = $MadelineProto->phone_login($number);
+    $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
     $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
@@ -38,12 +43,10 @@ if (file_exists('number.php') && $MadelineProto === false) {
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
-echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
 $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
-$mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
 $media = [];
@@ -80,7 +83,7 @@ $inputFile = $MadelineProto->upload('60', 'magic'); // This gets an inputFile ob
 var_dump(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
-foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
+foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
     foreach ($media as $type => $inputMedia) {
@@ -95,17 +98,16 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
 
-if (file_exists('token.php')) {
-    include_once 'token.php';
+if ($bot_token = getenv('BOT_TOKEN')) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login($token);
+    $authorization = $MadelineProto->bot_login($bot_token);
     \danog\MadelineProto\Logger::log($authorization);
 }
 $message = 'yay';
-$mention = $MadelineProto->get_info('@danogentili'); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
-foreach (['@pwrtelegramgroup', '@pwrtelegramgroupita'] as $peer) {
+foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage);
 }

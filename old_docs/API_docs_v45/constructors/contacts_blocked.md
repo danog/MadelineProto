@@ -1,8 +1,8 @@
 ---
-title: contacts_blocked
+title: contacts.blocked
 description: contacts_blocked attributes, type and example
 ---
-## Constructor: contacts\_blocked  
+## Constructor: contacts.blocked  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: contacts_blocked attributes, type and example
 ### Example:
 
 ```
-$contacts_blocked = ['_' => 'contacts_blocked', 'blocked' => [Vector t], 'users' => [Vector t], ];
+$contacts_blocked = ['_' => 'contacts.blocked', 'blocked' => [Vector t], 'users' => [Vector t], ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: messages_editChatTitle
-description: messages_editChatTitle parameters, return type and example
+title: messages.editChatTitle
+description: messages.editChatTitle parameters, return type and example
 ---
-## Method: messages\_editChatTitle  
+## Method: messages.editChatTitle  
 [Back to methods index](index.md)
 
 

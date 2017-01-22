@@ -1,8 +1,8 @@
 ---
-title: messages_affectedHistory
+title: messages.affectedHistory
 description: messages_affectedHistory attributes, type and example
 ---
-## Constructor: messages\_affectedHistory  
+## Constructor: messages.affectedHistory  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: messages_affectedHistory attributes, type and example
 ### Example:
 
 ```
-$messages_affectedHistory = ['_' => 'messages_affectedHistory', 'pts' => int, 'pts_count' => int, 'offset' => int, ];
+$messages_affectedHistory = ['_' => 'messages.affectedHistory', 'pts' => int, 'pts_count' => int, 'offset' => int, ];
 ```  
 

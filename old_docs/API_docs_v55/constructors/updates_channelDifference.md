@@ -1,8 +1,8 @@
 ---
-title: updates_channelDifference
+title: updates.channelDifference
 description: updates_channelDifference attributes, type and example
 ---
-## Constructor: updates\_channelDifference  
+## Constructor: updates.channelDifference  
 [Back to constructors index](index.md)
 
 
@@ -27,6 +27,6 @@ description: updates_channelDifference attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifference = ['_' => 'updates_channelDifference', 'final' => true, 'pts' => int, 'timeout' => int, 'new_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$updates_channelDifference = ['_' => 'updates.channelDifference', 'final' => true, 'pts' => int, 'timeout' => int, 'new_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

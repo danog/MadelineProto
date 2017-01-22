@@ -132,10 +132,10 @@ description: '.$this->settings['description'].'
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
             }
             $header = '---
-title: '.$method.'
-description: '.$method.' parameters, return type and example
+title: '.$rmethod.'
+description: '.$rmethod.' parameters, return type and example
 ---
-## Method: '.str_replace('_', '\_', $method).'  
+## Method: '.str_replace('_', '\_', $rmethod).'  
 [Back to methods index](index.md)
 
 
@@ -205,14 +205,14 @@ description: List of methods
         $constructors = [];
         \danog\MadelineProto\Logger::log('Generating constructors documentation...');
 
-        foreach ($this->constructors->predicate as $key => $constructor) {
+        foreach ($this->constructors->predicate as $key => $rconstructor) {
             if (preg_match('/%/', $type)) {
                 $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
             }
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->constructors->type[$key]);
             $real_type = preg_replace('/.*_of_/', '', $type);
 
-            $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $constructor);
+            $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
             $real_constructor = preg_replace('/.*_of_/', '', $constructor);
 
             $params = '';
@@ -291,13 +291,13 @@ description: List of methods
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
             }
-            $params = "['_' => '".$constructor."', ".$params.']';
+            $params = "['_' => '".$rconstructor."', ".$params.']';
 
             $header = '---
-title: '.$constructor.'
+title: '.$rconstructor.'
 description: '.$constructor.' attributes, type and example
 ---
-## Constructor: '.str_replace('_', '\_', $constructor).'  
+## Constructor: '.str_replace('_', '\_', $rconstructor).'  
 [Back to constructors index](index.md)
 
 

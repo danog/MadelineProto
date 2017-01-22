@@ -1,8 +1,8 @@
 ---
-title: channels_updatePinnedMessage
-description: channels_updatePinnedMessage parameters, return type and example
+title: channels.updatePinnedMessage
+description: channels.updatePinnedMessage parameters, return type and example
 ---
-## Method: channels\_updatePinnedMessage  
+## Method: channels.updatePinnedMessage  
 [Back to methods index](index.md)
 
 

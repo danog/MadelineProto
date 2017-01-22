@@ -1,8 +1,8 @@
 ---
-title: account_checkUsername
-description: account_checkUsername parameters, return type and example
+title: account.checkUsername
+description: account.checkUsername parameters, return type and example
 ---
-## Method: account\_checkUsername  
+## Method: account.checkUsername  
 [Back to methods index](index.md)
 
 

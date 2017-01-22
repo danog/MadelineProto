@@ -47,6 +47,8 @@ class API extends APIFactory
 
     public function __sleep()
     {
+        //$this->API->reset_session(false);
+
         return ['API'];
     }
 

@@ -1,8 +1,8 @@
 ---
-title: auth_sentCodeTypeFlashCall
+title: auth.sentCodeTypeFlashCall
 description: auth_sentCodeTypeFlashCall attributes, type and example
 ---
-## Constructor: auth\_sentCodeTypeFlashCall  
+## Constructor: auth.sentCodeTypeFlashCall  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: auth_sentCodeTypeFlashCall attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeFlashCall = ['_' => 'auth_sentCodeTypeFlashCall', 'pattern' => string, ];
+$auth_sentCodeTypeFlashCall = ['_' => 'auth.sentCodeTypeFlashCall', 'pattern' => string, ];
 ```  
 

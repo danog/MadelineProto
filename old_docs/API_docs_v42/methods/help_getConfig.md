@@ -1,8 +1,8 @@
 ---
-title: help_getConfig
-description: help_getConfig parameters, return type and example
+title: help.getConfig
+description: help.getConfig parameters, return type and example
 ---
-## Method: help\_getConfig  
+## Method: help.getConfig  
 [Back to methods index](index.md)
 
 

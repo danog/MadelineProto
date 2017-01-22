@@ -1,8 +1,8 @@
 ---
-title: account_passwordSettings
+title: account.passwordSettings
 description: account_passwordSettings attributes, type and example
 ---
-## Constructor: account\_passwordSettings  
+## Constructor: account.passwordSettings  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: account_passwordSettings attributes, type and example
 ### Example:
 
 ```
-$account_passwordSettings = ['_' => 'account_passwordSettings', 'email' => string, ];
+$account_passwordSettings = ['_' => 'account.passwordSettings', 'email' => string, ];
 ```  
 

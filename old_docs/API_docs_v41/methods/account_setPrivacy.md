@@ -1,8 +1,8 @@
 ---
-title: account_setPrivacy
-description: account_setPrivacy parameters, return type and example
+title: account.setPrivacy
+description: account.setPrivacy parameters, return type and example
 ---
-## Method: account\_setPrivacy  
+## Method: account.setPrivacy  
 [Back to methods index](index.md)
 
 

@@ -173,6 +173,7 @@ trait TL
 
         }
         $auto = false;
+
         if (!is_array($object) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object)[$type['type']];
         }

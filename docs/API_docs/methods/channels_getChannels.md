@@ -1,8 +1,8 @@
 ---
-title: channels_getChannels
-description: channels_getChannels parameters, return type and example
+title: channels.getChannels
+description: channels.getChannels parameters, return type and example
 ---
-## Method: channels\_getChannels  
+## Method: channels.getChannels  
 [Back to methods index](index.md)
 
 

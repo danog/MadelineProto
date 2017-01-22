@@ -4,6 +4,14 @@ _site
 .idea/
 *.iml
 
+# Eclipse
+.buildpath
+.project
+.settings
+
+# VI
+*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -64,7 +72,6 @@ target/
 *.swp
 vendor
 *bak
-number.php
 token.php
 *~uploading*
 session.mad
@@ -76,3 +83,6 @@ web_API.log
 db_connect.php
 sessions
 docs_md
+
+# .evn
+.env

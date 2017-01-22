@@ -1,8 +1,8 @@
 ---
-title: contacts_deleteContact
-description: contacts_deleteContact parameters, return type and example
+title: contacts.deleteContact
+description: contacts.deleteContact parameters, return type and example
 ---
-## Method: contacts\_deleteContact  
+## Method: contacts.deleteContact  
 [Back to methods index](index.md)
 
 

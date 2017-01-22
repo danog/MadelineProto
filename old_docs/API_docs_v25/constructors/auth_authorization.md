@@ -1,8 +1,8 @@
 ---
-title: auth_authorization
+title: auth.authorization
 description: auth_authorization attributes, type and example
 ---
-## Constructor: auth\_authorization  
+## Constructor: auth.authorization  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: auth_authorization attributes, type and example
 ### Example:
 
 ```
-$auth_authorization = ['_' => 'auth_authorization', 'expires' => int, 'user' => User, ];
+$auth_authorization = ['_' => 'auth.authorization', 'expires' => int, 'user' => User, ];
 ```  
 

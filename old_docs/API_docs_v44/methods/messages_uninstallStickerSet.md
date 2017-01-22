@@ -1,8 +1,8 @@
 ---
-title: messages_uninstallStickerSet
-description: messages_uninstallStickerSet parameters, return type and example
+title: messages.uninstallStickerSet
+description: messages.uninstallStickerSet parameters, return type and example
 ---
-## Method: messages\_uninstallStickerSet  
+## Method: messages.uninstallStickerSet  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: geochats_editChatPhoto
-description: geochats_editChatPhoto parameters, return type and example
+title: geochats.editChatPhoto
+description: geochats.editChatPhoto parameters, return type and example
 ---
-## Method: geochats\_editChatPhoto  
+## Method: geochats.editChatPhoto  
 [Back to methods index](index.md)
 
 

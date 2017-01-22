@@ -1,8 +1,8 @@
 ---
-title: messages_deactivateChat
-description: messages_deactivateChat parameters, return type and example
+title: messages.deactivateChat
+description: messages.deactivateChat parameters, return type and example
 ---
-## Method: messages\_deactivateChat  
+## Method: messages.deactivateChat  
 [Back to methods index](index.md)
 
 

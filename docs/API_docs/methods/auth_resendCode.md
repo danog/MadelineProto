@@ -1,8 +1,8 @@
 ---
-title: auth_resendCode
-description: auth_resendCode parameters, return type and example
+title: auth.resendCode
+description: auth.resendCode parameters, return type and example
 ---
-## Method: auth\_resendCode  
+## Method: auth.resendCode  
 [Back to methods index](index.md)
 
 

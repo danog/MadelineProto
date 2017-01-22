@@ -1,8 +1,8 @@
 ---
-title: messages_getAttachedStickers
-description: messages_getAttachedStickers parameters, return type and example
+title: messages.getAttachedStickers
+description: messages.getAttachedStickers parameters, return type and example
 ---
-## Method: messages\_getAttachedStickers  
+## Method: messages.getAttachedStickers  
 [Back to methods index](index.md)
 
 

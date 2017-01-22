@@ -1,8 +1,8 @@
 ---
-title: messages_dialogs
+title: messages.dialogs
 description: messages_dialogs attributes, type and example
 ---
-## Constructor: messages\_dialogs  
+## Constructor: messages.dialogs  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: messages_dialogs attributes, type and example
 ### Example:
 
 ```
-$messages_dialogs = ['_' => 'messages_dialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_dialogs = ['_' => 'messages.dialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

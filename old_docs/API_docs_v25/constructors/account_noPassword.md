@@ -1,8 +1,8 @@
 ---
-title: account_noPassword
+title: account.noPassword
 description: account_noPassword attributes, type and example
 ---
-## Constructor: account\_noPassword  
+## Constructor: account.noPassword  
 [Back to constructors index](index.md)
 
 
@@ -21,6 +21,6 @@ description: account_noPassword attributes, type and example
 ### Example:
 
 ```
-$account_noPassword = ['_' => 'account_noPassword', 'new_salt' => bytes, ];
+$account_noPassword = ['_' => 'account.noPassword', 'new_salt' => bytes, ];
 ```  
 

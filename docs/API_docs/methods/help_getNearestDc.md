@@ -1,8 +1,8 @@
 ---
-title: help_getNearestDc
-description: help_getNearestDc parameters, return type and example
+title: help.getNearestDc
+description: help.getNearestDc parameters, return type and example
 ---
-## Method: help\_getNearestDc  
+## Method: help.getNearestDc  
 [Back to methods index](index.md)
 
 

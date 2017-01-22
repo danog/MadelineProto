@@ -1,8 +1,8 @@
 ---
-title: geochats_messagesSlice
+title: geochats.messagesSlice
 description: geochats_messagesSlice attributes, type and example
 ---
-## Constructor: geochats\_messagesSlice  
+## Constructor: geochats.messagesSlice  
 [Back to constructors index](index.md)
 
 
@@ -24,6 +24,6 @@ description: geochats_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$geochats_messagesSlice = ['_' => 'geochats_messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$geochats_messagesSlice = ['_' => 'geochats.messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
 ```  
 

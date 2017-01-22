@@ -1,8 +1,8 @@
 ---
-title: contacts_foreignLinkUnknown
+title: contacts.foreignLinkUnknown
 description: contacts_foreignLinkUnknown attributes, type and example
 ---
-## Constructor: contacts\_foreignLinkUnknown  
+## Constructor: contacts.foreignLinkUnknown  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: contacts_foreignLinkUnknown attributes, type and example
 ### Example:
 
 ```
-$contacts_foreignLinkUnknown = ['_' => 'contacts_foreignLinkUnknown', ];
+$contacts_foreignLinkUnknown = ['_' => 'contacts.foreignLinkUnknown', ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: updates_differenceSlice
+title: updates.differenceSlice
 description: updates_differenceSlice attributes, type and example
 ---
-## Constructor: updates\_differenceSlice  
+## Constructor: updates.differenceSlice  
 [Back to constructors index](index.md)
 
 
@@ -26,6 +26,6 @@ description: updates_differenceSlice attributes, type and example
 ### Example:
 
 ```
-$updates_differenceSlice = ['_' => 'updates_differenceSlice', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'intermediate_state' => updates.State, ];
+$updates_differenceSlice = ['_' => 'updates.differenceSlice', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'intermediate_state' => updates.State, ];
 ```  
 

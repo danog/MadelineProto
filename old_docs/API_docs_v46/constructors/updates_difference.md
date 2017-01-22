@@ -1,8 +1,8 @@
 ---
-title: updates_difference
+title: updates.difference
 description: updates_difference attributes, type and example
 ---
-## Constructor: updates\_difference  
+## Constructor: updates.difference  
 [Back to constructors index](index.md)
 
 
@@ -26,6 +26,6 @@ description: updates_difference attributes, type and example
 ### Example:
 
 ```
-$updates_difference = ['_' => 'updates_difference', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$updates_difference = ['_' => 'updates.difference', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
 ```  
 

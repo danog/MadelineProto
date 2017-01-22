@@ -4,12 +4,12 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0ba93fe00498d4b5cdc319eed8d4578c",
-    "content-hash": "bca2ca34b7c419b998fbafd3ad3bc50a",
+    "hash": "e8bbb62792931576147b60ac9015be7a",
+    "content-hash": "88f022c06bcba63b61978fccad258d1a",
     "packages": [
         {
             "name": "danog/phpstruct",
-            "version": "dev-master",
+            "version": "1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danog/PHPStruct.git",
@@ -515,7 +515,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "danog/phpstruct": 20,
         "phpseclib/phpseclib": 20
     },
     "prefer-stable": false,

@@ -1,8 +1,8 @@
 ---
-title: account_getAuthorizations
-description: account_getAuthorizations parameters, return type and example
+title: account.getAuthorizations
+description: account.getAuthorizations parameters, return type and example
 ---
-## Method: account\_getAuthorizations  
+## Method: account.getAuthorizations  
 [Back to methods index](index.md)
 
 

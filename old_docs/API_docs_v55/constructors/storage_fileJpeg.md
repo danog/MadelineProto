@@ -1,8 +1,8 @@
 ---
-title: storage_fileJpeg
+title: storage.fileJpeg
 description: storage_fileJpeg attributes, type and example
 ---
-## Constructor: storage\_fileJpeg  
+## Constructor: storage.fileJpeg  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_fileJpeg attributes, type and example
 ### Example:
 
 ```
-$storage_fileJpeg = ['_' => 'storage_fileJpeg', ];
+$storage_fileJpeg = ['_' => 'storage.fileJpeg', ];
 ```  
 

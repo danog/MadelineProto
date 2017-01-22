@@ -1,8 +1,8 @@
 ---
-title: contacts_resolveUsername
-description: contacts_resolveUsername parameters, return type and example
+title: contacts.resolveUsername
+description: contacts.resolveUsername parameters, return type and example
 ---
-## Method: contacts\_resolveUsername  
+## Method: contacts.resolveUsername  
 [Back to methods index](index.md)
 
 

@@ -1,8 +1,8 @@
 ---
-title: storage_filePng
+title: storage.filePng
 description: storage_filePng attributes, type and example
 ---
-## Constructor: storage\_filePng  
+## Constructor: storage.filePng  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_filePng attributes, type and example
 ### Example:
 
 ```
-$storage_filePng = ['_' => 'storage_filePng', ];
+$storage_filePng = ['_' => 'storage.filePng', ];
 ```  
 

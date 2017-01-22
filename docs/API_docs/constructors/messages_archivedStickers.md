@@ -1,8 +1,8 @@
 ---
-title: messages_archivedStickers
+title: messages.archivedStickers
 description: messages_archivedStickers attributes, type and example
 ---
-## Constructor: messages\_archivedStickers  
+## Constructor: messages.archivedStickers  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: messages_archivedStickers attributes, type and example
 ### Example:
 
 ```
-$messages_archivedStickers = ['_' => 'messages_archivedStickers', 'count' => int, 'sets' => [Vector t], ];
+$messages_archivedStickers = ['_' => 'messages.archivedStickers', 'count' => int, 'sets' => [Vector t], ];
 ```  
 

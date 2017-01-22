@@ -1,8 +1,8 @@
 ---
-title: auth_exportedAuthorization
+title: auth.exportedAuthorization
 description: auth_exportedAuthorization attributes, type and example
 ---
-## Constructor: auth\_exportedAuthorization  
+## Constructor: auth.exportedAuthorization  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: auth_exportedAuthorization attributes, type and example
 ### Example:
 
 ```
-$auth_exportedAuthorization = ['_' => 'auth_exportedAuthorization', 'id' => int, 'bytes' => bytes, ];
+$auth_exportedAuthorization = ['_' => 'auth.exportedAuthorization', 'id' => int, 'bytes' => bytes, ];
 ```  
 

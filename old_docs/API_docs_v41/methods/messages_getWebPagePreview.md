@@ -1,8 +1,8 @@
 ---
-title: messages_getWebPagePreview
-description: messages_getWebPagePreview parameters, return type and example
+title: messages.getWebPagePreview
+description: messages.getWebPagePreview parameters, return type and example
 ---
-## Method: messages\_getWebPagePreview  
+## Method: messages.getWebPagePreview  
 [Back to methods index](index.md)
 
 

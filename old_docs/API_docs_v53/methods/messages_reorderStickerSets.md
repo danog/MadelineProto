@@ -1,8 +1,8 @@
 ---
-title: messages_reorderStickerSets
-description: messages_reorderStickerSets parameters, return type and example
+title: messages.reorderStickerSets
+description: messages.reorderStickerSets parameters, return type and example
 ---
-## Method: messages\_reorderStickerSets  
+## Method: messages.reorderStickerSets  
 [Back to methods index](index.md)
 
 

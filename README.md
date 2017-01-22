@@ -24,9 +24,18 @@ The MadelineProto API documentations (old layers) can be found [here](https://gi
 
 ## Usage
 
+### Installation
+
+```
+git clone https://github.com/danog/MadelineProto
+cd MadelineProto
+```
+
+Now copy .env.example to .env, edit the its values, read the docs and take a look at testing.php, bot.php.
+
 ### Dependencies
 
-This project depends on [PHPStruct](https://github.com/danog/PHPStruct), [phpseclib](https://github.com/phpseclib/phpseclib), https://packagist.org/packages/paragonie/constant_time_encoding and https://packagist.org/packages/paragonie/random_compat
+This project depends on [PHPStruct](https://github.com/danog/PHPStruct), [phpseclib](https://github.com/phpseclib/phpseclib)
 
 To install dependencies install composer and run:
 ```

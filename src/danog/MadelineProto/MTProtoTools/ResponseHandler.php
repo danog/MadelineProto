@@ -307,7 +307,7 @@ trait ResponseHandler
                 if (!$this->peer_isset($from_id) ||
                     !$this->peer_isset($to_id) ||
                     (isset($updates['via_bot_id']) && !$this->peer_isset($updates['via_bot_id'])) ||
-                    (isset($updates['entities']) && !$this->entities_peer_isset($updates['entites'])) ||
+                    (isset($updates['entities']) && !$this->entities_peer_isset($updates['entities'])) ||
                     (isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from']))) {
                     \danog\MadelineProto\Logger::log('getDifference: good - getting user for updateShortMessage');
 

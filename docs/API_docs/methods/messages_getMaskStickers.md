@@ -1,8 +1,8 @@
 ---
-title: messages_getMaskStickers
-description: messages_getMaskStickers parameters, return type and example
+title: messages.getMaskStickers
+description: messages.getMaskStickers parameters, return type and example
 ---
-## Method: messages\_getMaskStickers  
+## Method: messages.getMaskStickers  
 [Back to methods index](index.md)
 
 

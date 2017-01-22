@@ -1,8 +1,8 @@
 ---
-title: photos_photosSlice
+title: photos.photosSlice
 description: photos_photosSlice attributes, type and example
 ---
-## Constructor: photos\_photosSlice  
+## Constructor: photos.photosSlice  
 [Back to constructors index](index.md)
 
 
@@ -23,6 +23,6 @@ description: photos_photosSlice attributes, type and example
 ### Example:
 
 ```
-$photos_photosSlice = ['_' => 'photos_photosSlice', 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];
+$photos_photosSlice = ['_' => 'photos.photosSlice', 'count' => int, 'photos' => [Vector t], 'users' => [Vector t], ];
 ```  
 

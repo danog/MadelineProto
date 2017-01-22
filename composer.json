@@ -7,8 +7,8 @@
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "require": {
         "php": ">=5.6.0",
-        "danog/phpstruct": "dev-master|^2.0.4",
-        "phpseclib/phpseclib": "dev-master",
+        "danog/phpstruct": "^1.2",
+        "phpseclib/phpseclib": "dev-master|^2.0.4",
         "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {

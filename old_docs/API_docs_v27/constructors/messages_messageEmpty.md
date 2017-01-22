@@ -1,8 +1,8 @@
 ---
-title: messages_messageEmpty
+title: messages.messageEmpty
 description: messages_messageEmpty attributes, type and example
 ---
-## Constructor: messages\_messageEmpty  
+## Constructor: messages.messageEmpty  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: messages_messageEmpty attributes, type and example
 ### Example:
 
 ```
-$messages_messageEmpty = ['_' => 'messages_messageEmpty', ];
+$messages_messageEmpty = ['_' => 'messages.messageEmpty', ];
 ```  
 

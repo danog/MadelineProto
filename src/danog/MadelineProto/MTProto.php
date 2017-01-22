@@ -82,17 +82,17 @@ class MTProto extends PrimeModule
         $this->ipv6 = strlen($google) > 0;
 
         // Detect device model
-        $device_model = 'Web server';
         try {
             $device_model = php_uname('s');
         } catch (Exception $e) {
+            $device_model = 'Web server';
         }
 
         // Detect system version
-        $system_version = phpversion();
         try {
             $system_version = php_uname('r');
         } catch (Exception $e) {
+            $system_version = phpversion();
         }
 
         // Set default settings
@@ -158,7 +158,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
                     'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 5, // timeout for sockets
+                    'timeout'      => 3, // timeout for sockets
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -203,16 +203,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
-        foreach ($default_settings as $key => $param) {
-            if (!isset($settings[$key])) {
-                $settings[$key] = $param;
-            }
-            foreach ($param as $subkey => $subparam) {
-                if (!isset($settings[$key][$subkey])) {
-                    $settings[$key][$subkey] = $subparam;
-                }
-            }
-        }
+        $settings = array_replace_recursive($default_settings, $settings);
         if (isset($settings['connection_settings']['all'])) {
             foreach ($this->range(1, 6) as $n) {
                 if (!isset($settings['connection_settings'][$n])) {
@@ -232,12 +223,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         //}
     }
 
-    public function reset_session()
+    public function reset_session($de = true)
     {
         foreach ($this->datacenter->sockets as $id => &$socket) {
-            \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
-            $socket->session_id = \danog\MadelineProto\Tools::random(8);
-            $socket->seq_no = 0;
+            if ($de) {
+                \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
+                $socket->session_id = \danog\MadelineProto\Tools::random(8);
+                $socket->seq_no = 0;
+            }
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];

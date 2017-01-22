@@ -1,8 +1,8 @@
 ---
-title: contacts_topPeersNotModified
+title: contacts.topPeersNotModified
 description: contacts_topPeersNotModified attributes, type and example
 ---
-## Constructor: contacts\_topPeersNotModified  
+## Constructor: contacts.topPeersNotModified  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: contacts_topPeersNotModified attributes, type and example
 ### Example:
 
 ```
-$contacts_topPeersNotModified = ['_' => 'contacts_topPeersNotModified', ];
+$contacts_topPeersNotModified = ['_' => 'contacts.topPeersNotModified', ];
 ```  
 

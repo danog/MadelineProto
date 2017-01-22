@@ -1,8 +1,8 @@
 ---
-title: photos_uploadProfilePhoto
-description: photos_uploadProfilePhoto parameters, return type and example
+title: photos.uploadProfilePhoto
+description: photos.uploadProfilePhoto parameters, return type and example
 ---
-## Method: photos\_uploadProfilePhoto  
+## Method: photos.uploadProfilePhoto  
 [Back to methods index](index.md)
 
 

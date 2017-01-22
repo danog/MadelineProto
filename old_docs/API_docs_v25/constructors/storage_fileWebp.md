@@ -1,8 +1,8 @@
 ---
-title: storage_fileWebp
+title: storage.fileWebp
 description: storage_fileWebp attributes, type and example
 ---
-## Constructor: storage\_fileWebp  
+## Constructor: storage.fileWebp  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: storage_fileWebp attributes, type and example
 ### Example:
 
 ```
-$storage_fileWebp = ['_' => 'storage_fileWebp', ];
+$storage_fileWebp = ['_' => 'storage.fileWebp', ];
 ```  
 

@@ -1,8 +1,8 @@
 ---
-title: contacts_suggested
+title: contacts.suggested
 description: contacts_suggested attributes, type and example
 ---
-## Constructor: contacts\_suggested  
+## Constructor: contacts.suggested  
 [Back to constructors index](index.md)
 
 
@@ -22,6 +22,6 @@ description: contacts_suggested attributes, type and example
 ### Example:
 
 ```
-$contacts_suggested = ['_' => 'contacts_suggested', 'results' => [Vector t], 'users' => [Vector t], ];
+$contacts_suggested = ['_' => 'contacts.suggested', 'results' => [Vector t], 'users' => [Vector t], ];
 ```  
 

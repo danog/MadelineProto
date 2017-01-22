@@ -1,8 +1,8 @@
 ---
-title: auth_exportAuthorization
-description: auth_exportAuthorization parameters, return type and example
+title: auth.exportAuthorization
+description: auth.exportAuthorization parameters, return type and example
 ---
-## Method: auth\_exportAuthorization  
+## Method: auth.exportAuthorization  
 [Back to methods index](index.md)
 
 

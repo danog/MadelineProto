@@ -1,8 +1,8 @@
 ---
-title: messages_sendInlineBotResult
-description: messages_sendInlineBotResult parameters, return type and example
+title: messages.sendInlineBotResult
+description: messages.sendInlineBotResult parameters, return type and example
 ---
-## Method: messages\_sendInlineBotResult  
+## Method: messages.sendInlineBotResult  
 [Back to methods index](index.md)
 
 

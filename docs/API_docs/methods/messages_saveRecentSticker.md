@@ -1,8 +1,8 @@
 ---
-title: messages_saveRecentSticker
-description: messages_saveRecentSticker parameters, return type and example
+title: messages.saveRecentSticker
+description: messages.saveRecentSticker parameters, return type and example
 ---
-## Method: messages\_saveRecentSticker  
+## Method: messages.saveRecentSticker  
 [Back to methods index](index.md)
 
 

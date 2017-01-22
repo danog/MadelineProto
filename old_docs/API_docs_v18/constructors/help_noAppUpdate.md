@@ -1,8 +1,8 @@
 ---
-title: help_noAppUpdate
+title: help.noAppUpdate
 description: help_noAppUpdate attributes, type and example
 ---
-## Constructor: help\_noAppUpdate  
+## Constructor: help.noAppUpdate  
 [Back to constructors index](index.md)
 
 
@@ -16,6 +16,6 @@ description: help_noAppUpdate attributes, type and example
 ### Example:
 
 ```
-$help_noAppUpdate = ['_' => 'help_noAppUpdate', ];
+$help_noAppUpdate = ['_' => 'help.noAppUpdate', ];
 ```  
 
