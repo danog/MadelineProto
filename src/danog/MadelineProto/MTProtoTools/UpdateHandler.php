@@ -55,7 +55,9 @@ trait UpdateHandler
                 \danog\MadelineProto\Logger::log($e->getMessage());
             }
         }
-        if (isset($this->settings['pwr']['update_handler'])) $this->settings['pwr']['update_handler']($update);
+        if (isset($this->settings['pwr']['update_handler'])) {
+            $this->settings['pwr']['update_handler']($update);
+        }
     }
 
     public function get_updates_update_handler($update)

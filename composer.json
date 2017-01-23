@@ -6,10 +6,13 @@
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "require": {
+        "php": ">=5.6.0",
         "danog/phpstruct": "^1.2",
         "phpseclib/phpseclib": "dev-master|^2.0.4",
-        "php": ">=5.6.0",
         "vlucas/phpdotenv": "^2.4"
+    },
+    "require-dev": {
+        "phpdocumentor/reflection-docblock": "^3.1"
     },
     "authors": [
         {
