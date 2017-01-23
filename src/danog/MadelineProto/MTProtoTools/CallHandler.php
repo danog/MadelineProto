@@ -135,7 +135,7 @@ trait CallHandler
                     $this->datacenter->outgoing_messages[$int_message_id]['args'] = [];
                 }
             }
-            if ($server_answer == null) {
+            if ($server_answer === null) {
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.'.');
             }
             \danog\MadelineProto\Logger::log('Got response for method '.$method.' @ try '.$count.' (response try '.$res_count.')');
