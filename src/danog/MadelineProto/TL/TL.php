@@ -153,11 +153,7 @@ trait TL
 
                 return $concat;
             case 'Bool':
-                if (!is_bool($object)) {
-                    throw new Exception("given value isn't a boolean");
-                }
-
-                return $this->serialize_bool($object);
+                return $this->serialize_bool((bool)$object);
             case 'true':
                 return;
             case '!X':
