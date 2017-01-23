@@ -153,7 +153,7 @@ trait TL
 
                 return $concat;
             case 'Bool':
-                return $this->serialize_bool((bool)$object);
+                return $this->serialize_bool((bool) $object);
             case 'true':
                 return;
             case '!X':
