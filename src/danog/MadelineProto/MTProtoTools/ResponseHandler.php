@@ -164,7 +164,7 @@ trait ResponseHandler
                         if (($response['info'][$key] & 4) == 1) {
                             $this->ack_outgoing_message_id($msg_id);
                         }
-                        foreach ($msgs_info_flags as $flag => $description) {
+                        foreach ($this->msgs_info_flags as $flag => $description) {
                             if (($response['info'][$key] & $flag) == 1) {
                                 $status .= $description;
                             }

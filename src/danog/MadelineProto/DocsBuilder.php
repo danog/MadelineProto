@@ -372,7 +372,6 @@ description: List of constructors
 
         \danog\MadelineProto\Logger::log('Generating types documentation...');
 
-        $old_namespace = '';
         foreach ($types as $type => $keys) {
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
