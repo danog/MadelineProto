@@ -193,6 +193,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
                 'response'      => 5, // How many times should I try to get a response of a query before throwing an exception
             ],
+            'flood_timeout'     => [
+                'wait_if_lt'    => 20, // Sleeps if flood block time is lower than this
+            ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
                 'incoming' => 1000,
                 'outgoing' => 1000,
