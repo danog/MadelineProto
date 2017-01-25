@@ -10,6 +10,7 @@ description: updates.getChannelDifference parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
+|force|[Bool](../types/Bool.md) | Optional|
 |channel|[InputChannel](../types/InputChannel.md) | Required|
 |filter|[ChannelMessagesFilter](../types/ChannelMessagesFilter.md) | Required|
 |pts|[int](../types/int.md) | Required|
@@ -36,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$updates_ChannelDifference = $MadelineProto->updates->getChannelDifference(['channel' => InputChannel, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
+$updates_ChannelDifference = $MadelineProto->updates->getChannelDifference(['force' => Bool, 'channel' => InputChannel, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
 ```

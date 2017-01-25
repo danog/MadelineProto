@@ -15,6 +15,7 @@ description: messages_botCallbackAnswer attributes, type and example
 |has\_url|[Bool](../types/Bool.md) | Optional|
 |message|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
+|cache\_time|[int](../types/int.md) | Required|
 
 
 
@@ -24,6 +25,6 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Example:
 
 ```
-$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, ];
+$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, 'cache_time' => int, ];
 ```  
 

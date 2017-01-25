@@ -14,6 +14,7 @@ description: webPage attributes, type and example
 |id|[long](../types/long.md) | Required|
 |url|[string](../types/string.md) | Required|
 |display\_url|[string](../types/string.md) | Required|
+|hash|[int](../types/int.md) | Required|
 |type|[string](../types/string.md) | Optional|
 |site\_name|[string](../types/string.md) | Optional|
 |title|[string](../types/string.md) | Optional|
@@ -26,6 +27,7 @@ description: webPage attributes, type and example
 |duration|[int](../types/int.md) | Optional|
 |author|[string](../types/string.md) | Optional|
 |document|[Document](../types/Document.md) | Optional|
+|cached\_page|[Page](../types/Page.md) | Optional|
 
 
 
@@ -35,6 +37,6 @@ description: webPage attributes, type and example
 ### Example:
 
 ```
-$webPage = ['_' => 'webPage', 'id' => long, 'url' => string, 'display_url' => string, 'type' => string, 'site_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'embed_url' => string, 'embed_type' => string, 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => string, 'document' => Document, ];
+$webPage = ['_' => 'webPage', 'id' => long, 'url' => string, 'display_url' => string, 'hash' => int, 'type' => string, 'site_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'embed_url' => string, 'embed_type' => string, 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => string, 'document' => Document, 'cached_page' => Page, ];
 ```  
 

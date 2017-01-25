@@ -11,7 +11,7 @@ description: updateNewChannelMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[MTMessage](../types/MTMessage.md) | Required|
+|message|[Message](../types/Message.md) | Required|
 |channel\_pts|[int](../types/int.md) | Required|
 |channel\_pts\_count|[int](../types/int.md) | Required|
 
@@ -23,6 +23,6 @@ description: updateNewChannelMessage attributes, type and example
 ### Example:
 
 ```
-$updateNewChannelMessage = ['_' => 'updateNewChannelMessage', 'message' => MTMessage, 'channel_pts' => int, 'channel_pts_count' => int, ];
+$updateNewChannelMessage = ['_' => 'updateNewChannelMessage', 'message' => Message, 'channel_pts' => int, 'channel_pts_count' => int, ];
 ```  
 

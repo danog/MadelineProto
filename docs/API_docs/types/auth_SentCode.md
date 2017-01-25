@@ -17,9 +17,9 @@ description: constructors and methods of type auth_SentCode
 
 [$MadelineProto->auth->sendCode](../methods/auth_sendCode.md)  
 
-[$MadelineProto->account->sendChangePhoneCode](../methods/account_sendChangePhoneCode.md)  
-
 [$MadelineProto->auth->resendCode](../methods/auth_resendCode.md)  
+
+[$MadelineProto->account->sendChangePhoneCode](../methods/account_sendChangePhoneCode.md)  
 
 [$MadelineProto->account->sendConfirmPhoneCode](../methods/account_sendConfirmPhoneCode.md)  
 

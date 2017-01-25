@@ -14,6 +14,7 @@ description: messages.setBotCallbackAnswer parameters, return type and example
 |query\_id|[long](../types/long.md) | Required|
 |message|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
+|cache\_time|[int](../types/int.md) | Required|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, ]);
+$Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, 'cache_time' => int, ]);
 ```

@@ -19,13 +19,13 @@ description: constructors and methods of type User
 
 [$MadelineProto->account->updateProfile](../methods/account_updateProfile.md)  
 
-[$MadelineProto->users->getUsers](../methods/users_getUsers.md)  
-
-[$MadelineProto->contacts->importCard](../methods/contacts_importCard.md)  
-
 [$MadelineProto->account->updateUsername](../methods/account_updateUsername.md)  
 
 [$MadelineProto->account->changePhone](../methods/account_changePhone.md)  
+
+[$MadelineProto->users->getUsers](../methods/users_getUsers.md)  
+
+[$MadelineProto->contacts->importCard](../methods/contacts_importCard.md)  
 
 
 

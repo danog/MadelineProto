@@ -15,6 +15,8 @@ description: constructors and methods of type updates_Difference
 
 [updates\_differenceSlice](../constructors/updates_differenceSlice.md)  
 
+[updates\_differenceTooLong](../constructors/updates_differenceTooLong.md)  
+
 
 
 ### Methods that return an object of this type (methods):

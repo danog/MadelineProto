@@ -126,6 +126,8 @@ description: List of types
 
 [InputPeerNotifySettings](InputPeerNotifySettings.md)<a name="InputPeerNotifySettings"></a>  
 
+[InputPhoneCall](InputPhoneCall.md)<a name="InputPhoneCall"></a>  
+
 [InputPhoto](InputPhoto.md)<a name="InputPhoto"></a>  
 
 [InputPrivacyKey](InputPrivacyKey.md)<a name="InputPrivacyKey"></a>  
@@ -164,6 +166,10 @@ description: List of types
 
 [Null](Null.md)<a name="Null"></a>  
 
+[Page](Page.md)<a name="Page"></a>  
+
+[PageBlock](PageBlock.md)<a name="PageBlock"></a>  
+
 [Peer](Peer.md)<a name="Peer"></a>  
 
 [PeerNotifyEvents](PeerNotifyEvents.md)<a name="PeerNotifyEvents"></a>  
@@ -171,6 +177,14 @@ description: List of types
 [PeerNotifySettings](PeerNotifySettings.md)<a name="PeerNotifySettings"></a>  
 
 [PeerSettings](PeerSettings.md)<a name="PeerSettings"></a>  
+
+[PhoneCall](PhoneCall.md)<a name="PhoneCall"></a>  
+
+[PhoneCallDiscardReason](PhoneCallDiscardReason.md)<a name="PhoneCallDiscardReason"></a>  
+
+[PhoneCallProtocol](PhoneCallProtocol.md)<a name="PhoneCallProtocol"></a>  
+
+[PhoneConnection](PhoneConnection.md)<a name="PhoneConnection"></a>  
 
 [Photo](Photo.md)<a name="Photo"></a>  
 
@@ -185,6 +199,8 @@ description: List of types
 [ReplyMarkup](ReplyMarkup.md)<a name="ReplyMarkup"></a>  
 
 [ReportReason](ReportReason.md)<a name="ReportReason"></a>  
+
+[RichText](RichText.md)<a name="RichText"></a>  
 
 [SendMessageAction](SendMessageAction.md)<a name="SendMessageAction"></a>  
 
@@ -213,8 +229,6 @@ description: List of types
 [UserProfilePhoto](UserProfilePhoto.md)<a name="UserProfilePhoto"></a>  
 
 [UserStatus](UserStatus.md)<a name="UserStatus"></a>  
-
-[Vector t](Vector t.md)<a name="Vector t"></a>  
 
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
 
@@ -321,6 +335,8 @@ description: List of types
 [messages\_StickerSetInstallResult](messages_StickerSetInstallResult.md)<a name="messages_StickerSetInstallResult"></a>  
 
 [messages\_Stickers](messages_Stickers.md)<a name="messages_Stickers"></a>  
+
+[phone\_PhoneCall](phone_PhoneCall.md)<a name="phone_PhoneCall"></a>  
 
 [photos\_Photo](photos_Photo.md)<a name="photos_Photo"></a>  
 

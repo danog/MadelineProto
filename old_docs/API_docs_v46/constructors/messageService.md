@@ -23,7 +23,7 @@ description: messageService attributes, type and example
 
 
 
-### Type: [MTMessage](../types/MTMessage.md)
+### Type: [Message](../types/Message.md)
 
 
 ### Example:

@@ -13,6 +13,8 @@ description: constructors and methods of type PrivacyKey
 
 [privacyKeyChatInvite](../constructors/privacyKeyChatInvite.md)  
 
+[privacyKeyPhoneCall](../constructors/privacyKeyPhoneCall.md)  
+
 
 
 ### Methods that return an object of this type (methods):

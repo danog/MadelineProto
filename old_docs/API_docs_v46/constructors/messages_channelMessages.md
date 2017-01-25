@@ -13,7 +13,7 @@ description: messages_channelMessages attributes, type and example
 |----------|:-------------:|---------:|
 |pts|[int](../types/int.md) | Required|
 |count|[int](../types/int.md) | Required|
-|messages|Array of [MTMessage](../types/MTMessage.md) | Required|
+|messages|Array of [Message](../types/Message.md) | Required|
 |collapsed|Array of [MessageGroup](../types/MessageGroup.md) | Optional|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|

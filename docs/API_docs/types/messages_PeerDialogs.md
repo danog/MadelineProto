@@ -17,5 +17,7 @@ description: constructors and methods of type messages_PeerDialogs
 
 [$MadelineProto->messages->getPeerDialogs](../methods/messages_getPeerDialogs.md)  
 
+[$MadelineProto->messages->getPinnedDialogs](../methods/messages_getPinnedDialogs.md)  
+
 
 

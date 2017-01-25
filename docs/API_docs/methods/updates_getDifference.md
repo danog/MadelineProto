@@ -11,6 +11,7 @@ description: updates.getDifference parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |pts|[int](../types/int.md) | Required|
+|pts\_total\_limit|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Required|
 |qts|[int](../types/int.md) | Required|
 
@@ -35,5 +36,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$updates_Difference = $MadelineProto->updates->getDifference(['pts' => int, 'date' => int, 'qts' => int, ]);
+$updates_Difference = $MadelineProto->updates->getDifference(['pts' => int, 'pts_total_limit' => int, 'date' => int, 'qts' => int, ]);
 ```

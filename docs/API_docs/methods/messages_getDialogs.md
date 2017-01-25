@@ -10,6 +10,7 @@ description: messages.getDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
+|exclude\_pinned|[Bool](../types/Bool.md) | Optional|
 |offset\_date|[int](../types/int.md) | Required|
 |offset\_id|[int](../types/int.md) | Required|
 |offset\_peer|[InputPeer](../types/InputPeer.md) | Required|
@@ -36,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Dialogs = $MadelineProto->messages->getDialogs(['offset_date' => int, 'offset_id' => int, 'offset_peer' => InputPeer, 'limit' => int, ]);
+$messages_Dialogs = $MadelineProto->messages->getDialogs(['exclude_pinned' => Bool, 'offset_date' => int, 'offset_id' => int, 'offset_peer' => InputPeer, 'limit' => int, ]);
 ```

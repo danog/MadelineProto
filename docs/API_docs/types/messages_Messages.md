@@ -25,9 +25,9 @@ description: constructors and methods of type messages_Messages
 
 [$MadelineProto->messages->search](../methods/messages_search.md)  
 
-[$MadelineProto->channels->getMessages](../methods/channels_getMessages.md)  
-
 [$MadelineProto->messages->searchGlobal](../methods/messages_searchGlobal.md)  
+
+[$MadelineProto->channels->getMessages](../methods/channels_getMessages.md)  
 
 
 

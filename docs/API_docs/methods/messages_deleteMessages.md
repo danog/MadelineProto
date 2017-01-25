@@ -10,6 +10,7 @@ description: messages.deleteMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
+|revoke|[Bool](../types/Bool.md) | Optional|
 |id|Array of [int](../types/int.md) | Required|
 
 
@@ -33,5 +34,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AffectedMessages = $MadelineProto->messages->deleteMessages(['id' => [int], ]);
+$messages_AffectedMessages = $MadelineProto->messages->deleteMessages(['revoke' => Bool, 'id' => [int], ]);
 ```

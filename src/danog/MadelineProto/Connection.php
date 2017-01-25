@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -82,8 +82,15 @@ class Connection
                 break;
             case 'http':
             case 'https':
+                $this->parsed = parse_url($ip);
+                $this->sock = fsockopen(($this->protocol === 'https' ? 'tls' : 'tcp') .'://'.$this->parsed['host'].':'.$port);
+                stream_set_timeout($this->sock, $timeout);
+                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                    throw new Exception("Connection: couldn't connect to socket.");
+                }
+                break;
             case 'udp':
-                throw new Exception("Connection: This protocol wasn't implemented yet.");
+                throw new Exception("Connection: This protocol isn't implemented yet.");
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
@@ -100,6 +107,8 @@ class Connection
                 break;
             case 'http':
             case 'https':
+                fclose($this->sock);
+                break;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
@@ -131,23 +140,26 @@ class Connection
 
     public function write($what, $length = null)
     {
-        if ($length != null) {
+        if ($length !== null) {
             $what = substr($what, 0, $length);
         }
         switch ($this->protocol) {
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
+            case 'http':
+            case 'https':
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-
-                return fwrite($this->sock, $what);
+                if (($wrote = fwrite($this->sock, $what)) !== strlen($what)) {
+                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've written ".strlen($what).', wrote '.$wrote.')!');
+                }
+                return $wrote;
                 break;
-            case 'http':
-            case 'https':
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
+                break;
             default:
                 throw new Exception('Connection: invalid protocol specified.');
                 break;
@@ -160,18 +172,17 @@ class Connection
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
+            case 'http':
+            case 'https':
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $packet = stream_get_contents($this->sock, $length);
-                if (strlen($packet) != $length) {
+                if ($packet === false || strlen($packet) != $length) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
                 return $packet;
-                break;
-            case 'http':
-            case 'https':
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:
@@ -227,6 +238,22 @@ class Connection
                 break;
             case 'http':
             case 'https':
+                $headers = [];
+                $close = false;
+                while (true) {
+                    $current_header = '';
+                    while (($curchar = $this->read(1)) !== "\n") { $current_header .= $curchar; }
+                    $current_header = rtrim($current_header);
+                    if ($current_header === '') break;
+                    if ($current_header === false) throw new Exception('No data in the socket!');
+                    if (preg_match('|^Content-Length: |i', $current_header)) $length = preg_replace('|Content-Length: |i', '', $current_header);
+                    if (preg_match('|^Connection: close|i', $current_header)) $close = true;
+                    $headers [] = $current_header;
+                }
+                $payload = $this->fopen_and_write('php://memory', 'rw+b', $this->read($length));
+                if ($headers[0] !== 'HTTP/1.1 200 OK') throw new Exception($headers[0]);
+                if ($close) $this->close_and_reopen();
+                break;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
         }
@@ -257,6 +284,9 @@ class Connection
                 break;
             case 'http':
             case 'https':
+                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host']."\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
+                break;
+
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
             default:

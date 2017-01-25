@@ -16,6 +16,7 @@ description: messages_botResults attributes, type and example
 |next\_offset|[string](../types/string.md) | Optional|
 |switch\_pm|[InlineBotSwitchPM](../types/InlineBotSwitchPM.md) | Optional|
 |results|Array of [BotInlineResult](../types/BotInlineResult.md) | Required|
+|cache\_time|[int](../types/int.md) | Required|
 
 
 
@@ -25,6 +26,6 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [Vector t], ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [Vector t], 'cache_time' => int, ];
 ```  
 

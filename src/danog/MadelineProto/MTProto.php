@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -76,11 +76,16 @@ class MTProto extends PrimeModule
         // Detect ipv6
         $google = '';
         try {
-            $google = file_get_contents('https://ipv6.google.com');
+            $ctx = stream_context_create(array('http'=>
+                array(
+                    'timeout' => 1,  //1200 Seconds is 20 Minutes
+                )
+            ));
+
+            $google = file_get_contents('https://ipv6.google.com', false, $ctx);
         } catch (Exception $e) {
         }
         $this->ipv6 = strlen($google) > 0;
-
         // Detect device model
         try {
             $device_model = php_uname('s');
@@ -155,7 +160,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'connection_settings' => [ // connection settings
                 'all' => [ // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
+                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, udp (unsupported)
                     'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                     'timeout'      => 3, // timeout for sockets
@@ -170,10 +175,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
-                'layer'         => 57, // layer version
+                'layer'         => 62, // layer version
                 'src'           => [
                     'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram' => __DIR__.'/TL_telegram_v57.json', // telegram TL scheme
+                    'telegram' => __DIR__.'/TL_telegram_v62.tl', // telegram TL scheme
                 ],
             ],
             'logger'       => [ // Logger settings
@@ -286,6 +291,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
+            if (in_array($this->datacenter->protocol, ['http', 'https'])) $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0]);
         }
     }
 

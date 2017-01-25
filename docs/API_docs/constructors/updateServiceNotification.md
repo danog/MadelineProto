@@ -11,10 +11,12 @@ description: updateServiceNotification attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
+|popup|[Bool](../types/Bool.md) | Optional|
+|inbox\_date|[int](../types/int.md) | Optional|
 |type|[string](../types/string.md) | Required|
 |message|[string](../types/string.md) | Required|
 |media|[MessageMedia](../types/MessageMedia.md) | Required|
-|popup|[Bool](../types/Bool.md) | Required|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Required|
 
 
 
@@ -24,6 +26,6 @@ description: updateServiceNotification attributes, type and example
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'popup' => true, 'inbox_date' => int, 'type' => string, 'message' => string, 'media' => MessageMedia, 'entities' => [Vector t], ];
 ```  
 

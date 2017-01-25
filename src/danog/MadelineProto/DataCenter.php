@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -57,11 +57,16 @@ class DataCenter
         $address = $settings['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($settings['protocol'] == 'https') {
-            $subdomain = $this->dclist['ssl_subdomains'][$dc_number].($settings['upload'] ? '-1' : '');
+            $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
             $path = $settings['test_mode'] ? 'apiw_test1' : 'apiw1';
-            $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
+            $address = $settings['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
         }
-        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.')...');
+
+        if ($settings['protocol'] == 'http') {
+            $address = $settings['protocol'].'://'.$address.'/api';
+            $port = 80;
+        }
+        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$settings['protocol'].')...');
 
         $this->sockets[$dc_number] = new Connection($address, $port, $settings['protocol'], $settings['timeout']);
 

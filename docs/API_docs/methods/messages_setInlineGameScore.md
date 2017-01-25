@@ -11,6 +11,7 @@ description: messages.setInlineGameScore parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
+|force|[Bool](../types/Bool.md) | Optional|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
 |user\_id|[InputUser](../types/InputUser.md) | Required|
 |score|[int](../types/int.md) | Required|
@@ -36,5 +37,5 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->setInlineGameScore(['edit_message' => Bool, 'id' => InputBotInlineMessageID, 'user_id' => InputUser, 'score' => int, ]);
+$Bool = $MadelineProto->messages->setInlineGameScore(['edit_message' => Bool, 'force' => Bool, 'id' => InputBotInlineMessageID, 'user_id' => InputUser, 'score' => int, ]);
 ```

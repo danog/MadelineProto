@@ -31,7 +31,7 @@ git clone https://github.com/danog/MadelineProto
 cd MadelineProto
 ```
 
-Now copy .env.example to .env, edit the its values, read the docs and take a look at testing.php, bot.php.
+Now copy .env.example to .env, edit the its values, read the docs and take a look at tests/testing.php, bot.php.
 
 ### Dependencies
 
@@ -53,109 +53,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-Here you can see the default values for the settings\ arrays and explanations for every setting:
-
-```
-$settings = [
-    'authorization' => [ // Authorization settings
-        'default_temp_auth_key_expires_in' => 31557600, // validity of temporary keys and the binding of the temporary and permanent keys
-        'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
-MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
-lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
-an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
-Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
-8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
-Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----', // RSA public key
-     ],
-    'connection' => [ // List of datacenters/subdomains where to connect
-        'ssl_subdomains' => [ // Subdomains of web.telegram.org for https protocol
-            1 => 'pluto',
-            2 => 'venus',
-            3 => 'aurora',
-            4 => 'vesta',
-            5 => 'flora', // musa oh wait no :(
-        ],
-        'test' => [ // Test datacenters
-            'ipv4' => [ // ipv4 addresses
-                2 => [ // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.40',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false
-                ]
-            ],
-            'ipv6' => [ // ipv6 addresses
-                2 => [ // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false
-                ]
-            ]
-        ],
-        'main' => [ // Main datacenters
-            'ipv4' => [ // ipv4 addresses
-                2 => [ // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.51',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false
-                 ]
-             ],
-            'ipv6' => [ // ipv6 addresses
-                2 => [ // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false
-                ]
-            ]
-        ],
-    ],
-    'connection_settings' => [ // connection settings
-        'all' => [ // Connection settings will be applied on datacenter ids matching the key of these settings subarrays, if the key is equal to all like in this case that will match all datacenters that haven't a custom settings subarray...
-            'protocol'  => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http (unsupported), https (unsupported), udp (unsupported)
-            'test_mode' => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-            'ipv6' => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-            'timeout'      => 10 // timeout for sockets
-        ],
-    ],
-    'app_info' => [ // obtained in https://my.telegram.org
-        'api_id'          => 25628,
-        'api_hash'        => '1fe17cda7d355166cdaa71f04122873c',
-        'device_model'    => php_uname('s'),
-        'system_version'  => php_uname('r'),
-        'app_version'     => 'Unicorn', // 🌚
-        'lang_code'       => 'en',
-    ],
-    'tl_schema'     => [ // TL scheme files
-        'layer'         => 57, // layer version
-        'src'           => [
-            'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-            'telegram' => __DIR__.'/TL_telegram_v57.json', // telegram TL scheme
-        ],
-    ],
-    'logger'       => [ // Logger settings
-        'logger'       => 1, // 0 - No logger, 1 - Log to the default logger destination, 2 - Log to file defined in logger_param, 3 - Echo logs
-        'logger_param' => '/tmp/MadelineProto.log',
-        'logger'       => 3, // overwrite previous setting and echo logs
-    ],
-    'max_tries'         => [
-        'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
-        'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
-        'response'      => 5,// How many times should I try to get a response of a query before throwing an exception
-    ],
-    'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-        'incoming' => 30,
-        'outgoing' => 30,
-    ],
-    'updates'   => [
-        'updates_array_limit' => 1000, // How big should be the array containing the updates processed with the default example_update_handler callback
-        'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
-    ],
-];
-```
+See https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L99 for the default values for the settings\ arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
@@ -334,12 +232,12 @@ The upload method returns an [InputFile](https://daniil.it/MadelineProto/API_doc
 
 ```
 $inputFile = $MadelineProto->upload('file', 'optional new file name.ext');
-// Generate an inputMedia object and store it in $inputMedia, see testing.php
+// Generate an inputMedia object and store it in $inputMedia, see tests/testing.php
 $MadelineProto->messages->sendMedia(['peer' => '@pwrtelegramgroup', 'media' => $inputMedia]);
 ```
 
 
-See testing.php for more examples.
+See tests/testing.php for more examples.
 
 
 There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
@@ -390,7 +288,7 @@ $authorization = $MadelineProto->bot_login($token); // Note that every time you 
 var_dump($authorization);
 ```
 
-See testing.php for more examples.
+See tests/testing.php for more examples.
 
 ### Storing sessions
 

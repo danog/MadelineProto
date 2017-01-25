@@ -8,9 +8,6 @@ description: List of constructors
 
 
 ***
-<br><br>[$MTmessage](../constructors/MTmessage.md) = \['unread' => [Bool](../types/Bool.md), 'out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'fwd_from_id' => [Peer](../types/Peer.md), 'fwd_date' => [int](../types/int.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'views' => [int](../types/int.md), \];<a name="MTmessage"></a>  
-
-***
 <br><br>[$accountDaysTTL](../constructors/accountDaysTTL.md) = \['days' => [int](../types/int.md), \];<a name="accountDaysTTL"></a>  
 
 ***
@@ -606,6 +603,9 @@ description: List of constructors
 <br><br>[$keyboardButtonRow](../constructors/keyboardButtonRow.md) = \['buttons' => \[[KeyboardButton](../types/KeyboardButton.md)\], \];<a name="keyboardButtonRow"></a>  
 
 ***
+<br><br>[$message](../constructors/message.md) = \['unread' => [Bool](../types/Bool.md), 'out' => [Bool](../types/Bool.md), 'mentioned' => [Bool](../types/Bool.md), 'media_unread' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'from_id' => [int](../types/int.md), 'to_id' => [Peer](../types/Peer.md), 'fwd_from_id' => [Peer](../types/Peer.md), 'fwd_date' => [int](../types/int.md), 'via_bot_id' => [int](../types/int.md), 'reply_to_msg_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [MessageMedia](../types/MessageMedia.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'views' => [int](../types/int.md), \];<a name="message"></a>  
+
+***
 <br><br>[$messageActionChannelCreate](../constructors/messageActionChannelCreate.md) = \['title' => [string](../types/string.md), \];<a name="messageActionChannelCreate"></a>  
 
 ***
@@ -724,7 +724,7 @@ description: List of constructors
 
 [$messages\_botResults](../constructors/messages_botResults.md) = \['gallery' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'next_offset' => [string](../types/string.md), 'results' => \[[BotInlineResult](../types/BotInlineResult.md)\], \];<a name="messages_botResults"></a>  
 
-[$messages\_channelMessages](../constructors/messages_channelMessages.md) = \['pts' => [int](../types/int.md), 'count' => [int](../types/int.md), 'messages' => \[[MTMessage](../types/MTMessage.md)\], 'collapsed' => \[[MessageGroup](../types/MessageGroup.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_channelMessages"></a>  
+[$messages\_channelMessages](../constructors/messages_channelMessages.md) = \['pts' => [int](../types/int.md), 'count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'collapsed' => \[[MessageGroup](../types/MessageGroup.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_channelMessages"></a>  
 
 [$messages\_chatFull](../constructors/messages_chatFull.md) = \['full_chat' => [ChatFull](../types/ChatFull.md), 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_chatFull"></a>  
 
@@ -734,15 +734,15 @@ description: List of constructors
 
 [$messages\_dhConfigNotModified](../constructors/messages_dhConfigNotModified.md) = \['random' => [bytes](../types/bytes.md), \];<a name="messages_dhConfigNotModified"></a>  
 
-[$messages\_dialogs](../constructors/messages_dialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[MTMessage](../types/MTMessage.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_dialogs"></a>  
+[$messages\_dialogs](../constructors/messages_dialogs.md) = \['dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_dialogs"></a>  
 
-[$messages\_dialogsSlice](../constructors/messages_dialogsSlice.md) = \['count' => [int](../types/int.md), 'dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[MTMessage](../types/MTMessage.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_dialogsSlice"></a>  
+[$messages\_dialogsSlice](../constructors/messages_dialogsSlice.md) = \['count' => [int](../types/int.md), 'dialogs' => \[[Dialog](../types/Dialog.md)\], 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_dialogsSlice"></a>  
 
 [$messages\_foundGifs](../constructors/messages_foundGifs.md) = \['next_offset' => [int](../types/int.md), 'results' => \[[FoundGif](../types/FoundGif.md)\], \];<a name="messages_foundGifs"></a>  
 
-[$messages\_messages](../constructors/messages_messages.md) = \['messages' => \[[MTMessage](../types/MTMessage.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_messages"></a>  
+[$messages\_messages](../constructors/messages_messages.md) = \['messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_messages"></a>  
 
-[$messages\_messagesSlice](../constructors/messages_messagesSlice.md) = \['count' => [int](../types/int.md), 'messages' => \[[MTMessage](../types/MTMessage.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_messagesSlice"></a>  
+[$messages\_messagesSlice](../constructors/messages_messagesSlice.md) = \['count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="messages_messagesSlice"></a>  
 
 [$messages\_savedGifs](../constructors/messages_savedGifs.md) = \['hash' => [int](../types/int.md), 'gifs' => \[[Document](../types/Document.md)\], \];<a name="messages_savedGifs"></a>  
 
@@ -976,13 +976,13 @@ description: List of constructors
 <br><br>[$updateNewAuthorization](../constructors/updateNewAuthorization.md) = \['auth_key_id' => [long](../types/long.md), 'date' => [int](../types/int.md), 'device' => [string](../types/string.md), 'location' => [string](../types/string.md), \];<a name="updateNewAuthorization"></a>  
 
 ***
-<br><br>[$updateNewChannelMessage](../constructors/updateNewChannelMessage.md) = \['message' => [MTMessage](../types/MTMessage.md), 'channel_pts' => [int](../types/int.md), 'channel_pts_count' => [int](../types/int.md), \];<a name="updateNewChannelMessage"></a>  
+<br><br>[$updateNewChannelMessage](../constructors/updateNewChannelMessage.md) = \['message' => [Message](../types/Message.md), 'channel_pts' => [int](../types/int.md), 'channel_pts_count' => [int](../types/int.md), \];<a name="updateNewChannelMessage"></a>  
 
 ***
 <br><br>[$updateNewEncryptedMessage](../constructors/updateNewEncryptedMessage.md) = \['encr_message' => [EncryptedMessage](../types/EncryptedMessage.md), 'qts' => [int](../types/int.md), \];<a name="updateNewEncryptedMessage"></a>  
 
 ***
-<br><br>[$updateNewMessage](../constructors/updateNewMessage.md) = \['message' => [MTMessage](../types/MTMessage.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];<a name="updateNewMessage"></a>  
+<br><br>[$updateNewMessage](../constructors/updateNewMessage.md) = \['message' => [Message](../types/Message.md), 'pts' => [int](../types/int.md), 'pts_count' => [int](../types/int.md), \];<a name="updateNewMessage"></a>  
 
 ***
 <br><br>[$updateNewStickerSet](../constructors/updateNewStickerSet.md) = \['stickerset' => [messages\_StickerSet](../types/messages_StickerSet.md), \];<a name="updateNewStickerSet"></a>  
@@ -1060,17 +1060,17 @@ description: List of constructors
 <br><br>[$updatesTooLong](../constructors/updatesTooLong.md) = \[\];<a name="updatesTooLong"></a>  
 
 ***
-<br><br>[$updates\_channelDifference](../constructors/updates_channelDifference.md) = \['final' => [Bool](../types/Bool.md), 'channel_pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'new_messages' => \[[MTMessage](../types/MTMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="updates_channelDifference"></a>  
+<br><br>[$updates\_channelDifference](../constructors/updates_channelDifference.md) = \['final' => [Bool](../types/Bool.md), 'channel_pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'new_messages' => \[[Message](../types/Message.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="updates_channelDifference"></a>  
 
 [$updates\_channelDifferenceEmpty](../constructors/updates_channelDifferenceEmpty.md) = \['final' => [Bool](../types/Bool.md), 'channel_pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), \];<a name="updates_channelDifferenceEmpty"></a>  
 
-[$updates\_channelDifferenceTooLong](../constructors/updates_channelDifferenceTooLong.md) = \['final' => [Bool](../types/Bool.md), 'channel_pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'top_message' => [int](../types/int.md), 'top_important_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'unread_important_count' => [int](../types/int.md), 'messages' => \[[MTMessage](../types/MTMessage.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="updates_channelDifferenceTooLong"></a>  
+[$updates\_channelDifferenceTooLong](../constructors/updates_channelDifferenceTooLong.md) = \['final' => [Bool](../types/Bool.md), 'channel_pts' => [int](../types/int.md), 'timeout' => [int](../types/int.md), 'top_message' => [int](../types/int.md), 'top_important_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'unread_important_count' => [int](../types/int.md), 'messages' => \[[Message](../types/Message.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="updates_channelDifferenceTooLong"></a>  
 
-[$updates\_difference](../constructors/updates_difference.md) = \['new_messages' => \[[MTMessage](../types/MTMessage.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];<a name="updates_difference"></a>  
+[$updates\_difference](../constructors/updates_difference.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'state' => [updates\_State](../types/updates_State.md), \];<a name="updates_difference"></a>  
 
 [$updates\_differenceEmpty](../constructors/updates_differenceEmpty.md) = \['date' => [int](../types/int.md), 'seq' => [int](../types/int.md), \];<a name="updates_differenceEmpty"></a>  
 
-[$updates\_differenceSlice](../constructors/updates_differenceSlice.md) = \['new_messages' => \[[MTMessage](../types/MTMessage.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'intermediate_state' => [updates\_State](../types/updates_State.md), \];<a name="updates_differenceSlice"></a>  
+[$updates\_differenceSlice](../constructors/updates_differenceSlice.md) = \['new_messages' => \[[Message](../types/Message.md)\], 'new_encrypted_messages' => \[[EncryptedMessage](../types/EncryptedMessage.md)\], 'other_updates' => \[[Update](../types/Update.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], 'intermediate_state' => [updates\_State](../types/updates_State.md), \];<a name="updates_differenceSlice"></a>  
 
 [$updates\_state](../constructors/updates_state.md) = \['pts' => [int](../types/int.md), 'qts' => [int](../types/int.md), 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), \];<a name="updates_state"></a>  
 

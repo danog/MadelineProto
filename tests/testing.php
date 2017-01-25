@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,13 +19,18 @@ if (file_exists('web_data.php')) {
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 
+
 if (file_exists('.env')) {
+    echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
     $dotenv->load();
 }
+
+echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 if ($MadelineProto === false) {
+    echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
 
     $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone

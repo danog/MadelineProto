@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e8bbb62792931576147b60ac9015be7a",
     "content-hash": "88f022c06bcba63b61978fccad258d1a",
     "packages": [
         {
@@ -58,7 +57,7 @@
                 "struct",
                 "unpack"
             ],
-            "time": "2016-11-14 15:09:50"
+            "time": "2016-11-14T15:09:50+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -119,7 +118,7 @@
                 "hex2bin",
                 "rfc4648"
             ],
-            "time": "2016-07-11 20:32:06"
+            "time": "2016-07-11T20:32:06+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -167,7 +166,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-11-07 23:38:38"
+            "time": "2016-11-07T23:38:38+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -311,7 +310,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2016-09-01 10:05:43"
+            "time": "2016-09-01T10:05:43+00:00"
         }
     ],
     "packages-dev": [
@@ -367,7 +366,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2015-12-27 11:43:31"
+            "time": "2015-12-27T11:43:31+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -412,7 +411,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2016-09-30 07:12:33"
+            "time": "2016-09-30T07:12:33+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -459,7 +458,7 @@
                     "email": "me@mikevanriel.com"
                 }
             ],
-            "time": "2016-11-25 06:54:22"
+            "time": "2016-11-25T06:54:22+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -509,7 +508,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2016-11-23 20:04:58"
+            "time": "2016-11-23T20:04:58+00:00"
         }
     ],
     "aliases": [],

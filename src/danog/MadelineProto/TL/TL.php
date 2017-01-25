@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,8 +19,9 @@ trait TL
         \danog\MadelineProto\Logger::log('Loading TL schemes...');
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
-        foreach ($files as $type => $file) {
-            $type = $type === 'mtproto';
+        foreach ($files as $scheme_type => $file) {
+            $scheme_type = $scheme_type === 'mtproto';
+            \danog\MadelineProto\Logger::log('Parsing '.basename($file).'...');
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
             if ($TL_dict == false) {
@@ -29,11 +30,15 @@ trait TL
                 $tl_file = explode("\n", $filec);
                 $key = 0;
                 foreach ($tl_file as $line) {
-                    if ($line == '') {
+                    if ($line == '' || preg_match('|^//|', $line)) {
                         continue;
                     }
                     if ($line == '---functions---') {
                         $type = 'methods';
+                        continue;
+                    }
+                    if ($line == '---types---') {
+                        $type = 'constructors';
                         continue;
                     }
                     if (!preg_match('/^[^\s]+#/', $line)) {
@@ -64,7 +69,7 @@ trait TL
             }
             \danog\MadelineProto\Logger::log('Translating objects...');
             foreach ($TL_dict['constructors'] as $elem) {
-                $this->constructors->add($elem, $type);
+                $this->constructors->add($elem, $scheme_type);
             }
 
             \danog\MadelineProto\Logger::log('Translating methods...');

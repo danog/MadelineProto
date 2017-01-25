@@ -136,7 +136,7 @@ description: List of types
 
 [KeyboardButtonRow](KeyboardButtonRow.md)<a name="KeyboardButtonRow"></a>  
 
-[MTMessage](MTMessage.md)<a name="MTMessage"></a>  
+[Message](Message.md)<a name="Message"></a>  
 
 [MessageAction](MessageAction.md)<a name="MessageAction"></a>  
 

@@ -19,7 +19,7 @@ description: updates_channelDifferenceTooLong attributes, type and example
 |read\_inbox\_max\_id|[int](../types/int.md) | Required|
 |unread\_count|[int](../types/int.md) | Required|
 |unread\_important\_count|[int](../types/int.md) | Required|
-|messages|Array of [MTMessage](../types/MTMessage.md) | Required|
+|messages|Array of [Message](../types/Message.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|
 

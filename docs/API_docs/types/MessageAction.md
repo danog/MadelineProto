@@ -37,6 +37,8 @@ description: constructors and methods of type MessageAction
 
 [messageActionGameScore](../constructors/messageActionGameScore.md)  
 
+[messageActionPhoneCall](../constructors/messageActionPhoneCall.md)  
+
 
 
 ### Methods that return an object of this type (methods):

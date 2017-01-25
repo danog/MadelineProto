@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /*
-Copyright 2016 Daniil Gentili
+Copyright 2016-2017 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -31,9 +31,9 @@ $docs = [
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v57.json'],
-        'title'       => 'MadelineProto API documentation (layer 57)',
-        'description' => 'MadelineProto API documentation (layer 57)',
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v62.tl'],
+        'title'       => 'MadelineProto API documentation (layer 62)',
+        'description' => 'MadelineProto API documentation (layer 62)',
         'output_dir'  => __DIR__.'/docs/API_docs',
         'readme'      => false,
     ],

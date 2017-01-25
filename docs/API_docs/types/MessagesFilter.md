@@ -31,6 +31,8 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterChatPhotos](../constructors/inputMessagesFilterChatPhotos.md)  
 
+[inputMessagesFilterPhoneCalls](../constructors/inputMessagesFilterPhoneCalls.md)  
+
 
 
 ### Methods that return an object of this type (methods):

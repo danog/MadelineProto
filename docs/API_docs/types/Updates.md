@@ -49,6 +49,18 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->messages->startBot](../methods/messages_startBot.md)  
 
+[$MadelineProto->messages->toggleChatAdmins](../methods/messages_toggleChatAdmins.md)  
+
+[$MadelineProto->messages->migrateChat](../methods/messages_migrateChat.md)  
+
+[$MadelineProto->messages->sendInlineBotResult](../methods/messages_sendInlineBotResult.md)  
+
+[$MadelineProto->messages->editMessage](../methods/messages_editMessage.md)  
+
+[$MadelineProto->messages->getAllDrafts](../methods/messages_getAllDrafts.md)  
+
+[$MadelineProto->messages->setGameScore](../methods/messages_setGameScore.md)  
+
 [$MadelineProto->channels->createChannel](../methods/channels_createChannel.md)  
 
 [$MadelineProto->channels->editAdmin](../methods/channels_editAdmin.md)  
@@ -67,23 +79,11 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->channels->deleteChannel](../methods/channels_deleteChannel.md)  
 
-[$MadelineProto->messages->toggleChatAdmins](../methods/messages_toggleChatAdmins.md)  
-
-[$MadelineProto->messages->migrateChat](../methods/messages_migrateChat.md)  
-
-[$MadelineProto->messages->sendInlineBotResult](../methods/messages_sendInlineBotResult.md)  
-
 [$MadelineProto->channels->toggleInvites](../methods/channels_toggleInvites.md)  
 
 [$MadelineProto->channels->toggleSignatures](../methods/channels_toggleSignatures.md)  
 
 [$MadelineProto->channels->updatePinnedMessage](../methods/channels_updatePinnedMessage.md)  
-
-[$MadelineProto->messages->editMessage](../methods/messages_editMessage.md)  
-
-[$MadelineProto->messages->getAllDrafts](../methods/messages_getAllDrafts.md)  
-
-[$MadelineProto->messages->setGameScore](../methods/messages_setGameScore.md)  
 
 
 

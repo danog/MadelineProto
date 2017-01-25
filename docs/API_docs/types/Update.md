@@ -31,8 +31,6 @@ description: constructors and methods of type Update
 
 [updateContactLink](../constructors/updateContactLink.md)  
 
-[updateNewAuthorization](../constructors/updateNewAuthorization.md)  
-
 [updateNewEncryptedMessage](../constructors/updateNewEncryptedMessage.md)  
 
 [updateEncryptedChatTyping](../constructors/updateEncryptedChatTyping.md)  
@@ -114,6 +112,14 @@ description: constructors and methods of type Update
 [updateConfig](../constructors/updateConfig.md)  
 
 [updatePtsChanged](../constructors/updatePtsChanged.md)  
+
+[updateChannelWebPage](../constructors/updateChannelWebPage.md)  
+
+[updatePhoneCall](../constructors/updatePhoneCall.md)  
+
+[updateDialogPinned](../constructors/updateDialogPinned.md)  
+
+[updatePinnedDialogs](../constructors/updatePinnedDialogs.md)  
 
 
 

@@ -14,7 +14,7 @@ description: updates_channelDifference attributes, type and example
 |final|[Bool](../types/Bool.md) | Optional|
 |channel\_pts|[int](../types/int.md) | Required|
 |timeout|[int](../types/int.md) | Optional|
-|new\_messages|Array of [MTMessage](../types/MTMessage.md) | Required|
+|new\_messages|Array of [Message](../types/Message.md) | Required|
 |other\_updates|Array of [Update](../types/Update.md) | Required|
 |chats|Array of [Chat](../types/Chat.md) | Required|
 |users|Array of [User](../types/User.md) | Required|

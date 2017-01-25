@@ -15,9 +15,13 @@ description: constructors and methods of type WebPage
 
 [webPage](../constructors/webPage.md)  
 
+[webPageNotModified](../constructors/webPageNotModified.md)  
+
 
 
 ### Methods that return an object of this type (methods):
+
+[$MadelineProto->messages->getWebPage](../methods/messages_getWebPage.md)  
 
 
 

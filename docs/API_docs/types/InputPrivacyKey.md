@@ -13,6 +13,8 @@ description: constructors and methods of type InputPrivacyKey
 
 [inputPrivacyKeyChatInvite](../constructors/inputPrivacyKeyChatInvite.md)  
 
+[inputPrivacyKeyPhoneCall](../constructors/inputPrivacyKeyPhoneCall.md)  
+
 
 
 ### Methods that return an object of this type (methods):
