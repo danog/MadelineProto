@@ -83,7 +83,7 @@ class Connection
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                $this->sock = fsockopen(($this->protocol === 'https' ? 'tls' : 'tcp') .'://'.$this->parsed['host'].':'.$port);
+                $this->sock = fsockopen(($this->protocol === 'https' ? 'tls' : 'tcp').'://'.$this->parsed['host'].':'.$port);
                 stream_set_timeout($this->sock, $timeout);
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
@@ -155,6 +155,7 @@ class Connection
                 if (($wrote = fwrite($this->sock, $what)) !== strlen($what)) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've written ".strlen($what).', wrote '.$wrote.')!');
                 }
+
                 return $wrote;
                 break;
             case 'udp':
@@ -242,17 +243,31 @@ class Connection
                 $close = false;
                 while (true) {
                     $current_header = '';
-                    while (($curchar = $this->read(1)) !== "\n") { $current_header .= $curchar; }
+                    while (($curchar = $this->read(1)) !== "\n") {
+                        $current_header .= $curchar;
+                    }
                     $current_header = rtrim($current_header);
-                    if ($current_header === '') break;
-                    if ($current_header === false) throw new Exception('No data in the socket!');
-                    if (preg_match('|^Content-Length: |i', $current_header)) $length = preg_replace('|Content-Length: |i', '', $current_header);
-                    if (preg_match('|^Connection: close|i', $current_header)) $close = true;
-                    $headers [] = $current_header;
+                    if ($current_header === '') {
+                        break;
+                    }
+                    if ($current_header === false) {
+                        throw new Exception('No data in the socket!');
+                    }
+                    if (preg_match('|^Content-Length: |i', $current_header)) {
+                        $length = preg_replace('|Content-Length: |i', '', $current_header);
+                    }
+                    if (preg_match('|^Connection: close|i', $current_header)) {
+                        $close = true;
+                    }
+                    $headers[] = $current_header;
                 }
                 $payload = $this->fopen_and_write('php://memory', 'rw+b', $this->read($length));
-                if ($headers[0] !== 'HTTP/1.1 200 OK') throw new Exception($headers[0]);
-                if ($close) $this->close_and_reopen();
+                if ($headers[0] !== 'HTTP/1.1 200 OK') {
+                    throw new Exception($headers[0]);
+                }
+                if ($close) {
+                    $this->close_and_reopen();
+                }
                 break;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");

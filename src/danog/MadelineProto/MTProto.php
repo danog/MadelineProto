@@ -76,11 +76,10 @@ class MTProto extends PrimeModule
         // Detect ipv6
         $google = '';
         try {
-            $ctx = stream_context_create(array('http'=>
-                array(
+            $ctx = stream_context_create(['http'=> [
                     'timeout' => 1,  //1200 Seconds is 20 Minutes
-                )
-            ));
+                ],
+            ]);
 
             $google = file_get_contents('https://ipv6.google.com', false, $ctx);
         } catch (Exception $e) {
@@ -291,7 +290,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             \danog\MadelineProto\Logger::log('Generating temporary authorization key...');
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-            if (in_array($this->datacenter->protocol, ['http', 'https'])) $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0]);
+            if (in_array($this->datacenter->protocol, ['http', 'https'])) {
+                $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0]);
+            }
         }
     }
 

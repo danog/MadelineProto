@@ -28,7 +28,9 @@ trait CallHandler
 
                 $args = $this->get_named_method_args($method, $args);
                 $int_message_id = $this->send_message($this->serialize_method($method, $args), $this->content_related($method), $message_id);
-                if ($method === 'http_wait') return true;
+                if ($method === 'http_wait') {
+                    return true;
+                }
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
                 $this->datacenter->new_outgoing[$int_message_id] = ['msg_id' => $int_message_id, 'method' => $method, 'type' => $this->methods->find_by_method($method)['type']];
                 $res_count = 0;
@@ -130,7 +132,9 @@ trait CallHandler
                 \danog\MadelineProto\Logger::log('An error occurred while calling method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...');
                 if (in_array($this->datacenter->protocol, ['http', 'https']) && $method !== 'http_wait') {
                     //$this->method_call('http_wait', ['max_wait' => $this->datacenter->timeout, 'wait_after' => 0, 'max_delay' => 0]);
-                } else $this->datacenter->close_and_reopen();
+                } else {
+                    $this->datacenter->close_and_reopen();
+                }
                 sleep(1); // To avoid flooding
                 continue;
             } finally {
