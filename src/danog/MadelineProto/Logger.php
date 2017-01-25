@@ -32,7 +32,7 @@ class Logger
      */
     public static function constructor(&$mode, &$optional = null, $prefix = '')
     {
-        if ($mode == null) {
+        if ($mode === null) {
             throw new Exception('No mode was specified!');
         }
         self::$mode = &$mode;
