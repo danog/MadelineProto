@@ -179,7 +179,7 @@ class Connection
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $packet = stream_get_contents($this->sock, $length);
-                if ($packet === false || strlen($packet) != $length) {
+                if (strlen($packet) != $length) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 

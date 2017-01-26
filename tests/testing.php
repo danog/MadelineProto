@@ -17,7 +17,7 @@ if (file_exists('web_data.php')) {
 }
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('/tmp/pwr.madeline');
 
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
