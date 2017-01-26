@@ -61,7 +61,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->write($this->string2bin('\xef'));
+                $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
@@ -69,7 +69,7 @@ class Connection
                 if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->write($this->string2bin('\xee\xee\xee\xee'));
+                $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);

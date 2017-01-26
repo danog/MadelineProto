@@ -43,7 +43,7 @@ trait AuthKeyHandler
                  *               Vector long $server_public_key_fingerprints : This is a list of public RSA key fingerprints
                  *               ]
                  */
-                $nonce = \danog\MadelineProto\Tools::random(16);
+                $nonce = $this->random(16);
                 $ResPQ = $this->method_call('req_pq',
                     [
                         'nonce' => $nonce,
@@ -64,7 +64,7 @@ trait AuthKeyHandler
                 */
                 foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
                     $curfp_biginteger = new \phpseclib\Math\BigInteger($curfp);
-                    if ($this->key->fp->equals($curfp_biginteger)) {
+                    if ($this->key['fp']->equals($curfp_biginteger)) {
                         $public_key_fingerprint = $curfp;
                         break;
                     }
@@ -103,7 +103,7 @@ trait AuthKeyHandler
                 $p_bytes = \danog\PHP\Struct::pack('>I', (string) $p);
                 $q_bytes = \danog\PHP\Struct::pack('>I', (string) $q);
 
-                $new_nonce = \danog\MadelineProto\Tools::random(32);
+                $new_nonce = $this->random(32);
 
                 $data_unserialized = [
                     'pq'              => $pq_bytes,
@@ -121,9 +121,9 @@ trait AuthKeyHandler
                 * Encrypt serialized object
                 */
                 $sha_digest = sha1($p_q_inner_data, true);
-                $random_bytes = \danog\MadelineProto\Tools::random(255 - strlen($p_q_inner_data) - strlen($sha_digest));
+                $random_bytes = $this->random(255 - strlen($p_q_inner_data) - strlen($sha_digest));
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
-                $encrypted_data = $this->key->encrypt($to_encrypt);
+                $encrypted_data = $this->RSA_encrypt($to_encrypt, $this->key);
 
                 \danog\MadelineProto\Logger::log('Starting Diffie Hellman key exchange');
                 /*
@@ -314,9 +314,9 @@ trait AuthKeyHandler
                     throw new \danog\MadelineProto\Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
                 }
 
-                foreach ($this->range(0, $this->settings['max_tries']['authorization']) as $retry_id) {
+                for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
                     \danog\MadelineProto\Logger::log('Generating b...');
-                    $b = new \phpseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
+                    $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
                     \danog\MadelineProto\Logger::log('Generating g_b...');
                     $g_b = $g->powMod($b, $dh_prime);
 
@@ -362,7 +362,7 @@ trait AuthKeyHandler
                     * encrypt client_DH_inner_data
                     */
                     $data_with_sha = sha1($data, true).$data;
-                    $data_with_sha_padded = $data_with_sha.\danog\MadelineProto\Tools::random($this->posmod(-strlen($data_with_sha), 16));
+                    $data_with_sha_padded = $data_with_sha.$this->random($this->posmod(-strlen($data_with_sha), 16));
                     $encrypted_data = $this->ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
 
                     \danog\MadelineProto\Logger::log('Executing set_client_DH_params...');
@@ -483,7 +483,7 @@ trait AuthKeyHandler
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 \danog\MadelineProto\Logger::log('Binding authorization keys...');
-                $nonce = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
+                $nonce = \danog\PHP\Struct::unpack('<q', $this->random(8))[0];
                 $expires_at = time() + $expires_in;
                 $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
                 $perm_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->auth_key['id'])[0];
@@ -501,9 +501,9 @@ trait AuthKeyHandler
 
                 $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
                 $seq_no = 0;
-                $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+                $encrypted_data = $this->random(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
                 $message_key = substr(sha1($encrypted_data, true), -16);
-                $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
+                $padding = $this->random($this->posmod(-strlen($encrypted_data), 16));
                 list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->auth_key['auth_key']);
                 $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id);

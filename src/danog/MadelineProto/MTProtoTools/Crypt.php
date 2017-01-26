@@ -65,7 +65,7 @@ trait Crypt
         $ivp = substr($iv, 0, $blocksize);
         $ivp2 = substr($iv, $blocksize);
         $ciphered = '';
-        foreach ($this->range(0, strlen($message), $blocksize) as $i) {
+        for ($i = 0; $i <= strlen($message); $i += $blocksize) {
             $indata = substr($message, $i, $blocksize);
             if ($operation == 'decrypt') {
                 $xored = $indata ^ $ivp2;

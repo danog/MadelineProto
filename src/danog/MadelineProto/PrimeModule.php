@@ -18,12 +18,12 @@ class PrimeModule
     public function find_small_multiplier_lopatin($what)
     {
         $g = 0;
-        foreach ($this->range(3) as $i) {
+        for ($i = 0; $i < 3; $i++) {
             $q = (rand(0, 127) & 15) + 17;
             $x = rand(0, 1000000000) + 1;
             $y = $x;
             $lim = 1 << ($i + 18);
-            foreach ($this->range(1, $lim) as $j) {
+            for ($j = 1; $j <= $lim; $j++) {
                 list($a, $b, $c) = [$x, $x, $q];
                 while ($b != 0) {
                     if (($b & 1) != 0) {

@@ -22,7 +22,7 @@ trait CallHandler
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
-        foreach (range(1, $this->settings['max_tries']['query']) as $count) {
+        for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log('Calling method (try number '.$count.' for '.$method.')...');
 
@@ -158,7 +158,7 @@ trait CallHandler
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
 
-        foreach (range(1, $this->settings['max_tries']['query']) as $count) {
+        for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log($object == 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...');
                 $int_message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object));

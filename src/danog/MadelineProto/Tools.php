@@ -17,7 +17,7 @@ namespace danog\MadelineProto;
  */
 trait Tools
 {
-    public static function random($length)
+    public function random($length)
     {
         if ($length === 0) {
             return '';
@@ -30,7 +30,7 @@ trait Tools
      * posmod(numeric,numeric) : numeric
      * Works just like the % (modulus) operator, only returns always a postive number.
      */
-    public static function posmod($a, $b)
+    public function posmod($a, $b)
     {
         $resto = $a % $b;
         if ($resto < 0) {
@@ -40,57 +40,12 @@ trait Tools
         return $resto;
     }
 
-    public static function fread_all($handle)
-    {
-        $pos = ftell($handle);
-        fseek($handle, 0);
-        $content = stream_get_contents($handle, fstat($handle)['size']);
-        fseek($handle, $pos);
-
-        return $content;
-    }
-
-    public static function fopen_and_write($filename, $mode, $data)
+    public function fopen_and_write($filename, $mode, $data)
     {
         $handle = fopen($filename, $mode);
         fwrite($handle, $data);
         rewind($handle);
 
         return $handle;
-    }
-
-    public static function string2bin($string)
-    {
-        $res = null;
-        foreach (explode('\\', $string) as $s) {
-            if ($s != null && strlen($s) == 3) {
-                $res .= hex2bin(substr($s, 1));
-            }
-        }
-
-        return $res;
-    }
-
-    // taken from mochikit: range( [start,] stop[, step] )
-    public static function range($start, $stop = null, $step = 1)
-    {
-        if ($stop === null) {
-            $stop = $start;
-            $start = 0;
-        }
-        if ($stop <= $start && $step < 0) {
-            $arr = range($stop, $start, -$step);
-            array_pop($arr);
-
-            return array_reverse($arr, false);
-        }
-        if ($step > 1 && $step > ($stop - $start)) {
-            $arr = [$start];
-        } else {
-            $arr = range($start, $stop, $step);
-            array_pop($arr);
-        }
-
-        return $arr;
     }
 }

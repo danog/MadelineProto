@@ -180,9 +180,6 @@ $MadelineProto->[contacts->search](contacts_search.md)(\['q' => [string](../type
 $MadelineProto->[contacts->unblock](contacts_unblock.md)(\['id' => [InputUser](../types/InputUser.md), \]) == [$Bool](../types/Bool.md)<a name="contacts_unblock"></a>  
 
 ***
-<br><br>$MadelineProto->[contest->saveDeveloperInfo](contest_saveDeveloperInfo.md)(\['vk_id' => [int](../types/int.md), 'name' => [string](../types/string.md), 'phone_number' => [string](../types/string.md), 'age' => [int](../types/int.md), 'city' => [string](../types/string.md), \]) == [$Bool](../types/Bool.md)<a name="contest_saveDeveloperInfo"></a>  
-
-***
 <br><br>$MadelineProto->[help->getAppChangelog](help_getAppChangelog.md)(\[\]) == [$help\_AppChangelog](../types/help_AppChangelog.md)<a name="help_getAppChangelog"></a>  
 
 $MadelineProto->[help->getAppUpdate](help_getAppUpdate.md)(\[\]) == [$help\_AppUpdate](../types/help_AppUpdate.md)<a name="help_getAppUpdate"></a>  

@@ -32,12 +32,12 @@ trait MessageHandler
 
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
         if ($this->datacenter->temp_auth_key['auth_key'] == null || $this->datacenter->temp_auth_key['server_salt'] == null) {
-            $message = $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00').$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
+            $message = str_repeat(chr(0), 8).$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
             $encrypted_data = \danog\PHP\Struct::pack('<q', $this->datacenter->temp_auth_key['server_salt']).$this->datacenter->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
             $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = \danog\MadelineProto\Tools::random($this->posmod(-strlen($encrypted_data), 16));
+            $padding = $this->random($this->posmod(-strlen($encrypted_data), 16));
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key']);
             $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
             $this->datacenter->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
@@ -69,7 +69,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
         $auth_key_id = stream_get_contents($payload, 8);
-        if ($auth_key_id == $this->string2bin('\x00\x00\x00\x00\x00\x00\x00\x00')) {
+        if ($auth_key_id == str_repeat(chr(0), 8)) {
             list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', stream_get_contents($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = stream_get_contents($payload, $message_length);

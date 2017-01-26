@@ -30,7 +30,8 @@ trait TL
                 $tl_file = explode("\n", $filec);
                 $key = 0;
                 foreach ($tl_file as $line) {
-                    if ($line == '' || preg_match('|^//|', $line)) {
+                    $line = preg_replace(['|//.*|', '|^\s+$|'], '', $line);
+                    if ($line == '') {
                         continue;
                     }
                     if ($line == '---functions---') {
@@ -150,7 +151,7 @@ trait TL
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod((-$l - 1), 4));
                 } else {
-                    $concat .= $this->string2bin('\xfe');
+                    $concat .= chr(254);
                     $concat .= substr(\danog\PHP\Struct::pack('<i', $l), 0, 3);
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod(-$l, 4));
@@ -254,16 +255,16 @@ trait TL
                 if ($current_argument['name'] == 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
-                            $serialized .= \danog\MadelineProto\Tools::random(8);
+                            $serialized .= $this->random(8);
                             continue 2;
                         case 'int':
-                            $serialized .= \danog\MadelineProto\Tools::random(4);
+                            $serialized .= $this->random(4);
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
                                 $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                                 $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
-                                $serialized .= \danog\MadelineProto\Tools::random(8 * count($arguments['id']));
+                                $serialized .= $this->random(8 * count($arguments['id']));
                                 continue 2;
                             }
                     }
@@ -321,7 +322,7 @@ trait TL
                     throw new Exception('Length is too big');
                 }
                 if ($l == 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', stream_get_contents($bytes_io, 3).$this->string2bin('\x00'))[0];
+                    $long_len = \danog\PHP\Struct::unpack('<I', stream_get_contents($bytes_io, 3).chr(0))[0];
                     $x = stream_get_contents($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {

@@ -1,7 +1,3 @@
----functions---
-
-contest.saveDeveloperInfo#9a5f6e95 vk_id:int name:string phone_number:string age:int city:string = Bool;
-
 ///////////////////////////////
 ///////// Main application API
 ///////////////////////////////

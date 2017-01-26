@@ -30,6 +30,7 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
+    use \danog\MadelineProto\RSA;
 
     public $settings = [];
     public $config = ['expires' => -1];
@@ -50,7 +51,7 @@ class MTProto extends PrimeModule
 
         // Load rsa key
         \danog\MadelineProto\Logger::log('Loading RSA key...');
-        $this->key = new RSA($this->settings['authorization']['rsa_key']);
+        $this->key = $this->loadKey($this->settings['authorization']['rsa_key']);
 
         // Istantiate TL class
         \danog\MadelineProto\Logger::log('Translating tl schemas...');
@@ -212,7 +213,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         ];
         $settings = array_replace_recursive($default_settings, $settings);
         if (isset($settings['connection_settings']['all'])) {
-            foreach ($this->range(1, 6) as $n) {
+            for ($n = 1; $n <= 6; $n++) {
                 if (!isset($settings['connection_settings'][$n])) {
                     $settings['connection_settings'][$n] = $settings['connection_settings']['all'];
                 }
@@ -235,7 +236,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         foreach ($this->datacenter->sockets as $id => &$socket) {
             if ($de) {
                 \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...');
-                $socket->session_id = \danog\MadelineProto\Tools::random(8);
+                $socket->session_id = $this->random(8);
                 $socket->seq_no = 0;
             }
             $socket->incoming_messages = [];
@@ -279,7 +280,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function init_authorization()
     {
         if ($this->datacenter->session_id == null) {
-            $this->datacenter->session_id = \danog\MadelineProto\Tools::random(8);
+            $this->datacenter->session_id = $this->random(8);
         }
         if ($this->datacenter->temp_auth_key == null || $this->datacenter->auth_key == null) {
             if ($this->datacenter->auth_key == null) {

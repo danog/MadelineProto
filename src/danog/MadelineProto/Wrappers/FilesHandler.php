@@ -424,7 +424,7 @@ trait FilesHandler
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = $file_size > 10 * 1024 * 1024 ? 'inputFileBig' : 'inputFile';
-        $file_id = \danog\PHP\Struct::unpack('<q', \danog\MadelineProto\Tools::random(8))[0];
+        $file_id = \danog\PHP\Struct::unpack('<q', $this->API->random(8))[0];
         $f = fopen($file, 'r');
         fseek($f, 0);
         while (ftell($f) !== $file_size) {
