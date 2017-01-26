@@ -20,7 +20,7 @@ Also note that MadelineProto will perform better if a big math extension like gm
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here (layer 57)](https://daniil.it/MadelineProto/API_docs/).  
+The MadelineProto API documentation can be found [here (layer 62)](https://daniil.it/MadelineProto/API_docs/).  
 
 The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
 
