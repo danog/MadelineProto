@@ -30,7 +30,6 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
-    use \danog\MadelineProto\RSA;
 
     public $settings = [];
     public $config = ['expires' => -1];
@@ -48,7 +47,7 @@ class MTProto extends PrimeModule
 
         // Load rsa key
         \danog\MadelineProto\Logger::log('Loading RSA key...', Logger::ULTRA_VERBOSE);
-        $this->key = $this->loadKey($this->settings['authorization']['rsa_key']);
+        $this->key = new RSA($this->settings['authorization']['rsa_key']);
 
         // Istantiate TL class
         \danog\MadelineProto\Logger::log('Translating tl schemas...', Logger::ULTRA_VERBOSE);

@@ -63,8 +63,7 @@ trait AuthKeyHandler
                 * Find our key in the server_public_key_fingerprints vector
                 */
                 foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
-                    $curfp_biginteger = new \phpseclib\Math\BigInteger($curfp);
-                    if ($this->key['fp']->equals($curfp_biginteger)) {
+                    if ($this->key->keydata['fp'] === $curfp) {
                         $public_key_fingerprint = $curfp;
                         break;
                     }
@@ -123,7 +122,7 @@ trait AuthKeyHandler
                 $sha_digest = sha1($p_q_inner_data, true);
                 $random_bytes = $this->random(255 - strlen($p_q_inner_data) - strlen($sha_digest));
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
-                $encrypted_data = $this->RSA_encrypt($to_encrypt, $this->key);
+                $encrypted_data = $this->key->encrypt($to_encrypt);
 
                 \danog\MadelineProto\Logger::log('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
                 /*

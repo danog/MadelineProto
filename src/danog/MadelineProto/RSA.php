@@ -12,9 +12,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-trait RSA
+class RSA
 {
-    public function loadKey($rsa_key)
+    use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\Tools;
+
+    public $keydata = [];
+    public function __construct($rsa_key)
     {
         \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...', LOGGER::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
@@ -25,35 +29,31 @@ trait RSA
         } else {
             $key->loadKey($rsa_key);
         }
-        $keydata = ['n' => $key->modulus, 'e' => $key->exponent];
+        $this->keydata = ['n' => $key->modulus, 'e' => $key->exponent];
 
         \danog\MadelineProto\Logger::log('Computing fingerprint...', LOGGER::ULTRA_VERBOSE);
-        $keydata['fp_bytes'] = substr(
+        $this->keydata['fp'] = \danog\PHP\Struct::unpack('<q', substr(
             sha1(
                 $this->serialize_object(
                     ['type' => 'bytes'],
-                    $keydata['n']->toBytes()
+                    $this->keydata['n']->toBytes()
                 )
                 .
                 $this->serialize_object(
                     ['type' => 'bytes'],
-                    $keydata['e']->toBytes()
+                    $this->keydata['e']->toBytes()
                 ),
                 true
             ),
             -8
-        );
-
-        \danog\MadelineProto\Logger::log('Generating BigInteger object for fingerprint...', LOGGER::ULTRA_VERBOSE);
-        $keydata['fp'] = new \phpseclib\Math\BigInteger(strrev($keydata['fp_bytes']), -256);
-
-        return $keydata;
+        ))[0];
+        return $this->keydata;
     }
 
-    public function RSA_encrypt($data, $keydata)
+    public function encrypt($data)
     {
         \danog\MadelineProto\Logger::log('Encrypting with rsa key...', LOGGER::VERBOSE);
 
-        return (new \phpseclib\Math\BigInteger($data, 256))->powMod($keydata['e'], $keydata['n'])->toBytes();
+        return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->keydata['e'], $this->keydata['n'])->toBytes();
     }
 }
