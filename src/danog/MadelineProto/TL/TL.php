@@ -16,12 +16,12 @@ trait TL
 {
     public function construct_tl($files)
     {
-        \danog\MadelineProto\Logger::log('Loading TL schemes...');
+        \danog\MadelineProto\Logger::log('Loading TL schemes...', \danog\MadelineProto\Logger::VERBOSE);
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
         foreach ($files as $scheme_type => $file) {
             $scheme_type = $scheme_type === 'mtproto';
-            \danog\MadelineProto\Logger::log('Parsing '.basename($file).'...');
+            \danog\MadelineProto\Logger::log('Parsing '.basename($file).'...', \danog\MadelineProto\Logger::VERBOSE);
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
             if ($TL_dict == false) {
@@ -68,12 +68,12 @@ trait TL
             if (empty($TL_dict) || empty($TL_dict['constructors']) || empty($TL_dict['methods'])) {
                 throw new Exception('Invalid source file was provided: '.$file);
             }
-            \danog\MadelineProto\Logger::log('Translating objects...');
+            \danog\MadelineProto\Logger::log('Translating objects...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 $this->constructors->add($elem, $scheme_type);
             }
 
-            \danog\MadelineProto\Logger::log('Translating methods...');
+            \danog\MadelineProto\Logger::log('Translating methods...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->methods->add($elem);
             }
@@ -191,7 +191,7 @@ trait TL
 
         $constructorData = $this->constructors->find_by_predicate($predicate);
         if ($constructorData === false) {
-            \danog\MadelineProto\Logger::log($object);
+            \danog\MadelineProto\Logger::log($object, \danog\MadelineProto\Logger::FATAL_WARNING);
             throw new Exception('Could not extract type');
         }
 

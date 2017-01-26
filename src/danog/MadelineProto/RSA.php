@@ -16,10 +16,10 @@ trait RSA
 {
     public function loadKey($rsa_key)
     {
-        \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...');
+        \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...', LOGGER::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
 
-        \danog\MadelineProto\Logger::log('Loading key...');
+        \danog\MadelineProto\Logger::log('Loading key...', LOGGER::ULTRA_VERBOSE);
         if (method_exists($key, 'load')) {
             $key->load($rsa_key);
         } else {
@@ -27,7 +27,7 @@ trait RSA
         }
         $keydata = ['n' => $key->modulus, 'e' => $key->exponent];
 
-        \danog\MadelineProto\Logger::log('Computing fingerprint...');
+        \danog\MadelineProto\Logger::log('Computing fingerprint...', LOGGER::ULTRA_VERBOSE);
         $keydata['fp_bytes'] = substr(
             sha1(
                 $this->serialize_object(
@@ -44,14 +44,14 @@ trait RSA
             -8
         );
 
-        \danog\MadelineProto\Logger::log('Generating BigInteger object for fingerprint...');
+        \danog\MadelineProto\Logger::log('Generating BigInteger object for fingerprint...', LOGGER::ULTRA_VERBOSE);
         $keydata['fp'] = new \phpseclib\Math\BigInteger(strrev($keydata['fp_bytes']), -256);
         return $keydata;
     }
 
     public function RSA_encrypt($data, $keydata)
     {
-        \danog\MadelineProto\Logger::log('Encrypting with rsa key...');
+        \danog\MadelineProto\Logger::log('Encrypting with rsa key...', LOGGER::VERBOSE);
 
         return (new \phpseclib\Math\BigInteger($data, 256))->powMod($keydata['e'], $keydata['n'])->toBytes();
     }

@@ -21,7 +21,24 @@ class Logger
     public static $optional = null;
     public static $constructed = false;
     public static $prefix = '';
-
+    public static $level = 3;
+    const ULTRA_VERBOSE = 'ULTRA_VERBOSE';
+    const VERBOSE = 'VERBOSE';
+    const NOTICE = 'NOTICE';
+    const WARNING = 'WARNING';
+    const ERROR = 'ERROR';
+    const FATAL_ERROR = 'FATAL ERROR';
+    public static function level2num($level) {
+        switch ($level) {
+            case self::ULTRA_VERBOSE: return 5;
+            case self::VERBOSE: return 4;
+            case self::NOTICE: return 3;
+            case self::WARNING: return 2;
+            case self::ERROR: return 1;
+            case self::FATAL_ERROR: return 0;
+            default: return false;
+        }
+    }
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -30,7 +47,7 @@ class Logger
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public static function constructor(&$mode, &$optional = null, $prefix = '')
+    public static function constructor(&$mode, &$optional = null, $prefix = '', $level = self::NOTICE)
     {
         if ($mode === null) {
             throw new Exception('No mode was specified!');
@@ -39,6 +56,7 @@ class Logger
         self::$optional = &$optional;
         self::$constructed = true;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
+        self::$level = self::level2num($level);
     }
 
     public static function log(...$params)
@@ -46,6 +64,8 @@ class Logger
         if (!self::$constructed) {
             throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
         }
+        $level = self::level2num(end($params));
+        if ($level !== false) { if ($level > self::$level) return false; else array_pop($params); };
         foreach ($params as $param) {
             if (!is_string($param)) {
                 $param = var_export($param, true);

@@ -39,9 +39,9 @@ trait UpdateHandler
                 $full_chat['last_update'] = time();
                 $this->full_chats[$full_chat['id']] = $full_chat;
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage());
+                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage());
+                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             }
         }
         if (isset($update['message']['from_id']) && time() - $this->full_chat_last_updated($update['message']['from_id']) <= 600) {
@@ -50,9 +50,9 @@ trait UpdateHandler
                 $full_chat['last_update'] = time();
                 $this->full_chats[$full_chat['id']] = $full_chat;
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage());
+                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage());
+                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             }
         }
         if (isset($this->settings['pwr']['update_handler'])) {
@@ -131,7 +131,7 @@ trait UpdateHandler
             return false;
         }
         $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
-        \danog\MadelineProto\Logger::log('Got '.$difference['_']);
+        \danog\MadelineProto\Logger::log('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
                 $this->set_channel_state($channel, $difference);
@@ -195,7 +195,7 @@ trait UpdateHandler
         }
 
         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => -1]);
-        \danog\MadelineProto\Logger::log('Got '.$difference['_']);
+        \danog\MadelineProto\Logger::log('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
         switch ($difference['_']) {
             case 'updates.differenceEmpty':
                 $this->set_update_state($difference);
@@ -233,7 +233,7 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        \danog\MadelineProto\Logger::log('Handling an update of type '.$update['_'].'...');
+        \danog\MadelineProto\Logger::log('Handling an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         //var_dump($update, $options);
 
         $channel_id = false;
@@ -241,7 +241,7 @@ trait UpdateHandler
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
                 if ($update['message']['_'] == 'messageEmpty') {
-                    \danog\MadelineProto\Logger::log('Got message empty, not saving');
+                    \danog\MadelineProto\Logger::log('Got message empty, not saving', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     return false;
                 }
@@ -252,9 +252,9 @@ trait UpdateHandler
                 break;
             case 'updateChannelTooLong':
                 $channel_id = $update['channel_id'];
-                \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...');
+                \danog\MadelineProto\Logger::log('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
                 if (!isset($this->channels_state[$channel_id]) && !isset($update['pts'])) {
-                    \danog\MadelineProto\Logger::log('I do not have the channel in the states and the pts is not set.');
+                    \danog\MadelineProto\Logger::log('I do not have the channel in the states and the pts is not set.', \danog\MadelineProto\Logger::ERROR);
 
                     return;
                 }
@@ -267,7 +267,7 @@ trait UpdateHandler
         }
 
         if ($cur_state['sync_loading']) {
-            \danog\MadelineProto\Logger::log('Sync loading, not handling update');
+            \danog\MadelineProto\Logger::log('Sync loading, not handling update', \danog\MadelineProto\Logger::NOTICE);
 
             return false;
         }
@@ -286,7 +286,7 @@ trait UpdateHandler
                     (isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id'])) ||
                     (isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities'])) ||
                     (isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from']))) {
-                    \danog\MadelineProto\Logger::log('Not enough data for message update, getting difference...');
+                    \danog\MadelineProto\Logger::log('Not enough data for message update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
 
                     if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
                         $this->get_channel_difference($channel_id);
@@ -299,7 +299,7 @@ trait UpdateHandler
                 break;
             default:
                 if ($channel_id !== false && !$this->peer_isset('channel#'.$channel_id)) {
-                    \danog\MadelineProto\Logger::log('Skipping update, I do not have the channel id '.$channel_id);
+                    \danog\MadelineProto\Logger::log('Skipping update, I do not have the channel id '.$channel_id, \danog\MadelineProto\Logger::ERROR);
 
                     return false;
                 }
@@ -311,7 +311,7 @@ trait UpdateHandler
         if (isset($update['pts'])) {
             $new_pts = $cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0);
             if ($new_pts < $update['pts']) {
-                \danog\MadelineProto\Logger::log('Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id);
+                \danog\MadelineProto\Logger::log('Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
 
                 $this->cur_state['pending_pts_updates'][] = $update;
 
@@ -327,7 +327,7 @@ trait UpdateHandler
                 $cur_state['pts'] = $update['pts'];
                 $pop_pts = true;
             } elseif (isset($update['pts_count'])) {
-                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id);
+                \danog\MadelineProto\Logger::log('Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
 
                 return false;
             }
@@ -338,7 +338,7 @@ trait UpdateHandler
             $seq = $options['seq'];
             $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
             if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
-                \danog\MadelineProto\Logger::log('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1');
+                \danog\MadelineProto\Logger::log('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1', \danog\MadelineProto\Logger::ERROR);
 
                 if (!isset($cur_state['pending_seq_updates'][$seq_start])) {
                     $cur_state['pending_seq_updates'][$seq_start] = ['seq' => $seq, 'date' => $options['date'], 'updates' => []];
@@ -464,7 +464,7 @@ trait UpdateHandler
         if (isset($update['message']['from_id']) && $update['message']['from_id'] == $this->datacenter->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
-        \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...');
+        \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
             $this->pwr_update_handler($update);
         } else {

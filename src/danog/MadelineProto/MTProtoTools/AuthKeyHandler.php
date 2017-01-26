@@ -24,7 +24,7 @@ trait AuthKeyHandler
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
-                \danog\MadelineProto\Logger::log('Requesting pq');
+                \danog\MadelineProto\Logger::log('Requesting pq', \danog\MadelineProto\Logger::VERBOSE);
 
                 /**
                  * ***********************************************************************
@@ -94,7 +94,7 @@ trait AuthKeyHandler
                     throw new \danog\MadelineProto\Exception("couldn't compute p and q.");
                 }
 
-                \danog\MadelineProto\Logger::log('Factorization '.$pq.' = '.$p.' * '.$q);
+                \danog\MadelineProto\Logger::log('Factorization '.$pq.' = '.$p.' * '.$q, \danog\MadelineProto\Logger::VERBOSE);
 
                 /*
                 * ***********************************************************************
@@ -125,7 +125,7 @@ trait AuthKeyHandler
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
                 $encrypted_data = $this->RSA_encrypt($to_encrypt, $this->key);
 
-                \danog\MadelineProto\Logger::log('Starting Diffie Hellman key exchange');
+                \danog\MadelineProto\Logger::log('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
                 /*
                 * ***********************************************************************
                 * Starting Diffie Hellman key exchange, Server authentication
@@ -241,13 +241,13 @@ trait AuthKeyHandler
                 $server_time = $server_DH_inner_data['server_time'];
                 $this->datacenter->time_delta = $server_time - time();
 
-                \danog\MadelineProto\Logger::log(sprintf('Server-client time delta = %.1f s', $this->datacenter->time_delta));
+                \danog\MadelineProto\Logger::log(sprintf('Server-client time delta = %.1f s', $this->datacenter->time_delta), \danog\MadelineProto\Logger::VERBOSE);
 
                 /*
                 * ***********************************************************************
                 * Define some needed numbers for BigInteger
                 */
-                \danog\MadelineProto\Logger::log('Executing dh_prime checks (0/3)...');
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (0/3)...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $one = new \phpseclib\Math\BigInteger(1);
                 //$two = new \phpseclib\Math\BigInteger(2);
                 $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
@@ -258,7 +258,7 @@ trait AuthKeyHandler
                 * Check validity of dh_prime
                 * Is it a prime?
                 */
-                \danog\MadelineProto\Logger::log('Executing dh_prime checks (1/3)...');
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (1/3)...', \danog\MadelineProto\Logger::VERBOSE);
                 if (!$dh_prime->isPrime()) {
                     throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
                 }
@@ -271,7 +271,7 @@ trait AuthKeyHandler
                 * Almost always fails
                 */
                 /*
-                \danog\MadelineProto\Logger::log('Executing dh_prime checks (2/3)...');
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (2/3)...', \danog\MadelineProto\Logger::VERBOSE);
                 if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
                     throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
                 }
@@ -282,7 +282,7 @@ trait AuthKeyHandler
                 * Check validity of dh_prime
                 * 2^2047 < dh_prime < 2^2048
                 */
-                \danog\MadelineProto\Logger::log('Executing dh_prime checks (3/3)...');
+                \danog\MadelineProto\Logger::log('Executing dh_prime checks (3/3)...', \danog\MadelineProto\Logger::VERBOSE);
                 if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
                     || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
                 ) {
@@ -294,7 +294,7 @@ trait AuthKeyHandler
                 * Check validity of g
                 * 1 < g < dh_prime - 1
                 */
-                \danog\MadelineProto\Logger::log('Executing g check...');
+                \danog\MadelineProto\Logger::log('Executing g check...', \danog\MadelineProto\Logger::VERBOSE);
 
                 if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
                     || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
@@ -307,7 +307,7 @@ trait AuthKeyHandler
                 * Check validity of g_a
                 * 1 < g_a < dh_prime - 1
                 */
-                \danog\MadelineProto\Logger::log('Executing g_a check...');
+                \danog\MadelineProto\Logger::log('Executing g_a check...', \danog\MadelineProto\Logger::VERBOSE);
                 if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
                     || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
                 ) {
@@ -315,9 +315,9 @@ trait AuthKeyHandler
                 }
 
                 for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
-                    \danog\MadelineProto\Logger::log('Generating b...');
+                    \danog\MadelineProto\Logger::log('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
                     $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
-                    \danog\MadelineProto\Logger::log('Generating g_b...');
+                    \danog\MadelineProto\Logger::log('Generating g_b...', \danog\MadelineProto\Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
 
                     /*
@@ -325,14 +325,14 @@ trait AuthKeyHandler
                     * Check validity of g_b
                     * 1 < g_b < dh_prime - 1
                     */
-                    \danog\MadelineProto\Logger::log('Executing g_b check...');
+                    \danog\MadelineProto\Logger::log('Executing g_b check...', \danog\MadelineProto\Logger::VERBOSE);
                     if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
                         || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                     ) {
                         throw new \danog\MadelineProto\Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
 
-                    \danog\MadelineProto\Logger::log('Preparing client_DH_inner_data...');
+                    \danog\MadelineProto\Logger::log('Preparing client_DH_inner_data...', \danog\MadelineProto\Logger::VERBOSE);
 
                     $g_b_str = $g_b->toBytes();
 
@@ -365,7 +365,7 @@ trait AuthKeyHandler
                     $data_with_sha_padded = $data_with_sha.$this->random($this->posmod(-strlen($data_with_sha), 16));
                     $encrypted_data = $this->ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
 
-                    \danog\MadelineProto\Logger::log('Executing set_client_DH_params...');
+                    \danog\MadelineProto\Logger::log('Executing set_client_DH_params...', \danog\MadelineProto\Logger::VERBOSE);
                     /*
                     * ***********************************************************************
                     * Send set_client_DH_params query
@@ -396,7 +396,7 @@ trait AuthKeyHandler
                     * ***********************************************************************
                     * Generate auth_key
                     */
-                    \danog\MadelineProto\Logger::log('Generating authorization key...');
+                    \danog\MadelineProto\Logger::log('Generating authorization key...', \danog\MadelineProto\Logger::VERBOSE);
                     $auth_key = $g_a->powMod($b, $dh_prime);
                     $auth_key_str = $auth_key->toBytes();
                     $auth_key_sha = sha1($auth_key_str, true);
@@ -431,7 +431,7 @@ trait AuthKeyHandler
                                 throw new \danog\MadelineProto\Exception('wrong new_nonce_hash1');
                             }
 
-                            \danog\MadelineProto\Logger::log('Diffie Hellman key exchange processed successfully!');
+                            \danog\MadelineProto\Logger::log('Diffie Hellman key exchange processed successfully!', \danog\MadelineProto\Logger::VERBOSE);
 
                             $res_authorization['server_salt'] = \danog\PHP\Struct::unpack('<q', substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0))[0];
                             $res_authorization['auth_key'] = $auth_key_str;
@@ -442,7 +442,7 @@ trait AuthKeyHandler
                                 $res_authorization['p_q_inner_data_temp'] = $p_q_inner_data;
                             }
 
-                            \danog\MadelineProto\Logger::log('Auth key generated');
+                            \danog\MadelineProto\Logger::log('Auth key generated', \danog\MadelineProto\Logger::NOTICE);
 
                             return $res_authorization;
                         case 'dh_gen_retry':
@@ -451,14 +451,14 @@ trait AuthKeyHandler
                             }
 
                             //repeat foreach
-                            \danog\MadelineProto\Logger::log('Retrying Auth');
+                            \danog\MadelineProto\Logger::log('Retrying Auth', \danog\MadelineProto\Logger::VERBOSE);
                             break;
                         case 'dh_gen_fail':
                             if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
                                 throw new \danog\MadelineProto\Exception('wrong new_nonce_hash_3');
                             }
 
-                            \danog\MadelineProto\Logger::log('Auth Failed');
+                            \danog\MadelineProto\Logger::log('Auth Failed', \danog\MadelineProto\Logger::WARNING);
                             break 2;
                         default:
                             throw new \danog\MadelineProto\Exception('Response Error');
@@ -466,9 +466,9 @@ trait AuthKeyHandler
                     }
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } finally {
                 $this->datacenter->new_outgoing = [];
                 $this->datacenter->new_incoming = [];
@@ -482,7 +482,7 @@ trait AuthKeyHandler
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
-                \danog\MadelineProto\Logger::log('Binding authorization keys...');
+                \danog\MadelineProto\Logger::log('Binding authorization keys...', \danog\MadelineProto\Logger::VERBOSE);
                 $nonce = \danog\PHP\Struct::unpack('<q', $this->random(8))[0];
                 $expires_at = time() + $expires_in;
                 $temp_auth_key_id = \danog\PHP\Struct::unpack('<q', $this->datacenter->temp_auth_key['id'])[0];
@@ -508,14 +508,14 @@ trait AuthKeyHandler
                 $encrypted_message = $this->datacenter->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], $int_message_id);
                 if ($res === true) {
-                    \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.');
+                    \danog\MadelineProto\Logger::log('Successfully binded temporary and permanent authorization keys.', \danog\MadelineProto\Logger::NOTICE);
 
                     return true;
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+                \danog\MadelineProto\Logger::log('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...');
+                \danog\MadelineProto\Logger::log('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } finally {
                 $this->datacenter->new_outgoing = [];
                 $this->datacenter->new_incoming = [];
