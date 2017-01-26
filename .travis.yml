@@ -14,10 +14,8 @@ addons:
 before_script:
 - composer update --dev
 script:
-- "./testing.php"
+- "tests/testing.php"
 before_install:
-- openssl aes-256-cbc -K $encrypted_223c5fe08d29_key -iv $encrypted_223c5fe08d29_iv
-  -in enc.tar.xz.enc -out enc.tar.xz -d
 - openssl aes-256-cbc -K $encrypted_0b05103af24b_key -iv $encrypted_0b05103af24b_iv
   -in enc.tar.xz.enc -out enc.tar.xz -d
 - tar -xJpf enc.tar.xz

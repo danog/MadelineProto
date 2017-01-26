@@ -18,6 +18,7 @@ class RSA
     use \danog\MadelineProto\Tools;
 
     public $keydata = [];
+
     public function __construct($rsa_key)
     {
         \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...', LOGGER::ULTRA_VERBOSE);
@@ -47,6 +48,7 @@ class RSA
             ),
             -8
         ))[0];
+
         return $this->keydata;
     }
 
