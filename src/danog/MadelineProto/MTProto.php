@@ -186,9 +186,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                  * 2 - Log to file defined in second parameter
                  * 3 - Echo logs
                  */
-                'logger'       => 1, // write to
-                'logger_param' => '/tmp/MadelineProto.log',
-                'logger'       => 3, // overwrite previous setting and echo logs
+                'logger'             => 1, // write to
+                'logger_param'       => '/tmp/MadelineProto.log',
+                'logger'             => 3, // overwrite previous setting and echo logs
                 'logger_level'       => Logger::NOTICE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
             ],
             'max_tries'         => [

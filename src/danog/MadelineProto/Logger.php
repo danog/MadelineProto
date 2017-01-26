@@ -28,7 +28,9 @@ class Logger
     const WARNING = 'WARNING';
     const ERROR = 'ERROR';
     const FATAL_ERROR = 'FATAL ERROR';
-    public static function level2num($level) {
+
+    public static function level2num($level)
+    {
         switch ($level) {
             case self::ULTRA_VERBOSE: return 5;
             case self::VERBOSE: return 4;
@@ -39,6 +41,7 @@ class Logger
             default: return false;
         }
     }
+
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -65,7 +68,13 @@ class Logger
             throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
         }
         $level = self::level2num(end($params));
-        if ($level !== false) { if ($level > self::$level) return false; else array_pop($params); };
+        if ($level !== false) {
+            if ($level > self::$level) {
+                return false;
+            } else {
+                array_pop($params);
+            }
+        }
         foreach ($params as $param) {
             if (!is_string($param)) {
                 $param = var_export($param, true);

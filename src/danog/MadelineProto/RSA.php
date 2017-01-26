@@ -46,6 +46,7 @@ trait RSA
 
         \danog\MadelineProto\Logger::log('Generating BigInteger object for fingerprint...', LOGGER::ULTRA_VERBOSE);
         $keydata['fp'] = new \phpseclib\Math\BigInteger(strrev($keydata['fp_bytes']), -256);
+
         return $keydata;
     }
 
