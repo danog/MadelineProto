@@ -24,21 +24,21 @@ trait TL
             \danog\MadelineProto\Logger::log('Parsing '.basename($file).'...', \danog\MadelineProto\Logger::VERBOSE);
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
-            if ($TL_dict == false) {
+            if ($TL_dict === null) {
                 $TL_dict = [];
                 $type = 'constructors';
                 $tl_file = explode("\n", $filec);
                 $key = 0;
                 foreach ($tl_file as $line) {
                     $line = preg_replace(['|//.*|', '|^\s+$|'], '', $line);
-                    if ($line == '') {
+                    if ($line === '') {
                         continue;
                     }
-                    if ($line == '---functions---') {
+                    if ($line === '---functions---') {
                         $type = 'methods';
                         continue;
                     }
-                    if ($line == '---types---') {
+                    if ($line === '---types---') {
                         $type = 'constructors';
                         continue;
                     }
@@ -48,15 +48,15 @@ trait TL
                     if (preg_match('/^vector#/', $line)) {
                         continue;
                     }
-                    $TL_dict[$type][$key][$type == 'constructors' ? 'predicate' : 'method'] = preg_replace('/#.*/', '', $line);
+                    $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = preg_replace('/#.*/', '', $line);
                     $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line))))[0];
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
                     foreach (explode(' ', preg_replace(['/^[^\s]+\s/', '/=\s[^\s]+/', '/\s$/'], '', $line)) as $param) {
-                        if ($param == '') {
+                        if ($param === '') {
                             continue;
                         }
-                        if ($param[0] == '{') {
+                        if ($param[0] === '{') {
                             continue;
                         }
                         $explode = explode(':', $param);
@@ -87,7 +87,7 @@ trait TL
             throw new Exception('Could not extract method: '.$method);
         }
 
-        if (count(array_filter(array_keys($arguments), 'is_string')) == 0) {
+        if (count(array_filter(array_keys($arguments), 'is_string')) === 0) {
             $argcount = 0;
             $newargs = [];
             foreach ($tl_method['params'] as $current_argument) {
@@ -195,11 +195,11 @@ trait TL
             throw new Exception('Could not extract type');
         }
 
-        if ($bare = ($type['type'] != '' && $type['type'][0] == '%')) {
+        if ($bare = ($type['type'] != '' && $type['type'][0] === '%')) {
             $type['type'] = substr($type['type'], 1);
         }
 
-        if ($predicate == $type['type'] && !$auto) {
+        if ($predicate === $type['type'] && !$auto) {
             $bare = true;
         }
 
@@ -235,7 +235,7 @@ trait TL
                         break;
                     case 'Bool':
                         $arguments[$cur_flag['name']] = (isset($arguments[$cur_flag['name']]) && $arguments[$cur_flag['name']]) && (($flags & $cur_flag['pow']) != 0);
-                        if (($flags & $cur_flag['pow']) == 0) {
+                        if (($flags & $cur_flag['pow']) === 0) {
                             unset($arguments[$cur_flag['name']]);
                         }
                         break;
@@ -248,11 +248,11 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) == 0)) {
+                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
-                if ($current_argument['name'] == 'random_id') {
+                if ($current_argument['name'] === 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
                             $serialized .= $this->random(8);
@@ -290,7 +290,7 @@ trait TL
      */
     public function deserialize($bytes_io, $type = ['type' => ''])
     {
-        if (!(!is_string($bytes_io) && (get_resource_type($bytes_io) == 'file' || get_resource_type($bytes_io) == 'stream'))) {
+        if (!(!is_string($bytes_io) && (get_resource_type($bytes_io) === 'file' || get_resource_type($bytes_io) === 'stream'))) {
             if (is_string($bytes_io)) {
                 $bytes_io = $this->fopen_and_write('php://memory', 'rw+b', $bytes_io);
             } else {
@@ -321,7 +321,7 @@ trait TL
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
-                if ($l == 254) {
+                if ($l === 254) {
                     $long_len = \danog\PHP\Struct::unpack('<I', stream_get_contents($bytes_io, 3).chr(0))[0];
                     $x = stream_get_contents($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
@@ -366,7 +366,7 @@ trait TL
 
                 return $result;
         }
-        if ($type['type'] != '' && $type['type'][0] == '%') {
+        if ($type['type'] != '' && $type['type'][0] === '%') {
             $checkType = substr($type['type'], 1);
             $constructorData = $this->constructors->find_by_type($checkType);
             if ($constructorData === false) {
@@ -382,7 +382,7 @@ trait TL
                 }
             }
         }
-        if ($constructorData['predicate'] == 'gzip_packed') {
+        if ($constructorData['predicate'] === 'gzip_packed') {
             return $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', gzdecode($this->deserialize($bytes_io, ['type' => 'string']))));
         }
         $x = ['_' => $constructorData['predicate']];
@@ -395,12 +395,12 @@ trait TL
                         continue 2;
                         break;
                     case 'Bool':
-                        if (($x['flags'] & $arg['pow']) == 0) {
+                        if (($x['flags'] & $arg['pow']) === 0) {
                             $x[$arg['name']] = false;
                             continue 2;
                         }
                     default:
-                        if (($x['flags'] & $arg['pow']) == 0) {
+                        if (($x['flags'] & $arg['pow']) === 0) {
                             //$x[$arg['name']] = $default;
                             continue 2;
                         }

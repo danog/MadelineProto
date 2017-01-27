@@ -57,14 +57,14 @@ trait CallHandler
                             $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'] = [];
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
-                        if ($e->getMessage() == 'I had to recreate the temporary authorization key') {
+                        if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
                         continue;
                     }
                 }
-                if ($server_answer == null) {
+                if ($server_answer === null) {
                     throw new \danog\MadelineProto\Exception("Couldn't get response");
                 }
                 switch ($server_answer['_']) {
@@ -159,7 +159,7 @@ trait CallHandler
 
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
-                \danog\MadelineProto\Logger::log($object == 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                \danog\MadelineProto\Logger::log($object === 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $int_message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object));
                 $this->datacenter->outgoing_messages[$int_message_id]['content'] = ['method' => $object, 'args' => $args];
             } catch (Exception $e) {

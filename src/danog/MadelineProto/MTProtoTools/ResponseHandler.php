@@ -102,7 +102,7 @@ trait ResponseHandler
 
                 case 'pong':
                     foreach ($this->datacenter->outgoing_messages as $msg_id => &$omessage) {
-                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] == $response['ping_id']) {
+                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] === $response['ping_id']) {
                             $this->ack_outgoing_message_id($msg_id);
                             $omessage['response'] = $response['msg_id'];
                             $this->datacenter->incoming_messages[$response['msg_id']]['content'] = $response;
@@ -161,11 +161,11 @@ trait ResponseHandler
 
                     foreach ($response['msg_ids'] as $key => $msg_id) {
                         $status = 'Status for message id '.$msg_id.': ';
-                        if (($response['info'][$key] & 4) == 1) {
+                        if (($response['info'][$key] & 4) === 1) {
                             $this->ack_outgoing_message_id($msg_id);
                         }
                         foreach ($this->msgs_info_flags as $flag => $description) {
-                            if (($response['info'][$key] & $flag) == 1) {
+                            if (($response['info'][$key] & $flag) === 1) {
                                 $status .= $description;
                             }
                         }
@@ -223,7 +223,7 @@ trait ResponseHandler
                             \danog\MadelineProto\Logger::log('Trying to assign a response of type '.$response_type.' to its request...', \danog\MadelineProto\Logger::VERBOSE);
                             foreach ($this->datacenter->new_outgoing as $key => $expecting) {
                                 \danog\MadelineProto\Logger::log('Does the request of return type '.$expecting['type'].' and msg_id '.$expecting['msg_id'].' match?', \danog\MadelineProto\Logger::VERBOSE);
-                                if ($response_type == $expecting['type']) {
+                                if ($response_type === $expecting['type']) {
                                     \danog\MadelineProto\Logger::log('Yes', \danog\MadelineProto\Logger::VERBOSE);
                                     $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
                                     unset($this->datacenter->new_outgoing[$key]);

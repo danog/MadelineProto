@@ -23,7 +23,7 @@ trait MessageHandler
      */
     public function send_message($message_data, $content_related, $int_message_id = null)
     {
-        if ($int_message_id == null) {
+        if ($int_message_id === null) {
             $int_message_id = $this->generate_message_id();
         }
         if (!is_int($int_message_id)) {
@@ -31,7 +31,7 @@ trait MessageHandler
         }
 
         $message_id = \danog\PHP\Struct::pack('<Q', $int_message_id);
-        if ($this->datacenter->temp_auth_key['auth_key'] == null || $this->datacenter->temp_auth_key['server_salt'] == null) {
+        if ($this->datacenter->temp_auth_key['auth_key'] === null || $this->datacenter->temp_auth_key['server_salt'] === null) {
             $message = str_repeat(chr(0), 8).$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
@@ -54,9 +54,9 @@ trait MessageHandler
     public function recv_message()
     {
         $payload = $this->datacenter->read_message();
-        if (fstat($payload)['size'] == 4) {
+        if (fstat($payload)['size'] === 4) {
             $error = \danog\PHP\Struct::unpack('<i', stream_get_contents($payload, 4))[0];
-            if ($error == -404) {
+            if ($error === -404) {
                 if ($this->datacenter->temp_auth_key != null) {
                     \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...');
                     $this->datacenter->temp_auth_key = null;
@@ -69,11 +69,11 @@ trait MessageHandler
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
         $auth_key_id = stream_get_contents($payload, 8);
-        if ($auth_key_id == str_repeat(chr(0), 8)) {
+        if ($auth_key_id === str_repeat(chr(0), 8)) {
             list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', stream_get_contents($payload, 12));
             $this->check_message_id($message_id, false);
             $message_data = stream_get_contents($payload, $message_length);
-        } elseif ($auth_key_id == $this->datacenter->temp_auth_key['id']) {
+        } elseif ($auth_key_id === $this->datacenter->temp_auth_key['id']) {
             $message_key = stream_get_contents($payload, 16);
             $encrypted_data = stream_get_contents($payload);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key'], 'from server');

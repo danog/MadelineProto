@@ -58,7 +58,7 @@ class Connection
             case 'tcp_abridged':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
                 stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(chr(239));
@@ -66,7 +66,7 @@ class Connection
             case 'tcp_intermediate':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
                 stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(str_repeat(chr(238), 4));
@@ -74,7 +74,7 @@ class Connection
             case 'tcp_full':
                 $this->sock = fsockopen('tcp://'.$ip.':'.$port);
                 stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->out_seq_no = -1;
@@ -85,7 +85,7 @@ class Connection
                 $this->parsed = parse_url($ip);
                 $this->sock = fsockopen(($this->protocol === 'https' ? 'tls' : 'tcp').'://'.$this->parsed['host'].':'.$port);
                 stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 break;
@@ -149,7 +149,7 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 if (($wrote = fwrite($this->sock, $what)) !== strlen($what)) {
@@ -175,7 +175,7 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (!(get_resource_type($this->sock) == 'file' || get_resource_type($this->sock) == 'stream')) {
+                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $packet = stream_get_contents($this->sock, $length);

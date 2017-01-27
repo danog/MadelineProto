@@ -23,8 +23,8 @@ class TLConstructor extends TLParams
     public function add($json_dict, $mtproto)
     {
         $this->id[$this->key] = (int) $json_dict['id'];
-        $this->predicate[$this->key] = (string) ((($mtproto && $json_dict['predicate'] == 'message') ? 'MT' : '').$json_dict['predicate']);
-        $this->type[$this->key] = (($mtproto && $json_dict['type'] == 'Message') ? 'MT' : '').$json_dict['type'];
+        $this->predicate[$this->key] = (string) ((($mtproto && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
+        $this->type[$this->key] = (($mtproto && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
         $this->parse_params($this->key, $mtproto);
         $this->key++;

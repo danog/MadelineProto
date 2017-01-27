@@ -101,7 +101,7 @@ trait PeerHandler
     {
         try {
             foreach ($entities as $entity) {
-                if ($entity['_'] == 'messageEntityMentionName' || $entity['_'] == 'inputMessageEntityMentionName') {
+                if ($entity['_'] === 'messageEntityMentionName' || $entity['_'] === 'inputMessageEntityMentionName') {
                     if (!$this->peer_isset($entity['user_id'])) {
                         return false;
                     }
@@ -204,7 +204,7 @@ trait PeerHandler
         }
         $id = str_replace('@', '', $id);
         foreach ($this->chats as $chat) {
-            if (isset($chat['username']) && strtolower($chat['username']) == strtolower($id)) {
+            if (isset($chat['username']) && strtolower($chat['username']) === strtolower($id)) {
                 return $this->gen_all($chat);
             }
         }
@@ -305,7 +305,7 @@ trait PeerHandler
                     $res['photo'] = end($full['full']['profile_photo']['sizes']);
                 }
                 $bio = '';
-                if ($full['type'] == 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
+                if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
                     if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
                         $bio = html_entity_decode(preg_replace_callback('/(&#[0-9]+;)/', function ($m) {
                             return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
@@ -478,7 +478,7 @@ trait PeerHandler
     public function resolve_username($username)
     {
         $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)]);
-        if ($res['_'] == 'contacts.resolvedPeer') {
+        if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }
         throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($username, true));

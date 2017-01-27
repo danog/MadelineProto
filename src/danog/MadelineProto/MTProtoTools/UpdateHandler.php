@@ -94,7 +94,7 @@ trait UpdateHandler
         foreach ($this->updates as $key => $value) {
             if ($params['offset'] > $key) {
                 unset($this->updates[$key]);
-            } elseif ($params['limit'] == null || count($updates) < $params['limit']) {
+            } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
@@ -113,7 +113,7 @@ trait UpdateHandler
 
     public function set_channel_state($channel, $data)
     {
-        $this->get_channel_state($channel)['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
+        $this->get_channel_state($channel)['pts'] = (!isset($data['pts']) || $data['pts'] === 0) ? $this->get_channel_state($channel)['pts'] : $data['pts'];
     }
 
     public function get_channel_difference($channel)
@@ -164,8 +164,8 @@ trait UpdateHandler
 
     public function set_update_state($data)
     {
-        $this->get_update_state()['pts'] = (!isset($data['pts']) || $data['pts'] == 0) ? $this->get_update_state()['pts'] : $data['pts'];
-        $this->get_update_state()['seq'] = (!isset($data['seq']) || $data['seq'] == 0) ? $this->get_update_state()['seq'] : $data['seq'];
+        $this->get_update_state()['pts'] = (!isset($data['pts']) || $data['pts'] === 0) ? $this->get_update_state()['pts'] : $data['pts'];
+        $this->get_update_state()['seq'] = (!isset($data['seq']) || $data['seq'] === 0) ? $this->get_update_state()['seq'] : $data['seq'];
         $this->get_update_state()['date'] = (!isset($data['date']) || $data['date'] < $this->get_update_state()['date']) ? $this->get_update_state()['date'] : $data['date'];
 
         return $this->get_update_state();
@@ -240,7 +240,7 @@ trait UpdateHandler
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                if ($update['message']['_'] == 'messageEmpty') {
+                if ($update['message']['_'] === 'messageEmpty') {
                     \danog\MadelineProto\Logger::log('Got message empty, not saving', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     return false;
@@ -452,7 +452,7 @@ trait UpdateHandler
             return;
         }
         foreach ($messages as $message) {
-            $this->save_update(['_' => $channel == false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel == false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
+            $this->save_update(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 
@@ -461,7 +461,7 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        if (isset($update['message']['from_id']) && $update['message']['from_id'] == $this->datacenter->authorization['user']['id']) {
+        if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->datacenter->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);

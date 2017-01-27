@@ -98,7 +98,7 @@ class AnnotationsBuilder
                 }
                 $internalDoc[$namespace][$method]['attr'][$param['name']] = $ptype;
             }
-            if ($type == 'Bool') {
+            if ($type === 'Bool') {
                 $type = strtolower($type);
             }
             $internalDoc[$namespace][$method]['return'] = $type;

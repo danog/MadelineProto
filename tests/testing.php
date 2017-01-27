@@ -31,21 +31,22 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
-
-    $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
-        [
-            'phone_number'     => getenv('MTPROTO_NUMBER'),
-        ]
-    );
-    \danog\MadelineProto\Logger::log($checkedPhone);
-    $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
-    \danog\MadelineProto\Logger::log($sentCode);
-    echo 'Enter the code you received: ';
-    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
-    $authorization = $MadelineProto->complete_phone_login($code);
-    \danog\MadelineProto\Logger::log($authorization);
-    echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+    if (getenv('TRAVIS_COMMIT') == '') {
+        $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
+            [
+                'phone_number'     => getenv('MTPROTO_NUMBER'),
+           ]
+        );
+        \danog\MadelineProto\Logger::log($checkedPhone);
+        $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
+        \danog\MadelineProto\Logger::log($sentCode);
+        echo 'Enter the code you received: ';
+        $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
+        $authorization = $MadelineProto->complete_phone_login($code);
+        \danog\MadelineProto\Logger::log($authorization);
+        echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
+        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+    } else $MadelineProto->bot_login(getenv('BOT_TOKEN'));
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 

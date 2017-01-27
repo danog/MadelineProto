@@ -16,7 +16,7 @@ trait Crypt
 {
     public function aes_calculate($msg_key, $auth_key, $direction = 'to server')
     {
-        $x = ($direction == 'to server') ? 0 : 8;
+        $x = ($direction === 'to server') ? 0 : 8;
         $sha1_a = sha1($msg_key.substr($auth_key, $x, ($x + 32) - $x), true);
         $sha1_b = sha1(substr($auth_key, ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
         $sha1_c = sha1(substr($auth_key, ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
@@ -67,13 +67,13 @@ trait Crypt
         $ciphered = '';
         for ($i = 0; $i <= strlen($message); $i += $blocksize) {
             $indata = substr($message, $i, $blocksize);
-            if ($operation == 'decrypt') {
+            if ($operation === 'decrypt') {
                 $xored = $indata ^ $ivp2;
                 $decrypt_xored = $cipher->decrypt($xored);
                 $outdata = $decrypt_xored ^ $ivp;
                 $ivp = $indata;
                 $ivp2 = $outdata;
-            } elseif ($operation == 'encrypt') {
+            } elseif ($operation === 'encrypt') {
                 $xored = $indata ^ $ivp;
                 $encrypt_xored = $cipher->encrypt($xored);
                 $outdata = $encrypt_xored ^ $ivp2;

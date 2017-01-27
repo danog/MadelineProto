@@ -45,7 +45,7 @@ class PrimeModule
                     break;
                 }
 
-                if (($j & ($j - 1)) == 0) {
+                if (($j & ($j - 1)) === 0) {
                     $y = $x;
                 }
             }
@@ -60,10 +60,10 @@ class PrimeModule
     public function gcd($a, $b)
     {
         while ($a != 0 && $b != 0) {
-            while ($b & 1 == 0) {
+            while ($b & 1 === 0) {
                 $b >>= 1;
             }
-            while ($a & 1 == 0) {
+            while ($a & 1 === 0) {
                 $a >>= 1;
             }
             if ($a > $b) {
@@ -73,7 +73,7 @@ class PrimeModule
             }
         }
 
-        return ($b == 0) ? $a : $b;
+        return ($b === 0) ? $a : $b;
     }
 
     public function PrimeFactors($pq)
@@ -84,7 +84,7 @@ class PrimeModule
         if (function_exists('shell_exec')) {
             try {
                 $res = json_decode(shell_exec('python '.__DIR__.'/getpq.py '.$pqstr));
-                if (count($res) == 2) {
+                if (count($res) === 2) {
                     return $res;
                 }
             } catch (Exception $e) {
@@ -111,12 +111,12 @@ class PrimeModule
         $res = json_decode(curl_exec($ch), true);
         curl_close($ch);
         foreach ($res['queryresult']['pods'] as $cur) {
-            if ($cur['id'] == 'Divisors') {
+            if ($cur['id'] === 'Divisors') {
                 $res = explode(', ', preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
                 break;
             }
         }
-        if (count($res) == 2) {
+        if (count($res) === 2) {
             return $res;
         }
 

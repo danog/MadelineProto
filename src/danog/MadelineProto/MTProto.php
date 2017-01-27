@@ -276,11 +276,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     // Creates authorization keys
     public function init_authorization()
     {
-        if ($this->datacenter->session_id == null) {
+        if ($this->datacenter->session_id === null) {
             $this->datacenter->session_id = $this->random(8);
         }
-        if ($this->datacenter->temp_auth_key == null || $this->datacenter->auth_key == null) {
-            if ($this->datacenter->auth_key == null) {
+        if ($this->datacenter->temp_auth_key === null || $this->datacenter->auth_key === null) {
+            if ($this->datacenter->auth_key === null) {
                 \danog\MadelineProto\Logger::log('Generating permanent authorization key...', Logger::NOTICE);
                 $this->datacenter->auth_key = $this->create_auth_key(-1);
                 $this->should_serialize = true;

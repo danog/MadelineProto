@@ -32,7 +32,7 @@ class DataCenter
 
     public function dc_disconnect($dc_number)
     {
-        if ($this->curdc == $dc_number) {
+        if ($this->curdc === $dc_number) {
             $this->curdc = 0;
         }
         if (isset($this->sockets[$dc_number])) {
@@ -48,7 +48,7 @@ class DataCenter
             return false;
         }
 
-        if ($settings == []) {
+        if ($settings === []) {
             $settings = $this->settings[$dc_number];
         }
         $test = $settings['test_mode'] ? 'test' : 'main';
@@ -56,13 +56,13 @@ class DataCenter
         $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
         $address = $settings['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
-        if ($settings['protocol'] == 'https') {
+        if ($settings['protocol'] === 'https') {
             $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
             $path = $settings['test_mode'] ? 'apiw_test1' : 'apiw1';
             $address = $settings['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
         }
 
-        if ($settings['protocol'] == 'http') {
+        if ($settings['protocol'] === 'http') {
             $address = $settings['protocol'].'://'.$address.'/api';
             $port = 80;
         }
@@ -90,6 +90,6 @@ class DataCenter
 
     public function __call($name, $arguments)
     {
-        return $this->sockets[$this->curdc]->{$name}(...$arguments);
+        return call_user_func_array([$this->sockets[$this->curdc], $name], $arguments);
     }
 }

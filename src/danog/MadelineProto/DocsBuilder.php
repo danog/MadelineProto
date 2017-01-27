@@ -85,7 +85,7 @@ description: '.$this->settings['description'].'
                 $link_type = 'types';
                 if (isset($param['subtype'])) {
                     $stype = 'subtype';
-                    if ($param['type'] == 'vector') {
+                    if ($param['type'] === 'vector') {
                         $link_type = 'constructors';
                     }
                 }
@@ -105,7 +105,7 @@ description: '.$this->settings['description'].'
             }
             $md_method = '['.$real_method.']('.$method.'.md)';
 
-            $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) == [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)<a name="'.$method.'"></a>  
+            $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) === [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)<a name="'.$method.'"></a>  
 
 ';
 
@@ -224,7 +224,7 @@ description: List of methods
                 $link_type = 'types';
                 if (isset($param['subtype'])) {
                     $stype = 'subtype';
-                    if ($param['type'] == 'vector') {
+                    if ($param['type'] === 'vector') {
                         $link_type = 'constructors';
                     }
                 }
@@ -273,7 +273,7 @@ description: List of methods
 
                 $link_type = 'types';
                 if (isset($param['subtype'])) {
-                    if ($param['type'] == 'vector') {
+                    if ($param['type'] === 'vector') {
                         $link_type = 'constructors';
                     }
                 }
