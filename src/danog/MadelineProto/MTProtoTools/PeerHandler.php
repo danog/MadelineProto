@@ -200,7 +200,7 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            $dbres = file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id);
+            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
             if ($dbres['ok']) {
                 return $this->gen_all('@'.$dbres['username']);
             }
