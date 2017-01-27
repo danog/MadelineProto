@@ -84,5 +84,5 @@ db_connect.php
 sessions
 docs_md
 
-# .evn
 .env
+composer.lock
