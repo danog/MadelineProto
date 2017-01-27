@@ -128,8 +128,8 @@ trait CallHandler
                         break;
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                $last_error = $e->getMessage();
-                \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
+                $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
+                \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
                 if (in_array($this->datacenter->protocol, ['http', 'https']) && $method !== 'http_wait') {
                     //$this->method_call('http_wait', ['max_wait' => $this->datacenter->timeout, 'wait_after' => 0, 'max_delay' => 0]);
                 } else {
