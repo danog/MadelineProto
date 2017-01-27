@@ -37,23 +37,25 @@ if ($MadelineProto === false) {
                 'phone_number'     => getenv('MTPROTO_NUMBER'),
            ]
         );
-        \danog\MadelineProto\Logger::log([$checkedPhone],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([$checkedPhone], \danog\MadelineProto\Logger::NOTICE);
         $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
-        \danog\MadelineProto\Logger::log([$sentCode],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
         $authorization = $MadelineProto->complete_phone_login($code);
-        \danog\MadelineProto\Logger::log([$authorization],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
         if ($authorization['_'] === 'account.noPassword') {
             throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
         }
         if ($authorization['_'] === 'account.password') {
             \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $MadelineProto->complete_2fa_login(readline("Please enter your password (hint ".$authorization['hint'].'): '));
+            $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
         }
         echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
         echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-    } else $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+    } else {
+        $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+    }
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
@@ -97,9 +99,9 @@ $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile,
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log([$sentMessage],  \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
     foreach ($media as $type => $inputMedia) {
-        \danog\MadelineProto\Logger::log([$MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia])],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([$MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia])], \danog\MadelineProto\Logger::NOTICE);
     }
 }
 
@@ -113,7 +115,7 @@ echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' by
 if ($bot_token = getenv('BOT_TOKEN')) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($bot_token);
-    \danog\MadelineProto\Logger::log([$authorization],  \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 $message = 'yay';
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
@@ -121,7 +123,7 @@ $mention = $mention['user_id']; // Selects only the numeric user id
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log([$sentMessage],  \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
 }
 sleep(5);
 var_dump($MadelineProto->API->get_updates());

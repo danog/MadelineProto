@@ -201,7 +201,9 @@ trait PeerHandler
                 }
             }
             $dbres = file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id);
-            if ($dbres['ok']) return $this->gen_all('@'.$dbres['username']);
+            if ($dbres['ok']) {
+                return $this->gen_all('@'.$dbres['username']);
+            }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }
         $id = str_replace('@', '', $id);

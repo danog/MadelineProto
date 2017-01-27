@@ -31,7 +31,7 @@ class DocsBuilder
     {
         $types = [];
 
-        \danog\MadelineProto\Logger::log(['Generating documentation index...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents($this->index, '---
 title: '.$this->settings['title'].'
@@ -61,7 +61,7 @@ description: '.$this->settings['description'].'
 
         $methods = [];
 
-        \danog\MadelineProto\Logger::log(['Generating methods documentation...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating methods documentation...'], \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($this->methods->method as $key => $rmethod) {
             $method = str_replace('.', '_', $rmethod);
@@ -169,7 +169,7 @@ $'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
 
-        \danog\MadelineProto\Logger::log(['Generating methods index...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating methods index...'], \danog\MadelineProto\Logger::NOTICE);
 
         ksort($methods);
         $last_namespace = '';
@@ -203,7 +203,7 @@ description: List of methods
         mkdir('constructors');
 
         $constructors = [];
-        \danog\MadelineProto\Logger::log(['Generating constructors documentation...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating constructors documentation...'], \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($this->constructors->predicate as $key => $rconstructor) {
             if (preg_match('/%/', $type)) {
@@ -336,7 +336,7 @@ $".$constructor." = 'channel#38575794'; // tg-cli style id (channels)
             file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
         }
 
-        \danog\MadelineProto\Logger::log(['Generating constructors index...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating constructors index...'], \danog\MadelineProto\Logger::NOTICE);
 
         ksort($constructors);
         $last_namespace = '';
@@ -370,7 +370,7 @@ description: List of constructors
         ksort($types);
         $index = '';
 
-        \danog\MadelineProto\Logger::log(['Generating types documentation...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
 
         foreach ($types as $type => $keys) {
             $new_namespace = preg_replace('/_.*/', '', $method);
@@ -423,7 +423,7 @@ description: constructors and methods of type '.$type.'
             $last_namespace = $new_namespace;
         }
 
-        \danog\MadelineProto\Logger::log(['Generating types index...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating types index...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents('types/'.$this->index, '---
 title: Types
@@ -435,7 +435,7 @@ description: List of types
 
 '.$index);
 
-        \danog\MadelineProto\Logger::log(['Generating additional types...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating additional types...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents('types/string.md', '---
 title: string
@@ -562,6 +562,6 @@ description: Represents a boolean.
 
 Represents a boolean.');
 
-        \danog\MadelineProto\Logger::log(['Done!'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }
 }

@@ -80,7 +80,8 @@ trait TL
         }
     }
 
-    public function get_method_namespaces() {
+    public function get_method_namespaces()
+    {
         return $this->methods->method_namespace;
     }
 

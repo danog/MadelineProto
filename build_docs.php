@@ -14,7 +14,7 @@ require 'vendor/autoload.php';
 $param = 1;
 \danog\MadelineProto\Logger::constructor($param);
 
-\danog\MadelineProto\Logger::log(['Copying readme...'],  \danog\MadelineProto\Logger::NOTICE);
+\danog\MadelineProto\Logger::log(['Copying readme...'], \danog\MadelineProto\Logger::NOTICE);
 
 file_put_contents('docs/index.md', '---
 title: MadelineProto documentation

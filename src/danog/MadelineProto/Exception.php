@@ -25,7 +25,7 @@ class Exception extends \Exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
         }
-        \danog\MadelineProto\Logger::log([$errstr],  \danog\MadelineProto\Logger::FATAL_ERROR);
+        \danog\MadelineProto\Logger::log([$errstr], \danog\MadelineProto\Logger::FATAL_ERROR);
         $e = new \danog\MadelineProto\Exception($errstr, $errno);
         $e->file = $errfile;
         $e->line = $errline;

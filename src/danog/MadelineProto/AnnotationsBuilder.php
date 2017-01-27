@@ -26,7 +26,7 @@ class AnnotationsBuilder
 
     public function mk_annotations()
     {
-        \danog\MadelineProto\Logger::log(['Generating annotations...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating annotations...'], \danog\MadelineProto\Logger::NOTICE);
         $this->setProperties();
         $this->createInternalClasses();
     }
@@ -38,7 +38,7 @@ class AnnotationsBuilder
      */
     private function setProperties()
     {
-        \danog\MadelineProto\Logger::log(['Generating properties...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Generating properties...'], \danog\MadelineProto\Logger::NOTICE);
         $fixture = DocBlockFactory::createInstance();
         $class = new \ReflectionClass(APIFactory::class);
         $content = file_get_contents($filename = $class->getFileName());
@@ -71,7 +71,7 @@ class AnnotationsBuilder
      */
     private function createInternalClasses()
     {
-        \danog\MadelineProto\Logger::log(['Creating internal classes...'],  \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Creating internal classes...'], \danog\MadelineProto\Logger::NOTICE);
         $handle = fopen(dirname(__FILE__).'/InternalDoc.php', 'w');
         foreach ($this->methods->method as $key => $rmethod) {
             if (!strpos($rmethod, '.')) {

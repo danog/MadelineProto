@@ -94,7 +94,7 @@ trait CallHandler
                                 if ($this->settings['pwr']['pwr']) {
                                     $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
                                     if (is_numeric($seconds) && $seconds < $this->settings['flood_timeout']['wait_if_lt']) {
-                                        \danog\MadelineProto\Logger::log(['Flood, waiting '.$seconds.' seconds...'],  \danog\MadelineProto\Logger::NOTICE);
+                                        \danog\MadelineProto\Logger::log(['Flood, waiting '.$seconds.' seconds...'], \danog\MadelineProto\Logger::NOTICE);
                                         sleep($seconds);
                                         throw new \danog\MadelineProto\Exception('Re-executing query...');
                                     }
