@@ -42,15 +42,15 @@ class MTProto extends PrimeModule
         $this->parse_settings($settings);
 
         // Connect to servers
-        \danog\MadelineProto\Logger::log('Istantiating DataCenter...', Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Istantiating DataCenter...'], Logger::ULTRA_VERBOSE);
         $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
 
         // Load rsa key
-        \danog\MadelineProto\Logger::log('Loading RSA key...', Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
         $this->key = new RSA($this->settings['authorization']['rsa_key']);
 
         // Istantiate TL class
-        \danog\MadelineProto\Logger::log('Translating tl schemas...', Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Translating tl schemas...'], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
 
         $this->switch_dc(2, true);
@@ -63,7 +63,7 @@ class MTProto extends PrimeModule
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
         if ($this->datacenter->authorized && $this->settings['updates']['handle_updates']) {
-            \danog\MadelineProto\Logger::log('Getting updates after deserialization...', Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
     }
@@ -232,7 +232,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     {
         foreach ($this->datacenter->sockets as $id => &$socket) {
             if ($de) {
-                \danog\MadelineProto\Logger::log('Resetting session id and seq_no in DC '.$id.'...', Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log(['Resetting session id and seq_no in DC '.$id.'...'], Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
                 $socket->seq_no = 0;
             }
@@ -247,7 +247,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
     {
         $old_dc = $this->datacenter->curdc;
-        \danog\MadelineProto\Logger::log('Switching from DC '.$old_dc.' to DC '.$new_dc.'...', Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Switching from DC '.$old_dc.' to DC '.$new_dc.'...'], Logger::NOTICE);
         if (!isset($this->datacenter->sockets[$new_dc])) {
             $this->datacenter->dc_connect($new_dc);
             $this->init_authorization();
@@ -259,7 +259,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             (isset($this->datacenter->sockets[$old_dc]->authorized) && $this->datacenter->sockets[$old_dc]->authorized) &&
             !(isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] === $this->datacenter->sockets[$old_dc]->authorization['user']['id'])
         ) {
-            \danog\MadelineProto\Logger::log('Copying authorization...', Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Copying authorization...'], Logger::VERBOSE);
             $this->should_serialize = true;
             $this->datacenter->curdc = $old_dc;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
@@ -270,7 +270,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
             $this->datacenter->authorized = true;
         }
-        \danog\MadelineProto\Logger::log('Done! Current DC is '.$this->datacenter->curdc, Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Done! Current DC is '.$this->datacenter->curdc], Logger::NOTICE);
     }
 
     // Creates authorization keys
@@ -281,11 +281,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         }
         if ($this->datacenter->temp_auth_key === null || $this->datacenter->auth_key === null) {
             if ($this->datacenter->auth_key === null) {
-                \danog\MadelineProto\Logger::log('Generating permanent authorization key...', Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['Generating permanent authorization key...'], Logger::NOTICE);
                 $this->datacenter->auth_key = $this->create_auth_key(-1);
                 $this->should_serialize = true;
             }
-            \danog\MadelineProto\Logger::log('Generating temporary authorization key...', Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(['Generating temporary authorization key...'], Logger::NOTICE);
             $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
             if (in_array($this->datacenter->protocol, ['http', 'https'])) {
@@ -296,7 +296,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function write_client_info($method, $arguments = [])
     {
-        \danog\MadelineProto\Logger::log('Writing client info (also executing '.$method.')...', Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Writing client info (also executing '.$method.')...'], Logger::NOTICE);
 
         return $this->method_call(
             'invokeWithLayer',
@@ -315,7 +315,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function get_nearest_dc($allow_switch)
     {
         $nearest_dc = $this->method_call('help.getNearestDc');
-        \danog\MadelineProto\Logger::log("We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.', Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
 
         if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
             $this->switch_dc($nearest_dc['nearest_dc']);
@@ -344,6 +344,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         unset($this->config['dc_options']);
-        \danog\MadelineProto\Logger::log('Updated config!', $this->config, Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(['Updated config!', $this->config], Logger::NOTICE);
     }
 }

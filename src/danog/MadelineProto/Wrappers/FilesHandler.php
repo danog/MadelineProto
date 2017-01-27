@@ -416,7 +416,7 @@ trait FilesHandler
         }
         if ($cb === null) {
             $cb = function ($percent) {
-                \danog\MadelineProto\Logger::log('Upload status: '.$percent.'%');
+                \danog\MadelineProto\Logger::log(['Upload status: '.$percent.'%'],  \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $part_size = 512 * 1024;
@@ -539,7 +539,7 @@ trait FilesHandler
     {
         if ($cb === null) {
             $cb = function ($percent) {
-                \danog\MadelineProto\Logger::log('Download status: '.$percent.'%');
+                \danog\MadelineProto\Logger::log(['Download status: '.$percent.'%'],  \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $info = $this->get_download_info($message_media);
@@ -554,7 +554,7 @@ trait FilesHandler
         $percent = 0;
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
-            \danog\MadelineProto\Logger::log($real_part_size, $offset);
+            \danog\MadelineProto\Logger::log([$real_part_size, $offset],  \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $res = $this->API->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], null, true);
             $dc = 1;
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
@@ -563,8 +563,8 @@ trait FilesHandler
                 $dc++;
             }
 
-            \danog\MadelineProto\Logger::log(fwrite($stream, $res['bytes']));
-            \danog\MadelineProto\Logger::log($offset, $size, ftell($stream));
+            \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])],  \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)],  \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $cb($percent = ($offset += $real_part_size) * 100 / $size);
         }
 

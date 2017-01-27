@@ -21,7 +21,7 @@ trait MsgIdHandler
     {
         $min_message_id = ((int) ((time() + $this->datacenter->time_delta - 300) << 32));
         if ($min_message_id > $new_message_id) {
-            \danog\MadelineProto\Logger::log('Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').', \danog\MadelineProto\Logger::WARNING);
+            \danog\MadelineProto\Logger::log(['Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').'], \danog\MadelineProto\Logger::WARNING);
         }
         /*
         if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $new_message_id) {
@@ -50,13 +50,13 @@ trait MsgIdHandler
             if ($container) {
                 asort($keys);
                 if ($new_message_id >= end($keys)) {
-                    \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').', \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').'], \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
                 asort($keys);
                 foreach ($keys as $message_id) {
                     if ($new_message_id <= $message_id) {
-                        \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').', \danog\MadelineProto\Logger::WARNING);
+                        \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').'], \danog\MadelineProto\Logger::WARNING);
                     }
                 }
             }

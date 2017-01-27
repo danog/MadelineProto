@@ -36,7 +36,7 @@ class DataCenter
             $this->curdc = 0;
         }
         if (isset($this->sockets[$dc_number])) {
-            \danog\MadelineProto\Logger::log('Disconnecting from DC '.$dc_number.'...', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Disconnecting from DC '.$dc_number.'...'], \danog\MadelineProto\Logger::VERBOSE);
             unset($this->sockets[$dc_number]);
         }
     }
@@ -66,7 +66,7 @@ class DataCenter
             $address = $settings['protocol'].'://'.$address.'/api';
             $port = 80;
         }
-        \danog\MadelineProto\Logger::log('Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$settings['protocol'].')...', \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$settings['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $this->sockets[$dc_number] = new Connection($address, $port, $settings['protocol'], $settings['timeout']);
 

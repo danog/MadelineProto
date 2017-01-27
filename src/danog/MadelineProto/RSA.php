@@ -21,10 +21,10 @@ class RSA
 
     public function __construct($rsa_key)
     {
-        \danog\MadelineProto\Logger::log('Istantiating \phpseclib\Crypt\RSA...', LOGGER::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Istantiating \phpseclib\Crypt\RSA...'], Logger::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
 
-        \danog\MadelineProto\Logger::log('Loading key...', LOGGER::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Loading key...'], Logger::ULTRA_VERBOSE);
         if (method_exists($key, 'load')) {
             $key->load($rsa_key);
         } else {
@@ -32,7 +32,7 @@ class RSA
         }
         $this->keydata = ['n' => $key->modulus, 'e' => $key->exponent];
 
-        \danog\MadelineProto\Logger::log('Computing fingerprint...', LOGGER::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Computing fingerprint...'], Logger::ULTRA_VERBOSE);
         $this->keydata['fp'] = \danog\PHP\Struct::unpack('<q', substr(
             sha1(
                 $this->serialize_object(
@@ -54,7 +54,7 @@ class RSA
 
     public function encrypt($data)
     {
-        \danog\MadelineProto\Logger::log('Encrypting with rsa key...', LOGGER::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Encrypting with rsa key...'], Logger::VERBOSE);
 
         return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->keydata['e'], $this->keydata['n'])->toBytes();
     }

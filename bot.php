@@ -10,7 +10,7 @@ if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($token);
-    \danog\MadelineProto\Logger::log($authorization);
+    \danog\MadelineProto\Logger::log([$authorization],  \danog\MadelineProto\Logger::NOTICE);
 }
 $offset = 0;
 while (true) {

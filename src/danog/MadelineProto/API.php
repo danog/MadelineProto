@@ -33,16 +33,16 @@ class API extends APIFactory
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
 
-        \danog\MadelineProto\Logger::log('Running APIFactory...');
+        \danog\MadelineProto\Logger::log(['Running APIFactory...'], Logger::VERBOSE);
         $this->APIFactory();
 
-        \danog\MadelineProto\Logger::log('Ping...');
+        \danog\MadelineProto\Logger::log(['Ping...'], Logger::ULTRA_VERBOSE);
         $pong = $this->ping([3]);
-        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id']);
-        \danog\MadelineProto\Logger::log('Getting future salts...');
+        \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         $this->future_salts = $this->get_future_salts([3]);
 
-        \danog\MadelineProto\Logger::log('MadelineProto is ready!');
+        \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
     }
 
     public function __sleep()
@@ -65,7 +65,7 @@ class API extends APIFactory
 
     public function APIFactory()
     {
-        foreach ($this->API->methods->method_namespace as $namespace) {
+        foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }

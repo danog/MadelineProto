@@ -92,7 +92,6 @@ class APIFactory
     public function __call($name, $arguments)
     {
         $this->API->get_config();
-
-        return $this->API->method_call($this->namespace.$name, is_array($arguments[0]) ? $arguments[0] : []);
+        return $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : []);
     }
 }

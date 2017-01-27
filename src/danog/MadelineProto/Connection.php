@@ -32,7 +32,7 @@ class Connection
     public $seq_no = 0;
     public $authorized = false;
     public $authorization = null;
-    public $waiting_code = false;
+    public $login_temp_status = 'none';
 
     public $incoming_messages = [];
     public $outgoing_messages = [];

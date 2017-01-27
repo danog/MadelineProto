@@ -62,18 +62,14 @@ class Logger
         self::$level = self::level2num($level);
     }
 
-    public static function log(...$params)
+    public static function log($params, $level = self::NOTICE)
     {
         if (!self::$constructed) {
             throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
         }
-        $level = self::level2num(end($params));
-        if ($level !== false) {
-            if ($level > self::$level) {
-                return false;
-            } else {
-                array_pop($params);
-            }
+        $level = self::level2num($level);
+        if ($level > self::$level) {
+            return false;
         }
         foreach ($params as $param) {
             if (!is_string($param)) {

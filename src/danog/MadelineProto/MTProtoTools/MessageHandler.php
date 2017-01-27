@@ -58,7 +58,7 @@ trait MessageHandler
             $error = \danog\PHP\Struct::unpack('<i', stream_get_contents($payload, 4))[0];
             if ($error === -404) {
                 if ($this->datacenter->temp_auth_key != null) {
-                    \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...');
+                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'],  \danog\MadelineProto\Logger::WARNING);
                     $this->datacenter->temp_auth_key = null;
                     $this->init_authorization();
                     $this->config = $this->write_client_info('help.getConfig');
@@ -81,7 +81,7 @@ trait MessageHandler
 
             $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->datacenter->temp_auth_key['server_salt']) {
-                \danog\MadelineProto\Logger::log('WARNING: Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').');
+                \danog\MadelineProto\Logger::log(['WARNING: Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').'],  \danog\MadelineProto\Logger::WARNING);
             }
 
             $session_id = substr($decrypted_data, 8, 8);

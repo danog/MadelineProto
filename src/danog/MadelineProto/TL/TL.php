@@ -16,12 +16,12 @@ trait TL
 {
     public function construct_tl($files)
     {
-        \danog\MadelineProto\Logger::log('Loading TL schemes...', \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Loading TL schemes...'], \danog\MadelineProto\Logger::VERBOSE);
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
         foreach ($files as $scheme_type => $file) {
             $scheme_type = $scheme_type === 'mtproto';
-            \danog\MadelineProto\Logger::log('Parsing '.basename($file).'...', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Parsing '.basename($file).'...'], \danog\MadelineProto\Logger::VERBOSE);
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
@@ -68,16 +68,20 @@ trait TL
             if (empty($TL_dict) || empty($TL_dict['constructors']) || empty($TL_dict['methods'])) {
                 throw new Exception('Invalid source file was provided: '.$file);
             }
-            \danog\MadelineProto\Logger::log('Translating objects...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(['Translating objects...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 $this->constructors->add($elem, $scheme_type);
             }
 
-            \danog\MadelineProto\Logger::log('Translating methods...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(['Translating methods...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->methods->add($elem);
             }
         }
+    }
+
+    public function get_method_namespaces() {
+        return $this->methods->method_namespace;
     }
 
     public function get_named_method_args($method, $arguments)
@@ -191,7 +195,7 @@ trait TL
 
         $constructorData = $this->constructors->find_by_predicate($predicate);
         if ($constructorData === false) {
-            \danog\MadelineProto\Logger::log($object, \danog\MadelineProto\Logger::FATAL_WARNING);
+            \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_WARNING);
             throw new Exception('Could not extract type');
         }
 
@@ -249,7 +253,7 @@ trait TL
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
                 if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
-                    //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
+                    //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -271,7 +275,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
+            //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']]);
         }
 
@@ -297,7 +301,7 @@ trait TL
                 throw new Exception('An invalid bytes_io handle was provided.');
             }
         }
-        //\danog\MadelineProto\Logger::log('Deserializing '.$type['type'].' at byte '.ftell($bytes_io));
+        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.ftell($bytes_io));
         switch ($type['type']) {
             case 'Bool':
                 return $this->deserialize_bool(stream_get_contents($bytes_io, 4));

@@ -32,9 +32,9 @@ trait PeerHandler
                         try {
                             $this->get_pwr_chat($user['id'], false, true);
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                 case 'userEmpty':
@@ -59,9 +59,9 @@ trait PeerHandler
                         try {
                             $this->get_pwr_chat(-$chat['id'], true, true);
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         }
                     }
 
@@ -75,9 +75,9 @@ trait PeerHandler
                         try {
                             $this->get_pwr_chat('-100'.$chat['id'], true, true);
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                     break;
@@ -200,6 +200,8 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
+            $dbres = file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id);
+            if ($dbres['ok']) return $this->gen_all('@'.$dbres['username']);
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }
         $id = str_replace('@', '', $id);
@@ -444,7 +446,7 @@ trait PeerHandler
                     shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage());
+                \danog\MadelineProto\Logger::log([$e->getMessage());
             }
             */
             return;
@@ -467,9 +469,9 @@ trait PeerHandler
             file_put_contents($path, $payload);
             $id = isset($this->datacenter->authorization['user']['username']) ? $this->datacenter->authorization['user']['username'] : $this->datacenter->authorization['user']['id'];
             $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
-            \danog\MadelineProto\Logger::log($result, \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log([$result], \danog\MadelineProto\Logger::VERBOSE);
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::VERBOSE);
         }
         $this->qres = [];
         $this->last_stored = time() + 10;

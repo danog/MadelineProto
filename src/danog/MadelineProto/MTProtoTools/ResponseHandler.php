@@ -72,7 +72,7 @@ trait ResponseHandler
         foreach ($this->datacenter->new_incoming as $current_msg_id) {
             $this->only_updates = false;
             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
-            \danog\MadelineProto\Logger::log('Received '.$response['_'].'.', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Received '.$response['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
 
             switch ($response['_']) {
                 case 'msgs_ack':
@@ -144,7 +144,7 @@ trait ResponseHandler
                     break;
                 case 'http_wait':
 
-                    \danog\MadelineProto\Logger::log($response, \danog\MadelineProto\Logger::NOTICE);
+                    \danog\MadelineProto\Logger::log([$response], \danog\MadelineProto\Logger::NOTICE);
                     unset($this->datacenter->new_incoming[$current_msg_id]);
                     break;
                 case 'msgs_state_info':
@@ -169,7 +169,7 @@ trait ResponseHandler
                                 $status .= $description;
                             }
                         }
-                        \danog\MadelineProto\Logger::log($status, \danog\MadelineProto\Logger::NOTICE);
+                        \danog\MadelineProto\Logger::log([$status], \danog\MadelineProto\Logger::NOTICE);
                     }
                     break;
                 case 'msg_detailed_info':
@@ -220,18 +220,18 @@ trait ResponseHandler
                             $this->only_updates = true;
                             break;
                         default:
-                            \danog\MadelineProto\Logger::log('Trying to assign a response of type '.$response_type.' to its request...', \danog\MadelineProto\Logger::VERBOSE);
+                            \danog\MadelineProto\Logger::log(['Trying to assign a response of type '.$response_type.' to its request...'], \danog\MadelineProto\Logger::VERBOSE);
                             foreach ($this->datacenter->new_outgoing as $key => $expecting) {
-                                \danog\MadelineProto\Logger::log('Does the request of return type '.$expecting['type'].' and msg_id '.$expecting['msg_id'].' match?', \danog\MadelineProto\Logger::VERBOSE);
+                                \danog\MadelineProto\Logger::log(['Does the request of return type '.$expecting['type'].' and msg_id '.$expecting['msg_id'].' match?'], \danog\MadelineProto\Logger::VERBOSE);
                                 if ($response_type === $expecting['type']) {
-                                    \danog\MadelineProto\Logger::log('Yes', \danog\MadelineProto\Logger::VERBOSE);
+                                    \danog\MadelineProto\Logger::log(['Yes'], \danog\MadelineProto\Logger::VERBOSE);
                                     $this->datacenter->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
                                     unset($this->datacenter->new_outgoing[$key]);
                                     unset($this->datacenter->new_incoming[$current_msg_id]);
 
                                     return;
                                 }
-                                \danog\MadelineProto\Logger::log('No', \danog\MadelineProto\Logger::VERBOSE);
+                                \danog\MadelineProto\Logger::log(['No'], \danog\MadelineProto\Logger::VERBOSE);
                             }
                             throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($response, true));
                             break;
@@ -263,7 +263,7 @@ trait ResponseHandler
 
     public function handle_pending_updates()
     {
-        \danog\MadelineProto\Logger::log('Parsing pending updates...', \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Parsing pending updates...'], \danog\MadelineProto\Logger::VERBOSE);
         foreach ($this->pending_updates as $updates) {
             $this->handle_updates($updates);
         }
@@ -274,9 +274,9 @@ trait ResponseHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        \danog\MadelineProto\Logger::log('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         if ($this->getting_state) {
-            \danog\MadelineProto\Logger::log('Getting state, handle later', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Getting state, handle later'], \danog\MadelineProto\Logger::VERBOSE);
             $this->pending_updates[] = $updates;
 
             return false;
@@ -309,7 +309,7 @@ trait ResponseHandler
                     (isset($updates['via_bot_id']) && !$this->peer_isset($updates['via_bot_id'])) ||
                     (isset($updates['entities']) && !$this->entities_peer_isset($updates['entities'])) ||
                     (isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from']))) {
-                    \danog\MadelineProto\Logger::log('getDifference: good - getting user for updateShortMessage', \danog\MadelineProto\Logger::VERBOSE);
+                    \danog\MadelineProto\Logger::log(['getDifference: good - getting user for updateShortMessage'], \danog\MadelineProto\Logger::VERBOSE);
 
                     return $this->get_updates_difference();
                 }
