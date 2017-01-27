@@ -71,7 +71,7 @@ class Logger
         if ($level > self::$level) {
             return false;
         }
-        foreach ($params as $param) {
+        foreach (is_array($params) ? $params : [$params] as $param) {
             if (!is_string($param)) {
                 $param = var_export($param, true);
             }
