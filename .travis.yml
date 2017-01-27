@@ -7,8 +7,6 @@ php:
 - nightly
 - hhvm
 - '5.6'
-- '5.5'
-- '5.4'
 
 addons:
   apt:
