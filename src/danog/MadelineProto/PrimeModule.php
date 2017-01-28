@@ -92,6 +92,7 @@ class PrimeModule
         }
 
         \danog\MadelineProto\Logger::log(['Trying to use the wolfram alpha factorization module'], \danog\MadelineProto\Logger::VERBOSE);
+        try {
         $query = 'Do prime factorization of '.$pqstr;
         $params = [
             'async'         => true,
@@ -119,6 +120,8 @@ class PrimeModule
         if (count($res) === 2) {
             return $res;
         }
+            } catch (Exception $e) {
+            }
 
         \danog\MadelineProto\Logger::log(['Trying to use the native factorization module'], \danog\MadelineProto\Logger::VERBOSE);
         $res = $this->find_small_multiplier_lopatin((int) $pqstr);
