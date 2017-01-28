@@ -108,6 +108,7 @@ trait Login
             if ($e->getMessage() === 'SESSION_PASSWORD_NEEDED') {
                 \danog\MadelineProto\Logger::log(['2FA enabled, you will have to call the complete_2fa_login function...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->API->datacenter->login_temp_status = 'waiting_password';
+                $this->API->should_serialize = true;
 
                 return $this->API->datacenter->authorization = $this->account->getPassword();
             }
