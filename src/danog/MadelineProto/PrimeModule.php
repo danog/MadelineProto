@@ -93,8 +93,8 @@ class PrimeModule
 
         \danog\MadelineProto\Logger::log(['Trying to use the wolfram alpha factorization module'], \danog\MadelineProto\Logger::VERBOSE);
         try {
-        $query = 'Do prime factorization of '.$pqstr;
-        $params = [
+            $query = 'Do prime factorization of '.$pqstr;
+            $params = [
             'async'         => true,
             'banners'       => 'raw',
             'debuggingdata' => false,
@@ -104,24 +104,24 @@ class PrimeModule
             'output'        => 'JSON',
             'proxycode'     => json_decode(file_get_contents('http://www.wolframalpha.com/api/v1/code'), true)['code'],
         ];
-        $url = 'https://www.wolframalpha.com/input/json.jsp?'.http_build_query($params);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Referer: https://www.wolframalpha.com/input/?i='.urlencode($query)]);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        $res = json_decode(curl_exec($ch), true);
-        curl_close($ch);
-        foreach ($res['queryresult']['pods'] as $cur) {
-            if ($cur['id'] === 'Divisors') {
-                $res = explode(', ', preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
-                break;
+            $url = 'https://www.wolframalpha.com/input/json.jsp?'.http_build_query($params);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Referer: https://www.wolframalpha.com/input/?i='.urlencode($query)]);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            $res = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+            foreach ($res['queryresult']['pods'] as $cur) {
+                if ($cur['id'] === 'Divisors') {
+                    $res = explode(', ', preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
+                    break;
+                }
             }
-        }
-        if (count($res) === 2) {
-            return $res;
-        }
-            } catch (Exception $e) {
+            if (count($res) === 2) {
+                return $res;
             }
+        } catch (Exception $e) {
+        }
 
         \danog\MadelineProto\Logger::log(['Trying to use the native factorization module'], \danog\MadelineProto\Logger::VERBOSE);
         $res = $this->find_small_multiplier_lopatin((int) $pqstr);
