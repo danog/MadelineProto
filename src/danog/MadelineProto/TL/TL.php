@@ -181,8 +181,7 @@ trait TL
         }
         $auto = false;
 
-        if (!is_array($object) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-            //var_dump($this->get_info($object));
+        if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object)[$type['type']];
         }
         if (!isset($object['_'])) {
@@ -197,7 +196,7 @@ trait TL
 
         $constructorData = $this->constructors->find_by_predicate($predicate);
         if ($constructorData === false) {
-            \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_WARNING);
+            \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_ERROR);
             throw new Exception('Could not extract type');
         }
 
