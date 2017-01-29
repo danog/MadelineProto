@@ -472,29 +472,30 @@ trait UpdateHandler
         }
     }
 
-    public function pwr_webhook($update) {
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_URL, $this->hook_url);
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($update));
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                    $parse = parse_url($this->hook_url);
-                    if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
-                        if (isset($this->pem_path) && file_exists($this->pem_path)) {
-                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                            curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
-                        } else {
-                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                        }
-                    }
-                    $result = curl_exec($ch);
+    public function pwr_webhook($update)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $this->hook_url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($update));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        $parse = parse_url($this->hook_url);
+        if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
+            if (isset($this->pem_path) && file_exists($this->pem_path)) {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
+            } else {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            }
+        }
+        $result = curl_exec($ch);
 
-                    curl_close($ch);
-                    \danog\MadelineProto\Logger::log(['Result of webhook query is '.$result], \danog\MadelineProto\Logger::NOTICE);
-                    $result = json_decode($result, true);
-                    if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
-                        \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result)]);
-                    }
+        curl_close($ch);
+        \danog\MadelineProto\Logger::log(['Result of webhook query is '.$result], \danog\MadelineProto\Logger::NOTICE);
+        $result = json_decode($result, true);
+        if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
+            \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result)]);
+        }
     }
 }
