@@ -30,7 +30,7 @@ var_dump($updates);
                     $res = var_export($update, true);
                 }
                 try {
-//var_dump($update);
+                    //var_dump($update);
                     $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);

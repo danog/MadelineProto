@@ -97,7 +97,7 @@ trait UpdateHandler
             if ($params['offset'] > $key) {
                 $this->should_serialize = true;
                 unset($this->updates[$key]);
-            } else if ($params['limit'] === null || count($updates) < $params['limit']) {
+            } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
@@ -116,7 +116,10 @@ trait UpdateHandler
 
     public function set_channel_state($channel, $data)
     {
-        if (isset($data['pts']) && $data['pts'] !== 0) { $this->should_serialize = true; $this->get_channel_state($channel)['pts'] = $data['pts']; };
+        if (isset($data['pts']) && $data['pts'] !== 0) {
+            $this->should_serialize = true;
+            $this->get_channel_state($channel)['pts'] = $data['pts'];
+        }
     }
 
     public function get_channel_difference($channel)
@@ -165,9 +168,18 @@ trait UpdateHandler
 
     public function set_update_state($data)
     {
-        if (isset($data['pts']) && $data['pts'] !== 0) { $this->should_serialize = true; $this->get_update_state()['pts'] = $data['pts']; };
-        if (isset($data['seq']) && $data['seq'] !== 0) { $this->should_serialize = true; $this->get_update_state()['seq'] = $data['seq']; };
-        if (isset($data['date']) && $data['date'] > $this->get_update_state()['date']) { $this->should_serialize = true; $this->get_update_state()['date'] = $data['date']; };
+        if (isset($data['pts']) && $data['pts'] !== 0) {
+            $this->should_serialize = true;
+            $this->get_update_state()['pts'] = $data['pts'];
+        }
+        if (isset($data['seq']) && $data['seq'] !== 0) {
+            $this->should_serialize = true;
+            $this->get_update_state()['seq'] = $data['seq'];
+        }
+        if (isset($data['date']) && $data['date'] > $this->get_update_state()['date']) {
+            $this->should_serialize = true;
+            $this->get_update_state()['date'] = $data['date'];
+        }
     }
 
     public function &get_update_state()
@@ -334,7 +346,6 @@ trait UpdateHandler
             if ($channel_id !== false && isset($options['date']) && $this->get_update_state()['date'] < $options['date']) {
                 $this->get_update_state()['date'] = $options['date'];
                 $this->should_serialize = true;
-
             }
         } elseif ($channel_id === false && isset($options['seq']) && $options['seq'] > 0) {
             $seq = $options['seq'];
@@ -375,7 +386,7 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-                $this->should_serialize = true;
+        $this->should_serialize = true;
         $next_seq = $this->get_update_state()['seq'] + 1;
         if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) {
             return false;
@@ -398,7 +409,7 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-                $this->should_serialize = true;
+        $this->should_serialize = true;
         if ($channel_id === false) {
             $cur_state = &$this->get_update_state();
         } else {
