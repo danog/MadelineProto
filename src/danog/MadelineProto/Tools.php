@@ -48,6 +48,7 @@ trait Tools
 
         return $handle;
     }
+
     public function utf8ize($d)
     {
         if (is_array($d)) {
