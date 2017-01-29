@@ -202,7 +202,7 @@ trait PeerHandler
             }
             $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
             if ($dbres['ok']) {
-                return $this->gen_all('@'.$dbres['username']);
+                return $this->get_info('@'.$dbres['result']);
             }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }

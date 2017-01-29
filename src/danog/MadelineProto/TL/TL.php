@@ -182,6 +182,7 @@ trait TL
         $auto = false;
 
         if (!is_array($object) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+            //var_dump($this->get_info($object));
             $object = $this->get_info($object)[$type['type']];
         }
         if (!isset($object['_'])) {
