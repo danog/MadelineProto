@@ -478,7 +478,7 @@ trait UpdateHandler
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $this->hook_url);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($update));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->utf8ize($update)));
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         $parse = parse_url($this->hook_url);
         if (isset($parse['scheme']) && $parse['scheme'] == 'https') {

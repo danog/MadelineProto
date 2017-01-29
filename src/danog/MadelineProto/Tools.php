@@ -48,4 +48,16 @@ trait Tools
 
         return $handle;
     }
+    public function utf8ize($d)
+    {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = $this->utf8ize($v);
+            }
+        } elseif (is_string($d)) {
+            return utf8_encode($d);
+        }
+
+        return $d;
+    }
 }
