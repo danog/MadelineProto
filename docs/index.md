@@ -294,6 +294,8 @@ var_dump($authorization);
 
 See tests/testing.php for more examples.
 
+Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
+
 ### Storing sessions
 
 An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, usage of the `\danog\MadelineProto\Serialization` class is recommended:
