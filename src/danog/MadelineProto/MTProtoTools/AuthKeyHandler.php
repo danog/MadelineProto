@@ -62,10 +62,8 @@ trait AuthKeyHandler
                 * ***********************************************************************
                 * Find our key in the server_public_key_fingerprints vector
                 */
-                if (!isset($this->key->keydata)) {
-        // Load rsa key
-        \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
-        $this->key = new RSA($this->settings['authorization']['rsa_key']);
+                if (!isset($this->key->keydata['fp'])) {
+                    $this->key = new \danog\MadelineProto\RSA($this->settings['authorization']['rsa_key']);
                 }
                 foreach ($ResPQ['server_public_key_fingerprints'] as $curfp) {
                     if ($this->key->keydata['fp'] === $curfp) {
