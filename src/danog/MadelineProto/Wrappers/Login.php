@@ -53,7 +53,10 @@ trait Login
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
         if (!isset($this->API->settings['pwr']['pwr']) || !$this->API->settings['pwr']['pwr']) {
-            file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
+            try {
+                file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
+            } catch (\danog\MadelineProto\Exception $e) {
+            }
         }
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
