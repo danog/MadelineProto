@@ -17,6 +17,13 @@ namespace danog\MadelineProto;
  */
 class Serialization
 {
+    /**
+     * Serialize MTProto class
+     * @param string $filename the dump file
+     * @param MTProto $instance
+     * @param string $force
+     * @return number|boolean
+     */
     public static function serialize($filename, $instance, $force = false)
     {
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
@@ -28,6 +35,11 @@ class Serialization
         return false;
     }
 
+    /**
+     * Deserialize MTPRoto class
+     * @param string $filename
+     * @return boolean|MTProto
+     */
     public static function deserialize($filename)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
