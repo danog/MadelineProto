@@ -41,7 +41,7 @@ class Serialization
      * Deserialize MTPRoto class.
      *
      * @param string $filename
-     * 
+     *
      * @return bool|MTProto
      */
     public static function deserialize($filename)
