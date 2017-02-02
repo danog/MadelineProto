@@ -20,11 +20,11 @@ class Serialization
     /**
      * Serialize MTProto class.
      *
-     * @param string $filename the dump file
-     * @param MTProto $instance
+     * @param string  $filename the dump file
+     * @param MTProto  $instance
      * @param string $force
      *
-     * @return number|boolean
+     * @return number|bool
      */
     public static function serialize($filename, $instance, $force = false)
     {
@@ -40,9 +40,9 @@ class Serialization
     /**
      * Deserialize MTPRoto class.
      *
-     * @param string $filename
+     * @param string  $filename
      * 
-     * @return boolean|MTProto
+     * @return bool|MTProto
      */
     public static function deserialize($filename)
     {
