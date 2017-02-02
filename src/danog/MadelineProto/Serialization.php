@@ -20,8 +20,8 @@ class Serialization
     /**
      * Serialize MTProto class.
      *
-     * @param string  $filename the dump file
-     * @param MTProto  $instance
+     * @param string $filename the dump file
+     * @param MTProto $instance
      * @param string $force
      *
      * @return number|bool
@@ -40,7 +40,7 @@ class Serialization
     /**
      * Deserialize MTPRoto class.
      *
-     * @param string  $filename
+     * @param string $filename
      * 
      * @return bool|MTProto
      */
