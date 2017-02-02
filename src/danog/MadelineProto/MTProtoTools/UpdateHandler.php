@@ -495,7 +495,11 @@ trait UpdateHandler
     {
         $payload = json_encode($this->utf8ize($update));
         \danog\MadelineProto\Logger::log([$update, $payload, json_last_error()]);
-        if ($payload === '') { \danog\MadelineProto\Logger::log(['EMPTY UPDATE']); return false; }
+        if ($payload === '') {
+            \danog\MadelineProto\Logger::log(['EMPTY UPDATE']);
+
+            return false;
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $this->hook_url);
