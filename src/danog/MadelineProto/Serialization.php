@@ -18,11 +18,11 @@ namespace danog\MadelineProto;
 class Serialization
 {
     /**
-     * Serialize MTProto class.
+     * Serialize API class.
      *
      * @param string  $filename the dump file
-     * @param MTProto $instance
-     * @param string  $force
+     * @param API $instance
+     * @param bool  $force
      *
      * @return number|bool
      */
@@ -38,11 +38,11 @@ class Serialization
     }
 
     /**
-     * Deserialize MTPRoto class.
+     * Deserialize API class.
      *
      * @param string $filename
      *
-     * @return bool|MTProto
+     * @return bool|API
      */
     public static function deserialize($filename)
     {
