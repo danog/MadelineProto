@@ -22,7 +22,7 @@ class Serialization
      *
      * @param string $filename the dump file
      * @param API    $instance
-     * @param bool    $force
+     * @param bool   $force
      *
      * @return number|bool
      */
