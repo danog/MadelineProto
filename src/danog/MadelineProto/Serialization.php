@@ -20,9 +20,9 @@ class Serialization
     /**
      * Serialize API class.
      *
-     * @param string  $filename the dump file
-     * @param API $instance
-     * @param bool  $force
+     * @param string $filename the dump file
+     * @param API    $instance
+     * @param bool    $force
      *
      * @return number|bool
      */
