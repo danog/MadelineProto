@@ -17,6 +17,15 @@ namespace danog\MadelineProto;
  */
 class Serialization
 {
+    /**
+     * Serialize API class.
+     *
+     * @param string $filename the dump file
+     * @param API    $instance
+     * @param bool   $force
+     *
+     * @return number|bool
+     */
     public static function serialize($filename, $instance, $force = false)
     {
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
@@ -28,6 +37,13 @@ class Serialization
         return false;
     }
 
+    /**
+     * Deserialize API class.
+     *
+     * @param string $filename
+     *
+     * @return bool|API
+     */
     public static function deserialize($filename)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
