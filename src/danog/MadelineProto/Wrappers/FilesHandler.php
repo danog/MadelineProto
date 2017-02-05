@@ -507,7 +507,7 @@ trait FilesHandler
             $res['name'] .= '_'.$message_media['document']['id'];
             $res['size'] = $message_media['document']['size'];
             $res['mime'] = $message_media['document']['mime_type'];
-            $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => $message_media['document']['version'], 'dc_id' => $message_media['dc_id']];
+            $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => $message_media['document']['version'], 'dc_id' => $message_media['document']['dc_id']];
 
             return $res;
 
