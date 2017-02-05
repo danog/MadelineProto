@@ -552,7 +552,9 @@ trait FilesHandler
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
-        if (isset($info['InputFileLocation']['dc_id'])) $this->API->switch_dc($info['InputFileLocation']['dc_id']);
+        if (isset($info['InputFileLocation']['dc_id'])) {
+            $this->API->switch_dc($info['InputFileLocation']['dc_id']);
+        }
 
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
