@@ -343,10 +343,6 @@ trait UpdateHandler
                 $cur_state['pts'] = $update['pts'];
                 $this->should_serialize = true;
                 $pop_pts = true;
-            } elseif (isset($update['pts_count'])) {
-                \danog\MadelineProto\Logger::log(['Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' <= current pts '.$cur_state['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
-
-                return false;
             }
             if ($channel_id !== false && isset($options['date']) && $this->get_update_state()['date'] < $options['date']) {
                 $this->get_update_state()['date'] = $options['date'];
