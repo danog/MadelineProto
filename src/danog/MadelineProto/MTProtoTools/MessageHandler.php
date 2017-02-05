@@ -81,7 +81,7 @@ trait MessageHandler
 
             $server_salt = \danog\PHP\Struct::unpack('<q', substr($decrypted_data, 0, 8))[0];
             if ($server_salt != $this->datacenter->temp_auth_key['server_salt']) {
-                \danog\MadelineProto\Logger::log(['WARNING: Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').'], \danog\MadelineProto\Logger::WARNING);
+                //\danog\MadelineProto\Logger::log(['WARNING: Server salt mismatch (my server salt '.$this->datacenter->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').'], \danog\MadelineProto\Logger::WARNING);
             }
 
             $session_id = substr($decrypted_data, 8, 8);

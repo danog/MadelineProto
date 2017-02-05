@@ -26,6 +26,21 @@ The MadelineProto API documentation (mtproto tl scheme) can be found [here](http
 
 The MadelineProto API documentations (old layers) can be found [here](https://github.com/danog/MadelineProto/tree/master/old_docs).  
 
+## Acknowledgements
+
+While writing this client, I looked at many projects for inspiration and help. Here's the full list:
+
+* [tgl](https://github.com/vysheng/tgl)
+
+* [Kotlogram](https://github.com/badoualy/kotlogram)
+
+* [Webogram](https://github.com/zhukov/webogram)
+
+* [Telethon](https://github.com/LonamiWebs/Telethon/)
+
+Thanks to the devs that contributed to these projects, MadelineProto is now an easy, well-written and complete MTProto client.  
+
+
 ## Usage
 
 ### Installation
