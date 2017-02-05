@@ -462,7 +462,7 @@ trait FilesHandler
             $photo = end($message_media['photo']['sizes']);
             $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
             $res['size'] = $photo['size'];
-            $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret']];
+            $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
             $res['mime'] = 'image/jpeg';
 
             return $res;
@@ -472,7 +472,7 @@ trait FilesHandler
             $res['ext'] = '.jpg';
             $res['name'] = $message_media['location']['volume_id'].'_'.$message_media['location']['local_id'];
             $res['size'] = $message_media['size'];
-            $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret']];
+            $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret'], 'dc_id' => $message_media['location']['dc_id']];
             $res['mime'] = 'image/jpeg';
 
             return $res;
@@ -507,7 +507,7 @@ trait FilesHandler
             $res['name'] .= '_'.$message_media['document']['id'];
             $res['size'] = $message_media['document']['size'];
             $res['mime'] = $message_media['document']['mime_type'];
-            $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => $message_media['document']['version']];
+            $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => $message_media['document']['version'], 'dc_id' => $message_media['dc_id']];
 
             return $res;
 
@@ -552,6 +552,8 @@ trait FilesHandler
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
+        if (isset($info['InputFileLocation']['dc_id'])) $this->API->switch_dc($info['InputFileLocation']['dc_id']);
+
         while ($percent < 100) {
             $real_part_size = ($offset + $part_size > $end) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             \danog\MadelineProto\Logger::log([$real_part_size, $offset], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
