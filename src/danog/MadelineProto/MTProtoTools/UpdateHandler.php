@@ -143,9 +143,9 @@ trait UpdateHandler
                 $this->set_channel_state($channel, $difference);
                 break;
             case 'updates.channelDifference':
+                $this->set_channel_state($channel, $difference);
                 $this->handle_update_messages($difference['new_messages'], $channel);
                 $this->handle_multiple_update($difference['other_updates'], [], $channel);
-                $this->set_channel_state($channel, $difference);
                 if (!$difference['final']) {
                     unset($difference);
                     unset($input);
@@ -153,8 +153,8 @@ trait UpdateHandler
                 }
                 break;
             case 'updates.channelDifferenceTooLong':
-                $this->handle_update_messages($difference['messages'], $channel);
                 $this->set_channel_state($channel, $difference);
+                $this->handle_update_messages($difference['messages'], $channel);
                 unset($difference);
                 unset($input);
                 $this->get_channel_difference($channel);
@@ -212,14 +212,14 @@ trait UpdateHandler
                 $this->set_update_state($difference);
                 break;
             case 'updates.difference':
+                $this->set_update_state($difference['state']);
                 $this->handle_multiple_update($difference['other_updates']);
                 $this->handle_update_messages($difference['new_messages']);
-                $this->set_update_state($difference['state']);
                 break;
             case 'updates.differenceSlice':
+                $this->set_update_state($difference['intermediate_state']);
                 $this->handle_multiple_update($difference['other_updates']);
                 $this->handle_update_messages($difference['new_messages']);
-                $this->set_update_state($difference['intermediate_state']);
                 unset($difference);
                 $this->get_updates_difference();
                 break;
@@ -276,13 +276,13 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-
+/*
         if ($cur_state['sync_loading']) {
             \danog\MadelineProto\Logger::log(['Sync loading, not handling update'], \danog\MadelineProto\Logger::NOTICE);
 
-            return false;
+//            return false;
         }
-
+*/
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 $this->get_channel_difference($channel_id);
@@ -321,7 +321,12 @@ trait UpdateHandler
 
         if (isset($update['pts'])) {
             $new_pts = $cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0);
-            if ($new_pts < $update['pts']) {
+            if ($update['pts'] < $new_pts) {
+                \danog\MadelineProto\Logger::log(['Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.'. update pts: '.$update['pts'].' < new pts '.$new_pts.', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
+
+                return false;
+            }
+            if ($update['pts'] > $new_pts) {
                 \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
 
                 $this->cur_state['pending_pts_updates'][] = $update;
@@ -446,18 +451,11 @@ trait UpdateHandler
         }
         if ($channel === false) {
             foreach ($updates as $update) {
-                switch ($update['_']) {
-                    case 'updateChannelTooLong':
-                    case 'updateNewChannelMessage':
-                    case 'updateEditChannelMessage':
                         $this->handle_update($update, $options);
-                        continue 2;
-                }
-                $this->save_update($update);
             }
         } else {
             foreach ($updates as $update) {
-                $this->save_update($update);
+                        $this->handle_update($update);
             }
         }
     }
@@ -468,7 +466,7 @@ trait UpdateHandler
             return;
         }
         foreach ($messages as $message) {
-            $this->save_update(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
+            $this->handle_update(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? $this->get_update_state()['pts'] : $this->get_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 

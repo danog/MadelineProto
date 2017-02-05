@@ -430,6 +430,7 @@ trait PeerHandler
                     $res['participants'][$key] = $newres;
                 }
                 $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit]);
+                if (empty($gres['participants'])) break;
             }
         }
         if ($fullfetch || $send) {
