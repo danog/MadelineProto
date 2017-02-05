@@ -451,11 +451,11 @@ trait UpdateHandler
         }
         if ($channel === false) {
             foreach ($updates as $update) {
-                        $this->handle_update($update, $options);
+                $this->handle_update($update, $options);
             }
         } else {
             foreach ($updates as $update) {
-                        $this->handle_update($update);
+                $this->handle_update($update);
             }
         }
     }
