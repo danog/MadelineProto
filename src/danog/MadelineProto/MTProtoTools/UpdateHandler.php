@@ -339,7 +339,7 @@ trait UpdateHandler
 
                 return false;
             }
-            if ($update['pts'] > $cur_state['pts']) {
+            if ($update['pts'] >= $cur_state['pts']) {
                 $cur_state['pts'] = $update['pts'];
                 $this->should_serialize = true;
                 $pop_pts = true;
