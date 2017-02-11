@@ -69,4 +69,9 @@ class API extends APIFactory
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }
+
+    public function serialize($filename)
+    {
+        return Serialization::serialize($filename, $this);
+    }
 }
