@@ -17,8 +17,11 @@ if (file_exists('web_data.php')) {
 }
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-
+$MadelineProto = false;
+try {
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+} catch (\danog\MadelineProto\Exception $e) {
+}
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
