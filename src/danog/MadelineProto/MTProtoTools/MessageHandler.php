@@ -35,11 +35,11 @@ trait MessageHandler
             $message = str_repeat(chr(0), 8).$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_seq_no($content_related);
-            $encrypted_data = \danog\PHP\Struct::pack('<q', $this->datacenter->temp_auth_key['server_salt']).$this->datacenter->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
-            $message_key = substr(sha1($encrypted_data, true), -16);
-            $padding = $this->random($this->posmod(-strlen($encrypted_data), 16));
+            $data2enc = \danog\PHP\Struct::pack('<q', $this->datacenter->temp_auth_key['server_salt']).$this->datacenter->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+            $padding = $this->random($this->posmod(-strlen($data2enc), 16));
+            $message_key = substr(sha1($data2enc, true), -16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key']);
-            $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+            $message = $this->datacenter->temp_auth_key['id'].$message_key.$this->ige_encrypt($data2enc.$padding, $aes_key, $aes_iv);
             $this->datacenter->outgoing_messages[$int_message_id]['seq_no'] = $seq_no;
         }
         $this->datacenter->outgoing_messages[$int_message_id]['response'] = -1;
@@ -49,13 +49,13 @@ trait MessageHandler
     }
 
     /**
-     * Reading connectionet and receiving message from server. Check the CRC32.
+     * Reading connection and receiving message from server.
      */
     public function recv_message()
     {
         $payload = $this->datacenter->read_message();
-        if (fstat($payload)['size'] === 4) {
-            $error = \danog\PHP\Struct::unpack('<i', stream_get_contents($payload, 4))[0];
+        if (strlen($payload) === 4) {
+            $error = \danog\PHP\Struct::unpack('<i', $payload)[0];
             if ($error === -404) {
                 if ($this->datacenter->temp_auth_key != null) {
                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
@@ -68,14 +68,14 @@ trait MessageHandler
             }
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
-        $auth_key_id = stream_get_contents($payload, 8);
+        $auth_key_id = substr($payload, 0, 8);
         if ($auth_key_id === str_repeat(chr(0), 8)) {
-            list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', stream_get_contents($payload, 12));
+            list($message_id, $message_length) = \danog\PHP\Struct::unpack('<QI', substr($payload, 8, 12));
             $this->check_message_id($message_id, false);
-            $message_data = stream_get_contents($payload, $message_length);
+            $message_data = substr($payload, 20, $message_length);
         } elseif ($auth_key_id === $this->datacenter->temp_auth_key['id']) {
-            $message_key = stream_get_contents($payload, 16);
-            $encrypted_data = stream_get_contents($payload);
+            $message_key = substr($payload, 8, 16);
+            $encrypted_data = substr($payload, 24);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->temp_auth_key['auth_key'], 'from server');
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
@@ -121,7 +121,7 @@ trait MessageHandler
         } else {
             throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
         }
-        $deserialized = $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', $message_data));
+        $deserialized = $this->deserialize($message_data);
         $this->datacenter->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->new_incoming[$message_id] = $message_id;

@@ -14,7 +14,7 @@ Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
-This project can run on PHP 7, PHP 5.6 and HHVM, only 64 bit systems are supported ATM.  
+This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM.  
 
 Also note that MadelineProto will perform better if a big math extension like gmp or bcmath is installed.
 
@@ -72,7 +72,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L99 for the default values for the settings\ arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L99) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
@@ -328,8 +328,12 @@ The same operation should be done when serializing to another destination manual
 
 MadelineProto can throw three different exceptions:  
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
+
 * \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API)
+
 * \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
+
+* \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
 
 
 ## Contributing

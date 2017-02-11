@@ -4,9 +4,9 @@ group: edge
 language: php
 php:
 - '7.0'
+- '7.1'
 - nightly
 - hhvm
-- '5.6'
 
 addons:
   apt:

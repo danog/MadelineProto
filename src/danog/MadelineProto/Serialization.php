@@ -42,12 +42,16 @@ class Serialization
      *
      * @param string $filename
      *
-     * @return bool|API
+     * @return API
+     *
+     * @throws \danog\MadelineProto\Exception
      */
     public static function deserialize($filename)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
-        return file_exists($filename) ? unserialize(file_get_contents($filename)) : false;
+        if (file_exists($filename)) $unserialized = unserialize(file_get_contents($filename)); else throw new Exception('File does not exist');
+        //if ($unserialized === false) throw new Exception('An error occurred on deserialization');
+        return $unserialized;
     }
 }

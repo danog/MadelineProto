@@ -29,62 +29,17 @@ trait Crypt
 
     public function ige_encrypt($message, $key, $iv)
     {
-        return $this->_ige($message, $key, $iv, 'encrypt');
+        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
+        $cipher->setKey($key);
+        $cipher->setIV($iv);
+        return $cipher->encrypt($message);
     }
 
     public function ige_decrypt($message, $key, $iv)
     {
-        return $this->_ige($message, $key, $iv, 'decrypt');
-    }
-
-    /**
-     * Given a key, given an iv, and message
-     * do whatever operation asked in the operation field.
-     * Operation will be checked for: "decrypt" and "encrypt" strings.
-     * Returns the message encrypted/decrypted.
-     * message must be a multiple by 16 bytes (for division in 16 byte blocks)
-     * key must be 32 byte
-     * iv must be 32 byte (it's not internally used in AES 256 ECB, but it's
-     * needed for IGE).
-     */
-    public function _ige($message, $key, $iv, $operation = 'decrypt')
-    {
-        if (strlen($key) != 32) {
-            throw new \danog\MadelineProto\Exception('key must be 32 bytes long (was '.strlen($key).' bytes)');
-        }
-        if (strlen($iv) != 32) {
-            throw new \danog\MadelineProto\Exception('iv must be 32 bytes long (was '.strlen($iv).' bytes)');
-        }
-        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_ECB);
+        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
         $cipher->setKey($key);
-        $cipher->paddable = false;
-        $blocksize = $cipher->block_size;
-        if ((strlen($message) % $blocksize) != 0) {
-            throw new \danog\MadelineProto\Exception('message must be a multiple of 16 bytes (try adding '.(16 - (strlen($message) % 16)).' bytes of padding)');
-        }
-        $ivp = substr($iv, 0, $blocksize);
-        $ivp2 = substr($iv, $blocksize);
-        $ciphered = '';
-        for ($i = 0; $i <= strlen($message); $i += $blocksize) {
-            $indata = substr($message, $i, $blocksize);
-            if ($operation === 'decrypt') {
-                $xored = $indata ^ $ivp2;
-                $decrypt_xored = $cipher->decrypt($xored);
-                $outdata = $decrypt_xored ^ $ivp;
-                $ivp = $indata;
-                $ivp2 = $outdata;
-            } elseif ($operation === 'encrypt') {
-                $xored = $indata ^ $ivp;
-                $encrypt_xored = $cipher->encrypt($xored);
-                $outdata = $encrypt_xored ^ $ivp2;
-                $ivp = $outdata;
-                $ivp2 = $indata;
-            } else {
-                throw new \danog\MadelineProto\Exception('Crypt: operation must be either \'decrypt\' or \'encrypt\'');
-            }
-            $ciphered .= $outdata;
-        }
-
-        return $ciphered;
+        $cipher->setIV($iv);
+        return $cipher->decrypt($message);
     }
 }

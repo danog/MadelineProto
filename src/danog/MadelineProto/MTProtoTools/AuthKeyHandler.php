@@ -213,13 +213,13 @@ trait AuthKeyHandler
                 * 		int			$server_time
                 * ]
                 */
-                $server_DH_inner_data = $this->deserialize($this->fopen_and_write('php://memory', 'rw+b', $answer));
+                $server_DH_inner_data = $this->deserialize($answer);
 
                 /*
                 * ***********************************************************************
                 * Do some checks
                 */
-                $server_DH_inner_data_length = $this->get_length($this->fopen_and_write('php://memory', 'rw+b', $answer));
+                $server_DH_inner_data_length = $this->get_length(new \danog\MadelineProto\Stream($answer));
                 if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new \danog\MadelineProto\Exception('answer_hash mismatch.');
                 }

@@ -103,8 +103,6 @@ class Connection
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
-                fclose($this->sock);
-                break;
             case 'http':
             case 'https':
                 fclose($this->sock);
@@ -126,16 +124,6 @@ class Connection
     public function __wakeup()
     {
         $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
-    }
-
-    /**
-     * Function to get hex crc32.
-     *
-     * @param $data Data to encode.
-     */
-    public function newcrc32($data)
-    {
-        return hexdec(hash('crc32b', $data));
     }
 
     public function write($what, $length = null)
@@ -179,6 +167,9 @@ class Connection
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $packet = stream_get_contents($this->sock, $length);
+                if ($packet === false) {
+                    throw new NothingInTheSocketException('Nothing in the socket!');
+                }
                 if (strlen($packet) != $length) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
@@ -197,12 +188,9 @@ class Connection
         switch ($this->protocol) {
             case 'tcp_full':
                 $packet_length_data = $this->read(4);
-                if (strlen($packet_length_data) < 4) {
-                    throw new Exception('Nothing in the socket!');
-                }
                 $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
                 $packet = $this->read($packet_length - 4);
-                if ($this->newcrc32($packet_length_data.substr($packet, 0, -4)) != \danog\PHP\Struct::unpack('<I', substr($packet, -4))[0]) {
+                if (strrev(hash('crc32b', $packet_length_data.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
@@ -211,22 +199,13 @@ class Connection
                     throw new Exception('Incoming seq_no mismatch');
                 }
 
-                $payload = $this->fopen_and_write('php://memory', 'rw+b', substr($packet, 4, $packet_length - 12));
-                break;
+                return substr($packet, 4, $packet_length - 12);
             case 'tcp_intermediate':
                 $packet_length_data = $this->read(4);
-                if (strlen($packet_length_data) < 4) {
-                    throw new Exception('Nothing in the socket!');
-                }
                 $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
-                $packet = $this->read($packet_length);
-                $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
-                break;
+                return $this->read($packet_length);
             case 'tcp_abridged':
                 $packet_length_data = $this->read(1);
-                if (strlen($packet_length_data) < 1) {
-                    throw new Exception('Nothing in the socket!');
-                }
                 $packet_length = ord($packet_length_data);
                 if ($packet_length < 127) {
                     $packet_length <<= 2;
@@ -234,9 +213,7 @@ class Connection
                     $packet_length_data = $this->read(3);
                     $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
-                $packet = $this->read($packet_length);
-                $payload = $this->fopen_and_write('php://memory', 'rw+b', $packet);
-                break;
+                return $this->read($packet_length);
             case 'http':
             case 'https':
                 $headers = [];
@@ -261,19 +238,17 @@ class Connection
                     }
                     $headers[] = $current_header;
                 }
-                $payload = $this->fopen_and_write('php://memory', 'rw+b', $this->read($length));
+                $read = $this->read($length);
                 if ($headers[0] !== 'HTTP/1.1 200 OK') {
                     throw new Exception($headers[0]);
                 }
                 if ($close) {
                     $this->close_and_reopen();
                 }
-                break;
+                return $read;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
         }
-
-        return $payload;
     }
 
     public function send_message($message)
@@ -282,7 +257,7 @@ class Connection
             case 'tcp_full':
                 $this->out_seq_no++;
                 $step1 = \danog\PHP\Struct::pack('<II', (strlen($message) + 12), $this->out_seq_no).$message;
-                $step2 = $step1.\danog\PHP\Struct::pack('<I', $this->newcrc32($step1));
+                $step2 = $step1.strrev(hash('crc32b', $step1, true));
                 $this->write($step2);
                 break;
             case 'tcp_intermediate':

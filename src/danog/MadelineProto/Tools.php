@@ -40,15 +40,6 @@ trait Tools
         return $resto;
     }
 
-    public function fopen_and_write($filename, $mode, $data)
-    {
-        $handle = fopen($filename, $mode);
-        fwrite($handle, $data);
-        rewind($handle);
-
-        return $handle;
-    }
-
     public function utf8ize($d)
     {
         if (is_array($d)) {

@@ -25,12 +25,8 @@ class RSA
         $key = new \phpseclib\Crypt\RSA();
 
         \danog\MadelineProto\Logger::log(['Loading key...'], Logger::ULTRA_VERBOSE);
-        if (method_exists($key, 'load')) {
-            $key->load($rsa_key);
-        } else {
-            $key->loadKey($rsa_key);
-        }
-        $this->keydata = ['n' => $key->modulus, 'e' => $key->exponent];
+        $key->load($rsa_key);
+        $this->keydata = ['n' => \phpseclib\Common\Functions\Objects::getVar($key, 'modulus'), 'e' => \phpseclib\Common\Functions\Objects::getVar($key, 'exponent')];
 
         \danog\MadelineProto\Logger::log(['Computing fingerprint...'], Logger::ULTRA_VERBOSE);
         $this->keydata['fp'] = \danog\PHP\Struct::unpack('<q', substr(
