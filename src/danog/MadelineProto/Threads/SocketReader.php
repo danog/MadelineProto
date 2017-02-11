@@ -17,9 +17,11 @@ namespace danog\MadelineProto\Threads;
  */
 class SocketReader extends Threaded
 {
-    public function __construct(&$me) {
+    public function __construct(&$me)
+    {
         $this->API = $me;
     }
+
     /**
      * Reading connection and receiving message from server. Check the CRC32.
      */
@@ -31,6 +33,7 @@ class SocketReader extends Threaded
                 $thread->payloads[] = $payload;
                 $thread->notify();
             }, $this->API->socket_handler, $payload);
-        } catch (\danog\MadelineProto\NothingInTheSocketException $e) { ; };
+        } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+        }
     }
 }

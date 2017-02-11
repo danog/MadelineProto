@@ -203,6 +203,7 @@ class Connection
             case 'tcp_intermediate':
                 $packet_length_data = $this->read(4);
                 $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
+
                 return $this->read($packet_length);
             case 'tcp_abridged':
                 $packet_length_data = $this->read(1);
@@ -213,6 +214,7 @@ class Connection
                     $packet_length_data = $this->read(3);
                     $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data.pack('x'))[0] << 2;
                 }
+
                 return $this->read($packet_length);
             case 'http':
             case 'https':
@@ -245,6 +247,7 @@ class Connection
                 if ($close) {
                     $this->close_and_reopen();
                 }
+
                 return $read;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");

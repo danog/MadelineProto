@@ -111,15 +111,21 @@ trait UpdateHandler
             $this->get_channel_state($channel)['pts'] = $data['pts'];
         }
     }
-    public function get_msg_id($peer) {
+
+    public function get_msg_id($peer)
+    {
         $id = $this->get_info($peer)['bot_api_id'];
+
         return isset($this->msg_ids[$id]) ? $this->msg_ids[$id] : false;
     }
-    public function set_msg_id($peer, $msg_id) {
+
+    public function set_msg_id($peer, $msg_id)
+    {
         $id = $this->get_info($peer)['bot_api_id'];
         $this->msg_ids[$id] = $msg_id;
         $this->should_serialize = true;
     }
+
     public function get_channel_difference($channel)
     {
         if (!$this->settings['updates']['handle_updates']) {
@@ -444,11 +450,11 @@ trait UpdateHandler
         }
         if ($channel === false) {
             foreach ($updates as $update) {
-                        $this->handle_update($update, $options);
+                $this->handle_update($update, $options);
             }
         } else {
             foreach ($updates as $update) {
-                        $this->handle_update($update);
+                $this->handle_update($update);
             }
         }
     }
@@ -468,6 +474,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateDcOptions') {
             \danog\MadelineProto\Logger::log(['Got new dc options'], \danog\MadelineProto\Logger::VERBOSE);
             $this->parse_dc_options($update['dc_options']);
+
             return;
         }
         if (!$this->settings['updates']['handle_updates']) {

@@ -202,7 +202,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'incoming' => 1000,
                 'outgoing' => 1000,
             ],
-            'peer' => ['full_info_cache_time' => 60],
+            'peer'      => ['full_info_cache_time' => 60],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
@@ -341,7 +341,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         unset($this->config['dc_options']);
         \danog\MadelineProto\Logger::log(['Updated config!', $this->config], Logger::NOTICE);
     }
-    public function parse_dc_options($dc_options) {
+
+    public function parse_dc_options($dc_options)
+    {
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');

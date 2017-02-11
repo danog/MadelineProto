@@ -28,6 +28,7 @@ class Stream
     {
         $d = substr($this->string, $this->pos, $length);
         $this->pos += $length;
+
         return $d;
     }
 }

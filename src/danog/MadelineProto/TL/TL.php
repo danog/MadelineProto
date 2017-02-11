@@ -297,8 +297,8 @@ trait TL
     {
         if (is_string($bytes_io)) {
             $bytes_io = new \danog\MadelineProto\Stream($bytes_io);
-        } else if (!is_object($bytes_io)) {
-             throw new Exception('An invalid bytes_io handle was provided.');
+        } elseif (!is_object($bytes_io)) {
+            throw new Exception('An invalid bytes_io handle was provided.');
         }
         //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos);
         switch ($type['type']) {

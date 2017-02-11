@@ -262,6 +262,7 @@ trait PeerHandler
 
         return $res;
     }
+
     public function full_chat_last_updated($id)
     {
         $id = $this->get_info($id)['bot_api_id'];

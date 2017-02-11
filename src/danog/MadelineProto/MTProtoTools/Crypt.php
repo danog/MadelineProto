@@ -32,6 +32,7 @@ trait Crypt
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
         $cipher->setKey($key);
         $cipher->setIV($iv);
+
         return $cipher->encrypt($message);
     }
 
@@ -40,6 +41,7 @@ trait Crypt
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
         $cipher->setKey($key);
         $cipher->setIV($iv);
+
         return $cipher->decrypt($message);
     }
 }
