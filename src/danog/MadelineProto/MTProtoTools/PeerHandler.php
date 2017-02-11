@@ -265,13 +265,12 @@ trait PeerHandler
 
     public function full_chat_last_updated($id)
     {
-        $id = $this->get_info($id)['bot_api_id'];
-
         return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
     }
 
     public function get_full_info($id)
     {
+        $id = $this->get_info($id)['bot_api_id'];
         if (time() - $this->full_chat_last_updated($id) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
             return $this->full_chats[$id];
         }
