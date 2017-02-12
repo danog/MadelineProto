@@ -10,15 +10,15 @@ description: constructors and methods of type User
 The following syntaxes can also be used:
 
 ```
-$help_appChangelog = '@username'; // Username
+$User = '@username'; // Username
 
-$help_appChangelog = 44700; // bot API id (users)
-$help_appChangelog = -492772765; // bot API id (chats)
-$help_appChangelog = -10038575794; // bot API id (channels)
+$User = 44700; // bot API id (users)
+$User = -492772765; // bot API id (chats)
+$User = -10038575794; // bot API id (channels)
 
-$help_appChangelog = 'user#44700'; // tg-cli style id (users)
-$help_appChangelog = 'chat#492772765'; // tg-cli style id (chats)
-$help_appChangelog = 'channel#38575794'; // tg-cli style id (channels)
+$User = 'user#44700'; // tg-cli style id (users)
+$User = 'chat#492772765'; // tg-cli style id (chats)
+$User = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

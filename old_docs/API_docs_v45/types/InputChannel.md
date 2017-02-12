@@ -10,15 +10,15 @@ description: constructors and methods of type InputChannel
 The following syntaxes can also be used:
 
 ```
-$updateBotInlineSend = '@username'; // Username
+$InputChannel = '@username'; // Username
 
-$updateBotInlineSend = 44700; // bot API id (users)
-$updateBotInlineSend = -492772765; // bot API id (chats)
-$updateBotInlineSend = -10038575794; // bot API id (channels)
+$InputChannel = 44700; // bot API id (users)
+$InputChannel = -492772765; // bot API id (chats)
+$InputChannel = -10038575794; // bot API id (channels)
 
-$updateBotInlineSend = 'user#44700'; // tg-cli style id (users)
-$updateBotInlineSend = 'chat#492772765'; // tg-cli style id (chats)
-$updateBotInlineSend = 'channel#38575794'; // tg-cli style id (channels)
+$InputChannel = 'user#44700'; // tg-cli style id (users)
+$InputChannel = 'chat#492772765'; // tg-cli style id (chats)
+$InputChannel = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

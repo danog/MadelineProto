@@ -10,15 +10,15 @@ description: constructors and methods of type User
 The following syntaxes can also be used:
 
 ```
-$updateBotInlineSend = '@username'; // Username
+$User = '@username'; // Username
 
-$updateBotInlineSend = 44700; // bot API id (users)
-$updateBotInlineSend = -492772765; // bot API id (chats)
-$updateBotInlineSend = -10038575794; // bot API id (channels)
+$User = 44700; // bot API id (users)
+$User = -492772765; // bot API id (chats)
+$User = -10038575794; // bot API id (channels)
 
-$updateBotInlineSend = 'user#44700'; // tg-cli style id (users)
-$updateBotInlineSend = 'chat#492772765'; // tg-cli style id (chats)
-$updateBotInlineSend = 'channel#38575794'; // tg-cli style id (channels)
+$User = 'user#44700'; // tg-cli style id (users)
+$User = 'chat#492772765'; // tg-cli style id (chats)
+$User = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

@@ -10,15 +10,15 @@ description: constructors and methods of type Peer
 The following syntaxes can also be used:
 
 ```
-$updateBotInlineSend = '@username'; // Username
+$Peer = '@username'; // Username
 
-$updateBotInlineSend = 44700; // bot API id (users)
-$updateBotInlineSend = -492772765; // bot API id (chats)
-$updateBotInlineSend = -10038575794; // bot API id (channels)
+$Peer = 44700; // bot API id (users)
+$Peer = -492772765; // bot API id (chats)
+$Peer = -10038575794; // bot API id (channels)
 
-$updateBotInlineSend = 'user#44700'; // tg-cli style id (users)
-$updateBotInlineSend = 'chat#492772765'; // tg-cli style id (chats)
-$updateBotInlineSend = 'channel#38575794'; // tg-cli style id (channels)
+$Peer = 'user#44700'; // tg-cli style id (users)
+$Peer = 'chat#492772765'; // tg-cli style id (chats)
+$Peer = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

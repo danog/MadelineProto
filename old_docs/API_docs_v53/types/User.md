@@ -10,15 +10,15 @@ description: constructors and methods of type User
 The following syntaxes can also be used:
 
 ```
-$messageActionHistoryClear = '@username'; // Username
+$User = '@username'; // Username
 
-$messageActionHistoryClear = 44700; // bot API id (users)
-$messageActionHistoryClear = -492772765; // bot API id (chats)
-$messageActionHistoryClear = -10038575794; // bot API id (channels)
+$User = 44700; // bot API id (users)
+$User = -492772765; // bot API id (chats)
+$User = -10038575794; // bot API id (channels)
 
-$messageActionHistoryClear = 'user#44700'; // tg-cli style id (users)
-$messageActionHistoryClear = 'chat#492772765'; // tg-cli style id (chats)
-$messageActionHistoryClear = 'channel#38575794'; // tg-cli style id (channels)
+$User = 'user#44700'; // tg-cli style id (users)
+$User = 'chat#492772765'; // tg-cli style id (chats)
+$User = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

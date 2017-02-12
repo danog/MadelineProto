@@ -10,15 +10,15 @@ description: constructors and methods of type Chat
 The following syntaxes can also be used:
 
 ```
-$channels_channelParticipant = '@username'; // Username
+$Chat = '@username'; // Username
 
-$channels_channelParticipant = 44700; // bot API id (users)
-$channels_channelParticipant = -492772765; // bot API id (chats)
-$channels_channelParticipant = -10038575794; // bot API id (channels)
+$Chat = 44700; // bot API id (users)
+$Chat = -492772765; // bot API id (chats)
+$Chat = -10038575794; // bot API id (channels)
 
-$channels_channelParticipant = 'user#44700'; // tg-cli style id (users)
-$channels_channelParticipant = 'chat#492772765'; // tg-cli style id (chats)
-$channels_channelParticipant = 'channel#38575794'; // tg-cli style id (channels)
+$Chat = 'user#44700'; // tg-cli style id (users)
+$Chat = 'chat#492772765'; // tg-cli style id (chats)
+$Chat = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

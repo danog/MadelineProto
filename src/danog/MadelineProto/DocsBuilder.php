@@ -398,15 +398,15 @@ description: constructors and methods of type '.$type.'
                 $header .= 'The following syntaxes can also be used:
 
 ```
-$'.$constructor." = '@username'; // Username
+$'.$type." = '@username'; // Username
 
-$".$constructor.' = 44700; // bot API id (users)
-$'.$constructor.' = -492772765; // bot API id (chats)
-$'.$constructor.' = -10038575794; // bot API id (channels)
+$".$type.' = 44700; // bot API id (users)
+$'.$type.' = -492772765; // bot API id (chats)
+$'.$type.' = -10038575794; // bot API id (channels)
 
-$'.$constructor." = 'user#44700'; // tg-cli style id (users)
-$".$constructor." = 'chat#492772765'; // tg-cli style id (chats)
-$".$constructor." = 'channel#38575794'; // tg-cli style id (channels)
+$'.$type." = 'user#44700'; // tg-cli style id (users)
+$".$type." = 'chat#492772765'; // tg-cli style id (chats)
+$".$type." = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

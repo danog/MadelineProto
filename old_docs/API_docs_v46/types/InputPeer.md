@@ -10,15 +10,15 @@ description: constructors and methods of type InputPeer
 The following syntaxes can also be used:
 
 ```
-$messages_botResults = '@username'; // Username
+$InputPeer = '@username'; // Username
 
-$messages_botResults = 44700; // bot API id (users)
-$messages_botResults = -492772765; // bot API id (chats)
-$messages_botResults = -10038575794; // bot API id (channels)
+$InputPeer = 44700; // bot API id (users)
+$InputPeer = -492772765; // bot API id (chats)
+$InputPeer = -10038575794; // bot API id (channels)
 
-$messages_botResults = 'user#44700'; // tg-cli style id (users)
-$messages_botResults = 'chat#492772765'; // tg-cli style id (chats)
-$messages_botResults = 'channel#38575794'; // tg-cli style id (channels)
+$InputPeer = 'user#44700'; // tg-cli style id (users)
+$InputPeer = 'chat#492772765'; // tg-cli style id (chats)
+$InputPeer = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 

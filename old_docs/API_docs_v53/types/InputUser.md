@@ -10,15 +10,15 @@ description: constructors and methods of type InputUser
 The following syntaxes can also be used:
 
 ```
-$messageActionHistoryClear = '@username'; // Username
+$InputUser = '@username'; // Username
 
-$messageActionHistoryClear = 44700; // bot API id (users)
-$messageActionHistoryClear = -492772765; // bot API id (chats)
-$messageActionHistoryClear = -10038575794; // bot API id (channels)
+$InputUser = 44700; // bot API id (users)
+$InputUser = -492772765; // bot API id (chats)
+$InputUser = -10038575794; // bot API id (channels)
 
-$messageActionHistoryClear = 'user#44700'; // tg-cli style id (users)
-$messageActionHistoryClear = 'chat#492772765'; // tg-cli style id (chats)
-$messageActionHistoryClear = 'channel#38575794'; // tg-cli style id (channels)
+$InputUser = 'user#44700'; // tg-cli style id (users)
+$InputUser = 'chat#492772765'; // tg-cli style id (chats)
+$InputUser = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
 
