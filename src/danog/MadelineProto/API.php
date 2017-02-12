@@ -65,7 +65,7 @@ class API extends APIFactory
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $this->API->__construct($this->API->settings);
-            $this->v = $current;
+            $this->v = $this->getV();
         }
     }
 
