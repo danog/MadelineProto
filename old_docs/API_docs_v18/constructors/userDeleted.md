@@ -27,16 +27,3 @@ description: userDeleted attributes, type and example
 $userDeleted = ['_' => 'userDeleted', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$userDeleted = '@username'; // Username
-
-$userDeleted = 44700; // bot API id (users)
-$userDeleted = -492772765; // bot API id (chats)
-$userDeleted = -10038575794; // bot API id (channels)
-
-$userDeleted = 'user#44700'; // tg-cli style id (users)
-$userDeleted = 'chat#492772765'; // tg-cli style id (chats)
-$userDeleted = 'channel#38575794'; // tg-cli style id (channels)
-```

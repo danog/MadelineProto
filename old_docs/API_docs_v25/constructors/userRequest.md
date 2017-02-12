@@ -31,16 +31,3 @@ description: userRequest attributes, type and example
 $userRequest = ['_' => 'userRequest', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'access_hash' => long, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$userRequest = '@username'; // Username
-
-$userRequest = 44700; // bot API id (users)
-$userRequest = -492772765; // bot API id (chats)
-$userRequest = -10038575794; // bot API id (channels)
-
-$userRequest = 'user#44700'; // tg-cli style id (users)
-$userRequest = 'chat#492772765'; // tg-cli style id (chats)
-$userRequest = 'channel#38575794'; // tg-cli style id (channels)
-```

@@ -31,16 +31,3 @@ description: userContact attributes, type and example
 $userContact = ['_' => 'userContact', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'access_hash' => long, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$userContact = '@username'; // Username
-
-$userContact = 44700; // bot API id (users)
-$userContact = -492772765; // bot API id (chats)
-$userContact = -10038575794; // bot API id (channels)
-
-$userContact = 'user#44700'; // tg-cli style id (users)
-$userContact = 'chat#492772765'; // tg-cli style id (chats)
-$userContact = 'channel#38575794'; // tg-cli style id (channels)
-```

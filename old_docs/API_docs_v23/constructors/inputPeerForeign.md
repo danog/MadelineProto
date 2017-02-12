@@ -25,16 +25,3 @@ description: inputPeerForeign attributes, type and example
 $inputPeerForeign = ['_' => 'inputPeerForeign', 'user_id' => int, 'access_hash' => long, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$inputPeerForeign = '@username'; // Username
-
-$inputPeerForeign = 44700; // bot API id (users)
-$inputPeerForeign = -492772765; // bot API id (chats)
-$inputPeerForeign = -10038575794; // bot API id (channels)
-
-$inputPeerForeign = 'user#44700'; // tg-cli style id (users)
-$inputPeerForeign = 'chat#492772765'; // tg-cli style id (chats)
-$inputPeerForeign = 'channel#38575794'; // tg-cli style id (channels)
-```

@@ -43,16 +43,3 @@ description: channel attributes, type and example
 $channel = ['_' => 'channel', 'creator' => true, 'kicked' => true, 'left' => true, 'editor' => true, 'moderator' => true, 'broadcast' => true, 'verified' => true, 'megagroup' => true, 'restricted' => true, 'democracy' => true, 'signatures' => true, 'min' => true, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$channel = '@username'; // Username
-
-$channel = 44700; // bot API id (users)
-$channel = -492772765; // bot API id (chats)
-$channel = -10038575794; // bot API id (channels)
-
-$channel = 'user#44700'; // tg-cli style id (users)
-$channel = 'chat#492772765'; // tg-cli style id (chats)
-$channel = 'channel#38575794'; // tg-cli style id (channels)
-```

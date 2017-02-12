@@ -45,16 +45,3 @@ description: user attributes, type and example
 $user = ['_' => 'user', 'self' => true, 'contact' => true, 'mutual_contact' => true, 'deleted' => true, 'bot' => true, 'bot_chat_history' => true, 'bot_nochats' => true, 'verified' => true, 'restricted' => true, 'min' => true, 'bot_inline_geo' => true, 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, 'restriction_reason' => string, 'bot_inline_placeholder' => string, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$user = '@username'; // Username
-
-$user = 44700; // bot API id (users)
-$user = -492772765; // bot API id (chats)
-$user = -10038575794; // bot API id (channels)
-
-$user = 'user#44700'; // tg-cli style id (users)
-$user = 'chat#492772765'; // tg-cli style id (chats)
-$user = 'channel#38575794'; // tg-cli style id (channels)
-```

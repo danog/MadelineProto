@@ -34,16 +34,3 @@ description: geoChat attributes, type and example
 $geoChat = ['_' => 'geoChat', 'id' => int, 'access_hash' => long, 'title' => string, 'address' => string, 'venue' => string, 'geo' => GeoPoint, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'checked_in' => Bool, 'version' => int, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$geoChat = '@username'; // Username
-
-$geoChat = 44700; // bot API id (users)
-$geoChat = -492772765; // bot API id (chats)
-$geoChat = -10038575794; // bot API id (channels)
-
-$geoChat = 'user#44700'; // tg-cli style id (users)
-$geoChat = 'chat#492772765'; // tg-cli style id (chats)
-$geoChat = 'channel#38575794'; // tg-cli style id (channels)
-```

@@ -30,16 +30,3 @@ description: chat attributes, type and example
 $chat = ['_' => 'chat', 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'left' => Bool, 'version' => int, ];
 ```  
 
-The following syntaxes can also be used:
-
-```
-$chat = '@username'; // Username
-
-$chat = 44700; // bot API id (users)
-$chat = -492772765; // bot API id (chats)
-$chat = -10038575794; // bot API id (channels)
-
-$chat = 'user#44700'; // tg-cli style id (users)
-$chat = 'chat#492772765'; // tg-cli style id (chats)
-$chat = 'channel#38575794'; // tg-cli style id (channels)
-```
