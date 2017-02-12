@@ -19,7 +19,7 @@ class DataCenter
 {
     use \danog\MadelineProto\Tools;
 
-    public $sockets;
+    public $sockets = [];
     public $curdc = 0;
     public $dclist = [];
     public $settings = [];
@@ -28,6 +28,9 @@ class DataCenter
     {
         $this->dclist = &$dclist;
         $this->settings = &$settings;
+        foreach ($this->sockets as &$socket) {
+            $socket->close_and_reopen();
+        }
     }
 
     public function dc_disconnect($dc_number)

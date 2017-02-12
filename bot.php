@@ -14,13 +14,15 @@ If not, see <http://www.gnu.org/licenses/>.
 require 'vendor/autoload.php';
 $settings = [];
 
+try {
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
-
-if (file_exists('token.php') && $MadelineProto === false) {
+} catch (\danog\MadelineProto\Exception $e) {
+if (file_exists('token.php')) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+}
 }
 $offset = 0;
 while (true) {

@@ -43,8 +43,11 @@ class MTProto extends PrimeModule
 
         // Connect to servers
         \danog\MadelineProto\Logger::log(['Istantiating DataCenter...'], Logger::ULTRA_VERBOSE);
-        $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
-
+        if (isset($this->datacenter)) {
+            $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        } else {
+            $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+        }
         // Load rsa key
         \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
         $this->key = new RSA($this->settings['authorization']['rsa_key']);
@@ -74,7 +77,7 @@ class MTProto extends PrimeModule
         $google = '';
         try {
             $ctx = stream_context_create(['http'=> [
-                    'timeout' => 1,  //1200 Seconds is 20 Minutes
+                    'timeout' => 1,
                 ],
             ]);
 
