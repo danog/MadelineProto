@@ -15,14 +15,14 @@ require 'vendor/autoload.php';
 $settings = [];
 
 try {
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-if (file_exists('token.php')) {
-    include_once 'token.php';
-    $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login($token);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
-}
+    if (file_exists('token.php')) {
+        include_once 'token.php';
+        $MadelineProto = new \danog\MadelineProto\API($settings);
+        $authorization = $MadelineProto->bot_login($token);
+        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    }
 }
 $offset = 0;
 while (true) {

@@ -51,7 +51,12 @@ class API extends APIFactory
 
         return ['API', 'v'];
     }
-    public function getV() { return 1; }
+
+    public function getV()
+    {
+        return 1;
+    }
+
     public function __wakeup()
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
