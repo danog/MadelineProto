@@ -225,9 +225,12 @@ trait TL
 
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
-    public function html_entity_decode($stuff) {
+
+    public function html_entity_decode($stuff)
+    {
         return html_entity_decode(str_replace('<br />', "\n", $stuff));
     }
+
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
