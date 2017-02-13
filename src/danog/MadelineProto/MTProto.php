@@ -63,6 +63,11 @@ class MTProto extends PrimeModule
     public function __wakeup()
     {
         $this->setup_logger();
+        if (!isset($this->v) || $this->v !== $this->getV()) {
+            \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
+            $this->__construct($this->settings);
+            $this->v = $this->getV();
+        }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
         if ($this->datacenter->authorized && $this->settings['updates']['handle_updates']) {
@@ -355,4 +360,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
     }
+    public function getV()
+    {
+        return 1;
+    }
+
 }

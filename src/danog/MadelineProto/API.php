@@ -41,7 +41,7 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         $this->future_salts = $this->get_future_salts([3]);
-        $this->v = $this->getV();
+        $this->API->v = $this->API->getV();
         \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
     }
 
@@ -49,24 +49,13 @@ class API extends APIFactory
     {
         //$this->API->reset_session(false);
 
-        return ['API', 'v'];
-    }
-
-    public function getV()
-    {
-        return 1;
+        return ['API'];
     }
 
     public function __wakeup()
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->APIFactory();
-        $this->API->setup_logger();
-        if (!isset($this->v) || $this->v !== $this->getV()) {
-            \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
-            $this->API->__construct($this->API->settings);
-            $this->v = $this->getV();
-        }
     }
 
     public function __destruct()
