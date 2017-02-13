@@ -225,6 +225,7 @@ trait TL
 
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
+
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
@@ -237,7 +238,9 @@ trait TL
                 $dom = new \PHPHtmlParser\Dom();
                 $dom->loadStr(str_replace("\n", '<br>', $arguments['message']), []);
                 $nmessage = '';
-                if (!isset($arguments['entities'])) $arguments['entities'] = [];
+                if (!isset($arguments['entities'])) {
+                    $arguments['entities'] = [];
+                }
                 foreach ($dom->find('') as $tag) {
                     switch ($tag->tag->name()) {
                         case 'br':
@@ -247,28 +250,30 @@ trait TL
                         case 'b':
                         case 'strong':
                         $text = html_entity_decode($tag->innerHtml);
-                        $arguments['entities'] []= ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                        $arguments['entities'][] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'i':
                         case 'em':
                         $text = html_entity_decode($tag->innerHtml);
-                        $arguments['entities'] []= ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                        $arguments['entities'][] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'code':
                         $text = html_entity_decode($tag->innerHtml);
-                        $arguments['entities'] []= ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                        $arguments['entities'][] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'pre':
                         $text = html_entity_decode($tag->innerHtml);
                         $language = $tag->getAttribute('language');
-                        if ($language === null) $language = '';
-                        $arguments['entities'] []= ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
+                        if ($language === null) {
+                            $language = '';
+                        }
+                        $arguments['entities'][] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
                         $nmessage .= $text;
                         break;
 
@@ -276,13 +281,12 @@ trait TL
                         $text = html_entity_decode($tag->innerHtml);
                         $href = $tag->getAttribute('href');
                         if (preg_match('|mention:|', $href)) {
-                            $arguments['entities'] []= ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
+                            $arguments['entities'][] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
                         } else {
-                            $arguments['entities'] []= ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
+                            $arguments['entities'][] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
                         }
                         $nmessage .= $text;
                         break;
-
 
                         default:
                         $nmessage .= html_entity_decode($tag->outerHtml);
@@ -290,7 +294,7 @@ trait TL
                     }
                 }
                 $arguments['message'] = $nmessage;
-           }
+            }
         }
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {

@@ -174,7 +174,8 @@ if (isset($number)) {
 $'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
 ```
 ');
-    if ($hasentities) $example .= '
+            if ($hasentities) {
+                $example .= '
 ## Usage of parse_mode:
 
 Set parse_mode to html to enable HTML parsing of the message.  
@@ -206,6 +207,7 @@ You can also use normal markdown, note that to create mentions you must use the 
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
+            }
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
 
