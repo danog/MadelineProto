@@ -54,8 +54,6 @@ Now copy .env.example to .env, edit the its values, read the docs and take a loo
 
 ### Dependencies
 
-This project depends on [PHPStruct](https://github.com/danog/PHPStruct), [phpseclib](https://github.com/phpseclib/phpseclib)
-
 To install dependencies install composer and run:
 ```
 composer update
@@ -308,6 +306,8 @@ var_dump($authorization);
 ```
 
 See tests/testing.php for more examples.
+
+Methods that allow sending message entities (messages.sendMessage for example) also have an additional parse_mode parameter that enables or disables html/markdown parsing of the message to be sent. See the method-specific documentation for more info.  
 
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
 

@@ -17,7 +17,9 @@
         "danog/phpstruct": "dev-fast",
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
-        "krakjoe/pthreads-polyfill": "dev-master"
+        "krakjoe/pthreads-polyfill": "dev-master",
+        "paquettg/php-html-parser": "^1.7",
+        "erusev/parsedown": "^1.6"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"

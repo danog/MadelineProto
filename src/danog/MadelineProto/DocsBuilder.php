@@ -115,6 +115,7 @@ description: '.$this->settings['description'].'
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
+            $hasentities = false;
             foreach ($this->methods->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id'])) {
                     continue;
@@ -130,6 +131,12 @@ description: '.$this->settings['description'].'
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
+                if ($param['name'] === 'entities') {
+                    $hasentities = true;
+                    $table .= '|parse\_mode| [string](../types/string.md) | Optional |
+';
+                    $params .= "'parse_mode' => 'string', ";
+                }
             }
             $header = '---
 title: '.$rmethod.'
@@ -165,7 +172,40 @@ if (isset($number)) {
 }
 
 $'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
-```');
+```
+');
+    if ($hasentities) $example .= '
+## Usage of parse_mode:
+
+Set parse_mode to html to enable HTML parsing of the message.  
+
+Set parse_mode to Markdown to enable markown AND html parsing of the message.  
+
+The following tags are currently supported:
+
+```
+<br>a newline
+<b><i>bold works ok, internal tags aren\'t parsed and shown as is</i> </ b>
+<strong>bold</strong>
+<em>italic</em>
+<i>italic</i>
+<code>inline fixed-width code</code>
+<pre>pre-formatted fixed-width code block</pre>
+<a href="https://github.com">URL</a>
+<a href="mention:@danogentili">Mention by username</a>
+<a href="mention:186785362">Mention by user id</a>
+<pre language="json">Pre tags can have a language attribute</pre>
+```
+
+You can also use normal markdown, note that to create mentions you must use the `mention:` syntax like in html:  
+
+```
+[Mention by username](mention:@danogentili)
+[Mention by user id](mention:186785362)
+```
+
+MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
+';
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
 
