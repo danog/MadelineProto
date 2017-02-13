@@ -18,7 +18,7 @@
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
         "krakjoe/pthreads-polyfill": "dev-master",
-        "paquettg/php-html-parser": "^1.7",
+        "danog/php-html-parser": "dev-master",
         "erusev/parsedown": "^1.6"
     },
     "require-dev": {
