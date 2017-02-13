@@ -225,7 +225,9 @@ trait TL
 
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
-
+    public function html_entity_decode($stuff) {
+        return html_entity_decode(str_replace('<br />', "\n", $stuff));
+    }
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
@@ -249,26 +251,26 @@ trait TL
 
                         case 'b':
                         case 'strong':
-                        $text = html_entity_decode($tag->innerHtml);
+                        $text = $this->html_entity_decode($tag->innerHtml);
                         $arguments['entities'][] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'i':
                         case 'em':
-                        $text = html_entity_decode($tag->innerHtml);
+                        $text = $this->html_entity_decode($tag->innerHtml);
                         $arguments['entities'][] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'code':
-                        $text = html_entity_decode($tag->innerHtml);
+                        $text = $this->html_entity_decode($tag->innerHtml);
                         $arguments['entities'][] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
                         $nmessage .= $text;
                         break;
 
                         case 'pre':
-                        $text = html_entity_decode($tag->innerHtml);
+                        $text = $this->html_entity_decode($tag->innerHtml);
                         $language = $tag->getAttribute('language');
                         if ($language === null) {
                             $language = '';
@@ -278,7 +280,7 @@ trait TL
                         break;
 
                         case 'a':
-                        $text = html_entity_decode($tag->innerHtml);
+                        $text = $this->html_entity_decode($tag->innerHtml);
                         $href = $tag->getAttribute('href');
                         if (preg_match('|mention:|', $href)) {
                             $arguments['entities'][] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
@@ -289,7 +291,7 @@ trait TL
                         break;
 
                         default:
-                        $nmessage .= html_entity_decode($tag->outerHtml);
+                        $nmessage .= $this->html_entity_decode($tag->outerHtml);
                         break;
                     }
                 }
