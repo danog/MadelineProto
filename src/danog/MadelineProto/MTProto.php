@@ -360,9 +360,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
     }
+
     public function getV()
     {
         return 1;
     }
-
 }
