@@ -17,25 +17,31 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait FilesHandler
 {
-    public function upload($file, $file_name = '', $cb = null) {
+    public function upload($file, $file_name = '', $cb = null)
+    {
         return $this->API->upload($file, $file_name, $cb);
     }
+
     public function get_extension_from_mime($mime)
     {
         return $this->API->get_extension_from_mime($mime);
     }
+
     public function get_download_info($message_media)
     {
         return $this->API->get_download_info($message_media);
     }
+
     public function download_to_dir($message_media, $dir, $cb = null)
     {
         return $this->API->download_to_dir($message_media, $dir, $cb);
     }
+
     public function download_to_file($message_media, $file, $cb = null)
     {
         return $this->API->download_to_file($message_media, $file, $cb);
     }
+
     public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         return $this->API->download_to_stream($message_media, $stream, $cb);

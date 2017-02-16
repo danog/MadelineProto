@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\TL;
 
 /**
- * Manages serialization of file ids
+ * Manages serialization of file ids.
  */
 trait Files
 {
@@ -448,6 +448,7 @@ trait Files
 
         return '';
     }
+
     public function base64url_decode($data)
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
@@ -458,7 +459,8 @@ trait Files
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    function rle_decode($string) {
+    public function rle_decode($string)
+    {
         $new = '';
         $last = '';
         $null = chr(0);
@@ -472,10 +474,12 @@ trait Files
             }
         }
         $string = $new.$last;
+
         return $string;
     }
 
-    function rle_encode($string) {
+    public function rle_encode($string)
+    {
         $new = '';
         $count = 0;
         $null = chr(0);
@@ -490,42 +494,50 @@ trait Files
                 $new .= $cur;
             }
         }
+
         return $new;
     }
-    public function photosize_to_botapi($photo, $message_media, $thumbnail = false) {
+
+    public function photosize_to_botapi($photo, $message_media, $thumbnail = false)
+    {
         $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']], '.jpg');
-        $data = \danog\PHP\Struct::pack('<iiqqqqib', $thumbnail ? 0 : 2, $photo['location']['dc_id'], $thumbnail ? 0 : $message_media['id'], $thumbnail ? 0 : $message_media['access_hash'],$photo['location']['volume_id'],$photo['location']['secret'], $photo['location']['local_id'], 2);
+        $data = \danog\PHP\Struct::pack('<iiqqqqib', $thumbnail ? 0 : 2, $photo['location']['dc_id'], $thumbnail ? 0 : $message_media['id'], $thumbnail ? 0 : $message_media['access_hash'], $photo['location']['volume_id'], $photo['location']['secret'], $photo['location']['local_id'], 2);
+
         return [
-            'file_id' => $this->base64url_encode($this->rle_encode($data)),
-            'width' => $photo['w'],
-            'height' => $photo['h'],
+            'file_id'   => $this->base64url_encode($this->rle_encode($data)),
+            'width'     => $photo['w'],
+            'height'    => $photo['h'],
             'file_size' => isset($photo['size']) ? $photo['size'] : strlen($photo['bytes']),
             'mime_type' => 'image/jpeg',
-            'file_name' => $photo['location']['volume_id'].'_'.$photo['location']['local_id'].$ext
+            'file_name' => $photo['location']['volume_id'].'_'.$photo['location']['local_id'].$ext,
         ];
     }
-    public function unpack_file_id($file_id) {
+
+    public function unpack_file_id($file_id)
+    {
         $file_id = $this->rle_decode($this->base64url_decode($file_id));
         $res = [];
         $type = \danog\PHP\Struct::unpack('<i', substr($file_id, 0, 4))[0];
         switch ($type) {
             case 0:
             $constructor = ['_' => 'photo', 'sizes' => []];
-            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'],$constructor['sizes'][0]['location']['secret'],$constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
+            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'], $constructor['sizes'][0]['location']['secret'], $constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
             if ($verify !== 2) {
                 throw new Exception('Invalid last byte');
             }
             $res['type'] = 'photo';
             $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
+
             return $res;
             case 2:
             $constructor = ['_' => 'photo', 'sizes' => []];
-            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'],$constructor['sizes'][0]['location']['secret'],$constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
+            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'], $constructor['sizes'][0]['location']['secret'], $constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
             if ($verify !== 2) {
                 throw new Exception('Invalid last byte');
             }
             $res['type'] = 'photo';
             $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
+
             return $res;
             case 3:
             $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true]]];
@@ -535,6 +547,7 @@ trait Files
             }
             $res['type'] = 'voice';
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
+
             return $res;
             case 4:
             $res['type'] = 'videos';
@@ -544,6 +557,7 @@ trait Files
                 throw new Exception('Invalid last byte');
             }
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
+
             return $res;
             case 5:
             $res['type'] = 'document';
@@ -553,14 +567,17 @@ trait Files
                 throw new Exception('Invalid last byte');
             }
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
+
             return $res;
             default:
-            throw new Exception("Invalid file type detected (".$type.')');
+            throw new Exception('Invalid file type detected ('.$type.')');
         }
     }
-    public function get_extension_from_location($location, $default) {
+
+    public function get_extension_from_location($location, $default)
+    {
         $this->switch_dc($location['dc_id']);
-        $res = $this->method_call('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1],['heavy' => true]);
+        $res = $this->method_call('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1], ['heavy' => true]);
         switch ($res['type']['_']) {
             case 'storage.fileJpeg': return '.jpg';
             case 'storage.fileGif': return '.gif';
@@ -573,6 +590,7 @@ trait Files
             default: return $default;
         }
     }
+
     public function get_download_info($message_media)
     {
         if (is_string($message_media)) {
@@ -589,6 +607,7 @@ trait Files
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
             $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
             $res['mime'] = 'image/jpeg';
+
             return $res;
             case 'photoSize':
             case 'photoCachedSize':
@@ -596,13 +615,16 @@ trait Files
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret'], 'dc_id' => $message_media['location']['dc_id']];
             $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
             $res['mime'] = 'image/jpeg';
+
             return $res;
             case 'messageMediaDocument':
             foreach ($message_media['document']['attributes'] as $attribute) {
                 switch ($attribute['_']) {
                     case 'documentAttributeFilename':
                     $pathinfo = pathinfo($attribute['file_name']);
-                    if (isset($pathinfo['extension'])) $res['ext'] = '.'.$pathinfo['extension'];
+                    if (isset($pathinfo['extension'])) {
+                        $res['ext'] = '.'.$pathinfo['extension'];
+                    }
                     $res['name'] = $pathinfo['filename'];
                     break;
                     case 'documentAttributeAudio':
@@ -616,7 +638,7 @@ trait Files
                     $res['name'] .= ' - '.$audio['performer'];
                 }
             }
-            $res ['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id']];
+            $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id']];
             if (!isset($res['ext'])) {
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
             }
@@ -625,6 +647,7 @@ trait Files
             }
             $res['name'] .= '_'.$message_media['document']['id'];
             $res['mime'] = $message_media['document']['mime_type'];
+
             return $res;
             default:
             throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
@@ -642,7 +665,9 @@ trait Files
     {
         $file = str_replace('//', '/', $file);
         $info = $this->get_download_info($message_media);
-        if (!file_exists($file)) touch ($file);
+        if (!file_exists($file)) {
+            touch($file);
+        }
         $stream = fopen($file, 'r+b');
         flock($stream, LOCK_EX);
         $this->download_to_stream($info, $stream, $cb, filesize($file), -1);
@@ -675,9 +700,13 @@ trait Files
         while (true) {
             //$real_part_size = (($offset + $part_size > $end) && $end !== -1) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             try {
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size],['heavy' => true]);
+                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->getMessage() === 'OFFSET_INVALID') break; else throw $e;
+                if ($e->getMessage() === 'OFFSET_INVALID') {
+                    break;
+                } else {
+                    throw $e;
+                }
             }
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $dc = 1;
@@ -695,11 +724,18 @@ trait Files
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
             \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($end) break;
+            if ($end) {
+                break;
+            }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($end !== -1) $cb($percent = $downloaded_size * 100 / $size);
+            if ($end !== -1) {
+                $cb($percent = $downloaded_size * 100 / $size);
+            }
         }
-        if ($end === -1) $cb(100);
+        if ($end === -1) {
+            $cb(100);
+        }
+
         return true;
     }
 }

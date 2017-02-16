@@ -13,19 +13,20 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 $settings = [];
-$token='';
+$token = '';
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('b.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-        $MadelineProto = new \danog\MadelineProto\API($settings);
-        $authorization = $MadelineProto->bot_login($token);
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $authorization = $MadelineProto->bot_login($token);
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 function base64url_decode($data)
 {
     return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
 }
-function rle_decode($string) {
+function rle_decode($string)
+{
     $base256 = '';
     $last = '';
     foreach (str_split($string) as $cur) {
@@ -38,12 +39,13 @@ function rle_decode($string) {
         }
     }
     $string = $base256.$last;
+
     return $string;
 }
 
 function foreach_offset_length($string)
 {
-/*    $a = [];
+    /*    $a = [];
     $b = [];
     foreach ([2, 3, 4] as $r) {
         $a []= chr(0).chr($r);
@@ -53,7 +55,7 @@ function foreach_offset_length($string)
     $res = [];
     $strlen = strlen($string);
     for ($offset = 0; $offset < strlen($string); $offset++) {
-//        for ($length = $strlen - $offset; $length > 0; $length--) {
+        //        for ($length = $strlen - $offset; $length > 0; $length--) {
         foreach (['i' => 4, 'q' => 8] as $c => $length) {
             $s = substr($string, $offset, $length);
             if (strlen($s) === $length) {
@@ -68,9 +70,10 @@ function foreach_offset_length($string)
 }
 
 $res = ['offset' => 0, 'files' => []];
-function getfiles($token, &$params) {
+function getfiles($token, &$params)
+{
     foreach (json_decode(file_get_contents('https://api.telegram.org/bot'.$token.'/getupdates?offset='.$params['offset']), true)['result'] as $update) {
-        $params['offset'] = $update['update_id']+1;
+        $params['offset'] = $update['update_id'] + 1;
         if (isset($update['message']['audio'])) {
             $params['files'][$update['message']['message_id']] = $update['message']['audio']['file_id'];
         }
@@ -89,8 +92,6 @@ function getfiles($token, &$params) {
         if (isset($update['message']['photo'])) {
             $params['files'][$update['message']['message_id']] = end($update['message']['photo'])['file_id'];
         }
-
-
     }
 }
 
@@ -126,16 +127,26 @@ while (true) {
                         $mtproto = $MadelineProto->get_download_info($update['update']['message']['media'])['InputFileLocation'];
                         $m = [];
                         unset($mtproto['_']);
-                        if (isset($mtproto['version']))unset($mtproto['version']);
-                        if (isset($update['update']['message']['media']['photo'])) $mtproto['id'] = $update['update']['message']['media']['photo']['id'];
-                        if (isset($update['update']['message']['media']['photo'])) $mtproto['access_hash'] = $update['update']['message']['media']['photo']['access_hash'];
-                        if (isset($update['update']['message']['media']['document'])) $mtproto['id'] = $update['update']['message']['media']['document']['id'];
-                        if (isset($update['update']['message']['media']['document'])) $mtproto['access_hash'] = $update['update']['message']['media']['document']['access_hash'];
+                        if (isset($mtproto['version'])) {
+                            unset($mtproto['version']);
+                        }
+                        if (isset($update['update']['message']['media']['photo'])) {
+                            $mtproto['id'] = $update['update']['message']['media']['photo']['id'];
+                        }
+                        if (isset($update['update']['message']['media']['photo'])) {
+                            $mtproto['access_hash'] = $update['update']['message']['media']['photo']['access_hash'];
+                        }
+                        if (isset($update['update']['message']['media']['document'])) {
+                            $mtproto['id'] = $update['update']['message']['media']['document']['id'];
+                        }
+                        if (isset($update['update']['message']['media']['document'])) {
+                            $mtproto['access_hash'] = $update['update']['message']['media']['document']['access_hash'];
+                        }
                         //var_dump($mtproto);
                         foreach ($mtproto as $key => $n) {
                             foreach ($bot_api as $bn) {
                                 if ($bn['number'] === $n) {
-                                    $m [$bn['offset']+$bn['length']]= $key." (".$n."): ".$bn['offset'].'-'.($bn['offset']+$bn['length']).' ('.$bn['length'].')'.PHP_EOL;
+                                    $m[$bn['offset'] + $bn['length']] = $key.' ('.$n.'): '.$bn['offset'].'-'.($bn['offset'] + $bn['length']).' ('.$bn['length'].')'.PHP_EOL;
                                     unset($mtproto[$key]);
                                 }
                             }
@@ -145,7 +156,7 @@ while (true) {
                             $message .= $bn;
                         }
                         foreach ($mtproto as $key => $n) {
-                            $message .= $key." (".$n."): not found".PHP_EOL;
+                            $message .= $key.' ('.$n.'): not found'.PHP_EOL;
                         }
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'html']);
                     }
