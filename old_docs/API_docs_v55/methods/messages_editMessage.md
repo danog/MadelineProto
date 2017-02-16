@@ -52,7 +52,7 @@ The following tags are currently supported:
 
 ```
 <br>a newline
-<b><i>bold works ok, internal tags aren't parsed and shown as is</i> </ b>
+<b><i>bold works ok, internal tags are stripped</i> </b>
 <strong>bold</strong>
 <em>italic</em>
 <i>italic</i>

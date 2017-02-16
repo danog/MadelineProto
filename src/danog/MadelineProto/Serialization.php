@@ -53,9 +53,10 @@ class Serialization
         if (file_exists($filename)) {
             $file = fopen($filename, 'r+');
             flock($file, LOCK_EX);
-            $unserialized = unserialize(stream_get_contents($file));
+            $unserialized = stream_get_contents($file);
             flock($file, LOCK_UN);
             fclose($file);
+            $unserialized = unserialize($unserialized);
         } else {
             throw new Exception('File does not exist');
         }

@@ -10,7 +10,7 @@ Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
-This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM.  
+This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM. You must also install the mbstring, curl extensions.   
 
 Also note that MadelineProto will perform better if python and a big math extension like gmp or bcmath are installed.
 
