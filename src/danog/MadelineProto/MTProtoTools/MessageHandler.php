@@ -21,10 +21,12 @@ trait MessageHandler
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-    public function send_message($message_data, $content_related, $int_message_id = null)
+    public function send_message($message_data, $content_related, $aargs = [])
     {
-        if ($int_message_id === null) {
+        if (!isset($aargs['message_id']) || $aargs['message_id'] === null) {
             $int_message_id = $this->generate_message_id();
+        } else {
+            $int_message_id = $aargs['message_id'];
         }
         if (!is_int($int_message_id)) {
             throw new \danog\MadelineProto\Exception("Specified message id isn't an integer");

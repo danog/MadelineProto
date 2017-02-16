@@ -236,7 +236,7 @@ To specify a custom callback change the correct value in the settings. The speci
 
 ### Uploading and downloading files
 
-MadelineProto provides wrapper methods to upload and download files.
+MadelineProto provides wrapper methods to upload and download files that support bot API file ids.
 
 Every method described in this section accepts a last optional paramater with a callable function that will be called during the upload/download using the first parameter to pass a floating point number indicating the upload/download status in percentage.  
 
@@ -249,12 +249,13 @@ $inputFile = $MadelineProto->upload('file', 'optional new file name.ext');
 $MadelineProto->messages->sendMedia(['peer' => '@pwrtelegramgroup', 'media' => $inputMedia]);
 ```
 
+To convert the result of sendMedia to a bot API file id select the messageMedia object from the output of the method and pass it to `$MadelineProto->API->MTProto_to_botAPI()`.  
 
 See tests/testing.php for more examples.
 
 
 There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
-The first parameter of these functions must always be a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object. These objects are usually received in updates, see `bot.php` for examples
+The first parameter of these functions must always be either a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object or a bot API file id. These objects are usually received in updates, see `bot.php` for examples
 
 
 ```
@@ -304,6 +305,8 @@ var_dump($authorization);
 See tests/testing.php for more examples.
 
 Methods that allow sending message entities (messages.sendMessage for example) also have an additional parse_mode parameter that enables or disables html/markdown parsing of the message to be sent. See the method-specific documentation for more info.  
+
+To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true.
 
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
 

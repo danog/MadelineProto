@@ -29,6 +29,7 @@ class MTProto extends PrimeModule
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\TL\Files;
     use \danog\MadelineProto\Tools;
 
     public $settings = [];

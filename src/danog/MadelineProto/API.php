@@ -37,10 +37,10 @@ class API extends APIFactory
         $this->APIFactory();
 
         \danog\MadelineProto\Logger::log(['Ping...'], Logger::ULTRA_VERBOSE);
-        $pong = $this->ping([3]);
+        $pong = $this->ping(['ping_id' => 3]);
         \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
-        \danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
-        $this->future_salts = $this->get_future_salts([3]);
+        //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
+        //$this->future_salts = $this->get_future_salts(['num' => 3]);
         $this->API->v = $this->API->getV();
         \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
     }

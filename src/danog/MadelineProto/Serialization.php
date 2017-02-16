@@ -51,7 +51,11 @@ class Serialization
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
         if (file_exists($filename)) {
-            $unserialized = unserialize(file_get_contents($filename));
+            $file = fopen($filename, 'r+');
+            flock($file, LOCK_EX);
+            $unserialized = unserialize(stream_get_contents($file));
+            flock($file, LOCK_UN);
+            fclose($file);
         } else {
             throw new Exception('File does not exist');
         }

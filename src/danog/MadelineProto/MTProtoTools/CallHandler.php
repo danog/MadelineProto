@@ -17,17 +17,22 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait CallHandler
 {
-    public function method_call($method, $args = [], $message_id = null, $heavy = false)
+    public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
+        if (!is_array($aargs)) {
+            throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
+        }
+        $args = $this->botAPI_to_MTProto($args);
+        $serialized = $this->serialize_method($method, $args);
+        $content_related = $this->content_related($method);
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
 
-                $args = $this->get_named_method_args($method, $args);
-                $int_message_id = $this->send_message($this->serialize_method($method, $args), $this->content_related($method), $message_id);
+                $int_message_id = $this->send_message($serialized, $content_related, $aargs);
                 if ($method === 'http_wait') {
                     return true;
                 }
@@ -53,7 +58,7 @@ trait CallHandler
                             continue;
                         }
                         $server_answer = $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content']; // continue was not called, so I got a response
-                        if ($heavy) {
+                        if (isset($aargs['heavy']) && $aargs['heavy']) {
                             $this->datacenter->incoming_messages[$this->datacenter->outgoing_messages[$int_message_id]['response']]['content'] = [];
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
@@ -125,6 +130,9 @@ trait CallHandler
                         $server_answer = $server_answer['_'] === 'boolTrue';
                         break;
                 }
+                if (isset($aargs['botAPI']) && $aargs['botAPI']) {
+                    $server_answer = $this->MTProto_to_botAPI($server_answer, $args);
+                }
             } catch (\danog\MadelineProto\Exception $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
@@ -136,7 +144,7 @@ trait CallHandler
                 sleep(1); // To avoid flooding
                 continue;
             } finally {
-                if ($heavy && isset($int_message_id)) {
+                if (isset($aargs['heavy']) && $aargs['heavy'] && isset($int_message_id)) {
                     $this->datacenter->outgoing_messages[$int_message_id]['args'] = [];
                 }
             }

@@ -60,7 +60,7 @@ if ($MadelineProto === false) {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
-$message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
+$message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
 $flutter = 'https://storage.pwrtelegram.xyz/pwrtelegrambot/document/file_6570.mp4';
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
@@ -99,12 +99,12 @@ $time = time();
 $inputFile = $MadelineProto->upload('tests/60', 'magic'); // This gets an inputFile object with file name magic
 var_dump(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
-
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
     foreach ($media as $type => $inputMedia) {
-        \danog\MadelineProto\Logger::log([$MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia])], \danog\MadelineProto\Logger::NOTICE);
+        $type = $MadelineProto->invokeWithoutUpdates(['query' => $MadelineProto->API->serialize_method('messages.sendMedia', ['peer' => $peer, 'media' => $inputMedia])]);
+        var_dump($MadelineProto->API->MTProto_to_botAPI(end($type['updates'])));
     }
 }
 
@@ -125,7 +125,7 @@ $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an arra
 $mention = $mention['user_id']; // Selects only the numeric user id
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => strlen($message), 'user_id' => $mention]]]);
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
 }
 sleep(5);
