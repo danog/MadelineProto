@@ -573,8 +573,10 @@ trait TL
 
         return $arguments;
     }
-    public function parse_node($node, &$entities, &$nmessage, $recursive = true) {
-                switch ($node->nodeName) {
+
+    public function parse_node($node, &$entities, &$nmessage, $recursive = true)
+    {
+        switch ($node->nodeName) {
                         case 'br':
                         $nmessage .= "\n";
                         break;
@@ -630,6 +632,7 @@ trait TL
                         break;
                     }
     }
+
     public function parse_mode($arguments)
     {
         if (preg_match('/markdown/i', $arguments['parse_mode'])) {
@@ -649,9 +652,10 @@ trait TL
                 }
                 unset($arguments['parse_mode']);
             } catch (\DOMException $e) {
-            } catch (\danog\MadelineProto\Exception $e) { ; };
+            } catch (\danog\MadelineProto\Exception $e) {
+            }
         }
-       $arguments['message'] = $nmessage;
+        $arguments['message'] = $nmessage;
 
         return $arguments;
     }
