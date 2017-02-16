@@ -577,60 +577,60 @@ trait TL
     public function parse_node($node, &$entities, &$nmessage, $recursive = true)
     {
         switch ($node->nodeName) {
-                        case 'br':
-                        $nmessage .= "\n";
-                        break;
-                        case 'b':
-                        case 'strong':
-                        $text = $this->html_entity_decode($node->textContent);
-                        $entities[] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-                        $nmessage .= $text;
-                        break;
+            case 'br':
+            $nmessage .= "\n";
+            break;
+            case 'b':
+            case 'strong':
+            $text = $this->html_entity_decode($node->textContent);
+            $entities[] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+            $nmessage .= $text;
+            break;
 
-                        case 'i':
-                        case 'em':
-                        $text = $this->html_entity_decode($node->textContent);
-                        $entities[] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-                        $nmessage .= $text;
-                        break;
+            case 'i':
+            case 'em':
+            $text = $this->html_entity_decode($node->textContent);
+            $entities[] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+            $nmessage .= $text;
+            break;
 
-                        case 'code':
-                        $text = $this->html_entity_decode($node->textContent);
-                        $entities[] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-                        $nmessage .= $text;
-                        break;
+            case 'code':
+            $text = $this->html_entity_decode($node->textContent);
+            $entities[] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+            $nmessage .= $text;
+            break;
 
-                        case 'pre':
-                        $text = $this->html_entity_decode($node->textContent);
-                        $language = $node->getAttribute('language');
-                        if ($language === null) {
-                            $language = '';
-                        }
-                        $entities[] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
-                        $nmessage .= $text;
-                        break;
+            case 'pre':
+            $text = $this->html_entity_decode($node->textContent);
+            $language = $node->getAttribute('language');
+            if ($language === null) {
+                $language = '';
+            }
+            $entities[] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
+            $nmessage .= $text;
+            break;
 
-                        case 'p':
+            case 'p':
             foreach ($node->childNodes as $node) {
                 $this->parse_node($node, $entities, $nmessage);
             }
-                        break;
+            break;
 
-                        case 'a':
-                        $text = $this->html_entity_decode($node->textContent);
-                        $href = $node->getAttribute('href');
-                        if (preg_match('|mention:|', $href)) {
-                            $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
-                        } else {
-                            $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
-                        }
-                        $nmessage .= $text;
-                        break;
+            case 'a':
+            $text = $this->html_entity_decode($node->textContent);
+            $href = $node->getAttribute('href');
+            if (preg_match('|mention:|', $href)) {
+                $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
+            } else {
+                $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
+            }
+            $nmessage .= $text;
+            break;
 
-                        default:
-                        $nmessage .= $this->html_entity_decode($node->nodeValue);
-                        break;
-                    }
+            default:
+            $nmessage .= $this->html_entity_decode($node->nodeValue);
+            break;
+        }
     }
 
     public function parse_mode($arguments)
@@ -663,6 +663,7 @@ trait TL
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
+        $arguments = $this->botAPI_to_MTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if ($cur_flag['flag']) {
