@@ -640,10 +640,10 @@ trait TL
             $arguments['parse_mode'] = 'HTML';
         }
         if (preg_match('/html/i', $arguments['parse_mode'])) {
+            $nmessage = '';
             try {
                 $dom = new \DOMDocument();
                 $dom->loadHTML(str_replace("\n", '<br>', $arguments['message']));
-                $nmessage = '';
                 if (!isset($arguments['entities'])) {
                     $arguments['entities'] = [];
                 }
@@ -654,8 +654,8 @@ trait TL
             } catch (\DOMException $e) {
             } catch (\danog\MadelineProto\Exception $e) {
             }
+            $arguments['message'] = $nmessage;
         }
-        $arguments['message'] = $nmessage;
 
         return $arguments;
     }
