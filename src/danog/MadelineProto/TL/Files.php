@@ -607,8 +607,12 @@ trait Files
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
             $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
             $res['mime'] = 'image/jpeg';
-            if (isset($photo['location']['size'])) $res['size'] = $photo['location']['size'];
-            if (isset($photo['location']['bytes'])) $res['size'] = strlen($photo['location']['bytes']);
+            if (isset($photo['location']['size'])) {
+                $res['size'] = $photo['location']['size'];
+            }
+            if (isset($photo['location']['bytes'])) {
+                $res['size'] = strlen($photo['location']['bytes']);
+            }
 
             return $res;
             case 'photoSize':
@@ -617,8 +621,12 @@ trait Files
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret'], 'dc_id' => $message_media['location']['dc_id']];
             $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
             $res['mime'] = 'image/jpeg';
-            if (isset($photo['location']['size'])) $res['size'] = $photo['location']['size'];
-            if (isset($photo['location']['bytes'])) $res['size'] = strlen($photo['location']['bytes']);
+            if (isset($photo['location']['size'])) {
+                $res['size'] = $photo['location']['size'];
+            }
+            if (isset($photo['location']['bytes'])) {
+                $res['size'] = strlen($photo['location']['bytes']);
+            }
 
             return $res;
             case 'messageMediaDocument':
@@ -650,7 +658,9 @@ trait Files
                 $res['name'] = $message_media['document']['access_hash'];
             }
 
-            if (isset($message_media['document']['size'])) $res['size'] = $message_media['document']['size'];
+            if (isset($message_media['document']['size'])) {
+                $res['size'] = $message_media['document']['size'];
+            }
             $res['name'] .= '_'.$message_media['document']['id'];
             $res['mime'] = $message_media['document']['mime_type'];
 
