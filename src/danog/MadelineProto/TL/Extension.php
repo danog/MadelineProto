@@ -419,6 +419,7 @@ trait Extension
     {
         $this->switch_dc($location['dc_id']);
         $res = $this->method_call('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1], ['heavy' => true]);
+        if (!isset($res['type']['_'])) return $default;
         switch ($res['type']['_']) {
             case 'storage.fileJpeg': return '.jpg';
             case 'storage.fileGif': return '.gif';

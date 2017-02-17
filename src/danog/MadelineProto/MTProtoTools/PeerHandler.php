@@ -180,13 +180,13 @@ trait PeerHandler
         }
 
         if (preg_match('/^channel#/', $id)) {
-            $id = str_replace('channel#', '-100', $id);
+            $id = preg_replace('|\D+|', '-100', $id);
         }
         if (preg_match('/^chat#/', $id)) {
-            $id = str_replace('chat#', '-', $id);
+            $id = preg_replace('|\D+|', '-', $id);
         }
         if (preg_match('/^user#/', $id)) {
-            $id = str_replace('user#', '', $id);
+            $id = preg_replace('|\D+|', '', $id);
         }
 
         if (is_numeric($id)) {
