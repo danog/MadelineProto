@@ -636,14 +636,14 @@ trait TL
     public function parse_mode($arguments)
     {
         if (preg_match('/markdown/i', $arguments['parse_mode'])) {
-            $arguments['message'] = str_replace("\n", '', \Parsedown::instance()->line($arguments['message']));
+            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
             $arguments['parse_mode'] = 'HTML';
         }
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
             try {
                 $dom = new \DOMDocument();
-                $dom->loadHTML(str_replace("\n", '<br>', $arguments['message']));
+                $dom->loadHTML($arguments['message']);
                 if (!isset($arguments['entities'])) {
                     $arguments['entities'] = [];
                 }
