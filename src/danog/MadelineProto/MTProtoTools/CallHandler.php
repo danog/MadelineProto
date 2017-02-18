@@ -155,6 +155,7 @@ trait CallHandler
 
             return $server_answer;
         }
+
         throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
     }
 

@@ -299,7 +299,7 @@ trait Files
         if (isset($info['InputFileLocation']['dc_id'])) {
             $this->switch_dc($info['InputFileLocation']['dc_id']);
         }
-        $end = false;
+        $theend = false;
         while (true) {
             //$real_part_size = (($offset + $part_size > $end) && $end !== -1) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             try {
@@ -322,18 +322,16 @@ trait Files
             }
             if ($end !== -1 && strlen($res['bytes']) + $downloaded_size > $size) {
                 $res['bytes'] = substr($res['bytes'], 0, (strlen($res['bytes']) + $downloaded_size) - $size);
-                $end = true;
+                $theend = true;
             }
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
             \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($end) {
+            if ($theend) {
                 break;
             }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($end !== -1) {
-                $cb($percent = $downloaded_size * 100 / $size);
-            }
+            $cb($percent = $downloaded_size * 100 / $size);
         }
         if ($end === -1) {
             $cb(100);
