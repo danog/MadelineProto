@@ -83,16 +83,14 @@ trait AuthKeyHandler
                 * ***********************************************************************
                 * Compute p and q
                 */
-                $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
-                list($p, $q) = $this->PrimeFactors($pq);
-                $p = new \phpseclib\Math\BigInteger($p);
-                $q = new \phpseclib\Math\BigInteger($q);
-
-                if ($p->compare($q) > 0) {
+                $pq = \danog\PHP\Struct::unpack('>Q', $pq_bytes)[0];
+                $p = \danog\PrimeModule::auto_single($pq);
+                $q = $pq / $p;
+                if ($p > $q) {
                     list($p, $q) = [$q, $p];
                 }
 
-                if (!($pq->equals($p->multiply($q)) && $p->compare($q) < 0)) {
+                if ($pq !== $p*$q) {
                     throw new \danog\MadelineProto\Exception("couldn't compute p and q.");
                 }
 
@@ -102,8 +100,8 @@ trait AuthKeyHandler
                 * ***********************************************************************
                 * Serialize object for req_DH_params
                 */
-                $p_bytes = \danog\PHP\Struct::pack('>I', (string) $p);
-                $q_bytes = \danog\PHP\Struct::pack('>I', (string) $q);
+                $p_bytes = \danog\PHP\Struct::pack('>I', $p);
+                $q_bytes = \danog\PHP\Struct::pack('>I', $q);
 
                 $new_nonce = $this->random(32);
 

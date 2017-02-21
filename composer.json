@@ -15,6 +15,7 @@
     "require": {
         "php": ">=5.6.0",
         "danog/phpstruct": "dev-fast",
+        "danog/primemodule": "dev-master",
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
         "krakjoe/pthreads-polyfill": "dev-master",

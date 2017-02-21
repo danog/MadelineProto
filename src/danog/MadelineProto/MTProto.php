@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto extends PrimeModule
+class MTProto
 {
     use \danog\MadelineProto\MTProtoTools\AckHandler;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;

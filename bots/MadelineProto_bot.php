@@ -15,102 +15,58 @@ require 'vendor/autoload.php';
 $settings = [];
 $MadelineProto = false;
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('MadelineProto_bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
-$uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
+
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login($token);
+    $authorization = $MadelineProto->bot_login($MadelineProto_token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
-if ($uMadelineProto === false) {
-    echo 'Loading MadelineProto...'.PHP_EOL;
-    $uMadelineProto = new \danog\MadelineProto\API(['updates' => ['handle_updates' => false]]);
-    $sentCode = $uMadelineProto->phone_login(readline());
-    \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
-    echo 'Enter the code you received: ';
-    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
-    $authorization = $uMadelineProto->complete_phone_login($code);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
-    if ($authorization['_'] === 'account.noPassword') {
-        throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
-    }
-    if ($authorization['_'] === 'account.password') {
-        \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
-        $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
-    }
-    echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).' bytes'.PHP_EOL;
-}
-function inputify(&$stuff)
-{
-    $stuff['_'] = 'input'.ucfirst($stuff['_']);
-
-    return $stuff;
-}
-function translatetext(&$value)
-{
-    inputify($value);
-    if (isset($value['entities'])) {
-        foreach ($value['entities'] as &$entity) {
-            if ($entity['_'] === 'messageEntityMentionName') {
-                inputify($entity);
-            }
-        }
-    }
-    if (isset($value['geo'])) {
-        $value['geo_point'] = inputify($value['geo']);
-    }
-}
-function translate(&$value, $key)
-{
-    switch ($value['_']) {
-    case 'botInlineResult':
-        $value['_'] = 'inputBotInlineResult';
-        translatetext($value['send_message']);
-
-        return $value;
-    case 'botInlineMediaResult':
-        if (isset($value['game'])) {
-            throw new \danog\MadelineProto\RPCErrorException('Games are not supported.');
-        }
-        if (isset($value['photo'])) {
-            $value['_'] = 'inputBotInlineResultPhoto';
-        }
-        if (isset($value['document'])) {
-            $value['_'] = 'inputBotInlineResultDocument';
-        }
-        translatetext($value['send_message']);
-
-        return $value;
-    }
-}
-
-$offset = 0;
-$start = "This bot can create a pipeline between inline bots.
+$reply_markup = ['inline_keyboard' => 
+    [
+        [ // Row 1
+            ['text' => 'Row 1 b1'],
+            ['text' => 'Row 1 b2'],
+            ['text' => 'Row 1 b3'],
+        ],
+        [ // Row 2
+            ['text' => 'Row 2 b1'],
+            ['text' => 'Row 2 b2'],
+            ['text' => 'Row 2 b3'],
+        ],
+        [ // Row 3
+            ['text' => 'Row 3 b1'],
+            ['text' => 'Row 3 b2'],
+            ['text' => 'Row 3 b3'],
+        ],
+    ]
+    
+];
+$start = "This bot can create inline text buttons.
 To use it, simply type an inline query with the following syntax:
 
-Query | @ainlinebot:1 | @binlinebot:lel | @inlinebot \$
+Row 1 b1 | Row 1 b2 | Row 1 b3
+Row 2 b1 | Row 2 b2 | Row 2 b3
+Row 3 b1 | Row 3 b2 | Row 3 b3
 
-This will make an inline query with text \"Query\" to @ainlinebot, take the first result if it's a text message (entities will be ignored, if it's a media message you will be redirected here), then it will make an inline query to @binlinebot with the text received out of the first bot, select the result that is a text message with the word \"lel\" in it (regexes are supported), and finally pipe it to @inlinebot, fetch all results and return them to you.
-Note that the query must be terminated by a \$
+This will create a keyboard exactly like the one used in this message (click the buttons ;D)
 
-Created by @danogentili (@daniilgentili) using the daniil.it/MadelineProto PHP MTProto client.";
+Created by [Daniil Gentili](mention:@danogentili) (@daniilgentili) using the [MadelineProto PHP MTProto client](daniil.it/MadelineProto).";
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         switch ($update['update']['_']) {
             case 'updateNewMessage':
-var_dump($update);
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
                 try {
                     if (preg_match('|/start|', $update['update']['message']['message'])) {
-                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id']]);
+                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
@@ -122,7 +78,7 @@ var_dump($update);
                 }
                 try {
                     if (preg_match('|/start|', $update['update']['message']['message'])) {
-                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id']]);
+                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'],  'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
@@ -213,6 +169,5 @@ var_dump($update);
                 }
         }
     }
-    \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto);
-    \danog\MadelineProto\Serialization::serialize('pwr.madeline', $uMadelineProto);
+    \danog\MadelineProto\Serialization::serialize('MadelineProto_bot.madeline', $MadelineProto);
 }

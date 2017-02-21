@@ -115,6 +115,13 @@ trait Login
 
                 return $this->API->datacenter->authorization = $this->account->getPassword();
             }
+            if ($e->getMessage() === 'PHONE_NUMBER_UNOCCUPIED') {
+                \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
+                $this->API->datacenter->login_temp_status = 'waiting_signup';
+                $this->API->should_serialize = true;
+                $this->API->datacenter->authorization['phone_code'] = $code;
+                return ['_' => 'account.needSignup'];
+            }
             throw $e;
         }
         $this->API->datacenter->authorization = $authorization;
@@ -127,6 +134,31 @@ trait Login
         return $this->API->datacenter->authorization;
     }
 
+    public function complete_signup($first_name, $last_name)
+    {
+        if ($this->API->datacenter->login_temp_status !== 'waiting_signup') {
+            throw new \danog\MadelineProto\Exception("I'm not waiting for the password! Please call the phone_login and the complete_phone_login methods first!");
+        }
+        $this->API->datacenter->login_temp_status = 'none';
+        \danog\MadelineProto\Logger::log(['Signing up as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
+        $this->API->datacenter->authorization = $this->API->method_call(
+            'auth.signUp',
+            [
+                    'phone_number'    => $this->API->datacenter->authorization['phone_number'],
+                    'phone_code_hash' => $this->API->datacenter->authorization['phone_code_hash'],
+                    'phone_code'      => $this->API->datacenter->authorization['phone_code'],
+                    'first_name'    => $first_name,
+                    'last_name'    => $last_name,
+            ]
+        );
+        $this->API->datacenter->authorized = true;
+        $this->API->get_updates_state();
+        $this->API->should_serialize = true;
+
+        \danog\MadelineProto\Logger::log(['Signed up in successfully!'], \danog\MadelineProto\Logger::NOTICE);
+
+        return $this->API->datacenter->authorization;
+    }
     public function complete_2fa_login($password)
     {
         if ($this->API->datacenter->login_temp_status !== 'waiting_password') {
@@ -143,9 +175,7 @@ trait Login
         $this->API->datacenter->authorized = true;
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
-
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
-
         return $this->API->datacenter->authorization;
     }
 }
