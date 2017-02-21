@@ -25,8 +25,7 @@ if (file_exists('token.php') && $MadelineProto === false) {
     $authorization = $MadelineProto->bot_login($MadelineProto_token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
-$reply_markup = ['inline_keyboard' => 
-    [
+$reply_markup = ['inline_keyboard' => [
         [ // Row 1
             ['text' => 'Row 1 b1'],
             ['text' => 'Row 1 b2'],
@@ -42,10 +41,10 @@ $reply_markup = ['inline_keyboard' =>
             ['text' => 'Row 3 b2'],
             ['text' => 'Row 3 b3'],
         ],
-    ]
-    
+    ],
+
 ];
-$start = "This bot can create inline text buttons.
+$start = 'This bot can create inline text buttons.
 To use it, simply type an inline query with the following syntax:
 
 Row 1 b1 | Row 1 b2 | Row 1 b3
@@ -54,7 +53,7 @@ Row 3 b1 | Row 3 b2 | Row 3 b3
 
 This will create a keyboard exactly like the one used in this message (click the buttons ;D)
 
-Created by [Daniil Gentili](mention:@danogentili) (@daniilgentili) using the [MadelineProto PHP MTProto client](daniil.it/MadelineProto).";
+Created by [Daniil Gentili](mention:@danogentili) (@daniilgentili) using the [MadelineProto PHP MTProto client](daniil.it/MadelineProto).';
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {

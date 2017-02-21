@@ -90,7 +90,7 @@ trait AuthKeyHandler
                     list($p, $q) = [$q, $p];
                 }
 
-                if ($pq !== $p*$q) {
+                if ($pq !== $p * $q) {
                     throw new \danog\MadelineProto\Exception("couldn't compute p and q.");
                 }
 

@@ -66,7 +66,7 @@ if ($MadelineProto === false) {
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-var_dump( $MadelineProto->API->get_full_info('@pwrtelegram'));
+var_dump($MadelineProto->API->get_full_info('@pwrtelegram'));
 
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id

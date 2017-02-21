@@ -120,6 +120,7 @@ trait Login
                 $this->API->datacenter->login_temp_status = 'waiting_signup';
                 $this->API->should_serialize = true;
                 $this->API->datacenter->authorization['phone_code'] = $code;
+
                 return ['_' => 'account.needSignup'];
             }
             throw $e;
@@ -147,8 +148,8 @@ trait Login
                     'phone_number'    => $this->API->datacenter->authorization['phone_number'],
                     'phone_code_hash' => $this->API->datacenter->authorization['phone_code_hash'],
                     'phone_code'      => $this->API->datacenter->authorization['phone_code'],
-                    'first_name'    => $first_name,
-                    'last_name'    => $last_name,
+                    'first_name'      => $first_name,
+                    'last_name'       => $last_name,
             ]
         );
         $this->API->datacenter->authorized = true;
@@ -159,6 +160,7 @@ trait Login
 
         return $this->API->datacenter->authorization;
     }
+
     public function complete_2fa_login($password)
     {
         if ($this->API->datacenter->login_temp_status !== 'waiting_password') {
@@ -176,6 +178,7 @@ trait Login
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->API->datacenter->authorization;
     }
 }
