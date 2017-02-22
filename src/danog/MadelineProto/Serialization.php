@@ -60,7 +60,9 @@ class Serialization
         } else {
             throw new Exception('File does not exist');
         }
-        if ($unserialized === false) throw new Exception('An error occurred on deserialization');
+        if ($unserialized === false) {
+            throw new Exception('An error occurred on deserialization');
+        }
         return $unserialized;
     }
 }

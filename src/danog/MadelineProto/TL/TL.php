@@ -777,6 +777,7 @@ trait TL
                 if (!is_string($x)) {
                     throw new Exception("deserialize: generated value isn't a string");
                 }
+
                 return $x;
             case 'true':
                 return true;
