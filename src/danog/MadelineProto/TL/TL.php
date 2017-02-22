@@ -558,9 +558,9 @@ trait TL
     public function botAPI_to_MTProto($arguments)
     {
         foreach ($this->botapi_params as $bot => $mtproto) {
-            if (isset($arguments[$bot])) {
+            if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
                 $arguments[$mtproto] = $arguments[$bot];
-                unset($arguments[$bot]);
+                //unset($arguments[$bot]);
             }
         }
         if (isset($arguments['reply_markup'])) {
