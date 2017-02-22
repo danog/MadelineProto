@@ -105,7 +105,7 @@ trait Files
     public function photosize_to_botapi($photo, $message_media, $thumbnail = false)
     {
         $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']], '.jpg');
-        $data = \danog\PHP\Struct::pack('<iiqqqqib', $thumbnail ? 0 : 2, $photo['location']['dc_id'], $thumbnail ? 0 : $message_media['id'], $thumbnail ? 0 : $message_media['access_hash'], $photo['location']['volume_id'], $photo['location']['secret'], $photo['location']['local_id'], 2);
+        $data = \danog\PHP\Struct::pack('<iiqqqqib', $thumbnail ? 0 : 2, $photo['location']['dc_id'], isset($message_media['id']) ? $message_media['id'] : 0, isset($message_media['access_hash']) ? $message_media['access_hash'] : 0, $photo['location']['volume_id'], $photo['location']['secret'], $photo['location']['local_id'], 2);
 
         return [
             'file_id'   => $this->base64url_encode($this->rle_encode($data)),

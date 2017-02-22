@@ -316,7 +316,7 @@ trait PeerHandler
                     $res['bot_info'] = $full['full']['bot_info'];
                 }
                 if (isset($full['full']['profile_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), $full['User']);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), []);
                 }
                 $bio = '';
                 if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
@@ -338,7 +338,7 @@ trait PeerHandler
                 }
 
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['Chat']);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -361,7 +361,7 @@ trait PeerHandler
                 }
 
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['Chat']);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];

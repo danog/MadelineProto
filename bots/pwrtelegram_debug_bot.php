@@ -10,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 require '../vendor/autoload.php';
 $settings = [];
 include_once 'token.php';
@@ -159,7 +158,7 @@ var_dump($update);
                         foreach ($mtproto as $key => $n) {
                             $message .= $key.' ('.$n.'): not found'.PHP_EOL;
                         }
-                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'html']);
+                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown']);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);

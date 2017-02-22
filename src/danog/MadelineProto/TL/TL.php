@@ -148,7 +148,7 @@ trait TL
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $object);
             case 'string':
-                $object = utf8_decode($object);
+                $object = pack('C*', ...unpack('C*', $object));
             case 'bytes':
                 $l = strlen($object);
                 $concat = '';
@@ -460,7 +460,7 @@ trait TL
             $type_name = 'document';
             $res = [];
             if ($data['document']['thumb']['_'] === 'photoSize') {
-                $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], $data['document'], true);
+                $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], [], true);
             }
             foreach ($data['document']['attributes'] as $attribute) {
                 switch ($attribute['_']) {
@@ -644,7 +644,7 @@ trait TL
             $nmessage = '';
             try {
                 $dom = new \DOMDocument();
-                $dom->loadHTML($arguments['message']);
+                $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
                 if (!isset($arguments['entities'])) {
                     $arguments['entities'] = [];
                 }
@@ -657,7 +657,6 @@ trait TL
             }
             $arguments['message'] = $nmessage;
         }
-
         return $arguments;
     }
 
