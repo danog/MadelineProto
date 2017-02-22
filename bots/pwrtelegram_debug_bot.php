@@ -11,14 +11,14 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 $settings = [];
-$token = '';
+include_once 'token.php';
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('b.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login($token);
+    $authorization = $MadelineProto->bot_login($pwrtelegram_debug_token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 function base64url_decode($data)
@@ -107,9 +107,11 @@ while (true) {
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
+var_dump($update);
+
                 try {
                     if (isset($update['update']['message']['media'])) {
-                        getfiles($token, $res);
+                        getfiles($pwrtelegram_debug_token, $res);
                         $bot_api_id = $message = $res['files'][$update['update']['message']['id']];
                         $bot_api_id_b256 = base64url_decode($bot_api_id);
                         $bot_api_id_rledecoded = rle_decode($bot_api_id_b256);
@@ -122,7 +124,6 @@ while (true) {
                             'Total length: '.strlen($bot_api_id_b256).PHP_EOL.
                             'Total length (rledecoded): '.strlen($bot_api_id_rledecoded).PHP_EOL.
                              PHP_EOL.'<b>param (value): start-end (length)</b><br>'.PHP_EOL;
-//var_dump($update);
                         $bot_api = foreach_offset_length($bot_api_id_rledecoded);
                         $mtproto = $MadelineProto->get_download_info($update['update']['message']['media'])['InputFileLocation'];
                         $m = [];

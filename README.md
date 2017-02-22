@@ -39,6 +39,17 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 ## Usage
 
+### RTFM
+
+If you have some questions about the usage of the methods of this library, you can contact me [@danogentili](https://telegram.me/danogentili).  
+
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo.
+
+If you don't understand something, read everything again.
+
+I will NOT answer to questions that can be answered simply by reading this page; I will instead tell you to read it carefully twice.
+
+
 ### Installation
 
 ```

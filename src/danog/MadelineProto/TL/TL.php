@@ -148,6 +148,7 @@ trait TL
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $object);
             case 'string':
+                $object = utf8_decode($object);
             case 'bytes':
                 $l = strlen($object);
                 $concat = '';
@@ -776,7 +777,6 @@ trait TL
                 if (!is_string($x)) {
                     throw new Exception("deserialize: generated value isn't a string");
                 }
-
                 return $x;
             case 'true':
                 return true;
@@ -788,7 +788,7 @@ trait TL
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'string'])));
+                        return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'bytes'])));
                     case 'Vector t':
                     case 'vector':
                         break;
@@ -821,7 +821,7 @@ trait TL
             }
         }
         if ($constructorData['predicate'] === 'gzip_packed') {
-            return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'string'])));
+            return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'bytes'])));
         }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {

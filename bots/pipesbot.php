@@ -11,7 +11,7 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 $settings = [];
 $MadelineProto = false;
 try {
@@ -22,7 +22,7 @@ $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline'
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login($token);
+    $authorization = $MadelineProto->bot_login($pipes_token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 if ($uMadelineProto === false) {
