@@ -547,23 +547,21 @@ trait TL
             throw new Exception("Can't convert ".$data['_'].' to a bot API object');
         }
     }
+    public $botapi_params = [
+        'disable_web_page_preview' => 'no_webpage',
+        'disable_notification' => 'silent',
+        'reply_to_message_id' => 'reply_to_msg_id',
+        'chat_id' => 'peer',
+        'text' => 'message',
+    ];
 
     public function botAPI_to_MTProto($arguments)
     {
-        if (isset($arguments['disable_web_page_preview'])) {
-            $arguments['no_webpage'] = $arguments['disable_web_page_preview'];
-        }
-        if (isset($arguments['disable_notification'])) {
-            $arguments['silent'] = $arguments['disable_notification'];
-        }
-        if (isset($arguments['reply_to_message_id'])) {
-            $arguments['reply_to_msg_id'] = $arguments['reply_to_message_id'];
-        }
-        if (isset($arguments['chat_id'])) {
-            $arguments['peer'] = $arguments['chat_id'];
-        }
-        if (isset($arguments['text'])) {
-            $arguments['message'] = $arguments['text'];
+        foreach ($this->botapi_params as $bot => $mtproto) {
+            if (isset($arguments[$bot])) {
+                $arguments[$mtproto] = $arguments[$bot];
+                unset($arguments[$bot]);
+            }
         }
         if (isset($arguments['reply_markup'])) {
             $arguments['reply_markup'] = $this->parse_reply_markup($arguments['reply_markup']);
