@@ -547,12 +547,13 @@ trait TL
             throw new Exception("Can't convert ".$data['_'].' to a bot API object');
         }
     }
+
     public $botapi_params = [
         'disable_web_page_preview' => 'no_webpage',
-        'disable_notification' => 'silent',
-        'reply_to_message_id' => 'reply_to_msg_id',
-        'chat_id' => 'peer',
-        'text' => 'message',
+        'disable_notification'     => 'silent',
+        'reply_to_message_id'      => 'reply_to_msg_id',
+        'chat_id'                  => 'peer',
+        'text'                     => 'message',
     ];
 
     public function botAPI_to_MTProto($arguments)
