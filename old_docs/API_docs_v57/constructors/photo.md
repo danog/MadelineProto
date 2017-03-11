@@ -25,14 +25,14 @@ description: photo attributes, type and example
 ### Example:
 
 ```
-$photo = ['_' => 'photo', 'has_stickers' => true, 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [PhotoSize], ];
+$photo = ['_' => 'photo', 'has_stickers' => Bool, 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [PhotoSize], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-photo={_='photo', has_stickers=true, id=long, access_hash=long, date=int, sizes={PhotoSize}, }
+photo={_='photo', has_stickers=Bool, id=long, access_hash=long, date=int, sizes={PhotoSize}, }
 
 ```
 

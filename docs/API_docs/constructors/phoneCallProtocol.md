@@ -24,14 +24,14 @@ description: phoneCallProtocol attributes, type and example
 ### Example:
 
 ```
-$phoneCallProtocol = ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => int, 'max_layer' => int, ];
+$phoneCallProtocol = ['_' => 'phoneCallProtocol', 'udp_p2p' => Bool, 'udp_reflector' => Bool, 'min_layer' => int, 'max_layer' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-phoneCallProtocol={_='phoneCallProtocol', udp_p2p=true, udp_reflector=true, min_layer=int, max_layer=int, }
+phoneCallProtocol={_='phoneCallProtocol', udp_p2p=Bool, udp_reflector=Bool, min_layer=int, max_layer=int, }
 
 ```
 

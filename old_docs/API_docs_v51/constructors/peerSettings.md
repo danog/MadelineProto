@@ -21,14 +21,14 @@ description: peerSettings attributes, type and example
 ### Example:
 
 ```
-$peerSettings = ['_' => 'peerSettings', 'report_spam' => true, ];
+$peerSettings = ['_' => 'peerSettings', 'report_spam' => Bool, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-peerSettings={_='peerSettings', report_spam=true, }
+peerSettings={_='peerSettings', report_spam=Bool, }
 
 ```
 

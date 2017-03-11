@@ -22,14 +22,14 @@ description: updateDialogPinned attributes, type and example
 ### Example:
 
 ```
-$updateDialogPinned = ['_' => 'updateDialogPinned', 'pinned' => true, 'peer' => Peer, ];
+$updateDialogPinned = ['_' => 'updateDialogPinned', 'pinned' => Bool, 'peer' => Peer, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updateDialogPinned={_='updateDialogPinned', pinned=true, peer=Peer, }
+updateDialogPinned={_='updateDialogPinned', pinned=Bool, peer=Peer, }
 
 ```
 

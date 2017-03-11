@@ -24,14 +24,14 @@ description: documentAttributeSticker attributes, type and example
 ### Example:
 
 ```
-$documentAttributeSticker = ['_' => 'documentAttributeSticker', 'mask' => true, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
+$documentAttributeSticker = ['_' => 'documentAttributeSticker', 'mask' => Bool, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-documentAttributeSticker={_='documentAttributeSticker', mask=true, alt=string, stickerset=InputStickerSet, mask_coords=MaskCoords, }
+documentAttributeSticker={_='documentAttributeSticker', mask=Bool, alt=string, stickerset=InputStickerSet, mask_coords=MaskCoords, }
 
 ```
 

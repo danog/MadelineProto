@@ -24,14 +24,14 @@ description: botInlineMessageText attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [MessageEntity], 'reply_markup' => ReplyMarkup, ];
+$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => Bool, 'message' => string, 'entities' => [MessageEntity], 'reply_markup' => ReplyMarkup, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-botInlineMessageText={_='botInlineMessageText', no_webpage=true, message=string, entities={MessageEntity}, reply_markup=ReplyMarkup, }
+botInlineMessageText={_='botInlineMessageText', no_webpage=Bool, message=string, entities={MessageEntity}, reply_markup=ReplyMarkup, }
 
 ```
 

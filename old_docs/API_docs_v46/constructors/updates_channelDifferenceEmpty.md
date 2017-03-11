@@ -23,14 +23,14 @@ description: updates_channelDifferenceEmpty attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceEmpty = ['_' => 'updates.channelDifferenceEmpty', 'final' => true, 'channel_pts' => int, 'timeout' => int, ];
+$updates_channelDifferenceEmpty = ['_' => 'updates.channelDifferenceEmpty', 'final' => Bool, 'channel_pts' => int, 'timeout' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updates_channelDifferenceEmpty={_='updates.channelDifferenceEmpty', final=true, channel_pts=int, timeout=int, }
+updates_channelDifferenceEmpty={_='updates.channelDifferenceEmpty', final=Bool, channel_pts=int, timeout=int, }
 
 ```
 

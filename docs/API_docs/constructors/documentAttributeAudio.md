@@ -25,14 +25,14 @@ description: documentAttributeAudio attributes, type and example
 ### Example:
 
 ```
-$documentAttributeAudio = ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];
+$documentAttributeAudio = ['_' => 'documentAttributeAudio', 'voice' => Bool, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-documentAttributeAudio={_='documentAttributeAudio', voice=true, duration=int, title=string, performer=string, waveform=bytes, }
+documentAttributeAudio={_='documentAttributeAudio', voice=Bool, duration=int, title=string, performer=string, waveform=bytes, }
 
 ```
 

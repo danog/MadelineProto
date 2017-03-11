@@ -25,14 +25,14 @@ description: messages_sentMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'pts' => int, 'seq' => int, 'links' => [contacts.Link], ];
+$messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'pts' => int, 'seq' => int, 'links' => [contacts_Link], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-messages_sentMessageLink={_='messages.sentMessageLink', id=int, date=int, pts=int, seq=int, links={contacts.Link}, }
+messages_sentMessageLink={_='messages.sentMessageLink', id=int, date=int, pts=int, seq=int, links={contacts_Link}, }
 
 ```
 

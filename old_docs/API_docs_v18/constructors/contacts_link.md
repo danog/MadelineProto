@@ -23,14 +23,14 @@ description: contacts_link attributes, type and example
 ### Example:
 
 ```
-$contacts_link = ['_' => 'contacts.link', 'my_link' => contacts.MyLink, 'foreign_link' => contacts.ForeignLink, 'user' => User, ];
+$contacts_link = ['_' => 'contacts.link', 'my_link' => contacts_MyLink, 'foreign_link' => contacts_ForeignLink, 'user' => User, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-contacts_link={_='contacts.link', my_link=contacts.MyLink, foreign_link=contacts.ForeignLink, user=User, }
+contacts_link={_='contacts.link', my_link=contacts_MyLink, foreign_link=contacts_ForeignLink, user=User, }
 
 ```
 

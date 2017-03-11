@@ -21,14 +21,14 @@ description: test_vectorIntObject attributes, type and example
 ### Example:
 
 ```
-$test_vectorIntObject = ['_' => 'test.vectorIntObject', 'value' => [test.Int], ];
+$test_vectorIntObject = ['_' => 'test.vectorIntObject', 'value' => [test_Int], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-test_vectorIntObject={_='test.vectorIntObject', value={test.Int}, }
+test_vectorIntObject={_='test.vectorIntObject', value={test_Int}, }
 
 ```
 

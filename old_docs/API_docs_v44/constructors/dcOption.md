@@ -25,14 +25,14 @@ description: dcOption attributes, type and example
 ### Example:
 
 ```
-$dcOption = ['_' => 'dcOption', 'ipv6' => true, 'media_only' => true, 'id' => int, 'ip_address' => string, 'port' => int, ];
+$dcOption = ['_' => 'dcOption', 'ipv6' => Bool, 'media_only' => Bool, 'id' => int, 'ip_address' => string, 'port' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-dcOption={_='dcOption', ipv6=true, media_only=true, id=int, ip_address=string, port=int, }
+dcOption={_='dcOption', ipv6=Bool, media_only=Bool, id=int, ip_address=string, port=int, }
 
 ```
 

@@ -31,14 +31,14 @@ description: updates_channelDifferenceTooLong attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceTooLong = ['_' => 'updates.channelDifferenceTooLong', 'final' => true, 'pts' => int, 'timeout' => int, 'top_message' => int, 'top_important_message' => int, 'read_inbox_max_id' => int, 'unread_count' => int, 'unread_important_count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$updates_channelDifferenceTooLong = ['_' => 'updates.channelDifferenceTooLong', 'final' => Bool, 'pts' => int, 'timeout' => int, 'top_message' => int, 'top_important_message' => int, 'read_inbox_max_id' => int, 'unread_count' => int, 'unread_important_count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updates_channelDifferenceTooLong={_='updates.channelDifferenceTooLong', final=true, pts=int, timeout=int, top_message=int, top_important_message=int, read_inbox_max_id=int, unread_count=int, unread_important_count=int, messages={Message}, chats={Chat}, users={User}, }
+updates_channelDifferenceTooLong={_='updates.channelDifferenceTooLong', final=Bool, pts=int, timeout=int, top_message=int, top_important_message=int, read_inbox_max_id=int, unread_count=int, unread_important_count=int, messages={Message}, chats={Chat}, users={User}, }
 
 ```
 

@@ -23,14 +23,14 @@ description: upload_file attributes, type and example
 ### Example:
 
 ```
-$upload_file = ['_' => 'upload.file', 'type' => storage.FileType, 'mtime' => int, 'bytes' => bytes, ];
+$upload_file = ['_' => 'upload.file', 'type' => storage_FileType, 'mtime' => int, 'bytes' => bytes, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-upload_file={_='upload.file', type=storage.FileType, mtime=int, bytes=bytes, }
+upload_file={_='upload.file', type=storage_FileType, mtime=int, bytes=bytes, }
 
 ```
 

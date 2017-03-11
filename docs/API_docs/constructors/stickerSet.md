@@ -30,14 +30,14 @@ description: stickerSet attributes, type and example
 ### Example:
 
 ```
-$stickerSet = ['_' => 'stickerSet', 'installed' => true, 'archived' => true, 'official' => true, 'masks' => true, 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
+$stickerSet = ['_' => 'stickerSet', 'installed' => Bool, 'archived' => Bool, 'official' => Bool, 'masks' => Bool, 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-stickerSet={_='stickerSet', installed=true, archived=true, official=true, masks=true, id=long, access_hash=long, title=string, short_name=string, count=int, hash=int, }
+stickerSet={_='stickerSet', installed=Bool, archived=Bool, official=Bool, masks=Bool, id=long, access_hash=long, title=string, short_name=string, count=int, hash=int, }
 
 ```
 

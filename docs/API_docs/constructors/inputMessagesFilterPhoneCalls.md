@@ -21,14 +21,14 @@ description: inputMessagesFilterPhoneCalls attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => true, ];
+$inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => Bool, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-inputMessagesFilterPhoneCalls={_='inputMessagesFilterPhoneCalls', missed=true, }
+inputMessagesFilterPhoneCalls={_='inputMessagesFilterPhoneCalls', missed=Bool, }
 
 ```
 

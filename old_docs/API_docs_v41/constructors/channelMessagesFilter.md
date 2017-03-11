@@ -22,14 +22,14 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => true, 'ranges' => [MessageRange], ];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => Bool, 'ranges' => [MessageRange], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channelMessagesFilter={_='channelMessagesFilter', important_only=true, ranges={MessageRange}, }
+channelMessagesFilter={_='channelMessagesFilter', important_only=Bool, ranges={MessageRange}, }
 
 ```
 

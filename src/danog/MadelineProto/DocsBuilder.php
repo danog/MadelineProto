@@ -392,9 +392,9 @@ description: List of methods
                 $table .= PHP_EOL;
 
                 $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$param['subtype'].']' : $param['type']).', ';
+                $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
-                $lua_params .= (isset($param['subtype']) ? '{'.$param['subtype'].'}' : $param['type']).', ';
+                $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
             }
             $params = "['_' => '".$rconstructor."', ".$params.']';
             $lua_params = "{_='".$rconstructor."', ".$lua_params.'}';

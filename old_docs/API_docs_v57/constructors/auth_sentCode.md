@@ -25,14 +25,14 @@ description: auth_sentCode attributes, type and example
 ### Example:
 
 ```
-$auth_sentCode = ['_' => 'auth.sentCode', 'phone_registered' => true, 'type' => auth.SentCodeType, 'phone_code_hash' => string, 'next_type' => auth.CodeType, 'timeout' => int, ];
+$auth_sentCode = ['_' => 'auth.sentCode', 'phone_registered' => Bool, 'type' => auth_SentCodeType, 'phone_code_hash' => string, 'next_type' => auth_CodeType, 'timeout' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-auth_sentCode={_='auth.sentCode', phone_registered=true, type=auth.SentCodeType, phone_code_hash=string, next_type=auth.CodeType, timeout=int, }
+auth_sentCode={_='auth.sentCode', phone_registered=Bool, type=auth_SentCodeType, phone_code_hash=string, next_type=auth_CodeType, timeout=int, }
 
 ```
 

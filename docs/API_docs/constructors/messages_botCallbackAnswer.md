@@ -25,14 +25,14 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Example:
 
 ```
-$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => true, 'has_url' => true, 'message' => string, 'url' => string, 'cache_time' => int, ];
+$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => Bool, 'has_url' => Bool, 'message' => string, 'url' => string, 'cache_time' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-messages_botCallbackAnswer={_='messages.botCallbackAnswer', alert=true, has_url=true, message=string, url=string, cache_time=int, }
+messages_botCallbackAnswer={_='messages.botCallbackAnswer', alert=Bool, has_url=Bool, message=string, url=string, cache_time=int, }
 
 ```
 

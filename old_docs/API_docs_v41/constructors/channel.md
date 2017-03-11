@@ -35,14 +35,14 @@ description: channel attributes, type and example
 ### Example:
 
 ```
-$channel = ['_' => 'channel', 'creator' => true, 'kicked' => true, 'left' => true, 'editor' => true, 'moderator' => true, 'broadcast' => true, 'verified' => true, 'megagroup' => true, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, ];
+$channel = ['_' => 'channel', 'creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'editor' => Bool, 'moderator' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channel={_='channel', creator=true, kicked=true, left=true, editor=true, moderator=true, broadcast=true, verified=true, megagroup=true, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, }
+channel={_='channel', creator=Bool, kicked=Bool, left=Bool, editor=Bool, moderator=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, }
 
 ```
 

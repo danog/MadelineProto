@@ -26,14 +26,14 @@ description: messages_statedMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Chat], 'users' => [User], 'links' => [contacts.Link], 'pts' => int, 'seq' => int, ];
+$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Chat], 'users' => [User], 'links' => [contacts_Link], 'pts' => int, 'seq' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-messages_statedMessageLink={_='messages.statedMessageLink', message=Message, chats={Chat}, users={User}, links={contacts.Link}, pts=int, seq=int, }
+messages_statedMessageLink={_='messages.statedMessageLink', message=Message, chats={Chat}, users={User}, links={contacts_Link}, pts=int, seq=int, }
 
 ```
 

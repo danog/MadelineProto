@@ -24,14 +24,14 @@ description: replyKeyboardMarkup attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'resize' => true, 'single_use' => true, 'selective' => true, 'rows' => [KeyboardButtonRow], ];
+$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'resize' => Bool, 'single_use' => Bool, 'selective' => Bool, 'rows' => [KeyboardButtonRow], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-replyKeyboardMarkup={_='replyKeyboardMarkup', resize=true, single_use=true, selective=true, rows={KeyboardButtonRow}, }
+replyKeyboardMarkup={_='replyKeyboardMarkup', resize=Bool, single_use=Bool, selective=Bool, rows={KeyboardButtonRow}, }
 
 ```
 

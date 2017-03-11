@@ -25,14 +25,14 @@ description: channelForbidden attributes, type and example
 ### Example:
 
 ```
-$channelForbidden = ['_' => 'channelForbidden', 'broadcast' => true, 'megagroup' => true, 'id' => int, 'access_hash' => long, 'title' => string, ];
+$channelForbidden = ['_' => 'channelForbidden', 'broadcast' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channelForbidden={_='channelForbidden', broadcast=true, megagroup=true, id=int, access_hash=long, title=string, }
+channelForbidden={_='channelForbidden', broadcast=Bool, megagroup=Bool, id=int, access_hash=long, title=string, }
 
 ```
 

@@ -24,14 +24,14 @@ description: peerNotifySettings attributes, type and example
 ### Example:
 
 ```
-$peerNotifySettings = ['_' => 'peerNotifySettings', 'show_previews' => true, 'silent' => true, 'mute_until' => int, 'sound' => string, ];
+$peerNotifySettings = ['_' => 'peerNotifySettings', 'show_previews' => Bool, 'silent' => Bool, 'mute_until' => int, 'sound' => string, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-peerNotifySettings={_='peerNotifySettings', show_previews=true, silent=true, mute_until=int, sound=string, }
+peerNotifySettings={_='peerNotifySettings', show_previews=Bool, silent=Bool, mute_until=int, sound=string, }
 
 ```
 

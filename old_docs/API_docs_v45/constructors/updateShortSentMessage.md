@@ -28,14 +28,14 @@ description: updateShortSentMessage attributes, type and example
 ### Example:
 
 ```
-$updateShortSentMessage = ['_' => 'updateShortSentMessage', 'unread' => true, 'out' => true, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
+$updateShortSentMessage = ['_' => 'updateShortSentMessage', 'unread' => Bool, 'out' => Bool, 'id' => int, 'pts' => int, 'pts_count' => int, 'date' => int, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updateShortSentMessage={_='updateShortSentMessage', unread=true, out=true, id=int, pts=int, pts_count=int, date=int, media=MessageMedia, entities={MessageEntity}, }
+updateShortSentMessage={_='updateShortSentMessage', unread=Bool, out=Bool, id=int, pts=int, pts_count=int, date=int, media=MessageMedia, entities={MessageEntity}, }
 
 ```
 

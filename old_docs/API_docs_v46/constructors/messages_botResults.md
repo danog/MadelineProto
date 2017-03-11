@@ -24,14 +24,14 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'results' => [BotInlineResult], ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => string, 'results' => [BotInlineResult], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-messages_botResults={_='messages.botResults', gallery=true, query_id=long, next_offset=string, results={BotInlineResult}, }
+messages_botResults={_='messages.botResults', gallery=Bool, query_id=long, next_offset=string, results={BotInlineResult}, }
 
 ```
 

@@ -22,14 +22,14 @@ description: updateStickerSetsOrder attributes, type and example
 ### Example:
 
 ```
-$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => true, 'order' => [long], ];
+$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => Bool, 'order' => [long], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updateStickerSetsOrder={_='updateStickerSetsOrder', masks=true, order={long}, }
+updateStickerSetsOrder={_='updateStickerSetsOrder', masks=Bool, order={long}, }
 
 ```
 

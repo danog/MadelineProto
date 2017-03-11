@@ -23,14 +23,14 @@ description: inputBotInlineMessageText attributes, type and example
 ### Example:
 
 ```
-$inputBotInlineMessageText = ['_' => 'inputBotInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [MessageEntity], ];
+$inputBotInlineMessageText = ['_' => 'inputBotInlineMessageText', 'no_webpage' => Bool, 'message' => string, 'entities' => [MessageEntity], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-inputBotInlineMessageText={_='inputBotInlineMessageText', no_webpage=true, message=string, entities={MessageEntity}, }
+inputBotInlineMessageText={_='inputBotInlineMessageText', no_webpage=Bool, message=string, entities={MessageEntity}, }
 
 ```
 

@@ -25,14 +25,14 @@ description: chatInvite attributes, type and example
 ### Example:
 
 ```
-$chatInvite = ['_' => 'chatInvite', 'channel' => true, 'broadcast' => true, 'public' => true, 'megagroup' => true, 'title' => string, ];
+$chatInvite = ['_' => 'chatInvite', 'channel' => Bool, 'broadcast' => Bool, 'public' => Bool, 'megagroup' => Bool, 'title' => string, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-chatInvite={_='chatInvite', channel=true, broadcast=true, public=true, megagroup=true, title=string, }
+chatInvite={_='chatInvite', channel=Bool, broadcast=Bool, public=Bool, megagroup=Bool, title=string, }
 
 ```
 

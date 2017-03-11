@@ -35,14 +35,14 @@ description: updateShortMessage attributes, type and example
 ### Example:
 
 ```
-$updateShortMessage = ['_' => 'updateShortMessage', 'unread' => true, 'out' => true, 'mentioned' => true, 'media_unread' => true, 'id' => int, 'user_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => Peer, 'fwd_date' => int, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'entities' => [MessageEntity], ];
+$updateShortMessage = ['_' => 'updateShortMessage', 'unread' => Bool, 'out' => Bool, 'mentioned' => Bool, 'media_unread' => Bool, 'id' => int, 'user_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => Peer, 'fwd_date' => int, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'entities' => [MessageEntity], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updateShortMessage={_='updateShortMessage', unread=true, out=true, mentioned=true, media_unread=true, id=int, user_id=int, message=string, pts=int, pts_count=int, date=int, fwd_from_id=Peer, fwd_date=int, via_bot_id=int, reply_to_msg_id=int, entities={MessageEntity}, }
+updateShortMessage={_='updateShortMessage', unread=Bool, out=Bool, mentioned=Bool, media_unread=Bool, id=int, user_id=int, message=string, pts=int, pts_count=int, date=int, fwd_from_id=Peer, fwd_date=int, via_bot_id=int, reply_to_msg_id=int, entities={MessageEntity}, }
 
 ```
 

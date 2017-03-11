@@ -40,14 +40,14 @@ description: user attributes, type and example
 ### Example:
 
 ```
-$user = ['_' => 'user', 'self' => true, 'contact' => true, 'mutual_contact' => true, 'deleted' => true, 'bot' => true, 'bot_chat_history' => true, 'bot_nochats' => true, 'verified' => true, 'restricted' => true, 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, 'restriction_reason' => string, 'bot_inline_placeholder' => string, ];
+$user = ['_' => 'user', 'self' => Bool, 'contact' => Bool, 'mutual_contact' => Bool, 'deleted' => Bool, 'bot' => Bool, 'bot_chat_history' => Bool, 'bot_nochats' => Bool, 'verified' => Bool, 'restricted' => Bool, 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, 'restriction_reason' => string, 'bot_inline_placeholder' => string, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-user={_='user', self=true, contact=true, mutual_contact=true, deleted=true, bot=true, bot_chat_history=true, bot_nochats=true, verified=true, restricted=true, id=int, access_hash=long, first_name=string, last_name=string, username=string, phone=string, photo=UserProfilePhoto, status=UserStatus, bot_info_version=int, restriction_reason=string, bot_inline_placeholder=string, }
+user={_='user', self=Bool, contact=Bool, mutual_contact=Bool, deleted=Bool, bot=Bool, bot_chat_history=Bool, bot_nochats=Bool, verified=Bool, restricted=Bool, id=int, access_hash=long, first_name=string, last_name=string, username=string, phone=string, photo=UserProfilePhoto, status=UserStatus, bot_info_version=int, restriction_reason=string, bot_inline_placeholder=string, }
 
 ```
 

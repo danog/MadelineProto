@@ -23,14 +23,14 @@ description: updateContactLink attributes, type and example
 ### Example:
 
 ```
-$updateContactLink = ['_' => 'updateContactLink', 'user_id' => int, 'my_link' => contacts.MyLink, 'foreign_link' => contacts.ForeignLink, ];
+$updateContactLink = ['_' => 'updateContactLink', 'user_id' => int, 'my_link' => contacts_MyLink, 'foreign_link' => contacts_ForeignLink, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-updateContactLink={_='updateContactLink', user_id=int, my_link=contacts.MyLink, foreign_link=contacts.ForeignLink, }
+updateContactLink={_='updateContactLink', user_id=int, my_link=contacts_MyLink, foreign_link=contacts_ForeignLink, }
 
 ```
 

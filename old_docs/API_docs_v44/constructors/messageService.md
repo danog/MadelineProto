@@ -29,14 +29,14 @@ description: messageService attributes, type and example
 ### Example:
 
 ```
-$messageService = ['_' => 'messageService', 'unread' => true, 'out' => true, 'mentioned' => true, 'media_unread' => true, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'action' => MessageAction, ];
+$messageService = ['_' => 'messageService', 'unread' => Bool, 'out' => Bool, 'mentioned' => Bool, 'media_unread' => Bool, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'action' => MessageAction, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-messageService={_='messageService', unread=true, out=true, mentioned=true, media_unread=true, id=int, from_id=int, to_id=Peer, date=int, action=MessageAction, }
+messageService={_='messageService', unread=Bool, out=Bool, mentioned=Bool, media_unread=Bool, id=int, from_id=int, to_id=Peer, date=int, action=MessageAction, }
 
 ```
 

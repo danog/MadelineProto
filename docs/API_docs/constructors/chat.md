@@ -33,14 +33,14 @@ description: chat attributes, type and example
 ### Example:
 
 ```
-$chat = ['_' => 'chat', 'creator' => true, 'kicked' => true, 'left' => true, 'admins_enabled' => true, 'admin' => true, 'deactivated' => true, 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'version' => int, 'migrated_to' => InputChannel, ];
+$chat = ['_' => 'chat', 'creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'admins_enabled' => Bool, 'admin' => Bool, 'deactivated' => Bool, 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'version' => int, 'migrated_to' => InputChannel, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-chat={_='chat', creator=true, kicked=true, left=true, admins_enabled=true, admin=true, deactivated=true, id=int, title=string, photo=ChatPhoto, participants_count=int, date=int, version=int, migrated_to=InputChannel, }
+chat={_='chat', creator=Bool, kicked=Bool, left=Bool, admins_enabled=Bool, admin=Bool, deactivated=Bool, id=int, title=string, photo=ChatPhoto, participants_count=int, date=int, version=int, migrated_to=InputChannel, }
 
 ```
 
