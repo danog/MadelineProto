@@ -16,48 +16,56 @@ trait TD
 {
     private $td_params_conversion = [
         'updateNewMessage' => [
-            '_' => 'updateNewMessage',
+            '_'                    => 'updateNewMessage',
             'disable_notification' => ['message', 'silent'],
-            'message' => ['message'],
+            'message'              => ['message'],
          ],
          'message' => [
-              '_' => 'message',
-             'id' => ['id'],
-             'sender_user_id' => ['from_id'],
-             'chat_id' => ['to_id', 'choose_chat_id_from_botapi'],
-             'send_state' => ['choose_incoming_or_sent'],
-             'can_be_edited' => ['choose_can_edit'],
-             'can_be_deleted' => ['choose_can_delete'],
-             'is_post' => ['post'],
-             'date' => ['date'],
-             'edit_date' => ['edit_date'],
-             'forward_info' => ['fwd_info', 'choose_forward_info'],
+              '_'                  => 'message',
+             'id'                  => ['id'],
+             'sender_user_id'      => ['from_id'],
+             'chat_id'             => ['to_id', 'choose_chat_id_from_botapi'],
+             'send_state'          => ['choose_incoming_or_sent'],
+             'can_be_edited'       => ['choose_can_edit'],
+             'can_be_deleted'      => ['choose_can_delete'],
+             'is_post'             => ['post'],
+             'date'                => ['date'],
+             'edit_date'           => ['edit_date'],
+             'forward_info'        => ['fwd_info', 'choose_forward_info'],
              'reply_to_message_id' => ['reply_to_msg_id'],
-             'ttl' => ['choose_ttl'],
-             'ttl_expires_in' => ['choose_ttl_expires_in'],
-             'via_bot_user_id' => ['via_bot_id'],
-             'views' => ['views'],
-             'content' => ['choose_message_content'],
-             'reply_markup' => ['reply_markup']
+             'ttl'                 => ['choose_ttl'],
+             'ttl_expires_in'      => ['choose_ttl_expires_in'],
+             'via_bot_user_id'     => ['via_bot_id'],
+             'views'               => ['views'],
+             'content'             => ['choose_message_content'],
+             'reply_markup'        => ['reply_markup'],
          ],
 
          'messages.sendMessage' => [
-             'chat_id' => ['peer'],
-             'reply_to_message_id' => ['reply_to_msg_id'],
-             'disable_notification' => ['silent'],
-             'from_background' => ['background'],
+             'chat_id'               => ['peer'],
+             'reply_to_message_id'   => ['reply_to_msg_id'],
+             'disable_notification'  => ['silent'],
+             'from_background'       => ['background'],
              'input_message_content' => ['choose_message_content'],
-             'reply_markup' => ['reply_markup']
-         ]
+             'reply_markup'          => ['reply_markup'],
+         ],
 
     ];
     private $reverse = [
         'sendMessage'=> 'messages.sendMessage',
     ];
     private $ignore = ['updateMessageID'];
-    public function tdcli_to_td(&$params, $key=null) {
-        if (!is_array($params)) return $params;
-        if (!isset($params['ID'])) { array_walk($params, [$this, 'tdcli_to_td']); return $params; }
+
+    public function tdcli_to_td(&$params, $key = null)
+    {
+        if (!is_array($params)) {
+            return $params;
+        }
+        if (!isset($params['ID'])) {
+            array_walk($params, [$this, 'tdcli_to_td']);
+
+            return $params;
+        }
         foreach ($params as $key => $value) {
             $value = $this->tdcli_to_td($value);
             if (preg_match('/_$/', $key)) {
@@ -67,9 +75,12 @@ trait TD
         }
         $params['_'] = lcfirst($params['ID']);
         unset($params['ID']);
+
         return $params;
     }
-    public function td_to_mtproto($params) {
+
+    public function td_to_mtproto($params)
+    {
         $newparams = ['_' => $this->reverse[$params['_']]];
 
         foreach ($this->td_params_conversion[$newparams['_']] as $td => $mtproto) {
@@ -79,28 +90,45 @@ trait TD
                     switch ($params[$td]['_']) {
                         case 'inputMessageText':
                         $params[$td]['_'] = 'messages.sendMessage';
-                        if (isset($params['disable_web_page_preview'])) $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
-                        $newparams = array_merge($params[$td],$newparams);
+                        if (isset($params['disable_web_page_preview'])) {
+                            $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
+                        }
+                        $newparams = array_merge($params[$td], $newparams);
                         break;
                         default: throw new Exception("Can't convert non text messages yet!");
                     }
                     break;
                     default:
                     $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
-                    if (is_array($newparams[$mtproto[0]])) $newparams[$mtproto[0]] = $this->mtproto_to_td($newparams[$mtproto[0]]);
+                    if (is_array($newparams[$mtproto[0]])) {
+                        $newparams[$mtproto[0]] = $this->mtproto_to_td($newparams[$mtproto[0]]);
+                    }
                 }
             }
         }
+
         return $newparams;
-   }
-    public function mtproto_to_tdcli($params) {
+    }
+
+    public function mtproto_to_tdcli($params)
+    {
         return $this->td_to_tdcli($this->mtproto_to_td($params));
     }
-    public function mtproto_to_td(&$params) {
-        if (!is_array($params)) return $params;
-        if (!isset($params['_'])) { array_walk($params, [$this, 'mtproto_to_td']); return $params; }
+
+    public function mtproto_to_td(&$params)
+    {
+        if (!is_array($params)) {
+            return $params;
+        }
+        if (!isset($params['_'])) {
+            array_walk($params, [$this, 'mtproto_to_td']);
+
+            return $params;
+        }
         $newparams = ['_' => $params['_']];
-        if (in_array($params['_'], $this->ignore)) return $params;
+        if (in_array($params['_'], $this->ignore)) {
+            return $params;
+        }
         foreach ($this->td_params_conversion[$params['_']] as $td => $mtproto) {
             if (is_string($mtproto)) {
                 $newparams[$td] = $mtproto;
@@ -121,11 +149,19 @@ trait TD
                     case 'choose_forward_info':
                     if (isset($params['fwd_from'])) {
                         $newparams[$td] = ['_' => 'messageForwardedFromUser'];
-                        if (isset($params['fwd_from']['channel_id'])) $newparams[$td] = ['_'=> 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
+                        if (isset($params['fwd_from']['channel_id'])) {
+                            $newparams[$td] = ['_'=> 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
+                        }
                         $newparams[$td]['date'] = $params['fwd_from']['date'];
-                        if (isset($params['fwd_from']['channel_post'])) $newparams[$td]['channel_post'] = $params['fwd_from']['channel_post'];
-                        if (isset($params['fwd_from']['from_id'])) $newparams[$td]['sender_user_id'] = $params['fwd_from']['from_id'];
-                    } else $newparams[$td] = null;
+                        if (isset($params['fwd_from']['channel_post'])) {
+                            $newparams[$td]['channel_post'] = $params['fwd_from']['channel_post'];
+                        }
+                        if (isset($params['fwd_from']['from_id'])) {
+                            $newparams[$td]['sender_user_id'] = $params['fwd_from']['from_id'];
+                        }
+                    } else {
+                        $newparams[$td] = null;
+                    }
                     break;
                     case 'choose_ttl':
                     $newparams[$td] = isset($params['ttl']) ? $params['ttl'] : 0;
@@ -136,9 +172,15 @@ trait TD
                     case 'choose_message_content':
                     if ($params['message'] !== '') {
                         $newparams[$td] = ['_' => 'messageText', 'text' => $params['message']];
-                        if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') $newparams[$td]['web_page'] = $this->mtproto_to_td($params['media']['webpage']);
-                        if (isset($params['entities'])) $newparams[$td]['entities'] = $params['entities'];
-                    } else throw new Exception("Can't convert non text messages yet!");
+                        if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') {
+                            $newparams[$td]['web_page'] = $this->mtproto_to_td($params['media']['webpage']);
+                        }
+                        if (isset($params['entities'])) {
+                            $newparams[$td]['entities'] = $params['entities'];
+                        }
+                    } else {
+                        throw new Exception("Can't convert non text messages yet!");
+                    }
                     break;
                     default:
                     if (isset($mtproto[1])) {
@@ -146,24 +188,33 @@ trait TD
                     } else {
                         $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
                     }
-                    if (is_array($newparams[$td])) $newparams[$td] = $this->mtproto_to_td($newparams[$td]);
+                    if (is_array($newparams[$td])) {
+                        $newparams[$td] = $this->mtproto_to_td($newparams[$td]);
+                    }
                 }
             }
         }
 
         return $newparams;
     }
-    public function td_to_tdcli($params) {
-        if (!is_array($params)) return $params;
+
+    public function td_to_tdcli($params)
+    {
+        if (!is_array($params)) {
+            return $params;
+        }
         $newparams = [];
         foreach ($params as $key => $value) {
             if ($key === '_') {
                 $newparams['ID'] = ucfirst($value);
             } else {
-                if (!is_numeric($key) && !preg_match('/_^/', $key)) $key = $key.'_';
+                if (!is_numeric($key) && !preg_match('/_^/', $key)) {
+                    $key = $key.'_';
+                }
                 $newparams[$key] = $this->td_to_tdcli($value);
             }
         }
+
         return $newparams;
     }
 }

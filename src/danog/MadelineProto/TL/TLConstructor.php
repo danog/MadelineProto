@@ -27,7 +27,9 @@ class TLConstructor extends TLParams
         $this->predicate[$this->key] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
         $this->type[$this->key] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
-        if ($scheme_type === 'secret') $this->layer[$this->key] = $json_dict['layer'];
+        if ($scheme_type === 'secret') {
+            $this->layer[$this->key] = $json_dict['layer'];
+        }
         $this->parse_params($this->key, $scheme_type === 'mtproto');
         $this->key++;
     }
@@ -50,10 +52,16 @@ class TLConstructor extends TLParams
             $key = 0;
             $keys = array_keys($this->predicate, $predicate);
             foreach ($keys as $k) {
-                if ($this->layer[$k] === $layer) $key = $k;
+                if ($this->layer[$k] === $layer) {
+                    $key = $k;
+                }
             }
-            if ($key === 0) $key = array_search($predicate, $this->predicate);
-        } else $key = array_search($predicate, $this->predicate);
+            if ($key === 0) {
+                $key = array_search($predicate, $this->predicate);
+            }
+        } else {
+            $key = array_search($predicate, $this->predicate);
+        }
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],

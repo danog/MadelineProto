@@ -101,9 +101,11 @@ while (true) {
                         } else {
                             array_walk($rows, function (&$value, $key) {
                                 $value = explode('|', $value);
-                                array_walk($value, function (&$value, $key) { $value = ['text' => trim($value)]; });
+                                array_walk($value, function (&$value, $key) {
+                                    $value = ['text' => trim($value)];
+                                });
                             });
-                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => rand(0, pow(2,31)-1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
+                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => rand(0, pow(2, 31) - 1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
                             $MadelineProto->messages->setInlineBotResults($toset);
                         }
                     }

@@ -15,6 +15,7 @@ namespace danog\MadelineProto\TL;
 trait TL
 {
     public $encrypted_layer = -1;
+
     public function construct_tl($files)
     {
         \danog\MadelineProto\Logger::log(['Loading TL schemes...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -40,7 +41,9 @@ trait TL
                     if (preg_match('|^//@|', $line)) {
                         $list = explode(' @', str_replace('//', ' ', $line));
                         foreach ($list as $elem) {
-                            if ($elem === '') continue;
+                            if ($elem === '') {
+                                continue;
+                            }
                             $elem = explode(' ', $elem, 2);
                             if ($elem[0] === 'class') {
                                 $elem = explode(' ', $elem[1], 2);
@@ -51,11 +54,15 @@ trait TL
                                 if (!is_null($class)) {
                                     $this->td_descriptions['types'][$class] = $elem[1];
                                     $class = null;
-                                } else $e = $elem[1];
+                                } else {
+                                    $e = $elem[1];
+                                }
                                 continue;
                             }
-                            if ($elem[0] === 'param_description') $elem[0] = 'description';
-                            $dparams[$elem[0]]= $elem[1];
+                            if ($elem[0] === 'param_description') {
+                                $elem[0] = 'description';
+                            }
+                            $dparams[$elem[0]] = $elem[1];
                         }
                         continue;
                     }
@@ -78,9 +85,13 @@ trait TL
                     if (preg_match('/^vector#/', $line)) {
                         continue;
                     }
-                    if (preg_match('/ \?= /', $line)) continue;
+                    if (preg_match('/ \?= /', $line)) {
+                        continue;
+                    }
                     $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
-                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) continue;
+                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                        continue;
+                    }
                     $clean = preg_replace([
                         '/:bytes /',
                         '/;/',
@@ -93,7 +104,7 @@ trait TL
                         '/ $/',
                         '/\?bytes /',
                         '/{/',
-                        '/}/'
+                        '/}/',
                      ], [
                         ':string ',
                         '',
@@ -106,10 +117,10 @@ trait TL
                         '',
                         '?string ',
                         '',
-                        ''], $line);
+                        '', ], $line);
                     $id = hash('crc32b', $clean);
                     if (preg_match('/^[^\s]+#/', $line)) {
-                        $nid = str_pad(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line), 8, "0", \STR_PAD_LEFT);
+                        $nid = str_pad(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line), 8, '0', \STR_PAD_LEFT);
                         if ($id !== $nid) {
                             \danog\MadelineProto\Logger::log(['CRC32 mismatch ('.$id.', '.$nid.') for '.$line], \danog\MadelineProto\Logger::ERROR);
                         }
@@ -123,7 +134,9 @@ trait TL
                     $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec($id)))[0];
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
-                    if ($layer !== null) $TL_dict[$type][$key]['layer'] = $layer;
+                    if ($layer !== null) {
+                        $TL_dict[$type][$key]['layer'] = $layer;
+                    }
                     foreach (explode(' ', preg_replace(['/^[^\s]+\s/', '/=\s[^\s]+/', '/\s$/'], '', $line)) as $param) {
                         if ($param === '') {
                             continue;
@@ -143,17 +156,23 @@ trait TL
             $orig = $this->encrypted_layer;
             \danog\MadelineProto\Logger::log(['Translating objects...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
-                if ($scheme_type === 'secret') $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+                if ($scheme_type === 'secret') {
+                    $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+                }
                 $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
 
             \danog\MadelineProto\Logger::log(['Translating methods...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
-                if ($scheme_type === 'secret') $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+                if ($scheme_type === 'secret') {
+                    $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+                }
             }
             if ($this->encrypted_layer != $orig && isset($this->secret_chats)) {
-                foreach ($this->secret_chats as $chat => $data) { $this->notify_layer($chat); }
+                foreach ($this->secret_chats as $chat => $data) {
+                    $this->notify_layer($chat);
+                }
             }
         }
         if (isset($files['td']) && isset($files['telegram'])) {
@@ -184,7 +203,6 @@ trait TL
     {
         return array_unique(array_values($this->methods->method_namespace));
     }
-
 
     public function serialize_bool($bool)
     {
@@ -224,13 +242,19 @@ trait TL
 
                 return \danog\PHP\Struct::pack('<q', $object);
             case 'int128':
-                if (strlen($object) !== 16) throw new Exception('Given value is not 16 bytes long');
+                if (strlen($object) !== 16) {
+                    throw new Exception('Given value is not 16 bytes long');
+                }
                 return (string) $object;
             case 'int256':
-                if (strlen($object) !== 32) throw new Exception('Given value is not 32 bytes long');
+                if (strlen($object) !== 32) {
+                    throw new Exception('Given value is not 32 bytes long');
+                }
                 return (string) $object;
             case 'int512':
-                if (strlen($object) !== 64) throw new Exception('Given value is not 64 bytes long');
+                if (strlen($object) !== 64) {
+                    throw new Exception('Given value is not 64 bytes long');
+                }
                 return (string) $object;
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $object);
@@ -297,10 +321,13 @@ trait TL
         }
 
         $concat = '';
-        if ($constructorData['predicate'] === 'messageEntityMentionName') $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
+        if ($constructorData['predicate'] === 'messageEntityMentionName') {
+            $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
+        }
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
+
         return $concat.$this->serialize_params($constructorData, $object);
     }
 
@@ -310,9 +337,9 @@ trait TL
         if ($tl === false) {
             throw new Exception('Could not find method: '.$method);
         }
+
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
-
 
     public function serialize_params($tl, $arguments)
     {
@@ -348,7 +375,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->random(15+random_int(0, 10));
+                    $serialized .= $this->random(15 + random_int(0, 10));
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($arguments['message'])) {

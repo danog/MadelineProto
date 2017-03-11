@@ -97,6 +97,7 @@ trait BotAPI
             foreach ($data as $key => $element) {
                 $newd[$key] = $this->MTProto_to_botAPI($element, $sent_arguments);
             }
+
             return $newd;
         }
         switch ($data['_']) {
@@ -450,5 +451,4 @@ trait BotAPI
 
         return $arguments;
     }
-
 }

@@ -38,7 +38,7 @@ $docs = [
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v62.tl', 'secret' => __DIR__.'/src/danog/MadelineProto/TL_secret.tl','td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v62.tl', 'secret' => __DIR__.'/src/danog/MadelineProto/TL_secret.tl', 'td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
         'title'       => 'MadelineProto API documentation (layer 62)',
         'description' => 'MadelineProto API documentation (layer 62)',
         'output_dir'  => __DIR__.'/docs/API_docs',

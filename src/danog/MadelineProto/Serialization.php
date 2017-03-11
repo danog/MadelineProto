@@ -63,6 +63,7 @@ class Serialization
         if ($unserialized === false) {
             throw new Exception('An error occurred on deserialization');
         }
+
         return $unserialized;
     }
 }

@@ -129,15 +129,18 @@ trait MessageHandler
         $this->datacenter->new_incoming[$message_id] = $message_id;
         $this->handle_messages();
     }
-    public function encrypt_secret_message($chat_id, $message) {
+
+    public function encrypt_secret_message($chat_id, $message)
+    {
         if (!isset($this->secret_chats[$chat_id])) {
             \danog\MadelineProto\Logger::log('I do not have the secret chat '.$chat_id.' in the database, skipping message...');
+
             return false;
         }
         $message = $this->serialize_object(['type' => $message['_']], $message, $this->secret_chats[$chat_id]['layer']);
         $this->secret_chats[$chat_id]['outgoing'][] = $message;
         $this->secret_chats[$chat_id]['ttr']--;
-        if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7*24*60*60) && $this->secret_chats[$chat_id]['rekeying'] === 0) {
+        if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'] === 0) {
             $this->rekey($chat_id);
         }
 
@@ -146,15 +149,21 @@ trait MessageHandler
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
         $padding = $this->random($this->posmod(-strlen($message), 16));
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message.$padding, $aes_key, $aes_iv);
+
         return $message;
     }
-    public function handle_encrypted_update($message) {
+
+    public function handle_encrypted_update($message)
+    {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             \danog\MadelineProto\Logger::log('I do not have the secret chat '.$message['message']['chat_id'].' in the database, skipping message...');
+
             return false;
         }
         $auth_key_id = \danog\PHP\Struct::unpack('<q', substr($message['message']['bytes'], 0, 8))[0];
-        if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+        if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
+            throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+        }
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']]['key']['auth_key'], 'to server');
@@ -180,7 +189,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('random_bytes is too short');
         }
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
-        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7*24*60*60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'] === 0) {
+        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'] === 0) {
             $this->rekey($message['message']['chat_id']);
         }
         unset($message['message']['bytes']);

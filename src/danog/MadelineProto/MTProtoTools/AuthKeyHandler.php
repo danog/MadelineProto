@@ -414,7 +414,9 @@ trait AuthKeyHandler
 
         throw new \danog\MadelineProto\SecurityException('Auth Failed');
     }
-    public function check_G($g_a, $p) {
+
+    public function check_G($g_a, $p)
+    {
 
         /*
          * ***********************************************************************
@@ -437,7 +439,9 @@ trait AuthKeyHandler
 
         return true;
     }
-    public function check_p_g($p, $g) {
+
+    public function check_p_g($p, $g)
+    {
         /*
         * ***********************************************************************
         * Check validity of dh_prime
@@ -468,11 +472,11 @@ trait AuthKeyHandler
                 * 2^2047 < p < 2^2048
                 */
                 \danog\MadelineProto\Logger::log(['Executing p/g checks (2/2)...'], \danog\MadelineProto\Logger::VERBOSE);
-                if ($p->compare($this->twoe2047) <= 0 // 2^2047 < p or p > 2^2047 or ! p <= 2^2047
+        if ($p->compare($this->twoe2047) <= 0 // 2^2047 < p or p > 2^2047 or ! p <= 2^2047
                     || $p->compare($this->twoe2048) >= 0 // p < 2^2048 or ! p >= 2^2048
                 ) {
-                    throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
-                }
+            throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
+        }
 
                 /*
                 * ***********************************************************************
@@ -481,29 +485,37 @@ trait AuthKeyHandler
                 */
                 \danog\MadelineProto\Logger::log(['Executing g check...'], \danog\MadelineProto\Logger::VERBOSE);
 
-                if ($g->compare($this->one) <= 0 // 1 < g or g > 1 or ! g <= 1
+        if ($g->compare($this->one) <= 0 // 1 < g or g > 1 or ! g <= 1
                     || $g->compare($p->subtract($this->one)) >= 0 // g < p - 1 or ! g >= p - 1
                 ) {
-                    throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
-                }
+            throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
+        }
+
         return true;
     }
-    public function get_dh_config() {
+
+    public function get_dh_config()
+    {
         $this->getting_state = true;
         $dh_config = $this->method_call('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         $this->getting_state = false;
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             \danog\MadelineProto\Logger::log(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
+
             return $this->dh_config;
         }
         $dh_config['p'] = new \phpseclib\Math\BigInteger($dh_config['p'], 256);
         $dh_config['g'] = new \phpseclib\Math\BigInteger($dh_config['g']);
         $this->check_p_g($dh_config['p'], $dh_config['g']);
+
         return $this->dh_config = $dh_config;
     }
+
     private $temp_requested_secret_chats = [];
     private $secret_chats = [];
-    public function accept_secret_chat($params) {
+
+    public function accept_secret_chat($params)
+    {
         $dh_config = $this->get_dh_config();
         \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
@@ -518,9 +530,10 @@ trait AuthKeyHandler
         $this->check_G($g_b, $dh_config['p']);
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
-
     }
-    public function request_secret_chat($user) {
+
+    public function request_secret_chat($user)
+    {
         $user = $this->get_info($user)['InputUser'];
         \danog\MadelineProto\Logger::log(['Creating secret chat with '.$user['user_id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
@@ -533,11 +546,15 @@ trait AuthKeyHandler
         $this->temp_requested_secret_chats[$res['id']] = $a;
         $this->handle_pending_updates();
         $this->get_updates_difference();
+
         return $res['id'];
     }
-    public function complete_secret_chat($params) {
+
+    public function complete_secret_chat($params)
+    {
         if ($this->secret_chat_status($params['id']) !== 1) {
             \danog\MadelineProto\Logger::log(['Could not find and complete secret chat '.$params['id']]);
+
             return false;
         }
         $dh_config = $this->get_dh_config();
@@ -556,12 +573,19 @@ trait AuthKeyHandler
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
     }
-    public function notify_layer($chat) {
+
+    public function notify_layer($chat)
+    {
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->encrypted_layer]]]);
     }
+
     private $temp_rekeyed_secret_chats = [];
-    public function rekey($chat) {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 0) return;
+
+    public function rekey($chat)
+    {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
+            return;
+        }
         \danog\MadelineProto\Logger::log(['Rekeying secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -575,9 +599,12 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
         $this->handle_pending_updates();
         $this->get_updates_difference();
+
         return $e;
     }
-    public function accept_rekey($chat, $params) {
+
+    public function accept_rekey($chat, $params)
+    {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my = $this->temp_rekeyed_secret_chats[$this->secret_chats[$chat]['rekeying'][1]];
             if ($my['exchange_id'] > $params['exchange_id']) {
@@ -586,6 +613,7 @@ trait AuthKeyHandler
             if ($my['exchange_id'] === $params['exchange_id']) {
                 $this->secret_chats[$chat]['rekeying'] = [0];
                 $this->rekey($chat);
+
                 return;
             }
         }
@@ -606,10 +634,13 @@ trait AuthKeyHandler
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
         $this->handle_pending_updates();
         $this->get_updates_difference();
-
     }
-    public function commit_rekey($chat, $params) {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 1) return;
+
+    public function commit_rekey($chat, $params)
+    {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 1) {
+            return;
+        }
         \danog\MadelineProto\Logger::log(['Committing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
@@ -631,10 +662,13 @@ trait AuthKeyHandler
 
         $this->handle_pending_updates();
         $this->get_updates_difference();
-
     }
-    public function complete_rekey($chat, $params) {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 2) return;
+
+    public function complete_rekey($chat, $params)
+    {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 2) {
+            return;
+        }
         if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
             $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
@@ -647,14 +681,24 @@ trait AuthKeyHandler
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
     }
-    public function secret_chat_status($chat) {
-        if (isset($this->secret_chats[$chat])) return 2;
-        if (isset($this->temp_requested_secret_chats[$chat])) return 1;
+
+    public function secret_chat_status($chat)
+    {
+        if (isset($this->secret_chats[$chat])) {
+            return 2;
+        }
+        if (isset($this->temp_requested_secret_chats[$chat])) {
+            return 1;
+        }
+
         return 0;
     }
-    public function get_secret_chat($chat) {
+
+    public function get_secret_chat($chat)
+    {
         return $this->secret_chats[$chat];
     }
+
     public function bind_temp_auth_key($expires_in)
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {

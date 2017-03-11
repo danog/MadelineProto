@@ -158,7 +158,9 @@ trait CallHandler
 
         throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
     }
-    public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false]) {
+
+    public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
+    {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }

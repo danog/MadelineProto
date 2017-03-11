@@ -32,7 +32,6 @@ echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 if ($MadelineProto === false) {
-
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
@@ -87,7 +86,6 @@ $media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inpu
 // Photo uploaded as document, secret chat
 //$inputFile = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
 //$secret_media['document_photo'] = ['peer' => $secret, 'file' => $inputFile, 'message' => ['ttl' => PHP_INT_MAX, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]]]];
-
 
 // Photo
 $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];

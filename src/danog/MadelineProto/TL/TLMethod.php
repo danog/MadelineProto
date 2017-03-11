@@ -47,9 +47,11 @@ class TLMethod extends TLParams
             'params'            => $this->params[$key],
         ];
     }
+
     public function find_by_id($id)
     {
         $key = array_search($id, $this->id);
+
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],

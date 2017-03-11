@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Manages upload and download of files
+ * Manages upload and download of files.
  */
 trait Files
 {
@@ -46,7 +46,7 @@ trait Files
             $key = $this->random(32);
             $iv = $this->random(32);
             $digest = hash('md5', $key.$iv, true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4)^substr($digest, 4, 4))[0];
+            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -70,12 +70,15 @@ trait Files
             $constructor['key'] = $key;
             $constructor['key'] = $iv;
         }
+
         return $constructor;
     }
+
     public function upload_encrypted($file, $file_name = '', $cb = null)
     {
         return $this->upload($file, $file_name, $cb, true);
     }
+
     public function get_download_info($message_media)
     {
         if (is_string($message_media)) {
@@ -93,16 +96,18 @@ trait Files
             $res['key'] = $message_media['decrypted_message']['media']['key'];
             $res['iv'] = $message_media['decrypted_message']['media']['iv'];
             if (isset($message_media['decrypted_message']['media']['file_name'])) {
-                    $pathinfo = pathinfo($message_media['decrypted_message']['media']['file_name']);
-                    if (isset($pathinfo['extension'])) {
-                        $res['ext'] = '.'.$pathinfo['extension'];
-                    }
-                    $res['name'] = $pathinfo['filename'];
+                $pathinfo = pathinfo($message_media['decrypted_message']['media']['file_name']);
+                if (isset($pathinfo['extension'])) {
+                    $res['ext'] = '.'.$pathinfo['extension'];
+                }
+                $res['name'] = $pathinfo['filename'];
             }
-            if (isset($message_media['decrypted_message']['media']['mime_type'])) $res['mime'] = $message_media['decrypted_message']['media']['mime_type'];
+            if (isset($message_media['decrypted_message']['media']['mime_type'])) {
+                $res['mime'] = $message_media['decrypted_message']['media']['mime_type'];
+            }
             if (isset($message_media['decrypted_message']['media']['attributes'])) {
-            foreach ($message_media['decrypted_message']['media']['attributes'] as $attribute) {
-                switch ($attribute['_']) {
+                foreach ($message_media['decrypted_message']['media']['attributes'] as $attribute) {
+                    switch ($attribute['_']) {
                     case 'documentAttributeFilename':
                     $pathinfo = pathinfo($attribute['file_name']);
                     if (isset($pathinfo['extension'])) {
@@ -114,7 +119,7 @@ trait Files
                     $audio = $attribute;
                     break;
                 }
-            }
+                }
             }
             if (isset($audio) && isset($audio['title']) && !isset($res['name'])) {
                 $res['name'] = $audio['title'];
@@ -128,6 +133,7 @@ trait Files
             if (!isset($res['name'])) {
                 $res['name'] = $message_media['file']['access_hash'];
             }
+
             return $res;
             case 'messageMediaPhoto':
             $photo = end($message_media['photo']['sizes']);
@@ -245,8 +251,10 @@ trait Files
         }
         if (isset($info['key'])) {
             $digest = hash('md5', $info['key'].$info['iv'], true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4)^substr($digest, 4, 4))[0];
-            if ($fingerprint !== $info['key_fingerprint']) throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
+            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            if ($fingerprint !== $info['key_fingerprint']) {
+                throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
+            }
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
             $ige->setIV($info['iv']);
             $ige->setKey($info['key']);

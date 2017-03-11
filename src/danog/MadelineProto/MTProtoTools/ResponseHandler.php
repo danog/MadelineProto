@@ -332,31 +332,42 @@ trait ResponseHandler
                 break;
         }
     }
-    public function handle_decrypted_update($update) {
-        if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) throw new \danog\MadelineProto\ResponseException('random_bytes is too short!');
+
+    public function handle_decrypted_update($update)
+    {
+        if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
+            throw new \danog\MadelineProto\ResponseException('random_bytes is too short!');
+        }
         $this->secret_chats[$update['message']['chat_id']]['incoming'][] = $update['message'];
         switch ($update['message']['decrypted_message']['_']) {
             case 'decryptedMessageService':
             switch ($update['message']['decrypted_message']['action']) {
                 case 'decryptedMessageActionRequestKey':
                 $this->accept_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                 return;
 
                 case 'decryptedMessageActionAcceptKey':
                 $this->commit_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                 return;
 
                 case 'decryptedMessageActionCommitKey':
                 $this->complete_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                 return;
 
                 case 'decryptedMessageActionNotifyLayer':
                 $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['action']['layer'];
-                if ($update['message']['decrypted_message']['action']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) $this->notify_layer($update['message']['chat_id']);
+                if ($update['message']['decrypted_message']['action']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
+                    $this->notify_layer($update['message']['chat_id']);
+                }
+
                 return;
 
                 case 'decryptedMessageActionSetMessageTTL':
                 $this->secret_chats[$update['message']['chat_id']]['ttl'] = $update['message']['decrypted_message']['action']['ttl_seconds'];
+
                 return;
 
                 case 'decryptedMessageActionResend':
@@ -366,6 +377,7 @@ trait ResponseHandler
 //                        $this->send_encrypted_message($update['message']['chat_id'], $update['message']['decrypted_message']);
                     }
                 }
+
                 return;
                 default:
 //                $this->save_update(['_' => 'updateNewDecryptedMessage', 'peer' => $this->secret_chats[$update['message']['chat_id']]['InputEncryptedChat'], 'in_seq_no' => $this->get_in_seq_no($update['message']['chat_id']), 'out_seq_no' => $this->get_out_seq_no($update['message']['chat_id']), 'message' => $update['message']['decrypted_message']]);

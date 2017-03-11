@@ -20,8 +20,12 @@ class DocsBuilder
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
-        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) $this->constructors = $this->td_constructors;
-        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) $this->methods = $this->td_methods;
+        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
+            $this->constructors = $this->td_constructors;
+        }
+        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
+            $this->methods = $this->td_methods;
+        }
         $this->settings = $settings;
         if (!file_exists($this->settings['output_dir'])) {
             mkdir($this->settings['output_dir']);
@@ -149,13 +153,13 @@ description: '.$this->settings['description'].'
                 }
                 $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$rmethod])) {
-                     $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
+                    $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
-                $lua_params .= $param['name']."=";
+                $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
@@ -383,13 +387,13 @@ description: List of methods
                 }
                 $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']])) {
-                     $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
+                    $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$param['subtype'].']' : $param['type']).', ';
-                $lua_params .= $param['name']."=";
+                $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$param['subtype'].'}' : $param['type']).', ';
             }
             $params = "['_' => '".$rconstructor."', ".$params.']';
@@ -531,11 +535,11 @@ $".$type." = 'channel#38575794'; // tg-cli style id (channels)
                 $header .= 'The following syntax can also be used:
 
 ```
-$'.$type." = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
 ```
 
 
-";
+';
             }
             $constructors = '### Possible values (constructors):
 

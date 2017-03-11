@@ -59,6 +59,7 @@ trait BotAPIFiles
                 $new .= $cur;
             }
         }
+
         return $new;
     }
 
@@ -145,7 +146,6 @@ trait BotAPIFiles
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
-
 
             case 9:
             $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false]]];

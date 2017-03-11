@@ -18,8 +18,11 @@ class Lua
     private $Lua;
     private $script;
 
-    public function __construct($script, $MadelineProto) {
-        if (!file_exists($script)) throw new Exception('Provided script does not exist');
+    public function __construct($script, $MadelineProto)
+    {
+        if (!file_exists($script)) {
+            throw new Exception('Provided script does not exist');
+        }
         $this->MadelineProto = $MadelineProto;
         $settings = $this->MadelineProto->get_settings();
         $settings['updates']['handle_updates'] = true;
@@ -27,8 +30,14 @@ class Lua
         $this->script = $script;
         $this->__wakeup();
     }
-    public function __sleep() { return ['MadelineProto', 'script']; }
-    public function __wakeup() {
+
+    public function __sleep()
+    {
+        return ['MadelineProto', 'script'];
+    }
+
+    public function __wakeup()
+    {
         $this->Lua = new \Lua($this->script);
         $this->madelineproto_lua = 1;
         $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
@@ -45,37 +54,73 @@ class Lua
             $this->{$namespace} = $methods[$namespace];
         }
     }
-    public function tdcli_function ($params, $cb = null, $cb_extra = null) {
+
+    public function tdcli_function($params, $cb = null, $cb_extra = null)
+    {
         $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcli_to_td($params));
-        if ($params === 0) return 0;
+        if ($params === 0) {
+            return 0;
+        }
         $result = $this->MadelineProto->API->method_call($params['_'], $params);
-        if (is_callable($cb)) $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
+        if (is_callable($cb)) {
+            $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
+        }
+
         return $result;
     }
 
-    public function madeline_function ($params, $cb = null, $cb_extra = null) {
+    public function madeline_function($params, $cb = null, $cb_extra = null)
+    {
         $result = $this->MadelineProto->API->method_call($params['_'], $params);
-        if (is_callable($cb)) $cb($result, $cb_extra);
+        if (is_callable($cb)) {
+            $cb($result, $cb_extra);
+        }
+
         return $result;
     }
-    public function tdcli_update_callback($update) {
+
+    public function tdcli_update_callback($update)
+    {
         $this->Lua->tdcli_update_callback($this->MadelineProto->mtproto_to_tdcli($update));
     }
 
-
-    private function convert_array($array) {
-        if (!is_array($value)) return $array;
-        if ($this->is_seqential($value)) return array_flip(array_map(function($el){ return $el + 1; }, array_flip($array)));
+    private function convert_array($array)
+    {
+        if (!is_array($value)) {
+            return $array;
+        }
+        if ($this->is_seqential($value)) {
+            return array_flip(array_map(function ($el) {
+                return $el + 1;
+            }, array_flip($array)));
+        }
     }
 
-    private function is_sequential(array $arr) {
-        if (array() === $arr) return false;
+    private function is_sequential(array $arr)
+    {
+        if ([] === $arr) {
+            return false;
+        }
+
         return isset($arr[0]) && array_keys($arr) === range(0, count($arr) - 1);
     }
-    public function __get($name) {
-        if ($name === 'API') return $this->MadelineProto->API;
+
+    public function __get($name)
+    {
+        if ($name === 'API') {
+            return $this->MadelineProto->API;
+        }
+
         return $this->Lua->{$name};
     }
-    public function __call($name, $params) { return $this->Lua->{$name}(...$params); }
-    public function __set($name, $value) { return $this->Lua->{$name} = $value; }
+
+    public function __call($name, $params)
+    {
+        return $this->Lua->{$name}(...$params);
+    }
+
+    public function __set($name, $value)
+    {
+        return $this->Lua->{$name} = $value;
+    }
 }
