@@ -19,3 +19,12 @@ description: inputNotifyChats attributes, type and example
 $inputNotifyChats = ['_' => 'inputNotifyChats', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputNotifyChats={_='inputNotifyChats', }
+
+```
+
+

@@ -12,7 +12,7 @@ description: botInlineMessageText attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
-|message|[string](../types/string.md) | Required|
+|message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 
 
@@ -23,6 +23,15 @@ description: botInlineMessageText attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [Vector t], ];
+$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => true, 'message' => string, 'entities' => [MessageEntity], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineMessageText={_='botInlineMessageText', no_webpage=true, message=string, entities={MessageEntity}, }
+
+```
+
 

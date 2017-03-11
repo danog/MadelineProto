@@ -16,9 +16,9 @@ description: pageBlockEmbed attributes, type and example
 |url|[string](../types/string.md) | Optional|
 |html|[string](../types/string.md) | Optional|
 |poster\_photo\_id|[long](../types/long.md) | Optional|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -30,4 +30,13 @@ description: pageBlockEmbed attributes, type and example
 ```
 $pageBlockEmbed = ['_' => 'pageBlockEmbed', 'full_width' => true, 'allow_scrolling' => true, 'url' => string, 'html' => string, 'poster_photo_id' => long, 'w' => int, 'h' => int, 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockEmbed={_='pageBlockEmbed', full_width=true, allow_scrolling=true, url=string, html=string, poster_photo_id=long, w=int, h=int, caption=RichText, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: messageMediaUnsupported attributes, type and example
 $messageMediaUnsupported = ['_' => 'messageMediaUnsupported', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageMediaUnsupported={_='messageMediaUnsupported', }
+
+```
+
+

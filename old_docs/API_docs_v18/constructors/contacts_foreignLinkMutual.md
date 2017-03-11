@@ -19,3 +19,12 @@ description: contacts_foreignLinkMutual attributes, type and example
 $contacts_foreignLinkMutual = ['_' => 'contacts.foreignLinkMutual', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_foreignLinkMutual={_='contacts.foreignLinkMutual', }
+
+```
+
+

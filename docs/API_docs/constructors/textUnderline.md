@@ -11,7 +11,7 @@ description: textUnderline attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textUnderline attributes, type and example
 ```
 $textUnderline = ['_' => 'textUnderline', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textUnderline={_='textUnderline', text=RichText, }
+
+```
+
 

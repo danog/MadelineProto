@@ -11,7 +11,7 @@ description: messageActionChatEditTitle attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageActionChatEditTitle attributes, type and example
 ```
 $messageActionChatEditTitle = ['_' => 'messageActionChatEditTitle', 'title' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatEditTitle={_='messageActionChatEditTitle', title=string, }
+
+```
+
 

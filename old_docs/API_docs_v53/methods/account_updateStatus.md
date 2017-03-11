@@ -10,7 +10,7 @@ description: account.updateStatus parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offline|[Bool](../types/Bool.md) | Required|
+|offline|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->updateStatus(['offline' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.updateStatus({offline=Bool, })
+```
+

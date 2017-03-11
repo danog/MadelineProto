@@ -10,8 +10,8 @@ description: messages.deleteHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|offset|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_AffectedHistory = $MadelineProto->messages->deleteHistory(['peer' => InputPeer, 'offset' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedHistory = messages.deleteHistory({peer=InputPeer, offset=int, })
+```
+

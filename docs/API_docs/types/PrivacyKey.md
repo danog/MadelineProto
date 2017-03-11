@@ -7,6 +7,8 @@ description: constructors and methods of type PrivacyKey
 
 
 
+Describes available privacy settings
+
 ### Possible values (constructors):
 
 [privacyKeyStatusTimestamp](../constructors/privacyKeyStatusTimestamp.md)  

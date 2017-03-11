@@ -11,8 +11,8 @@ description: updateDeleteMessages attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|messages|Array of [int](../types/int.md) | Required|
-|pts|[int](../types/int.md) | Required|
+|messages|Array of [int](../types/int.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: updateDeleteMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [Vector t], 'pts' => int, ];
+$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int], 'pts' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateDeleteMessages={_='updateDeleteMessages', messages={int}, pts=int, }
+
+```
+
 

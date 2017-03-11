@@ -10,7 +10,7 @@ description: destroy_session parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|session\_id|[long](../types/long.md) | Required|
+|session\_id|[long](../types/long.md) | Yes|
 
 
 ### Return type: [DestroySessionRes](../types/DestroySessionRes.md)
@@ -33,5 +33,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$DestroySessionRes = $MadelineProto->destroy->session(['session_id' => long, ]);
+$DestroySessionRes = $MadelineProto->destroy_session(['session_id' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+DestroySessionRes = destroy_session({session_id=long, })
+```
+

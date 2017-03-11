@@ -11,7 +11,7 @@ description: chatInvite attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: chatInvite attributes, type and example
 ```
 $chatInvite = ['_' => 'chatInvite', 'title' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatInvite={_='chatInvite', title=string, }
+
+```
+
 

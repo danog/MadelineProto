@@ -19,3 +19,12 @@ description: inputMessagesFilterAudioDocuments attributes, type and example
 $inputMessagesFilterAudioDocuments = ['_' => 'inputMessagesFilterAudioDocuments', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterAudioDocuments={_='inputMessagesFilterAudioDocuments', }
+
+```
+
+

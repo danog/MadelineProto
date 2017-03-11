@@ -19,3 +19,12 @@ description: inputReportReasonViolence attributes, type and example
 $inputReportReasonViolence = ['_' => 'inputReportReasonViolence', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputReportReasonViolence={_='inputReportReasonViolence', }
+
+```
+
+

@@ -11,7 +11,7 @@ description: keyboardButtonRequestPhone attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: keyboardButtonRequestPhone attributes, type and example
 ```
 $keyboardButtonRequestPhone = ['_' => 'keyboardButtonRequestPhone', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonRequestPhone={_='keyboardButtonRequestPhone', text=string, }
+
+```
+
 

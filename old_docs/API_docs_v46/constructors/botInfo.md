@@ -11,11 +11,11 @@ description: botInfo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|version|[int](../types/int.md) | Required|
-|share\_text|[string](../types/string.md) | Required|
-|description|[string](../types/string.md) | Required|
-|commands|Array of [BotCommand](../types/BotCommand.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|version|[int](../types/int.md) | Yes|
+|share\_text|[string](../types/string.md) | Yes|
+|description|[string](../types/string.md) | Yes|
+|commands|Array of [BotCommand](../types/BotCommand.md) | Yes|
 
 
 
@@ -25,6 +25,15 @@ description: botInfo attributes, type and example
 ### Example:
 
 ```
-$botInfo = ['_' => 'botInfo', 'user_id' => int, 'version' => int, 'share_text' => string, 'description' => string, 'commands' => [Vector t], ];
+$botInfo = ['_' => 'botInfo', 'user_id' => int, 'version' => int, 'share_text' => string, 'description' => string, 'commands' => [BotCommand], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInfo={_='botInfo', user_id=int, version=int, share_text=string, description=string, commands={BotCommand}, }
+
+```
+
 

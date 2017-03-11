@@ -24,3 +24,12 @@ description: messages_messageEditData attributes, type and example
 $messages_messageEditData = ['_' => 'messages.messageEditData', 'caption' => true, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_messageEditData={_='messages.messageEditData', caption=true, }
+
+```
+
+

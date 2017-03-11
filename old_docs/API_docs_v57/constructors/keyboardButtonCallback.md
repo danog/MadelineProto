@@ -11,8 +11,8 @@ description: keyboardButtonCallback attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
+|text|[string](../types/string.md) | Yes|
+|data|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: keyboardButtonCallback attributes, type and example
 ```
 $keyboardButtonCallback = ['_' => 'keyboardButtonCallback', 'text' => string, 'data' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonCallback={_='keyboardButtonCallback', text=string, data=bytes, }
+
+```
+
 

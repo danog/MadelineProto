@@ -10,7 +10,7 @@ description: messages.checkChatInvite parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[string](../types/string.md) | Required|
+|hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [ChatInvite](../types/ChatInvite.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $ChatInvite = $MadelineProto->messages->checkChatInvite(['hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+ChatInvite = messages.checkChatInvite({hash=string, })
+```
+

@@ -10,9 +10,9 @@ description: messages.sendMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|message|[string](../types/string.md) | Required|
+|message|[string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_SentMessage](../types/messages_SentMessage.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_SentMessage = $MadelineProto->messages->sendMessage(['peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_SentMessage = messages.sendMessage({peer=InputPeer, reply_to_msg_id=int, message=string, })
+```
+

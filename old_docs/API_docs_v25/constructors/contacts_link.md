@@ -11,9 +11,9 @@ description: contacts_link attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|my\_link|[ContactLink](../types/ContactLink.md) | Required|
-|foreign\_link|[ContactLink](../types/ContactLink.md) | Required|
-|user|[User](../types/User.md) | Required|
+|my\_link|[ContactLink](../types/ContactLink.md) | Yes|
+|foreign\_link|[ContactLink](../types/ContactLink.md) | Yes|
+|user|[User](../types/User.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: contacts_link attributes, type and example
 ```
 $contacts_link = ['_' => 'contacts.link', 'my_link' => ContactLink, 'foreign_link' => ContactLink, 'user' => User, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_link={_='contacts.link', my_link=ContactLink, foreign_link=ContactLink, user=User, }
+
+```
+
 

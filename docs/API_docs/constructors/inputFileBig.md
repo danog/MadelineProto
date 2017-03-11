@@ -11,9 +11,9 @@ description: inputFileBig attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|parts|[int](../types/int.md) | Required|
-|name|[string](../types/string.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|parts|[int](../types/int.md) | Yes|
+|name|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: inputFileBig attributes, type and example
 ```
 $inputFileBig = ['_' => 'inputFileBig', 'id' => long, 'parts' => int, 'name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputFileBig={_='inputFileBig', id=long, parts=int, name=string, }
+
+```
+
 

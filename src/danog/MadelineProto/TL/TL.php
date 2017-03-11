@@ -14,22 +14,51 @@ namespace danog\MadelineProto\TL;
 
 trait TL
 {
+    public $encrypted_layer = -1;
     public function construct_tl($files)
     {
         \danog\MadelineProto\Logger::log(['Loading TL schemes...'], \danog\MadelineProto\Logger::VERBOSE);
         $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
         $this->methods = new \danog\MadelineProto\TL\TLMethod();
+        $this->td_constructors = new \danog\MadelineProto\TL\TLConstructor();
+        $this->td_methods = new \danog\MadelineProto\TL\TLMethod();
+        $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
-            $scheme_type = $scheme_type === 'mtproto';
             \danog\MadelineProto\Logger::log(['Parsing '.basename($file).'...'], \danog\MadelineProto\Logger::VERBOSE);
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
-                $TL_dict = [];
+                $TL_dict = ['methods' => [], 'constructors' => []];
                 $type = 'constructors';
+                $layer = null;
                 $tl_file = explode("\n", $filec);
                 $key = 0;
+                $e = null;
+                $class = null;
+                $dparams = [];
                 foreach ($tl_file as $line) {
+                    if (preg_match('|^//@|', $line)) {
+                        $list = explode(' @', str_replace('//', ' ', $line));
+                        foreach ($list as $elem) {
+                            if ($elem === '') continue;
+                            $elem = explode(' ', $elem, 2);
+                            if ($elem[0] === 'class') {
+                                $elem = explode(' ', $elem[1], 2);
+                                $class = $elem[0];
+                                continue;
+                            }
+                            if ($elem[0] === 'description') {
+                                if (!is_null($class)) {
+                                    $this->td_descriptions['types'][$class] = $elem[1];
+                                    $class = null;
+                                } else $e = $elem[1];
+                                continue;
+                            }
+                            if ($elem[0] === 'param_description') $elem[0] = 'description';
+                            $dparams[$elem[0]]= $elem[1];
+                        }
+                        continue;
+                    }
                     $line = preg_replace(['|//.*|', '|^\s+$|'], '', $line);
                     if ($line === '') {
                         continue;
@@ -42,16 +71,59 @@ trait TL
                         $type = 'constructors';
                         continue;
                     }
-                    if (!preg_match('/^[^\s]+#/', $line)) {
+                    if (preg_match('|^===\d*===$|', $line)) {
+                        $layer = preg_replace('|\D*|', '', $line);
                         continue;
                     }
                     if (preg_match('/^vector#/', $line)) {
                         continue;
                     }
-                    $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = preg_replace('/#.*/', '', $line);
-                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line))))[0];
+                    if (preg_match('/ \?= /', $line)) continue;
+                    $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
+                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) continue;
+                    $clean = preg_replace([
+                        '/:bytes /',
+                        '/;/',
+                        '/#[a-f0-9]+ /',
+                        '/ [a-zA-Z0-9_]+\:flags\.[0-9]+\?true/',
+                        '/[<]/',
+                        '/[>]/',
+                        '/  /',
+                        '/^ /',
+                        '/ $/',
+                        '/\?bytes /',
+                        '/{/',
+                        '/}/'
+                     ], [
+                        ':string ',
+                        '',
+                        ' ',
+                        '',
+                        ' ',
+                        ' ',
+                        ' ',
+                        '',
+                        '',
+                        '?string ',
+                        '',
+                        ''], $line);
+                    $id = hash('crc32b', $clean);
+                    if (preg_match('/^[^\s]+#/', $line)) {
+                        $nid = str_pad(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line), 8, "0", \STR_PAD_LEFT);
+                        if ($id !== $nid) {
+                            \danog\MadelineProto\Logger::log(['CRC32 mismatch ('.$id.', '.$nid.') for '.$line], \danog\MadelineProto\Logger::ERROR);
+                        }
+                    }
+                    if (!is_null($e)) {
+                        $this->td_descriptions[$type][$name] = ['description' => $e, 'params' => $dparams];
+                        $e = null;
+                        $dparams = [];
+                    }
+                    $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
+                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec($id)))[0];
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
+                    if ($layer !== null) $TL_dict[$type][$key]['layer'] = $layer;
                     foreach (explode(' ', preg_replace(['/^[^\s]+\s/', '/=\s[^\s]+/', '/\s$/'], '', $line)) as $param) {
                         if ($param === '') {
                             continue;
@@ -65,44 +137,54 @@ trait TL
                     $key++;
                 }
             }
-            if (empty($TL_dict) || empty($TL_dict['constructors']) || empty($TL_dict['methods'])) {
+            if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception('Invalid source file was provided: '.$file);
             }
+            $orig = $this->encrypted_layer;
             \danog\MadelineProto\Logger::log(['Translating objects...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
-                $this->constructors->add($elem, $scheme_type);
+                if ($scheme_type === 'secret') $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+                $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
 
             \danog\MadelineProto\Logger::log(['Translating methods...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->methods->add($elem);
+                $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
+                if ($scheme_type === 'secret') $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
+            }
+            if ($this->encrypted_layer != $orig && isset($this->secret_chats)) {
+                foreach ($this->secret_chats as $chat => $data) { $this->notify_layer($chat); }
+            }
+        }
+        if (isset($files['td']) && isset($files['telegram'])) {
+            foreach ($this->td_constructors->id as $key => $id) {
+                $name = $this->td_constructors->predicate[$key];
+                if ($this->constructors->find_by_id($id) === false) {
+                    unset($this->td_descriptions['constructors'][$name]);
+                } else {
+                    foreach ($this->td_descriptions['constructors'][$name]['params'] as &$param) {
+                        $param = str_replace('nullable', 'optional', $param);
+                    }
+                }
+            }
+            foreach ($this->td_methods->id as $key => $id) {
+                $name = $this->td_methods->method[$key];
+                if ($this->methods->find_by_id($id) === false) {
+                    unset($this->td_descriptions['methods'][$name]);
+                } else {
+                    foreach ($this->td_descriptions['methods'][$name]['params'] as &$param) {
+                        $param = str_replace('nullable', 'optional', $param);
+                    }
+                }
             }
         }
     }
 
     public function get_method_namespaces()
     {
-        return $this->methods->method_namespace;
+        return array_unique(array_values($this->methods->method_namespace));
     }
 
-    public function get_named_method_args($method, $arguments)
-    {
-        $tl_method = $this->methods->find_by_method($method);
-        if ($tl_method === false) {
-            throw new Exception('Could not extract method: '.$method);
-        }
-
-        if (count(array_filter(array_keys($arguments), 'is_string')) === 0) {
-            $argcount = 0;
-            $newargs = [];
-            foreach ($tl_method['params'] as $current_argument) {
-                $newargs[$current_argument['name']] = $arguments[$argcount++];
-            }
-            $arguments = $newargs;
-        }
-
-        return $arguments;
-    }
 
     public function serialize_bool($bool)
     {
@@ -120,7 +202,7 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object($type, $object)
+    public function serialize_object($type, $object, $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
@@ -142,8 +224,13 @@ trait TL
 
                 return \danog\PHP\Struct::pack('<q', $object);
             case 'int128':
+                if (strlen($object) !== 16) throw new Exception('Given value is not 16 bytes long');
+                return (string) $object;
             case 'int256':
+                if (strlen($object) !== 32) throw new Exception('Given value is not 32 bytes long');
+                return (string) $object;
             case 'int512':
+                if (strlen($object) !== 64) throw new Exception('Given value is not 64 bytes long');
                 return (string) $object;
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $object);
@@ -186,7 +273,7 @@ trait TL
             $object = $this->get_info($object)[$type['type']];
         }
         if (!isset($object['_'])) {
-            $constructorData = $this->constructors->find_by_predicate($type['type']);
+            $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);
             if ($constructorData === false) {
                 throw new Exception('Predicate was not set!');
             }
@@ -210,10 +297,10 @@ trait TL
         }
 
         $concat = '';
+        if ($constructorData['predicate'] === 'messageEntityMentionName') $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
-
         return $concat.$this->serialize_params($constructorData, $object);
     }
 
@@ -223,446 +310,14 @@ trait TL
         if ($tl === false) {
             throw new Exception('Could not find method: '.$method);
         }
-
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
 
-    public function html_entity_decode($stuff)
-    {
-        return html_entity_decode(str_replace('<br />', "\n", $stuff));
-    }
-
-    public function parse_buttons($rows)
-    {
-        $newrows = [];
-        $key = 0;
-        $button_key = 0;
-        foreach ($rows as $row) {
-            $newrows[$key] = ['_' => 'keyboardButtonRow', 'buttons' => []];
-            foreach ($row as $button) {
-                $newrows[$key]['buttons'][$button_key] = ['_' => 'keyboardButton', 'text' => $button['text']];
-                if (isset($button['url'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonUrl';
-                    $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
-                } elseif (isset($button['callback_data'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonCallback';
-                    $newrows[$key]['buttons'][$button_key]['data'] = $button['callback_data'];
-                } elseif (isset($button['switch_inline_query'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query'];
-                } elseif (isset($button['switch_inline_query_current_chat'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = true;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'];
-                } elseif (isset($button['callback_game'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonGame';
-                    $newrows[$key]['buttons'][$button_key]['text'] = $button['callback_game'];
-                } elseif (isset($button['request_contact'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestPhone';
-                } elseif (isset($button['request_location'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestGeoLocation';
-                }
-                $button_key++;
-            }
-            $key++;
-        }
-
-        return $newrows;
-    }
-
-    public function parse_reply_markup($markup)
-    {
-        if (isset($markup['force_reply']) && $markup['force_reply']) {
-            $markup['_'] = 'replyKeyboardForceReply';
-            unset($markup['force_reply']);
-        }
-        if (isset($markup['remove_keyboard']) && $markup['remove_keyboard']) {
-            $markup['_'] = 'replyKeyboardHide';
-            unset($markup['remove_keyboard']);
-        }
-        if (isset($markup['keyboard'])) {
-            $markup['_'] = 'replyKeyboardMarkup';
-            if (isset($markup['resize_keyboard'])) {
-                $markup['resize'] = $markup['resize_keyboard'];
-                unset($markup['resize_keyboard']);
-            }
-            if (isset($markup['one_time_keyboard'])) {
-                $markup['single_use'] = $markup['one_time_keyboard'];
-                unset($markup['one_time_keyboard']);
-            }
-            $markup['rows'] = $this->parse_buttons($markup['keyboard']);
-            unset($markup['keyboard']);
-        }
-        if (isset($markup['inline_keyboard'])) {
-            $markup['_'] = 'replyInlineMarkup';
-            $markup['rows'] = $this->parse_buttons($markup['inline_keyboard']);
-            unset($markup['inline_keyboard']);
-        }
-
-        return $markup;
-    }
-
-    public function MTProto_to_botAPI($data, $sent_arguments = [])
-    {
-        $newd = [];
-        if (!isset($data['_'])) {
-            foreach ($data as $key => $element) {
-                $newd[$key] = $this->MTProto_to_botAPI($element, $sent_arguments);
-            }
-
-            return $newd;
-        }
-        switch ($data['_']) {
-            case 'updateShortSentMessage':
-            $newd['message_id'] = $data['id'];
-            $newd['date'] = $data['date'];
-            $newd['text'] = $sent_arguments['message'];
-            if ($data['out']) {
-                $newd['from'] = $this->get_pwr_chat($this->datacenter->authorization['user']);
-            }
-            $newd['chat'] = $this->get_pwr_chat($sent_arguments['peer']);
-            if (isset($data['entities'])) {
-                $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
-            }
-            if (isset($data['media'])) {
-                $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
-            }
-
-            return $newd;
-
-            case 'updateNewChannelMessage':
-            case 'updateNewMessage':
-            return $this->MTProto_to_botAPI($data['message']);
-
-            case 'message':
-            $newd['message_id'] = $data['id'];
-            $newd['date'] = $data['date'];
-            $newd['text'] = $data['message'];
-            $newd['post'] = $data['post'];
-            $newd['silent'] = $data['silent'];
-            if (isset($data['from_id'])) {
-                $newd['from'] = $this->get_pwr_chat($data['from_id']);
-            }
-            $newd['chat'] = $this->get_pwr_chat($data['to_id']);
-            if (isset($data['entities'])) {
-                $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
-            }
-            if (isset($data['views'])) {
-                $newd['views'] = $data['views'];
-            }
-            if (isset($data['edit_date'])) {
-                $newd['edit_date'] = $data['edit_date'];
-            }
-            if (isset($data['via_bot_id'])) {
-                $newd['via_bot'] = $this->get_pwr_chat($data['via_bot_id']);
-            }
-            if (isset($data['fwd_from']['from_id'])) {
-                $newd['froward_from'] = $this->get_pwr_chat($data['fwd_from']['from_id']);
-            }
-            if (isset($data['fwd_from']['channel_id'])) {
-                $newd['forward_from_chat'] = $this->get_pwr_chat($data['fwd_from']['channel_id']);
-            }
-            if (isset($data['fwd_from']['date'])) {
-                $newd['forward_date'] = $data['fwd_from']['date'];
-            }
-            if (isset($data['fwd_from']['channel_post'])) {
-                $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
-            }
-
-            if (isset($data['media'])) {
-                $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
-            }
-
-            return $newd;
-
-            case 'messageEntityMention':
-            unset($data['_']);
-            $data['type'] = 'mention';
-
-            return $data;
-
-            case 'messageEntityHashtag':
-            unset($data['_']);
-            $data['type'] = 'hashtag';
-
-            return $data;
-
-            case 'messageEntityBotCommand':
-            unset($data['_']);
-            $data['type'] = 'bot_command';
-
-            return $data;
-
-            case 'messageEntityUrl':
-            unset($data['_']);
-            $data['type'] = 'url';
-
-            return $data;
-
-            case 'messageEntityEmail':
-            unset($data['_']);
-            $data['type'] = 'email';
-
-            return $data;
-
-            case 'messageEntityBold':
-            unset($data['_']);
-            $data['type'] = 'bold';
-
-            return $data;
-
-            case 'messageEntityItalic':
-            unset($data['_']);
-            $data['type'] = 'italic';
-
-            return $data;
-
-            case 'messageEntityCode':
-            unset($data['_']);
-            $data['type'] = 'code';
-
-            return $data;
-
-            case 'messageEntityPre':
-            unset($data['_']);
-            $data['type'] = 'pre';
-
-            return $data;
-
-            case 'messageEntityTextUrl':
-            unset($data['_']);
-            $data['type'] = 'text_url';
-
-            return $data;
-
-            case 'messageEntityMentionName':
-            unset($data['_']);
-            $data['type'] = 'text_mention';
-            $data['user'] = $this->get_pwr_chat($data['user_id']);
-            unset($data['user_id']);
-
-            return $data;
-
-            case 'messageMediaPhoto':
-            $res['caption'] = $data['caption'];
-            $res['photo'] = [];
-            foreach ($data['photo']['sizes'] as $key => $photo) {
-                $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
-            }
-
-            return $res;
-            case 'messageMediaEmpty':
-            return [];
-
-            case 'messageMediaDocument':
-            $type = 5;
-            $type_name = 'document';
-            $res = [];
-            if ($data['document']['thumb']['_'] === 'photoSize') {
-                $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], [], true);
-            }
-            foreach ($data['document']['attributes'] as $attribute) {
-                switch ($attribute['_']) {
-                    case 'documentAttributeFilename':
-                    $pathinfo = pathinfo($attribute['file_name']);
-                    $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
-                    $res['file_name'] = $pathinfo['filename'];
-                    break;
-
-                    case 'documentAttributeAudio':
-                    $audio = $attribute;
-                    $type_name = 'audio';
-                    if ($attribute['voice']) {
-                        $type = 3;
-                        $type_name = 'voice';
-                    }
-                    $res['duration'] = $attribute['duration'];
-                    if (isset($attribute['performer'])) {
-                        $res['performer'] = $attribute['performer'];
-                    }
-                    if (isset($attribute['title'])) {
-                        $res['title'] = $attribute['title'];
-                    }
-                    if (isset($attribute['waveform'])) {
-                        $res['title'] = $attribute['waveform'];
-                    }
-                    break;
-
-                    case 'documentAttributeVideo':
-                    $type = 4;
-                    $type_name = 'video';
-                    $res['width'] = $attribute['w'];
-                    $res['height'] = $attribute['h'];
-                    $res['duration'] = $attribute['duration'];
-                    break;
-
-                    case 'documentAttributeImageSize':
-                    $res['width'] = $attribute['w'];
-                    $res['height'] = $attribute['h'];
-                    break;
-
-                    case 'documentAttributeAnimated':
-                    $res['animated'] = true;
-                    break;
-
-                    case 'documentAttributeHasStickers':
-                    $res['has_stickers'] = true;
-                    break;
-
-                    case 'documentAttributeSticker':
-                    $type_name = 'sticker';
-                    $res['mask'] = $attribute['mask'];
-                    $res['emoji'] = $attribute['alt'];
-                    $res['sticker_set'] = $attribute['stickerset'];
-                    if (isset($attribute['mask_coords'])) {
-                        $res['mask_coords'] = $attribute['mask_coords'];
-                    }
-                    break;
-
-                }
-            }
-            if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
-                $res['file_name'] = $audio['title'];
-                if (isset($audio['performer'])) {
-                    $res['file_name'] .= ' - '.$audio['performer'];
-                }
-            }
-            if (!isset($res['file_name'])) {
-                $res['file_name'] = $data['document']['access_hash'];
-            }
-            $res['file_name'] .= '_'.$data['document']['id'];
-            if (isset($res['ext'])) {
-                $res['file_name'] .= $res['ext'];
-                unset($res['ext']);
-            } else {
-                $res['file_name'] .= $this->get_extension_from_mime($data['document']['mime_type']);
-            }
-            $res['file_size'] = $data['document']['size'];
-            $res['mime_type'] = $data['document']['mime_type'];
-            $res['file_id'] = $this->base64url_encode($this->rle_encode(\danog\PHP\Struct::pack('<iiqqb', $type, $data['document']['dc_id'], $data['document']['id'], $data['document']['access_hash'], 2)));
-
-            return [$type_name => $res, 'caption' => $data['caption']];
-            default:
-            throw new Exception("Can't convert ".$data['_'].' to a bot API object');
-        }
-    }
-
-    public $botapi_params = [
-        'disable_web_page_preview' => 'no_webpage',
-        'disable_notification'     => 'silent',
-        'reply_to_message_id'      => 'reply_to_msg_id',
-        'chat_id'                  => 'peer',
-        'text'                     => 'message',
-    ];
-
-    public function botAPI_to_MTProto($arguments)
-    {
-        foreach ($this->botapi_params as $bot => $mtproto) {
-            if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
-                $arguments[$mtproto] = $arguments[$bot];
-                //unset($arguments[$bot]);
-            }
-        }
-        if (isset($arguments['reply_markup'])) {
-            $arguments['reply_markup'] = $this->parse_reply_markup($arguments['reply_markup']);
-        }
-        if (isset($arguments['parse_mode'])) {
-            $arguments = $this->parse_mode($arguments);
-        }
-
-        return $arguments;
-    }
-
-    public function parse_node($node, &$entities, &$nmessage, $recursive = true)
-    {
-        switch ($node->nodeName) {
-            case 'br':
-            $nmessage .= "\n";
-            break;
-            case 'b':
-            case 'strong':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
-            case 'i':
-            case 'em':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
-            case 'code':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
-            case 'pre':
-            $text = $this->html_entity_decode($node->textContent);
-            $language = $node->getAttribute('language');
-            if ($language === null) {
-                $language = '';
-            }
-            $entities[] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
-            $nmessage .= $text;
-            break;
-
-            case 'p':
-            foreach ($node->childNodes as $node) {
-                $this->parse_node($node, $entities, $nmessage);
-            }
-            break;
-
-            case 'a':
-            $text = $this->html_entity_decode($node->textContent);
-            $href = $node->getAttribute('href');
-            if (preg_match('|mention:|', $href)) {
-                $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
-            } else {
-                $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
-            }
-            $nmessage .= $text;
-            break;
-
-            default:
-            $nmessage .= $this->html_entity_decode($node->nodeValue);
-            break;
-        }
-    }
-
-    public function parse_mode($arguments)
-    {
-        if (preg_match('/markdown/i', $arguments['parse_mode'])) {
-            $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
-            $arguments['parse_mode'] = 'HTML';
-        }
-        if (preg_match('/html/i', $arguments['parse_mode'])) {
-            $nmessage = '';
-            try {
-                $dom = new \DOMDocument();
-                $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
-                if (!isset($arguments['entities'])) {
-                    $arguments['entities'] = [];
-                }
-                foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
-                    $this->parse_node($node, $arguments['entities'], $nmessage);
-                }
-                unset($arguments['parse_mode']);
-            } catch (\DOMException $e) {
-            } catch (\danog\MadelineProto\Exception $e) {
-            }
-            $arguments['message'] = $nmessage;
-        }
-
-        return $arguments;
-    }
 
     public function serialize_params($tl, $arguments)
     {
         $serialized = '';
+
         $arguments = $this->botAPI_to_MTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
@@ -692,6 +347,14 @@ trait TL
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
+                if ($current_argument['name'] === 'random_bytes') {
+                    $serialized .= $this->random(15+random_int(0, 10));
+                    continue;
+                }
+                if ($current_argument['name'] === 'data' && isset($arguments['message'])) {
+                    $serialized .= $this->serialize_object($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']));
+                    continue;
+                }
                 if ($current_argument['name'] === 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
@@ -710,6 +373,9 @@ trait TL
                     }
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
+            }
+            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+                $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']]);
@@ -752,7 +418,7 @@ trait TL
             case 'int256':
                 return $bytes_io->read(32);
             case 'int512':
-                return $bytes_io->read(32);
+                return $bytes_io->read(64);
             case 'string':
             case 'bytes':
                 $l = \danog\PHP\Struct::unpack('<B', $bytes_io->read(1))[0];

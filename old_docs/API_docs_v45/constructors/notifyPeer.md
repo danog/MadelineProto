@@ -11,7 +11,7 @@ description: notifyPeer attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[Peer](../types/Peer.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: notifyPeer attributes, type and example
 ```
 $notifyPeer = ['_' => 'notifyPeer', 'peer' => Peer, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+notifyPeer={_='notifyPeer', peer=Peer, }
+
+```
+
 

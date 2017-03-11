@@ -11,12 +11,12 @@ description: foundGif attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|thumb\_url|[string](../types/string.md) | Required|
-|content\_url|[string](../types/string.md) | Required|
-|content\_type|[string](../types/string.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|thumb\_url|[string](../types/string.md) | Yes|
+|content\_url|[string](../types/string.md) | Yes|
+|content\_type|[string](../types/string.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: foundGif attributes, type and example
 ```
 $foundGif = ['_' => 'foundGif', 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+foundGif={_='foundGif', url=string, thumb_url=string, content_url=string, content_type=string, w=int, h=int, }
+
+```
+
 

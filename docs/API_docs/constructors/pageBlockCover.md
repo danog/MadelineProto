@@ -11,7 +11,7 @@ description: pageBlockCover attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|cover|[PageBlock](../types/PageBlock.md) | Required|
+|cover|[PageBlock](../types/PageBlock.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockCover attributes, type and example
 ```
 $pageBlockCover = ['_' => 'pageBlockCover', 'cover' => PageBlock, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockCover={_='pageBlockCover', cover=PageBlock, }
+
+```
+
 

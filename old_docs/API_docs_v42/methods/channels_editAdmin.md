@@ -10,9 +10,9 @@ description: channels.editAdmin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|role|[ChannelParticipantRole](../types/ChannelParticipantRole.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|role|[ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->editAdmin(['channel' => InputChannel, 'user_id' => InputUser, 'role' => ChannelParticipantRole, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.editAdmin({channel=InputChannel, user_id=InputUser, role=ChannelParticipantRole, })
+```
+

@@ -11,7 +11,7 @@ description: messageActionChatEditPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo|[Photo](../types/Photo.md) | Required|
+|photo|[Photo](../types/Photo.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageActionChatEditPhoto attributes, type and example
 ```
 $messageActionChatEditPhoto = ['_' => 'messageActionChatEditPhoto', 'photo' => Photo, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatEditPhoto={_='messageActionChatEditPhoto', photo=Photo, }
+
+```
+
 

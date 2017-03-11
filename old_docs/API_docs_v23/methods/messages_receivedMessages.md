@@ -10,7 +10,7 @@ description: messages.receivedMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|max\_id|[int](../types/int.md) | Required|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_int = $MadelineProto->messages->receivedMessages(['max_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_int = messages.receivedMessages({max_id=int, })
+```
+

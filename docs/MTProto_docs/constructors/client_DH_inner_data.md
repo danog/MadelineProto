@@ -11,10 +11,10 @@ description: client_DH_inner_data attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
-|server\_nonce|[int128](../types/int128.md) | Required|
-|retry\_id|[long](../types/long.md) | Required|
-|g\_b|[bytes](../types/bytes.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
+|server\_nonce|[int128](../types/int128.md) | Yes|
+|retry\_id|[long](../types/long.md) | Yes|
+|g\_b|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: client_DH_inner_data attributes, type and example
 ```
 $client_DH_inner_data = ['_' => 'client_DH_inner_data', 'nonce' => int128, 'server_nonce' => int128, 'retry_id' => long, 'g_b' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+client_DH_inner_data={_='client_DH_inner_data', nonce=int128, server_nonce=int128, retry_id=long, g_b=bytes, }
+
+```
+
 

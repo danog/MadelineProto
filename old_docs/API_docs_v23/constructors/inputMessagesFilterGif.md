@@ -19,3 +19,12 @@ description: inputMessagesFilterGif attributes, type and example
 $inputMessagesFilterGif = ['_' => 'inputMessagesFilterGif', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterGif={_='inputMessagesFilterGif', }
+
+```
+
+

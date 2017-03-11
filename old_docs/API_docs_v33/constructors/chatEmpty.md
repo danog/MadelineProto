@@ -11,7 +11,7 @@ description: chatEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: chatEmpty attributes, type and example
 ```
 $chatEmpty = ['_' => 'chatEmpty', 'id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatEmpty={_='chatEmpty', id=int, }
+
+```
+
 

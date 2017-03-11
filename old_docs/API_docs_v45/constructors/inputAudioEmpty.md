@@ -19,3 +19,12 @@ description: inputAudioEmpty attributes, type and example
 $inputAudioEmpty = ['_' => 'inputAudioEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputAudioEmpty={_='inputAudioEmpty', }
+
+```
+
+

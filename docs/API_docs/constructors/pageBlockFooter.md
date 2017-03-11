@@ -11,7 +11,7 @@ description: pageBlockFooter attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockFooter attributes, type and example
 ```
 $pageBlockFooter = ['_' => 'pageBlockFooter', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockFooter={_='pageBlockFooter', text=RichText, }
+
+```
+
 

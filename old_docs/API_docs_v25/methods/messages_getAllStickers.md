@@ -10,7 +10,7 @@ description: messages.getAllStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[string](../types/string.md) | Required|
+|hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_AllStickers = $MadelineProto->messages->getAllStickers(['hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AllStickers = messages.getAllStickers({hash=string, })
+```
+

@@ -19,3 +19,12 @@ description: inputEncryptedFileEmpty attributes, type and example
 $inputEncryptedFileEmpty = ['_' => 'inputEncryptedFileEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputEncryptedFileEmpty={_='inputEncryptedFileEmpty', }
+
+```
+
+

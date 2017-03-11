@@ -11,7 +11,7 @@ description: channelMessagesFilter attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|ranges|Array of [MessageRange](../types/MessageRange.md) | Required|
+|ranges|Array of [MessageRange](../types/MessageRange.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [Vector t], ];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channelMessagesFilter={_='channelMessagesFilter', ranges={MessageRange}, }
+
+```
+
 

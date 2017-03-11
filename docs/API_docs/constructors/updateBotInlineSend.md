@@ -11,10 +11,10 @@ description: updateBotInlineSend attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|query|[string](../types/string.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|query|[string](../types/string.md) | Yes|
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
-|id|[string](../types/string.md) | Required|
+|id|[string](../types/string.md) | Yes|
 |msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Optional|
 
 
@@ -27,4 +27,13 @@ description: updateBotInlineSend attributes, type and example
 ```
 $updateBotInlineSend = ['_' => 'updateBotInlineSend', 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'id' => string, 'msg_id' => InputBotInlineMessageID, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateBotInlineSend={_='updateBotInlineSend', user_id=int, query=string, geo=GeoPoint, id=string, msg_id=InputBotInlineMessageID, }
+
+```
+
 

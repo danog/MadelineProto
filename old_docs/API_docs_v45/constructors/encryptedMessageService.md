@@ -11,9 +11,9 @@ description: encryptedMessageService attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|bytes|[bytes](../types/bytes.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|decrypted\_message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: encryptedMessageService attributes, type and example
 ### Example:
 
 ```
-$encryptedMessageService = ['_' => 'encryptedMessageService', 'chat_id' => int, 'date' => int, 'bytes' => bytes, ];
+$encryptedMessageService = ['_' => 'encryptedMessageService', 'chat_id' => int, 'date' => int, 'decrypted_message' => DecryptedMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+encryptedMessageService={_='encryptedMessageService', chat_id=int, date=int, decrypted_message=DecryptedMessage, }
+
+```
+
 

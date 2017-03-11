@@ -12,7 +12,7 @@ description: channelMessagesFilter attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |important\_only|[Bool](../types/Bool.md) | Optional|
-|ranges|Array of [MessageRange](../types/MessageRange.md) | Required|
+|ranges|Array of [MessageRange](../types/MessageRange.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => true, 'ranges' => [Vector t], ];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => true, 'ranges' => [MessageRange], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channelMessagesFilter={_='channelMessagesFilter', important_only=true, ranges={MessageRange}, }
+
+```
+
 

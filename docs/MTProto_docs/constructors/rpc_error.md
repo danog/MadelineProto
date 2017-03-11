@@ -11,8 +11,8 @@ description: rpc_error attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|error\_code|[int](../types/int.md) | Required|
-|error\_message|[string](../types/string.md) | Required|
+|error\_code|[int](../types/int.md) | Yes|
+|error\_message|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: rpc_error attributes, type and example
 ```
 $rpc_error = ['_' => 'rpc_error', 'error_code' => int, 'error_message' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+rpc_error={_='rpc_error', error_code=int, error_message=string, }
+
+```
+
 

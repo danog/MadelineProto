@@ -19,3 +19,12 @@ description: topPeerCategoryGroups attributes, type and example
 $topPeerCategoryGroups = ['_' => 'topPeerCategoryGroups', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+topPeerCategoryGroups={_='topPeerCategoryGroups', }
+
+```
+
+

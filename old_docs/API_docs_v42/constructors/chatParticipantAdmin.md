@@ -11,9 +11,9 @@ description: chatParticipantAdmin attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|inviter\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|inviter\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: chatParticipantAdmin attributes, type and example
 ```
 $chatParticipantAdmin = ['_' => 'chatParticipantAdmin', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatParticipantAdmin={_='chatParticipantAdmin', user_id=int, inviter_id=int, date=int, }
+
+```
+
 

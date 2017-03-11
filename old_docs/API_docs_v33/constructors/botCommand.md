@@ -11,8 +11,8 @@ description: botCommand attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|command|[string](../types/string.md) | Required|
-|description|[string](../types/string.md) | Required|
+|command|[string](../types/string.md) | Yes|
+|description|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: botCommand attributes, type and example
 ```
 $botCommand = ['_' => 'botCommand', 'command' => string, 'description' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botCommand={_='botCommand', command=string, description=string, }
+
+```
+
 

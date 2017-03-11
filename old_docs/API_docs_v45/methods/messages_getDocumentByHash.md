@@ -10,9 +10,9 @@ description: messages.getDocumentByHash parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|sha256|[bytes](../types/bytes.md) | Required|
-|size|[int](../types/int.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
+|sha256|[bytes](../types/bytes.md) | Yes|
+|size|[int](../types/int.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Document](../types/Document.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Document = $MadelineProto->messages->getDocumentByHash(['sha256' => bytes, 'size' => int, 'mime_type' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Document = messages.getDocumentByHash({sha256=bytes, size=int, mime_type=string, })
+```
+

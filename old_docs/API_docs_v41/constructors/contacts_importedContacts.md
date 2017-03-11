@@ -11,9 +11,9 @@ description: contacts_importedContacts attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|imported|Array of [ImportedContact](../types/ImportedContact.md) | Required|
-|retry\_contacts|Array of [long](../types/long.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|imported|Array of [ImportedContact](../types/ImportedContact.md) | Yes|
+|retry\_contacts|Array of [long](../types/long.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: contacts_importedContacts attributes, type and example
 ### Example:
 
 ```
-$contacts_importedContacts = ['_' => 'contacts.importedContacts', 'imported' => [Vector t], 'retry_contacts' => [Vector t], 'users' => [Vector t], ];
+$contacts_importedContacts = ['_' => 'contacts.importedContacts', 'imported' => [ImportedContact], 'retry_contacts' => [long], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_importedContacts={_='contacts.importedContacts', imported={ImportedContact}, retry_contacts={long}, users={User}, }
+
+```
+
 

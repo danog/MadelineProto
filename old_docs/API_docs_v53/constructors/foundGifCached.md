@@ -11,9 +11,9 @@ description: foundGifCached attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|photo|[Photo](../types/Photo.md) | Required|
-|document|[Document](../types/Document.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Yes|
+|document|[Document](../types/Document.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: foundGifCached attributes, type and example
 ```
 $foundGifCached = ['_' => 'foundGifCached', 'url' => string, 'photo' => Photo, 'document' => Document, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+foundGifCached={_='foundGifCached', url=string, photo=Photo, document=Document, }
+
+```
+
 

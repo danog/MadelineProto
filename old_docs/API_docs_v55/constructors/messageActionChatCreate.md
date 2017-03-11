@@ -11,8 +11,8 @@ description: messageActionChatCreate attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
-|users|Array of [int](../types/int.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|users|Array of [int](../types/int.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messageActionChatCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => string, 'users' => [Vector t], ];
+$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => string, 'users' => [int], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatCreate={_='messageActionChatCreate', title=string, users={int}, }
+
+```
+
 

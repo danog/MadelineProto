@@ -11,8 +11,8 @@ description: keyboardButtonUrl attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
-|url|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
+|url|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: keyboardButtonUrl attributes, type and example
 ```
 $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => string, 'url' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonUrl={_='keyboardButtonUrl', text=string, url=string, }
+
+```
+
 

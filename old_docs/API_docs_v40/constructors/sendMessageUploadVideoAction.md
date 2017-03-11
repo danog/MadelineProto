@@ -11,7 +11,7 @@ description: sendMessageUploadVideoAction attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|progress|[int](../types/int.md) | Required|
+|progress|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: sendMessageUploadVideoAction attributes, type and example
 ```
 $sendMessageUploadVideoAction = ['_' => 'sendMessageUploadVideoAction', 'progress' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadVideoAction={_='sendMessageUploadVideoAction', progress=int, }
+
+```
+
 

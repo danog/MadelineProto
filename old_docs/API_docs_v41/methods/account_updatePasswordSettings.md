@@ -10,8 +10,8 @@ description: account.updatePasswordSettings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|current\_password\_hash|[bytes](../types/bytes.md) | Required|
-|new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Required|
+|current\_password\_hash|[bytes](../types/bytes.md) | Yes|
+|new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->updatePasswordSettings(['current_password_hash' => bytes, 'new_settings' => account_PasswordInputSettings, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.updatePasswordSettings({current_password_hash=bytes, new_settings=account_PasswordInputSettings, })
+```
+

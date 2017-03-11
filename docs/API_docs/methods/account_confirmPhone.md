@@ -10,8 +10,8 @@ description: account.confirmPhone parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_code\_hash|[string](../types/string.md) | Required|
-|phone\_code|[string](../types/string.md) | Required|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
+|phone\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->confirmPhone(['phone_code_hash' => string, 'phone_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.confirmPhone({phone_code_hash=string, phone_code=string, })
+```
+

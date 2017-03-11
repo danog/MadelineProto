@@ -19,3 +19,12 @@ description: inputNotifyUsers attributes, type and example
 $inputNotifyUsers = ['_' => 'inputNotifyUsers', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputNotifyUsers={_='inputNotifyUsers', }
+
+```
+
+

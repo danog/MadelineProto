@@ -10,7 +10,7 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
 
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+photos_Photo = photos.uploadProfilePhoto({file=InputFile, })
+```
+

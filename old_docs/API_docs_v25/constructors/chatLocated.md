@@ -11,8 +11,8 @@ description: chatLocated attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|distance|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|distance|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: chatLocated attributes, type and example
 ```
 $chatLocated = ['_' => 'chatLocated', 'chat_id' => int, 'distance' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatLocated={_='chatLocated', chat_id=int, distance=int, }
+
+```
+
 

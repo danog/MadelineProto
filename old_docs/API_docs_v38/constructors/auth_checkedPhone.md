@@ -11,7 +11,7 @@ description: auth_checkedPhone attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_registered|[Bool](../types/Bool.md) | Required|
+|phone\_registered|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: auth_checkedPhone attributes, type and example
 ```
 $auth_checkedPhone = ['_' => 'auth.checkedPhone', 'phone_registered' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_checkedPhone={_='auth.checkedPhone', phone_registered=Bool, }
+
+```
+
 

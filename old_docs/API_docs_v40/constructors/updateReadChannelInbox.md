@@ -11,8 +11,8 @@ description: updateReadChannelInbox attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[Peer](../types/Peer.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateReadChannelInbox attributes, type and example
 ```
 $updateReadChannelInbox = ['_' => 'updateReadChannelInbox', 'peer' => Peer, 'max_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateReadChannelInbox={_='updateReadChannelInbox', peer=Peer, max_id=int, }
+
+```
+
 

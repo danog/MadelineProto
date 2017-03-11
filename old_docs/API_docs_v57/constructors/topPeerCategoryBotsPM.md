@@ -19,3 +19,12 @@ description: topPeerCategoryBotsPM attributes, type and example
 $topPeerCategoryBotsPM = ['_' => 'topPeerCategoryBotsPM', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+topPeerCategoryBotsPM={_='topPeerCategoryBotsPM', }
+
+```
+
+

@@ -19,3 +19,12 @@ description: peerNotifyEventsEmpty attributes, type and example
 $peerNotifyEventsEmpty = ['_' => 'peerNotifyEventsEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+peerNotifyEventsEmpty={_='peerNotifyEventsEmpty', }
+
+```
+
+

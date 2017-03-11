@@ -13,6 +13,10 @@ description: constructors and methods of type FileLocation
 
 [fileLocation](../constructors/fileLocation.md)  
 
+[fileLocationUnavailable\_23](../constructors/fileLocationUnavailable_23.md)  
+
+[fileLocation\_23](../constructors/fileLocation_23.md)  
+
 
 
 ### Methods that return an object of this type (methods):

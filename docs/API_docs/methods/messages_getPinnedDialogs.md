@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $messages_PeerDialogs = $MadelineProto->messages->getPinnedDialogs();
 ```
+
+Or, if you're into Lua:
+
+```
+messages_PeerDialogs = messages.getPinnedDialogs({})
+```
+

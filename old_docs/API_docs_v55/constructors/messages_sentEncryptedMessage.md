@@ -11,7 +11,7 @@ description: messages_sentEncryptedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|date|[int](../types/int.md) | Required|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messages_sentEncryptedMessage attributes, type and example
 ```
 $messages_sentEncryptedMessage = ['_' => 'messages.sentEncryptedMessage', 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_sentEncryptedMessage={_='messages.sentEncryptedMessage', date=int, }
+
+```
+
 

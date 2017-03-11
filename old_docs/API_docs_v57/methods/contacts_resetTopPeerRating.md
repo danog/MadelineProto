@@ -10,8 +10,8 @@ description: contacts.resetTopPeerRating parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|category|[TopPeerCategory](../types/TopPeerCategory.md) | Required|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->contacts->resetTopPeerRating(['category' => TopPeerCategory, 'peer' => InputPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = contacts.resetTopPeerRating({category=TopPeerCategory, peer=InputPeer, })
+```
+

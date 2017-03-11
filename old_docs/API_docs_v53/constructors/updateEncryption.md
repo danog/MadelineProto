@@ -11,8 +11,8 @@ description: updateEncryption attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat|[EncryptedChat](../types/EncryptedChat.md) | Required|
-|date|[int](../types/int.md) | Required|
+|chat|[EncryptedChat](../types/EncryptedChat.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateEncryption attributes, type and example
 ```
 $updateEncryption = ['_' => 'updateEncryption', 'chat' => EncryptedChat, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateEncryption={_='updateEncryption', chat=EncryptedChat, date=int, }
+
+```
+
 

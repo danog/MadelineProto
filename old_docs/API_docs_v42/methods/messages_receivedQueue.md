@@ -10,7 +10,7 @@ description: messages.receivedQueue parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|max\_qts|[int](../types/int.md) | Required|
+|max\_qts|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_long](../types/long.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_long = $MadelineProto->messages->receivedQueue(['max_qts' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_long = messages.receivedQueue({max_qts=int, })
+```
+

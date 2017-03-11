@@ -10,9 +10,9 @@ description: geochats.editChatTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
-|title|[string](../types/string.md) | Required|
-|address|[string](../types/string.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|address|[string](../types/string.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $geochats_StatedMessage = $MadelineProto->geochats->editChatTitle(['peer' => InputGeoChat, 'title' => string, 'address' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_StatedMessage = geochats.editChatTitle({peer=InputGeoChat, title=string, address=string, })
+```
+

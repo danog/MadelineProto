@@ -11,8 +11,8 @@ description: auth_authorization attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|expires|[int](../types/int.md) | Required|
-|user|[User](../types/User.md) | Required|
+|expires|[int](../types/int.md) | Yes|
+|user|[User](../types/User.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: auth_authorization attributes, type and example
 ```
 $auth_authorization = ['_' => 'auth.authorization', 'expires' => int, 'user' => User, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_authorization={_='auth.authorization', expires=int, user=User, }
+
+```
+
 

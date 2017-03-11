@@ -11,7 +11,7 @@ description: keyboardButtonGame attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: keyboardButtonGame attributes, type and example
 ```
 $keyboardButtonGame = ['_' => 'keyboardButtonGame', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonGame={_='keyboardButtonGame', text=string, }
+
+```
+
 

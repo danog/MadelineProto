@@ -1,0 +1,46 @@
+---
+title: checkChangePhoneNumberCode
+description: Checks authentication code sent to change user's phone number. Returns authStateOk on success
+---
+## Method: checkChangePhoneNumberCode  
+[Back to methods index](index.md)
+
+
+Checks authentication code sent to change user's phone number. Returns authStateOk on success
+
+### Params:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+|code|[string](../types/string.md) | Yes|Verification code from SMS, voice call or flash call|
+
+
+### Return type: [AuthState](../types/AuthState.md)
+
+### Example:
+
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+if (isset($token)) {
+    $this->bot_login($token);
+}
+if (isset($number)) {
+    $sentCode = $MadelineProto->phone_login($number);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $MadelineProto->complete_phone_login($code);
+}
+
+$AuthState = $MadelineProto->checkChangePhoneNumberCode(['code' => string, ]);
+```
+
+Or, if you're into Lua:
+
+```
+AuthState = checkChangePhoneNumberCode({code=string, })
+```
+

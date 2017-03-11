@@ -11,12 +11,12 @@ description: game attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|short\_name|[string](../types/string.md) | Required|
-|title|[string](../types/string.md) | Required|
-|description|[string](../types/string.md) | Required|
-|photo|[Photo](../types/Photo.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|short\_name|[string](../types/string.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|description|[string](../types/string.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Yes|
 |document|[Document](../types/Document.md) | Optional|
 
 
@@ -29,4 +29,13 @@ description: game attributes, type and example
 ```
 $game = ['_' => 'game', 'id' => long, 'access_hash' => long, 'short_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'document' => Document, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+game={_='game', id=long, access_hash=long, short_name=string, title=string, description=string, photo=Photo, document=Document, }
+
+```
+
 

@@ -10,7 +10,7 @@ description: messages.createChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->createChannel(['title' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.createChannel({title=string, })
+```
+

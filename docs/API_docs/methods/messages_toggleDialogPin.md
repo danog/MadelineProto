@@ -11,7 +11,7 @@ description: messages.toggleDialogPin parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |pinned|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->toggleDialogPin(['pinned' => Bool, 'peer' => InputPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.toggleDialogPin({pinned=Bool, peer=InputPeer, })
+```
+

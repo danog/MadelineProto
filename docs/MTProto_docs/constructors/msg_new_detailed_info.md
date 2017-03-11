@@ -11,9 +11,9 @@ description: msg_new_detailed_info attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|answer\_msg\_id|[long](../types/long.md) | Required|
-|bytes|[int](../types/int.md) | Required|
-|status|[int](../types/int.md) | Required|
+|answer\_msg\_id|[long](../types/long.md) | Yes|
+|bytes|[int](../types/int.md) | Yes|
+|status|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: msg_new_detailed_info attributes, type and example
 ```
 $msg_new_detailed_info = ['_' => 'msg_new_detailed_info', 'answer_msg_id' => long, 'bytes' => int, 'status' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msg_new_detailed_info={_='msg_new_detailed_info', answer_msg_id=long, bytes=int, status=int, }
+
+```
+
 

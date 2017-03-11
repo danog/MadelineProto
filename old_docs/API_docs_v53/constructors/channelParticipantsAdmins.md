@@ -19,3 +19,12 @@ description: channelParticipantsAdmins attributes, type and example
 $channelParticipantsAdmins = ['_' => 'channelParticipantsAdmins', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelParticipantsAdmins={_='channelParticipantsAdmins', }
+
+```
+
+

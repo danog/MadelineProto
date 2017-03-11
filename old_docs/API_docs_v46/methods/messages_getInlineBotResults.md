@@ -10,9 +10,9 @@ description: messages.getInlineBotResults parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|bot|[InputUser](../types/InputUser.md) | Required|
-|query|[string](../types/string.md) | Required|
-|offset|[string](../types/string.md) | Required|
+|bot|[InputUser](../types/InputUser.md) | Yes|
+|query|[string](../types/string.md) | Yes|
+|offset|[string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_BotResults](../types/messages_BotResults.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_BotResults = $MadelineProto->messages->getInlineBotResults(['bot' => InputUser, 'query' => string, 'offset' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_BotResults = messages.getInlineBotResults({bot=InputUser, query=string, offset=string, })
+```
+

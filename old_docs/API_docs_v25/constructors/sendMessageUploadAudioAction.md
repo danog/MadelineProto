@@ -19,3 +19,12 @@ description: sendMessageUploadAudioAction attributes, type and example
 $sendMessageUploadAudioAction = ['_' => 'sendMessageUploadAudioAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadAudioAction={_='sendMessageUploadAudioAction', }
+
+```
+
+

@@ -11,8 +11,8 @@ description: messages.deleteHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |just\_clear|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_AffectedHistory = $MadelineProto->messages->deleteHistory(['just_clear' => Bool, 'peer' => InputPeer, 'max_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedHistory = messages.deleteHistory({just_clear=Bool, peer=InputPeer, max_id=int, })
+```
+

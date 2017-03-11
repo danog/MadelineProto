@@ -19,3 +19,12 @@ description: contactLinkNone attributes, type and example
 $contactLinkNone = ['_' => 'contactLinkNone', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contactLinkNone={_='contactLinkNone', }
+
+```
+
+

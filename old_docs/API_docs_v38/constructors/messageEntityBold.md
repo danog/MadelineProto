@@ -11,8 +11,8 @@ description: messageEntityBold attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messageEntityBold attributes, type and example
 ```
 $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => int, 'length' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageEntityBold={_='messageEntityBold', offset=int, length=int, }
+
+```
+
 

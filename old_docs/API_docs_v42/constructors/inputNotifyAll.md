@@ -19,3 +19,12 @@ description: inputNotifyAll attributes, type and example
 $inputNotifyAll = ['_' => 'inputNotifyAll', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputNotifyAll={_='inputNotifyAll', }
+
+```
+
+

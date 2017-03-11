@@ -10,7 +10,7 @@ description: contacts.unblock parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputUser](../types/InputUser.md) | Required|
+|id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->contacts->unblock(['id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = contacts.unblock({id=InputUser, })
+```
+

@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $help_Support = $MadelineProto->help->getSupport();
 ```
+
+Or, if you're into Lua:
+
+```
+help_Support = help.getSupport({})
+```
+

@@ -10,9 +10,9 @@ description: account.changePhone parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
-|phone\_code\_hash|[string](../types/string.md) | Required|
-|phone\_code|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
+|phone\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [User](../types/User.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $User = $MadelineProto->account->changePhone(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+User = account.changePhone({phone_number=string, phone_code_hash=string, phone_code=string, })
+```
+

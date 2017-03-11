@@ -11,7 +11,7 @@ description: textConcat attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|texts|Array of [RichText](../types/RichText.md) | Required|
+|texts|Array of [RichText](../types/RichText.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: textConcat attributes, type and example
 ### Example:
 
 ```
-$textConcat = ['_' => 'textConcat', 'texts' => [Vector t], ];
+$textConcat = ['_' => 'textConcat', 'texts' => [RichText], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textConcat={_='textConcat', texts={RichText}, }
+
+```
+
 

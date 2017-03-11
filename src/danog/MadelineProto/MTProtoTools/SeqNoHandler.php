@@ -25,4 +25,10 @@ trait SeqNoHandler
 
         return ($value * 2) + $in;
     }
+    public function get_in_seq_no($chat) {
+        return count($this->secret_chats[$chat]['incoming']);
+    }
+    public function get_out_seq_no($chat) {
+        return count($this->secret_chats[$chat]['outgoing']);
+    }
 }

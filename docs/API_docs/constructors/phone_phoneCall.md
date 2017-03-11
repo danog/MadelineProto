@@ -11,8 +11,8 @@ description: phone_phoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_call|[PhoneCall](../types/PhoneCall.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: phone_phoneCall attributes, type and example
 ### Example:
 
 ```
-$phone_phoneCall = ['_' => 'phone.phoneCall', 'phone_call' => PhoneCall, 'users' => [Vector t], ];
+$phone_phoneCall = ['_' => 'phone.phoneCall', 'phone_call' => PhoneCall, 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+phone_phoneCall={_='phone.phoneCall', phone_call=PhoneCall, users={User}, }
+
+```
+
 

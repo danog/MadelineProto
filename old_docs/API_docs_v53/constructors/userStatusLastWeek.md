@@ -19,3 +19,12 @@ description: userStatusLastWeek attributes, type and example
 $userStatusLastWeek = ['_' => 'userStatusLastWeek', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+userStatusLastWeek={_='userStatusLastWeek', }
+
+```
+
+

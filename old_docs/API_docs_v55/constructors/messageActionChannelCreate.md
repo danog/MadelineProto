@@ -11,7 +11,7 @@ description: messageActionChannelCreate attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageActionChannelCreate attributes, type and example
 ```
 $messageActionChannelCreate = ['_' => 'messageActionChannelCreate', 'title' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChannelCreate={_='messageActionChannelCreate', title=string, }
+
+```
+
 

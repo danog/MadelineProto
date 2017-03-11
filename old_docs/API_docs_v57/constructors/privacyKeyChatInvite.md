@@ -19,3 +19,12 @@ description: privacyKeyChatInvite attributes, type and example
 $privacyKeyChatInvite = ['_' => 'privacyKeyChatInvite', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+privacyKeyChatInvite={_='privacyKeyChatInvite', }
+
+```
+
+

@@ -10,7 +10,7 @@ description: messages.getFullChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[InputChat](../types/InputChat.md) | Required|
+|chat\_id|[InputChat](../types/InputChat.md) | Yes|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_ChatFull = $MadelineProto->messages->getFullChat(['chat_id' => InputChat, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_ChatFull = messages.getFullChat({chat_id=InputChat, })
+```
+

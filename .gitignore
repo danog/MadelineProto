@@ -87,3 +87,7 @@ docs_md
 .env
 composer.lock
 b.php
+*.log
+telegram-cli*
+src/danog/MadelineProto/Fuzzer.php
+fuzzer.php

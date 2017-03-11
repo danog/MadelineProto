@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $User = $MadelineProto->account->updateProfile(['first_name' => string, 'last_name' => string, 'about' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+User = account.updateProfile({first_name=string, last_name=string, about=string, })
+```
+

@@ -10,9 +10,9 @@ description: channels.reportSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|id|Array of [int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->channels->reportSpam(['channel' => InputChannel, 'user_id' => InputUser, 'id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = channels.reportSpam({channel=InputChannel, user_id=InputUser, id={int}, })
+```
+

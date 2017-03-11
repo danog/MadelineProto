@@ -11,7 +11,7 @@ description: account_authorizations attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|authorizations|Array of [Authorization](../types/Authorization.md) | Required|
+|authorizations|Array of [Authorization](../types/Authorization.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: account_authorizations attributes, type and example
 ### Example:
 
 ```
-$account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Vector t], ];
+$account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Authorization], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_authorizations={_='account.authorizations', authorizations={Authorization}, }
+
+```
+
 

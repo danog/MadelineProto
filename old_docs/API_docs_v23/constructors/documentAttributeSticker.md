@@ -19,3 +19,12 @@ description: documentAttributeSticker attributes, type and example
 $documentAttributeSticker = ['_' => 'documentAttributeSticker', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+documentAttributeSticker={_='documentAttributeSticker', }
+
+```
+
+

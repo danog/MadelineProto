@@ -11,8 +11,8 @@ description: inputMediaDocumentExternal attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaDocumentExternal attributes, type and example
 ```
 $inputMediaDocumentExternal = ['_' => 'inputMediaDocumentExternal', 'url' => string, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaDocumentExternal={_='inputMediaDocumentExternal', url=string, caption=string, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: inputBotInlineMessageMediaAuto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|caption|[string](../types/string.md) | Required|
+|caption|[string](../types/string.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
@@ -24,4 +24,13 @@ description: inputBotInlineMessageMediaAuto attributes, type and example
 ```
 $inputBotInlineMessageMediaAuto = ['_' => 'inputBotInlineMessageMediaAuto', 'caption' => string, 'reply_markup' => ReplyMarkup, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputBotInlineMessageMediaAuto={_='inputBotInlineMessageMediaAuto', caption=string, reply_markup=ReplyMarkup, }
+
+```
+
 

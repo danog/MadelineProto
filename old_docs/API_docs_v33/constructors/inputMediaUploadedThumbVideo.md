@@ -11,12 +11,12 @@ description: inputMediaUploadedThumbVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|thumb|[InputFile](../types/InputFile.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|thumb|[InputFile](../types/InputFile.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: inputMediaUploadedThumbVideo attributes, type and example
 ```
 $inputMediaUploadedThumbVideo = ['_' => 'inputMediaUploadedThumbVideo', 'file' => InputFile, 'thumb' => InputFile, 'duration' => int, 'w' => int, 'h' => int, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaUploadedThumbVideo={_='inputMediaUploadedThumbVideo', file=InputFile, thumb=InputFile, duration=int, w=int, h=int, caption=string, }
+
+```
+
 

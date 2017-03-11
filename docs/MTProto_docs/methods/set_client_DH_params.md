@@ -10,9 +10,9 @@ description: set_client_DH_params parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
-|server\_nonce|[int128](../types/int128.md) | Required|
-|encrypted\_data|[bytes](../types/bytes.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
+|server\_nonce|[int128](../types/int128.md) | Yes|
+|encrypted\_data|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)
@@ -35,5 +35,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Set_client_DH_params_answer = $MadelineProto->set->client->DH->params(['nonce' => int128, 'server_nonce' => int128, 'encrypted_data' => bytes, ]);
+$Set_client_DH_params_answer = $MadelineProto->set_client_DH_params(['nonce' => int128, 'server_nonce' => int128, 'encrypted_data' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Set_client_DH_params_answer = set_client_DH_params({nonce=int128, server_nonce=int128, encrypted_data=bytes, })
+```
+

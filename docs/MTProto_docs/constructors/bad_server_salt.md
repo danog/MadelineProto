@@ -11,10 +11,10 @@ description: bad_server_salt attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|bad\_msg\_id|[long](../types/long.md) | Required|
-|bad\_msg\_seqno|[int](../types/int.md) | Required|
-|error\_code|[int](../types/int.md) | Required|
-|new\_server\_salt|[long](../types/long.md) | Required|
+|bad\_msg\_id|[long](../types/long.md) | Yes|
+|bad\_msg\_seqno|[int](../types/int.md) | Yes|
+|error\_code|[int](../types/int.md) | Yes|
+|new\_server\_salt|[long](../types/long.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: bad_server_salt attributes, type and example
 ```
 $bad_server_salt = ['_' => 'bad_server_salt', 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int, 'new_server_salt' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+bad_server_salt={_='bad_server_salt', bad_msg_id=long, bad_msg_seqno=int, error_code=int, new_server_salt=long, }
+
+```
+
 

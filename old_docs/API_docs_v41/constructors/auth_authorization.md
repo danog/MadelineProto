@@ -11,7 +11,7 @@ description: auth_authorization attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user|[User](../types/User.md) | Required|
+|user|[User](../types/User.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: auth_authorization attributes, type and example
 ```
 $auth_authorization = ['_' => 'auth.authorization', 'user' => User, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_authorization={_='auth.authorization', user=User, }
+
+```
+
 

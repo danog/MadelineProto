@@ -19,3 +19,12 @@ description: help_appChangelogEmpty attributes, type and example
 $help_appChangelogEmpty = ['_' => 'help.appChangelogEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+help_appChangelogEmpty={_='help.appChangelogEmpty', }
+
+```
+
+

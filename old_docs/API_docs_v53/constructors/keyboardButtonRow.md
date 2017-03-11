@@ -11,7 +11,7 @@ description: keyboardButtonRow attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|buttons|Array of [KeyboardButton](../types/KeyboardButton.md) | Required|
+|buttons|Array of [KeyboardButton](../types/KeyboardButton.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: keyboardButtonRow attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [Vector t], ];
+$keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [KeyboardButton], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonRow={_='keyboardButtonRow', buttons={KeyboardButton}, }
+
+```
+
 

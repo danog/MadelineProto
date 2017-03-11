@@ -19,3 +19,12 @@ description: botInfoEmpty attributes, type and example
 $botInfoEmpty = ['_' => 'botInfoEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+botInfoEmpty={_='botInfoEmpty', }
+
+```
+
+

@@ -11,10 +11,10 @@ description: messages_sentMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: messages_sentMessage attributes, type and example
 ```
 $messages_sentMessage = ['_' => 'messages.sentMessage', 'id' => int, 'date' => int, 'pts' => int, 'seq' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_sentMessage={_='messages.sentMessage', id=int, date=int, pts=int, seq=int, }
+
+```
+
 

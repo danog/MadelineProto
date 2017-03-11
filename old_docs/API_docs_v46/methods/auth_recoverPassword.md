@@ -10,7 +10,7 @@ description: auth.recoverPassword parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|code|[string](../types/string.md) | Required|
+|code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $auth_Authorization = $MadelineProto->auth->recoverPassword(['code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_Authorization = auth.recoverPassword({code=string, })
+```
+

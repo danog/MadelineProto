@@ -11,12 +11,12 @@ description: updates_channelDifference attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
 |timeout|[int](../types/int.md) | Optional|
-|new\_messages|Array of [Message](../types/Message.md) | Required|
-|other\_updates|Array of [Update](../types/Update.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|new\_messages|Array of [Message](../types/Message.md) | Yes|
+|other\_updates|Array of [Update](../types/Update.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: updates_channelDifference attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifference = ['_' => 'updates.channelDifference', 'pts' => int, 'timeout' => int, 'new_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$updates_channelDifference = ['_' => 'updates.channelDifference', 'pts' => int, 'timeout' => int, 'new_messages' => [Message], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_channelDifference={_='updates.channelDifference', pts=int, timeout=int, new_messages={Message}, other_updates={Update}, chats={Chat}, users={User}, }
+
+```
+
 

@@ -10,8 +10,8 @@ description: messages.setTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|action|[SendMessageAction](../types/SendMessageAction.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->setTyping(['peer' => InputPeer, 'action' => SendMessageAction, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.setTyping({peer=InputPeer, action=SendMessageAction, })
+```
+

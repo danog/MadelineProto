@@ -10,7 +10,7 @@ description: messages.getMaskStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_AllStickers = $MadelineProto->messages->getMaskStickers(['hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AllStickers = messages.getMaskStickers({hash=int, })
+```
+

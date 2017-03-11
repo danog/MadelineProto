@@ -10,8 +10,8 @@ description: ping_delay_disconnect parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|ping\_id|[long](../types/long.md) | Required|
-|disconnect\_delay|[int](../types/int.md) | Required|
+|ping\_id|[long](../types/long.md) | Yes|
+|disconnect\_delay|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Pong](../types/Pong.md)
@@ -34,5 +34,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Pong = $MadelineProto->ping->delay->disconnect(['ping_id' => long, 'disconnect_delay' => int, ]);
+$Pong = $MadelineProto->ping_delay_disconnect(['ping_id' => long, 'disconnect_delay' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Pong = ping_delay_disconnect({ping_id=long, disconnect_delay=int, })
+```
+

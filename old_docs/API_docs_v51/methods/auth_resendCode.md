@@ -10,8 +10,8 @@ description: auth.resendCode parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
-|phone\_code\_hash|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $auth_SentCode = $MadelineProto->auth->resendCode(['phone_number' => string, 'phone_code_hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_SentCode = auth.resendCode({phone_number=string, phone_code_hash=string, })
+```
+

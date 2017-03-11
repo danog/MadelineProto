@@ -11,13 +11,13 @@ description: chat attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|title|[string](../types/string.md) | Required|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
-|participants\_count|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|left|[Bool](../types/Bool.md) | Required|
-|version|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|participants\_count|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|left|[Bool](../types/Bool.md) | Yes|
+|version|[int](../types/int.md) | Yes|
 
 
 
@@ -29,4 +29,13 @@ description: chat attributes, type and example
 ```
 $chat = ['_' => 'chat', 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'left' => Bool, 'version' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chat={_='chat', id=int, title=string, photo=ChatPhoto, participants_count=int, date=int, left=Bool, version=int, }
+
+```
+
 

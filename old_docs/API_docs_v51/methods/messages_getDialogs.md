@@ -10,10 +10,10 @@ description: messages.getDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset\_date|[int](../types/int.md) | Required|
-|offset\_id|[int](../types/int.md) | Required|
-|offset\_peer|[InputPeer](../types/InputPeer.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|offset\_date|[int](../types/int.md) | Yes|
+|offset\_id|[int](../types/int.md) | Yes|
+|offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $messages_Dialogs = $MadelineProto->messages->getDialogs(['offset_date' => int, 'offset_id' => int, 'offset_peer' => InputPeer, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Dialogs = messages.getDialogs({offset_date=int, offset_id=int, offset_peer=InputPeer, limit=int, })
+```
+

@@ -11,8 +11,8 @@ description: messages_sentEncryptedFile attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|date|[int](../types/int.md) | Required|
-|file|[EncryptedFile](../types/EncryptedFile.md) | Required|
+|date|[int](../types/int.md) | Yes|
+|file|[EncryptedFile](../types/EncryptedFile.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messages_sentEncryptedFile attributes, type and example
 ```
 $messages_sentEncryptedFile = ['_' => 'messages.sentEncryptedFile', 'date' => int, 'file' => EncryptedFile, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_sentEncryptedFile={_='messages.sentEncryptedFile', date=int, file=EncryptedFile, }
+
+```
+
 

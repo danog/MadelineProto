@@ -11,8 +11,8 @@ description: messageActionGeoChatCreate attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
-|address|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|address|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messageActionGeoChatCreate attributes, type and example
 ```
 $messageActionGeoChatCreate = ['_' => 'messageActionGeoChatCreate', 'title' => string, 'address' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionGeoChatCreate={_='messageActionGeoChatCreate', title=string, address=string, }
+
+```
+
 

@@ -11,9 +11,9 @@ description: documentAttributeVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|duration|[int](../types/int.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
+|duration|[int](../types/int.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: documentAttributeVideo attributes, type and example
 ```
 $documentAttributeVideo = ['_' => 'documentAttributeVideo', 'duration' => int, 'w' => int, 'h' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeVideo={_='documentAttributeVideo', duration=int, w=int, h=int, }
+
+```
+
 

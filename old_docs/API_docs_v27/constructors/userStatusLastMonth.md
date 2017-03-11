@@ -19,3 +19,12 @@ description: userStatusLastMonth attributes, type and example
 $userStatusLastMonth = ['_' => 'userStatusLastMonth', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+userStatusLastMonth={_='userStatusLastMonth', }
+
+```
+
+

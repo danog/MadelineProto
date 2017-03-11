@@ -10,8 +10,8 @@ description: messages.getWebPage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|hash|[int](../types/int.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [WebPage](../types/WebPage.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $WebPage = $MadelineProto->messages->getWebPage(['url' => string, 'hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+WebPage = messages.getWebPage({url=string, hash=int, })
+```
+

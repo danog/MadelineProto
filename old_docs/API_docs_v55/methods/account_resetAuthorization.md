@@ -10,7 +10,7 @@ description: account.resetAuthorization parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[long](../types/long.md) | Required|
+|hash|[long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->resetAuthorization(['hash' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.resetAuthorization({hash=long, })
+```
+

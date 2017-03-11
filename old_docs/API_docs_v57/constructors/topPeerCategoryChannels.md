@@ -19,3 +19,12 @@ description: topPeerCategoryChannels attributes, type and example
 $topPeerCategoryChannels = ['_' => 'topPeerCategoryChannels', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+topPeerCategoryChannels={_='topPeerCategoryChannels', }
+
+```
+
+

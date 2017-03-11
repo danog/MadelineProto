@@ -19,3 +19,12 @@ description: updateReadFeaturedStickers attributes, type and example
 $updateReadFeaturedStickers = ['_' => 'updateReadFeaturedStickers', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updateReadFeaturedStickers={_='updateReadFeaturedStickers', }
+
+```
+
+

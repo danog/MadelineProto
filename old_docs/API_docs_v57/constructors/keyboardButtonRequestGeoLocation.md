@@ -11,7 +11,7 @@ description: keyboardButtonRequestGeoLocation attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: keyboardButtonRequestGeoLocation attributes, type and example
 ```
 $keyboardButtonRequestGeoLocation = ['_' => 'keyboardButtonRequestGeoLocation', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonRequestGeoLocation={_='keyboardButtonRequestGeoLocation', text=string, }
+
+```
+
 

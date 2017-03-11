@@ -20,6 +20,8 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait AuthKeyHandler
 {
+    public $dh_config = ['version' => 0];
+
     public function create_auth_key($expires_in = -1)
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
@@ -55,7 +57,7 @@ trait AuthKeyHandler
                 * Check if the client's nonce and the server's nonce are the same
                 */
                 if ($ResPQ['nonce'] !== $nonce) {
-                    throw new \danog\MadelineProto\Exception('wrong nonce');
+                    throw new \danog\MadelineProto\SecurityException('wrong nonce');
                 }
 
                 /*
@@ -73,7 +75,7 @@ trait AuthKeyHandler
                 }
 
                 if (!isset($public_key_fingerprint)) {
-                    throw new \danog\MadelineProto\Exception("Couldn't find our key in the server_public_key_fingerprints vector.");
+                    throw new \danog\MadelineProto\SecurityException("Couldn't find our key in the server_public_key_fingerprints vector.");
                 }
 
                 $pq_bytes = $ResPQ['pq'];
@@ -91,7 +93,7 @@ trait AuthKeyHandler
                 }
 
                 if ($pq !== $p * $q) {
-                    throw new \danog\MadelineProto\Exception("couldn't compute p and q.");
+                    throw new \danog\MadelineProto\SecurityException("couldn't compute p and q.");
                 }
 
                 \danog\MadelineProto\Logger::log(['Factorization '.$pq.' = '.$p.' * '.$q], \danog\MadelineProto\Logger::VERBOSE);
@@ -162,7 +164,7 @@ trait AuthKeyHandler
                 * Check if the client's nonce and the server's nonce are the same
                 */
                 if ($nonce != $server_dh_params['nonce']) {
-                    throw new \danog\MadelineProto\Exception('wrong nonce.');
+                    throw new \danog\MadelineProto\SecurityException('wrong nonce.');
                 }
 
                 /*
@@ -170,7 +172,7 @@ trait AuthKeyHandler
                 * Check if server_nonce and new server_nonce are the same
                 */
                 if ($server_nonce != $server_dh_params['server_nonce']) {
-                    throw new \danog\MadelineProto\Exception('wrong server nonce.');
+                    throw new \danog\MadelineProto\SecurityException('wrong server nonce.');
                 }
 
                 /*
@@ -179,7 +181,7 @@ trait AuthKeyHandler
                 * new nonce hash return in server_DH_params_fail
                 */
                 if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
-                    throw new \danog\MadelineProto\Exception('wrong new nonce hash.');
+                    throw new \danog\MadelineProto\SecurityException('wrong new nonce hash.');
                 }
 
                 /*
@@ -219,15 +221,15 @@ trait AuthKeyHandler
                 */
                 $server_DH_inner_data_length = $this->get_length(new \danog\MadelineProto\Stream($answer));
                 if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
-                    throw new \danog\MadelineProto\Exception('answer_hash mismatch.');
+                    throw new \danog\MadelineProto\SecurityException('answer_hash mismatch.');
                 }
 
                 if ($nonce != $server_DH_inner_data['nonce']) {
-                    throw new \danog\MadelineProto\Exception('wrong nonce');
+                    throw new \danog\MadelineProto\SecurityException('wrong nonce');
                 }
 
                 if ($server_nonce != $server_DH_inner_data['server_nonce']) {
-                    throw new \danog\MadelineProto\Exception('wrong server nonce');
+                    throw new \danog\MadelineProto\SecurityException('wrong server nonce');
                 }
 
                 $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
@@ -243,82 +245,15 @@ trait AuthKeyHandler
 
                 \danog\MadelineProto\Logger::log([sprintf('Server-client time delta = %.1f s', $this->datacenter->time_delta)], \danog\MadelineProto\Logger::VERBOSE);
 
-                /*
-                * ***********************************************************************
-                * Define some needed numbers for BigInteger
-                */
-                \danog\MadelineProto\Logger::log(['Executing dh_prime checks (0/3)...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $one = new \phpseclib\Math\BigInteger(1);
-                //$two = new \phpseclib\Math\BigInteger(2);
-                $twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
-                $twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
-
-                /*
-                * ***********************************************************************
-                * Check validity of dh_prime
-                * Is it a prime?
-                */
-                \danog\MadelineProto\Logger::log(['Executing dh_prime checks (1/3)...'], \danog\MadelineProto\Logger::VERBOSE);
-                if (!$dh_prime->isPrime()) {
-                    throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime (dh_prime isn't a prime).");
-                }
-
-                /*
-                * ***********************************************************************
-                * Check validity of dh_prime
-                * Is (dh_prime - 1) / 2 a prime?
-                *
-                * Almost always fails
-                */
-                /*
-                \danog\MadelineProto\Logger::log(['Executing dh_prime checks (2/3)...'], \danog\MadelineProto\Logger::VERBOSE);
-                if (!$dh_prime->subtract($one)->divide($two)[0]->isPrime()) {
-                    throw new \danog\MadelineProto\Exception("dh_prime isn't a safe 2048-bit prime ((dh_prime - 1) / 2 isn't a prime).");
-                }
-                */
-
-                /*
-                * ***********************************************************************
-                * Check validity of dh_prime
-                * 2^2047 < dh_prime < 2^2048
-                */
-                \danog\MadelineProto\Logger::log(['Executing dh_prime checks (3/3)...'], \danog\MadelineProto\Logger::VERBOSE);
-                if ($dh_prime->compare($twoe2047) <= 0 // 2^2047 < dh_prime or dh_prime > 2^2047 or ! dh_prime <= 2^2047
-                    || $dh_prime->compare($twoe2048) >= 0 // dh_prime < 2^2048 or ! dh_prime >= 2^2048
-                ) {
-                    throw new \danog\MadelineProto\Exception("g isn't a safe 2048-bit prime (2^2047 < dh_prime < 2^2048 is false).");
-                }
-
-                /*
-                * ***********************************************************************
-                * Check validity of g
-                * 1 < g < dh_prime - 1
-                */
-                \danog\MadelineProto\Logger::log(['Executing g check...'], \danog\MadelineProto\Logger::VERBOSE);
-
-                if ($g->compare($one) <= 0 // 1 < g or g > 1 or ! g <= 1
-                    || $g->compare($dh_prime->subtract($one)) >= 0 // g < dh_prime - 1 or ! g >= dh_prime - 1
-                ) {
-                    throw new \danog\MadelineProto\Exception('g is invalid (1 < g < dh_prime - 1 is false).');
-                }
-
-                /*
-                * ***********************************************************************
-                * Check validity of g_a
-                * 1 < g_a < dh_prime - 1
-                */
-                \danog\MadelineProto\Logger::log(['Executing g_a check...'], \danog\MadelineProto\Logger::VERBOSE);
-                if ($g_a->compare($one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
-                    || $g_a->compare($dh_prime->subtract($one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
-                ) {
-                    throw new \danog\MadelineProto\Exception('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
-                }
+                $this->check_p_g($dh_prime, $g);
+                $this->check_G($g_a, $dh_prime);
 
                 for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
                     \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
                     $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
                     \danog\MadelineProto\Logger::log(['Generating g_b...'], \danog\MadelineProto\Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
+                    $this->check_G($g_b, $dh_prime);
 
                     /*
                     * ***********************************************************************
@@ -326,10 +261,10 @@ trait AuthKeyHandler
                     * 1 < g_b < dh_prime - 1
                     */
                     \danog\MadelineProto\Logger::log(['Executing g_b check...'], \danog\MadelineProto\Logger::VERBOSE);
-                    if ($g_b->compare($one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
-                        || $g_b->compare($dh_prime->subtract($one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
+                    if ($g_b->compare($this->one) <= 0 // 1 < g_b or g_b > 1 or ! g_b <= 1
+                        || $g_b->compare($dh_prime->subtract($this->one)) >= 0 // g_b < dh_prime - 1 or ! g_b >= dh_prime - 1
                     ) {
-                        throw new \danog\MadelineProto\Exception('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
+                        throw new \danog\MadelineProto\SecurityException('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
 
                     \danog\MadelineProto\Logger::log(['Preparing client_DH_inner_data...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -410,7 +345,7 @@ trait AuthKeyHandler
                     * Check if the client's nonce and the server's nonce are the same
                     */
                     if ($Set_client_DH_params_answer['nonce'] != $nonce) {
-                        throw new \danog\MadelineProto\Exception('wrong nonce.');
+                        throw new \danog\MadelineProto\SecurityException('wrong nonce.');
                     }
 
                     /*
@@ -418,7 +353,7 @@ trait AuthKeyHandler
                     * Check if server_nonce and new server_nonce are the same
                     */
                     if ($Set_client_DH_params_answer['server_nonce'] != $server_nonce) {
-                        throw new \danog\MadelineProto\Exception('wrong server nonce');
+                        throw new \danog\MadelineProto\SecurityException('wrong server nonce');
                     }
 
                     /*
@@ -428,7 +363,7 @@ trait AuthKeyHandler
                     switch ($Set_client_DH_params_answer['_']) {
                         case 'dh_gen_ok':
                             if ($Set_client_DH_params_answer['new_nonce_hash1'] != $new_nonce_hash1) {
-                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash1');
+                                throw new \danog\MadelineProto\SecurityException('wrong new_nonce_hash1');
                             }
 
                             \danog\MadelineProto\Logger::log(['Diffie Hellman key exchange processed successfully!'], \danog\MadelineProto\Logger::VERBOSE);
@@ -447,7 +382,7 @@ trait AuthKeyHandler
                             return $res_authorization;
                         case 'dh_gen_retry':
                             if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
-                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash_2');
+                                throw new \danog\MadelineProto\SecurityException('wrong new_nonce_hash_2');
                             }
 
                             //repeat foreach
@@ -455,16 +390,18 @@ trait AuthKeyHandler
                             break;
                         case 'dh_gen_fail':
                             if ($Set_client_DH_params_answer['new_nonce_hash3'] != $new_nonce_hash3) {
-                                throw new \danog\MadelineProto\Exception('wrong new_nonce_hash_3');
+                                throw new \danog\MadelineProto\SecurityException('wrong new_nonce_hash_3');
                             }
 
                             \danog\MadelineProto\Logger::log(['Auth Failed'], \danog\MadelineProto\Logger::WARNING);
                             break 2;
                         default:
-                            throw new \danog\MadelineProto\Exception('Response Error');
+                            throw new \danog\MadelineProto\SecurityException('Response Error');
                             break;
                     }
                 }
+            } catch (\danog\MadelineProto\SecurityException $e) {
+                \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -475,9 +412,249 @@ trait AuthKeyHandler
             }
         }
 
-        throw new \danog\MadelineProto\Exception('Auth Failed');
+        throw new \danog\MadelineProto\SecurityException('Auth Failed');
     }
+    public function check_G($g_a, $p) {
 
+        /*
+         * ***********************************************************************
+         * Check validity of g_a
+         * 1 < g_a < p - 1
+         */
+        \danog\MadelineProto\Logger::log(['Executing g_a check (1/2)...'], \danog\MadelineProto\Logger::VERBOSE);
+        if ($g_a->compare($this->one) <= 0 // 1 < g_a or g_a > 1 or ! g_a <= 1
+           || $g_a->compare($p->subtract($this->one)) >= 0 // g_a < dh_prime - 1 or ! g_a >= dh_prime - 1
+        ) {
+            throw new \danog\MadelineProto\SecurityException('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
+        }
+
+        \danog\MadelineProto\Logger::log(['Executing g_a check (2/2)...'], \danog\MadelineProto\Logger::VERBOSE);
+        if ($g_a->compare($this->twoe1984) < 0 // gA < 2^{2048-64}
+           || $g_a->compare($p->subtract($this->twoe1984)) >= 0 // gA > dhPrime - 2^{2048-64}
+        ) {
+            throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < gA < dh_prime - 2^1984 is false).');
+        }
+
+        return true;
+    }
+    public function check_p_g($p, $g) {
+        /*
+        * ***********************************************************************
+        * Check validity of dh_prime
+        * Is it a prime?
+        */
+        \danog\MadelineProto\Logger::log(['Executing p/g checks (1/2)...'], \danog\MadelineProto\Logger::VERBOSE);
+        if (!$p->isPrime()) {
+            throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime (p isn't a prime).");
+        }
+
+       /*
+                * ***********************************************************************
+                * Check validity of p
+                * Is (p - 1) / 2 a prime?
+                *
+                * Almost always fails
+                */
+                /*
+                \danog\MadelineProto\Logger::log(['Executing p/g checks (2/3)...'], \danog\MadelineProto\Logger::VERBOSE);
+                if (!$p->subtract($this->one)->divide($this->two)[0]->isPrime()) {
+                    throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
+                }
+                */
+
+                /*
+                * ***********************************************************************
+                * Check validity of p
+                * 2^2047 < p < 2^2048
+                */
+                \danog\MadelineProto\Logger::log(['Executing p/g checks (2/2)...'], \danog\MadelineProto\Logger::VERBOSE);
+                if ($p->compare($this->twoe2047) <= 0 // 2^2047 < p or p > 2^2047 or ! p <= 2^2047
+                    || $p->compare($this->twoe2048) >= 0 // p < 2^2048 or ! p >= 2^2048
+                ) {
+                    throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
+                }
+
+                /*
+                * ***********************************************************************
+                * Check validity of g
+                * 1 < g < p - 1
+                */
+                \danog\MadelineProto\Logger::log(['Executing g check...'], \danog\MadelineProto\Logger::VERBOSE);
+
+                if ($g->compare($this->one) <= 0 // 1 < g or g > 1 or ! g <= 1
+                    || $g->compare($p->subtract($this->one)) >= 0 // g < p - 1 or ! g >= p - 1
+                ) {
+                    throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
+                }
+        return true;
+    }
+    public function get_dh_config() {
+        $this->getting_state = true;
+        $dh_config = $this->method_call('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
+        $this->getting_state = false;
+        if ($dh_config['_'] === 'messages.dhConfigNotModified') {
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
+            return $this->dh_config;
+        }
+        $dh_config['p'] = new \phpseclib\Math\BigInteger($dh_config['p'], 256);
+        $dh_config['g'] = new \phpseclib\Math\BigInteger($dh_config['g']);
+        $this->check_p_g($dh_config['p'], $dh_config['g']);
+        return $this->dh_config = $dh_config;
+    }
+    private $temp_requested_secret_chats = [];
+    private $secret_chats = [];
+    public function accept_secret_chat($params) {
+        $dh_config = $this->get_dh_config();
+        \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
+        $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
+        $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
+        $this->check_G($params['g_a'], $dh_config['p']);
+        $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        $key['fingerprint'] = \danog\PHP\Struct::unpack('<q', substr(sha1($key['auth_key'], true), -8))[0];
+        $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
+        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => 8, 'ttl' => PHP_INT_MAX, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0]];
+        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
+        $this->check_G($g_b, $dh_config['p']);
+        $this->notify_layer($params['id']);
+        $this->handle_pending_updates();
+
+    }
+    public function request_secret_chat($user) {
+        $user = $this->get_info($user)['InputUser'];
+        \danog\MadelineProto\Logger::log(['Creating secret chat with '.$user['user_id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $dh_config = $this->get_dh_config();
+        \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
+        \danog\MadelineProto\Logger::log(['Generating g_a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
+        $this->check_G($g_a, $dh_config['p']);
+        $res = $this->method_call('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()]);
+        $this->temp_requested_secret_chats[$res['id']] = $a;
+        $this->handle_pending_updates();
+        $this->get_updates_difference();
+        return $res['id'];
+    }
+    public function complete_secret_chat($params) {
+        if ($this->secret_chat_status($params['id']) !== 1) {
+            \danog\MadelineProto\Logger::log(['Could not find and complete secret chat '.$params['id']]);
+            return false;
+        }
+        $dh_config = $this->get_dh_config();
+        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
+        $this->check_G($params['g_a_or_b'], $dh_config['p']);
+        $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        unset($this->temp_requested_secret_chats[$params['id']]);
+        $key['fingerprint'] = \danog\PHP\Struct::unpack('<q', substr(sha1($key['auth_key'], true), -8))[0];
+        if ($key['fingerprint'] !== $params['key_fingerprint']) {
+            $this->method_call('messages.discardEncryption', ['chat_id' => $params['id']]);
+            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
+        }
+        $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
+        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 8, 'ttl' => PHP_INT_MAX, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0]];
+        $this->notify_layer($params['id']);
+        $this->handle_pending_updates();
+    }
+    public function notify_layer($chat) {
+        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->encrypted_layer]]]);
+    }
+    private $temp_rekeyed_secret_chats = [];
+    public function rekey($chat) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 0) return;
+        \danog\MadelineProto\Logger::log(['Rekeying secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $dh_config = $this->get_dh_config();
+        \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
+        \danog\MadelineProto\Logger::log(['Generating g_a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
+        $this->check_G($g_a, $dh_config['p']);
+        $e = \danog\PHP\Struct::unpack('<q', $this->random(8))[0];
+        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]]);
+        $this->temp_rekeyed_secret_chats[$e] = $a;
+        $this->secret_chats[$chat]['rekeying'] = [1, $e];
+        $this->handle_pending_updates();
+        $this->get_updates_difference();
+        return $e;
+    }
+    public function accept_rekey($chat, $params) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
+            $my = $this->temp_rekeyed_secret_chats[$this->secret_chats[$chat]['rekeying'][1]];
+            if ($my['exchange_id'] > $params['exchange_id']) {
+                return;
+            }
+            if ($my['exchange_id'] === $params['exchange_id']) {
+                $this->secret_chats[$chat]['rekeying'] = [0];
+                $this->rekey($chat);
+                return;
+            }
+        }
+        \danog\MadelineProto\Logger::log(['Accepting rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $dh_config = $this->get_dh_config();
+        \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
+        $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
+        $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
+        $this->check_G($params['g_a'], $dh_config['p']);
+        $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        $key['fingerprint'] = \danog\PHP\Struct::unpack('<q', substr(sha1($key['auth_key'], true), -8))[0];
+        $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
+        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        $this->temp_rekeyed_secret_chats[$params['exchange_id']] = $key;
+        $this->secret_chats[$chat]['rekeying'] = [2, $params['exchange_id']];
+        $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
+        $this->check_G($g_b, $dh_config['p']);
+        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
+        $this->handle_pending_updates();
+        $this->get_updates_difference();
+
+    }
+    public function commit_rekey($chat, $params) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 1) return;
+        \danog\MadelineProto\Logger::log(['Committing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $dh_config = $this->get_dh_config();
+        $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
+        $this->check_G($params['g_b'], $dh_config['p']);
+        $key = ['auth_key' => str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        $key['fingerprint'] = \danog\PHP\Struct::unpack('<q', substr(sha1($key['auth_key'], true), -8))[0];
+        $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
+        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        if ($key['fingerprint'] !== $params['key_fingerprint']) {
+            $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
+            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
+        }
+        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]]);
+        unset($this->temp_rekeyed_secret_chats[$chat]);
+        $this->secret_chats[$chat]['rekeying'] = [0];
+        $this->secret_chats[$chat]['key'] = $key;
+        $this->secret_chats[$chat]['ttr'] = 100;
+        $this->secret_chats[$chat]['updated'] = time();
+
+        $this->handle_pending_updates();
+        $this->get_updates_difference();
+
+    }
+    public function complete_rekey($chat, $params) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 2) return;
+        if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
+            $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
+            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
+        }
+        \danog\MadelineProto\Logger::log(['Completing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $this->secret_chats[$chat]['rekeying'] = [0];
+        $this->secret_chats[$chat]['key'] = $this->temp_rekeyed_secret_chats;
+        $this->secret_chats[$chat]['ttr'] = 100;
+        $this->secret_chats[$chat]['updated'] = time();
+        unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
+        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]]);
+    }
+    public function secret_chat_status($chat) {
+        if (isset($this->secret_chats[$chat])) return 2;
+        if (isset($this->temp_requested_secret_chats[$chat])) return 1;
+        return 0;
+    }
+    public function get_secret_chat($chat) {
+        return $this->secret_chats[$chat];
+    }
     public function bind_temp_auth_key($expires_in)
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
@@ -512,6 +689,8 @@ trait AuthKeyHandler
 
                     return true;
                 }
+            } catch (\danog\MadelineProto\SecurityException $e) {
+                \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -521,6 +700,6 @@ trait AuthKeyHandler
                 $this->datacenter->new_incoming = [];
             }
         }
-        throw new \danog\MadelineProto\Exception('An error occurred while binding temporary and permanent authorization keys.');
+        throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
     }
 }

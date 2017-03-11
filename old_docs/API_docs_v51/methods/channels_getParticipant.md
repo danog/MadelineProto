@@ -10,8 +10,8 @@ description: channels.getParticipant parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $channels_ChannelParticipant = $MadelineProto->channels->getParticipant(['channel' => InputChannel, 'user_id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+channels_ChannelParticipant = channels.getParticipant({channel=InputChannel, user_id=InputUser, })
+```
+

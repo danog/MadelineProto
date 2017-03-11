@@ -10,14 +10,14 @@ description: geochats.search parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
-|q|[string](../types/string.md) | Required|
-|filter|[MessagesFilter](../types/MessagesFilter.md) | Required|
-|min\_date|[int](../types/int.md) | Required|
-|max\_date|[int](../types/int.md) | Required|
-|offset|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|q|[string](../types/string.md) | Yes|
+|filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
+|min\_date|[int](../types/int.md) | Yes|
+|max\_date|[int](../types/int.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)
@@ -42,3 +42,10 @@ if (isset($number)) {
 
 $geochats_Messages = $MadelineProto->geochats->search(['peer' => InputGeoChat, 'q' => string, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_Messages = geochats.search({peer=InputGeoChat, q=string, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
+```
+

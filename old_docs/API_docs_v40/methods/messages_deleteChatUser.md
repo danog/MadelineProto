@@ -10,8 +10,8 @@ description: messages.deleteChatUser parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[InputChat](../types/InputChat.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->deleteChatUser(['chat_id' => InputChat, 'user_id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.deleteChatUser({chat_id=InputChat, user_id=InputUser, })
+```
+

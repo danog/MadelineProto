@@ -11,8 +11,8 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |game|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|msg\_id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|msg\_id|[int](../types/int.md) | Yes|
 |data|[bytes](../types/bytes.md) | Optional|
 
 
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $messages_BotCallbackAnswer = $MadelineProto->messages->getBotCallbackAnswer(['game' => Bool, 'peer' => InputPeer, 'msg_id' => int, 'data' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_BotCallbackAnswer = messages.getBotCallbackAnswer({game=Bool, peer=InputPeer, msg_id=int, data=bytes, })
+```
+

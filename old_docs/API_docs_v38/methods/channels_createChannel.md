@@ -10,9 +10,9 @@ description: channels.createChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
-|about|[string](../types/string.md) | Required|
-|users|Array of [InputUser](../types/InputUser.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|about|[string](../types/string.md) | Yes|
+|users|Array of [InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->createChannel(['title' => string, 'about' => string, 'users' => [InputUser], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.createChannel({title=string, about=string, users={InputUser}, })
+```
+

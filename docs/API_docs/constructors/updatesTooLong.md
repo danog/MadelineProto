@@ -19,3 +19,12 @@ description: updatesTooLong attributes, type and example
 $updatesTooLong = ['_' => 'updatesTooLong', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updatesTooLong={_='updatesTooLong', }
+
+```
+
+

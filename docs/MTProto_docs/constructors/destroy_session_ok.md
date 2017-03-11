@@ -11,7 +11,7 @@ description: destroy_session_ok attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|session\_id|[long](../types/long.md) | Required|
+|session\_id|[long](../types/long.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: destroy_session_ok attributes, type and example
 ```
 $destroy_session_ok = ['_' => 'destroy_session_ok', 'session_id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+destroy_session_ok={_='destroy_session_ok', session_id=long, }
+
+```
+
 

@@ -10,7 +10,7 @@ description: messages.uninstallStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->uninstallStickerSet(['stickerset' => InputStickerSet, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.uninstallStickerSet({stickerset=InputStickerSet, })
+```
+

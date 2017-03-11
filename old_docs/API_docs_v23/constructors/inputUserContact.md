@@ -11,7 +11,7 @@ description: inputUserContact attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputUserContact attributes, type and example
 ```
 $inputUserContact = ['_' => 'inputUserContact', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputUserContact={_='inputUserContact', user_id=int, }
+
+```
+
 

@@ -10,8 +10,8 @@ description: messages.createChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|users|Array of [InputUser](../types/InputUser.md) | Required|
-|title|[string](../types/string.md) | Required|
+|users|Array of [InputUser](../types/InputUser.md) | Yes|
+|title|[string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_StatedMessage = $MadelineProto->messages->createChat(['users' => [InputUser], 'title' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_StatedMessage = messages.createChat({users={InputUser}, title=string, })
+```
+

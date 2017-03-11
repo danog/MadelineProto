@@ -10,8 +10,8 @@ description: messages.getStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|emoticon|[string](../types/string.md) | Required|
-|hash|[string](../types/string.md) | Required|
+|emoticon|[string](../types/string.md) | Yes|
+|hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_Stickers](../types/messages_Stickers.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_Stickers = $MadelineProto->messages->getStickers(['emoticon' => string, 'hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Stickers = messages.getStickers({emoticon=string, hash=string, })
+```
+

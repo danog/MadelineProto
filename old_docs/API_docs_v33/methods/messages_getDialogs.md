@@ -10,9 +10,9 @@ description: messages.getDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_Dialogs = $MadelineProto->messages->getDialogs(['offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Dialogs = messages.getDialogs({offset=int, max_id=int, limit=int, })
+```
+

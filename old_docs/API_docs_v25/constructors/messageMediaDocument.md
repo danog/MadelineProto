@@ -11,7 +11,7 @@ description: messageMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|document|[Document](../types/Document.md) | Required|
+|document|[Document](../types/Document.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaDocument attributes, type and example
 ```
 $messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaDocument={_='messageMediaDocument', document=Document, }
+
+```
+
 

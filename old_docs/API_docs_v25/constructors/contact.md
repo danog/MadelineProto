@@ -11,8 +11,8 @@ description: contact attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|mutual|[Bool](../types/Bool.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|mutual|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: contact attributes, type and example
 ```
 $contact = ['_' => 'contact', 'user_id' => int, 'mutual' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contact={_='contact', user_id=int, mutual=Bool, }
+
+```
+
 

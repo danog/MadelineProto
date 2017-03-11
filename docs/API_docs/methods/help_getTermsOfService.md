@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $help_TermsOfService = $MadelineProto->help->getTermsOfService();
 ```
+
+Or, if you're into Lua:
+
+```
+help_TermsOfService = help.getTermsOfService({})
+```
+

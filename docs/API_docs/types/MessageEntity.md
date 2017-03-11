@@ -7,6 +7,8 @@ description: constructors and methods of type MessageEntity
 
 
 
+Represent part of the message text which needs to be formatted in some unusual way
+
 ### Possible values (constructors):
 
 [messageEntityUnknown](../constructors/messageEntityUnknown.md)  

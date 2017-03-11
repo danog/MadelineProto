@@ -10,7 +10,7 @@ description: messages.reportSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->reportSpam(['peer' => InputPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.reportSpam({peer=InputPeer, })
+```
+

@@ -10,7 +10,7 @@ description: account.getNotifySettings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Required|
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|
 
 
 ### Return type: [PeerNotifySettings](../types/PeerNotifySettings.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $PeerNotifySettings = $MadelineProto->account->getNotifySettings(['peer' => InputNotifyPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+PeerNotifySettings = account.getNotifySettings({peer=InputNotifyPeer, })
+```
+

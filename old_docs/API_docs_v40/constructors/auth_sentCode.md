@@ -11,10 +11,10 @@ description: auth_sentCode attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_registered|[Bool](../types/Bool.md) | Required|
-|phone\_code\_hash|[string](../types/string.md) | Required|
-|send\_call\_timeout|[int](../types/int.md) | Required|
-|is\_password|[Bool](../types/Bool.md) | Required|
+|phone\_registered|[Bool](../types/Bool.md) | Yes|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
+|send\_call\_timeout|[int](../types/int.md) | Yes|
+|is\_password|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: auth_sentCode attributes, type and example
 ```
 $auth_sentCode = ['_' => 'auth.sentCode', 'phone_registered' => Bool, 'phone_code_hash' => string, 'send_call_timeout' => int, 'is_password' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_sentCode={_='auth.sentCode', phone_registered=Bool, phone_code_hash=string, send_call_timeout=int, is_password=Bool, }
+
+```
+
 

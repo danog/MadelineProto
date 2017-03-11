@@ -32,6 +32,7 @@ echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 if ($MadelineProto === false) {
+
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
@@ -65,17 +66,28 @@ if ($MadelineProto === false) {
     }
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
-
-var_dump($MadelineProto->API->get_full_info('@pwrtelegram'));
+$secret = $MadelineProto->API->request_secret_chat(getenv('TEST_USERNAME'));
+var_dump($MadelineProto->get_pwr_chat('@telegram'));
+//$MadelineProto->API->request_secret_chat('@Harold_Saxon');
+echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
+echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
+readline();
 
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
 $media = [];
+$secret_media = [];
 
 // Photo uploaded as document
 $inputFile = $MadelineProto->upload('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
 $media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]];
+
+// Photo uploaded as document, secret chat
+//$inputFile = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
+//$secret_media['document_photo'] = ['peer' => $secret, 'file' => $inputFile, 'message' => ['ttl' => PHP_INT_MAX, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]]]];
+
 
 // Photo
 $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];
@@ -108,7 +120,7 @@ foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
     foreach ($media as $type => $inputMedia) {
-        $type = $MadelineProto->invokeWithoutUpdates(['query' => $MadelineProto->API->serialize_method('messages.sendMedia', ['peer' => $peer, 'media' => $inputMedia])]);
+        $type = $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia]);
         var_dump($MadelineProto->API->MTProto_to_botAPI(end($type['updates'])));
     }
 }

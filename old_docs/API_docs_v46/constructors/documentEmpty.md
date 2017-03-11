@@ -11,7 +11,7 @@ description: documentEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: documentEmpty attributes, type and example
 ```
 $documentEmpty = ['_' => 'documentEmpty', 'id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentEmpty={_='documentEmpty', id=long, }
+
+```
+
 

@@ -11,11 +11,11 @@ description: messages_dialogsSlice attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|dialogs|Array of [Dialog](../types/Dialog.md) | Required|
-|messages|Array of [Message](../types/Message.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|dialogs|Array of [Dialog](../types/Dialog.md) | Yes|
+|messages|Array of [Message](../types/Message.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -25,6 +25,15 @@ description: messages_dialogsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_dialogsSlice = ['_' => 'messages.dialogsSlice', 'count' => int, 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_dialogsSlice = ['_' => 'messages.dialogsSlice', 'count' => int, 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_dialogsSlice={_='messages.dialogsSlice', count=int, dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}, }
+
+```
+
 

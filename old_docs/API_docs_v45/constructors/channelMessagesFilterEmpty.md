@@ -19,3 +19,12 @@ description: channelMessagesFilterEmpty attributes, type and example
 $channelMessagesFilterEmpty = ['_' => 'channelMessagesFilterEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelMessagesFilterEmpty={_='channelMessagesFilterEmpty', }
+
+```
+
+

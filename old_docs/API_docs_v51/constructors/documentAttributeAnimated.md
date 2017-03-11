@@ -19,3 +19,12 @@ description: documentAttributeAnimated attributes, type and example
 $documentAttributeAnimated = ['_' => 'documentAttributeAnimated', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+documentAttributeAnimated={_='documentAttributeAnimated', }
+
+```
+
+

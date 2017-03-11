@@ -25,3 +25,12 @@ description: messages_botCallbackAnswer attributes, type and example
 $messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => true, 'message' => string, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_botCallbackAnswer={_='messages.botCallbackAnswer', alert=true, message=string, }
+
+```
+
+

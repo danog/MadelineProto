@@ -10,8 +10,8 @@ description: messages.readChannelHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->readChannelHistory(['peer' => InputPeer, 'max_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.readChannelHistory({peer=InputPeer, max_id=int, })
+```
+

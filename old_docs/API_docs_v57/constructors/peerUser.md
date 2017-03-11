@@ -11,7 +11,7 @@ description: peerUser attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: peerUser attributes, type and example
 ```
 $peerUser = ['_' => 'peerUser', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+peerUser={_='peerUser', user_id=int, }
+
+```
+
 

@@ -11,10 +11,10 @@ description: botInlineMediaResultDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[string](../types/string.md) | Required|
-|type|[string](../types/string.md) | Required|
-|document|[Document](../types/Document.md) | Required|
-|send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Required|
+|id|[string](../types/string.md) | Yes|
+|type|[string](../types/string.md) | Yes|
+|document|[Document](../types/Document.md) | Yes|
+|send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: botInlineMediaResultDocument attributes, type and example
 ```
 $botInlineMediaResultDocument = ['_' => 'botInlineMediaResultDocument', 'id' => string, 'type' => string, 'document' => Document, 'send_message' => BotInlineMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineMediaResultDocument={_='botInlineMediaResultDocument', id=string, type=string, document=Document, send_message=BotInlineMessage, }
+
+```
+
 

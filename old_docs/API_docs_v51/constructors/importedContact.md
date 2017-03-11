@@ -11,8 +11,8 @@ description: importedContact attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|client\_id|[long](../types/long.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|client\_id|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: importedContact attributes, type and example
 ```
 $importedContact = ['_' => 'importedContact', 'user_id' => int, 'client_id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+importedContact={_='importedContact', user_id=int, client_id=long, }
+
+```
+
 

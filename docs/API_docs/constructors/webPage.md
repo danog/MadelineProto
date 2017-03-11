@@ -11,10 +11,10 @@ description: webPage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|url|[string](../types/string.md) | Required|
-|display\_url|[string](../types/string.md) | Required|
-|hash|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|url|[string](../types/string.md) | Yes|
+|display\_url|[string](../types/string.md) | Yes|
+|hash|[int](../types/int.md) | Yes|
 |type|[string](../types/string.md) | Optional|
 |site\_name|[string](../types/string.md) | Optional|
 |title|[string](../types/string.md) | Optional|
@@ -39,4 +39,13 @@ description: webPage attributes, type and example
 ```
 $webPage = ['_' => 'webPage', 'id' => long, 'url' => string, 'display_url' => string, 'hash' => int, 'type' => string, 'site_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'embed_url' => string, 'embed_type' => string, 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => string, 'document' => Document, 'cached_page' => Page, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+webPage={_='webPage', id=long, url=string, display_url=string, hash=int, type=string, site_name=string, title=string, description=string, photo=Photo, embed_url=string, embed_type=string, embed_width=int, embed_height=int, duration=int, author=string, document=Document, cached_page=Page, }
+
+```
+
 

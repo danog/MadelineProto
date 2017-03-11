@@ -19,3 +19,12 @@ description: inputPrivacyKeyStatusTimestamp attributes, type and example
 $inputPrivacyKeyStatusTimestamp = ['_' => 'inputPrivacyKeyStatusTimestamp', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyKeyStatusTimestamp={_='inputPrivacyKeyStatusTimestamp', }
+
+```
+
+

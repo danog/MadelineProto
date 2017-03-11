@@ -11,14 +11,14 @@ description: audio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
-|size|[int](../types/int.md) | Required|
-|dc\_id|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
+|size|[int](../types/int.md) | Yes|
+|dc\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -30,4 +30,13 @@ description: audio attributes, type and example
 ```
 $audio = ['_' => 'audio', 'id' => long, 'access_hash' => long, 'user_id' => int, 'date' => int, 'duration' => int, 'mime_type' => string, 'size' => int, 'dc_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+audio={_='audio', id=long, access_hash=long, user_id=int, date=int, duration=int, mime_type=string, size=int, dc_id=int, }
+
+```
+
 

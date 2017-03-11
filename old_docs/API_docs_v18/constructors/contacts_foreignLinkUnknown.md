@@ -19,3 +19,12 @@ description: contacts_foreignLinkUnknown attributes, type and example
 $contacts_foreignLinkUnknown = ['_' => 'contacts.foreignLinkUnknown', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_foreignLinkUnknown={_='contacts.foreignLinkUnknown', }
+
+```
+
+

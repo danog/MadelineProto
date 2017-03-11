@@ -11,8 +11,8 @@ description: pageBlockBlockquote attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: pageBlockBlockquote attributes, type and example
 ```
 $pageBlockBlockquote = ['_' => 'pageBlockBlockquote', 'text' => RichText, 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockBlockquote={_='pageBlockBlockquote', text=RichText, caption=RichText, }
+
+```
+
 

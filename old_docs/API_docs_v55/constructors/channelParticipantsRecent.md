@@ -19,3 +19,12 @@ description: channelParticipantsRecent attributes, type and example
 $channelParticipantsRecent = ['_' => 'channelParticipantsRecent', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelParticipantsRecent={_='channelParticipantsRecent', }
+
+```
+
+

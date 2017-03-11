@@ -23,6 +23,18 @@ description: constructors and methods of type DocumentAttribute
 
 [documentAttributeHasStickers](../constructors/documentAttributeHasStickers.md)  
 
+[documentAttributeImageSize\_23](../constructors/documentAttributeImageSize_23.md)  
+
+[documentAttributeAnimated\_23](../constructors/documentAttributeAnimated_23.md)  
+
+[documentAttributeSticker\_23](../constructors/documentAttributeSticker_23.md)  
+
+[documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md)  
+
+[documentAttributeAudio\_23](../constructors/documentAttributeAudio_23.md)  
+
+[documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md)  
+
 
 
 ### Methods that return an object of this type (methods):

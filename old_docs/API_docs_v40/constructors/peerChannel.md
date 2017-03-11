@@ -11,7 +11,7 @@ description: peerChannel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: peerChannel attributes, type and example
 ```
 $peerChannel = ['_' => 'peerChannel', 'channel_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+peerChannel={_='peerChannel', channel_id=int, }
+
+```
+
 

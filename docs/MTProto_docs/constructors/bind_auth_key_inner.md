@@ -11,11 +11,11 @@ description: bind_auth_key_inner attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[long](../types/long.md) | Required|
-|temp\_auth\_key\_id|[long](../types/long.md) | Required|
-|perm\_auth\_key\_id|[long](../types/long.md) | Required|
-|temp\_session\_id|[long](../types/long.md) | Required|
-|expires\_at|[int](../types/int.md) | Required|
+|nonce|[long](../types/long.md) | Yes|
+|temp\_auth\_key\_id|[long](../types/long.md) | Yes|
+|perm\_auth\_key\_id|[long](../types/long.md) | Yes|
+|temp\_session\_id|[long](../types/long.md) | Yes|
+|expires\_at|[int](../types/int.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: bind_auth_key_inner attributes, type and example
 ```
 $bind_auth_key_inner = ['_' => 'bind_auth_key_inner', 'nonce' => long, 'temp_auth_key_id' => long, 'perm_auth_key_id' => long, 'temp_session_id' => long, 'expires_at' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+bind_auth_key_inner={_='bind_auth_key_inner', nonce=long, temp_auth_key_id=long, perm_auth_key_id=long, temp_session_id=long, expires_at=int, }
+
+```
+
 

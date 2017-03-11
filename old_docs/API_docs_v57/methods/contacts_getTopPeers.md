@@ -15,9 +15,9 @@ description: contacts.getTopPeers parameters, return type and example
 |bots\_inline|[Bool](../types/Bool.md) | Optional|
 |groups|[Bool](../types/Bool.md) | Optional|
 |channels|[Bool](../types/Bool.md) | Optional|
-|offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
-|hash|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
@@ -42,3 +42,10 @@ if (isset($number)) {
 
 $contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_TopPeers = contacts.getTopPeers({correspondents=Bool, bots_pm=Bool, bots_inline=Bool, groups=Bool, channels=Bool, offset=int, limit=int, hash=int, })
+```
+

@@ -19,3 +19,12 @@ description: messages_messageEmpty attributes, type and example
 $messages_messageEmpty = ['_' => 'messages.messageEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_messageEmpty={_='messages.messageEmpty', }
+
+```
+
+

@@ -10,8 +10,8 @@ description: channels.deleteUserHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_AffectedHistory = $MadelineProto->channels->deleteUserHistory(['channel' => InputChannel, 'user_id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedHistory = channels.deleteUserHistory({channel=InputChannel, user_id=InputUser, })
+```
+

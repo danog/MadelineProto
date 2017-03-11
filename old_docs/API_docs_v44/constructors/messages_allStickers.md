@@ -11,8 +11,8 @@ description: messages_allStickers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
-|sets|Array of [StickerSet](../types/StickerSet.md) | Required|
+|hash|[int](../types/int.md) | Yes|
+|sets|Array of [StickerSet](../types/StickerSet.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_allStickers attributes, type and example
 ### Example:
 
 ```
-$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => int, 'sets' => [Vector t], ];
+$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => int, 'sets' => [StickerSet], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_allStickers={_='messages.allStickers', hash=int, sets={StickerSet}, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: messages_allStickersNotModified attributes, type and example
 $messages_allStickersNotModified = ['_' => 'messages.allStickersNotModified', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_allStickersNotModified={_='messages.allStickersNotModified', }
+
+```
+
+

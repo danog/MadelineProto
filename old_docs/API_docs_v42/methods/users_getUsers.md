@@ -10,7 +10,7 @@ description: users.getUsers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [InputUser](../types/InputUser.md) | Required|
+|id|Array of [InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Vector\_of\_User](../types/User.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_User = users.getUsers({id={InputUser}, })
+```
+

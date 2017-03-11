@@ -11,7 +11,7 @@ description: encryptedChatEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: encryptedChatEmpty attributes, type and example
 ```
 $encryptedChatEmpty = ['_' => 'encryptedChatEmpty', 'id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+encryptedChatEmpty={_='encryptedChatEmpty', id=int, }
+
+```
+
 

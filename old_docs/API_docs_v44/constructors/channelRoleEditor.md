@@ -19,3 +19,12 @@ description: channelRoleEditor attributes, type and example
 $channelRoleEditor = ['_' => 'channelRoleEditor', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelRoleEditor={_='channelRoleEditor', }
+
+```
+
+

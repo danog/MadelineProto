@@ -19,3 +19,12 @@ description: channelMessagesFilterCollapsed attributes, type and example
 $channelMessagesFilterCollapsed = ['_' => 'channelMessagesFilterCollapsed', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelMessagesFilterCollapsed={_='channelMessagesFilterCollapsed', }
+
+```
+
+

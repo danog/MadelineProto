@@ -11,7 +11,7 @@ description: inputStickeredMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputPhoto](../types/InputPhoto.md) | Required|
+|id|[InputPhoto](../types/InputPhoto.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputStickeredMediaPhoto attributes, type and example
 ```
 $inputStickeredMediaPhoto = ['_' => 'inputStickeredMediaPhoto', 'id' => InputPhoto, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputStickeredMediaPhoto={_='inputStickeredMediaPhoto', id=InputPhoto, }
+
+```
+
 

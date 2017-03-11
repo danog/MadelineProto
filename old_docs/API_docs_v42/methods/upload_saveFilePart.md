@@ -10,9 +10,9 @@ description: upload.saveFilePart parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file\_id|[long](../types/long.md) | Required|
-|file\_part|[int](../types/int.md) | Required|
-|bytes|[bytes](../types/bytes.md) | Required|
+|file\_id|[long](../types/long.md) | Yes|
+|file\_part|[int](../types/int.md) | Yes|
+|bytes|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->upload->saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = upload.saveFilePart({file_id=long, file_part=int, bytes=bytes, })
+```
+

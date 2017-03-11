@@ -10,7 +10,7 @@ description: messages.getFeaturedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_FeaturedStickers = $MadelineProto->messages->getFeaturedStickers(['hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_FeaturedStickers = messages.getFeaturedStickers({hash=int, })
+```
+

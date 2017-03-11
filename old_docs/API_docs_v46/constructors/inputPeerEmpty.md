@@ -19,3 +19,12 @@ description: inputPeerEmpty attributes, type and example
 $inputPeerEmpty = ['_' => 'inputPeerEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPeerEmpty={_='inputPeerEmpty', }
+
+```
+
+

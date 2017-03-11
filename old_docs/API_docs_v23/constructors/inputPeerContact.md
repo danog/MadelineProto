@@ -11,7 +11,7 @@ description: inputPeerContact attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputPeerContact attributes, type and example
 ```
 $inputPeerContact = ['_' => 'inputPeerContact', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPeerContact={_='inputPeerContact', user_id=int, }
+
+```
+
 

@@ -11,11 +11,11 @@ description: photoSize attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|type|[string](../types/string.md) | Required|
-|location|[FileLocation](../types/FileLocation.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
-|size|[int](../types/int.md) | Required|
+|type|[string](../types/string.md) | Yes|
+|location|[FileLocation](../types/FileLocation.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
+|size|[int](../types/int.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: photoSize attributes, type and example
 ```
 $photoSize = ['_' => 'photoSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photoSize={_='photoSize', type=string, location=FileLocation, w=int, h=int, size=int, }
+
+```
+
 

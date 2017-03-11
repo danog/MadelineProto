@@ -19,3 +19,12 @@ description: topPeerCategoryBotsInline attributes, type and example
 $topPeerCategoryBotsInline = ['_' => 'topPeerCategoryBotsInline', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+topPeerCategoryBotsInline={_='topPeerCategoryBotsInline', }
+
+```
+
+

@@ -19,3 +19,12 @@ description: sendMessageUploadPhotoAction attributes, type and example
 $sendMessageUploadPhotoAction = ['_' => 'sendMessageUploadPhotoAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadPhotoAction={_='sendMessageUploadPhotoAction', }
+
+```
+
+

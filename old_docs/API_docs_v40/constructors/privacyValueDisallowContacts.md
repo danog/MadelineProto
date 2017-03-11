@@ -19,3 +19,12 @@ description: privacyValueDisallowContacts attributes, type and example
 $privacyValueDisallowContacts = ['_' => 'privacyValueDisallowContacts', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+privacyValueDisallowContacts={_='privacyValueDisallowContacts', }
+
+```
+
+

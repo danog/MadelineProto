@@ -11,8 +11,8 @@ description: messages_foundGifs attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|next\_offset|[int](../types/int.md) | Required|
-|results|Array of [FoundGif](../types/FoundGif.md) | Required|
+|next\_offset|[int](../types/int.md) | Yes|
+|results|Array of [FoundGif](../types/FoundGif.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_foundGifs attributes, type and example
 ### Example:
 
 ```
-$messages_foundGifs = ['_' => 'messages.foundGifs', 'next_offset' => int, 'results' => [Vector t], ];
+$messages_foundGifs = ['_' => 'messages.foundGifs', 'next_offset' => int, 'results' => [FoundGif], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_foundGifs={_='messages.foundGifs', next_offset=int, results={FoundGif}, }
+
+```
+
 

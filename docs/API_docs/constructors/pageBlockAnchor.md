@@ -11,7 +11,7 @@ description: pageBlockAnchor attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|name|[string](../types/string.md) | Required|
+|name|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockAnchor attributes, type and example
 ```
 $pageBlockAnchor = ['_' => 'pageBlockAnchor', 'name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockAnchor={_='pageBlockAnchor', name=string, }
+
+```
+
 

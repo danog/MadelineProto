@@ -11,7 +11,7 @@ description: sendMessageUploadDocumentAction attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|progress|[int](../types/int.md) | Required|
+|progress|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: sendMessageUploadDocumentAction attributes, type and example
 ```
 $sendMessageUploadDocumentAction = ['_' => 'sendMessageUploadDocumentAction', 'progress' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadDocumentAction={_='sendMessageUploadDocumentAction', progress=int, }
+
+```
+
 

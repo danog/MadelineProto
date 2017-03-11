@@ -19,3 +19,12 @@ description: storage_fileMp4 attributes, type and example
 $storage_fileMp4 = ['_' => 'storage.fileMp4', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_fileMp4={_='storage.fileMp4', }
+
+```
+
+

@@ -11,10 +11,10 @@ description: updateServiceNotification attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|type|[string](../types/string.md) | Required|
-|message\_text|[string](../types/string.md) | Required|
-|media|[MessageMedia](../types/MessageMedia.md) | Required|
-|popup|[Bool](../types/Bool.md) | Required|
+|type|[string](../types/string.md) | Yes|
+|message\_text|[string](../types/string.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|popup|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: updateServiceNotification attributes, type and example
 ```
 $updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'message_text' => string, 'media' => MessageMedia, 'popup' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateServiceNotification={_='updateServiceNotification', type=string, message_text=string, media=MessageMedia, popup=Bool, }
+
+```
+
 

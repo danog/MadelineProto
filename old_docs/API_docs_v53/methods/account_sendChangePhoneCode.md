@@ -11,7 +11,7 @@ description: account.sendChangePhoneCode parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|phone\_number|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
 |current\_number|[Bool](../types/Bool.md) | Optional|
 
 
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $auth_SentCode = $MadelineProto->account->sendChangePhoneCode(['allow_flashcall' => Bool, 'phone_number' => string, 'current_number' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_SentCode = account.sendChangePhoneCode({allow_flashcall=Bool, phone_number=string, current_number=Bool, })
+```
+

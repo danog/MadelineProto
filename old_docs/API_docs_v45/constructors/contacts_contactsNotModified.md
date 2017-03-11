@@ -19,3 +19,12 @@ description: contacts_contactsNotModified attributes, type and example
 $contacts_contactsNotModified = ['_' => 'contacts.contactsNotModified', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_contactsNotModified={_='contacts.contactsNotModified', }
+
+```
+
+

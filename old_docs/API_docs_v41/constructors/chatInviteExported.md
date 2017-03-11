@@ -11,7 +11,7 @@ description: chatInviteExported attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|link|[string](../types/string.md) | Required|
+|link|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: chatInviteExported attributes, type and example
 ```
 $chatInviteExported = ['_' => 'chatInviteExported', 'link' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatInviteExported={_='chatInviteExported', link=string, }
+
+```
+
 

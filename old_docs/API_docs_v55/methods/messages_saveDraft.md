@@ -12,8 +12,8 @@ description: messages.saveDraft parameters, return type and example
 |----------|:-------------:|---------:|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|message|[string](../types/string.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
 
@@ -40,6 +40,13 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->saveDraft(['no_webpage' => Bool, 'reply_to_msg_id' => int, 'peer' => InputPeer, 'message' => string, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.saveDraft({no_webpage=Bool, reply_to_msg_id=int, peer=InputPeer, message=string, entities={MessageEntity}, parse_mode='string', })
+```
+
 
 ## Usage of parse_mode:
 

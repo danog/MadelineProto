@@ -10,7 +10,7 @@ description: contacts.getContacts parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[string](../types/string.md) | Required|
+|hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $contacts_Contacts = $MadelineProto->contacts->getContacts(['hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_Contacts = contacts.getContacts({hash=string, })
+```
+

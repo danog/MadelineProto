@@ -13,9 +13,9 @@ description: channelForbidden attributes, type and example
 |----------|:-------------:|---------:|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
-|id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|title|[string](../types/string.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|title|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: channelForbidden attributes, type and example
 ```
 $channelForbidden = ['_' => 'channelForbidden', 'broadcast' => true, 'megagroup' => true, 'id' => int, 'access_hash' => long, 'title' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channelForbidden={_='channelForbidden', broadcast=true, megagroup=true, id=int, access_hash=long, title=string, }
+
+```
+
 

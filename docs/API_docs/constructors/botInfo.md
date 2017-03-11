@@ -11,9 +11,9 @@ description: botInfo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|description|[string](../types/string.md) | Required|
-|commands|Array of [BotCommand](../types/BotCommand.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|description|[string](../types/string.md) | Yes|
+|commands|Array of [BotCommand](../types/BotCommand.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: botInfo attributes, type and example
 ### Example:
 
 ```
-$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => string, 'commands' => [Vector t], ];
+$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => string, 'commands' => [BotCommand], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInfo={_='botInfo', user_id=int, description=string, commands={BotCommand}, }
+
+```
+
 

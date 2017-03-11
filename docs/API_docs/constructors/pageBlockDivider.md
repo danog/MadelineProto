@@ -19,3 +19,12 @@ description: pageBlockDivider attributes, type and example
 $pageBlockDivider = ['_' => 'pageBlockDivider', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+pageBlockDivider={_='pageBlockDivider', }
+
+```
+
+

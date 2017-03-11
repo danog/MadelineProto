@@ -10,7 +10,7 @@ description: channels.getChannels parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [InputChannel](../types/InputChannel.md) | Required|
+|id|Array of [InputChannel](../types/InputChannel.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_Chats = $MadelineProto->channels->getChannels(['id' => [InputChannel], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Chats = channels.getChannels({id={InputChannel}, })
+```
+

@@ -19,3 +19,12 @@ description: inputMessagesFilterMusic attributes, type and example
 $inputMessagesFilterMusic = ['_' => 'inputMessagesFilterMusic', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterMusic={_='inputMessagesFilterMusic', }
+
+```
+
+

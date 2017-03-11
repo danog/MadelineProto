@@ -11,8 +11,8 @@ description: channels.updatePinnedMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |silent|[Bool](../types/Bool.md) | Optional|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|id|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->updatePinnedMessage(['silent' => Bool, 'channel' => InputChannel, 'id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.updatePinnedMessage({silent=Bool, channel=InputChannel, id=int, })
+```
+

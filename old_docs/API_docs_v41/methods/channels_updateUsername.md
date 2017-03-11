@@ -10,8 +10,8 @@ description: channels.updateUsername parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|username|[string](../types/string.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|username|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->channels->updateUsername(['channel' => InputChannel, 'username' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = channels.updateUsername({channel=InputChannel, username=string, })
+```
+

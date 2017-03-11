@@ -19,3 +19,12 @@ description: userStatusEmpty attributes, type and example
 $userStatusEmpty = ['_' => 'userStatusEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+userStatusEmpty={_='userStatusEmpty', }
+
+```
+
+

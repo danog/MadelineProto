@@ -10,8 +10,8 @@ description: geochats.getRecents parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $geochats_Messages = $MadelineProto->geochats->getRecents(['offset' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_Messages = geochats.getRecents({offset=int, limit=int, })
+```
+

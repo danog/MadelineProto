@@ -11,10 +11,10 @@ description: MTmessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_id|[long](../types/long.md) | Required|
-|seqno|[int](../types/int.md) | Required|
-|bytes|[int](../types/int.md) | Required|
-|body|[Object](../types/Object.md) | Required|
+|msg\_id|[long](../types/long.md) | Yes|
+|seqno|[int](../types/int.md) | Yes|
+|bytes|[int](../types/int.md) | Yes|
+|body|[Object](../types/Object.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: MTmessage attributes, type and example
 ```
 $MTmessage = ['_' => 'MTmessage', 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+MTmessage={_='MTmessage', msg_id=long, seqno=int, bytes=int, body=Object, }
+
+```
+
 

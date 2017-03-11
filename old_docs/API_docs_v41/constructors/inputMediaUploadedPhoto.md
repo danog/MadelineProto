@@ -11,8 +11,8 @@ description: inputMediaUploadedPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaUploadedPhoto attributes, type and example
 ```
 $inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaUploadedPhoto={_='inputMediaUploadedPhoto', file=InputFile, caption=string, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: accountDaysTTL attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|days|[int](../types/int.md) | Required|
+|days|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: accountDaysTTL attributes, type and example
 ```
 $accountDaysTTL = ['_' => 'accountDaysTTL', 'days' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+accountDaysTTL={_='accountDaysTTL', days=int, }
+
+```
+
 

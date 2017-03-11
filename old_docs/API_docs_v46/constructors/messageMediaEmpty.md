@@ -19,3 +19,12 @@ description: messageMediaEmpty attributes, type and example
 $messageMediaEmpty = ['_' => 'messageMediaEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageMediaEmpty={_='messageMediaEmpty', }
+
+```
+
+

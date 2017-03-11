@@ -11,8 +11,8 @@ description: chatPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo\_small|[FileLocation](../types/FileLocation.md) | Required|
-|photo\_big|[FileLocation](../types/FileLocation.md) | Required|
+|photo\_small|[FileLocation](../types/FileLocation.md) | Yes|
+|photo\_big|[FileLocation](../types/FileLocation.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: chatPhoto attributes, type and example
 ```
 $chatPhoto = ['_' => 'chatPhoto', 'photo_small' => FileLocation, 'photo_big' => FileLocation, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatPhoto={_='chatPhoto', photo_small=FileLocation, photo_big=FileLocation, }
+
+```
+
 

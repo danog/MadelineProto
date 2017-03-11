@@ -10,7 +10,7 @@ description: auth.dropTempAuthKeys parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|except\_auth\_keys|Array of [long](../types/long.md) | Required|
+|except\_auth\_keys|Array of [long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->auth->dropTempAuthKeys(['except_auth_keys' => [long], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = auth.dropTempAuthKeys({except_auth_keys={long}, })
+```
+

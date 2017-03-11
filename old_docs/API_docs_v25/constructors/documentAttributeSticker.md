@@ -11,7 +11,7 @@ description: documentAttributeSticker attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|alt|[string](../types/string.md) | Required|
+|alt|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: documentAttributeSticker attributes, type and example
 ```
 $documentAttributeSticker = ['_' => 'documentAttributeSticker', 'alt' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeSticker={_='documentAttributeSticker', alt=string, }
+
+```
+
 

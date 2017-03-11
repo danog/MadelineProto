@@ -19,3 +19,12 @@ description: chatPhotoEmpty attributes, type and example
 $chatPhotoEmpty = ['_' => 'chatPhotoEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+chatPhotoEmpty={_='chatPhotoEmpty', }
+
+```
+
+

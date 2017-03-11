@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->resetNotifySettings();
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.resetNotifySettings({})
+```
+

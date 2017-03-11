@@ -19,3 +19,12 @@ description: phoneCallDiscardReasonDisconnect attributes, type and example
 $phoneCallDiscardReasonDisconnect = ['_' => 'phoneCallDiscardReasonDisconnect', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+phoneCallDiscardReasonDisconnect={_='phoneCallDiscardReasonDisconnect', }
+
+```
+
+

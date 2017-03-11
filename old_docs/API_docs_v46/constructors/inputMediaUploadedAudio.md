@@ -11,9 +11,9 @@ description: inputMediaUploadedAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: inputMediaUploadedAudio attributes, type and example
 ```
 $inputMediaUploadedAudio = ['_' => 'inputMediaUploadedAudio', 'file' => InputFile, 'duration' => int, 'mime_type' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaUploadedAudio={_='inputMediaUploadedAudio', file=InputFile, duration=int, mime_type=string, }
+
+```
+
 

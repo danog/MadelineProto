@@ -1,0 +1,47 @@
+---
+title: getMessage
+description: Returns information about a message
+---
+## Method: getMessage  
+[Back to methods index](index.md)
+
+
+Returns information about a message
+
+### Params:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat, message belongs to|
+|message\_id|[long](../types/long.md) | Yes|Identifier of the message to get|
+
+
+### Return type: [Message](../types/Message.md)
+
+### Example:
+
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+if (isset($token)) {
+    $this->bot_login($token);
+}
+if (isset($number)) {
+    $sentCode = $MadelineProto->phone_login($number);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $MadelineProto->complete_phone_login($code);
+}
+
+$Message = $MadelineProto->getMessage(['chat_id' => long, 'message_id' => long, ]);
+```
+
+Or, if you're into Lua:
+
+```
+Message = getMessage({chat_id=long, message_id=long, })
+```
+

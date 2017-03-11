@@ -11,7 +11,7 @@ description: msgs_state_req attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_ids|Array of [long](../types/long.md) | Required|
+|msg\_ids|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: msgs_state_req attributes, type and example
 ### Example:
 
 ```
-$msgs_state_req = ['_' => 'msgs_state_req', 'msg_ids' => [Vector t], ];
+$msgs_state_req = ['_' => 'msgs_state_req', 'msg_ids' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msgs_state_req={_='msgs_state_req', msg_ids={long}, }
+
+```
+
 

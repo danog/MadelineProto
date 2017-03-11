@@ -11,7 +11,7 @@ description: channelParticipantCreator attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: channelParticipantCreator attributes, type and example
 ```
 $channelParticipantCreator = ['_' => 'channelParticipantCreator', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channelParticipantCreator={_='channelParticipantCreator', user_id=int, }
+
+```
+
 

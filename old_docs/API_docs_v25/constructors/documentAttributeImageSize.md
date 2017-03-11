@@ -11,8 +11,8 @@ description: documentAttributeImageSize attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: documentAttributeImageSize attributes, type and example
 ```
 $documentAttributeImageSize = ['_' => 'documentAttributeImageSize', 'w' => int, 'h' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeImageSize={_='documentAttributeImageSize', w=int, h=int, }
+
+```
+
 

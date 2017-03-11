@@ -10,7 +10,7 @@ description: photos.deletePhotos parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [InputPhoto](../types/InputPhoto.md) | Required|
+|id|Array of [InputPhoto](../types/InputPhoto.md) | Yes|
 
 
 ### Return type: [Vector\_of\_long](../types/long.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_long = $MadelineProto->photos->deletePhotos(['id' => [InputPhoto], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_long = photos.deletePhotos({id={InputPhoto}, })
+```
+

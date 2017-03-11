@@ -13,8 +13,8 @@ description: peerNotifySettings attributes, type and example
 |----------|:-------------:|---------:|
 |show\_previews|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
-|mute\_until|[int](../types/int.md) | Required|
-|sound|[string](../types/string.md) | Required|
+|mute\_until|[int](../types/int.md) | Yes|
+|sound|[string](../types/string.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: peerNotifySettings attributes, type and example
 ```
 $peerNotifySettings = ['_' => 'peerNotifySettings', 'show_previews' => true, 'silent' => true, 'mute_until' => int, 'sound' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+peerNotifySettings={_='peerNotifySettings', show_previews=true, silent=true, mute_until=int, sound=string, }
+
+```
+
 

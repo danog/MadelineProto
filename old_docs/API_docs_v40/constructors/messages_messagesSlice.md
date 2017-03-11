@@ -11,10 +11,10 @@ description: messages_messagesSlice attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|messages|Array of [Message](../types/Message.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|messages|Array of [Message](../types/Message.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: messages_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$messages_messagesSlice = ['_' => 'messages.messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_messagesSlice = ['_' => 'messages.messagesSlice', 'count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_messagesSlice={_='messages.messagesSlice', count=int, messages={Message}, chats={Chat}, users={User}, }
+
+```
+
 

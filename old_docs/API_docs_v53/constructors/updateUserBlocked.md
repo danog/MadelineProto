@@ -11,8 +11,8 @@ description: updateUserBlocked attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|blocked|[Bool](../types/Bool.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|blocked|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateUserBlocked attributes, type and example
 ```
 $updateUserBlocked = ['_' => 'updateUserBlocked', 'user_id' => int, 'blocked' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateUserBlocked={_='updateUserBlocked', user_id=int, blocked=Bool, }
+
+```
+
 

@@ -11,8 +11,8 @@ description: pageBlockList attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|ordered|[Bool](../types/Bool.md) | Required|
-|items|Array of [RichText](../types/RichText.md) | Required|
+|ordered|[Bool](../types/Bool.md) | Yes|
+|items|Array of [RichText](../types/RichText.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: pageBlockList attributes, type and example
 ### Example:
 
 ```
-$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [Vector t], ];
+$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [RichText], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockList={_='pageBlockList', ordered=Bool, items={RichText}, }
+
+```
+
 

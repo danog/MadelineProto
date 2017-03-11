@@ -11,7 +11,7 @@ description: pageBlockTitle attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockTitle attributes, type and example
 ```
 $pageBlockTitle = ['_' => 'pageBlockTitle', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockTitle={_='pageBlockTitle', text=RichText, }
+
+```
+
 

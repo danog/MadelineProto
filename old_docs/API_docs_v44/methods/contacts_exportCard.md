@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Vector_of_int = $MadelineProto->contacts->exportCard();
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_int = contacts.exportCard({})
+```
+

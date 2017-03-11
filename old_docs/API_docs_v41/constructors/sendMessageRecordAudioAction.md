@@ -19,3 +19,12 @@ description: sendMessageRecordAudioAction attributes, type and example
 $sendMessageRecordAudioAction = ['_' => 'sendMessageRecordAudioAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageRecordAudioAction={_='sendMessageRecordAudioAction', }
+
+```
+
+

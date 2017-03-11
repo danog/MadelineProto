@@ -19,3 +19,12 @@ description: inputPeerNotifyEventsEmpty attributes, type and example
 $inputPeerNotifyEventsEmpty = ['_' => 'inputPeerNotifyEventsEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPeerNotifyEventsEmpty={_='inputPeerNotifyEventsEmpty', }
+
+```
+
+

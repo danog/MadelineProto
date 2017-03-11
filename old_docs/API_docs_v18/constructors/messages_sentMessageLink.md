@@ -11,11 +11,11 @@ description: messages_sentMessageLink attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
-|links|Array of [contacts\_Link](../types/contacts_Link.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
+|links|Array of [contacts\_Link](../types/contacts_Link.md) | Yes|
 
 
 
@@ -25,6 +25,15 @@ description: messages_sentMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'pts' => int, 'seq' => int, 'links' => [Vector t], ];
+$messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'pts' => int, 'seq' => int, 'links' => [contacts.Link], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_sentMessageLink={_='messages.sentMessageLink', id=int, date=int, pts=int, seq=int, links={contacts.Link}, }
+
+```
+
 

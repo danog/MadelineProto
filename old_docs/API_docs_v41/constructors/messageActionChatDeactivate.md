@@ -19,3 +19,12 @@ description: messageActionChatDeactivate attributes, type and example
 $messageActionChatDeactivate = ['_' => 'messageActionChatDeactivate', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageActionChatDeactivate={_='messageActionChatDeactivate', }
+
+```
+
+

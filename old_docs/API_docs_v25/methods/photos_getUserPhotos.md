@@ -10,10 +10,10 @@ description: photos.getUserPhotos parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|offset|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [photos\_Photos](../types/photos_Photos.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $photos_Photos = $MadelineProto->photos->getUserPhotos(['user_id' => InputUser, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+photos_Photos = photos.getUserPhotos({user_id=InputUser, offset=int, max_id=int, limit=int, })
+```
+

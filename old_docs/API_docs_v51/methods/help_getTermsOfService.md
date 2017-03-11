@@ -10,7 +10,7 @@ description: help.getTermsOfService parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|lang\_code|[string](../types/string.md) | Required|
+|lang\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_TermsOfService](../types/help_TermsOfService.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $help_TermsOfService = $MadelineProto->help->getTermsOfService(['lang_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+help_TermsOfService = help.getTermsOfService({lang_code=string, })
+```
+

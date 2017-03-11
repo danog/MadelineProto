@@ -10,8 +10,8 @@ description: channels.exportMessageLink parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|id|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [ExportedMessageLink](../types/ExportedMessageLink.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $ExportedMessageLink = $MadelineProto->channels->exportMessageLink(['channel' => InputChannel, 'id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+ExportedMessageLink = channels.exportMessageLink({channel=InputChannel, id=int, })
+```
+

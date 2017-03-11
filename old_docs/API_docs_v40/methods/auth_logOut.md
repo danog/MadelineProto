@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->auth->logOut();
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = auth.logOut({})
+```
+

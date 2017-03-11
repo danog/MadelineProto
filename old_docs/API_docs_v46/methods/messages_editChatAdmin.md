@@ -10,9 +10,9 @@ description: messages.editChatAdmin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|is\_admin|[Bool](../types/Bool.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|is\_admin|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->editChatAdmin(['chat_id' => int, 'user_id' => InputUser, 'is_admin' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.editChatAdmin({chat_id=int, user_id=InputUser, is_admin=Bool, })
+```
+

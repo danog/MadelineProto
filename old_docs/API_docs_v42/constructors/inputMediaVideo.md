@@ -11,8 +11,8 @@ description: inputMediaVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputVideo](../types/InputVideo.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|id|[InputVideo](../types/InputVideo.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaVideo attributes, type and example
 ```
 $inputMediaVideo = ['_' => 'inputMediaVideo', 'id' => InputVideo, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaVideo={_='inputMediaVideo', id=InputVideo, caption=string, }
+
+```
+
 

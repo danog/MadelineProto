@@ -11,8 +11,8 @@ description: pong attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_id|[long](../types/long.md) | Required|
-|ping\_id|[long](../types/long.md) | Required|
+|msg\_id|[long](../types/long.md) | Yes|
+|ping\_id|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: pong attributes, type and example
 ```
 $pong = ['_' => 'pong', 'msg_id' => long, 'ping_id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pong={_='pong', msg_id=long, ping_id=long, }
+
+```
+
 

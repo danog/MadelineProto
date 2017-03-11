@@ -24,6 +24,13 @@ description: PHP implementation of telegram\'s MTProto protocol
 
 $docs = [
     [
+        'tl_schema'   => ['td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
+        'title'       => 'MadelineProto API documentation (td-lib)',
+        'description' => 'MadelineProto API documentation (td-lib)',
+        'output_dir'  => __DIR__.'/docs/TD_docs',
+        'readme'      => false,
+    ],
+    [
         'tl_schema'   => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
@@ -31,7 +38,7 @@ $docs = [
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v62.tl'],
+        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v62.tl', 'secret' => __DIR__.'/src/danog/MadelineProto/TL_secret.tl','td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
         'title'       => 'MadelineProto API documentation (layer 62)',
         'description' => 'MadelineProto API documentation (layer 62)',
         'output_dir'  => __DIR__.'/docs/API_docs',
@@ -61,7 +68,7 @@ description: Documentation of old mtproto layers
 
 '.$layer_list);
 
-$doc = new \danog\MadelineProto\AnnotationsBuilder($docs[1]);
+$doc = new \danog\MadelineProto\AnnotationsBuilder($docs[2]);
 $doc->mk_annotations();
 
 foreach ($docs as $settings) {

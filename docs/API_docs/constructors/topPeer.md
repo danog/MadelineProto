@@ -11,8 +11,8 @@ description: topPeer attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[Peer](../types/Peer.md) | Required|
-|rating|[double](../types/double.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
+|rating|[double](../types/double.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: topPeer attributes, type and example
 ```
 $topPeer = ['_' => 'topPeer', 'peer' => Peer, 'rating' => double, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+topPeer={_='topPeer', peer=Peer, rating=double, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: privacyValueDisallowUsers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|users|Array of [int](../types/int.md) | Required|
+|users|Array of [int](../types/int.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: privacyValueDisallowUsers attributes, type and example
 ### Example:
 
 ```
-$privacyValueDisallowUsers = ['_' => 'privacyValueDisallowUsers', 'users' => [Vector t], ];
+$privacyValueDisallowUsers = ['_' => 'privacyValueDisallowUsers', 'users' => [int], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+privacyValueDisallowUsers={_='privacyValueDisallowUsers', users={int}, }
+
+```
+
 

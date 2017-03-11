@@ -11,8 +11,8 @@ description: inputMediaPhotoExternal attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaPhotoExternal attributes, type and example
 ```
 $inputMediaPhotoExternal = ['_' => 'inputMediaPhotoExternal', 'url' => string, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaPhotoExternal={_='inputMediaPhotoExternal', url=string, caption=string, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: replyInlineMarkup attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Required|
+|rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: replyInlineMarkup attributes, type and example
 ### Example:
 
 ```
-$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [Vector t], ];
+$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [KeyboardButtonRow], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+replyInlineMarkup={_='replyInlineMarkup', rows={KeyboardButtonRow}, }
+
+```
+
 

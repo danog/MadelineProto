@@ -11,8 +11,8 @@ description: msgs_state_info attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|req\_msg\_id|[long](../types/long.md) | Required|
-|info|[bytes](../types/bytes.md) | Required|
+|req\_msg\_id|[long](../types/long.md) | Yes|
+|info|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: msgs_state_info attributes, type and example
 ```
 $msgs_state_info = ['_' => 'msgs_state_info', 'req_msg_id' => long, 'info' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msgs_state_info={_='msgs_state_info', req_msg_id=long, info=bytes, }
+
+```
+
 

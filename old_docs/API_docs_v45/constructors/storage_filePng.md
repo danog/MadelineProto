@@ -19,3 +19,12 @@ description: storage_filePng attributes, type and example
 $storage_filePng = ['_' => 'storage.filePng', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_filePng={_='storage.filePng', }
+
+```
+
+

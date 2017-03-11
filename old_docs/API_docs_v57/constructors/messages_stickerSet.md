@@ -11,9 +11,9 @@ description: messages_stickerSet attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|set|[StickerSet](../types/StickerSet.md) | Required|
-|packs|Array of [StickerPack](../types/StickerPack.md) | Required|
-|documents|Array of [Document](../types/Document.md) | Required|
+|set|[StickerSet](../types/StickerSet.md) | Yes|
+|packs|Array of [StickerPack](../types/StickerPack.md) | Yes|
+|documents|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: messages_stickerSet attributes, type and example
 ### Example:
 
 ```
-$messages_stickerSet = ['_' => 'messages.stickerSet', 'set' => StickerSet, 'packs' => [Vector t], 'documents' => [Vector t], ];
+$messages_stickerSet = ['_' => 'messages.stickerSet', 'set' => StickerSet, 'packs' => [StickerPack], 'documents' => [Document], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_stickerSet={_='messages.stickerSet', set=StickerSet, packs={StickerPack}, documents={Document}, }
+
+```
+
 

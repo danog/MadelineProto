@@ -10,7 +10,7 @@ description: messages.getSavedGifs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_SavedGifs](../types/messages_SavedGifs.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_SavedGifs = $MadelineProto->messages->getSavedGifs(['hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_SavedGifs = messages.getSavedGifs({hash=int, })
+```
+

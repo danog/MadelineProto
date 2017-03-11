@@ -27,3 +27,12 @@ description: account_passwordInputSettings attributes, type and example
 $account_passwordInputSettings = ['_' => 'account.passwordInputSettings', 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+account_passwordInputSettings={_='account.passwordInputSettings', new_salt=bytes, new_password_hash=bytes, hint=string, email=string, }
+
+```
+
+

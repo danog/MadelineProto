@@ -19,3 +19,12 @@ description: updateStickerSets attributes, type and example
 $updateStickerSets = ['_' => 'updateStickerSets', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updateStickerSets={_='updateStickerSets', }
+
+```
+
+

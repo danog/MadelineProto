@@ -19,3 +19,12 @@ description: storage_filePartial attributes, type and example
 $storage_filePartial = ['_' => 'storage.filePartial', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_filePartial={_='storage.filePartial', }
+
+```
+
+

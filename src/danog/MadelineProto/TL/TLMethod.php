@@ -29,7 +29,7 @@ class TLMethod extends TLParams
         $this->params[$this->key] = $json_dict['params'];
         $namespace = explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
-            $this->method_namespace[$namespace[0]] = $namespace[0];
+            $this->method_namespace[$namespace[1]] = $namespace[0];
         }
 
         $this->parse_params($this->key);
@@ -40,6 +40,16 @@ class TLMethod extends TLParams
     {
         $key = array_search($method, $this->method);
 
+        return ($key === false) ? false : [
+            'id'                => $this->id[$key],
+            'method'            => $this->method[$key],
+            'type'              => $this->type[$key],
+            'params'            => $this->params[$key],
+        ];
+    }
+    public function find_by_id($id)
+    {
+        $key = array_search($id, $this->id);
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],

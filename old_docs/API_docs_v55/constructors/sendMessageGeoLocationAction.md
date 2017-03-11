@@ -19,3 +19,12 @@ description: sendMessageGeoLocationAction attributes, type and example
 $sendMessageGeoLocationAction = ['_' => 'sendMessageGeoLocationAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageGeoLocationAction={_='sendMessageGeoLocationAction', }
+
+```
+
+

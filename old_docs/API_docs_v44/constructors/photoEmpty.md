@@ -11,7 +11,7 @@ description: photoEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: photoEmpty attributes, type and example
 ```
 $photoEmpty = ['_' => 'photoEmpty', 'id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photoEmpty={_='photoEmpty', id=long, }
+
+```
+
 

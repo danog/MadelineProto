@@ -11,8 +11,8 @@ description: auth_exportedAuthorization attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|bytes|[bytes](../types/bytes.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|bytes|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: auth_exportedAuthorization attributes, type and example
 ```
 $auth_exportedAuthorization = ['_' => 'auth.exportedAuthorization', 'id' => int, 'bytes' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_exportedAuthorization={_='auth.exportedAuthorization', id=int, bytes=bytes, }
+
+```
+
 

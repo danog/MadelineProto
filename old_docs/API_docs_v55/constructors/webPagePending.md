@@ -11,8 +11,8 @@ description: webPagePending attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|date|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: webPagePending attributes, type and example
 ```
 $webPagePending = ['_' => 'webPagePending', 'id' => long, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+webPagePending={_='webPagePending', id=long, date=int, }
+
+```
+
 

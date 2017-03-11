@@ -19,3 +19,12 @@ description: notifyUsers attributes, type and example
 $notifyUsers = ['_' => 'notifyUsers', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+notifyUsers={_='notifyUsers', }
+
+```
+
+

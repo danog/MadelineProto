@@ -11,8 +11,8 @@ description: inputGameShortName attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|bot\_id|[InputUser](../types/InputUser.md) | Required|
-|short\_name|[string](../types/string.md) | Required|
+|bot\_id|[InputUser](../types/InputUser.md) | Yes|
+|short\_name|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputGameShortName attributes, type and example
 ```
 $inputGameShortName = ['_' => 'inputGameShortName', 'bot_id' => InputUser, 'short_name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputGameShortName={_='inputGameShortName', bot_id=InputUser, short_name=string, }
+
+```
+
 

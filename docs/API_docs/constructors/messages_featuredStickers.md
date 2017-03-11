@@ -11,9 +11,9 @@ description: messages_featuredStickers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
-|sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Required|
-|unread|Array of [long](../types/long.md) | Required|
+|hash|[int](../types/int.md) | Yes|
+|sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Yes|
+|unread|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: messages_featuredStickers attributes, type and example
 ### Example:
 
 ```
-$messages_featuredStickers = ['_' => 'messages.featuredStickers', 'hash' => int, 'sets' => [Vector t], 'unread' => [Vector t], ];
+$messages_featuredStickers = ['_' => 'messages.featuredStickers', 'hash' => int, 'sets' => [StickerSetCovered], 'unread' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_featuredStickers={_='messages.featuredStickers', hash=int, sets={StickerSetCovered}, unread={long}, }
+
+```
+
 

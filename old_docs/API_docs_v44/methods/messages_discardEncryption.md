@@ -10,7 +10,7 @@ description: messages.discardEncryption parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->discardEncryption(['chat_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.discardEncryption({chat_id=int, })
+```
+

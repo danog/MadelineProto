@@ -11,7 +11,7 @@ description: msg_resend_req attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_ids|Array of [long](../types/long.md) | Required|
+|msg\_ids|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: msg_resend_req attributes, type and example
 ### Example:
 
 ```
-$msg_resend_req = ['_' => 'msg_resend_req', 'msg_ids' => [Vector t], ];
+$msg_resend_req = ['_' => 'msg_resend_req', 'msg_ids' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msg_resend_req={_='msg_resend_req', msg_ids={long}, }
+
+```
+
 

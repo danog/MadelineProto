@@ -10,7 +10,7 @@ description: messages.getMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [int](../types/int.md) | Required|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->messages->getMessages(['id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = messages.getMessages({id={int}, })
+```
+

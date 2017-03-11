@@ -11,10 +11,10 @@ description: inputMediaUploadedDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
-|attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
+|attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: inputMediaUploadedDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [Vector t], 'caption' => string, ];
+$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaUploadedDocument={_='inputMediaUploadedDocument', file=InputFile, mime_type=string, attributes={DocumentAttribute}, caption=string, }
+
+```
+
 

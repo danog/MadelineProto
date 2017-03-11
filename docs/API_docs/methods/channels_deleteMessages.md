@@ -10,8 +10,8 @@ description: channels.deleteMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|id|Array of [int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_AffectedMessages = $MadelineProto->channels->deleteMessages(['channel' => InputChannel, 'id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedMessages = channels.deleteMessages({channel=InputChannel, id={int}, })
+```
+

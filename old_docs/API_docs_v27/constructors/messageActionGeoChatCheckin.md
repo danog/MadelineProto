@@ -19,3 +19,12 @@ description: messageActionGeoChatCheckin attributes, type and example
 $messageActionGeoChatCheckin = ['_' => 'messageActionGeoChatCheckin', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageActionGeoChatCheckin={_='messageActionGeoChatCheckin', }
+
+```
+
+

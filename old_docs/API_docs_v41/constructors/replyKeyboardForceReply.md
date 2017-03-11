@@ -25,3 +25,12 @@ description: replyKeyboardForceReply attributes, type and example
 $replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply', 'single_use' => true, 'selective' => true, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+replyKeyboardForceReply={_='replyKeyboardForceReply', single_use=true, selective=true, }
+
+```
+
+

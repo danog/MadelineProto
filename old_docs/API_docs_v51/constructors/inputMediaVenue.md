@@ -11,11 +11,11 @@ description: inputMediaVenue attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Required|
-|title|[string](../types/string.md) | Required|
-|address|[string](../types/string.md) | Required|
-|provider|[string](../types/string.md) | Required|
-|venue\_id|[string](../types/string.md) | Required|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|address|[string](../types/string.md) | Yes|
+|provider|[string](../types/string.md) | Yes|
+|venue\_id|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: inputMediaVenue attributes, type and example
 ```
 $inputMediaVenue = ['_' => 'inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaVenue={_='inputMediaVenue', geo_point=InputGeoPoint, title=string, address=string, provider=string, venue_id=string, }
+
+```
+
 

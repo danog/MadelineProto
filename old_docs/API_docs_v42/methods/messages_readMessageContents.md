@@ -10,7 +10,7 @@ description: messages.readMessageContents parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [int](../types/int.md) | Required|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_AffectedMessages = $MadelineProto->messages->readMessageContents(['id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedMessages = messages.readMessageContents({id={int}, })
+```
+

@@ -18,15 +18,17 @@ class TLConstructor extends TLParams
     public $predicate = [];
     public $type = [];
     public $params = [];
+    public $layer = [];
     public $key = 0;
 
-    public function add($json_dict, $mtproto)
+    public function add($json_dict, $scheme_type)
     {
         $this->id[$this->key] = (int) $json_dict['id'];
-        $this->predicate[$this->key] = (string) ((($mtproto && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
-        $this->type[$this->key] = (($mtproto && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
+        $this->predicate[$this->key] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
+        $this->type[$this->key] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
-        $this->parse_params($this->key, $mtproto);
+        if ($scheme_type === 'secret') $this->layer[$this->key] = $json_dict['layer'];
+        $this->parse_params($this->key, $scheme_type === 'mtproto');
         $this->key++;
     }
 
@@ -42,9 +44,16 @@ class TLConstructor extends TLParams
         ];
     }
 
-    public function find_by_predicate($predicate)
+    public function find_by_predicate($predicate, $layer = -1)
     {
-        $key = array_search($predicate, $this->predicate);
+        if ($layer !== -1) {
+            $key = 0;
+            $keys = array_keys($this->predicate, $predicate);
+            foreach ($keys as $k) {
+                if ($this->layer[$k] === $layer) $key = $k;
+            }
+            if ($key === 0) $key = array_search($predicate, $this->predicate);
+        } else $key = array_search($predicate, $this->predicate);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],

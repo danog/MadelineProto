@@ -11,8 +11,8 @@ description: inputGeoPoint attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|lat|[double](../types/double.md) | Required|
-|long|[double](../types/double.md) | Required|
+|lat|[double](../types/double.md) | Yes|
+|long|[double](../types/double.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputGeoPoint attributes, type and example
 ```
 $inputGeoPoint = ['_' => 'inputGeoPoint', 'lat' => double, 'long' => double, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputGeoPoint={_='inputGeoPoint', lat=double, long=double, }
+
+```
+
 

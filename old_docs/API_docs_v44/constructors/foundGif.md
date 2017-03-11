@@ -11,7 +11,7 @@ description: foundGif attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|webpage|[WebPage](../types/WebPage.md) | Required|
+|webpage|[WebPage](../types/WebPage.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: foundGif attributes, type and example
 ```
 $foundGif = ['_' => 'foundGif', 'webpage' => WebPage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+foundGif={_='foundGif', webpage=WebPage, }
+
+```
+
 

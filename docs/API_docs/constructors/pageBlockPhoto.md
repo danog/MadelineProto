@@ -11,8 +11,8 @@ description: pageBlockPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo\_id|[long](../types/long.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|photo\_id|[long](../types/long.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: pageBlockPhoto attributes, type and example
 ```
 $pageBlockPhoto = ['_' => 'pageBlockPhoto', 'photo_id' => long, 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockPhoto={_='pageBlockPhoto', photo_id=long, caption=RichText, }
+
+```
+
 

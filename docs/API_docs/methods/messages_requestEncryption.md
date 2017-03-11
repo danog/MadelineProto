@@ -10,8 +10,8 @@ description: messages.requestEncryption parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|g\_a|[bytes](../types/bytes.md) | Required|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|g\_a|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [EncryptedChat](../types/EncryptedChat.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'g_a' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+EncryptedChat = messages.requestEncryption({user_id=InputUser, g_a=bytes, })
+```
+

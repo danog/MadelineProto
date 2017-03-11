@@ -10,12 +10,12 @@ description: messages.getHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|offset\_id|[int](../types/int.md) | Required|
-|add\_offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|min\_id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|offset\_id|[int](../types/int.md) | Yes|
+|add\_offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|min\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -40,3 +40,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->messages->getHistory(['peer' => InputPeer, 'offset_id' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = messages.getHistory({peer=InputPeer, offset_id=int, add_offset=int, limit=int, max_id=int, min_id=int, })
+```
+

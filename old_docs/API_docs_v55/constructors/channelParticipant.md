@@ -11,8 +11,8 @@ description: channelParticipant attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: channelParticipant attributes, type and example
 ```
 $channelParticipant = ['_' => 'channelParticipant', 'user_id' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channelParticipant={_='channelParticipant', user_id=int, date=int, }
+
+```
+
 

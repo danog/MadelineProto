@@ -10,8 +10,8 @@ description: account.reportPeer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|reason|[ReportReason](../types/ReportReason.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|reason|[ReportReason](../types/ReportReason.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->reportPeer(['peer' => InputPeer, 'reason' => ReportReason, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.reportPeer({peer=InputPeer, reason=ReportReason, })
+```
+

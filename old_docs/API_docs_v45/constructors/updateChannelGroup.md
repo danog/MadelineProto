@@ -11,8 +11,8 @@ description: updateChannelGroup attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
-|group|[MessageGroup](../types/MessageGroup.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
+|group|[MessageGroup](../types/MessageGroup.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateChannelGroup attributes, type and example
 ```
 $updateChannelGroup = ['_' => 'updateChannelGroup', 'channel_id' => int, 'group' => MessageGroup, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateChannelGroup={_='updateChannelGroup', channel_id=int, group=MessageGroup, }
+
+```
+
 

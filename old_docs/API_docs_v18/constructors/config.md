@@ -11,12 +11,12 @@ description: config attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|date|[int](../types/int.md) | Required|
-|test\_mode|[Bool](../types/Bool.md) | Required|
-|this\_dc|[int](../types/int.md) | Required|
-|dc\_options|Array of [DcOption](../types/DcOption.md) | Required|
-|chat\_size\_max|[int](../types/int.md) | Required|
-|broadcast\_size\_max|[int](../types/int.md) | Required|
+|date|[int](../types/int.md) | Yes|
+|test\_mode|[Bool](../types/Bool.md) | Yes|
+|this\_dc|[int](../types/int.md) | Yes|
+|dc\_options|Array of [DcOption](../types/DcOption.md) | Yes|
+|chat\_size\_max|[int](../types/int.md) | Yes|
+|broadcast\_size\_max|[int](../types/int.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: config attributes, type and example
 ### Example:
 
 ```
-$config = ['_' => 'config', 'date' => int, 'test_mode' => Bool, 'this_dc' => int, 'dc_options' => [Vector t], 'chat_size_max' => int, 'broadcast_size_max' => int, ];
+$config = ['_' => 'config', 'date' => int, 'test_mode' => Bool, 'this_dc' => int, 'dc_options' => [DcOption], 'chat_size_max' => int, 'broadcast_size_max' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+config={_='config', date=int, test_mode=Bool, this_dc=int, dc_options={DcOption}, chat_size_max=int, broadcast_size_max=int, }
+
+```
+
 

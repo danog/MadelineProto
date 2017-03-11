@@ -28,9 +28,12 @@ class MTProto
     use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
+    use \danog\MadelineProto\MTProtoTools\Files;
     use \danog\MadelineProto\TL\TL;
-    use \danog\MadelineProto\TL\Files;
-    use \danog\MadelineProto\TL\Extension;
+    use \danog\MadelineProto\Conversion\BotAPI;
+    use \danog\MadelineProto\Conversion\BotAPIFiles;
+    use \danog\MadelineProto\Conversion\Extension;
+    use \danog\MadelineProto\Conversion\TD;
     use \danog\MadelineProto\Tools;
 
     public $settings = [];
@@ -57,6 +60,17 @@ class MTProto
         // Istantiate TL class
         \danog\MadelineProto\Logger::log(['Translating tl schemas...'], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
+                /*
+                * ***********************************************************************
+                * Define some needed numbers for BigInteger
+                */
+        \danog\MadelineProto\Logger::log(['Executing dh_prime checks (0/3)...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->one = new \phpseclib\Math\BigInteger(1);
+        //$two = new \phpseclib\Math\BigInteger(2);
+        $this->twoe1984 = new \phpseclib\Math\BigInteger('1751908409537131537220509645351687597690304110853111572994449976845956819751541616602568796259317428464425605223064365804210081422215355425149431390635151955247955156636234741221447435733643262808668929902091770092492911737768377135426590363166295684370498604708288556044687341394398676292971255828404734517580702346564613427770683056761383955397564338690628093211465848244049196353703022640400205739093118270803778352768276670202698397214556629204420309965547056893233608758387329699097930255380715679250799950923553703740673620901978370802540218870279314810722790539899334271514365444369275682816');
+        $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
+        $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
+
 
         $this->switch_dc(2, true);
         $this->get_config();
@@ -177,7 +191,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'api_hash'        => '4251a2777e179232705e2462706f4143',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
-                'app_version'     => 'Unicorn', // 🌚
+//                'app_version'     => 'Unicorn', // 🌚
+                'app_version'     => $this->getV(),
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
@@ -185,6 +200,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'src'           => [
                     'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
                     'telegram' => __DIR__.'/TL_telegram_v62.tl', // telegram TL scheme
+                    'secret' => __DIR__.'/TL_secret.tl', // secret chats TL scheme
+                    'td' => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
                 ],
             ],
             'logger'       => [ // Logger settings
@@ -209,13 +226,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'wait_if_lt'    => 20, // Sleeps if flood block time is lower than this
             ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-                'incoming' => 1000,
-                'outgoing' => 1000,
+                'incoming' => 200,
+                'outgoing' => 200,
             ],
             'peer'      => ['full_info_cache_time' => 60],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+            ],
+            'secret_chats' => [
+                'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
@@ -365,6 +385,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 1;
+        return 2;
+    }
+    public function get_self() {
+        return $this->datacenter->authorization['user'];
     }
 }

@@ -10,8 +10,8 @@ description: contacts.search parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|q|[string](../types/string.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|q|[string](../types/string.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [contacts\_Found](../types/contacts_Found.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $contacts_Found = $MadelineProto->contacts->search(['q' => string, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_Found = contacts.search({q=string, limit=int, })
+```
+

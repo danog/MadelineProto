@@ -23,3 +23,12 @@ description: replyKeyboardHide attributes, type and example
 $replyKeyboardHide = ['_' => 'replyKeyboardHide', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+replyKeyboardHide={_='replyKeyboardHide', }
+
+```
+
+

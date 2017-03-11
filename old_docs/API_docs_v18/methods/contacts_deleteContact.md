@@ -10,7 +10,7 @@ description: contacts.deleteContact parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputUser](../types/InputUser.md) | Required|
+|id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [contacts\_Link](../types/contacts_Link.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $contacts_Link = $MadelineProto->contacts->deleteContact(['id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_Link = contacts.deleteContact({id=InputUser, })
+```
+

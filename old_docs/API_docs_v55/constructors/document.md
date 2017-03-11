@@ -11,15 +11,15 @@ description: document attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|date|[int](../types/int.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
-|size|[int](../types/int.md) | Required|
-|thumb|[PhotoSize](../types/PhotoSize.md) | Required|
-|dc\_id|[int](../types/int.md) | Required|
-|version|[int](../types/int.md) | Required|
-|attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
+|size|[int](../types/int.md) | Yes|
+|thumb|[PhotoSize](../types/PhotoSize.md) | Yes|
+|dc\_id|[int](../types/int.md) | Yes|
+|version|[int](../types/int.md) | Yes|
+|attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 
 
 
@@ -29,6 +29,15 @@ description: document attributes, type and example
 ### Example:
 
 ```
-$document = ['_' => 'document', 'id' => long, 'access_hash' => long, 'date' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'version' => int, 'attributes' => [Vector t], ];
+$document = ['_' => 'document', 'id' => long, 'access_hash' => long, 'date' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'version' => int, 'attributes' => [DocumentAttribute], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+document={_='document', id=long, access_hash=long, date=int, mime_type=string, size=int, thumb=PhotoSize, dc_id=int, version=int, attributes={DocumentAttribute}, }
+
+```
+
 

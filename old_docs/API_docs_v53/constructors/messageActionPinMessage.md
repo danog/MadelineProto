@@ -19,3 +19,12 @@ description: messageActionPinMessage attributes, type and example
 $messageActionPinMessage = ['_' => 'messageActionPinMessage', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageActionPinMessage={_='messageActionPinMessage', }
+
+```
+
+

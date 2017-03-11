@@ -10,9 +10,9 @@ description: messages.getMessagesViews parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|Array of [int](../types/int.md) | Required|
-|increment|[Bool](../types/Bool.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|Array of [int](../types/int.md) | Yes|
+|increment|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Vector_of_int = $MadelineProto->messages->getMessagesViews(['peer' => InputPeer, 'id' => [int], 'increment' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_int = messages.getMessagesViews({peer=InputPeer, id={int}, increment=Bool, })
+```
+

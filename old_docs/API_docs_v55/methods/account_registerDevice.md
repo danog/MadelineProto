@@ -10,8 +10,8 @@ description: account.registerDevice parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|token\_type|[int](../types/int.md) | Required|
-|token|[string](../types/string.md) | Required|
+|token\_type|[int](../types/int.md) | Yes|
+|token|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->registerDevice(['token_type' => int, 'token' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.registerDevice({token_type=int, token=string, })
+```
+

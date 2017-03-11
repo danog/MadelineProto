@@ -10,8 +10,8 @@ description: channels.readHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->channels->readHistory(['channel' => InputChannel, 'max_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = channels.readHistory({channel=InputChannel, max_id=int, })
+```
+

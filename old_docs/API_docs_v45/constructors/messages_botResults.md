@@ -12,9 +12,9 @@ description: messages_botResults attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |gallery|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
 |next\_offset|[string](../types/string.md) | Optional|
-|results|Array of [BotInlineResult](../types/BotInlineResult.md) | Required|
+|results|Array of [BotInlineResult](../types/BotInlineResult.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'results' => [Vector t], ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'results' => [BotInlineResult], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_botResults={_='messages.botResults', gallery=true, query_id=long, next_offset=string, results={BotInlineResult}, }
+
+```
+
 

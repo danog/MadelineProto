@@ -12,8 +12,8 @@ description: keyboardButtonSwitchInline attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |same\_peer|[Bool](../types/Bool.md) | Optional|
-|text|[string](../types/string.md) | Required|
-|query|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
+|query|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: keyboardButtonSwitchInline attributes, type and example
 ```
 $keyboardButtonSwitchInline = ['_' => 'keyboardButtonSwitchInline', 'same_peer' => true, 'text' => string, 'query' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonSwitchInline={_='keyboardButtonSwitchInline', same_peer=true, text=string, query=string, }
+
+```
+
 

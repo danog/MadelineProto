@@ -10,10 +10,10 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|caption|[string](../types/string.md) | Required|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Required|
-|crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
 
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, 'caption' => string, 'geo_point' => InputGeoPoint, 'crop' => InputPhotoCrop, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+photos_Photo = photos.uploadProfilePhoto({file=InputFile, caption=string, geo_point=InputGeoPoint, crop=InputPhotoCrop, })
+```
+

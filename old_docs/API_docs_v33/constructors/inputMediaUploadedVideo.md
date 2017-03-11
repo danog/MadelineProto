@@ -11,11 +11,11 @@ description: inputMediaUploadedVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: inputMediaUploadedVideo attributes, type and example
 ```
 $inputMediaUploadedVideo = ['_' => 'inputMediaUploadedVideo', 'file' => InputFile, 'duration' => int, 'w' => int, 'h' => int, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaUploadedVideo={_='inputMediaUploadedVideo', file=InputFile, duration=int, w=int, h=int, caption=string, }
+
+```
+
 

@@ -18,7 +18,10 @@ class DocsBuilder
 
     public function __construct($settings)
     {
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
+        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) $this->constructors = $this->td_constructors;
+        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) $this->methods = $this->td_methods;
         $this->settings = $settings;
         if (!file_exists($this->settings['output_dir'])) {
             mkdir($this->settings['output_dir']);
@@ -30,7 +33,7 @@ class DocsBuilder
     public function mk_docs()
     {
         $types = [];
-
+//        $any = '*';
         \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents($this->index, '---
@@ -66,20 +69,24 @@ description: '.$this->settings['description'].'
         foreach ($this->methods->method as $key => $rmethod) {
             $method = str_replace('.', '_', $rmethod);
             $real_method = str_replace('.', '->', $rmethod);
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->methods->type[$key]);
+            $rtype = $this->methods->type[$key];
+            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
-
-            if (!isset($types[$real_type])) {
-                $types[$real_type] = ['constructors' => [], 'methods' => []];
+            if (!isset($types[$rtype])) {
+                $types[$rtype] = ['constructors' => [], 'methods' => []];
             }
-            if (!in_array($key, $types[$real_type]['methods'])) {
-                $types[$real_type]['methods'][] = $key;
+            if (!in_array($key, $types[$rtype]['methods'])) {
+                $types[$rtype]['methods'][] = $key;
             }
 
             $params = '';
             foreach ($this->methods->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id'])) {
+                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
+                }
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                    $param['name'] = 'message';
+                    $param['type'] = 'DecryptedMessage';
                 }
                 $stype = 'type';
                 $link_type = 'types';
@@ -110,43 +117,65 @@ description: '.$this->settings['description'].'
 ';
 
             $params = '';
+            $lua_params = '';
             $table = empty($this->methods->params[$key]) ? '' : '### Parameters:
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
+            if (isset($this->td_descriptions['methods'][$rmethod])) {
+                $table = '### Params:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+';
+            }
+
             $hasentities = false;
             foreach ($this->methods->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id'])) {
+                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                    $param['name'] = 'message';
+                    $param['type'] = 'DecryptedMessage';
+                }
+
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
                 switch ($ptype) {
                     case 'true':
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
-';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                if (isset($this->td_descriptions['methods'][$rmethod])) {
+                     $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
+                }
+                $table .= PHP_EOL;
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
+                $lua_params .= $param['name']."=";
+                $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
                     $table .= '|parse\_mode| [string](../types/string.md) | Optional |
 ';
                     $params .= "'parse_mode' => 'string', ";
+                    $lua_params .= "parse_mode='string', ";
                 }
             }
+            $description = isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'] : ($rmethod.' parameters, return type and example');
             $header = '---
 title: '.$rmethod.'
-description: '.$rmethod.' parameters, return type and example
+description: '.$description.'
 ---
 ## Method: '.str_replace('_', '\_', $rmethod).'  
 [Back to methods index](index.md)
 
 
 ';
+            $header .= isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
 
 ';
@@ -171,8 +200,15 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$'.$type.' = $MadelineProto->'.str_replace('_', '->', $method).'(['.$params.']);
+$'.$type.' = $MadelineProto->'.$real_method.'(['.$params.']);
 ```
+
+Or, if you\'re into Lua:
+
+```
+'.$type.' = '.$rmethod.'({'.$lua_params.'})
+```
+
 ');
             if ($hasentities) {
                 $example .= '
@@ -251,16 +287,27 @@ description: List of methods
             if (preg_match('/%/', $type)) {
                 $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
             }
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->constructors->type[$key]);
+            $layer = isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '';
+            $rtype = $this->constructors->type[$key];
+            if (!isset($types[$rtype])) {
+                $types[$rtype] = ['constructors' => [], 'methods' => []];
+            }
+            if (!in_array($key, $types[$rtype]['constructors'])) {
+                $types[$rtype]['constructors'][] = $key;
+            }
+            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
-
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
             $real_constructor = preg_replace('/.*_of_/', '', $constructor);
 
             $params = '';
             foreach ($this->constructors->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id'])) {
+                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
+                }
+                if ($type === 'EncryptedMessage' && $param['name'] === 'bytes') {
+                    $param['name'] = 'decrypted_message';
+                    $param['type'] = 'DecryptedMessage';
                 }
                 $stype = 'type';
                 $link_type = 'types';
@@ -289,27 +336,34 @@ description: List of methods
 
                 $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
             }
-            $md_constructor = str_replace('_', '\_', $constructor);
+            $md_constructor = str_replace('_', '\_', $constructor.$layer);
 
-            $constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$real_constructor.'.md) = \['.$params.'\];<a name="'.$constructor.'"></a>  
+            $constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$real_constructor.$layer.'.md) = \['.$params.'\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
 
-            if (!isset($types[$real_type])) {
-                $types[$real_type] = ['constructors' => [], 'methods' => []];
-            }
-            if (!in_array($key, $types[$real_type]['constructors'])) {
-                $types[$real_type]['constructors'][] = $key;
-            }
             $table = empty($this->constructors->params[$key]) ? '' : '### Attributes:
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 ';
+            if (isset($this->td_descriptions['constructors'][$rconstructor])) {
+                $table = '### Attributes:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+';
+            }
+
             $params = '';
+            $lua_params = '';
             foreach ($this->constructors->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id'])) {
+                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
+                }
+                if ($type === 'EncryptedMessage' && $param['name'] === 'bytes') {
+                    $param['name'] = 'decrypted_message';
+                    $param['type'] = 'DecryptedMessage';
                 }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
 
@@ -327,19 +381,25 @@ description: List of methods
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Required').'|
-';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                if (isset($this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']])) {
+                     $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
+                }
+                $table .= PHP_EOL;
 
                 $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$param['type'].']' : $param['type']).', ';
+                $params .= (isset($param['subtype']) ? '['.$param['subtype'].']' : $param['type']).', ';
+                $lua_params .= $param['name']."=";
+                $lua_params .= (isset($param['subtype']) ? '{'.$param['subtype'].'}' : $param['type']).', ';
             }
             $params = "['_' => '".$rconstructor."', ".$params.']';
-
+            $lua_params = "{_='".$rconstructor."', ".$lua_params.'}';
+            $description = isset($this->td_descriptions['constructors'][$rconstructor]) ? $this->td_descriptions['constructors'][$rconstructor]['description'] : ($constructor.' attributes, type and example');
             $header = '---
 title: '.$rconstructor.'
-description: '.$constructor.' attributes, type and example
+description: '.$description.'
 ---
-## Constructor: '.str_replace('_', '\_', $rconstructor).'  
+## Constructor: '.str_replace('_', '\_', $rconstructor.$layer).'  
 [Back to constructors index](index.md)
 
 
@@ -349,6 +409,10 @@ description: '.$constructor.' attributes, type and example
 
 
 ';
+            if (isset($this->td_descriptions['constructors'][$rconstructor])) {
+                $header .= $this->td_descriptions['constructors'][$rconstructor]['description'].PHP_EOL.PHP_EOL;
+            }
+
             $type = '### Type: ['.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md)
 
 
@@ -356,11 +420,20 @@ description: '.$constructor.' attributes, type and example
             $example = '### Example:
 
 ```
-$'.$constructor.' = '.$params.';
+$'.$constructor.$layer.' = '.$params.';
 ```  
 
+Or, if you\'re into Lua:  
+
+
+```
+'.$constructor.$layer.'='.$lua_params.'
+
+```
+
+
 ';
-            file_put_contents('constructors/'.$constructor.'.md', $header.$table.$type.$example);
+            file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
 
         \danog\MadelineProto\Logger::log(['Generating constructors index...'], \danog\MadelineProto\Logger::NOTICE);
@@ -398,25 +471,23 @@ description: List of constructors
         $index = '';
 
         \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
-
-        foreach ($types as $type => $keys) {
+        foreach ($types as $otype => $keys) {
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
-            $type = str_replace('.', '_', $type);
-
+            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
+            $type = preg_replace('/.*_of_/', '', $type);
             $index .= $br.'['.str_replace('_', '\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $key) {
-                $predicate = str_replace('.', '_', $this->constructors->predicate[$key]);
+                $predicate = str_replace('.', '_', $this->constructors->predicate[$key]).(isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '');
                 $md_predicate = str_replace('_', '\_', $predicate);
                 $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
             }
-
             $methods = '';
             foreach ($keys['methods'] as $key) {
                 $name = str_replace('.', '_', $this->methods->method[$key]);
@@ -425,6 +496,7 @@ description: List of constructors
 
 ';
             }
+            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : ('constructors and methods of typr '.$type);
 
             $header = '---
 title: '.$type.'
@@ -436,6 +508,7 @@ description: constructors and methods of type '.$type.'
 
 
 ';
+            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
                 $header .= 'The following syntaxes can also be used:
 
@@ -449,6 +522,16 @@ $'.$type.' = -10038575794; // bot API id (channels)
 $'.$type." = 'user#44700'; // tg-cli style id (users)
 $".$type." = 'chat#492772765'; // tg-cli style id (chats)
 $".$type." = 'channel#38575794'; // tg-cli style id (channels)
+```
+
+
+";
+            }
+            if (in_array($type, ['InputEncryptedChat'])) {
+                $header .= 'The following syntax can also be used:
+
+```
+$'.$type." = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
 ```
 
 
@@ -484,7 +567,7 @@ description: List of types
 
         file_put_contents('types/string.md', '---
 title: string
-description: A string of variable length
+description: A UTF8 string of variable length
 ---
 ## Type: string  
 [Back to constructor index](index.md)

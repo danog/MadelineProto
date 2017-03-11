@@ -11,7 +11,7 @@ description: pageBlockParagraph attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockParagraph attributes, type and example
 ```
 $pageBlockParagraph = ['_' => 'pageBlockParagraph', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockParagraph={_='pageBlockParagraph', text=RichText, }
+
+```
+
 

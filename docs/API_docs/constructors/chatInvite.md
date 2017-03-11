@@ -15,9 +15,9 @@ description: chatInvite attributes, type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |public|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
-|title|[string](../types/string.md) | Required|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
-|participants\_count|[int](../types/int.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|participants\_count|[int](../types/int.md) | Yes|
 |participants|Array of [User](../types/User.md) | Optional|
 
 
@@ -28,6 +28,15 @@ description: chatInvite attributes, type and example
 ### Example:
 
 ```
-$chatInvite = ['_' => 'chatInvite', 'channel' => true, 'broadcast' => true, 'public' => true, 'megagroup' => true, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'participants' => [Vector t], ];
+$chatInvite = ['_' => 'chatInvite', 'channel' => true, 'broadcast' => true, 'public' => true, 'megagroup' => true, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'participants' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatInvite={_='chatInvite', channel=true, broadcast=true, public=true, megagroup=true, title=string, photo=ChatPhoto, participants_count=int, participants={User}, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: photoSizeEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|type|[string](../types/string.md) | Required|
+|type|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: photoSizeEmpty attributes, type and example
 ```
 $photoSizeEmpty = ['_' => 'photoSizeEmpty', 'type' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photoSizeEmpty={_='photoSizeEmpty', type=string, }
+
+```
+
 

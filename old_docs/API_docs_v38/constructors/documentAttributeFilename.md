@@ -11,7 +11,7 @@ description: documentAttributeFilename attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file\_name|[string](../types/string.md) | Required|
+|file\_name|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: documentAttributeFilename attributes, type and example
 ```
 $documentAttributeFilename = ['_' => 'documentAttributeFilename', 'file_name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeFilename={_='documentAttributeFilename', file_name=string, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: webPageNotModified attributes, type and example
 $webPageNotModified = ['_' => 'webPageNotModified', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+webPageNotModified={_='webPageNotModified', }
+
+```
+
+

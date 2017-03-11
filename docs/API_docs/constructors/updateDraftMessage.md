@@ -11,8 +11,8 @@ description: updateDraftMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[Peer](../types/Peer.md) | Required|
-|draft|[DraftMessage](../types/DraftMessage.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
+|draft|[DraftMessage](../types/DraftMessage.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateDraftMessage attributes, type and example
 ```
 $updateDraftMessage = ['_' => 'updateDraftMessage', 'peer' => Peer, 'draft' => DraftMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateDraftMessage={_='updateDraftMessage', peer=Peer, draft=DraftMessage, }
+
+```
+
 

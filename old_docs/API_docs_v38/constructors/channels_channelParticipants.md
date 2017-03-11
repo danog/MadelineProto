@@ -11,9 +11,9 @@ description: channels_channelParticipants attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|participants|Array of [ChannelParticipant](../types/ChannelParticipant.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|participants|Array of [ChannelParticipant](../types/ChannelParticipant.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: channels_channelParticipants attributes, type and example
 ### Example:
 
 ```
-$channels_channelParticipants = ['_' => 'channels.channelParticipants', 'count' => int, 'participants' => [Vector t], 'users' => [Vector t], ];
+$channels_channelParticipants = ['_' => 'channels.channelParticipants', 'count' => int, 'participants' => [ChannelParticipant], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channels_channelParticipants={_='channels.channelParticipants', count=int, participants={ChannelParticipant}, users={User}, }
+
+```
+
 

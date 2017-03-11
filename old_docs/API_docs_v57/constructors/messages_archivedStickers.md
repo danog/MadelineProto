@@ -11,8 +11,8 @@ description: messages_archivedStickers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_archivedStickers attributes, type and example
 ### Example:
 
 ```
-$messages_archivedStickers = ['_' => 'messages.archivedStickers', 'count' => int, 'sets' => [Vector t], ];
+$messages_archivedStickers = ['_' => 'messages.archivedStickers', 'count' => int, 'sets' => [StickerSetCovered], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_archivedStickers={_='messages.archivedStickers', count=int, sets={StickerSetCovered}, }
+
+```
+
 

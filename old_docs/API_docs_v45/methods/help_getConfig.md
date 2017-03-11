@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Config = $MadelineProto->help->getConfig();
 ```
+
+Or, if you're into Lua:
+
+```
+Config = help.getConfig({})
+```
+

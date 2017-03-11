@@ -19,3 +19,12 @@ description: inputMessagesFilterDocument attributes, type and example
 $inputMessagesFilterDocument = ['_' => 'inputMessagesFilterDocument', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterDocument={_='inputMessagesFilterDocument', }
+
+```
+
+

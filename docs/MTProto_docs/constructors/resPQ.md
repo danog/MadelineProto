@@ -11,10 +11,10 @@ description: resPQ attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
-|server\_nonce|[int128](../types/int128.md) | Required|
-|pq|[bytes](../types/bytes.md) | Required|
-|server\_public\_key\_fingerprints|Array of [long](../types/long.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
+|server\_nonce|[int128](../types/int128.md) | Yes|
+|pq|[bytes](../types/bytes.md) | Yes|
+|server\_public\_key\_fingerprints|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: resPQ attributes, type and example
 ### Example:
 
 ```
-$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => bytes, 'server_public_key_fingerprints' => [Vector t], ];
+$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => bytes, 'server_public_key_fingerprints' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+resPQ={_='resPQ', nonce=int128, server_nonce=int128, pq=bytes, server_public_key_fingerprints={long}, }
+
+```
+
 

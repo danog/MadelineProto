@@ -11,7 +11,7 @@ description: gzip_packed attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|packed\_data|[bytes](../types/bytes.md) | Required|
+|packed\_data|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: gzip_packed attributes, type and example
 ```
 $gzip_packed = ['_' => 'gzip_packed', 'packed_data' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+gzip_packed={_='gzip_packed', packed_data=bytes, }
+
+```
+
 

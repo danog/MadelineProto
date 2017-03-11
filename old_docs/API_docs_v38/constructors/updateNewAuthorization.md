@@ -11,10 +11,10 @@ description: updateNewAuthorization attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|auth\_key\_id|[long](../types/long.md) | Required|
-|date|[int](../types/int.md) | Required|
-|device|[string](../types/string.md) | Required|
-|location|[string](../types/string.md) | Required|
+|auth\_key\_id|[long](../types/long.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|device|[string](../types/string.md) | Yes|
+|location|[string](../types/string.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: updateNewAuthorization attributes, type and example
 ```
 $updateNewAuthorization = ['_' => 'updateNewAuthorization', 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNewAuthorization={_='updateNewAuthorization', auth_key_id=long, date=int, device=string, location=string, }
+
+```
+
 

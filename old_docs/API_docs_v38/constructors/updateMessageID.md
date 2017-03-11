@@ -11,7 +11,7 @@ description: updateMessageID attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateMessageID attributes, type and example
 ```
 $updateMessageID = ['_' => 'updateMessageID', 'id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateMessageID={_='updateMessageID', id=int, }
+
+```
+
 

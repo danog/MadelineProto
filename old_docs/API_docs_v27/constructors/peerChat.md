@@ -11,7 +11,7 @@ description: peerChat attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: peerChat attributes, type and example
 ```
 $peerChat = ['_' => 'peerChat', 'chat_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+peerChat={_='peerChat', chat_id=int, }
+
+```
+
 

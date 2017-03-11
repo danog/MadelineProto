@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $auth_PasswordRecovery = $MadelineProto->auth->requestPasswordRecovery();
 ```
+
+Or, if you're into Lua:
+
+```
+auth_PasswordRecovery = auth.requestPasswordRecovery({})
+```
+

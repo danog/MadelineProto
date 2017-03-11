@@ -11,11 +11,11 @@ description: messages_peerDialogs attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|dialogs|Array of [Dialog](../types/Dialog.md) | Required|
-|messages|Array of [Message](../types/Message.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
-|state|[updates\_State](../types/updates_State.md) | Required|
+|dialogs|Array of [Dialog](../types/Dialog.md) | Yes|
+|messages|Array of [Message](../types/Message.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
+|state|[updates\_State](../types/updates_State.md) | Yes|
 
 
 
@@ -25,6 +25,15 @@ description: messages_peerDialogs attributes, type and example
 ### Example:
 
 ```
-$messages_peerDialogs = ['_' => 'messages.peerDialogs', 'dialogs' => [Vector t], 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$messages_peerDialogs = ['_' => 'messages.peerDialogs', 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'state' => updates.State, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_peerDialogs={_='messages.peerDialogs', dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}, state=updates.State, }
+
+```
+
 

@@ -10,8 +10,8 @@ description: messages.getMessageEditData parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_MessageEditData](../types/messages_MessageEditData.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_MessageEditData = $MadelineProto->messages->getMessageEditData(['peer' => InputPeer, 'id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_MessageEditData = messages.getMessageEditData({peer=InputPeer, id=int, })
+```
+

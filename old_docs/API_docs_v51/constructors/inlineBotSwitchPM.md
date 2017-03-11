@@ -11,8 +11,8 @@ description: inlineBotSwitchPM attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
-|start\_param|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
+|start\_param|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inlineBotSwitchPM attributes, type and example
 ```
 $inlineBotSwitchPM = ['_' => 'inlineBotSwitchPM', 'text' => string, 'start_param' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inlineBotSwitchPM={_='inlineBotSwitchPM', text=string, start_param=string, }
+
+```
+
 

@@ -10,10 +10,10 @@ description: phone.discardCall parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Required|
-|connection\_id|[long](../types/long.md) | Required|
+|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Yes|
+|connection\_id|[long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->phone->discardCall(['peer' => InputPhoneCall, 'duration' => int, 'reason' => PhoneCallDiscardReason, 'connection_id' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = phone.discardCall({peer=InputPhoneCall, duration=int, reason=PhoneCallDiscardReason, connection_id=long, })
+```
+

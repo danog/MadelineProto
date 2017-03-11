@@ -19,3 +19,12 @@ description: storage_fileUnknown attributes, type and example
 $storage_fileUnknown = ['_' => 'storage.fileUnknown', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_fileUnknown={_='storage.fileUnknown', }
+
+```
+
+

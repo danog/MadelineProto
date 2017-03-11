@@ -11,8 +11,8 @@ description: messageEntityBotCommand attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messageEntityBotCommand attributes, type and example
 ```
 $messageEntityBotCommand = ['_' => 'messageEntityBotCommand', 'offset' => int, 'length' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageEntityBotCommand={_='messageEntityBotCommand', offset=int, length=int, }
+
+```
+
 

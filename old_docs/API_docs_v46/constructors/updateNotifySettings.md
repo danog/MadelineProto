@@ -11,8 +11,8 @@ description: updateNotifySettings attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|notify\_peer|[NotifyPeer](../types/NotifyPeer.md) | Required|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
+|notify\_peer|[NotifyPeer](../types/NotifyPeer.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateNotifySettings attributes, type and example
 ```
 $updateNotifySettings = ['_' => 'updateNotifySettings', 'notify_peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNotifySettings={_='updateNotifySettings', notify_peer=NotifyPeer, notify_settings=PeerNotifySettings, }
+
+```
+
 

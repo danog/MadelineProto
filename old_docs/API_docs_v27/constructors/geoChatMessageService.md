@@ -11,11 +11,11 @@ description: geoChatMessageService attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|id|[int](../types/int.md) | Required|
-|from\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|action|[MessageAction](../types/MessageAction.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|id|[int](../types/int.md) | Yes|
+|from\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|action|[MessageAction](../types/MessageAction.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: geoChatMessageService attributes, type and example
 ```
 $geoChatMessageService = ['_' => 'geoChatMessageService', 'chat_id' => int, 'id' => int, 'from_id' => int, 'date' => int, 'action' => MessageAction, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geoChatMessageService={_='geoChatMessageService', chat_id=int, id=int, from_id=int, date=int, action=MessageAction, }
+
+```
+
 

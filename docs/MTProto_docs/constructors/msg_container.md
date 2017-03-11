@@ -11,7 +11,7 @@ description: msg_container attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|messages|Array of [MTmessage](../constructors/MTmessage.md) | Required|
+|messages|Array of [MTmessage](../constructors/MTmessage.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: msg_container attributes, type and example
 ### Example:
 
 ```
-$msg_container = ['_' => 'msg_container', 'messages' => [vector], ];
+$msg_container = ['_' => 'msg_container', 'messages' => [%MTMessage], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msg_container={_='msg_container', messages={%MTMessage}, }
+
+```
+
 

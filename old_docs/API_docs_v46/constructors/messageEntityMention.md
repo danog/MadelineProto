@@ -11,8 +11,8 @@ description: messageEntityMention attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messageEntityMention attributes, type and example
 ```
 $messageEntityMention = ['_' => 'messageEntityMention', 'offset' => int, 'length' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageEntityMention={_='messageEntityMention', offset=int, length=int, }
+
+```
+
 

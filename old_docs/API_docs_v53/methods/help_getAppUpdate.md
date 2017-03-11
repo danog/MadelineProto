@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $help_AppUpdate = $MadelineProto->help->getAppUpdate();
 ```
+
+Or, if you're into Lua:
+
+```
+help_AppUpdate = help.getAppUpdate({})
+```
+

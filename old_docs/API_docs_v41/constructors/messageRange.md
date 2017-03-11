@@ -11,8 +11,8 @@ description: messageRange attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|min\_id|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|min\_id|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messageRange attributes, type and example
 ```
 $messageRange = ['_' => 'messageRange', 'min_id' => int, 'max_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageRange={_='messageRange', min_id=int, max_id=int, }
+
+```
+
 

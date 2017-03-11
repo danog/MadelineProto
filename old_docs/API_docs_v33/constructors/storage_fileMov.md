@@ -19,3 +19,12 @@ description: storage_fileMov attributes, type and example
 $storage_fileMov = ['_' => 'storage.fileMov', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_fileMov={_='storage.fileMov', }
+
+```
+
+

@@ -11,7 +11,7 @@ description: phoneCallDiscarded attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
 |reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Optional|
 |duration|[int](../types/int.md) | Optional|
 
@@ -25,4 +25,13 @@ description: phoneCallDiscarded attributes, type and example
 ```
 $phoneCallDiscarded = ['_' => 'phoneCallDiscarded', 'id' => long, 'reason' => PhoneCallDiscardReason, 'duration' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+phoneCallDiscarded={_='phoneCallDiscarded', id=long, reason=PhoneCallDiscardReason, duration=int, }
+
+```
+
 

@@ -11,8 +11,8 @@ description: inputPeerChannel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputPeerChannel attributes, type and example
 ```
 $inputPeerChannel = ['_' => 'inputPeerChannel', 'channel_id' => int, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPeerChannel={_='inputPeerChannel', channel_id=int, access_hash=long, }
+
+```
+
 

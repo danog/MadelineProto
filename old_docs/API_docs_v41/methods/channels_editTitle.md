@@ -10,8 +10,8 @@ description: channels.editTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|title|[string](../types/string.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|title|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->editTitle(['channel' => InputChannel, 'title' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.editTitle({channel=InputChannel, title=string, })
+```
+

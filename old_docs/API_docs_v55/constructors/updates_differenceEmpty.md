@@ -11,8 +11,8 @@ description: updates_differenceEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|date|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
+|date|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updates_differenceEmpty attributes, type and example
 ```
 $updates_differenceEmpty = ['_' => 'updates.differenceEmpty', 'date' => int, 'seq' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_differenceEmpty={_='updates.differenceEmpty', date=int, seq=int, }
+
+```
+
 

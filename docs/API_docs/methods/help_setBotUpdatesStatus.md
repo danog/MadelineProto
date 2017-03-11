@@ -10,8 +10,8 @@ description: help.setBotUpdatesStatus parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pending\_updates\_count|[int](../types/int.md) | Required|
-|message|[string](../types/string.md) | Required|
+|pending\_updates\_count|[int](../types/int.md) | Yes|
+|message|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->help->setBotUpdatesStatus(['pending_updates_count' => int, 'message' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = help.setBotUpdatesStatus({pending_updates_count=int, message=string, })
+```
+

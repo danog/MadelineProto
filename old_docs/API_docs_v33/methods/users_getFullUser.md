@@ -10,7 +10,7 @@ description: users.getFullUser parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputUser](../types/InputUser.md) | Required|
+|id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [UserFull](../types/UserFull.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $UserFull = $MadelineProto->users->getFullUser(['id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+UserFull = users.getFullUser({id=InputUser, })
+```
+

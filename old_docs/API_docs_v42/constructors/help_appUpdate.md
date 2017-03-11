@@ -11,10 +11,10 @@ description: help_appUpdate attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|critical|[Bool](../types/Bool.md) | Required|
-|url|[string](../types/string.md) | Required|
-|text|[string](../types/string.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|critical|[Bool](../types/Bool.md) | Yes|
+|url|[string](../types/string.md) | Yes|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: help_appUpdate attributes, type and example
 ```
 $help_appUpdate = ['_' => 'help.appUpdate', 'id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+help_appUpdate={_='help.appUpdate', id=int, critical=Bool, url=string, text=string, }
+
+```
+
 

@@ -11,10 +11,10 @@ description: geochats_messagesSlice attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: geochats_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$geochats_messagesSlice = ['_' => 'geochats.messagesSlice', 'count' => int, 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$geochats_messagesSlice = ['_' => 'geochats.messagesSlice', 'count' => int, 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geochats_messagesSlice={_='geochats.messagesSlice', count=int, messages={GeoChatMessage}, chats={Chat}, users={User}, }
+
+```
+
 

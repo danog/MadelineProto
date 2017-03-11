@@ -7,6 +7,8 @@ description: constructors and methods of type InputFile
 
 
 
+Points to some file
+
 ### Possible values (constructors):
 
 [inputFile](../constructors/inputFile.md)  

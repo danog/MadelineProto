@@ -11,16 +11,16 @@ description: video attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|date|[int](../types/int.md) | Required|
-|duration|[int](../types/int.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
-|size|[int](../types/int.md) | Required|
-|thumb|[PhotoSize](../types/PhotoSize.md) | Required|
-|dc\_id|[int](../types/int.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|duration|[int](../types/int.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
+|size|[int](../types/int.md) | Yes|
+|thumb|[PhotoSize](../types/PhotoSize.md) | Yes|
+|dc\_id|[int](../types/int.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
 
 
 
@@ -32,4 +32,13 @@ description: video attributes, type and example
 ```
 $video = ['_' => 'video', 'id' => long, 'access_hash' => long, 'date' => int, 'duration' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'w' => int, 'h' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+video={_='video', id=long, access_hash=long, date=int, duration=int, mime_type=string, size=int, thumb=PhotoSize, dc_id=int, w=int, h=int, }
+
+```
+
 

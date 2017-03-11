@@ -11,8 +11,8 @@ description: stickerSetCovered attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|set|[StickerSet](../types/StickerSet.md) | Required|
-|cover|[Document](../types/Document.md) | Required|
+|set|[StickerSet](../types/StickerSet.md) | Yes|
+|cover|[Document](../types/Document.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: stickerSetCovered attributes, type and example
 ```
 $stickerSetCovered = ['_' => 'stickerSetCovered', 'set' => StickerSet, 'cover' => Document, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+stickerSetCovered={_='stickerSetCovered', set=StickerSet, cover=Document, }
+
+```
+
 

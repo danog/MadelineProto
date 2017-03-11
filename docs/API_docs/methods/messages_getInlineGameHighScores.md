@@ -10,8 +10,8 @@ description: messages.getInlineGameHighScores parameters, return type and exampl
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_HighScores = $MadelineProto->messages->getInlineGameHighScores(['id' => InputBotInlineMessageID, 'user_id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_HighScores = messages.getInlineGameHighScores({id=InputBotInlineMessageID, user_id=InputUser, })
+```
+

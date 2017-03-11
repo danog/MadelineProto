@@ -12,8 +12,8 @@ description: channels.createChannel parameters, return type and example
 |----------|:-------------:|---------:|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
-|title|[string](../types/string.md) | Required|
-|about|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|about|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->createChannel(['broadcast' => Bool, 'megagroup' => Bool, 'title' => string, 'about' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.createChannel({broadcast=Bool, megagroup=Bool, title=string, about=string, })
+```
+

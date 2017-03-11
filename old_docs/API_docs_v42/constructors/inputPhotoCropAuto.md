@@ -19,3 +19,12 @@ description: inputPhotoCropAuto attributes, type and example
 $inputPhotoCropAuto = ['_' => 'inputPhotoCropAuto', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPhotoCropAuto={_='inputPhotoCropAuto', }
+
+```
+
+

@@ -10,7 +10,7 @@ description: messages.reportEncryptedSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->reportEncryptedSpam(['peer' => InputEncryptedChat, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.reportEncryptedSpam({peer=InputEncryptedChat, })
+```
+

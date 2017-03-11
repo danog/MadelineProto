@@ -10,7 +10,7 @@ description: messages.getPeerDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peers|Array of [InputPeer](../types/InputPeer.md) | Required|
+|peers|Array of [InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [messages\_PeerDialogs](../types/messages_PeerDialogs.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_PeerDialogs = $MadelineProto->messages->getPeerDialogs(['peers' => [InputPeer], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_PeerDialogs = messages.getPeerDialogs({peers={InputPeer}, })
+```
+

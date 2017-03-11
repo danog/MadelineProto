@@ -11,8 +11,8 @@ description: inputEncryptedChat attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputEncryptedChat attributes, type and example
 ```
 $inputEncryptedChat = ['_' => 'inputEncryptedChat', 'chat_id' => int, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputEncryptedChat={_='inputEncryptedChat', chat_id=int, access_hash=long, }
+
+```
+
 

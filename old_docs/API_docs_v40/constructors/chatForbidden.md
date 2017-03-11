@@ -11,9 +11,9 @@ description: chatForbidden attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|title|[string](../types/string.md) | Required|
-|date|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: chatForbidden attributes, type and example
 ```
 $chatForbidden = ['_' => 'chatForbidden', 'id' => int, 'title' => string, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatForbidden={_='chatForbidden', id=int, title=string, date=int, }
+
+```
+
 

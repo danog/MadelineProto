@@ -10,8 +10,8 @@ description: channels.toggleSignatures parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|enabled|[Bool](../types/Bool.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|enabled|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->toggleSignatures(['channel' => InputChannel, 'enabled' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.toggleSignatures({channel=InputChannel, enabled=Bool, })
+```
+

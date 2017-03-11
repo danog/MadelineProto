@@ -50,7 +50,7 @@ class AnnotationsBuilder
                 }
             }
         }
-        foreach ($this->methods->method_namespace as $namespace) {
+        foreach ($this->get_method_namespaces() as $namespace) {
             $content = preg_replace(
                 '/(class( \w+[,]?){0,}\n{\n)/',
                 '${1}'.
@@ -78,7 +78,7 @@ class AnnotationsBuilder
                 continue;
             }
             list($namespace, $method) = explode('.', $rmethod);
-            if (!in_array($namespace, $this->methods->method_namespace)) {
+            if (!in_array($namespace, $this->get_method_namespaces())) {
                 continue;
             }
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->methods->type[$key]);

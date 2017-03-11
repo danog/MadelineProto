@@ -11,8 +11,8 @@ description: keyboardButtonSwitchInline attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
-|query|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
+|query|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: keyboardButtonSwitchInline attributes, type and example
 ```
 $keyboardButtonSwitchInline = ['_' => 'keyboardButtonSwitchInline', 'text' => string, 'query' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+keyboardButtonSwitchInline={_='keyboardButtonSwitchInline', text=string, query=string, }
+
+```
+
 

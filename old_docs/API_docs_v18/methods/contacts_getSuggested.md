@@ -10,7 +10,7 @@ description: contacts.getSuggested parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|limit|[int](../types/int.md) | Required|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [contacts\_Suggested](../types/contacts_Suggested.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $contacts_Suggested = $MadelineProto->contacts->getSuggested(['limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_Suggested = contacts.getSuggested({limit=int, })
+```
+

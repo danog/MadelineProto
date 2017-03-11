@@ -19,3 +19,12 @@ description: chatInviteEmpty attributes, type and example
 $chatInviteEmpty = ['_' => 'chatInviteEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+chatInviteEmpty={_='chatInviteEmpty', }
+
+```
+
+

@@ -10,7 +10,7 @@ description: help.getInviteText parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|lang\_code|[string](../types/string.md) | Required|
+|lang\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_InviteText](../types/help_InviteText.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $help_InviteText = $MadelineProto->help->getInviteText(['lang_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+help_InviteText = help.getInviteText({lang_code=string, })
+```
+

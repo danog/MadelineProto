@@ -10,10 +10,10 @@ description: geochats.createGeoChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|title|[string](../types/string.md) | Required|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Required|
-|address|[string](../types/string.md) | Required|
-|venue|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|address|[string](../types/string.md) | Yes|
+|venue|[string](../types/string.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $geochats_StatedMessage = $MadelineProto->geochats->createGeoChat(['title' => string, 'geo_point' => InputGeoPoint, 'address' => string, 'venue' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_StatedMessage = geochats.createGeoChat({title=string, geo_point=InputGeoPoint, address=string, venue=string, })
+```
+

@@ -12,8 +12,8 @@ description: documentAttributeSticker attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |mask|[Bool](../types/Bool.md) | Optional|
-|alt|[string](../types/string.md) | Required|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
+|alt|[string](../types/string.md) | Yes|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 |mask\_coords|[MaskCoords](../types/MaskCoords.md) | Optional|
 
 
@@ -26,4 +26,13 @@ description: documentAttributeSticker attributes, type and example
 ```
 $documentAttributeSticker = ['_' => 'documentAttributeSticker', 'mask' => true, 'alt' => string, 'stickerset' => InputStickerSet, 'mask_coords' => MaskCoords, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeSticker={_='documentAttributeSticker', mask=true, alt=string, stickerset=InputStickerSet, mask_coords=MaskCoords, }
+
+```
+
 

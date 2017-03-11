@@ -19,3 +19,12 @@ description: inputDocumentEmpty attributes, type and example
 $inputDocumentEmpty = ['_' => 'inputDocumentEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputDocumentEmpty={_='inputDocumentEmpty', }
+
+```
+
+

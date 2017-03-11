@@ -11,8 +11,8 @@ description: account_privacyRules attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: account_privacyRules attributes, type and example
 ### Example:
 
 ```
-$account_privacyRules = ['_' => 'account.privacyRules', 'rules' => [Vector t], 'users' => [Vector t], ];
+$account_privacyRules = ['_' => 'account.privacyRules', 'rules' => [PrivacyRule], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_privacyRules={_='account.privacyRules', rules={PrivacyRule}, users={User}, }
+
+```
+
 

@@ -10,8 +10,8 @@ description: messages.getDhConfig parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|version|[int](../types/int.md) | Required|
-|random\_length|[int](../types/int.md) | Required|
+|version|[int](../types/int.md) | Yes|
+|random\_length|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_DhConfig](../types/messages_DhConfig.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_DhConfig = $MadelineProto->messages->getDhConfig(['version' => int, 'random_length' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_DhConfig = messages.getDhConfig({version=int, random_length=int, })
+```
+

@@ -11,8 +11,8 @@ description: updateContactRegistered attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateContactRegistered attributes, type and example
 ```
 $updateContactRegistered = ['_' => 'updateContactRegistered', 'user_id' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateContactRegistered={_='updateContactRegistered', user_id=int, date=int, }
+
+```
+
 

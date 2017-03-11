@@ -11,7 +11,7 @@ description: messageMediaGame attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|game|[Game](../types/Game.md) | Required|
+|game|[Game](../types/Game.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaGame attributes, type and example
 ```
 $messageMediaGame = ['_' => 'messageMediaGame', 'game' => Game, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaGame={_='messageMediaGame', game=Game, }
+
+```
+
 

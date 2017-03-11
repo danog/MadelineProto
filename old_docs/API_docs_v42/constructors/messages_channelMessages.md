@@ -11,12 +11,12 @@ description: messages_channelMessages attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
-|count|[int](../types/int.md) | Required|
-|messages|Array of [Message](../types/Message.md) | Required|
+|pts|[int](../types/int.md) | Yes|
+|count|[int](../types/int.md) | Yes|
+|messages|Array of [Message](../types/Message.md) | Yes|
 |collapsed|Array of [MessageGroup](../types/MessageGroup.md) | Optional|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: messages_channelMessages attributes, type and example
 ### Example:
 
 ```
-$messages_channelMessages = ['_' => 'messages.channelMessages', 'pts' => int, 'count' => int, 'messages' => [Vector t], 'collapsed' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_channelMessages = ['_' => 'messages.channelMessages', 'pts' => int, 'count' => int, 'messages' => [Message], 'collapsed' => [MessageGroup], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_channelMessages={_='messages.channelMessages', pts=int, count=int, messages={Message}, collapsed={MessageGroup}, chats={Chat}, users={User}, }
+
+```
+
 

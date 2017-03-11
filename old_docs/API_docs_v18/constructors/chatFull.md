@@ -11,10 +11,10 @@ description: chatFull attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|participants|[ChatParticipants](../types/ChatParticipants.md) | Required|
-|chat\_photo|[Photo](../types/Photo.md) | Required|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|participants|[ChatParticipants](../types/ChatParticipants.md) | Yes|
+|chat\_photo|[Photo](../types/Photo.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: chatFull attributes, type and example
 ```
 $chatFull = ['_' => 'chatFull', 'id' => int, 'participants' => ChatParticipants, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatFull={_='chatFull', id=int, participants=ChatParticipants, chat_photo=Photo, notify_settings=PeerNotifySettings, }
+
+```
+
 

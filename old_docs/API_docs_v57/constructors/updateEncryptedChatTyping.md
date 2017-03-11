@@ -11,7 +11,7 @@ description: updateEncryptedChatTyping attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateEncryptedChatTyping attributes, type and example
 ```
 $updateEncryptedChatTyping = ['_' => 'updateEncryptedChatTyping', 'chat_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateEncryptedChatTyping={_='updateEncryptedChatTyping', chat_id=int, }
+
+```
+
 

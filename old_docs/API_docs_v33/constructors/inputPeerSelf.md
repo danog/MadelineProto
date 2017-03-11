@@ -19,3 +19,12 @@ description: inputPeerSelf attributes, type and example
 $inputPeerSelf = ['_' => 'inputPeerSelf', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPeerSelf={_='inputPeerSelf', }
+
+```
+
+

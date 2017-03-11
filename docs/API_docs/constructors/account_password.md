@@ -11,11 +11,11 @@ description: account_password attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|current\_salt|[bytes](../types/bytes.md) | Required|
-|new\_salt|[bytes](../types/bytes.md) | Required|
-|hint|[string](../types/string.md) | Required|
-|has\_recovery|[Bool](../types/Bool.md) | Required|
-|email\_unconfirmed\_pattern|[string](../types/string.md) | Required|
+|current\_salt|[bytes](../types/bytes.md) | Yes|
+|new\_salt|[bytes](../types/bytes.md) | Yes|
+|hint|[string](../types/string.md) | Yes|
+|has\_recovery|[Bool](../types/Bool.md) | Yes|
+|email\_unconfirmed\_pattern|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: account_password attributes, type and example
 ```
 $account_password = ['_' => 'account.password', 'current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, 'has_recovery' => Bool, 'email_unconfirmed_pattern' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_password={_='account.password', current_salt=bytes, new_salt=bytes, hint=string, has_recovery=Bool, email_unconfirmed_pattern=string, }
+
+```
+
 

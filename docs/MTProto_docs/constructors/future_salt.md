@@ -11,9 +11,9 @@ description: future_salt attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|valid\_since|[int](../types/int.md) | Required|
-|valid\_until|[int](../types/int.md) | Required|
-|salt|[long](../types/long.md) | Required|
+|valid\_since|[int](../types/int.md) | Yes|
+|valid\_until|[int](../types/int.md) | Yes|
+|salt|[long](../types/long.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: future_salt attributes, type and example
 ```
 $future_salt = ['_' => 'future_salt', 'valid_since' => int, 'valid_until' => int, 'salt' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+future_salt={_='future_salt', valid_since=int, valid_until=int, salt=long, }
+
+```
+
 

@@ -10,8 +10,8 @@ description: account.setPrivacy parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Required|
-|rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Required|
+|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
+|rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $account_PrivacyRules = $MadelineProto->account->setPrivacy(['key' => InputPrivacyKey, 'rules' => [InputPrivacyRule], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+account_PrivacyRules = account.setPrivacy({key=InputPrivacyKey, rules={InputPrivacyRule}, })
+```
+

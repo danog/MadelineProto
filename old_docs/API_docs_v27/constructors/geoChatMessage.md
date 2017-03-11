@@ -11,12 +11,12 @@ description: geoChatMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|id|[int](../types/int.md) | Required|
-|from\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|message|[string](../types/string.md) | Required|
-|media|[MessageMedia](../types/MessageMedia.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|id|[int](../types/int.md) | Yes|
+|from\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: geoChatMessage attributes, type and example
 ```
 $geoChatMessage = ['_' => 'geoChatMessage', 'chat_id' => int, 'id' => int, 'from_id' => int, 'date' => int, 'message' => string, 'media' => MessageMedia, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geoChatMessage={_='geoChatMessage', chat_id=int, id=int, from_id=int, date=int, message=string, media=MessageMedia, }
+
+```
+
 

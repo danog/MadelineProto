@@ -14,9 +14,9 @@ description: messages.sendMessage parameters, return type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|message|[string](../types/string.md) | Required|
+|message|[string](../types/string.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
@@ -44,6 +44,13 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->sendMessage(['no_webpage' => Bool, 'broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.sendMessage({no_webpage=Bool, broadcast=Bool, silent=Bool, background=Bool, peer=InputPeer, reply_to_msg_id=int, message=string, reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
+```
+
 
 ## Usage of parse_mode:
 

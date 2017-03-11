@@ -19,3 +19,12 @@ description: contacts_myLinkContact attributes, type and example
 $contacts_myLinkContact = ['_' => 'contacts.myLinkContact', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_myLinkContact={_='contacts.myLinkContact', }
+
+```
+
+

@@ -11,7 +11,7 @@ description: inputNotifyPeer attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputNotifyPeer attributes, type and example
 ```
 $inputNotifyPeer = ['_' => 'inputNotifyPeer', 'peer' => InputPeer, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputNotifyPeer={_='inputNotifyPeer', peer=InputPeer, }
+
+```
+
 

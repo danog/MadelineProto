@@ -11,11 +11,11 @@ description: updates attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|updates|Array of [Update](../types/Update.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|date|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
+|updates|Array of [Update](../types/Update.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
 
 
 
@@ -25,6 +25,15 @@ description: updates attributes, type and example
 ### Example:
 
 ```
-$updates = ['_' => 'updates', 'updates' => [Vector t], 'users' => [Vector t], 'chats' => [Vector t], 'date' => int, 'seq' => int, ];
+$updates = ['_' => 'updates', 'updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates={_='updates', updates={Update}, users={User}, chats={Chat}, date=int, seq=int, }
+
+```
+
 

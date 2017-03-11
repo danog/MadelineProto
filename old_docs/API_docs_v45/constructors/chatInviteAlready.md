@@ -11,7 +11,7 @@ description: chatInviteAlready attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat|[Chat](../types/Chat.md) | Required|
+|chat|[Chat](../types/Chat.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: chatInviteAlready attributes, type and example
 ```
 $chatInviteAlready = ['_' => 'chatInviteAlready', 'chat' => Chat, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatInviteAlready={_='chatInviteAlready', chat=Chat, }
+
+```
+
 

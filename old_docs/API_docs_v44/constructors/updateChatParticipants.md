@@ -11,7 +11,7 @@ description: updateChatParticipants attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|participants|[ChatParticipants](../types/ChatParticipants.md) | Required|
+|participants|[ChatParticipants](../types/ChatParticipants.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateChatParticipants attributes, type and example
 ```
 $updateChatParticipants = ['_' => 'updateChatParticipants', 'participants' => ChatParticipants, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateChatParticipants={_='updateChatParticipants', participants=ChatParticipants, }
+
+```
+
 

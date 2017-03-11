@@ -19,3 +19,12 @@ description: inputGeoPointEmpty attributes, type and example
 $inputGeoPointEmpty = ['_' => 'inputGeoPointEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputGeoPointEmpty={_='inputGeoPointEmpty', }
+
+```
+
+

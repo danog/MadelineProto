@@ -11,8 +11,8 @@ description: messages.saveRecentSticker parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |attached|[Bool](../types/Bool.md) | Optional|
-|id|[InputDocument](../types/InputDocument.md) | Required|
-|unsave|[Bool](../types/Bool.md) | Required|
+|id|[InputDocument](../types/InputDocument.md) | Yes|
+|unsave|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->saveRecentSticker(['attached' => Bool, 'id' => InputDocument, 'unsave' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.saveRecentSticker({attached=Bool, id=InputDocument, unsave=Bool, })
+```
+

@@ -11,8 +11,8 @@ description: pageBlockPullquote attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: pageBlockPullquote attributes, type and example
 ```
 $pageBlockPullquote = ['_' => 'pageBlockPullquote', 'text' => RichText, 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockPullquote={_='pageBlockPullquote', text=RichText, caption=RichText, }
+
+```
+
 

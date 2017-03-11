@@ -11,7 +11,7 @@ description: help_inviteText attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[string](../types/string.md) | Required|
+|message|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: help_inviteText attributes, type and example
 ```
 $help_inviteText = ['_' => 'help.inviteText', 'message' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+help_inviteText={_='help.inviteText', message=string, }
+
+```
+
 

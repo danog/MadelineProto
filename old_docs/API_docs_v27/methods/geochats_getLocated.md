@@ -10,9 +10,9 @@ description: geochats.getLocated parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Required|
-|radius|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|radius|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Located](../types/geochats_Located.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $geochats_Located = $MadelineProto->geochats->getLocated(['geo_point' => InputGeoPoint, 'radius' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_Located = geochats.getLocated({geo_point=InputGeoPoint, radius=int, limit=int, })
+```
+

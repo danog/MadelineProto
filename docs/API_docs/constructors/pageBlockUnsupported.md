@@ -19,3 +19,12 @@ description: pageBlockUnsupported attributes, type and example
 $pageBlockUnsupported = ['_' => 'pageBlockUnsupported', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+pageBlockUnsupported={_='pageBlockUnsupported', }
+
+```
+
+

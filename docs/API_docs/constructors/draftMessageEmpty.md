@@ -19,3 +19,12 @@ description: draftMessageEmpty attributes, type and example
 $draftMessageEmpty = ['_' => 'draftMessageEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+draftMessageEmpty={_='draftMessageEmpty', }
+
+```
+
+

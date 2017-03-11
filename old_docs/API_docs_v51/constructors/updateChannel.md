@@ -11,7 +11,7 @@ description: updateChannel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateChannel attributes, type and example
 ```
 $updateChannel = ['_' => 'updateChannel', 'channel_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateChannel={_='updateChannel', channel_id=int, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: textEmpty attributes, type and example
 $textEmpty = ['_' => 'textEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+textEmpty={_='textEmpty', }
+
+```
+
+

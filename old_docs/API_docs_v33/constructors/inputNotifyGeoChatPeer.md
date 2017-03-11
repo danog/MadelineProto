@@ -11,7 +11,7 @@ description: inputNotifyGeoChatPeer attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputNotifyGeoChatPeer attributes, type and example
 ```
 $inputNotifyGeoChatPeer = ['_' => 'inputNotifyGeoChatPeer', 'peer' => InputGeoChat, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputNotifyGeoChatPeer={_='inputNotifyGeoChatPeer', peer=InputGeoChat, }
+
+```
+
 

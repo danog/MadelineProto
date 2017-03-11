@@ -11,9 +11,9 @@ description: contacts_found attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|results|Array of [Peer](../types/Peer.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|results|Array of [Peer](../types/Peer.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: contacts_found attributes, type and example
 ### Example:
 
 ```
-$contacts_found = ['_' => 'contacts.found', 'results' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$contacts_found = ['_' => 'contacts.found', 'results' => [Peer], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_found={_='contacts.found', results={Peer}, chats={Chat}, users={User}, }
+
+```
+
 

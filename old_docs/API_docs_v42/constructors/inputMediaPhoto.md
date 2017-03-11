@@ -11,8 +11,8 @@ description: inputMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputPhoto](../types/InputPhoto.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|id|[InputPhoto](../types/InputPhoto.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaPhoto attributes, type and example
 ```
 $inputMediaPhoto = ['_' => 'inputMediaPhoto', 'id' => InputPhoto, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaPhoto={_='inputMediaPhoto', id=InputPhoto, caption=string, }
+
+```
+
 

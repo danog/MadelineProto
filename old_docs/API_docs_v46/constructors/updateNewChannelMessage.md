@@ -11,9 +11,9 @@ description: updateNewChannelMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[Message](../types/Message.md) | Required|
-|channel\_pts|[int](../types/int.md) | Required|
-|channel\_pts\_count|[int](../types/int.md) | Required|
+|message|[Message](../types/Message.md) | Yes|
+|channel\_pts|[int](../types/int.md) | Yes|
+|channel\_pts\_count|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateNewChannelMessage attributes, type and example
 ```
 $updateNewChannelMessage = ['_' => 'updateNewChannelMessage', 'message' => Message, 'channel_pts' => int, 'channel_pts_count' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNewChannelMessage={_='updateNewChannelMessage', message=Message, channel_pts=int, channel_pts_count=int, }
+
+```
+
 

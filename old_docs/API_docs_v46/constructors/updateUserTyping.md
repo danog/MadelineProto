@@ -11,8 +11,8 @@ description: updateUserTyping attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|action|[SendMessageAction](../types/SendMessageAction.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateUserTyping attributes, type and example
 ```
 $updateUserTyping = ['_' => 'updateUserTyping', 'user_id' => int, 'action' => SendMessageAction, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateUserTyping={_='updateUserTyping', user_id=int, action=SendMessageAction, }
+
+```
+
 

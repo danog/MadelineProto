@@ -10,13 +10,13 @@ description: channels.getImportantHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|offset\_id|[int](../types/int.md) | Required|
-|offset\_date|[int](../types/int.md) | Required|
-|add\_offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|min\_id|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|offset\_id|[int](../types/int.md) | Yes|
+|offset\_date|[int](../types/int.md) | Yes|
+|add\_offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|min\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -41,3 +41,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->channels->getImportantHistory(['channel' => InputChannel, 'offset_id' => int, 'offset_date' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = channels.getImportantHistory({channel=InputChannel, offset_id=int, offset_date=int, add_offset=int, limit=int, max_id=int, min_id=int, })
+```
+

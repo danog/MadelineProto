@@ -10,7 +10,7 @@ description: ping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|ping\_id|[long](../types/long.md) | Required|
+|ping\_id|[long](../types/long.md) | Yes|
 
 
 ### Return type: [Pong](../types/Pong.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Pong = $MadelineProto->ping(['ping_id' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Pong = ping({ping_id=long, })
+```
+

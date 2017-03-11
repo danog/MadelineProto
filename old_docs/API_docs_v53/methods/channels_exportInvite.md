@@ -10,7 +10,7 @@ description: channels.exportInvite parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
 
 
 ### Return type: [ExportedChatInvite](../types/ExportedChatInvite.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $ExportedChatInvite = $MadelineProto->channels->exportInvite(['channel' => InputChannel, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+ExportedChatInvite = channels.exportInvite({channel=InputChannel, })
+```
+

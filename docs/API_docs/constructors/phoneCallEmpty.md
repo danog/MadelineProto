@@ -11,7 +11,7 @@ description: phoneCallEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: phoneCallEmpty attributes, type and example
 ```
 $phoneCallEmpty = ['_' => 'phoneCallEmpty', 'id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+phoneCallEmpty={_='phoneCallEmpty', id=long, }
+
+```
+
 

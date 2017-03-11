@@ -11,7 +11,7 @@ description: botInlineMessageMediaAuto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|caption|[string](../types/string.md) | Required|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: botInlineMessageMediaAuto attributes, type and example
 ```
 $botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineMessageMediaAuto={_='botInlineMessageMediaAuto', caption=string, }
+
+```
+
 

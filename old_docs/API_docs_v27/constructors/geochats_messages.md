@@ -11,9 +11,9 @@ description: geochats_messages attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: geochats_messages attributes, type and example
 ### Example:
 
 ```
-$geochats_messages = ['_' => 'geochats.messages', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], ];
+$geochats_messages = ['_' => 'geochats.messages', 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geochats_messages={_='geochats.messages', messages={GeoChatMessage}, chats={Chat}, users={User}, }
+
+```
+
 

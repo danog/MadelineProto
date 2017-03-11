@@ -11,7 +11,7 @@ description: textPlain attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textPlain attributes, type and example
 ```
 $textPlain = ['_' => 'textPlain', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textPlain={_='textPlain', text=string, }
+
+```
+
 

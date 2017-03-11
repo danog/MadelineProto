@@ -11,7 +11,7 @@ description: messageMediaVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|video|[Video](../types/Video.md) | Required|
+|video|[Video](../types/Video.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaVideo attributes, type and example
 ```
 $messageMediaVideo = ['_' => 'messageMediaVideo', 'video' => Video, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaVideo={_='messageMediaVideo', video=Video, }
+
+```
+
 

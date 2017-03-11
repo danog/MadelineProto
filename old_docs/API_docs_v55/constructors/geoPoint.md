@@ -11,8 +11,8 @@ description: geoPoint attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|long|[double](../types/double.md) | Required|
-|lat|[double](../types/double.md) | Required|
+|long|[double](../types/double.md) | Yes|
+|lat|[double](../types/double.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: geoPoint attributes, type and example
 ```
 $geoPoint = ['_' => 'geoPoint', 'long' => double, 'lat' => double, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geoPoint={_='geoPoint', long=double, lat=double, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: help_appChangelog attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: help_appChangelog attributes, type and example
 ```
 $help_appChangelog = ['_' => 'help.appChangelog', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+help_appChangelog={_='help.appChangelog', text=string, }
+
+```
+
 

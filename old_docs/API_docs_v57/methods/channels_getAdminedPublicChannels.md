@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $messages_Chats = $MadelineProto->channels->getAdminedPublicChannels();
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Chats = channels.getAdminedPublicChannels({})
+```
+

@@ -11,10 +11,10 @@ description: inputBotInlineResultPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[string](../types/string.md) | Required|
-|type|[string](../types/string.md) | Required|
-|photo|[InputPhoto](../types/InputPhoto.md) | Required|
-|send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Required|
+|id|[string](../types/string.md) | Yes|
+|type|[string](../types/string.md) | Yes|
+|photo|[InputPhoto](../types/InputPhoto.md) | Yes|
+|send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: inputBotInlineResultPhoto attributes, type and example
 ```
 $inputBotInlineResultPhoto = ['_' => 'inputBotInlineResultPhoto', 'id' => string, 'type' => string, 'photo' => InputPhoto, 'send_message' => InputBotInlineMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputBotInlineResultPhoto={_='inputBotInlineResultPhoto', id=string, type=string, photo=InputPhoto, send_message=InputBotInlineMessage, }
+
+```
+
 

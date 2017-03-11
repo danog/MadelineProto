@@ -10,7 +10,7 @@ description: messages.getPeerSettings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [PeerSettings](../types/PeerSettings.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $PeerSettings = $MadelineProto->messages->getPeerSettings(['peer' => InputPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+PeerSettings = messages.getPeerSettings({peer=InputPeer, })
+```
+

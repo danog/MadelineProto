@@ -10,11 +10,11 @@ description: auth.sendCode parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
-|sms\_type|[int](../types/int.md) | Required|
-|api\_id|[int](../types/int.md) | Required|
-|api\_hash|[string](../types/string.md) | Required|
-|lang\_code|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
+|sms\_type|[int](../types/int.md) | Yes|
+|api\_id|[int](../types/int.md) | Yes|
+|api\_hash|[string](../types/string.md) | Yes|
+|lang\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $auth_SentCode = $MadelineProto->auth->sendCode(['phone_number' => string, 'sms_type' => int, 'api_id' => int, 'api_hash' => string, 'lang_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_SentCode = auth.sendCode({phone_number=string, sms_type=int, api_id=int, api_hash=string, lang_code=string, })
+```
+

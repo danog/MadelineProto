@@ -11,8 +11,8 @@ description: photos_photos attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photos|Array of [Photo](../types/Photo.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|photos|Array of [Photo](../types/Photo.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: photos_photos attributes, type and example
 ### Example:
 
 ```
-$photos_photos = ['_' => 'photos.photos', 'photos' => [Vector t], 'users' => [Vector t], ];
+$photos_photos = ['_' => 'photos.photos', 'photos' => [Photo], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photos_photos={_='photos.photos', photos={Photo}, users={User}, }
+
+```
+
 

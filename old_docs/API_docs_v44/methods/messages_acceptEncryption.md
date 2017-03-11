@@ -10,9 +10,9 @@ description: messages.acceptEncryption parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|g\_b|[bytes](../types/bytes.md) | Required|
-|key\_fingerprint|[long](../types/long.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|g\_b|[bytes](../types/bytes.md) | Yes|
+|key\_fingerprint|[long](../types/long.md) | Yes|
 
 
 ### Return type: [EncryptedChat](../types/EncryptedChat.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $EncryptedChat = $MadelineProto->messages->acceptEncryption(['peer' => InputEncryptedChat, 'g_b' => bytes, 'key_fingerprint' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+EncryptedChat = messages.acceptEncryption({peer=InputEncryptedChat, g_b=bytes, key_fingerprint=long, })
+```
+

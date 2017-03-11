@@ -11,7 +11,7 @@ description: messageActionChatAddUser attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|users|Array of [int](../types/int.md) | Required|
+|users|Array of [int](../types/int.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: messageActionChatAddUser attributes, type and example
 ### Example:
 
 ```
-$messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [Vector t], ];
+$messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [int], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatAddUser={_='messageActionChatAddUser', users={int}, }
+
+```
+
 

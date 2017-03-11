@@ -11,12 +11,12 @@ description: userFull attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user|[User](../types/User.md) | Required|
-|link|[contacts\_Link](../types/contacts_Link.md) | Required|
-|profile\_photo|[Photo](../types/Photo.md) | Required|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
-|blocked|[Bool](../types/Bool.md) | Required|
-|bot\_info|[BotInfo](../types/BotInfo.md) | Required|
+|user|[User](../types/User.md) | Yes|
+|link|[contacts\_Link](../types/contacts_Link.md) | Yes|
+|profile\_photo|[Photo](../types/Photo.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|blocked|[Bool](../types/Bool.md) | Yes|
+|bot\_info|[BotInfo](../types/BotInfo.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: userFull attributes, type and example
 ```
 $userFull = ['_' => 'userFull', 'user' => User, 'link' => contacts.Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'blocked' => Bool, 'bot_info' => BotInfo, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userFull={_='userFull', user=User, link=contacts.Link, profile_photo=Photo, notify_settings=PeerNotifySettings, blocked=Bool, bot_info=BotInfo, }
+
+```
+
 

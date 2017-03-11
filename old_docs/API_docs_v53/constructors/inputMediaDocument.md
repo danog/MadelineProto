@@ -11,8 +11,8 @@ description: inputMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputDocument](../types/InputDocument.md) | Required|
-|caption|[string](../types/string.md) | Required|
+|id|[InputDocument](../types/InputDocument.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaDocument attributes, type and example
 ```
 $inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument, 'caption' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaDocument={_='inputMediaDocument', id=InputDocument, caption=string, }
+
+```
+
 

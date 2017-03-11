@@ -24,3 +24,12 @@ description: peerSettings attributes, type and example
 $peerSettings = ['_' => 'peerSettings', 'report_spam' => true, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+peerSettings={_='peerSettings', report_spam=true, }
+
+```
+
+

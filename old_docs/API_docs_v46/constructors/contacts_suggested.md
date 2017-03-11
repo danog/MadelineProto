@@ -11,8 +11,8 @@ description: contacts_suggested attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|results|Array of [ContactSuggested](../types/ContactSuggested.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|results|Array of [ContactSuggested](../types/ContactSuggested.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: contacts_suggested attributes, type and example
 ### Example:
 
 ```
-$contacts_suggested = ['_' => 'contacts.suggested', 'results' => [Vector t], 'users' => [Vector t], ];
+$contacts_suggested = ['_' => 'contacts.suggested', 'results' => [ContactSuggested], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_suggested={_='contacts.suggested', results={ContactSuggested}, users={User}, }
+
+```
+
 

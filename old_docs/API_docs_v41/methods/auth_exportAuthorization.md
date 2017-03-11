@@ -10,7 +10,7 @@ description: auth.exportAuthorization parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|dc\_id|[int](../types/int.md) | Required|
+|dc\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $auth_ExportedAuthorization = $MadelineProto->auth->exportAuthorization(['dc_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_ExportedAuthorization = auth.exportAuthorization({dc_id=int, })
+```
+

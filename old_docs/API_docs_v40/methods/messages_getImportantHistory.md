@@ -10,10 +10,10 @@ description: messages.getImportantHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|min\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|min\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->messages->getImportantHistory(['peer' => InputPeer, 'max_id' => int, 'min_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = messages.getImportantHistory({peer=InputPeer, max_id=int, min_id=int, limit=int, })
+```
+

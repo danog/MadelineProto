@@ -11,9 +11,9 @@ description: inputPhotoCrop attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|crop\_left|[double](../types/double.md) | Required|
-|crop\_top|[double](../types/double.md) | Required|
-|crop\_width|[double](../types/double.md) | Required|
+|crop\_left|[double](../types/double.md) | Yes|
+|crop\_top|[double](../types/double.md) | Yes|
+|crop\_width|[double](../types/double.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: inputPhotoCrop attributes, type and example
 ```
 $inputPhotoCrop = ['_' => 'inputPhotoCrop', 'crop_left' => double, 'crop_top' => double, 'crop_width' => double, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPhotoCrop={_='inputPhotoCrop', crop_left=double, crop_top=double, crop_width=double, }
+
+```
+
 

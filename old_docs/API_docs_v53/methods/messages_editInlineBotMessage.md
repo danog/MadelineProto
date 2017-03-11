@@ -11,7 +11,7 @@ description: messages.editInlineBotMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
 |message|[string](../types/string.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
@@ -40,6 +40,13 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.editInlineBotMessage({no_webpage=Bool, id=InputBotInlineMessageID, message=string, reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
+```
+
 
 ## Usage of parse_mode:
 

@@ -15,6 +15,12 @@ description: constructors and methods of type PhotoSize
 
 [photoCachedSize](../constructors/photoCachedSize.md)  
 
+[photoSizeEmpty\_23](../constructors/photoSizeEmpty_23.md)  
+
+[photoSize\_23](../constructors/photoSize_23.md)  
+
+[photoCachedSize\_23](../constructors/photoCachedSize_23.md)  
+
 
 
 ### Methods that return an object of this type (methods):

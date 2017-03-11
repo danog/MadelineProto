@@ -19,3 +19,12 @@ description: sendMessageChooseContactAction attributes, type and example
 $sendMessageChooseContactAction = ['_' => 'sendMessageChooseContactAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageChooseContactAction={_='sendMessageChooseContactAction', }
+
+```
+
+

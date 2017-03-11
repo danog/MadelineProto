@@ -10,9 +10,9 @@ description: messages.sendEncryptedFile parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
-|file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
+|file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Yes|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
@@ -35,5 +35,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedFile(['peer' => InputEncryptedChat, 'data' => bytes, 'file' => InputEncryptedFile, ]);
+$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedFile(['peer' => InputEncryptedChat, 'message' => DecryptedMessage, 'file' => InputEncryptedFile, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_SentEncryptedMessage = messages.sendEncryptedFile({peer=InputEncryptedChat, message=DecryptedMessage, file=InputEncryptedFile, })
+```
+

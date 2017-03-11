@@ -11,8 +11,8 @@ description: updateShort attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|update|[Update](../types/Update.md) | Required|
-|date|[int](../types/int.md) | Required|
+|update|[Update](../types/Update.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateShort attributes, type and example
 ```
 $updateShort = ['_' => 'updateShort', 'update' => Update, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateShort={_='updateShort', update=Update, date=int, }
+
+```
+
 

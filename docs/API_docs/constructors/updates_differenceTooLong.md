@@ -11,7 +11,7 @@ description: updates_differenceTooLong attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updates_differenceTooLong attributes, type and example
 ```
 $updates_differenceTooLong = ['_' => 'updates.differenceTooLong', 'pts' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_differenceTooLong={_='updates.differenceTooLong', pts=int, }
+
+```
+
 

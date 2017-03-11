@@ -10,7 +10,7 @@ description: account.sendChangePhoneCode parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
 
 
 ### Return type: [account\_SentChangePhoneCode](../types/account_SentChangePhoneCode.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $account_SentChangePhoneCode = $MadelineProto->account->sendChangePhoneCode(['phone_number' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+account_SentChangePhoneCode = account.sendChangePhoneCode({phone_number=string, })
+```
+

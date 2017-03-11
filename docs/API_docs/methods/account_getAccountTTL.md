@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $AccountDaysTTL = $MadelineProto->account->getAccountTTL();
 ```
+
+Or, if you're into Lua:
+
+```
+AccountDaysTTL = account.getAccountTTL({})
+```
+

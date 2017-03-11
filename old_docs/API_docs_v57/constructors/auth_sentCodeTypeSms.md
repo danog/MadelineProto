@@ -11,7 +11,7 @@ description: auth_sentCodeTypeSms attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|length|[int](../types/int.md) | Required|
+|length|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: auth_sentCodeTypeSms attributes, type and example
 ```
 $auth_sentCodeTypeSms = ['_' => 'auth.sentCodeTypeSms', 'length' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_sentCodeTypeSms={_='auth.sentCodeTypeSms', length=int, }
+
+```
+
 

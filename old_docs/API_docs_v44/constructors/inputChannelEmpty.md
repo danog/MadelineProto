@@ -19,3 +19,12 @@ description: inputChannelEmpty attributes, type and example
 $inputChannelEmpty = ['_' => 'inputChannelEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputChannelEmpty={_='inputChannelEmpty', }
+
+```
+
+

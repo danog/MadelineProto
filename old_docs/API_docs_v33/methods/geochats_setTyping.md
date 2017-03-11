@@ -10,8 +10,8 @@ description: geochats.setTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
-|typing|[Bool](../types/Bool.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|typing|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->geochats->setTyping(['peer' => InputGeoChat, 'typing' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = geochats.setTyping({peer=InputGeoChat, typing=Bool, })
+```
+

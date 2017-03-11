@@ -11,8 +11,8 @@ description: textEmail attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
-|email|[string](../types/string.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
+|email|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: textEmail attributes, type and example
 ```
 $textEmail = ['_' => 'textEmail', 'text' => RichText, 'email' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textEmail={_='textEmail', text=RichText, email=string, }
+
+```
+
 

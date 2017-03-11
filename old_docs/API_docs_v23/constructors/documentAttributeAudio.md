@@ -11,7 +11,7 @@ description: documentAttributeAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|duration|[int](../types/int.md) | Required|
+|duration|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: documentAttributeAudio attributes, type and example
 ```
 $documentAttributeAudio = ['_' => 'documentAttributeAudio', 'duration' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeAudio={_='documentAttributeAudio', duration=int, }
+
+```
+
 

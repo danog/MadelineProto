@@ -11,7 +11,7 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |force|[Bool](../types/Bool.md) | Optional|
-|order|Array of [InputPeer](../types/InputPeer.md) | Required|
+|order|Array of [InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->reorderPinnedDialogs(['force' => Bool, 'order' => [InputPeer], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.reorderPinnedDialogs({force=Bool, order={InputPeer}, })
+```
+

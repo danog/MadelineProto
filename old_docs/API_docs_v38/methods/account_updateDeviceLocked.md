@@ -10,7 +10,7 @@ description: account.updateDeviceLocked parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|period|[int](../types/int.md) | Required|
+|period|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->updateDeviceLocked(['period' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.updateDeviceLocked({period=int, })
+```
+

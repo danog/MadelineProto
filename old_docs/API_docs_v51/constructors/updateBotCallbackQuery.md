@@ -11,11 +11,11 @@ description: updateBotCallbackQuery attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|query\_id|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|peer|[Peer](../types/Peer.md) | Required|
-|msg\_id|[int](../types/int.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|peer|[Peer](../types/Peer.md) | Yes|
+|msg\_id|[int](../types/int.md) | Yes|
+|data|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: updateBotCallbackQuery attributes, type and example
 ```
 $updateBotCallbackQuery = ['_' => 'updateBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'peer' => Peer, 'msg_id' => int, 'data' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateBotCallbackQuery={_='updateBotCallbackQuery', query_id=long, user_id=int, peer=Peer, msg_id=int, data=bytes, }
+
+```
+
 

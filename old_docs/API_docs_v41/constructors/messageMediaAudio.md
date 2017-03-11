@@ -11,7 +11,7 @@ description: messageMediaAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|audio|[Audio](../types/Audio.md) | Required|
+|audio|[Audio](../types/Audio.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaAudio attributes, type and example
 ```
 $messageMediaAudio = ['_' => 'messageMediaAudio', 'audio' => Audio, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaAudio={_='messageMediaAudio', audio=Audio, }
+
+```
+
 

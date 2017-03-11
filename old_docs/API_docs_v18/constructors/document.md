@@ -11,15 +11,15 @@ description: document attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|file\_name|[string](../types/string.md) | Required|
-|mime\_type|[string](../types/string.md) | Required|
-|size|[int](../types/int.md) | Required|
-|thumb|[PhotoSize](../types/PhotoSize.md) | Required|
-|dc\_id|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|file\_name|[string](../types/string.md) | Yes|
+|mime\_type|[string](../types/string.md) | Yes|
+|size|[int](../types/int.md) | Yes|
+|thumb|[PhotoSize](../types/PhotoSize.md) | Yes|
+|dc\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -31,4 +31,13 @@ description: document attributes, type and example
 ```
 $document = ['_' => 'document', 'id' => long, 'access_hash' => long, 'user_id' => int, 'date' => int, 'file_name' => string, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+document={_='document', id=long, access_hash=long, user_id=int, date=int, file_name=string, mime_type=string, size=int, thumb=PhotoSize, dc_id=int, }
+
+```
+
 

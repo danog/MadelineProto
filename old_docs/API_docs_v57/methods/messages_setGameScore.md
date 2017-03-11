@@ -11,10 +11,10 @@ description: messages.setGameScore parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|[int](../types/int.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|score|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|[int](../types/int.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|score|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->setGameScore(['edit_message' => Bool, 'peer' => InputPeer, 'id' => int, 'user_id' => InputUser, 'score' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.setGameScore({edit_message=Bool, peer=InputPeer, id=int, user_id=InputUser, score=int, })
+```
+

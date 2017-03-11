@@ -10,7 +10,7 @@ description: phone.receivedCall parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Required|
+|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->phone->receivedCall(['peer' => InputPhoneCall, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = phone.receivedCall({peer=InputPhoneCall, })
+```
+

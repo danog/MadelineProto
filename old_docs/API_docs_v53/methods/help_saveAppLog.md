@@ -10,7 +10,7 @@ description: help.saveAppLog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|events|Array of [InputAppEvent](../types/InputAppEvent.md) | Required|
+|events|Array of [InputAppEvent](../types/InputAppEvent.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->help->saveAppLog(['events' => [InputAppEvent], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = help.saveAppLog({events={InputAppEvent}, })
+```
+

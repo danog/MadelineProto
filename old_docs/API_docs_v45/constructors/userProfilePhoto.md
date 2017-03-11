@@ -11,9 +11,9 @@ description: userProfilePhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo\_id|[long](../types/long.md) | Required|
-|photo\_small|[FileLocation](../types/FileLocation.md) | Required|
-|photo\_big|[FileLocation](../types/FileLocation.md) | Required|
+|photo\_id|[long](../types/long.md) | Yes|
+|photo\_small|[FileLocation](../types/FileLocation.md) | Yes|
+|photo\_big|[FileLocation](../types/FileLocation.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: userProfilePhoto attributes, type and example
 ```
 $userProfilePhoto = ['_' => 'userProfilePhoto', 'photo_id' => long, 'photo_small' => FileLocation, 'photo_big' => FileLocation, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userProfilePhoto={_='userProfilePhoto', photo_id=long, photo_small=FileLocation, photo_big=FileLocation, }
+
+```
+
 

@@ -11,8 +11,8 @@ description: inputChatPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputPhoto](../types/InputPhoto.md) | Required|
-|crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Required|
+|id|[InputPhoto](../types/InputPhoto.md) | Yes|
+|crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputChatPhoto attributes, type and example
 ```
 $inputChatPhoto = ['_' => 'inputChatPhoto', 'id' => InputPhoto, 'crop' => InputPhotoCrop, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputChatPhoto={_='inputChatPhoto', id=InputPhoto, crop=InputPhotoCrop, }
+
+```
+
 

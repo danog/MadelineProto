@@ -25,21 +25,22 @@ if (file_exists('token.php') && $MadelineProto === false) {
     $authorization = $MadelineProto->bot_login($MadelineProto_token);
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
+$offset = 0;
 $reply_markup = ['inline_keyboard' => [
         [ // Row 1
-            ['text' => 'Row 1 b1'],
-            ['text' => 'Row 1 b2'],
-            ['text' => 'Row 1 b3'],
+            ['text' => 'Row 1 c1'],
+            ['text' => 'Row 1 c2'],
+            ['text' => 'Row 1 c3'],
         ],
         [ // Row 2
-            ['text' => 'Row 2 b1'],
-            ['text' => 'Row 2 b2'],
-            ['text' => 'Row 2 b3'],
+            ['text' => 'Row 2 c1'],
+            ['text' => 'Row 2 c2'],
+            ['text' => 'Row 2 c3'],
         ],
         [ // Row 3
-            ['text' => 'Row 3 b1'],
-            ['text' => 'Row 3 b2'],
-            ['text' => 'Row 3 b3'],
+            ['text' => 'Row 3 c1'],
+            ['text' => 'Row 3 c2'],
+            ['text' => 'Row 3 c3'],
         ],
     ],
 
@@ -47,11 +48,12 @@ $reply_markup = ['inline_keyboard' => [
 $start = 'This bot can create inline text buttons.
 To use it, simply type an inline query with the following syntax:
 
-Row 1 b1 | Row 1 b2 | Row 1 b3
-Row 2 b1 | Row 2 b2 | Row 2 b3
-Row 3 b1 | Row 3 b2 | Row 3 b3
+@MadelineProto_bot Text to show in message
+Row 1 c1 | Row 1 c2 | Row 1 c3
+Row 2 c1 | Row 2 c2 | Row 2 c3
+Row 3 c1 | Row 3 c2 | Row 3 c3
 
-This will create a keyboard exactly like the one used in this message (click the buttons ;D)
+This will create a keyboard exactly like the one used in this message (click the buttons ;D) with the phrase "Text to show in message" instead of this help message.
 
 Created by [Daniil Gentili](mention:@danogentili) (@daniilgentili) using the [MadelineProto PHP MTProto client](daniil.it/MadelineProto).';
 while (true) {
@@ -92,52 +94,18 @@ while (true) {
                         $MadelineProto->messages->setInlineBotResults(['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'switch_pm' => $sswitch]);
                     } else {
                         $toset = ['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'private' => true];
-                        if (preg_match('|\$\s*$|', $update['update']['query'])) {
-                            $exploded = explode('|', preg_replace('/\$\s*$/', '', $update['update']['query']));
-                            array_walk($exploded, function (&$value, $key) {
-                                $value = preg_replace(['/^\s+/', '/\s+$/'], '', $value);
-                            });
-                            $query = array_shift($exploded);
-                            foreach ($exploded as $current => $botq) {
-                                $bot = preg_replace('|:.*|', '', $botq);
-                                if ($bot === '' || $uMadelineProto->get_info($bot)['bot_api_id'] === $MadelineProto->API->datacenter->authorization['user']['id']) {
-                                    $toset['switch_pm'] = $sswitch;
-                                    break;
-                                }
-                                $select = preg_replace('|'.$bot.':|', '', $botq);
-                                $results = $uMadelineProto->messages->getInlineBotResults(['bot' => $bot, 'peer' => $update['update']['user_id'], 'query' => $query, 'offset' => $offset]);
-                                if (isset($results['switch_pm'])) {
-                                    $toset['switch_pm'] = $results['switch_pm'];
-                                    break;
-                                }
-                                $toset['gallery'] = $results['gallery'];
-                                $toset['results'] = [];
-                                if (is_numeric($select)) {
-                                    $toset['results'][0] = $results['results'][$select - 1];
-                                } elseif ($select === '') {
-                                    $toset['results'] = $results['results'];
-                                } else {
-                                    foreach ($results['results'] as $result) {
-                                        if (isset($result['send_message']['message']) && preg_match('|'.$select.'|', $result['send_message']['message'])) {
-                                            $toset['results'][0] = $result;
-                                        }
-                                    }
-                                }
-                                if (!isset($toset['results'][0])) {
-                                    $toset['results'] = $results['results'];
-                                }
-                                if (count($exploded) - 1 === $current || !isset($toset['results'][0]['send_message']['message'])) {
-                                    break;
-                                }
-                                $query = $toset['results'][0]['send_message']['message'];
-                            }
-                        }
-                        if (empty($toset['results'])) {
-                            $toset['switch_pm'] = $sswitch;
+                        $rows = explode("\n", $update['update']['query']);
+                        $text = array_shift($rows);
+                        if (empty($rows)) {
+                            $MadelineProto->messages->setInlineBotResults(['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'switch_pm' => $sswitch]);
                         } else {
-                            array_walk($toset['results'], 'translate');
+                            array_walk($rows, function (&$value, $key) {
+                                $value = explode('|', $value);
+                                array_walk($value, function (&$value, $key) { $value = ['text' => trim($value)]; });
+                            });
+                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => rand(0, pow(2,31)-1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
+                            $MadelineProto->messages->setInlineBotResults($toset);
                         }
-                        $MadelineProto->messages->setInlineBotResults($toset);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
@@ -153,9 +121,9 @@ while (true) {
                     } catch (\danog\MadelineProto\Exception $e) {
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
-                    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     try {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+                        $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     } catch (\danog\MadelineProto\Exception $e) {
                     }

@@ -19,3 +19,12 @@ description: messages_stickerSetInstallResultSuccess attributes, type and exampl
 $messages_stickerSetInstallResultSuccess = ['_' => 'messages.stickerSetInstallResultSuccess', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_stickerSetInstallResultSuccess={_='messages.stickerSetInstallResultSuccess', }
+
+```
+
+

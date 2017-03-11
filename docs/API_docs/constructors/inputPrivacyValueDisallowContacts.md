@@ -19,3 +19,12 @@ description: inputPrivacyValueDisallowContacts attributes, type and example
 $inputPrivacyValueDisallowContacts = ['_' => 'inputPrivacyValueDisallowContacts', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyValueDisallowContacts={_='inputPrivacyValueDisallowContacts', }
+
+```
+
+

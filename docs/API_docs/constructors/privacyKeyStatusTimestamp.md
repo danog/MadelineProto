@@ -19,3 +19,12 @@ description: privacyKeyStatusTimestamp attributes, type and example
 $privacyKeyStatusTimestamp = ['_' => 'privacyKeyStatusTimestamp', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+privacyKeyStatusTimestamp={_='privacyKeyStatusTimestamp', }
+
+```
+
+

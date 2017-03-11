@@ -11,7 +11,7 @@ description: inputChatUploadedPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|file|[InputFile](../types/InputFile.md) | Required|
+|file|[InputFile](../types/InputFile.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputChatUploadedPhoto attributes, type and example
 ```
 $inputChatUploadedPhoto = ['_' => 'inputChatUploadedPhoto', 'file' => InputFile, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputChatUploadedPhoto={_='inputChatUploadedPhoto', file=InputFile, }
+
+```
+
 

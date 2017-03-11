@@ -11,8 +11,8 @@ description: stickerPack attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|emoticon|[string](../types/string.md) | Required|
-|documents|Array of [long](../types/long.md) | Required|
+|emoticon|[string](../types/string.md) | Yes|
+|documents|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: stickerPack attributes, type and example
 ### Example:
 
 ```
-$stickerPack = ['_' => 'stickerPack', 'emoticon' => string, 'documents' => [Vector t], ];
+$stickerPack = ['_' => 'stickerPack', 'emoticon' => string, 'documents' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+stickerPack={_='stickerPack', emoticon=string, documents={long}, }
+
+```
+
 

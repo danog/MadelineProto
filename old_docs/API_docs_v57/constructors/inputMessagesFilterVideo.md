@@ -19,3 +19,12 @@ description: inputMessagesFilterVideo attributes, type and example
 $inputMessagesFilterVideo = ['_' => 'inputMessagesFilterVideo', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterVideo={_='inputMessagesFilterVideo', }
+
+```
+
+

@@ -10,7 +10,7 @@ description: channels.getFullChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_ChatFull = $MadelineProto->channels->getFullChannel(['channel' => InputChannel, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_ChatFull = channels.getFullChannel({channel=InputChannel, })
+```
+

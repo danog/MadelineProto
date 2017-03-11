@@ -10,9 +10,9 @@ description: upload.getFile parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|location|[InputFileLocation](../types/InputFileLocation.md) | Required|
-|offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|location|[InputFileLocation](../types/InputFileLocation.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [upload\_File](../types/upload_File.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $upload_File = $MadelineProto->upload->getFile(['location' => InputFileLocation, 'offset' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+upload_File = upload.getFile({location=InputFileLocation, offset=int, limit=int, })
+```
+

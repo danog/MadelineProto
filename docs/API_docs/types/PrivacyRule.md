@@ -7,6 +7,8 @@ description: constructors and methods of type PrivacyRule
 
 
 
+Represents one rule for managing privacy settings
+
 ### Possible values (constructors):
 
 [privacyValueAllowContacts](../constructors/privacyValueAllowContacts.md)  

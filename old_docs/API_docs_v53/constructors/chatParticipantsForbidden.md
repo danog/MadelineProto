@@ -11,7 +11,7 @@ description: chatParticipantsForbidden attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
 |self\_participant|[ChatParticipant](../types/ChatParticipant.md) | Optional|
 
 
@@ -24,4 +24,13 @@ description: chatParticipantsForbidden attributes, type and example
 ```
 $chatParticipantsForbidden = ['_' => 'chatParticipantsForbidden', 'chat_id' => int, 'self_participant' => ChatParticipant, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatParticipantsForbidden={_='chatParticipantsForbidden', chat_id=int, self_participant=ChatParticipant, }
+
+```
+
 

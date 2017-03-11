@@ -11,8 +11,8 @@ description: messages_affectedMessages attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
-|pts\_count|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
+|pts\_count|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: messages_affectedMessages attributes, type and example
 ```
 $messages_affectedMessages = ['_' => 'messages.affectedMessages', 'pts' => int, 'pts_count' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_affectedMessages={_='messages.affectedMessages', pts=int, pts_count=int, }
+
+```
+
 

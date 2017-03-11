@@ -11,11 +11,11 @@ description: messageMediaVenue attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo|[GeoPoint](../types/GeoPoint.md) | Required|
-|title|[string](../types/string.md) | Required|
-|address|[string](../types/string.md) | Required|
-|provider|[string](../types/string.md) | Required|
-|venue\_id|[string](../types/string.md) | Required|
+|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|address|[string](../types/string.md) | Yes|
+|provider|[string](../types/string.md) | Yes|
+|venue\_id|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: messageMediaVenue attributes, type and example
 ```
 $messageMediaVenue = ['_' => 'messageMediaVenue', 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaVenue={_='messageMediaVenue', geo=GeoPoint, title=string, address=string, provider=string, venue_id=string, }
+
+```
+
 

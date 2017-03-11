@@ -11,10 +11,10 @@ description: updateInlineBotCallbackQuery attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|query\_id|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
-|chat\_instance|[long](../types/long.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|chat\_instance|[long](../types/long.md) | Yes|
 |data|[bytes](../types/bytes.md) | Optional|
 |game\_short\_name|[string](../types/string.md) | Optional|
 
@@ -28,4 +28,13 @@ description: updateInlineBotCallbackQuery attributes, type and example
 ```
 $updateInlineBotCallbackQuery = ['_' => 'updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateInlineBotCallbackQuery={_='updateInlineBotCallbackQuery', query_id=long, user_id=int, msg_id=InputBotInlineMessageID, chat_instance=long, data=bytes, game_short_name=string, }
+
+```
+
 

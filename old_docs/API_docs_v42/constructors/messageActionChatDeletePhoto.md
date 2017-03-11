@@ -19,3 +19,12 @@ description: messageActionChatDeletePhoto attributes, type and example
 $messageActionChatDeletePhoto = ['_' => 'messageActionChatDeletePhoto', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageActionChatDeletePhoto={_='messageActionChatDeletePhoto', }
+
+```
+
+

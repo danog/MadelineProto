@@ -11,8 +11,8 @@ description: updatePrivacy attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|key|[PrivacyKey](../types/PrivacyKey.md) | Required|
-|rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Required|
+|key|[PrivacyKey](../types/PrivacyKey.md) | Yes|
+|rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: updatePrivacy attributes, type and example
 ### Example:
 
 ```
-$updatePrivacy = ['_' => 'updatePrivacy', 'key' => PrivacyKey, 'rules' => [Vector t], ];
+$updatePrivacy = ['_' => 'updatePrivacy', 'key' => PrivacyKey, 'rules' => [PrivacyRule], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updatePrivacy={_='updatePrivacy', key=PrivacyKey, rules={PrivacyRule}, }
+
+```
+
 

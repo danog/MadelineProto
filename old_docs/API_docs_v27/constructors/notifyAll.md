@@ -19,3 +19,12 @@ description: notifyAll attributes, type and example
 $notifyAll = ['_' => 'notifyAll', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+notifyAll={_='notifyAll', }
+
+```
+
+

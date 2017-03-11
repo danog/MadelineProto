@@ -10,7 +10,7 @@ description: account.setAccountTTL parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Required|
+|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->setAccountTTL(['ttl' => AccountDaysTTL, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.setAccountTTL({ttl=AccountDaysTTL, })
+```
+

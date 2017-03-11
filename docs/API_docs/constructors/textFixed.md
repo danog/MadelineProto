@@ -11,7 +11,7 @@ description: textFixed attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textFixed attributes, type and example
 ```
 $textFixed = ['_' => 'textFixed', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textFixed={_='textFixed', text=RichText, }
+
+```
+
 

@@ -206,6 +206,18 @@ description: List of types
 
 [Vector t](Vector t.md)<a name="Vector t"></a>  
 
+[ContactStatus](ContactStatus.md)<a name="ContactStatus"></a>  
+
+[ReceivedNotifyMessage](ReceivedNotifyMessage.md)<a name="ReceivedNotifyMessage"></a>  
+
+[User](User.md)<a name="User"></a>  
+
+[WallPaper](WallPaper.md)<a name="WallPaper"></a>  
+
+[int](int.md)<a name="int"></a>  
+
+[long](long.md)<a name="long"></a>  
+
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
 
 [WebPage](WebPage.md)<a name="WebPage"></a>  
@@ -263,10 +275,6 @@ description: List of types
 [help\_Support](help_Support.md)<a name="help_Support"></a>  
 
 [help\_TermsOfService](help_TermsOfService.md)<a name="help_TermsOfService"></a>  
-
-[int](int.md)<a name="int"></a>  
-
-[long](long.md)<a name="long"></a>  
 
 [messages\_AffectedHistory](messages_AffectedHistory.md)<a name="messages_AffectedHistory"></a>  
 

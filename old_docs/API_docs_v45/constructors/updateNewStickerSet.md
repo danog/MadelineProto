@@ -11,7 +11,7 @@ description: updateNewStickerSet attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|stickerset|[messages\_StickerSet](../types/messages_StickerSet.md) | Required|
+|stickerset|[messages\_StickerSet](../types/messages_StickerSet.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateNewStickerSet attributes, type and example
 ```
 $updateNewStickerSet = ['_' => 'updateNewStickerSet', 'stickerset' => messages.StickerSet, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNewStickerSet={_='updateNewStickerSet', stickerset=messages.StickerSet, }
+
+```
+
 

@@ -12,7 +12,7 @@ description: updates_channelDifferenceEmpty attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |final|[Bool](../types/Bool.md) | Optional|
-|pts|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
 |timeout|[int](../types/int.md) | Optional|
 
 
@@ -25,4 +25,13 @@ description: updates_channelDifferenceEmpty attributes, type and example
 ```
 $updates_channelDifferenceEmpty = ['_' => 'updates.channelDifferenceEmpty', 'final' => true, 'pts' => int, 'timeout' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_channelDifferenceEmpty={_='updates.channelDifferenceEmpty', final=true, pts=int, timeout=int, }
+
+```
+
 

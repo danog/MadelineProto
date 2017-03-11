@@ -11,7 +11,7 @@ description: msg_copy attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|orig\_message|[MTMessage](../types/MTMessage.md) | Required|
+|orig\_message|[MTMessage](../types/MTMessage.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: msg_copy attributes, type and example
 ```
 $msg_copy = ['_' => 'msg_copy', 'orig_message' => MTMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msg_copy={_='msg_copy', orig_message=MTMessage, }
+
+```
+
 

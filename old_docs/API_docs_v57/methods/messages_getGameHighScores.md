@@ -10,9 +10,9 @@ description: messages.getGameHighScores parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|[int](../types/int.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|[int](../types/int.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_HighScores = $MadelineProto->messages->getGameHighScores(['peer' => InputPeer, 'id' => int, 'user_id' => InputUser, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_HighScores = messages.getGameHighScores({peer=InputPeer, id=int, user_id=InputUser, })
+```
+

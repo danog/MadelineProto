@@ -10,8 +10,8 @@ description: messages.searchGifs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|q|[string](../types/string.md) | Required|
-|offset|[int](../types/int.md) | Required|
+|q|[string](../types/string.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_FoundGifs](../types/messages_FoundGifs.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_FoundGifs = $MadelineProto->messages->searchGifs(['q' => string, 'offset' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_FoundGifs = messages.searchGifs({q=string, offset=int, })
+```
+

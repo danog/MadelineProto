@@ -10,8 +10,8 @@ description: invokeAfterMsg parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_id|[long](../types/long.md) | Required|
-|query|[!X](../types/!X.md) | Required|
+|msg\_id|[long](../types/long.md) | Yes|
+|query|[!X](../types/!X.md) | Yes|
 
 
 ### Return type: [X](../types/X.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $X = $MadelineProto->invokeAfterMsg(['msg_id' => long, 'query' => !X, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+X = invokeAfterMsg({msg_id=long, query=!X, })
+```
+

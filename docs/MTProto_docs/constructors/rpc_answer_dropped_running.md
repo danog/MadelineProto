@@ -19,3 +19,12 @@ description: rpc_answer_dropped_running attributes, type and example
 $rpc_answer_dropped_running = ['_' => 'rpc_answer_dropped_running', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+rpc_answer_dropped_running={_='rpc_answer_dropped_running', }
+
+```
+
+

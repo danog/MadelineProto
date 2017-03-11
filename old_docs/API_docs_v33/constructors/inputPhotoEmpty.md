@@ -19,3 +19,12 @@ description: inputPhotoEmpty attributes, type and example
 $inputPhotoEmpty = ['_' => 'inputPhotoEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPhotoEmpty={_='inputPhotoEmpty', }
+
+```
+
+

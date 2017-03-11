@@ -10,12 +10,12 @@ description: req_DH_params parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
-|server\_nonce|[int128](../types/int128.md) | Required|
-|p|[bytes](../types/bytes.md) | Required|
-|q|[bytes](../types/bytes.md) | Required|
-|public\_key\_fingerprint|[long](../types/long.md) | Required|
-|encrypted\_data|[bytes](../types/bytes.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
+|server\_nonce|[int128](../types/int128.md) | Yes|
+|p|[bytes](../types/bytes.md) | Yes|
+|q|[bytes](../types/bytes.md) | Yes|
+|public\_key\_fingerprint|[long](../types/long.md) | Yes|
+|encrypted\_data|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)
@@ -38,5 +38,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Server_DH_Params = $MadelineProto->req->DH->params(['nonce' => int128, 'server_nonce' => int128, 'p' => bytes, 'q' => bytes, 'public_key_fingerprint' => long, 'encrypted_data' => bytes, ]);
+$Server_DH_Params = $MadelineProto->req_DH_params(['nonce' => int128, 'server_nonce' => int128, 'p' => bytes, 'q' => bytes, 'public_key_fingerprint' => long, 'encrypted_data' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Server_DH_Params = req_DH_params({nonce=int128, server_nonce=int128, p=bytes, q=bytes, public_key_fingerprint=long, encrypted_data=bytes, })
+```
+

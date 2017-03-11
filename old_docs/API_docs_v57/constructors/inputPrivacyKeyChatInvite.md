@@ -19,3 +19,12 @@ description: inputPrivacyKeyChatInvite attributes, type and example
 $inputPrivacyKeyChatInvite = ['_' => 'inputPrivacyKeyChatInvite', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyKeyChatInvite={_='inputPrivacyKeyChatInvite', }
+
+```
+
+

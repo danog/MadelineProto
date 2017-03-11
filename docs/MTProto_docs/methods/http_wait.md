@@ -10,9 +10,9 @@ description: http_wait parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|max\_delay|[int](../types/int.md) | Required|
-|wait\_after|[int](../types/int.md) | Required|
-|max\_wait|[int](../types/int.md) | Required|
+|max\_delay|[int](../types/int.md) | Yes|
+|wait\_after|[int](../types/int.md) | Yes|
+|max\_wait|[int](../types/int.md) | Yes|
 
 
 ### Return type: [HttpWait](../types/HttpWait.md)
@@ -35,5 +35,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$HttpWait = $MadelineProto->http->wait(['max_delay' => int, 'wait_after' => int, 'max_wait' => int, ]);
+$HttpWait = $MadelineProto->http_wait(['max_delay' => int, 'wait_after' => int, 'max_wait' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+HttpWait = http_wait({max_delay=int, wait_after=int, max_wait=int, })
+```
+

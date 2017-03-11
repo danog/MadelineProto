@@ -11,9 +11,9 @@ description: highScore attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pos|[int](../types/int.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|score|[int](../types/int.md) | Required|
+|pos|[int](../types/int.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|score|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: highScore attributes, type and example
 ```
 $highScore = ['_' => 'highScore', 'pos' => int, 'user_id' => int, 'score' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+highScore={_='highScore', pos=int, user_id=int, score=int, }
+
+```
+
 

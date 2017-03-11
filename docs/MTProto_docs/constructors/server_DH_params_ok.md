@@ -11,9 +11,9 @@ description: server_DH_params_ok attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
-|server\_nonce|[int128](../types/int128.md) | Required|
-|encrypted\_answer|[bytes](../types/bytes.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
+|server\_nonce|[int128](../types/int128.md) | Yes|
+|encrypted\_answer|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: server_DH_params_ok attributes, type and example
 ```
 $server_DH_params_ok = ['_' => 'server_DH_params_ok', 'nonce' => int128, 'server_nonce' => int128, 'encrypted_answer' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+server_DH_params_ok={_='server_DH_params_ok', nonce=int128, server_nonce=int128, encrypted_answer=bytes, }
+
+```
+
 

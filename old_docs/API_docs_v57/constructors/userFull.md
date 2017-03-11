@@ -12,11 +12,11 @@ description: userFull attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |blocked|[Bool](../types/Bool.md) | Optional|
-|user|[User](../types/User.md) | Required|
+|user|[User](../types/User.md) | Yes|
 |about|[string](../types/string.md) | Optional|
-|link|[contacts\_Link](../types/contacts_Link.md) | Required|
+|link|[contacts\_Link](../types/contacts_Link.md) | Yes|
 |profile\_photo|[Photo](../types/Photo.md) | Optional|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Required|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
 |bot\_info|[BotInfo](../types/BotInfo.md) | Optional|
 
 
@@ -29,4 +29,13 @@ description: userFull attributes, type and example
 ```
 $userFull = ['_' => 'userFull', 'blocked' => true, 'user' => User, 'about' => string, 'link' => contacts.Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userFull={_='userFull', blocked=true, user=User, about=string, link=contacts.Link, profile_photo=Photo, notify_settings=PeerNotifySettings, bot_info=BotInfo, }
+
+```
+
 

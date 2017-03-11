@@ -11,11 +11,11 @@ description: photoCachedSize attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|type|[string](../types/string.md) | Required|
-|location|[FileLocation](../types/FileLocation.md) | Required|
-|w|[int](../types/int.md) | Required|
-|h|[int](../types/int.md) | Required|
-|bytes|[bytes](../types/bytes.md) | Required|
+|type|[string](../types/string.md) | Yes|
+|location|[FileLocation](../types/FileLocation.md) | Yes|
+|w|[int](../types/int.md) | Yes|
+|h|[int](../types/int.md) | Yes|
+|bytes|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: photoCachedSize attributes, type and example
 ```
 $photoCachedSize = ['_' => 'photoCachedSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'bytes' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photoCachedSize={_='photoCachedSize', type=string, location=FileLocation, w=int, h=int, bytes=bytes, }
+
+```
+
 

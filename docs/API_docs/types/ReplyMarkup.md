@@ -7,6 +7,8 @@ description: constructors and methods of type ReplyMarkup
 
 
 
+Contains description of custom keyboard and actions with it for fast reply to bots
+
 ### Possible values (constructors):
 
 [replyKeyboardHide](../constructors/replyKeyboardHide.md)  

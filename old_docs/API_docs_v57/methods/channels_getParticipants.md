@@ -10,10 +10,10 @@ description: channels.getParticipants parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|filter|[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Required|
-|offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|filter|[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $channels_ChannelParticipants = $MadelineProto->channels->getParticipants(['channel' => InputChannel, 'filter' => ChannelParticipantsFilter, 'offset' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+channels_ChannelParticipants = channels.getParticipants({channel=InputChannel, filter=ChannelParticipantsFilter, offset=int, limit=int, })
+```
+

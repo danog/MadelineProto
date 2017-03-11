@@ -10,7 +10,7 @@ description: messages.reorderStickerSets parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|order|Array of [long](../types/long.md) | Required|
+|order|Array of [long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->reorderStickerSets(['order' => [long], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.reorderStickerSets({order={long}, })
+```
+

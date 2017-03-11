@@ -12,7 +12,7 @@ description: documentAttributeAudio attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |voice|[Bool](../types/Bool.md) | Optional|
-|duration|[int](../types/int.md) | Required|
+|duration|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Optional|
 |performer|[string](../types/string.md) | Optional|
 |waveform|[bytes](../types/bytes.md) | Optional|
@@ -27,4 +27,13 @@ description: documentAttributeAudio attributes, type and example
 ```
 $documentAttributeAudio = ['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => int, 'title' => string, 'performer' => string, 'waveform' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+documentAttributeAudio={_='documentAttributeAudio', voice=true, duration=int, title=string, performer=string, waveform=bytes, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: messageMediaWebPage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|webpage|[WebPage](../types/WebPage.md) | Required|
+|webpage|[WebPage](../types/WebPage.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaWebPage attributes, type and example
 ```
 $messageMediaWebPage = ['_' => 'messageMediaWebPage', 'webpage' => WebPage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaWebPage={_='messageMediaWebPage', webpage=WebPage, }
+
+```
+
 

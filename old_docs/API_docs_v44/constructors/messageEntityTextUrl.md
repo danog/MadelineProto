@@ -11,9 +11,9 @@ description: messageEntityTextUrl attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
-|url|[string](../types/string.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
+|url|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: messageEntityTextUrl attributes, type and example
 ```
 $messageEntityTextUrl = ['_' => 'messageEntityTextUrl', 'offset' => int, 'length' => int, 'url' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageEntityTextUrl={_='messageEntityTextUrl', offset=int, length=int, url=string, }
+
+```
+
 

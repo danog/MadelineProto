@@ -11,8 +11,8 @@ description: account_sentChangePhoneCode attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_code\_hash|[string](../types/string.md) | Required|
-|send\_call\_timeout|[int](../types/int.md) | Required|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
+|send\_call\_timeout|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: account_sentChangePhoneCode attributes, type and example
 ```
 $account_sentChangePhoneCode = ['_' => 'account.sentChangePhoneCode', 'phone_code_hash' => string, 'send_call_timeout' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_sentChangePhoneCode={_='account.sentChangePhoneCode', phone_code_hash=string, send_call_timeout=int, }
+
+```
+
 

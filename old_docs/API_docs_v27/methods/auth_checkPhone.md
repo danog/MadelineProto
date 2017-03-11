@@ -10,7 +10,7 @@ description: auth.checkPhone parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_CheckedPhone = auth.checkPhone({phone_number=string, })
+```
+

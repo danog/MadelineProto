@@ -19,3 +19,12 @@ description: inputReportReasonSpam attributes, type and example
 $inputReportReasonSpam = ['_' => 'inputReportReasonSpam', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputReportReasonSpam={_='inputReportReasonSpam', }
+
+```
+
+

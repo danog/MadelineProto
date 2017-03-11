@@ -19,3 +19,12 @@ description: auth_codeTypeCall attributes, type and example
 $auth_codeTypeCall = ['_' => 'auth.codeTypeCall', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+auth_codeTypeCall={_='auth.codeTypeCall', }
+
+```
+
+

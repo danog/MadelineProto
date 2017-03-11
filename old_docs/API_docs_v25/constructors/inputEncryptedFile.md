@@ -11,8 +11,8 @@ description: inputEncryptedFile attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputEncryptedFile attributes, type and example
 ```
 $inputEncryptedFile = ['_' => 'inputEncryptedFile', 'id' => long, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputEncryptedFile={_='inputEncryptedFile', id=long, access_hash=long, }
+
+```
+
 

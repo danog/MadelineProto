@@ -10,8 +10,8 @@ description: invokeWithLayer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|layer|[int](../types/int.md) | Required|
-|query|[!X](../types/!X.md) | Required|
+|layer|[int](../types/int.md) | Yes|
+|query|[!X](../types/!X.md) | Yes|
 
 
 ### Return type: [X](../types/X.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $X = $MadelineProto->invokeWithLayer(['layer' => int, 'query' => !X, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+X = invokeWithLayer({layer=int, query=!X, })
+```
+

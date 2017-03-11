@@ -11,8 +11,8 @@ description: pageBlockCollage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|items|Array of [PageBlock](../types/PageBlock.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|items|Array of [PageBlock](../types/PageBlock.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: pageBlockCollage attributes, type and example
 ### Example:
 
 ```
-$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [Vector t], 'caption' => RichText, ];
+$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock], 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockCollage={_='pageBlockCollage', items={PageBlock}, caption=RichText, }
+
+```
+
 

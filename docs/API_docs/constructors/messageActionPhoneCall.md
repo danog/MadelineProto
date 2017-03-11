@@ -11,7 +11,7 @@ description: messageActionPhoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|call\_id|[long](../types/long.md) | Required|
+|call\_id|[long](../types/long.md) | Yes|
 |reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Optional|
 |duration|[int](../types/int.md) | Optional|
 
@@ -25,4 +25,13 @@ description: messageActionPhoneCall attributes, type and example
 ```
 $messageActionPhoneCall = ['_' => 'messageActionPhoneCall', 'call_id' => long, 'reason' => PhoneCallDiscardReason, 'duration' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionPhoneCall={_='messageActionPhoneCall', call_id=long, reason=PhoneCallDiscardReason, duration=int, }
+
+```
+
 

@@ -10,7 +10,7 @@ description: account.deleteAccount parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|reason|[string](../types/string.md) | Required|
+|reason|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->account->deleteAccount(['reason' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = account.deleteAccount({reason=string, })
+```
+

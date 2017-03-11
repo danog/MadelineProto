@@ -10,11 +10,11 @@ description: auth.signUp parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_number|[string](../types/string.md) | Required|
-|phone\_code\_hash|[string](../types/string.md) | Required|
-|phone\_code|[string](../types/string.md) | Required|
-|first\_name|[string](../types/string.md) | Required|
-|last\_name|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
+|phone\_code\_hash|[string](../types/string.md) | Yes|
+|phone\_code|[string](../types/string.md) | Yes|
+|first\_name|[string](../types/string.md) | Yes|
+|last\_name|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $auth_Authorization = $MadelineProto->auth->signUp(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, 'first_name' => string, 'last_name' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_Authorization = auth.signUp({phone_number=string, phone_code_hash=string, phone_code=string, first_name=string, last_name=string, })
+```
+

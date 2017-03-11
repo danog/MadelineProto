@@ -11,8 +11,8 @@ description: stickerSetMultiCovered attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|set|[StickerSet](../types/StickerSet.md) | Required|
-|covers|Array of [Document](../types/Document.md) | Required|
+|set|[StickerSet](../types/StickerSet.md) | Yes|
+|covers|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: stickerSetMultiCovered attributes, type and example
 ### Example:
 
 ```
-$stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Vector t], ];
+$stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Document], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+stickerSetMultiCovered={_='stickerSetMultiCovered', set=StickerSet, covers={Document}, }
+
+```
+
 

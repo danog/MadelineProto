@@ -11,7 +11,7 @@ description: updateWebPage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|webpage|[WebPage](../types/WebPage.md) | Required|
+|webpage|[WebPage](../types/WebPage.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateWebPage attributes, type and example
 ```
 $updateWebPage = ['_' => 'updateWebPage', 'webpage' => WebPage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateWebPage={_='updateWebPage', webpage=WebPage, }
+
+```
+
 

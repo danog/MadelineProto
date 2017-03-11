@@ -11,10 +11,10 @@ description: updateDeleteChannelMessages attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[Peer](../types/Peer.md) | Required|
-|messages|Array of [int](../types/int.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|pts\_count|[int](../types/int.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
+|messages|Array of [int](../types/int.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|pts\_count|[int](../types/int.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: updateDeleteChannelMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteChannelMessages = ['_' => 'updateDeleteChannelMessages', 'peer' => Peer, 'messages' => [Vector t], 'pts' => int, 'pts_count' => int, ];
+$updateDeleteChannelMessages = ['_' => 'updateDeleteChannelMessages', 'peer' => Peer, 'messages' => [int], 'pts' => int, 'pts_count' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateDeleteChannelMessages={_='updateDeleteChannelMessages', peer=Peer, messages={int}, pts=int, pts_count=int, }
+
+```
+
 

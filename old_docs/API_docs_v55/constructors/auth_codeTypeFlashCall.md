@@ -19,3 +19,12 @@ description: auth_codeTypeFlashCall attributes, type and example
 $auth_codeTypeFlashCall = ['_' => 'auth.codeTypeFlashCall', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+auth_codeTypeFlashCall={_='auth.codeTypeFlashCall', }
+
+```
+
+

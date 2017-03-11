@@ -11,7 +11,7 @@ description: auth_sentCodeTypeFlashCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pattern|[string](../types/string.md) | Required|
+|pattern|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: auth_sentCodeTypeFlashCall attributes, type and example
 ```
 $auth_sentCodeTypeFlashCall = ['_' => 'auth.sentCodeTypeFlashCall', 'pattern' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_sentCodeTypeFlashCall={_='auth.sentCodeTypeFlashCall', pattern=string, }
+
+```
+
 

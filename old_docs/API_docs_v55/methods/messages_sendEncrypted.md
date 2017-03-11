@@ -10,8 +10,8 @@ description: messages.sendEncrypted parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
@@ -34,5 +34,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncrypted(['peer' => InputEncryptedChat, 'data' => bytes, ]);
+$messages_SentEncryptedMessage = $MadelineProto->messages->sendEncrypted(['peer' => InputEncryptedChat, 'message' => DecryptedMessage, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_SentEncryptedMessage = messages.sendEncrypted({peer=InputEncryptedChat, message=DecryptedMessage, })
+```
+

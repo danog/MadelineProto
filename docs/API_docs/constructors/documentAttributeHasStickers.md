@@ -19,3 +19,12 @@ description: documentAttributeHasStickers attributes, type and example
 $documentAttributeHasStickers = ['_' => 'documentAttributeHasStickers', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+documentAttributeHasStickers={_='documentAttributeHasStickers', }
+
+```
+
+

@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $account_Password = $MadelineProto->account->getPassword();
 ```
+
+Or, if you're into Lua:
+
+```
+account_Password = account.getPassword({})
+```
+

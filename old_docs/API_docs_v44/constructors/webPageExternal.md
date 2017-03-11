@@ -11,8 +11,8 @@ description: webPageExternal attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|display\_url|[string](../types/string.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|display\_url|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Optional|
 |title|[string](../types/string.md) | Optional|
 |description|[string](../types/string.md) | Optional|
@@ -32,4 +32,13 @@ description: webPageExternal attributes, type and example
 ```
 $webPageExternal = ['_' => 'webPageExternal', 'url' => string, 'display_url' => string, 'type' => string, 'title' => string, 'description' => string, 'thumb_url' => string, 'content_url' => string, 'w' => int, 'h' => int, 'duration' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+webPageExternal={_='webPageExternal', url=string, display_url=string, type=string, title=string, description=string, thumb_url=string, content_url=string, w=int, h=int, duration=int, }
+
+```
+
 

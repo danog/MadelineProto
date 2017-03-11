@@ -11,8 +11,8 @@ description: inputPhoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputPhoneCall attributes, type and example
 ```
 $inputPhoneCall = ['_' => 'inputPhoneCall', 'id' => long, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPhoneCall={_='inputPhoneCall', id=long, access_hash=long, }
+
+```
+
 

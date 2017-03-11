@@ -19,3 +19,12 @@ description: channelRoleEmpty attributes, type and example
 $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelRoleEmpty={_='channelRoleEmpty', }
+
+```
+
+

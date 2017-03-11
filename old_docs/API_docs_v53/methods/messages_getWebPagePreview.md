@@ -10,7 +10,7 @@ description: messages.getWebPagePreview parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[string](../types/string.md) | Required|
+|message|[string](../types/string.md) | Yes|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $MessageMedia = $MadelineProto->messages->getWebPagePreview(['message' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+MessageMedia = messages.getWebPagePreview({message=string, })
+```
+

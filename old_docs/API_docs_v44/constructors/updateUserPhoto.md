@@ -11,10 +11,10 @@ description: updateUserPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Required|
-|previous|[Bool](../types/Bool.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
+|previous|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: updateUserPhoto attributes, type and example
 ```
 $updateUserPhoto = ['_' => 'updateUserPhoto', 'user_id' => int, 'date' => int, 'photo' => UserProfilePhoto, 'previous' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateUserPhoto={_='updateUserPhoto', user_id=int, date=int, photo=UserProfilePhoto, previous=Bool, }
+
+```
+
 

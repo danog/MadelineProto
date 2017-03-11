@@ -1,0 +1,46 @@
+---
+title: unpinChannelMessage
+description: Removes pinned message in the supergroup channel. Needs editor privileges in the channel
+---
+## Method: unpinChannelMessage  
+[Back to methods index](index.md)
+
+
+Removes pinned message in the supergroup channel. Needs editor privileges in the channel
+
+### Params:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+|channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
+
+
+### Return type: [Ok](../types/Ok.md)
+
+### Example:
+
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+if (isset($token)) {
+    $this->bot_login($token);
+}
+if (isset($number)) {
+    $sentCode = $MadelineProto->phone_login($number);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $MadelineProto->complete_phone_login($code);
+}
+
+$Ok = $MadelineProto->unpinChannelMessage(['channel_id' => int, ]);
+```
+
+Or, if you're into Lua:
+
+```
+Ok = unpinChannelMessage({channel_id=int, })
+```
+

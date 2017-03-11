@@ -10,7 +10,7 @@ description: rpc_drop_answer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|req\_msg\_id|[long](../types/long.md) | Required|
+|req\_msg\_id|[long](../types/long.md) | Yes|
 
 
 ### Return type: [RpcDropAnswer](../types/RpcDropAnswer.md)
@@ -33,5 +33,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$RpcDropAnswer = $MadelineProto->rpc->drop->answer(['req_msg_id' => long, ]);
+$RpcDropAnswer = $MadelineProto->rpc_drop_answer(['req_msg_id' => long, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+RpcDropAnswer = rpc_drop_answer({req_msg_id=long, })
+```
+

@@ -11,7 +11,7 @@ description: pageBlockSubheader attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: pageBlockSubheader attributes, type and example
 ```
 $pageBlockSubheader = ['_' => 'pageBlockSubheader', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockSubheader={_='pageBlockSubheader', text=RichText, }
+
+```
+
 

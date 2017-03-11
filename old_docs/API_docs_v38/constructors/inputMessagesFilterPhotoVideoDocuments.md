@@ -19,3 +19,12 @@ description: inputMessagesFilterPhotoVideoDocuments attributes, type and example
 $inputMessagesFilterPhotoVideoDocuments = ['_' => 'inputMessagesFilterPhotoVideoDocuments', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterPhotoVideoDocuments={_='inputMessagesFilterPhotoVideoDocuments', }
+
+```
+
+

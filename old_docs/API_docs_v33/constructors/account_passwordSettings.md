@@ -11,7 +11,7 @@ description: account_passwordSettings attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|email|[string](../types/string.md) | Required|
+|email|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: account_passwordSettings attributes, type and example
 ```
 $account_passwordSettings = ['_' => 'account.passwordSettings', 'email' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_passwordSettings={_='account.passwordSettings', email=string, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: messageActionHistoryClear attributes, type and example
 $messageActionHistoryClear = ['_' => 'messageActionHistoryClear', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messageActionHistoryClear={_='messageActionHistoryClear', }
+
+```
+
+

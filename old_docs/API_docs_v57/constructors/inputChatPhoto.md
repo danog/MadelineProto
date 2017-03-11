@@ -11,7 +11,7 @@ description: inputChatPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputPhoto](../types/InputPhoto.md) | Required|
+|id|[InputPhoto](../types/InputPhoto.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputChatPhoto attributes, type and example
 ```
 $inputChatPhoto = ['_' => 'inputChatPhoto', 'id' => InputPhoto, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputChatPhoto={_='inputChatPhoto', id=InputPhoto, }
+
+```
+
 

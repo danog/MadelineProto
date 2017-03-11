@@ -11,9 +11,9 @@ description: rpc_answer_dropped attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_id|[long](../types/long.md) | Required|
-|seq\_no|[int](../types/int.md) | Required|
-|bytes|[int](../types/int.md) | Required|
+|msg\_id|[long](../types/long.md) | Yes|
+|seq\_no|[int](../types/int.md) | Yes|
+|bytes|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: rpc_answer_dropped attributes, type and example
 ```
 $rpc_answer_dropped = ['_' => 'rpc_answer_dropped', 'msg_id' => long, 'seq_no' => int, 'bytes' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+rpc_answer_dropped={_='rpc_answer_dropped', msg_id=long, seq_no=int, bytes=int, }
+
+```
+
 

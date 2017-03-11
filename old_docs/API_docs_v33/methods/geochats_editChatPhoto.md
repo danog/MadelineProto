@@ -10,8 +10,8 @@ description: geochats.editChatPhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
-|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $geochats_StatedMessage = $MadelineProto->geochats->editChatPhoto(['peer' => InputGeoChat, 'photo' => InputChatPhoto, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_StatedMessage = geochats.editChatPhoto({peer=InputGeoChat, photo=InputChatPhoto, })
+```
+

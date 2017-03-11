@@ -11,12 +11,12 @@ description: messages_statedMessageLink attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[Message](../types/Message.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
-|links|Array of [contacts\_Link](../types/contacts_Link.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
+|message|[Message](../types/Message.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
+|links|Array of [contacts\_Link](../types/contacts_Link.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: messages_statedMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Vector t], 'users' => [Vector t], 'links' => [Vector t], 'pts' => int, 'seq' => int, ];
+$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Chat], 'users' => [User], 'links' => [contacts.Link], 'pts' => int, 'seq' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_statedMessageLink={_='messages.statedMessageLink', message=Message, chats={Chat}, users={User}, links={contacts.Link}, pts=int, seq=int, }
+
+```
+
 

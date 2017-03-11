@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $updates_State = $MadelineProto->updates->getState();
 ```
+
+Or, if you're into Lua:
+
+```
+updates_State = updates.getState({})
+```
+

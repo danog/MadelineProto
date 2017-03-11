@@ -11,7 +11,7 @@ description: updatePhoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_call|[PhoneCall](../types/PhoneCall.md) | Required|
+|phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updatePhoneCall attributes, type and example
 ```
 $updatePhoneCall = ['_' => 'updatePhoneCall', 'phone_call' => PhoneCall, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updatePhoneCall={_='updatePhoneCall', phone_call=PhoneCall, }
+
+```
+
 

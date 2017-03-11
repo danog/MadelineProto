@@ -19,3 +19,12 @@ description: inputMessagesFilterEmpty attributes, type and example
 $inputMessagesFilterEmpty = ['_' => 'inputMessagesFilterEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterEmpty={_='inputMessagesFilterEmpty', }
+
+```
+
+

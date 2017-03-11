@@ -11,9 +11,9 @@ description: messages_chatFull attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|full\_chat|[ChatFull](../types/ChatFull.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|full\_chat|[ChatFull](../types/ChatFull.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: messages_chatFull attributes, type and example
 ### Example:
 
 ```
-$messages_chatFull = ['_' => 'messages.chatFull', 'full_chat' => ChatFull, 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_chatFull = ['_' => 'messages.chatFull', 'full_chat' => ChatFull, 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_chatFull={_='messages.chatFull', full_chat=ChatFull, chats={Chat}, users={User}, }
+
+```
+
 

@@ -11,12 +11,12 @@ description: message attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|from\_id|[int](../types/int.md) | Required|
-|to\_id|[Peer](../types/Peer.md) | Required|
-|date|[int](../types/int.md) | Required|
-|message|[string](../types/string.md) | Required|
-|media|[MessageMedia](../types/MessageMedia.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|from\_id|[int](../types/int.md) | Yes|
+|to\_id|[Peer](../types/Peer.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: message attributes, type and example
 ```
 $message = ['_' => 'message', 'id' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'message' => string, 'media' => MessageMedia, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+message={_='message', id=int, from_id=int, to_id=Peer, date=int, message=string, media=MessageMedia, }
+
+```
+
 

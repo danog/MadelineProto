@@ -19,3 +19,12 @@ description: userStatusRecently attributes, type and example
 $userStatusRecently = ['_' => 'userStatusRecently', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+userStatusRecently={_='userStatusRecently', }
+
+```
+
+

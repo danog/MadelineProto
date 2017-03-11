@@ -10,8 +10,8 @@ description: channels.inviteToChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|users|Array of [InputUser](../types/InputUser.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|users|Array of [InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->inviteToChannel(['channel' => InputChannel, 'users' => [InputUser], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.inviteToChannel({channel=InputChannel, users={InputUser}, })
+```
+

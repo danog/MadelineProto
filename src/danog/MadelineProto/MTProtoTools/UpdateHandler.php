@@ -17,7 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait UpdateHandler
 {
-    public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0];
+    public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
     public $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
@@ -139,6 +139,8 @@ trait UpdateHandler
             $input = $this->get_info('channel#'.$channel)['InputChannel'];
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            return false;
         }
         $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
@@ -176,6 +178,10 @@ trait UpdateHandler
             $this->should_serialize = true;
             $this->get_update_state()['pts'] = $data['pts'];
         }
+        if (isset($data['qts']) && $data['qts'] !== 0) {
+            $this->should_serialize = true;
+            $this->get_update_state()['qts'] = $data['qts'];
+        }
         if (isset($data['seq']) && $data['seq'] !== 0) {
             $this->should_serialize = true;
             $this->get_update_state()['seq'] = $data['seq'];
@@ -188,6 +194,10 @@ trait UpdateHandler
 
     public function &get_update_state()
     {
+        if (!isset($this->updates_state['qts'])) {
+            $this->should_serialize = true;
+            $this->updates_state['qts'] = 0;
+        }
         return $this->updates_state;
     }
 
@@ -208,8 +218,7 @@ trait UpdateHandler
             $this->get_update_state()['pending_pts_updates'] = [];
             $this->get_update_state()['pending_seq_updates'] = [];
         }
-
-        $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => -1]);
+        $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']]);
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_update_state()['sync_loading'] = false;
 
@@ -219,6 +228,9 @@ trait UpdateHandler
                 break;
             case 'updates.difference':
                 $this->set_update_state($difference['state']);
+                foreach ($difference['new_encrypted_messages'] as $encrypted) {
+                    $this->handle_encrypted_update(['_' => 'updateNewEncryptedMessage', 'message' => $encrypted]);
+                }
                 $this->handle_multiple_update($difference['other_updates']);
                 $this->handle_update_messages($difference['new_messages']);
                 break;
@@ -474,6 +486,54 @@ trait UpdateHandler
         if ($update['_'] === 'updateDcOptions') {
             \danog\MadelineProto\Logger::log(['Got new dc options'], \danog\MadelineProto\Logger::VERBOSE);
             $this->parse_dc_options($update['dc_options']);
+
+            return;
+        }
+        if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
+            $cur_state = $this->get_update_state();
+            if ($cur_state['qts'] === -1) {
+                $cur_state['qts'] = $update['qts'];
+                $this->should_serialize = true;
+            }
+            if ($update['qts'] < $cur_state['qts']) {
+                \danog\MadelineProto\Logger::log(['Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
+
+                return false;
+            }
+            if ($update['qts'] > $cur_state['qts']+1) {
+                \danog\MadelineProto\Logger::log(['Qts hole. update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
+
+                $this->get_updates_difference();
+
+                return false;
+            }
+            \danog\MadelineProto\Logger::log(['Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::VERBOSE);
+            $cur_state['qts'] = $update['qts'];
+            $this->should_serialize = true;
+            $this->handle_encrypted_update($update);
+            return;
+        }
+        /*
+        if ($update['_'] === 'updateEncryptedChatTyping') {
+            $update = ['_' => 'updateUserTyping', 'user_id' => $this->encrypted_chats[$update['chat_id']]['user_id'], 'action' => ['_' => 'sendMessageTypingAction']];
+        }
+        */
+        if ($update['_'] === 'updateEncryption') {
+            switch ($update['chat']['_']) {
+                case 'encryptedChatRequested':
+                if ($this->settings['secret_chats']['accept_chats'] === false || (is_array($this->settings['secret_chats']['accept_chats']) && !in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) return;
+                \danog\MadelineProto\Logger::log(['Accepting secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
+                return $this->accept_secret_chat($update['chat']);
+                case 'encryptedChatDiscarded':
+                \danog\MadelineProto\Logger::log(['Revoking secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
+                if (isset($this->secret_chats[$update['chat']['id']])) unset($this->secret_chats[$update['chat']['id']]);
+                if (isset($this->temp_requested_secret_chats[$update['chat']['id']])) unset($this->temp_requested_secret_chats[$update['chat']['id']]);
+                return;
+                case 'encryptedChat':
+                \danog\MadelineProto\Logger::log(['Completing creation of secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
+                return $this->complete_secret_chat($update['chat']);
+            }
+            \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::NOTICE);
 
             return;
         }

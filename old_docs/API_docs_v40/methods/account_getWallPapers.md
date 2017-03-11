@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Vector_of_WallPaper = $MadelineProto->account->getWallPapers();
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_WallPaper = account.getWallPapers({})
+```
+

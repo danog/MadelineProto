@@ -10,7 +10,7 @@ description: account.getPrivacy parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Required|
+|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $account_PrivacyRules = $MadelineProto->account->getPrivacy(['key' => InputPrivacyKey, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+account_PrivacyRules = account.getPrivacy({key=InputPrivacyKey, })
+```
+

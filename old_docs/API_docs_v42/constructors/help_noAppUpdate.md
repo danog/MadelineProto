@@ -19,3 +19,12 @@ description: help_noAppUpdate attributes, type and example
 $help_noAppUpdate = ['_' => 'help.noAppUpdate', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+help_noAppUpdate={_='help.noAppUpdate', }
+
+```
+
+

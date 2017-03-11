@@ -19,3 +19,12 @@ description: updateSavedGifs attributes, type and example
 $updateSavedGifs = ['_' => 'updateSavedGifs', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updateSavedGifs={_='updateSavedGifs', }
+
+```
+
+

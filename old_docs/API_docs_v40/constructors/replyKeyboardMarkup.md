@@ -11,7 +11,7 @@ description: replyKeyboardMarkup attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Required|
+|rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: replyKeyboardMarkup attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'rows' => [Vector t], ];
+$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'rows' => [KeyboardButtonRow], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+replyKeyboardMarkup={_='replyKeyboardMarkup', rows={KeyboardButtonRow}, }
+
+```
+
 

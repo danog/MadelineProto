@@ -11,7 +11,7 @@ description: messageMediaGeo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo|[GeoPoint](../types/GeoPoint.md) | Required|
+|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaGeo attributes, type and example
 ```
 $messageMediaGeo = ['_' => 'messageMediaGeo', 'geo' => GeoPoint, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaGeo={_='messageMediaGeo', geo=GeoPoint, }
+
+```
+
 

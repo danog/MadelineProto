@@ -10,7 +10,7 @@ description: account.getPasswordSettings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|current\_password\_hash|[bytes](../types/bytes.md) | Required|
+|current\_password\_hash|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [account\_PasswordSettings](../types/account_PasswordSettings.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $account_PasswordSettings = $MadelineProto->account->getPasswordSettings(['current_password_hash' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+account_PasswordSettings = account.getPasswordSettings({current_password_hash=bytes, })
+```
+

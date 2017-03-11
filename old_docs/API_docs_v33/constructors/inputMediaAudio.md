@@ -11,7 +11,7 @@ description: inputMediaAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputAudio](../types/InputAudio.md) | Required|
+|id|[InputAudio](../types/InputAudio.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputMediaAudio attributes, type and example
 ```
 $inputMediaAudio = ['_' => 'inputMediaAudio', 'id' => InputAudio, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaAudio={_='inputMediaAudio', id=InputAudio, }
+
+```
+
 

@@ -11,7 +11,7 @@ description: userStatusOffline attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|was\_online|[int](../types/int.md) | Required|
+|was\_online|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: userStatusOffline attributes, type and example
 ```
 $userStatusOffline = ['_' => 'userStatusOffline', 'was_online' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userStatusOffline={_='userStatusOffline', was_online=int, }
+
+```
+
 

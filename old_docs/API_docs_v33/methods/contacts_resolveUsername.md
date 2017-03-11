@@ -10,7 +10,7 @@ description: contacts.resolveUsername parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|username|[string](../types/string.md) | Required|
+|username|[string](../types/string.md) | Yes|
 
 
 ### Return type: [User](../types/User.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $User = $MadelineProto->contacts->resolveUsername(['username' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+User = contacts.resolveUsername({username=string, })
+```
+

@@ -154,6 +154,16 @@ description: List of types
 
 [Vector t](Vector t.md)<a name="Vector t"></a>  
 
+[ContactStatus](ContactStatus.md)<a name="ContactStatus"></a>  
+
+[User](User.md)<a name="User"></a>  
+
+[WallPaper](WallPaper.md)<a name="WallPaper"></a>  
+
+[int](int.md)<a name="int"></a>  
+
+[long](long.md)<a name="long"></a>  
+
 [Video](Video.md)<a name="Video"></a>  
 
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
@@ -197,10 +207,6 @@ description: List of types
 [help\_InviteText](help_InviteText.md)<a name="help_InviteText"></a>  
 
 [help\_Support](help_Support.md)<a name="help_Support"></a>  
-
-[int](int.md)<a name="int"></a>  
-
-[long](long.md)<a name="long"></a>  
 
 [messages\_AffectedHistory](messages_AffectedHistory.md)<a name="messages_AffectedHistory"></a>  
 

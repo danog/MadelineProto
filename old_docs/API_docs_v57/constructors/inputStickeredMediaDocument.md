@@ -11,7 +11,7 @@ description: inputStickeredMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputDocument](../types/InputDocument.md) | Required|
+|id|[InputDocument](../types/InputDocument.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputStickeredMediaDocument attributes, type and example
 ```
 $inputStickeredMediaDocument = ['_' => 'inputStickeredMediaDocument', 'id' => InputDocument, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputStickeredMediaDocument={_='inputStickeredMediaDocument', id=InputDocument, }
+
+```
+
 

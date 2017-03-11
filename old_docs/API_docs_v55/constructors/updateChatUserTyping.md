@@ -11,9 +11,9 @@ description: updateChatUserTyping attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|action|[SendMessageAction](../types/SendMessageAction.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateChatUserTyping attributes, type and example
 ```
 $updateChatUserTyping = ['_' => 'updateChatUserTyping', 'chat_id' => int, 'user_id' => int, 'action' => SendMessageAction, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateChatUserTyping={_='updateChatUserTyping', chat_id=int, user_id=int, action=SendMessageAction, }
+
+```
+
 

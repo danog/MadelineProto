@@ -1,0 +1,46 @@
+---
+title: deleteRecentlyFoundChat
+description: Deletes chat from the list of recently found chats
+---
+## Method: deleteRecentlyFoundChat  
+[Back to methods index](index.md)
+
+
+Deletes chat from the list of recently found chats
+
+### Params:
+
+| Name     |    Type       | Required | Description |
+|----------|:-------------:|:--------:|------------:|
+|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat to delete|
+
+
+### Return type: [Ok](../types/Ok.md)
+
+### Example:
+
+
+```
+$MadelineProto = new \danog\MadelineProto\API();
+if (isset($token)) {
+    $this->bot_login($token);
+}
+if (isset($number)) {
+    $sentCode = $MadelineProto->phone_login($number);
+    echo 'Enter the code you received: ';
+    $code = '';
+    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
+        $code .= fgetc(STDIN);
+    }
+    $MadelineProto->complete_phone_login($code);
+}
+
+$Ok = $MadelineProto->deleteRecentlyFoundChat(['chat_id' => long, ]);
+```
+
+Or, if you're into Lua:
+
+```
+Ok = deleteRecentlyFoundChat({chat_id=long, })
+```
+

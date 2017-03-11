@@ -11,11 +11,11 @@ description: updateBotInlineQuery attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|query\_id|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|query|[string](../types/string.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|query|[string](../types/string.md) | Yes|
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|
-|offset|[string](../types/string.md) | Required|
+|offset|[string](../types/string.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: updateBotInlineQuery attributes, type and example
 ```
 $updateBotInlineQuery = ['_' => 'updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'offset' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateBotInlineQuery={_='updateBotInlineQuery', query_id=long, user_id=int, query=string, geo=GeoPoint, offset=string, }
+
+```
+
 

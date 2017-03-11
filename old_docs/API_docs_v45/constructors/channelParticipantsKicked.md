@@ -19,3 +19,12 @@ description: channelParticipantsKicked attributes, type and example
 $channelParticipantsKicked = ['_' => 'channelParticipantsKicked', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+channelParticipantsKicked={_='channelParticipantsKicked', }
+
+```
+
+

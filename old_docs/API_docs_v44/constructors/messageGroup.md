@@ -11,10 +11,10 @@ description: messageGroup attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|min\_id|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|count|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|min\_id|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|count|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: messageGroup attributes, type and example
 ```
 $messageGroup = ['_' => 'messageGroup', 'min_id' => int, 'max_id' => int, 'count' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageGroup={_='messageGroup', min_id=int, max_id=int, count=int, date=int, }
+
+```
+
 

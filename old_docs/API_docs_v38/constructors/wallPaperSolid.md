@@ -11,10 +11,10 @@ description: wallPaperSolid attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|title|[string](../types/string.md) | Required|
-|bg\_color|[int](../types/int.md) | Required|
-|color|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|bg\_color|[int](../types/int.md) | Yes|
+|color|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: wallPaperSolid attributes, type and example
 ```
 $wallPaperSolid = ['_' => 'wallPaperSolid', 'id' => int, 'title' => string, 'bg_color' => int, 'color' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+wallPaperSolid={_='wallPaperSolid', id=int, title=string, bg_color=int, color=int, }
+
+```
+
 

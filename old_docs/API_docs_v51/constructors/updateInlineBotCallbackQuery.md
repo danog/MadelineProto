@@ -11,10 +11,10 @@ description: updateInlineBotCallbackQuery attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|query\_id|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|msg\_id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|data|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: updateInlineBotCallbackQuery attributes, type and example
 ```
 $updateInlineBotCallbackQuery = ['_' => 'updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'data' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateInlineBotCallbackQuery={_='updateInlineBotCallbackQuery', query_id=long, user_id=int, msg_id=InputBotInlineMessageID, data=bytes, }
+
+```
+
 

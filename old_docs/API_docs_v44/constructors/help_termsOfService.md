@@ -11,7 +11,7 @@ description: help_termsOfService attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: help_termsOfService attributes, type and example
 ```
 $help_termsOfService = ['_' => 'help.termsOfService', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+help_termsOfService={_='help.termsOfService', text=string, }
+
+```
+
 

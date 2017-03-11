@@ -10,7 +10,7 @@ description: invokeWithoutUpdates parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|query|[!X](../types/!X.md) | Required|
+|query|[!X](../types/!X.md) | Yes|
 
 
 ### Return type: [X](../types/X.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $X = $MadelineProto->invokeWithoutUpdates(['query' => !X, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+X = invokeWithoutUpdates({query=!X, })
+```
+

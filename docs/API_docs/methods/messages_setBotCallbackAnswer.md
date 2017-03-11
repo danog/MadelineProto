@@ -11,10 +11,10 @@ description: messages.setBotCallbackAnswer parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |alert|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
 |message|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
-|cache\_time|[int](../types/int.md) | Required|
+|cache\_time|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, 'cache_time' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.setBotCallbackAnswer({alert=Bool, query_id=long, message=string, url=string, cache_time=int, })
+```
+

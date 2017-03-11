@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $help_AppChangelog = $MadelineProto->help->getAppChangelog();
 ```
+
+Or, if you're into Lua:
+
+```
+help_AppChangelog = help.getAppChangelog({})
+```
+

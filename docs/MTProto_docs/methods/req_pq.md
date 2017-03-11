@@ -10,7 +10,7 @@ description: req_pq parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|nonce|[int128](../types/int128.md) | Required|
+|nonce|[int128](../types/int128.md) | Yes|
 
 
 ### Return type: [ResPQ](../types/ResPQ.md)
@@ -33,5 +33,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$ResPQ = $MadelineProto->req->pq(['nonce' => int128, ]);
+$ResPQ = $MadelineProto->req_pq(['nonce' => int128, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+ResPQ = req_pq({nonce=int128, })
+```
+

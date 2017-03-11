@@ -11,8 +11,8 @@ description: messages_stickers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[string](../types/string.md) | Required|
-|stickers|Array of [Document](../types/Document.md) | Required|
+|hash|[string](../types/string.md) | Yes|
+|stickers|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_stickers attributes, type and example
 ### Example:
 
 ```
-$messages_stickers = ['_' => 'messages.stickers', 'hash' => string, 'stickers' => [Vector t], ];
+$messages_stickers = ['_' => 'messages.stickers', 'hash' => string, 'stickers' => [Document], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_stickers={_='messages.stickers', hash=string, stickers={Document}, }
+
+```
+
 

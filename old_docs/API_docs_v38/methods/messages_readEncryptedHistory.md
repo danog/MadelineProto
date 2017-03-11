@@ -10,8 +10,8 @@ description: messages.readEncryptedHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|max\_date|[int](../types/int.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|max\_date|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->readEncryptedHistory(['peer' => InputEncryptedChat, 'max_date' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.readEncryptedHistory({peer=InputEncryptedChat, max_date=int, })
+```
+

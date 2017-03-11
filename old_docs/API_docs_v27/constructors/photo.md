@@ -11,13 +11,13 @@ description: photo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|caption|[string](../types/string.md) | Required|
-|geo|[GeoPoint](../types/GeoPoint.md) | Required|
-|sizes|Array of [PhotoSize](../types/PhotoSize.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|caption|[string](../types/string.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|sizes|Array of [PhotoSize](../types/PhotoSize.md) | Yes|
 
 
 
@@ -27,6 +27,15 @@ description: photo attributes, type and example
 ### Example:
 
 ```
-$photo = ['_' => 'photo', 'id' => long, 'access_hash' => long, 'user_id' => int, 'date' => int, 'caption' => string, 'geo' => GeoPoint, 'sizes' => [Vector t], ];
+$photo = ['_' => 'photo', 'id' => long, 'access_hash' => long, 'user_id' => int, 'date' => int, 'caption' => string, 'geo' => GeoPoint, 'sizes' => [PhotoSize], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+photo={_='photo', id=long, access_hash=long, user_id=int, date=int, caption=string, geo=GeoPoint, sizes={PhotoSize}, }
+
+```
+
 

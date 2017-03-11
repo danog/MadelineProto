@@ -10,8 +10,8 @@ description: messages.getArchivedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset\_id|[long](../types/long.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|offset\_id|[long](../types/long.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_ArchivedStickers = $MadelineProto->messages->getArchivedStickers(['offset_id' => long, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_ArchivedStickers = messages.getArchivedStickers({offset_id=long, limit=int, })
+```
+

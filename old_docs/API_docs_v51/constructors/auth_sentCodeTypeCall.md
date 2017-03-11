@@ -11,7 +11,7 @@ description: auth_sentCodeTypeCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|length|[int](../types/int.md) | Required|
+|length|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: auth_sentCodeTypeCall attributes, type and example
 ```
 $auth_sentCodeTypeCall = ['_' => 'auth.sentCodeTypeCall', 'length' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+auth_sentCodeTypeCall={_='auth.sentCodeTypeCall', length=int, }
+
+```
+
 

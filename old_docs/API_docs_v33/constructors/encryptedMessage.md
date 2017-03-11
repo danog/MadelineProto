@@ -11,10 +11,10 @@ description: encryptedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|bytes|[bytes](../types/bytes.md) | Required|
-|file|[EncryptedFile](../types/EncryptedFile.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|decrypted\_message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
+|file|[EncryptedFile](../types/EncryptedFile.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: encryptedMessage attributes, type and example
 ### Example:
 
 ```
-$encryptedMessage = ['_' => 'encryptedMessage', 'chat_id' => int, 'date' => int, 'bytes' => bytes, 'file' => EncryptedFile, ];
+$encryptedMessage = ['_' => 'encryptedMessage', 'chat_id' => int, 'date' => int, 'decrypted_message' => DecryptedMessage, 'file' => EncryptedFile, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+encryptedMessage={_='encryptedMessage', chat_id=int, date=int, decrypted_message=DecryptedMessage, file=EncryptedFile, }
+
+```
+
 

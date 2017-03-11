@@ -11,11 +11,11 @@ description: updates_state attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
-|qts|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
-|unread\_count|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
+|qts|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
+|unread\_count|[int](../types/int.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: updates_state attributes, type and example
 ```
 $updates_state = ['_' => 'updates.state', 'pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_state={_='updates.state', pts=int, qts=int, date=int, seq=int, unread_count=int, }
+
+```
+
 

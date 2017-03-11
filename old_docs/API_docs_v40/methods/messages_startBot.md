@@ -10,9 +10,9 @@ description: messages.startBot parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|bot|[InputUser](../types/InputUser.md) | Required|
-|chat\_id|[InputChat](../types/InputChat.md) | Required|
-|start\_param|[string](../types/string.md) | Required|
+|bot|[InputUser](../types/InputUser.md) | Yes|
+|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|start\_param|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'chat_id' => InputChat, 'start_param' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.startBot({bot=InputUser, chat_id=InputChat, start_param=string, })
+```
+

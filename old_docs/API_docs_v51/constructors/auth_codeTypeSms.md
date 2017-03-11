@@ -19,3 +19,12 @@ description: auth_codeTypeSms attributes, type and example
 $auth_codeTypeSms = ['_' => 'auth.codeTypeSms', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+auth_codeTypeSms={_='auth.codeTypeSms', }
+
+```
+
+

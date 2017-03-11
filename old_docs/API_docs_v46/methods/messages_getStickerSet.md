@@ -10,7 +10,7 @@ description: messages.getStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_StickerSet = $MadelineProto->messages->getStickerSet(['stickerset' => InputStickerSet, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_StickerSet = messages.getStickerSet({stickerset=InputStickerSet, })
+```
+

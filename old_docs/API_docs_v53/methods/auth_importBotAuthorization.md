@@ -10,9 +10,9 @@ description: auth.importBotAuthorization parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|api\_id|[int](../types/int.md) | Required|
-|api\_hash|[string](../types/string.md) | Required|
-|bot\_auth\_token|[string](../types/string.md) | Required|
+|api\_id|[int](../types/int.md) | Yes|
+|api\_hash|[string](../types/string.md) | Yes|
+|bot\_auth\_token|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $auth_Authorization = $MadelineProto->auth->importBotAuthorization(['api_id' => int, 'api_hash' => string, 'bot_auth_token' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_Authorization = auth.importBotAuthorization({api_id=int, api_hash=string, bot_auth_token=string, })
+```
+

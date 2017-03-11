@@ -7,6 +7,8 @@ description: constructors and methods of type Update
 
 
 
+Contains notifications about data changes
+
 ### Possible values (constructors):
 
 [updateNewMessage](../constructors/updateNewMessage.md)  

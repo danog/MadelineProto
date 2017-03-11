@@ -13,8 +13,8 @@ description: phoneCallProtocol attributes, type and example
 |----------|:-------------:|---------:|
 |udp\_p2p|[Bool](../types/Bool.md) | Optional|
 |udp\_reflector|[Bool](../types/Bool.md) | Optional|
-|min\_layer|[int](../types/int.md) | Required|
-|max\_layer|[int](../types/int.md) | Required|
+|min\_layer|[int](../types/int.md) | Yes|
+|max\_layer|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: phoneCallProtocol attributes, type and example
 ```
 $phoneCallProtocol = ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => int, 'max_layer' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+phoneCallProtocol={_='phoneCallProtocol', udp_p2p=true, udp_reflector=true, min_layer=int, max_layer=int, }
+
+```
+
 

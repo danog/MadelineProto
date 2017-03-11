@@ -19,3 +19,12 @@ description: inputPrivacyValueDisallowAll attributes, type and example
 $inputPrivacyValueDisallowAll = ['_' => 'inputPrivacyValueDisallowAll', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyValueDisallowAll={_='inputPrivacyValueDisallowAll', }
+
+```
+
+

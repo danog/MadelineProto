@@ -19,3 +19,12 @@ description: sendMessageGamePlayAction attributes, type and example
 $sendMessageGamePlayAction = ['_' => 'sendMessageGamePlayAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageGamePlayAction={_='sendMessageGamePlayAction', }
+
+```
+
+

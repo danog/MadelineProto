@@ -11,8 +11,8 @@ description: messages_chats attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_chats attributes, type and example
 ### Example:
 
 ```
-$messages_chats = ['_' => 'messages.chats', 'chats' => [Vector t], 'users' => [Vector t], ];
+$messages_chats = ['_' => 'messages.chats', 'chats' => [Chat], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_chats={_='messages.chats', chats={Chat}, users={User}, }
+
+```
+
 

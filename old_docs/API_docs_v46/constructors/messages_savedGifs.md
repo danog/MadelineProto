@@ -11,8 +11,8 @@ description: messages_savedGifs attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|hash|[int](../types/int.md) | Required|
-|gifs|Array of [Document](../types/Document.md) | Required|
+|hash|[int](../types/int.md) | Yes|
+|gifs|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: messages_savedGifs attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Vector t], ];
+$messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Document], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_savedGifs={_='messages.savedGifs', hash=int, gifs={Document}, }
+
+```
+
 

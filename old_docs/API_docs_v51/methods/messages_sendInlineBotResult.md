@@ -13,10 +13,10 @@ description: messages.sendInlineBotResult parameters, return type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|query\_id|[long](../types/long.md) | Required|
-|id|[string](../types/string.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
+|id|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -41,3 +41,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.sendInlineBotResult({broadcast=Bool, silent=Bool, background=Bool, peer=InputPeer, reply_to_msg_id=int, query_id=long, id=string, })
+```
+

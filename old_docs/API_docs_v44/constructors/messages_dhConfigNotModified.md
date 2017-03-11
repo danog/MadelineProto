@@ -11,7 +11,7 @@ description: messages_dhConfigNotModified attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|random|[bytes](../types/bytes.md) | Required|
+|random|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messages_dhConfigNotModified attributes, type and example
 ```
 $messages_dhConfigNotModified = ['_' => 'messages.dhConfigNotModified', 'random' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_dhConfigNotModified={_='messages.dhConfigNotModified', random=bytes, }
+
+```
+
 

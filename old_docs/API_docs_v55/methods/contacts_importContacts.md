@@ -10,8 +10,8 @@ description: contacts.importContacts parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|contacts|Array of [InputContact](../types/InputContact.md) | Required|
-|replace|[Bool](../types/Bool.md) | Required|
+|contacts|Array of [InputContact](../types/InputContact.md) | Yes|
+|replace|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_ImportedContacts = contacts.importContacts({contacts={InputContact}, replace=Bool, })
+```
+

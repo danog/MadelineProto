@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $account_Authorizations = $MadelineProto->account->getAuthorizations();
 ```
+
+Or, if you're into Lua:
+
+```
+account_Authorizations = account.getAuthorizations({})
+```
+

@@ -13,9 +13,9 @@ description: messages.forwardMessages parameters, return type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
-|from\_peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|Array of [int](../types/int.md) | Required|
-|to\_peer|[InputPeer](../types/InputPeer.md) | Required|
+|from\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|Array of [int](../types/int.md) | Yes|
+|to\_peer|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -40,3 +40,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->forwardMessages(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'from_peer' => InputPeer, 'id' => [int], 'to_peer' => InputPeer, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.forwardMessages({broadcast=Bool, silent=Bool, background=Bool, from_peer=InputPeer, id={int}, to_peer=InputPeer, })
+```
+

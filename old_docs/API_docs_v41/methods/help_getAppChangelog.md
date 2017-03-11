@@ -10,10 +10,10 @@ description: help.getAppChangelog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|device\_model|[string](../types/string.md) | Required|
-|system\_version|[string](../types/string.md) | Required|
-|app\_version|[string](../types/string.md) | Required|
-|lang\_code|[string](../types/string.md) | Required|
+|device\_model|[string](../types/string.md) | Yes|
+|system\_version|[string](../types/string.md) | Yes|
+|app\_version|[string](../types/string.md) | Yes|
+|lang\_code|[string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $help_AppChangelog = $MadelineProto->help->getAppChangelog(['device_model' => string, 'system_version' => string, 'app_version' => string, 'lang_code' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+help_AppChangelog = help.getAppChangelog({device_model=string, system_version=string, app_version=string, lang_code=string, })
+```
+

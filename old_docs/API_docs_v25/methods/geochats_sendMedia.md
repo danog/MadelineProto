@@ -10,8 +10,8 @@ description: geochats.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
-|media|[InputMedia](../types/InputMedia.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $geochats_StatedMessage = $MadelineProto->geochats->sendMedia(['peer' => InputGeoChat, 'media' => InputMedia, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_StatedMessage = geochats.sendMedia({peer=InputGeoChat, media=InputMedia, })
+```
+

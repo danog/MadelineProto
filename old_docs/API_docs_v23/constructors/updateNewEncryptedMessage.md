@@ -11,8 +11,8 @@ description: updateNewEncryptedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[EncryptedMessage](../types/EncryptedMessage.md) | Required|
-|qts|[int](../types/int.md) | Required|
+|message|[EncryptedMessage](../types/EncryptedMessage.md) | Yes|
+|qts|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateNewEncryptedMessage attributes, type and example
 ```
 $updateNewEncryptedMessage = ['_' => 'updateNewEncryptedMessage', 'message' => EncryptedMessage, 'qts' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNewEncryptedMessage={_='updateNewEncryptedMessage', message=EncryptedMessage, qts=int, }
+
+```
+
 

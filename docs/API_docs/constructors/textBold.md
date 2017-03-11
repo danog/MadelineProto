@@ -11,7 +11,7 @@ description: textBold attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textBold attributes, type and example
 ```
 $textBold = ['_' => 'textBold', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textBold={_='textBold', text=RichText, }
+
+```
+
 

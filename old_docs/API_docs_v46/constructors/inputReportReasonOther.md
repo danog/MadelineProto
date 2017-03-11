@@ -11,7 +11,7 @@ description: inputReportReasonOther attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[string](../types/string.md) | Required|
+|text|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputReportReasonOther attributes, type and example
 ```
 $inputReportReasonOther = ['_' => 'inputReportReasonOther', 'text' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputReportReasonOther={_='inputReportReasonOther', text=string, }
+
+```
+
 

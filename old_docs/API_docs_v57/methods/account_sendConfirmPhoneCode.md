@@ -11,7 +11,7 @@ description: account.sendConfirmPhoneCode parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|hash|[string](../types/string.md) | Required|
+|hash|[string](../types/string.md) | Yes|
 |current\_number|[Bool](../types/Bool.md) | Optional|
 
 
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $auth_SentCode = $MadelineProto->account->sendConfirmPhoneCode(['allow_flashcall' => Bool, 'hash' => string, 'current_number' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_SentCode = account.sendConfirmPhoneCode({allow_flashcall=Bool, hash=string, current_number=Bool, })
+```
+

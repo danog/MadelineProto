@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->clearRecentStickers();
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.clearRecentStickers({})
+```
+

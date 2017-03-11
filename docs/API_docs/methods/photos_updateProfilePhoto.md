@@ -10,7 +10,7 @@ description: photos.updateProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputPhoto](../types/InputPhoto.md) | Required|
+|id|[InputPhoto](../types/InputPhoto.md) | Yes|
 
 
 ### Return type: [UserProfilePhoto](../types/UserProfilePhoto.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $UserProfilePhoto = $MadelineProto->photos->updateProfilePhoto(['id' => InputPhoto, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+UserProfilePhoto = photos.updateProfilePhoto({id=InputPhoto, })
+```
+

@@ -11,7 +11,7 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|users|Array of [InputUser](../types/InputUser.md) | Required|
+|users|Array of [InputUser](../types/InputUser.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [Vector t], ];
+$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyValueAllowUsers={_='inputPrivacyValueAllowUsers', users={InputUser}, }
+
+```
+
 

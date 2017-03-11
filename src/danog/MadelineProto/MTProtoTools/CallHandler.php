@@ -141,7 +141,7 @@ trait CallHandler
                 } else {
                     $this->datacenter->close_and_reopen();
                 }
-                sleep(1); // To avoid flooding
+                //sleep(1); // To avoid flooding
                 continue;
             } finally {
                 if (isset($aargs['heavy']) && $aargs['heavy'] && isset($int_message_id)) {
@@ -158,9 +158,7 @@ trait CallHandler
 
         throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
     }
-
-    public function object_call($object, $args = [])
-    {
+    public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false]) {
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }

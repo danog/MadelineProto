@@ -11,8 +11,8 @@ description: geoChatMessageEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|id|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|id|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: geoChatMessageEmpty attributes, type and example
 ```
 $geoChatMessageEmpty = ['_' => 'geoChatMessageEmpty', 'chat_id' => int, 'id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+geoChatMessageEmpty={_='geoChatMessageEmpty', chat_id=int, id=int, }
+
+```
+
 

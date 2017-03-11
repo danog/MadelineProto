@@ -19,3 +19,12 @@ description: true attributes, type and example
 $true = ['_' => 'true', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+true={_='true', }
+
+```
+
+

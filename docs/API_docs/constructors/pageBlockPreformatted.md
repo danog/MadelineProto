@@ -11,8 +11,8 @@ description: pageBlockPreformatted attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
-|language|[string](../types/string.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
+|language|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: pageBlockPreformatted attributes, type and example
 ```
 $pageBlockPreformatted = ['_' => 'pageBlockPreformatted', 'text' => RichText, 'language' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockPreformatted={_='pageBlockPreformatted', text=RichText, language=string, }
+
+```
+
 

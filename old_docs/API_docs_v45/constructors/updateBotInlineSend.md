@@ -11,9 +11,9 @@ description: updateBotInlineSend attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|query|[string](../types/string.md) | Required|
-|id|[string](../types/string.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|query|[string](../types/string.md) | Yes|
+|id|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateBotInlineSend attributes, type and example
 ```
 $updateBotInlineSend = ['_' => 'updateBotInlineSend', 'user_id' => int, 'query' => string, 'id' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateBotInlineSend={_='updateBotInlineSend', user_id=int, query=string, id=string, }
+
+```
+
 

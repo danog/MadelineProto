@@ -19,3 +19,12 @@ description: contacts_myLinkEmpty attributes, type and example
 $contacts_myLinkEmpty = ['_' => 'contacts.myLinkEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_myLinkEmpty={_='contacts.myLinkEmpty', }
+
+```
+
+

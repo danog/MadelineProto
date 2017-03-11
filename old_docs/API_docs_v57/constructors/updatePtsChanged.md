@@ -19,3 +19,12 @@ description: updatePtsChanged attributes, type and example
 $updatePtsChanged = ['_' => 'updatePtsChanged', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updatePtsChanged={_='updatePtsChanged', }
+
+```
+
+

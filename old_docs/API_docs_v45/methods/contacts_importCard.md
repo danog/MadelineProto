@@ -10,7 +10,7 @@ description: contacts.importCard parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|export\_card|Array of [int](../types/int.md) | Required|
+|export\_card|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [User](../types/User.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $User = $MadelineProto->contacts->importCard(['export_card' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+User = contacts.importCard({export_card={int}, })
+```
+

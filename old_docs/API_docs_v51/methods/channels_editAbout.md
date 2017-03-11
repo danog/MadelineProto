@@ -10,8 +10,8 @@ description: channels.editAbout parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|about|[string](../types/string.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|about|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->channels->editAbout(['channel' => InputChannel, 'about' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = channels.editAbout({channel=InputChannel, about=string, })
+```
+

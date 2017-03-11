@@ -11,7 +11,7 @@ description: userStatusOnline attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|expires|[int](../types/int.md) | Required|
+|expires|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: userStatusOnline attributes, type and example
 ```
 $userStatusOnline = ['_' => 'userStatusOnline', 'expires' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userStatusOnline={_='userStatusOnline', expires=int, }
+
+```
+
 

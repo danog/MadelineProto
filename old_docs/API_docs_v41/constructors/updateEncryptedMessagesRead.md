@@ -11,9 +11,9 @@ description: updateEncryptedMessagesRead attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|max\_date|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|max\_date|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateEncryptedMessagesRead attributes, type and example
 ```
 $updateEncryptedMessagesRead = ['_' => 'updateEncryptedMessagesRead', 'chat_id' => int, 'max_date' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateEncryptedMessagesRead={_='updateEncryptedMessagesRead', chat_id=int, max_date=int, date=int, }
+
+```
+
 

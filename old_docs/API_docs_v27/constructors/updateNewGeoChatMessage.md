@@ -11,7 +11,7 @@ description: updateNewGeoChatMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|message|[GeoChatMessage](../types/GeoChatMessage.md) | Required|
+|message|[GeoChatMessage](../types/GeoChatMessage.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: updateNewGeoChatMessage attributes, type and example
 ```
 $updateNewGeoChatMessage = ['_' => 'updateNewGeoChatMessage', 'message' => GeoChatMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateNewGeoChatMessage={_='updateNewGeoChatMessage', message=GeoChatMessage, }
+
+```
+
 

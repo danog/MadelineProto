@@ -10,9 +10,9 @@ description: updates.getDifference parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|qts|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|qts|[int](../types/int.md) | Yes|
 
 
 ### Return type: [updates\_Difference](../types/updates_Difference.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $updates_Difference = $MadelineProto->updates->getDifference(['pts' => int, 'date' => int, 'qts' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+updates_Difference = updates.getDifference({pts=int, date=int, qts=int, })
+```
+

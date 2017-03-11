@@ -12,9 +12,9 @@ description: messages.setInlineGameScore parameters, return type and example
 |----------|:-------------:|---------:|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
 |force|[Bool](../types/Bool.md) | Optional|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|score|[int](../types/int.md) | Required|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|score|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->setInlineGameScore(['edit_message' => Bool, 'force' => Bool, 'id' => InputBotInlineMessageID, 'user_id' => InputUser, 'score' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.setInlineGameScore({edit_message=Bool, force=Bool, id=InputBotInlineMessageID, user_id=InputUser, score=int, })
+```
+

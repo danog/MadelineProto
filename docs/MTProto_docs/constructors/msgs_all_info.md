@@ -11,8 +11,8 @@ description: msgs_all_info attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_ids|Array of [long](../types/long.md) | Required|
-|info|[bytes](../types/bytes.md) | Required|
+|msg\_ids|Array of [long](../types/long.md) | Yes|
+|info|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: msgs_all_info attributes, type and example
 ### Example:
 
 ```
-$msgs_all_info = ['_' => 'msgs_all_info', 'msg_ids' => [Vector t], 'info' => bytes, ];
+$msgs_all_info = ['_' => 'msgs_all_info', 'msg_ids' => [long], 'info' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msgs_all_info={_='msgs_all_info', msg_ids={long}, info=bytes, }
+
+```
+
 

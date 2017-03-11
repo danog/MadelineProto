@@ -11,10 +11,10 @@ description: wallPaper attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|title|[string](../types/string.md) | Required|
-|sizes|Array of [PhotoSize](../types/PhotoSize.md) | Required|
-|color|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|sizes|Array of [PhotoSize](../types/PhotoSize.md) | Yes|
+|color|[int](../types/int.md) | Yes|
 
 
 
@@ -24,6 +24,15 @@ description: wallPaper attributes, type and example
 ### Example:
 
 ```
-$wallPaper = ['_' => 'wallPaper', 'id' => int, 'title' => string, 'sizes' => [Vector t], 'color' => int, ];
+$wallPaper = ['_' => 'wallPaper', 'id' => int, 'title' => string, 'sizes' => [PhotoSize], 'color' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+wallPaper={_='wallPaper', id=int, title=string, sizes={PhotoSize}, color=int, }
+
+```
+
 

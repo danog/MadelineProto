@@ -10,9 +10,9 @@ description: messages.getCommonChats parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_Chats = $MadelineProto->messages->getCommonChats(['user_id' => InputUser, 'max_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Chats = messages.getCommonChats({user_id=InputUser, max_id=int, limit=int, })
+```
+

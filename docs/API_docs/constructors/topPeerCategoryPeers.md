@@ -11,9 +11,9 @@ description: topPeerCategoryPeers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|category|[TopPeerCategory](../types/TopPeerCategory.md) | Required|
-|count|[int](../types/int.md) | Required|
-|peers|Array of [TopPeer](../types/TopPeer.md) | Required|
+|category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|
+|count|[int](../types/int.md) | Yes|
+|peers|Array of [TopPeer](../types/TopPeer.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: topPeerCategoryPeers attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [Vector t], ];
+$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+topPeerCategoryPeers={_='topPeerCategoryPeers', category=TopPeerCategory, count=int, peers={TopPeer}, }
+
+```
+
 

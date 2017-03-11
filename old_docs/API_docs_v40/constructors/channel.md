@@ -11,12 +11,12 @@ description: channel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|title|[string](../types/string.md) | Required|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
-|date|[int](../types/int.md) | Required|
-|version|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|version|[int](../types/int.md) | Yes|
 
 
 
@@ -28,4 +28,13 @@ description: channel attributes, type and example
 ```
 $channel = ['_' => 'channel', 'id' => int, 'access_hash' => long, 'title' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channel={_='channel', id=int, access_hash=long, title=string, photo=ChatPhoto, date=int, version=int, }
+
+```
+
 

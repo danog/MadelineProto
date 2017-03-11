@@ -11,14 +11,14 @@ description: messages.search parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |important\_only|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|q|[string](../types/string.md) | Required|
-|filter|[MessagesFilter](../types/MessagesFilter.md) | Required|
-|min\_date|[int](../types/int.md) | Required|
-|max\_date|[int](../types/int.md) | Required|
-|offset|[int](../types/int.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|q|[string](../types/string.md) | Yes|
+|filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
+|min\_date|[int](../types/int.md) | Yes|
+|max\_date|[int](../types/int.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -43,3 +43,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->messages->search(['important_only' => Bool, 'peer' => InputPeer, 'q' => string, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = messages.search({important_only=Bool, peer=InputPeer, q=string, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
+```
+

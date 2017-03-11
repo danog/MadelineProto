@@ -11,8 +11,8 @@ description: messages.editMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
@@ -41,6 +41,13 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->editMessage(['no_webpage' => Bool, 'peer' => InputPeer, 'id' => int, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.editMessage({no_webpage=Bool, peer=InputPeer, id=int, message=string, reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
+```
+
 
 ## Usage of parse_mode:
 

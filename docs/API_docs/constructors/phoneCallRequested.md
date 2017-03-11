@@ -11,13 +11,13 @@ description: phoneCallRequested attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|date|[int](../types/int.md) | Required|
-|admin\_id|[int](../types/int.md) | Required|
-|participant\_id|[int](../types/int.md) | Required|
-|g\_a|[bytes](../types/bytes.md) | Required|
-|protocol|[PhoneCallProtocol](../types/PhoneCallProtocol.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|admin\_id|[int](../types/int.md) | Yes|
+|participant\_id|[int](../types/int.md) | Yes|
+|g\_a|[bytes](../types/bytes.md) | Yes|
+|protocol|[PhoneCallProtocol](../types/PhoneCallProtocol.md) | Yes|
 
 
 
@@ -29,4 +29,13 @@ description: phoneCallRequested attributes, type and example
 ```
 $phoneCallRequested = ['_' => 'phoneCallRequested', 'id' => long, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, 'protocol' => PhoneCallProtocol, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+phoneCallRequested={_='phoneCallRequested', id=long, access_hash=long, date=int, admin_id=int, participant_id=int, g_a=bytes, protocol=PhoneCallProtocol, }
+
+```
+
 

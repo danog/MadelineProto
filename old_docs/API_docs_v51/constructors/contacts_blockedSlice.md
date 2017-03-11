@@ -11,9 +11,9 @@ description: contacts_blockedSlice attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|count|[int](../types/int.md) | Required|
-|blocked|Array of [ContactBlocked](../types/ContactBlocked.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
+|count|[int](../types/int.md) | Yes|
+|blocked|Array of [ContactBlocked](../types/ContactBlocked.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: contacts_blockedSlice attributes, type and example
 ### Example:
 
 ```
-$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [Vector t], 'users' => [Vector t], ];
+$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [ContactBlocked], 'users' => [User], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_blockedSlice={_='contacts.blockedSlice', count=int, blocked={ContactBlocked}, users={User}, }
+
+```
+
 

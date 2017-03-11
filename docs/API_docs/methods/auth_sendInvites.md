@@ -10,8 +10,8 @@ description: auth.sendInvites parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|phone\_numbers|Array of [string](../types/string.md) | Required|
-|message|[string](../types/string.md) | Required|
+|phone\_numbers|Array of [string](../types/string.md) | Yes|
+|message|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => [string], 'message' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = auth.sendInvites({phone_numbers={string}, message=string, })
+```
+

@@ -10,7 +10,7 @@ description: messages.getUnusedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|limit|[int](../types/int.md) | Required|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_StickerSetCovered = $MadelineProto->messages->getUnusedStickers(['limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_StickerSetCovered = messages.getUnusedStickers({limit=int, })
+```
+

@@ -11,9 +11,9 @@ description: messageEntityPre attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
-|language|[string](../types/string.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
+|language|[string](../types/string.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: messageEntityPre attributes, type and example
 ```
 $messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int, 'language' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageEntityPre={_='messageEntityPre', offset=int, length=int, language=string, }
+
+```
+
 

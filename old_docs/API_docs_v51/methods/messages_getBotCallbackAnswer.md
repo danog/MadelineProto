@@ -10,9 +10,9 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|msg\_id|[int](../types/int.md) | Required|
-|data|[bytes](../types/bytes.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|msg\_id|[int](../types/int.md) | Yes|
+|data|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_BotCallbackAnswer = $MadelineProto->messages->getBotCallbackAnswer(['peer' => InputPeer, 'msg_id' => int, 'data' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_BotCallbackAnswer = messages.getBotCallbackAnswer({peer=InputPeer, msg_id=int, data=bytes, })
+```
+

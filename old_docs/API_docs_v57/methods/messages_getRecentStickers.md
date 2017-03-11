@@ -11,7 +11,7 @@ description: messages.getRecentStickers parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |attached|[Bool](../types/Bool.md) | Optional|
-|hash|[int](../types/int.md) | Required|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_RecentStickers](../types/messages_RecentStickers.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_RecentStickers = $MadelineProto->messages->getRecentStickers(['attached' => Bool, 'hash' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_RecentStickers = messages.getRecentStickers({attached=Bool, hash=int, })
+```
+

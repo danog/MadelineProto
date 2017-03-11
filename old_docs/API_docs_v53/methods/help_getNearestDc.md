@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $NearestDc = $MadelineProto->help->getNearestDc();
 ```
+
+Or, if you're into Lua:
+
+```
+NearestDc = help.getNearestDc({})
+```
+

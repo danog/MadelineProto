@@ -19,3 +19,12 @@ description: inputMessagesFilterChatPhotos attributes, type and example
 $inputMessagesFilterChatPhotos = ['_' => 'inputMessagesFilterChatPhotos', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterChatPhotos={_='inputMessagesFilterChatPhotos', }
+
+```
+
+

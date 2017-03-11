@@ -11,8 +11,8 @@ description: inputChannel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputChannel attributes, type and example
 ```
 $inputChannel = ['_' => 'inputChannel', 'channel_id' => int, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputChannel={_='inputChannel', channel_id=int, access_hash=long, }
+
+```
+
 

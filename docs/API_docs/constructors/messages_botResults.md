@@ -12,11 +12,11 @@ description: messages_botResults attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |gallery|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Required|
+|query\_id|[long](../types/long.md) | Yes|
 |next\_offset|[string](../types/string.md) | Optional|
 |switch\_pm|[InlineBotSwitchPM](../types/InlineBotSwitchPM.md) | Optional|
-|results|Array of [BotInlineResult](../types/BotInlineResult.md) | Required|
-|cache\_time|[int](../types/int.md) | Required|
+|results|Array of [BotInlineResult](../types/BotInlineResult.md) | Yes|
+|cache\_time|[int](../types/int.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [Vector t], 'cache_time' => int, ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => true, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult], 'cache_time' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_botResults={_='messages.botResults', gallery=true, query_id=long, next_offset=string, switch_pm=InlineBotSwitchPM, results={BotInlineResult}, cache_time=int, }
+
+```
+
 

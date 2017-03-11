@@ -11,8 +11,8 @@ description: botInlineResult attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[string](../types/string.md) | Required|
-|type|[string](../types/string.md) | Required|
+|id|[string](../types/string.md) | Yes|
+|type|[string](../types/string.md) | Yes|
 |title|[string](../types/string.md) | Optional|
 |description|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
@@ -22,7 +22,7 @@ description: botInlineResult attributes, type and example
 |w|[int](../types/int.md) | Optional|
 |h|[int](../types/int.md) | Optional|
 |duration|[int](../types/int.md) | Optional|
-|send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Required|
+|send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Yes|
 
 
 
@@ -34,4 +34,13 @@ description: botInlineResult attributes, type and example
 ```
 $botInlineResult = ['_' => 'botInlineResult', 'id' => string, 'type' => string, 'title' => string, 'description' => string, 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, 'duration' => int, 'send_message' => BotInlineMessage, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineResult={_='botInlineResult', id=string, type=string, title=string, description=string, url=string, thumb_url=string, content_url=string, content_type=string, w=int, h=int, duration=int, send_message=BotInlineMessage, }
+
+```
+
 

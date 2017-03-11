@@ -11,9 +11,9 @@ description: updateWebPage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|webpage|[WebPage](../types/WebPage.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|pts\_count|[int](../types/int.md) | Required|
+|webpage|[WebPage](../types/WebPage.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|pts\_count|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateWebPage attributes, type and example
 ```
 $updateWebPage = ['_' => 'updateWebPage', 'webpage' => WebPage, 'pts' => int, 'pts_count' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateWebPage={_='updateWebPage', webpage=WebPage, pts=int, pts_count=int, }
+
+```
+
 

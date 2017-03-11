@@ -19,3 +19,12 @@ description: updateConfig attributes, type and example
 $updateConfig = ['_' => 'updateConfig', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updateConfig={_='updateConfig', }
+
+```
+
+

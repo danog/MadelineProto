@@ -19,3 +19,12 @@ description: sendMessageRecordVideoAction attributes, type and example
 $sendMessageRecordVideoAction = ['_' => 'sendMessageRecordVideoAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageRecordVideoAction={_='sendMessageRecordVideoAction', }
+
+```
+
+

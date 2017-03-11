@@ -13,10 +13,10 @@ description: updateServiceNotification attributes, type and example
 |----------|:-------------:|---------:|
 |popup|[Bool](../types/Bool.md) | Optional|
 |inbox\_date|[int](../types/int.md) | Optional|
-|type|[string](../types/string.md) | Required|
-|message|[string](../types/string.md) | Required|
-|media|[MessageMedia](../types/MessageMedia.md) | Required|
-|entities|Array of [MessageEntity](../types/MessageEntity.md) | Required|
+|type|[string](../types/string.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: updateServiceNotification attributes, type and example
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => 'updateServiceNotification', 'popup' => true, 'inbox_date' => int, 'type' => string, 'message' => string, 'media' => MessageMedia, 'entities' => [Vector t], ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'popup' => true, 'inbox_date' => int, 'type' => string, 'message' => string, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateServiceNotification={_='updateServiceNotification', popup=true, inbox_date=int, type=string, message=string, media=MessageMedia, entities={MessageEntity}, }
+
+```
+
 

@@ -11,10 +11,10 @@ description: inputEncryptedFileUploaded attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|parts|[int](../types/int.md) | Required|
-|md5\_checksum|[string](../types/string.md) | Required|
-|key\_fingerprint|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|parts|[int](../types/int.md) | Yes|
+|md5\_checksum|[string](../types/string.md) | Yes|
+|key\_fingerprint|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: inputEncryptedFileUploaded attributes, type and example
 ```
 $inputEncryptedFileUploaded = ['_' => 'inputEncryptedFileUploaded', 'id' => long, 'parts' => int, 'md5_checksum' => string, 'key_fingerprint' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputEncryptedFileUploaded={_='inputEncryptedFileUploaded', id=long, parts=int, md5_checksum=string, key_fingerprint=int, }
+
+```
+
 

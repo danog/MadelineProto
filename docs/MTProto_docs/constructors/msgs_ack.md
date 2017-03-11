@@ -11,7 +11,7 @@ description: msgs_ack attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_ids|Array of [long](../types/long.md) | Required|
+|msg\_ids|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -21,6 +21,15 @@ description: msgs_ack attributes, type and example
 ### Example:
 
 ```
-$msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [Vector t], ];
+$msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msgs_ack={_='msgs_ack', msg_ids={long}, }
+
+```
+
 

@@ -11,9 +11,9 @@ description: inputDocumentFileLocation attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|version|[int](../types/int.md) | Required|
+|id|[long](../types/long.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|version|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: inputDocumentFileLocation attributes, type and example
 ```
 $inputDocumentFileLocation = ['_' => 'inputDocumentFileLocation', 'id' => long, 'access_hash' => long, 'version' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputDocumentFileLocation={_='inputDocumentFileLocation', id=long, access_hash=long, version=int, }
+
+```
+
 

@@ -19,3 +19,12 @@ description: phoneCallDiscardReasonHangup attributes, type and example
 $phoneCallDiscardReasonHangup = ['_' => 'phoneCallDiscardReasonHangup', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+phoneCallDiscardReasonHangup={_='phoneCallDiscardReasonHangup', }
+
+```
+
+

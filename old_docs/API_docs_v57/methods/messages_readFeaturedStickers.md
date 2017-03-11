@@ -10,7 +10,7 @@ description: messages.readFeaturedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [long](../types/long.md) | Required|
+|id|Array of [long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->readFeaturedStickers(['id' => [long], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.readFeaturedStickers({id={long}, })
+```
+

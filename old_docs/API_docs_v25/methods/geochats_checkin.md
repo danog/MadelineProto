@@ -10,7 +10,7 @@ description: geochats.checkin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $geochats_StatedMessage = $MadelineProto->geochats->checkin(['peer' => InputGeoChat, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+geochats_StatedMessage = geochats.checkin({peer=InputGeoChat, })
+```
+

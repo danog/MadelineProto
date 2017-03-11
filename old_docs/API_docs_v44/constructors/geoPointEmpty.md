@@ -19,3 +19,12 @@ description: geoPointEmpty attributes, type and example
 $geoPointEmpty = ['_' => 'geoPointEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+geoPointEmpty={_='geoPointEmpty', }
+
+```
+
+

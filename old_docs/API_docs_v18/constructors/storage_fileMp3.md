@@ -19,3 +19,12 @@ description: storage_fileMp3 attributes, type and example
 $storage_fileMp3 = ['_' => 'storage.fileMp3', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_fileMp3={_='storage.fileMp3', }
+
+```
+
+

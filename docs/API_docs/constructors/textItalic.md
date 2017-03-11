@@ -11,7 +11,7 @@ description: textItalic attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textItalic attributes, type and example
 ```
 $textItalic = ['_' => 'textItalic', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textItalic={_='textItalic', text=RichText, }
+
+```
+
 

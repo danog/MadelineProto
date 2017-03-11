@@ -19,3 +19,12 @@ description: sendMessageUploadDocumentAction attributes, type and example
 $sendMessageUploadDocumentAction = ['_' => 'sendMessageUploadDocumentAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadDocumentAction={_='sendMessageUploadDocumentAction', }
+
+```
+
+

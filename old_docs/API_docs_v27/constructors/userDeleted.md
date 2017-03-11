@@ -11,10 +11,10 @@ description: userDeleted attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|first\_name|[string](../types/string.md) | Required|
-|last\_name|[string](../types/string.md) | Required|
-|username|[string](../types/string.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|first\_name|[string](../types/string.md) | Yes|
+|last\_name|[string](../types/string.md) | Yes|
+|username|[string](../types/string.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: userDeleted attributes, type and example
 ```
 $userDeleted = ['_' => 'userDeleted', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userDeleted={_='userDeleted', id=int, first_name=string, last_name=string, username=string, }
+
+```
+
 

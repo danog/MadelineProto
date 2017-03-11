@@ -11,8 +11,8 @@ description: inputMediaGifExternal attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|url|[string](../types/string.md) | Required|
-|q|[string](../types/string.md) | Required|
+|url|[string](../types/string.md) | Yes|
+|q|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputMediaGifExternal attributes, type and example
 ```
 $inputMediaGifExternal = ['_' => 'inputMediaGifExternal', 'url' => string, 'q' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaGifExternal={_='inputMediaGifExternal', url=string, q=string, }
+
+```
+
 

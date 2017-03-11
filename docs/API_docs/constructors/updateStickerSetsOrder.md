@@ -12,7 +12,7 @@ description: updateStickerSetsOrder attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |masks|[Bool](../types/Bool.md) | Optional|
-|order|Array of [long](../types/long.md) | Required|
+|order|Array of [long](../types/long.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: updateStickerSetsOrder attributes, type and example
 ### Example:
 
 ```
-$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => true, 'order' => [Vector t], ];
+$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => true, 'order' => [long], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateStickerSetsOrder={_='updateStickerSetsOrder', masks=true, order={long}, }
+
+```
+
 

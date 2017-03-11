@@ -10,8 +10,8 @@ description: messages.setEncryptedTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Required|
-|typing|[Bool](../types/Bool.md) | Required|
+|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|typing|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->setEncryptedTyping(['peer' => InputEncryptedChat, 'typing' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.setEncryptedTyping({peer=InputEncryptedChat, typing=Bool, })
+```
+

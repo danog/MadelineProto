@@ -11,9 +11,9 @@ description: pageFull attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|blocks|Array of [PageBlock](../types/PageBlock.md) | Required|
-|photos|Array of [Photo](../types/Photo.md) | Required|
-|videos|Array of [Document](../types/Document.md) | Required|
+|blocks|Array of [PageBlock](../types/PageBlock.md) | Yes|
+|photos|Array of [Photo](../types/Photo.md) | Yes|
+|videos|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -23,6 +23,15 @@ description: pageFull attributes, type and example
 ### Example:
 
 ```
-$pageFull = ['_' => 'pageFull', 'blocks' => [Vector t], 'photos' => [Vector t], 'videos' => [Vector t], ];
+$pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock], 'photos' => [Photo], 'videos' => [Document], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageFull={_='pageFull', blocks={PageBlock}, photos={Photo}, videos={Document}, }
+
+```
+
 

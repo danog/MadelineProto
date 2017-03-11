@@ -11,7 +11,7 @@ description: messageMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo|[Photo](../types/Photo.md) | Required|
+|photo|[Photo](../types/Photo.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageMediaPhoto attributes, type and example
 ```
 $messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageMediaPhoto={_='messageMediaPhoto', photo=Photo, }
+
+```
+
 

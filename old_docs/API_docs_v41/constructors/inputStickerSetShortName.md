@@ -11,7 +11,7 @@ description: inputStickerSetShortName attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|short\_name|[string](../types/string.md) | Required|
+|short\_name|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputStickerSetShortName attributes, type and example
 ```
 $inputStickerSetShortName = ['_' => 'inputStickerSetShortName', 'short_name' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputStickerSetShortName={_='inputStickerSetShortName', short_name=string, }
+
+```
+
 

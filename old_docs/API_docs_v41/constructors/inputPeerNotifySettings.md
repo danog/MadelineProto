@@ -11,10 +11,10 @@ description: inputPeerNotifySettings attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|mute\_until|[int](../types/int.md) | Required|
-|sound|[string](../types/string.md) | Required|
-|show\_previews|[Bool](../types/Bool.md) | Required|
-|events\_mask|[int](../types/int.md) | Required|
+|mute\_until|[int](../types/int.md) | Yes|
+|sound|[string](../types/string.md) | Yes|
+|show\_previews|[Bool](../types/Bool.md) | Yes|
+|events\_mask|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: inputPeerNotifySettings attributes, type and example
 ```
 $inputPeerNotifySettings = ['_' => 'inputPeerNotifySettings', 'mute_until' => int, 'sound' => string, 'show_previews' => Bool, 'events_mask' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPeerNotifySettings={_='inputPeerNotifySettings', mute_until=int, sound=string, show_previews=Bool, events_mask=int, }
+
+```
+
 

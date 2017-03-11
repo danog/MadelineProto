@@ -11,11 +11,11 @@ description: botInlineMessageMediaVenue attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo|[GeoPoint](../types/GeoPoint.md) | Required|
-|title|[string](../types/string.md) | Required|
-|address|[string](../types/string.md) | Required|
-|provider|[string](../types/string.md) | Required|
-|venue\_id|[string](../types/string.md) | Required|
+|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|title|[string](../types/string.md) | Yes|
+|address|[string](../types/string.md) | Yes|
+|provider|[string](../types/string.md) | Yes|
+|venue\_id|[string](../types/string.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
@@ -28,4 +28,13 @@ description: botInlineMessageMediaVenue attributes, type and example
 ```
 $botInlineMessageMediaVenue = ['_' => 'botInlineMessageMediaVenue', 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, 'reply_markup' => ReplyMarkup, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineMessageMediaVenue={_='botInlineMessageMediaVenue', geo=GeoPoint, title=string, address=string, provider=string, venue_id=string, reply_markup=ReplyMarkup, }
+
+```
+
 

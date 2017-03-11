@@ -185,8 +185,8 @@ var_dump($update);
                         $MadelineProto->messages->setInlineBotResults($toset);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     try {
+                        $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     } catch (\danog\MadelineProto\Exception $e) {
@@ -198,8 +198,8 @@ var_dump($update);
                     } catch (\danog\MadelineProto\Exception $e) {
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
-                    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     try {
+                        $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     } catch (\danog\MadelineProto\Exception $e) {

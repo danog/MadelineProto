@@ -11,10 +11,10 @@ description: auth.sendCode parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|phone\_number|[string](../types/string.md) | Required|
+|phone\_number|[string](../types/string.md) | Yes|
 |current\_number|[Bool](../types/Bool.md) | Optional|
-|api\_id|[int](../types/int.md) | Required|
-|api\_hash|[string](../types/string.md) | Required|
+|api\_id|[int](../types/int.md) | Yes|
+|api\_hash|[string](../types/string.md) | Yes|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $auth_SentCode = $MadelineProto->auth->sendCode(['allow_flashcall' => Bool, 'phone_number' => string, 'current_number' => Bool, 'api_id' => int, 'api_hash' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_SentCode = auth.sendCode({allow_flashcall=Bool, phone_number=string, current_number=Bool, api_id=int, api_hash=string, })
+```
+

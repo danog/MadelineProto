@@ -11,9 +11,9 @@ description: messages_affectedHistory attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|pts|[int](../types/int.md) | Required|
-|seq|[int](../types/int.md) | Required|
-|offset|[int](../types/int.md) | Required|
+|pts|[int](../types/int.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
+|offset|[int](../types/int.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: messages_affectedHistory attributes, type and example
 ```
 $messages_affectedHistory = ['_' => 'messages.affectedHistory', 'pts' => int, 'seq' => int, 'offset' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_affectedHistory={_='messages.affectedHistory', pts=int, seq=int, offset=int, }
+
+```
+
 

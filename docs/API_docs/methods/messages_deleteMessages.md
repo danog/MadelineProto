@@ -11,7 +11,7 @@ description: messages.deleteMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |revoke|[Bool](../types/Bool.md) | Optional|
-|id|Array of [int](../types/int.md) | Required|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_AffectedMessages = $MadelineProto->messages->deleteMessages(['revoke' => Bool, 'id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedMessages = messages.deleteMessages({revoke=Bool, id={int}, })
+```
+

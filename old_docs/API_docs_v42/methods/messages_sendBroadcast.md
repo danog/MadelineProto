@@ -10,9 +10,9 @@ description: messages.sendBroadcast parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|contacts|Array of [InputUser](../types/InputUser.md) | Required|
-|message|[string](../types/string.md) | Required|
-|media|[InputMedia](../types/InputMedia.md) | Required|
+|contacts|Array of [InputUser](../types/InputUser.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->sendBroadcast(['contacts' => [InputUser], 'message' => string, 'media' => InputMedia, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.sendBroadcast({contacts={InputUser}, message=string, media=InputMedia, })
+```
+

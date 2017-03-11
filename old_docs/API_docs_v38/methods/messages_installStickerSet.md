@@ -10,8 +10,8 @@ description: messages.installStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Required|
-|disabled|[Bool](../types/Bool.md) | Required|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|disabled|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->installStickerSet(['stickerset' => InputStickerSet, 'disabled' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.installStickerSet({stickerset=InputStickerSet, disabled=Bool, })
+```
+

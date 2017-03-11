@@ -11,10 +11,10 @@ description: dcOption attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|hostname|[string](../types/string.md) | Required|
-|ip\_address|[string](../types/string.md) | Required|
-|port|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|hostname|[string](../types/string.md) | Yes|
+|ip\_address|[string](../types/string.md) | Yes|
+|port|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: dcOption attributes, type and example
 ```
 $dcOption = ['_' => 'dcOption', 'id' => int, 'hostname' => string, 'ip_address' => string, 'port' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+dcOption={_='dcOption', id=int, hostname=string, ip_address=string, port=int, }
+
+```
+
 

@@ -11,8 +11,8 @@ description: pageBlockSlideshow attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|items|Array of [PageBlock](../types/PageBlock.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|items|Array of [PageBlock](../types/PageBlock.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -22,6 +22,15 @@ description: pageBlockSlideshow attributes, type and example
 ### Example:
 
 ```
-$pageBlockSlideshow = ['_' => 'pageBlockSlideshow', 'items' => [Vector t], 'caption' => RichText, ];
+$pageBlockSlideshow = ['_' => 'pageBlockSlideshow', 'items' => [PageBlock], 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockSlideshow={_='pageBlockSlideshow', items={PageBlock}, caption=RichText, }
+
+```
+
 

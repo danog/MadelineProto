@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $help_InviteText = $MadelineProto->help->getInviteText();
 ```
+
+Or, if you're into Lua:
+
+```
+help_InviteText = help.getInviteText({})
+```
+

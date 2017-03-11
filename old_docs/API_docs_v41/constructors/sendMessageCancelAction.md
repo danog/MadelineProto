@@ -19,3 +19,12 @@ description: sendMessageCancelAction attributes, type and example
 $sendMessageCancelAction = ['_' => 'sendMessageCancelAction', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+sendMessageCancelAction={_='sendMessageCancelAction', }
+
+```
+
+

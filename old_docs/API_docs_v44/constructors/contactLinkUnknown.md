@@ -19,3 +19,12 @@ description: contactLinkUnknown attributes, type and example
 $contactLinkUnknown = ['_' => 'contactLinkUnknown', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contactLinkUnknown={_='contactLinkUnknown', }
+
+```
+
+

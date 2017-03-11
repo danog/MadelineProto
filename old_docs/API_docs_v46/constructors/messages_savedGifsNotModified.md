@@ -19,3 +19,12 @@ description: messages_savedGifsNotModified attributes, type and example
 $messages_savedGifsNotModified = ['_' => 'messages.savedGifsNotModified', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+messages_savedGifsNotModified={_='messages.savedGifsNotModified', }
+
+```
+
+

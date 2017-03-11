@@ -19,3 +19,12 @@ description: contacts_topPeersNotModified attributes, type and example
 $contacts_topPeersNotModified = ['_' => 'contacts.topPeersNotModified', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+contacts_topPeersNotModified={_='contacts.topPeersNotModified', }
+
+```
+
+

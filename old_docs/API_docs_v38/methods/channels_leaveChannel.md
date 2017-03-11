@@ -10,7 +10,7 @@ description: channels.leaveChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->leaveChannel(['channel' => InputChannel, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.leaveChannel({channel=InputChannel, })
+```
+

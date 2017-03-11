@@ -10,7 +10,7 @@ description: messages.getChats parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|Array of [InputChat](../types/InputChat.md) | Required|
+|id|Array of [InputChat](../types/InputChat.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_Chats = $MadelineProto->messages->getChats(['id' => [InputChat], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Chats = messages.getChats({id={InputChat}, })
+```
+

@@ -94,6 +94,8 @@ trait PeerHandler
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            return false;
         }
     }
 
@@ -498,6 +500,6 @@ trait PeerHandler
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }
-        throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($username, true));
+        throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($res, true));
     }
 }

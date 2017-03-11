@@ -10,8 +10,8 @@ description: messages.editChatTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|title|[string](../types/string.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|title|[string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->editChatTitle(['chat_id' => int, 'title' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.editChatTitle({chat_id=int, title=string, })
+```
+

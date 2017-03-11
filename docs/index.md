@@ -14,7 +14,7 @@ Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
-This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM. You must also install the mbstring, curl extensions.   
+This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM. You must also install the mbstring, curl extensions and the PHP Lua extension if you want to use the lua binding.   
 
 Also note that MadelineProto will perform better if python and a big math extension like gmp or bcmath are installed.
 
@@ -22,9 +22,45 @@ This project is in beta state.
 
 The MadelineProto API documentation can be found [here (layer 62)](https://daniil.it/MadelineProto/API_docs/).  
 
+The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/).  
+
 The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
 
 The MadelineProto API documentations (old layers) can be found [here](https://github.com/danog/MadelineProto/tree/master/old_docs).  
+
+
+Features:
+
+
+* It allows you to do everything official clients can do, programmatically!
+
+* It is very fast!
+
+* It can be easily serialized!
+
+* It featured update handling with callbacks or long polling!
+
+* Easy to use wrappers to upload/download files and call mtproto methods
+
+* Documentation for EVERY mtproto method! 
+
+* Internal peer management: you can provide a simple bot API chat id or a username to send a message or to call other mtproto methods!
+
+* You can easily login as a user (2FA is supported) or as a bot!
+
+* Simple error handling!
+
+* It is highly customizable with a lot of different settings!
+
+* Bot API file id/object support (even for users)!
+
+* A Lua binding
+
+* A lua wrapper for td-cli scripts
+
+* Secret chats
+
+
 
 ## Acknowledgements
 
@@ -42,6 +78,17 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 
 ## Usage
+
+### RTFM
+
+If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili).  
+
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo.
+
+If you don't understand something, read everything again.
+
+I will NOT answer to questions that can be answered simply by reading this page; I will instead ask you to read it carefully twice.
+
 
 ### Installation
 
@@ -123,6 +170,7 @@ $MadelineProto->update_settings($settings);
 ### Handling updates
 
 When an update is received, the update callback function (see settings) is called. By default, the get_updates_update_handler MadelineProto method is called. This method stores all incoming updates into an array (its size limit is specified by the updates\_array\_limit parameter in the settings) and can be fetched by running the `get_updates` method.  
+IMPORTANT Note that you should turn off update handling if you don't plan to use it because the default get_updates update handling stores updates in an array inside the MadelineProto class, without deleting old ones unless they are read using get_updates. This will eventually fill up the RAM of your server if you don't disable updates or read them using get_updates.  
 This method accepts an array of options as the first parameter, and returns an array of updates (an array containing the update id and an object of type [Update](https://daniil.it/MadelineProto/API_docs/types/Update.html)). Example:  
 
 ```
@@ -246,11 +294,16 @@ Every method described in this section accepts a last optional paramater with a 
 
 The upload method returns an [InputFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) object that must be used to generate an [InputMedia](https://daniil.it/MadelineProto/API_docs/types/InputMedia.html) object, that can be later sent using the [sendmedia method](https://daniil.it/MadelineProto/API_docs/methods/messages_sendMedia.html).  
 
+The `upload_encrypted` method returns an [InputEncryptedFile](https://daniil.it/MadelineProto/API_docs/types/InputEncryptedFile.html) object that must be used to generate an [EncryptedMessage](https://daniil.it/MadelineProto/API_docs/types/EncryptedMessage.html) object, that can be later sent using the [sendEncryptedFile method](https://daniil.it/MadelineProto/API_docs/methods/messages_sendEncryptedFile.html).  
+
 
 ```
 $inputFile = $MadelineProto->upload('file', 'optional new file name.ext');
 // Generate an inputMedia object and store it in $inputMedia, see tests/testing.php
 $MadelineProto->messages->sendMedia(['peer' => '@pwrtelegramgroup', 'media' => $inputMedia]);
+
+$inputEncryptedFile = $MadelineProto->upload_encrypted('file', 'optional new file name.ext');
+
 ```
 
 To convert the result of sendMedia to a bot API file id select the messageMedia object from the output of the method and pass it to `$MadelineProto->API->MTProto_to_botAPI()`.  
@@ -259,7 +312,7 @@ See tests/testing.php for more examples.
 
 
 There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
-The first parameter of these functions must always be either a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object or a bot API file id. These objects are usually received in updates, see `bot.php` for examples
+The first parameter of these functions must always be either a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object, an [EncryptedMessage](https://daniil.it/MadelineProto/API_docs/types/EncryptedMessage.html) or a bot API file id. These objects are usually received in updates, see `bot.php` for examples
 
 
 ```
@@ -268,6 +321,81 @@ $custom_output_file_name = $MadelineProto->download_to_file($message_media, '/tm
 $stream = fopen('php://output', 'w'); // Stream to browser like with echo
 $MadelineProto->download_to_stream($message_media, $stream, $cb, $offset, $endoffset); // offset and endoffset are optional parameters that specify the byte from which to start downloading and the byte where to stop downloading (the latter non-inclusive), if not specified default to 0 and the size of the file
 ```
+
+
+### Secret chats
+
+MadelineProto provides some wrappers to work with secret chats:
+
+```
+$secret_chat = $MadelineProto->request_secret_chat($InputUser);
+```
+
+`request_secret_chat` requests a secret secret chat to the [InputUser](https://daniil.it/MadelineProto/API_docs/types/InputUser.html) specified, and returns a number that can be used instead of an [InputEncryptedChat](https://daniil.it/MadelineProto/API_docs/constructors/inputEncryptedChat.html).
+
+
+Secret chats are accepted or refused automatically, based on a value in the settings array (by default MadelineProto is set to accept all secret chats).
+
+Before sending any message, you must check if the secret chat was accepted by the other client with the following method:
+
+
+```
+$status = $MadelineProto->secret_chat_info($chat);
+```
+
+Returns 0 if the chat cannot be found in the local database, 1 if the chat was requested but not yet accepted, and 2 if it is a valid accepted secret chat.
+
+
+To send messages/files/service messages, simply use the sendEncrypted methods with objects that use the same layer used by the other client (specified by the number after the underscore in decryptedMessage object names, to obtain the layer that must be used for a secret chat use the following wrapper method).  
+
+```
+$secret_chat = $MadelineProto->get_secret_chat($chat);
+/*
+[
+    'key' => [ // The authorization key
+        'auth_key' => 'string', // 256 bytes long
+        'fingerprint' => 10387374747492, // a 64 bit signed integer
+        'visualization_orig' => 'string', // 16 bytes long
+        'visualization_46' => 'string', // 20 bytes long
+         // The two visualization strings must be concatenated to generate a visual fingerprint
+    ],
+    'admin' => false, // Am I the creator of the chat?
+    'user_id' => 101374607, // The user id of the other user
+    'InputEncryptedChat' => [...], // An inputEncryptedChat object that represents the current chat
+    'in_seq_no_x' => number, // in_seq_no must be multiplied by two and incremented by this before being sent over the network
+    'out_seq_no_x' => number, // out_seq_no must be multiplied by two and incremeneted this begore being sent over the network
+    'layer' => number, // The secret chat TL layer used by the other client
+    'ttl' => number, // The default time to live of messages in this chat
+    'ttr' => 100, // Time left before rekeying must be done, decremented by one every time a message as encrypted/decrypted with this key
+    'updated' => time(), // Last time the key of the current chat was changed
+    'incoming' => [], // Incoming messages, TL serialized strings
+    'outgoing' => [], // Outgoing ~
+    'created' => time(), // When was this chat created
+    'rekeying' => [0] // Info for rekeying
+];
+*/
+```
+
+This method gets info about a certain chat.
+
+
+### Lua binding
+
+The lua binding makes use of the Lua php extension.
+
+When istantiating the `\danog\MadelineProto\Lua` class, the first parameter provided to the constructor must be the path to the lua script, and the second parameter a logged in instance of MadelineProto.
+
+The class is basically a wrapper for the lua environment, so by setting an attribute you're setting a variable in the Lua environment, by reading an attribute you're reading a variable from the lua environment, and by calling a function you're actually calling a Lua function you declared in the script.
+
+By assigning a callable to an attribute, you're actually assigning a new function in the lua environment that once called, will call the php callable.
+
+Passing lua callables to a parameter of a PHP callable will throw an exception due to a bug in the PHP lua extension that I gotta fix (so passing the usual cb and cb_extra parameters to the td-cli wrappers isn't yet possible).
+
+All MadelineProto wrapper methods (for example upload, download, upload_encrypted, get_self, and others) are imported in the Lua environment, as well as all MTProto wrappers (see the API docs for more info).  
+
+td-cli wrappers are also present: you can use the tdcli_function in lua and pass mtproto updates to the tdcli_update_callback via PHP, they will be automatically converted to/from td objects. Please note that the object conversion is not complete, feel free to contribute to the conversion module in `src/danog/MadelineProto/Conversion/TD.php`.  
+
+For examples, see `lua/*`.
 
 
 ### Calling mtproto methods and available wrappers
@@ -287,6 +415,8 @@ $ping = $MadelineProto->ping([3]); // parameter names can be omitted as long as 
 $message = "Hey! I'm sending this message with MadelineProto!";
 $sentMessage = $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $message]);
 var_dump($sentMessage);
+
+$me = $MadelineProto->get_self(); // This gets info about the currently logged in user as a User object
 ```
 
 The API class also provides some wrapper methods for logging in as a bot or as a normal user, and for getting inputPeer constructors to use in sendMessage and other methods:
@@ -337,6 +467,11 @@ MadelineProto can throw three different exceptions:
 * \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
 
 * \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
+
+* \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
+
+* \danog\MadelineProto\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
+
 
 
 ## Contributing

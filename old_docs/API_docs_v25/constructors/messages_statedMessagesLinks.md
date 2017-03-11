@@ -11,13 +11,13 @@ description: messages_statedMessagesLinks attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|messages|Array of [Message](../types/Message.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|pts\_count|[int](../types/int.md) | Required|
-|links|Array of [contacts\_Link](../types/contacts_Link.md) | Required|
-|seq|[int](../types/int.md) | Required|
+|messages|Array of [Message](../types/Message.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|pts\_count|[int](../types/int.md) | Yes|
+|links|Array of [contacts\_Link](../types/contacts_Link.md) | Yes|
+|seq|[int](../types/int.md) | Yes|
 
 
 
@@ -27,6 +27,15 @@ description: messages_statedMessagesLinks attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessagesLinks = ['_' => 'messages.statedMessagesLinks', 'messages' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'pts' => int, 'pts_count' => int, 'links' => [Vector t], 'seq' => int, ];
+$messages_statedMessagesLinks = ['_' => 'messages.statedMessagesLinks', 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'pts' => int, 'pts_count' => int, 'links' => [contacts.Link], 'seq' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_statedMessagesLinks={_='messages.statedMessagesLinks', messages={Message}, chats={Chat}, users={User}, pts=int, pts_count=int, links={contacts.Link}, seq=int, }
+
+```
+
 

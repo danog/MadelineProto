@@ -10,8 +10,8 @@ description: account.updateProfile parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|first\_name|[string](../types/string.md) | Required|
-|last\_name|[string](../types/string.md) | Required|
+|first\_name|[string](../types/string.md) | Yes|
+|last\_name|[string](../types/string.md) | Yes|
 
 
 ### Return type: [User](../types/User.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $User = $MadelineProto->account->updateProfile(['first_name' => string, 'last_name' => string, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+User = account.updateProfile({first_name=string, last_name=string, })
+```
+

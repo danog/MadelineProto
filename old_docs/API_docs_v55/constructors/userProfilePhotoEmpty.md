@@ -19,3 +19,12 @@ description: userProfilePhotoEmpty attributes, type and example
 $userProfilePhotoEmpty = ['_' => 'userProfilePhotoEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+userProfilePhotoEmpty={_='userProfilePhotoEmpty', }
+
+```
+
+

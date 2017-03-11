@@ -10,8 +10,8 @@ description: messages.forwardMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|id|Array of [int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|id|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->forwardMessages(['peer' => InputPeer, 'id' => [int], ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.forwardMessages({peer=InputPeer, id={int}, })
+```
+

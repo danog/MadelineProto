@@ -11,12 +11,12 @@ description: updates_difference attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|new\_messages|Array of [Message](../types/Message.md) | Required|
-|new\_encrypted\_messages|Array of [EncryptedMessage](../types/EncryptedMessage.md) | Required|
-|other\_updates|Array of [Update](../types/Update.md) | Required|
-|chats|Array of [Chat](../types/Chat.md) | Required|
-|users|Array of [User](../types/User.md) | Required|
-|state|[updates\_State](../types/updates_State.md) | Required|
+|new\_messages|Array of [Message](../types/Message.md) | Yes|
+|new\_encrypted\_messages|Array of [EncryptedMessage](../types/EncryptedMessage.md) | Yes|
+|other\_updates|Array of [Update](../types/Update.md) | Yes|
+|chats|Array of [Chat](../types/Chat.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
+|state|[updates\_State](../types/updates_State.md) | Yes|
 
 
 
@@ -26,6 +26,15 @@ description: updates_difference attributes, type and example
 ### Example:
 
 ```
-$updates_difference = ['_' => 'updates.difference', 'new_messages' => [Vector t], 'new_encrypted_messages' => [Vector t], 'other_updates' => [Vector t], 'chats' => [Vector t], 'users' => [Vector t], 'state' => updates.State, ];
+$updates_difference = ['_' => 'updates.difference', 'new_messages' => [Message], 'new_encrypted_messages' => [EncryptedMessage], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], 'state' => updates.State, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updates_difference={_='updates.difference', new_messages={Message}, new_encrypted_messages={EncryptedMessage}, other_updates={Update}, chats={Chat}, users={User}, state=updates.State, }
+
+```
+
 

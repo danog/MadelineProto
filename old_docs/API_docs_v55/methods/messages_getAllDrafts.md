@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->messages->getAllDrafts();
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = messages.getAllDrafts({})
+```
+

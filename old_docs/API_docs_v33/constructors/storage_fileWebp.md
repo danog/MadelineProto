@@ -19,3 +19,12 @@ description: storage_fileWebp attributes, type and example
 $storage_fileWebp = ['_' => 'storage.fileWebp', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+storage_fileWebp={_='storage.fileWebp', }
+
+```
+
+

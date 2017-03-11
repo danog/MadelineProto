@@ -11,8 +11,8 @@ description: account_noPassword attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|new\_salt|[bytes](../types/bytes.md) | Required|
-|email\_unconfirmed\_pattern|[string](../types/string.md) | Required|
+|new\_salt|[bytes](../types/bytes.md) | Yes|
+|email\_unconfirmed\_pattern|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: account_noPassword attributes, type and example
 ```
 $account_noPassword = ['_' => 'account.noPassword', 'new_salt' => bytes, 'email_unconfirmed_pattern' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+account_noPassword={_='account.noPassword', new_salt=bytes, email_unconfirmed_pattern=string, }
+
+```
+
 

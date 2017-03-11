@@ -10,8 +10,8 @@ description: messages.readHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|max\_id|[int](../types/int.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|max\_id|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $messages_AffectedMessages = $MadelineProto->messages->readHistory(['peer' => InputPeer, 'max_id' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_AffectedMessages = messages.readHistory({peer=InputPeer, max_id=int, })
+```
+

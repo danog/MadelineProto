@@ -12,7 +12,7 @@ description: updateDialogPinned attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |pinned|[Bool](../types/Bool.md) | Optional|
-|peer|[Peer](../types/Peer.md) | Required|
+|peer|[Peer](../types/Peer.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateDialogPinned attributes, type and example
 ```
 $updateDialogPinned = ['_' => 'updateDialogPinned', 'pinned' => true, 'peer' => Peer, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateDialogPinned={_='updateDialogPinned', pinned=true, peer=Peer, }
+
+```
+
 

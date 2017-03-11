@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->readFeaturedStickers();
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.readFeaturedStickers({})
+```
+

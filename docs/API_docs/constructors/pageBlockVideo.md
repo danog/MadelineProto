@@ -13,8 +13,8 @@ description: pageBlockVideo attributes, type and example
 |----------|:-------------:|---------:|
 |autoplay|[Bool](../types/Bool.md) | Optional|
 |loop|[Bool](../types/Bool.md) | Optional|
-|video\_id|[long](../types/long.md) | Required|
-|caption|[RichText](../types/RichText.md) | Required|
+|video\_id|[long](../types/long.md) | Yes|
+|caption|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: pageBlockVideo attributes, type and example
 ```
 $pageBlockVideo = ['_' => 'pageBlockVideo', 'autoplay' => true, 'loop' => true, 'video_id' => long, 'caption' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+pageBlockVideo={_='pageBlockVideo', autoplay=true, loop=true, video_id=long, caption=RichText, }
+
+```
+
 

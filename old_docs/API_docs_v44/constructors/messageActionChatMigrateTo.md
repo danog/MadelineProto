@@ -11,7 +11,7 @@ description: messageActionChatMigrateTo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel\_id|[int](../types/int.md) | Required|
+|channel\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageActionChatMigrateTo attributes, type and example
 ```
 $messageActionChatMigrateTo = ['_' => 'messageActionChatMigrateTo', 'channel_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatMigrateTo={_='messageActionChatMigrateTo', channel_id=int, }
+
+```
+
 

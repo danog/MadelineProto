@@ -11,7 +11,7 @@ description: textStrike attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|text|[RichText](../types/RichText.md) | Required|
+|text|[RichText](../types/RichText.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: textStrike attributes, type and example
 ```
 $textStrike = ['_' => 'textStrike', 'text' => RichText, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+textStrike={_='textStrike', text=RichText, }
+
+```
+
 

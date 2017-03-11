@@ -11,10 +11,10 @@ description: msg_detailed_info attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|msg\_id|[long](../types/long.md) | Required|
-|answer\_msg\_id|[long](../types/long.md) | Required|
-|bytes|[int](../types/int.md) | Required|
-|status|[int](../types/int.md) | Required|
+|msg\_id|[long](../types/long.md) | Yes|
+|answer\_msg\_id|[long](../types/long.md) | Yes|
+|bytes|[int](../types/int.md) | Yes|
+|status|[int](../types/int.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: msg_detailed_info attributes, type and example
 ```
 $msg_detailed_info = ['_' => 'msg_detailed_info', 'msg_id' => long, 'answer_msg_id' => long, 'bytes' => int, 'status' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+msg_detailed_info={_='msg_detailed_info', msg_id=long, answer_msg_id=long, bytes=int, status=int, }
+
+```
+
 

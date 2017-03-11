@@ -10,8 +10,8 @@ description: contacts.getBlocked parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [contacts\_Blocked](../types/contacts_Blocked.md)
@@ -36,3 +36,10 @@ if (isset($number)) {
 
 $contacts_Blocked = $MadelineProto->contacts->getBlocked(['offset' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+contacts_Blocked = contacts.getBlocked({offset=int, limit=int, })
+```
+

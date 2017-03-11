@@ -11,7 +11,7 @@ description: chatParticipantCreator attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: chatParticipantCreator attributes, type and example
 ```
 $chatParticipantCreator = ['_' => 'chatParticipantCreator', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+chatParticipantCreator={_='chatParticipantCreator', user_id=int, }
+
+```
+
 

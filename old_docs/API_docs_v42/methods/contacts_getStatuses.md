@@ -30,3 +30,10 @@ if (isset($number)) {
 
 $Vector_of_ContactStatus = $MadelineProto->contacts->getStatuses();
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_ContactStatus = contacts.getStatuses({})
+```
+

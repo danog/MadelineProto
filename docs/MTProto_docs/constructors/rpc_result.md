@@ -11,8 +11,8 @@ description: rpc_result attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|req\_msg\_id|[long](../types/long.md) | Required|
-|result|[Object](../types/Object.md) | Required|
+|req\_msg\_id|[long](../types/long.md) | Yes|
+|result|[Object](../types/Object.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: rpc_result attributes, type and example
 ```
 $rpc_result = ['_' => 'rpc_result', 'req_msg_id' => long, 'result' => Object, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+rpc_result={_='rpc_result', req_msg_id=long, result=Object, }
+
+```
+
 

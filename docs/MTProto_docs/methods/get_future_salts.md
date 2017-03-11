@@ -10,7 +10,7 @@ description: get_future_salts parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|num|[int](../types/int.md) | Required|
+|num|[int](../types/int.md) | Yes|
 
 
 ### Return type: [FutureSalts](../types/FutureSalts.md)
@@ -33,5 +33,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$FutureSalts = $MadelineProto->get->future->salts(['num' => int, ]);
+$FutureSalts = $MadelineProto->get_future_salts(['num' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+FutureSalts = get_future_salts({num=int, })
+```
+

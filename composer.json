@@ -19,7 +19,8 @@
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
         "krakjoe/pthreads-polyfill": "dev-master",
-        "erusev/parsedown": "^1.6"
+        "erusev/parsedown": "^1.6",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"

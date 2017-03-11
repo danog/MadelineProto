@@ -11,7 +11,7 @@ description: botInlineMessageMediaGeo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|geo|[GeoPoint](../types/GeoPoint.md) | Required|
+|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
@@ -24,4 +24,13 @@ description: botInlineMessageMediaGeo attributes, type and example
 ```
 $botInlineMessageMediaGeo = ['_' => 'botInlineMessageMediaGeo', 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+botInlineMessageMediaGeo={_='botInlineMessageMediaGeo', geo=GeoPoint, reply_markup=ReplyMarkup, }
+
+```
+
 

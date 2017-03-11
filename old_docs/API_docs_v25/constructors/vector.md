@@ -19,3 +19,12 @@ description: vector attributes, type and example
 $vector = ['_' => 'vector', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+vector={_='vector', }
+
+```
+
+

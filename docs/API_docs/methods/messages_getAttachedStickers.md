@@ -10,7 +10,7 @@ description: messages.getAttachedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|media|[InputStickeredMedia](../types/InputStickeredMedia.md) | Required|
+|media|[InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Vector_of_StickerSetCovered = $MadelineProto->messages->getAttachedStickers(['media' => InputStickeredMedia, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Vector_of_StickerSetCovered = messages.getAttachedStickers({media=InputStickeredMedia, })
+```
+

@@ -11,12 +11,12 @@ description: updateShortMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|message|[string](../types/string.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|pts\_count|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|pts\_count|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 |fwd\_from\_id|[int](../types/int.md) | Optional|
 |fwd\_date|[int](../types/int.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
@@ -31,4 +31,13 @@ description: updateShortMessage attributes, type and example
 ```
 $updateShortMessage = ['_' => 'updateShortMessage', 'id' => int, 'user_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => int, 'fwd_date' => int, 'reply_to_msg_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateShortMessage={_='updateShortMessage', id=int, user_id=int, message=string, pts=int, pts_count=int, date=int, fwd_from_id=int, fwd_date=int, reply_to_msg_id=int, }
+
+```
+
 

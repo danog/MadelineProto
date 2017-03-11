@@ -11,7 +11,7 @@ description: exportedMessageLink attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|link|[string](../types/string.md) | Required|
+|link|[string](../types/string.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: exportedMessageLink attributes, type and example
 ```
 $exportedMessageLink = ['_' => 'exportedMessageLink', 'link' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+exportedMessageLink={_='exportedMessageLink', link=string, }
+
+```
+
 

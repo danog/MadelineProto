@@ -11,7 +11,7 @@ description: contacts_myLinkRequested attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|contact|[Bool](../types/Bool.md) | Required|
+|contact|[Bool](../types/Bool.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: contacts_myLinkRequested attributes, type and example
 ```
 $contacts_myLinkRequested = ['_' => 'contacts.myLinkRequested', 'contact' => Bool, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contacts_myLinkRequested={_='contacts.myLinkRequested', contact=Bool, }
+
+```
+
 

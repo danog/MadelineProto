@@ -11,9 +11,9 @@ description: updateContactLink attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|my\_link|[contacts\_MyLink](../types/contacts_MyLink.md) | Required|
-|foreign\_link|[contacts\_ForeignLink](../types/contacts_ForeignLink.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|my\_link|[contacts\_MyLink](../types/contacts_MyLink.md) | Yes|
+|foreign\_link|[contacts\_ForeignLink](../types/contacts_ForeignLink.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: updateContactLink attributes, type and example
 ```
 $updateContactLink = ['_' => 'updateContactLink', 'user_id' => int, 'my_link' => contacts.MyLink, 'foreign_link' => contacts.ForeignLink, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateContactLink={_='updateContactLink', user_id=int, my_link=contacts.MyLink, foreign_link=contacts.ForeignLink, }
+
+```
+
 

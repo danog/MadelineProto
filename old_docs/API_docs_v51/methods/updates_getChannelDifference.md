@@ -10,10 +10,10 @@ description: updates.getChannelDifference parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|filter|[ChannelMessagesFilter](../types/ChannelMessagesFilter.md) | Required|
-|pts|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|filter|[ChannelMessagesFilter](../types/ChannelMessagesFilter.md) | Yes|
+|pts|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [updates\_ChannelDifference](../types/updates_ChannelDifference.md)
@@ -38,3 +38,10 @@ if (isset($number)) {
 
 $updates_ChannelDifference = $MadelineProto->updates->getChannelDifference(['channel' => InputChannel, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+updates_ChannelDifference = updates.getChannelDifference({channel=InputChannel, filter=ChannelMessagesFilter, pts=int, limit=int, })
+```
+

@@ -11,10 +11,10 @@ description: messages_dhConfig attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|g|[int](../types/int.md) | Required|
-|p|[bytes](../types/bytes.md) | Required|
-|version|[int](../types/int.md) | Required|
-|random|[bytes](../types/bytes.md) | Required|
+|g|[int](../types/int.md) | Yes|
+|p|[bytes](../types/bytes.md) | Yes|
+|version|[int](../types/int.md) | Yes|
+|random|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -26,4 +26,13 @@ description: messages_dhConfig attributes, type and example
 ```
 $messages_dhConfig = ['_' => 'messages.dhConfig', 'g' => int, 'p' => bytes, 'version' => int, 'random' => bytes, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messages_dhConfig={_='messages.dhConfig', g=int, p=bytes, version=int, random=bytes, }
+
+```
+
 

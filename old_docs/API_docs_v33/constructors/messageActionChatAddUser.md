@@ -11,7 +11,7 @@ description: messageActionChatAddUser attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: messageActionChatAddUser attributes, type and example
 ```
 $messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'user_id' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+messageActionChatAddUser={_='messageActionChatAddUser', user_id=int, }
+
+```
+
 

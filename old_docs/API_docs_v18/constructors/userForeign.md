@@ -11,13 +11,13 @@ description: userForeign attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[int](../types/int.md) | Required|
-|first\_name|[string](../types/string.md) | Required|
-|last\_name|[string](../types/string.md) | Required|
-|username|[string](../types/string.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Required|
-|status|[UserStatus](../types/UserStatus.md) | Required|
+|id|[int](../types/int.md) | Yes|
+|first\_name|[string](../types/string.md) | Yes|
+|last\_name|[string](../types/string.md) | Yes|
+|username|[string](../types/string.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
+|status|[UserStatus](../types/UserStatus.md) | Yes|
 
 
 
@@ -29,4 +29,13 @@ description: userForeign attributes, type and example
 ```
 $userForeign = ['_' => 'userForeign', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'access_hash' => long, 'photo' => UserProfilePhoto, 'status' => UserStatus, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+userForeign={_='userForeign', id=int, first_name=string, last_name=string, username=string, access_hash=long, photo=UserProfilePhoto, status=UserStatus, }
+
+```
+
 

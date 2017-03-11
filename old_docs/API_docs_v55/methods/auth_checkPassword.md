@@ -10,7 +10,7 @@ description: auth.checkPassword parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|password\_hash|[bytes](../types/bytes.md) | Required|
+|password\_hash|[bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $auth_Authorization = $MadelineProto->auth->checkPassword(['password_hash' => bytes, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+auth_Authorization = auth.checkPassword({password_hash=bytes, })
+```
+

@@ -11,11 +11,11 @@ description: updateChatParticipantAdd attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Required|
-|user\_id|[int](../types/int.md) | Required|
-|inviter\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
-|version|[int](../types/int.md) | Required|
+|chat\_id|[int](../types/int.md) | Yes|
+|user\_id|[int](../types/int.md) | Yes|
+|inviter\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|version|[int](../types/int.md) | Yes|
 
 
 
@@ -27,4 +27,13 @@ description: updateChatParticipantAdd attributes, type and example
 ```
 $updateChatParticipantAdd = ['_' => 'updateChatParticipantAdd', 'chat_id' => int, 'user_id' => int, 'inviter_id' => int, 'date' => int, 'version' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateChatParticipantAdd={_='updateChatParticipantAdd', chat_id=int, user_id=int, inviter_id=int, date=int, version=int, }
+
+```
+
 

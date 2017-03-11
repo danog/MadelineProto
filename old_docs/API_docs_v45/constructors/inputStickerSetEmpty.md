@@ -19,3 +19,12 @@ description: inputStickerSetEmpty attributes, type and example
 $inputStickerSetEmpty = ['_' => 'inputStickerSetEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputStickerSetEmpty={_='inputStickerSetEmpty', }
+
+```
+
+

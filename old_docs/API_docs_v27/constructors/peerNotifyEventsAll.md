@@ -19,3 +19,12 @@ description: peerNotifyEventsAll attributes, type and example
 $peerNotifyEventsAll = ['_' => 'peerNotifyEventsAll', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+peerNotifyEventsAll={_='peerNotifyEventsAll', }
+
+```
+
+

@@ -24,3 +24,12 @@ description: inputMessagesFilterPhoneCalls attributes, type and example
 $inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => true, ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputMessagesFilterPhoneCalls={_='inputMessagesFilterPhoneCalls', missed=true, }
+
+```
+
+

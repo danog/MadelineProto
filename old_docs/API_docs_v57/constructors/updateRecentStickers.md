@@ -19,3 +19,12 @@ description: updateRecentStickers attributes, type and example
 $updateRecentStickers = ['_' => 'updateRecentStickers', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+updateRecentStickers={_='updateRecentStickers', }
+
+```
+
+

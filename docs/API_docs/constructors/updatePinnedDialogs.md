@@ -21,6 +21,15 @@ description: updatePinnedDialogs attributes, type and example
 ### Example:
 
 ```
-$updatePinnedDialogs = ['_' => 'updatePinnedDialogs', 'order' => [Vector t], ];
+$updatePinnedDialogs = ['_' => 'updatePinnedDialogs', 'order' => [Peer], ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updatePinnedDialogs={_='updatePinnedDialogs', order={Peer}, }
+
+```
+
 

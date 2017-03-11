@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $Bool = $MadelineProto->messages->clearRecentStickers(['attached' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Bool = messages.clearRecentStickers({attached=Bool, })
+```
+

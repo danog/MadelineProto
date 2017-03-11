@@ -10,9 +10,9 @@ description: channels.kickFromChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|channel|[InputChannel](../types/InputChannel.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
-|kicked|[Bool](../types/Bool.md) | Required|
+|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|kicked|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $Updates = $MadelineProto->channels->kickFromChannel(['channel' => InputChannel, 'user_id' => InputUser, 'kicked' => Bool, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+Updates = channels.kickFromChannel({channel=InputChannel, user_id=InputUser, kicked=Bool, })
+```
+

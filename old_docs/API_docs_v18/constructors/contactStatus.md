@@ -11,8 +11,8 @@ description: contactStatus attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|expires|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|expires|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: contactStatus attributes, type and example
 ```
 $contactStatus = ['_' => 'contactStatus', 'user_id' => int, 'expires' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contactStatus={_='contactStatus', user_id=int, expires=int, }
+
+```
+
 

@@ -11,8 +11,8 @@ description: updateUserPhone attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|phone|[string](../types/string.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|phone|[string](../types/string.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: updateUserPhone attributes, type and example
 ```
 $updateUserPhone = ['_' => 'updateUserPhone', 'user_id' => int, 'phone' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+updateUserPhone={_='updateUserPhone', user_id=int, phone=string, }
+
+```
+
 

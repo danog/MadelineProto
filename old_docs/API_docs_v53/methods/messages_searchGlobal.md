@@ -10,11 +10,11 @@ description: messages.searchGlobal parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|q|[string](../types/string.md) | Required|
-|offset\_date|[int](../types/int.md) | Required|
-|offset\_peer|[InputPeer](../types/InputPeer.md) | Required|
-|offset\_id|[int](../types/int.md) | Required|
-|limit|[int](../types/int.md) | Required|
+|q|[string](../types/string.md) | Yes|
+|offset\_date|[int](../types/int.md) | Yes|
+|offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|offset\_id|[int](../types/int.md) | Yes|
+|limit|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -39,3 +39,10 @@ if (isset($number)) {
 
 $messages_Messages = $MadelineProto->messages->searchGlobal(['q' => string, 'offset_date' => int, 'offset_peer' => InputPeer, 'offset_id' => int, 'limit' => int, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_Messages = messages.searchGlobal({q=string, offset_date=int, offset_peer=InputPeer, offset_id=int, limit=int, })
+```
+

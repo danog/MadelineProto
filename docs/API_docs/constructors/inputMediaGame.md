@@ -11,7 +11,7 @@ description: inputMediaGame attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[InputGame](../types/InputGame.md) | Required|
+|id|[InputGame](../types/InputGame.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: inputMediaGame attributes, type and example
 ```
 $inputMediaGame = ['_' => 'inputMediaGame', 'id' => InputGame, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMediaGame={_='inputMediaGame', id=InputGame, }
+
+```
+
 

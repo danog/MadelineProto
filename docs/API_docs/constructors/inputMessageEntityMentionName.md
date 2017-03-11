@@ -11,9 +11,9 @@ description: inputMessageEntityMentionName attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|offset|[int](../types/int.md) | Required|
-|length|[int](../types/int.md) | Required|
-|user\_id|[InputUser](../types/InputUser.md) | Required|
+|offset|[int](../types/int.md) | Yes|
+|length|[int](../types/int.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
 
@@ -25,4 +25,13 @@ description: inputMessageEntityMentionName attributes, type and example
 ```
 $inputMessageEntityMentionName = ['_' => 'inputMessageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => InputUser, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputMessageEntityMentionName={_='inputMessageEntityMentionName', offset=int, length=int, user_id=InputUser, }
+
+```
+
 

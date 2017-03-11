@@ -19,3 +19,12 @@ description: inputPrivacyKeyPhoneCall attributes, type and example
 $inputPrivacyKeyPhoneCall = ['_' => 'inputPrivacyKeyPhoneCall', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputPrivacyKeyPhoneCall={_='inputPrivacyKeyPhoneCall', }
+
+```
+
+

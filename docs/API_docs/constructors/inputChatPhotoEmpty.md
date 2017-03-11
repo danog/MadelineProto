@@ -19,3 +19,12 @@ description: inputChatPhotoEmpty attributes, type and example
 $inputChatPhotoEmpty = ['_' => 'inputChatPhotoEmpty', ];
 ```  
 
+Or, if you're into Lua:  
+
+
+```
+inputChatPhotoEmpty={_='inputChatPhotoEmpty', }
+
+```
+
+

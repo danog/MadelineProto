@@ -10,9 +10,9 @@ description: messages.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputPeer](../types/InputPeer.md) | Required|
-|reply\_to\_msg\_id|[int](../types/int.md) | Required|
-|media|[InputMedia](../types/InputMedia.md) | Required|
+|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|reply\_to\_msg\_id|[int](../types/int.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Yes|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)
@@ -37,3 +37,10 @@ if (isset($number)) {
 
 $messages_StatedMessage = $MadelineProto->messages->sendMedia(['peer' => InputPeer, 'reply_to_msg_id' => int, 'media' => InputMedia, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_StatedMessage = messages.sendMedia({peer=InputPeer, reply_to_msg_id=int, media=InputMedia, })
+```
+

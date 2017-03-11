@@ -11,7 +11,7 @@ description: audioEmpty attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|id|[long](../types/long.md) | Required|
+|id|[long](../types/long.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: audioEmpty attributes, type and example
 ```
 $audioEmpty = ['_' => 'audioEmpty', 'id' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+audioEmpty={_='audioEmpty', id=long, }
+
+```
+
 

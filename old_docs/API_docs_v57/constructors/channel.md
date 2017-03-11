@@ -23,13 +23,13 @@ description: channel attributes, type and example
 |democracy|[Bool](../types/Bool.md) | Optional|
 |signatures|[Bool](../types/Bool.md) | Optional|
 |min|[Bool](../types/Bool.md) | Optional|
-|id|[int](../types/int.md) | Required|
+|id|[int](../types/int.md) | Yes|
 |access\_hash|[long](../types/long.md) | Optional|
-|title|[string](../types/string.md) | Required|
+|title|[string](../types/string.md) | Yes|
 |username|[string](../types/string.md) | Optional|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Required|
-|date|[int](../types/int.md) | Required|
-|version|[int](../types/int.md) | Required|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|date|[int](../types/int.md) | Yes|
+|version|[int](../types/int.md) | Yes|
 |restriction\_reason|[string](../types/string.md) | Optional|
 
 
@@ -42,4 +42,13 @@ description: channel attributes, type and example
 ```
 $channel = ['_' => 'channel', 'creator' => true, 'kicked' => true, 'left' => true, 'editor' => true, 'moderator' => true, 'broadcast' => true, 'verified' => true, 'megagroup' => true, 'restricted' => true, 'democracy' => true, 'signatures' => true, 'min' => true, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+channel={_='channel', creator=true, kicked=true, left=true, editor=true, moderator=true, broadcast=true, verified=true, megagroup=true, restricted=true, democracy=true, signatures=true, min=true, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, restriction_reason=string, }
+
+```
+
 

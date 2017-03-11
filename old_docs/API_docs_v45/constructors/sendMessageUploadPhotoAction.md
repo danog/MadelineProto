@@ -11,7 +11,7 @@ description: sendMessageUploadPhotoAction attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|progress|[int](../types/int.md) | Required|
+|progress|[int](../types/int.md) | Yes|
 
 
 
@@ -23,4 +23,13 @@ description: sendMessageUploadPhotoAction attributes, type and example
 ```
 $sendMessageUploadPhotoAction = ['_' => 'sendMessageUploadPhotoAction', 'progress' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+sendMessageUploadPhotoAction={_='sendMessageUploadPhotoAction', progress=int, }
+
+```
+
 

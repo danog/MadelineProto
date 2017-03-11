@@ -11,8 +11,8 @@ description: contactBlocked attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|date|[int](../types/int.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|date|[int](../types/int.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: contactBlocked attributes, type and example
 ```
 $contactBlocked = ['_' => 'contactBlocked', 'user_id' => int, 'date' => int, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+contactBlocked={_='contactBlocked', user_id=int, date=int, }
+
+```
+
 

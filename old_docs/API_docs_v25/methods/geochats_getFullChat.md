@@ -10,7 +10,7 @@ description: geochats.getFullChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Required|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
@@ -35,3 +35,10 @@ if (isset($number)) {
 
 $messages_ChatFull = $MadelineProto->geochats->getFullChat(['peer' => InputGeoChat, ]);
 ```
+
+Or, if you're into Lua:
+
+```
+messages_ChatFull = geochats.getFullChat({peer=InputGeoChat, })
+```
+

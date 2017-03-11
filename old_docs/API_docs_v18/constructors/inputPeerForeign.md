@@ -11,8 +11,8 @@ description: inputPeerForeign attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|user\_id|[int](../types/int.md) | Required|
-|access\_hash|[long](../types/long.md) | Required|
+|user\_id|[int](../types/int.md) | Yes|
+|access\_hash|[long](../types/long.md) | Yes|
 
 
 
@@ -24,4 +24,13 @@ description: inputPeerForeign attributes, type and example
 ```
 $inputPeerForeign = ['_' => 'inputPeerForeign', 'user_id' => int, 'access_hash' => long, ];
 ```  
+
+Or, if you're into Lua:  
+
+
+```
+inputPeerForeign={_='inputPeerForeign', user_id=int, access_hash=long, }
+
+```
+
 
