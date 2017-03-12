@@ -15,10 +15,10 @@ if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
 
-echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
+echo 'Deserializing MadelineProto from calls.madeline...'.PHP_EOL;
 $MadelineProto = false;
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('calls.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
 if (file_exists('.env')) {
@@ -57,14 +57,16 @@ if ($MadelineProto === false) {
             \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
-        echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+        echo 'Serializing MadelineProto to calls.madeline...'.PHP_EOL;
+        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('calls.madeline', $MadelineProto).' bytes'.PHP_EOL;
     } else {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
-$MadelineProto->request_call('@manuel15');
-while (true) {
+for ($x = 0; $x < $argv[2]; $x++) {
+    $MadelineProto->request_call($argv[1]);
     $MadelineProto->get_updates_difference();
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+
+        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('calls.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
+$MadelineProto->messages->sendMessage(['peer' => $argv[1], 'message' => '[Powered by MadelineProto](https://github.com/danog/MadelineProto)', 'parse_mode' => 'markdown']);
