@@ -66,5 +66,5 @@ if ($MadelineProto === false) {
 $MadelineProto->request_call('@manuel15');
 while (true) {
     $MadelineProto->get_updates_difference();
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }

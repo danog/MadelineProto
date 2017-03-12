@@ -552,6 +552,7 @@ trait AuthKeyHandler
 
         return $res['id'];
     }
+
     public function request_call($user)
     {
         $user = $this->get_info($user)['InputUser'];
