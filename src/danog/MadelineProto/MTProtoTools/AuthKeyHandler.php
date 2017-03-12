@@ -514,6 +514,9 @@ trait AuthKeyHandler
     private $temp_requested_secret_chats = [];
     private $secret_chats = [];
 
+    private $temp_requested_calls = [];
+    private $calls = [];
+
     public function accept_secret_chat($params)
     {
         $dh_config = $this->get_dh_config();
@@ -548,6 +551,24 @@ trait AuthKeyHandler
         $this->get_updates_difference();
 
         return $res['id'];
+    }
+    public function request_call($user)
+    {
+        $user = $this->get_info($user)['InputUser'];
+        \danog\MadelineProto\Logger::log(['Calling '.$user['user_id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
+        $dh_config = $this->get_dh_config();
+        \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
+        \danog\MadelineProto\Logger::log(['Generating g_a...'], \danog\MadelineProto\Logger::VERBOSE);
+        $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
+        $this->check_G($g_a, $dh_config['p']);
+//        $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a' => $g_a->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]]);
+        $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a' => $g_a->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'min_layer' => 65, 'max_layer' => 65, 'udp_reflector' => true]]);
+        $this->temp_requested_calls[$res['phone_call']['id']] = $a;
+        $this->handle_pending_updates();
+        $this->get_updates_difference();
+
+        return $res['phone_call']['id'];
     }
 
     public function complete_secret_chat($params)
