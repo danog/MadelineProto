@@ -68,4 +68,4 @@ for ($x = 0; $x < $argv[2]; $x++) {
     $MadelineProto->get_updates_difference();
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
-$MadelineProto->messages->sendMessage(['peer' => $argv[1], 'message' => '[Powered by MadelineProto](https://github.com/danog/MadelineProto)', 'parse_mode' => 'markdown']);
+$MadelineProto->messages->sendMessage(['peer' => $argv[1], 'message' => '<a href="https://github.com/danog/MadelineProto">Powered by MadelineProto</a>', 'parse_mode' => 'markdown']);

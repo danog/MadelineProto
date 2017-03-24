@@ -142,7 +142,7 @@ trait UpdateHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             return false;
         }
-        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+        $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_channel_state($channel)['sync_loading'] = false;
         switch ($difference['_']) {
@@ -219,7 +219,7 @@ trait UpdateHandler
             $this->get_update_state()['pending_pts_updates'] = [];
             $this->get_update_state()['pending_seq_updates'] = [];
         }
-        $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']]);
+        $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_update_state()['sync_loading'] = false;
 
@@ -252,7 +252,7 @@ trait UpdateHandler
     {
         $this->updates_state['sync_loading'] = false;
         $this->getting_state = true;
-        $this->set_update_state($this->method_call('updates.getState'));
+        $this->set_update_state($this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]));
         $this->getting_state = false;
         $this->handle_pending_updates();
     }
@@ -345,7 +345,7 @@ trait UpdateHandler
             if ($update['pts'] > $new_pts) {
                 \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
 
-                $this->cur_state['pending_pts_updates'][] = $update;
+                $this->cur_state['pending_pts_updates'] = arrray_merge($this->cur_state['pending_pts_updates'], [$update]);
 
                 if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
                     $this->get_channel_difference($channel_id);
@@ -490,6 +490,14 @@ trait UpdateHandler
 
             return;
         }
+        if ($update['_'] === 'updatePhoneCall') {
+            switch ($update['phone_call']['_']) {
+                case 'phoneCallRequested':
+                return $this->accept_call($update['phone_call']);
+                case 'phoneCall':
+                return $this->complete_call($update['phone_call']);
+            }
+        }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             $cur_state = $this->get_update_state();
             if ($cur_state['qts'] === -1) {
@@ -503,7 +511,6 @@ trait UpdateHandler
             }
             if ($update['qts'] > $cur_state['qts'] + 1) {
                 \danog\MadelineProto\Logger::log(['Qts hole. update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
-
                 $this->get_updates_difference();
 
                 return false;
@@ -554,7 +561,7 @@ trait UpdateHandler
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
             return;
         }
-        if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->datacenter->authorization['user']['id']) {
+        if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log(['Saving an update of type '.$update['_'].'...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -595,7 +602,7 @@ trait UpdateHandler
         \danog\MadelineProto\Logger::log(['Result of webhook query is '.$result], \danog\MadelineProto\Logger::NOTICE);
         $result = json_decode($result, true);
         if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
-            \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result)]);
+            \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result, ['datacenter' => $this->datacenter->curdc])]);
         }
     }
 }

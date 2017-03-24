@@ -17,7 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait Files
 {
-    public function upload($file, $file_name = '', $cb = null, $encrypted = false)
+    public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
         if (!file_exists($file)) {
             throw new \danog\MadelineProto\Exception('Given file does not exist!');
@@ -25,6 +25,7 @@ trait Files
         if (empty($file_name)) {
             $file_name = basename($file);
         }
+        $datacenter = is_null($datacenter) ? $this->datacenter->curdc : $datacenter;
         $file_size = filesize($file);
         if ($file_size > 1500 * 1024 * 1024) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
@@ -39,7 +40,7 @@ trait Files
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($file_size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
-        $file_id = \danog\PHP\Struct::unpack('<q', $this->random(8))[0];
+        $file_id = $this->random(8);
         $f = fopen($file, 'r');
         fseek($f, 0);
         if ($encrypted === true) {
@@ -57,7 +58,7 @@ trait Files
             if ($encrypted === true) {
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
-            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true])) {
+            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => $datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
@@ -246,9 +247,7 @@ trait Files
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
-        if (isset($info['InputFileLocation']['dc_id'])) {
-            $this->switch_dc($info['InputFileLocation']['dc_id']);
-        }
+        $datacenter = isset($info['InputFileLocation']['dc_id']) ? $info['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($info['key'])) {
             $digest = hash('md5', $info['key'].$info['iv'], true);
             $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
@@ -264,7 +263,7 @@ trait Files
         while (true) {
             //$real_part_size = (($offset + $part_size > $end) && $end !== -1) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             try {
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true]);
+                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->getMessage() === 'OFFSET_INVALID') {
                     break;
@@ -274,10 +273,9 @@ trait Files
             }
 
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
-                $dc = 1;
-                $this->switch_dc($dc);
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], ['heavy' => true]);
-                $dc++;
+                $datacenter = 1;
+                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $datacenter++;
             }
             if ($res['bytes'] === '') {
                 break;
@@ -285,7 +283,7 @@ trait Files
             if (isset($info['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
-            if ($end !== -1 && strlen($res['bytes']) + $downloaded_size > $size) {
+            if ($end !== -1 && strlen($res['bytes']) + $downloaded_size >= $size) {
                 $res['bytes'] = substr($res['bytes'], 0, (strlen($res['bytes']) + $downloaded_size) - $size);
                 $theend = true;
             }

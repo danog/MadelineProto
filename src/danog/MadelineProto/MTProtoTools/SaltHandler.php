@@ -26,8 +26,8 @@ trait SaltHandler
 
     public function add_salt($valid_since, $valid_until, $salt)
     {
-        if (!isset($this->datacenter->temp_auth_key['salts'][$salt])) {
-            $this->datacenter->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
+        if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt])) {
+            $this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
         }
     }
 }

@@ -236,6 +236,17 @@ trait TL
 
                 return \danog\PHP\Struct::pack('<I', $object);
             case 'long':
+                if (is_object($object)) {
+                    return str_pad(strrev($object->toBytes()), 8, chr(0));
+                }
+
+                if (is_string($object)) {
+                    if (strlen($object) !== 8) {
+                        throw new Exception('Given value is not 8 bytes long');
+                    }
+                    return $object;
+                }
+
                 if (!is_numeric($object)) {
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
@@ -437,7 +448,7 @@ trait TL
             case '#':
                 return \danog\PHP\Struct::unpack('<I', $bytes_io->read(4))[0];
             case 'long':
-                return \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
+                return $this->bigint || isset($type['strlong']) ? $bytes_io->read(8) : \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
             case 'double':
                 return \danog\PHP\Struct::unpack('<d', $bytes_io->read(8))[0];
             case 'int128':
@@ -457,13 +468,13 @@ trait TL
                     $x = $bytes_io->read($long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        $bytes_io->read($resto);
+                        $bytes_io->pos += $resto;
                     }
                 } else {
                     $x = $bytes_io->read($l);
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        $bytes_io->read($resto);
+                        $bytes_io->pos += $resto;
                     }
                 }
                 if (!is_string($x)) {
@@ -491,8 +502,9 @@ trait TL
             case 'vector':
                 $count = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
                 $result = [];
+                $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserialize($bytes_io, ['type' => $type['subtype']]);
+                    $result[] = $this->deserialize($bytes_io, $type);
                 }
 
                 return $result;
@@ -538,6 +550,9 @@ trait TL
                         break;
                 }
             }
+            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt'])) {
+                $arg['strlong'] = true;
+            }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
         }
         if (isset($x['flags'])) { // I don't think we need this anymore
@@ -547,42 +562,4 @@ trait TL
         return $x;
     }
 
-    public function content_related($method)
-    {
-        return !in_array(
-            $method,
-            [
-                'rpc_result',
-                'rpc_error',
-                'rpc_drop_answer',
-                'rpc_answer_unknown',
-                'rpc_answer_dropped_running',
-                'rpc_answer_dropped',
-                'get_future_salts',
-                'future_salt',
-                'future_salts',
-                'ping',
-                'pong',
-                'ping_delay_disconnect',
-                'destroy_session',
-                'destroy_session_ok',
-                'destroy_session_none',
-                'new_session_created',
-                'msg_container',
-                'msg_copy',
-                'gzip_packed',
-                'http_wait',
-                'msgs_ack',
-                'bad_msg_notification',
-                'bad_server_salt',
-                'msgs_state_req',
-                'msgs_state_info',
-                'msgs_all_info',
-                'msg_detailed_info',
-                'msg_new_detailed_info',
-                'msg_resend_req',
-                'msg_resend_ans_req',
-            ]
-        );
-    }
 }

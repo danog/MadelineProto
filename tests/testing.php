@@ -15,7 +15,6 @@ require_once 'vendor/autoload.php';
 if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
-
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = false;
 try {
@@ -65,8 +64,7 @@ if ($MadelineProto === false) {
     }
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
-$secret = $MadelineProto->API->request_secret_chat(getenv('TEST_USERNAME'));
-var_dump($MadelineProto->get_pwr_chat('@telegram'));
+//$secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
 //$MadelineProto->API->request_secret_chat('@Harold_Saxon');
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;

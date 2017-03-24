@@ -29,7 +29,7 @@ class RSA
         $this->keydata = ['n' => \phpseclib\Common\Functions\Objects::getVar($key, 'modulus'), 'e' => \phpseclib\Common\Functions\Objects::getVar($key, 'exponent')];
 
         \danog\MadelineProto\Logger::log(['Computing fingerprint...'], Logger::ULTRA_VERBOSE);
-        $this->keydata['fp'] = \danog\PHP\Struct::unpack('<q', substr(
+        $this->keydata['fp'] = substr(
             sha1(
                 $this->serialize_object(
                     ['type' => 'bytes'],
@@ -43,7 +43,7 @@ class RSA
                 true
             ),
             -8
-        ))[0];
+        );
 
         return $this->keydata;
     }

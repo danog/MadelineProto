@@ -138,7 +138,7 @@ trait PeerHandler
             switch ($id['_']) {
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
-                    $id = $this->datacenter->authorization['user']['id'];
+                    $id = $this->authorization['user']['id'];
                     break;
                 case 'user':
                     $id = $id['id'];
@@ -197,7 +197,7 @@ trait PeerHandler
                 return $this->gen_all($this->chats[$id]);
             }
             if ($id < 0 && !preg_match('/^-100/', $id)) {
-                $this->method_call('messages.getFullChat', ['chat_id' => -$id]);
+                $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
                 if (isset($this->chats[$id])) {
                     return $this->gen_all($this->chats[$id]);
                 }
@@ -280,16 +280,16 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-            $full = $this->method_call('users.getFullUser', ['id' => $partial['InputUser']]);
+            $full = $this->method_call('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
             break;
 
             case 'chat':
-            $full = $this->method_call('messages.getFullChat', $partial)['full_chat'];
+            $full = $this->method_call('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc])['full_chat'];
             break;
 
             case 'channel':
             case 'supergroup':
-            $full = $this->method_call('channels.getFullChannel', ['channel' => $partial['InputChannel']])['full_chat'];
+            $full = $this->method_call('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
             break;
         }
         $partial['full'] = $full;
@@ -403,7 +403,7 @@ trait PeerHandler
             $res['participants'] = [];
             $limit = 400;
             $offset = -$limit;
-            $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => 200]);
+            $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => 200], ['datacenter' => $this->datacenter->curdc]);
             $count = $gres['count'];
             $key = -1;
             while ($offset <= $count) {
@@ -441,7 +441,7 @@ trait PeerHandler
                     }
                     $res['participants'][$key] = $newres;
                 }
-                $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit]);
+                $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
                 if (empty($gres['participants'])) {
                     break;
                 }
@@ -484,7 +484,7 @@ trait PeerHandler
             $payload = json_encode($this->qres);
             $path = '/tmp/ids'.hash('sha256', $payload);
             file_put_contents($path, $payload);
-            $id = isset($this->datacenter->authorization['user']['username']) ? $this->datacenter->authorization['user']['username'] : $this->datacenter->authorization['user']['id'];
+            $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
             $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
             \danog\MadelineProto\Logger::log([$result], \danog\MadelineProto\Logger::VERBOSE);
         } catch (\danog\MadelineProto\Exception $e) {
@@ -496,7 +496,7 @@ trait PeerHandler
 
     public function resolve_username($username)
     {
-        $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)]);
+        $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }

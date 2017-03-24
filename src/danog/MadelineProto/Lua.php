@@ -61,7 +61,7 @@ class Lua
         if ($params === 0) {
             return 0;
         }
-        $result = $this->MadelineProto->API->method_call($params['_'], $params);
+        $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
         if (is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
@@ -71,7 +71,7 @@ class Lua
 
     public function madeline_function($params, $cb = null, $cb_extra = null)
     {
-        $result = $this->MadelineProto->API->method_call($params['_'], $params);
+        $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
         if (is_callable($cb)) {
             $cb($result, $cb_extra);
         }

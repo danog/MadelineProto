@@ -336,7 +336,7 @@ Before sending any message, you must check if the secret chat was accepted by th
 
 
 ```
-$status = $MadelineProto->secret_chat_info($chat);
+$status = $MadelineProto->secret_chat_status($chat);
 ```
 
 Returns 0 if the chat cannot be found in the local database, 1 if the chat was requested but not yet accepted, and 2 if it is a valid accepted secret chat.
@@ -455,7 +455,7 @@ The same operation should be done when serializing to another destination manual
 
 ### Exceptions
 
-MadelineProto can throw three different exceptions:  
+MadelineProto can throw lots of different exceptions:  
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
 
 * \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API)
@@ -466,7 +466,7 @@ MadelineProto can throw three different exceptions:
 
 * \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
 
-* \danog\MadelineProto\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
+* \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
 
 
 

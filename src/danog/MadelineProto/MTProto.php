@@ -25,27 +25,37 @@ class MTProto
     use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\ResponseHandler;
-    use \danog\MadelineProto\MTProtoTools\SaltHandler;
+    //use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
+    use \danog\MadelineProto\SecretChats\AuthKeyHandler;
+    use \danog\MadelineProto\SecretChats\MessageHandler;
     use \danog\MadelineProto\TL\TL;
-    use \danog\MadelineProto\Conversion\BotAPI;
-    use \danog\MadelineProto\Conversion\BotAPIFiles;
-    use \danog\MadelineProto\Conversion\Extension;
-    use \danog\MadelineProto\Conversion\TD;
+    use \danog\MadelineProto\TL\Conversion\BotAPI;
+    use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
+    use \danog\MadelineProto\TL\Conversion\Extension;
+    use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\Tools;
 
     public $settings = [];
     public $config = ['expires' => -1];
     public $ipv6 = false;
     public $should_serialize = true;
+    public $authorization = null;
+    public $authorized = false;
+    public $login_temp_status = 'none';
+    public $bigint = false;
+    public $run_workers = false;
+    public $threads = false;
+    public $readers = [];
 
     public function __construct($settings = [])
     {
+        $this->bigint = PHP_INT_SIZE < 8;
         // Parse settings
         $this->parse_settings($settings);
-
+        
         // Connect to servers
         \danog\MadelineProto\Logger::log(['Istantiating DataCenter...'], Logger::ULTRA_VERBOSE);
         if (isset($this->datacenter)) {
@@ -60,37 +70,90 @@ class MTProto
         // Istantiate TL class
         \danog\MadelineProto\Logger::log(['Translating tl schemas...'], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
-                /*
-                * ***********************************************************************
-                * Define some needed numbers for BigInteger
-                */
+        /*
+         * ***********************************************************************
+         * Define some needed numbers for BigInteger
+         */
         \danog\MadelineProto\Logger::log(['Executing dh_prime checks (0/3)...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        
+        $this->zero = new \phpseclib\Math\BigInteger(0);
         $this->one = new \phpseclib\Math\BigInteger(1);
-        //$two = new \phpseclib\Math\BigInteger(2);
+        $this->three = new \phpseclib\Math\BigInteger(3);
+        $this->four = new \phpseclib\Math\BigInteger(4);
         $this->twoe1984 = new \phpseclib\Math\BigInteger('1751908409537131537220509645351687597690304110853111572994449976845956819751541616602568796259317428464425605223064365804210081422215355425149431390635151955247955156636234741221447435733643262808668929902091770092492911737768377135426590363166295684370498604708288556044687341394398676292971255828404734517580702346564613427770683056761383955397564338690628093211465848244049196353703022640400205739093118270803778352768276670202698397214556629204420309965547056893233608758387329699097930255380715679250799950923553703740673620901978370802540218870279314810722790539899334271514365444369275682816');
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
-        $this->switch_dc(2, true);
-        $this->get_config();
-    }
+        $this->connect_to_all_dcs();
+        $this->datacenter->curdc = 2;
 
+        $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
+        \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
+
+        if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
+            $this->datacenter->curdc = $nearest_dc['nearest_dc'];
+            $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
+            $this->should_serialize = true;
+        }
+
+        $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+        $this->v = $this->getV();
+        $this->should_serialize = true;
+    }
+    public function setup_threads() {
+        if ($this->threads = $this->run_workers = class_exists('\Pool') && php_sapi_name() == "cli" && $this->settings['threading']['allow_threading']) {
+            \danog\MadelineProto\Logger::log(['THREADING IS ENABLED'], \danog\MadelineProto\Logger::NOTICE);
+            $this->start_threads();
+        }
+        
+    }
+    public function start_threads() {
+        if ($this->threads) {
+            $dcs = $this->datacenter->get_dcs();
+            if (!isset($this->reader_pool)) $this->reader_pool = new \Pool(count($dcs));
+            foreach ($dcs as $dc) {
+                if (!isset($this->readers[$dc])) {
+                    $this->readers [$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
+                }
+                if (!$this->readers[$dc]->isRunning()) {
+                    $this->readers[$dc]->garbage = false;
+                    $this->reader_pool->submit($this->readers[$dc]);
+                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
+                } else {
+                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
+                }
+            }
+        }
+    }
+    public function __sleep() {
+        $t = get_object_vars($this);
+        if (isset($t['reader_pool'])) unset($t['reader_pool']);
+        return array_keys($t);
+    }
     public function __wakeup()
     {
+        if (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117)) return;
+        $this->bigint = PHP_INT_SIZE < 8;
         $this->setup_logger();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $this->__construct($this->settings);
-            $this->v = $this->getV();
         }
+        $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->reset_session();
-        if ($this->datacenter->authorized && $this->settings['updates']['handle_updates']) {
+        if ($this->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
     }
-
+    public function __destruct() {
+        if (isset($this->reader_pool)) {
+            $this->run_workers = false;
+            \danog\MadelineProto\Logger::log(['Shutting down reader pool...'], Logger::NOTICE);
+            $this->reader_pool->shutdown();
+        }
+    }
     public function parse_settings($settings)
     {
         // Detect ipv6
@@ -100,11 +163,11 @@ class MTProto
                     'timeout' => 1,
                 ],
             ]);
-
-            $google = file_get_contents('https://ipv6.google.com', false, $ctx);
+            $google = file_get_contents('http://ipv6.test-ipv6.com/', false, $ctx);
         } catch (Exception $e) {
         }
         $this->ipv6 = strlen($google) > 0;
+
         // Detect device model
         try {
             $device_model = php_uname('s');
@@ -182,7 +245,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, udp (unsupported)
                     'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 3, // timeout for sockets
+                    'timeout'      => 2, // timeout for sockets
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -190,8 +253,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'api_hash'        => '4251a2777e179232705e2462706f4143',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
-//                'app_version'     => 'Unicorn', // 🌚
-                'app_version'     => $this->getV(),
+                'app_version'     => 'Unicorn', // 🌚
+//                'app_version'     => $this->getV(),
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
@@ -236,6 +299,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'secret_chats' => [
                 'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
             ],
+            'calls' => [
+                'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
+            ],
+            'threading' => [
+                'allow_threading' => false, // Should I use threading, if it is enabled?
+                'handler_workers' => 10 // How many workers should every message handler pool of each socket reader have
+            ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
         $settings = array_replace_recursive($default_settings, $settings);
@@ -247,15 +317,26 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
             unset($settings['connection_settings']['all']);
         }
+        switch ($settings['logger']['logger_level']) {
+            case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
+            case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;
+            case 'NOTICE': $settings['logger']['logger_level'] = 3; break;
+            case 'WARNING': $settings['logger']['logger_level'] = 2; break;
+            case 'ERROR': $settings['logger']['logger_level'] = 1; break;
+            case 'FATAL ERROR': $settings['logger']['logger_level'] = 0; break;
+        }
+        
         $this->settings = $settings;
 
         // Setup logger
         $this->setup_logger();
+        $this->should_serialize = true;
     }
+    
 
     public function setup_logger()
     {
-        \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->datacenter->authorization['user']) ? (isset($this->datacenter->authorization['user']['username']) ? $this->datacenter->authorization['user']['username'] : $this->datacenter->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 
     public function reset_session($de = true)
@@ -264,67 +345,66 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($de) {
                 \danog\MadelineProto\Logger::log(['Resetting session id and seq_no in DC '.$id.'...'], Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
-                $socket->seq_no = 0;
+                $socket->session_in_seq_no = 0;
+                $socket->session_out_seq_no = 0;
             }
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];
             $socket->new_incoming = [];
+            $this->should_serialize = true;
         }
     }
 
-    // Switches to a new datacenter and if necessary creates authorization keys, binds them and writes client info
-    public function switch_dc($new_dc, $allow_nearest_dc_switch = false)
+    // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
+    public function connect_to_all_dcs()
     {
-        $old_dc = $this->datacenter->curdc;
-        \danog\MadelineProto\Logger::log(['Switching from DC '.$old_dc.' to DC '.$new_dc.'...'], Logger::NOTICE);
-        if (!isset($this->datacenter->sockets[$new_dc])) {
-            $this->datacenter->dc_connect($new_dc);
-            $this->init_authorization();
-            $this->get_config($this->write_client_info('help.getConfig'));
-            $this->get_nearest_dc($allow_nearest_dc_switch);
+        foreach ($old = $this->datacenter->get_dcs() as $new_dc) {
+            if (!isset($this->datacenter->sockets[$new_dc])) $this->datacenter->dc_connect($new_dc);
         }
-        $this->datacenter->curdc = $new_dc;
-        if (
-            (isset($this->datacenter->sockets[$old_dc]->authorized) && $this->datacenter->sockets[$old_dc]->authorized) &&
-            !(isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] === $this->datacenter->sockets[$old_dc]->authorization['user']['id'])
-        ) {
-            \danog\MadelineProto\Logger::log(['Copying authorization...'], Logger::VERBOSE);
-            $this->should_serialize = true;
-            $this->datacenter->curdc = $old_dc;
-            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc]);
-            $this->datacenter->curdc = $new_dc;
-            if (isset($this->datacenter->sockets[$new_dc]->authorized) && $this->datacenter->sockets[$new_dc]->authorized && $this->datacenter->sockets[$new_dc]->authorization['user']['id'] !== $this->datacenter->sockets[$old_dc]->authorization['user']['id']) {
-                $this->method_call('auth.logOut');
-            }
-            $this->datacenter->authorization = $this->method_call('auth.importAuthorization', $exported_authorization);
-            $this->datacenter->authorized = true;
-        }
-        \danog\MadelineProto\Logger::log(['Done! Current DC is '.$this->datacenter->curdc], Logger::NOTICE);
+        $this->setup_threads();
+        $this->init_authorization();
+        if ($old !== $this->datacenter->get_dcs()) $this->connect_to_all_dcs();
     }
 
     // Creates authorization keys
     public function init_authorization()
     {
-        if ($this->datacenter->session_id === null) {
-            $this->datacenter->session_id = $this->random(8);
-        }
-        if ($this->datacenter->temp_auth_key === null || $this->datacenter->auth_key === null) {
-            if ($this->datacenter->auth_key === null) {
-                \danog\MadelineProto\Logger::log(['Generating permanent authorization key...'], Logger::NOTICE);
-                $this->datacenter->auth_key = $this->create_auth_key(-1);
+        foreach ($this->datacenter->sockets as $id => &$socket) {
+            if ($socket->session_id === null) {
+                $socket->session_id = $this->random(8);
+                $socket->session_in_seq_no = 0;
+                $socket->session_out_seq_no = 0;
                 $this->should_serialize = true;
             }
-            \danog\MadelineProto\Logger::log(['Generating temporary authorization key...'], Logger::NOTICE);
-            $this->datacenter->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in']);
-            if (in_array($this->datacenter->protocol, ['http', 'https'])) {
-                $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0]);
+            if ($socket->temp_auth_key === null || $socket->auth_key === null) {
+                if ($socket->auth_key === null) {
+                    \danog\MadelineProto\Logger::log(['Generating permanent authorization key for DC '.$id.'...'], Logger::NOTICE);
+                    $socket->auth_key = $this->create_auth_key(-1, $id);
+                }
+                \danog\MadelineProto\Logger::log(['Generating temporary authorization key for DC '.$id.'...'], Logger::NOTICE);
+                $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
+                if (in_array($socket->protocol, ['http', 'https'])) {
+                    $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
+                }
+                $this->should_serialize = true;
             }
         }
     }
+    public function sync_authorization($authorized_dc) {
+        foreach ($this->datacenter->sockets as $new_dc => &$socket) {
+            if ($new_dc === $authorized_dc) continue;
+            \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
+            $this->should_serialize = true;
+            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
+            $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
+            $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
+        }
+    }
 
-    public function write_client_info($method, $arguments = [])
+    public function write_client_info($method, $arguments = [], $options = [])
     {
         \danog\MadelineProto\Logger::log(['Writing client info (also executing '.$method.')...'], Logger::NOTICE);
 
@@ -338,28 +418,17 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                         ['query' => $this->serialize_method($method, $arguments)]
                     )
                 ),
-            ]
+            ],
+            $options
         );
     }
 
-    public function get_nearest_dc($allow_switch)
-    {
-        $nearest_dc = $this->method_call('help.getNearestDc');
-        \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
-
-        if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc'] && $allow_switch) {
-            $this->switch_dc($nearest_dc['nearest_dc']);
-            $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
-            $this->should_serialize = true;
-        }
-    }
-
-    public function get_config($config = [])
+    public function get_config($config = [], $options = [])
     {
         if ($this->config['expires'] > time()) {
             return;
         }
-        $this->config = empty($config) ? $this->method_call('help.getConfig') : $config;
+        $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
         $this->should_serialize = true;
         $this->parse_config();
     }
@@ -380,15 +449,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $test .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
+        $this->should_serialize = true;
     }
 
     public function getV()
     {
-        return 2;
+        return 4;
     }
 
     public function get_self()
     {
-        return $this->datacenter->authorization['user'];
+        return $this->authorization['user'];
     }
 }

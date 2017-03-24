@@ -17,61 +17,60 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait MsgIdHandler
 {
-    public function check_message_id($new_message_id, $outgoing, $container = false)
+    public function check_message_id($new_message_id, $aargs)
     {
-        $min_message_id = ((int) ((time() + $this->datacenter->time_delta - 300) << 32));
-        if ($min_message_id > $new_message_id) {
+        if (!is_object($new_message_id)) {
+            $new_message_id = new \phpseclib\Math\BigInteger(strrev($new_message_id), 256);
+        }
+        $min_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta - 300))->bitwise_leftShift(32);
+        if ($min_message_id->compare($new_message_id) > 0) {
             \danog\MadelineProto\Logger::log(['Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').'], \danog\MadelineProto\Logger::WARNING);
         }
         /*
-        if (((int) ((time() + $this->datacenter->time_delta + 30) << 32)) < $new_message_id) {
+        if (((int) ((time() + $this->datacenter->sockets[$datacenter]->time_delta + 30) << 32)) < $new_message_id) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
         }
         */
-        if ($outgoing) {
-            if ($new_message_id % 4 != 0) {
+        if ($aargs['outgoing']) {
+            if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $keys = array_keys($this->datacenter->outgoing_messages);
-            asort($keys);
-            if ($new_message_id <= end($keys)) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.end($keys).').', 1);
+            $keys = array_keys($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
+            $key = $this->get_max_id($aargs['datacenter'], false);
+            if ($new_message_id->compare($key) <= 0) {
+                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').', 1);
             }
-            if (count($this->datacenter->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
-                reset($this->datacenter->outgoing_messages);
-                unset($this->datacenter->outgoing_messages[key($this->datacenter->outgoing_messages)]);
+            if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
+                reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
+                unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages)]);
             }
-            $this->datacenter->outgoing_messages[$new_message_id] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[strrev($new_message_id->toBytes())] = [];
         } else {
-            if ($new_message_id % 4 != 1 && $new_message_id % 4 != 3) {
+            if (!$new_message_id->divide($this->four)[1]->equals($this->one) && !$new_message_id->divide($this->four)[1]->equals($this->three)) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
             }
-            $keys = array_keys($this->datacenter->incoming_messages);
-            if ($container) {
-                asort($keys);
-                if ($new_message_id >= end($keys)) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.end($keys).').'], \danog\MadelineProto\Logger::WARNING);
+            $key = $this->get_max_id($aargs['datacenter'], true);
+            if ($aargs['container']) {
+                if ($new_message_id->compare($key) >= 0) {
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
-                asort($keys);
-                foreach ($keys as $message_id) {
-                    if ($new_message_id <= $message_id) {
-                        \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').'], \danog\MadelineProto\Logger::WARNING);
-                    }
+                if ($new_message_id->compare($key) <= 0) {
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             }
-            if (count($this->datacenter->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
-                reset($this->datacenter->incoming_messages);
-                unset($this->datacenter->incoming_messages[key($this->datacenter->incoming_messages)]);
+            
+            if (count($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
+                reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
+                unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages)]);
             }
-            $this->datacenter->incoming_messages[$new_message_id] = [];
-            ksort($this->datacenter->incoming_messages);
+            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[strrev($new_message_id->toBytes())] = [];
         }
     }
 
-    public function generate_message_id()
+    public function generate_message_id($datacenter)
     {
-        $int_message_id = (int) ((time() + $this->datacenter->time_delta) << 32);
+        $message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta))->bitwise_leftShift(32);
         /*
         $int_message_id = (int) (
             ((int) ($ms_time / 1000) << 32) |
@@ -79,15 +78,18 @@ trait MsgIdHandler
             rand(0, 524288) << 2
         );
         */
-
-        $keys = array_keys($this->datacenter->outgoing_messages);
-        asort($keys);
-        $keys = end($keys);
-        if ($int_message_id <= $keys) {
-            $int_message_id = $keys + 4;
+        $key = $this->get_max_id($datacenter, false);
+        if ($message_id->compare($key) <= 0) {
+            $message_id = $key->add($this->four);
         }
-        $this->check_message_id($int_message_id, true);
+        $this->check_message_id($message_id, ['outgoing' => true, 'datacenter' => $datacenter, 'container' => false]);
 
-        return $int_message_id;
+        return strrev($message_id->toBytes());
+    }
+    public function get_max_id($datacenter, $incoming) {
+        $keys = array_keys($this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
+        if (empty($keys)) return $this->zero;
+        array_walk($keys, function (&$value, $key) { $value = is_integer($value) ? new \phpseclib\Math\BigInteger($value) : new \phpseclib\Math\BigInteger(strrev($value), 256); });
+        return \phpseclib\Math\BigInteger::max(...$keys);
     }
 }

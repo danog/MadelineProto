@@ -22,6 +22,9 @@ try {
         $MadelineProto = new \danog\MadelineProto\API($settings);
         $authorization = $MadelineProto->bot_login($token);
         \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    } else {
+        echo 'token.php does not exist';
+        die;
     }
 }
 $offset = 0;

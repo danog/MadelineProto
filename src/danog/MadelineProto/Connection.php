@@ -29,10 +29,8 @@ class Connection
     public $temp_auth_key;
     public $auth_key;
     public $session_id;
-    public $seq_no = 0;
-    public $authorized = false;
-    public $authorization = null;
-    public $login_temp_status = 'none';
+    public $session_out_seq_no = 0;
+    public $session_in_seq_no = 0;
 
     public $incoming_messages = [];
     public $outgoing_messages = [];
@@ -105,7 +103,9 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                fclose($this->sock);
+                try {
+                    fclose($this->sock);
+                } catch (\danog\MadelineProto\Exception $e) { ; }
                 break;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");
@@ -167,8 +167,8 @@ class Connection
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $packet = stream_get_contents($this->sock, $length);
-                if ($packet === false) {
-                    throw new NothingInTheSocketException('Nothing in the socket!');
+                if ($packet === false || strlen($packet) === 0) {
+                    throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }
                 if (strlen($packet) != $length) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
