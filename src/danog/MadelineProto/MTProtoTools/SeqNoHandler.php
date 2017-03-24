@@ -39,7 +39,7 @@ trait SeqNoHandler
             $method,
             [
                 'rpc_result',
-                'rpc_error',
+//                'rpc_error',
                 'rpc_drop_answer',
                 'rpc_answer_unknown',
                 'rpc_answer_dropped_running',

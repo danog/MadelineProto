@@ -279,8 +279,9 @@ trait ResponseHandler
             }
             $only_updates = ($only_updates || $first) && $last_was_updates;
             $first = false;
+//var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']);
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
-                throw new \danog\MadelineProto\SecurityException('Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']);
+                //throw new \danog\MadelineProto\SecurityException('Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']);
             }
             if ($unset) {
                 unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);

@@ -48,7 +48,7 @@ trait Login
             ], ['datacenter' => $this->API->datacenter->curdc]
         );
         $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->cur_dc);
+        $this->API->sync_authorization($this->API->datacenter->curdc);
         $this->API->updates = [];
         $this->API->updates_key = 0;
         $this->API->get_updates_state();
@@ -128,7 +128,7 @@ trait Login
         }
         $this->API->authorization = $authorization;
         $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->cur_dc);
+        $this->API->sync_authorization($this->API->datacenter->curdc);
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
 
@@ -155,7 +155,7 @@ trait Login
             ], ['datacenter' => $this->API->datacenter->curdc]
         );
         $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->cur_dc);
+        $this->API->sync_authorization($this->API->datacenter->curdc);
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
 
@@ -178,7 +178,7 @@ trait Login
             ], ['datacenter' => $this->API->datacenter->curdc]
         );
         $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->cur_dc);
+        $this->API->sync_authorization($this->API->datacenter->curdc);
         $this->API->get_updates_state();
         $this->API->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
