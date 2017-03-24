@@ -22,6 +22,7 @@ trait SeqNoHandler
         $in = $content_related ? 1 : 0;
         $value = $this->datacenter->sockets[$datacenter]->session_out_seq_no;
         $this->datacenter->sockets[$datacenter]->session_out_seq_no += $in;
+
         return ($value * 2) + $in;
     }
 
@@ -30,6 +31,7 @@ trait SeqNoHandler
         $in = $content_related ? 1 : 0;
         $value = $this->datacenter->sockets[$datacenter]->session_in_seq_no;
         $this->datacenter->sockets[$datacenter]->session_in_seq_no += $in;
+
         return ($value * 2) + $in;
     }
 

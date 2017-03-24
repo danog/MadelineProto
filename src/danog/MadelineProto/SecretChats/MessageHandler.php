@@ -25,7 +25,7 @@ trait MessageHandler
             return false;
         }
         $message = $this->serialize_object(['type' => $message['_']], $message, $this->secret_chats[$chat_id]['layer']);
-        $this->secret_chats[$chat_id]['outgoing'] []= $message;
+        $this->secret_chats[$chat_id]['outgoing'][] = $message;
         $this->secret_chats[$chat_id]['ttr']--;
         if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'] === 0) {
             $this->rekey($chat_id);

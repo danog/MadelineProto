@@ -68,10 +68,9 @@ trait AuthKeyHandler
                 if (!isset($this->key->keydata['fp'])) {
                     $this->key = new \danog\MadelineProto\RSA($this->settings['authorization']['rsa_key']);
                 }
-                if (in_array($this->key->keydata['fp'], $ResPQ['server_public_key_fingerprints'])) throw new \danog\MadelineProto\SecurityException("Couldn't find our key in the server_public_key_fingerprints vector.");
-
-                
-
+                if (in_array($this->key->keydata['fp'], $ResPQ['server_public_key_fingerprints'])) {
+                    throw new \danog\MadelineProto\SecurityException("Couldn't find our key in the server_public_key_fingerprints vector.");
+                }
                 $pq_bytes = $ResPQ['pq'];
                 $server_nonce = $ResPQ['server_nonce'];
 
@@ -512,7 +511,6 @@ trait AuthKeyHandler
     private $temp_requested_calls = [];
     private $calls = [];
 
-
     public function accept_call($params)
     {
         $dh_config = $this->get_dh_config();
@@ -530,6 +528,7 @@ trait AuthKeyHandler
         $this->check_G($g_b, $dh_config['p']);
         $this->handle_pending_updates();
     }
+
     public function request_call($user)
     {
         $user = $this->get_info($user)['InputUser'];
@@ -549,8 +548,6 @@ trait AuthKeyHandler
         return $res['phone_call']['id'];
     }
 
-
-    
     public function complete_call($params)
     {
         if ($this->call_status($params['id']) !== 1) {
@@ -572,7 +569,6 @@ trait AuthKeyHandler
         $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 65, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'protocol' => $params['protocol'], 'connection' => $params['connection'], 'alternative_connections' => $params['alternative_connections']];
         $this->handle_pending_updates();
     }
-
 
     public function call_status($id)
     {

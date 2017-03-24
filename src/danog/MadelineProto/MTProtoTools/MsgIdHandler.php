@@ -59,7 +59,7 @@ trait MsgIdHandler
                     \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             }
-            
+
             if (count($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                 unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages)]);
@@ -86,10 +86,17 @@ trait MsgIdHandler
 
         return strrev($message_id->toBytes());
     }
-    public function get_max_id($datacenter, $incoming) {
+
+    public function get_max_id($datacenter, $incoming)
+    {
         $keys = array_keys($this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
-        if (empty($keys)) return $this->zero;
-        array_walk($keys, function (&$value, $key) { $value = is_integer($value) ? new \phpseclib\Math\BigInteger($value) : new \phpseclib\Math\BigInteger(strrev($value), 256); });
+        if (empty($keys)) {
+            return $this->zero;
+        }
+        array_walk($keys, function (&$value, $key) {
+            $value = is_int($value) ? new \phpseclib\Math\BigInteger($value) : new \phpseclib\Math\BigInteger(strrev($value), 256);
+        });
+
         return \phpseclib\Math\BigInteger::max(...$keys);
     }
 }

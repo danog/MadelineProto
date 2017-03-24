@@ -14,13 +14,14 @@ namespace danog\MadelineProto;
 
 class Exception extends \Exception
 {
-    public function __construct($message = null, $code = 0, Exception $previous = null) {
+    public function __construct($message = null, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, $code, $previous);
         if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-    
     }
+
     /**
      * ExceptionErrorHandler.
      *

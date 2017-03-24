@@ -36,6 +36,7 @@ class API extends APIFactory
         $this->API->v = $this->API->getV();
         \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
     }
+
     /*
     public function __sleep()
     {

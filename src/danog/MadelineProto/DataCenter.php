@@ -24,9 +24,11 @@ class DataCenter
     public $dclist = [];
     public $settings = [];
 
-    public function __sleep() {
+    public function __sleep()
+    {
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
+
     public function __construct(&$dclist, &$settings)
     {
         $this->dclist = &$dclist;
@@ -71,13 +73,18 @@ class DataCenter
         \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$this->settings[$dc_number]['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $this->sockets[$dc_number] = new Connection($address, $port, $this->settings[$dc_number]['protocol'], $this->settings[$dc_number]['timeout']);
+
         return true;
     }
-    public function get_dcs() {
+
+    public function get_dcs()
+    {
         $test = $this->settings[2]['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings[2]['ipv6'] ? 'ipv6' : 'ipv4';
+
         return array_keys($this->dclist[$test][$ipv6]);
     }
+
     public function &__get($name)
     {
         return $this->sockets[$this->curdc]->{$name};

@@ -21,46 +21,59 @@ class SocketReader extends \Threaded implements \Collectable
     {
         $this->API = $me;
         $this->current = $current;
-        
     }
-    public function __sleep() {
+
+    public function __sleep()
+    {
         return ['current', 'API', 'garbage'];
     }
-    public function __destruct() {
+
+    public function __destruct()
+    {
         \danog\MadelineProto\Logger::log(['Shutting down handler pool for DC '.$this->current], \danog\MadelineProto\Logger::NOTICE);
-        if (isset($this->handler_pool)) $this->handler_pool->shutdown();
+        if (isset($this->handler_pool)) {
+            $this->handler_pool->shutdown();
+        }
     }
+
     /**
      * Reading connection and receiving message from server. Check the CRC32.
      */
     public function run()
     {
-        require_once(__DIR__.'/../SecurityException.php');
-        require_once(__DIR__.'/../RPCErrorException.php');
-        require_once(__DIR__.'/../ResponseException.php');
-        require_once(__DIR__.'/../TL/Conversion/Exception.php');
-        require_once(__DIR__.'/../TL/Exception.php');
-        require_once(__DIR__.'/../NothingInTheSocketException.php');
-        require_once(__DIR__.'/../Exception.php');
-var_dump($this->API->settings['threading']);
-        if (!isset($this->handler_pool)) $this->handler_pool = new \Pool(2);
+        require_once __DIR__.'/../SecurityException.php';
+        require_once __DIR__.'/../RPCErrorException.php';
+        require_once __DIR__.'/../ResponseException.php';
+        require_once __DIR__.'/../TL/Conversion/Exception.php';
+        require_once __DIR__.'/../TL/Exception.php';
+        require_once __DIR__.'/../NothingInTheSocketException.php';
+        require_once __DIR__.'/../Exception.php';
+        var_dump($this->API->settings['threading']);
+        if (!isset($this->handler_pool)) {
+            $this->handler_pool = new \Pool(2);
+        }
 
-var_dump($this->API->settings['threading']);
+        var_dump($this->API->settings['threading']);
 
         while ($this->API->run_workers) {
             try {
-                 $this->API->recv_message($this->current);
-                 $this->handler_pool->submit(new SocketHandler($this->API, $this->current));
-             } catch (\danog\MadelineProto\NothingInTheSocketException $e) { ; }
+                $this->API->recv_message($this->current);
+                $this->handler_pool->submit(new SocketHandler($this->API, $this->current));
+            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            }
         }
         $this->setGarbage();
     }
-    
+
     public $garbage = false;
-    public function setGarbage():void {
+
+    public function setGarbage():void
+    {
         $this->garbage = true;
     }
-    public function isGarbage():bool {
+
+    public function isGarbage():bool
+    {
         return $this->garbage;
     }
 }
