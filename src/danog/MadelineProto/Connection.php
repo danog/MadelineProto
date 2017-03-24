@@ -105,7 +105,8 @@ class Connection
             case 'https':
                 try {
                     fclose($this->sock);
-                } catch (\danog\MadelineProto\Exception $e) { ; }
+                } catch (\danog\MadelineProto\Exception $e) {
+                }
                 break;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");

@@ -90,7 +90,7 @@ trait MessageHandler
             }
 
             $message_id = substr($decrypted_data, 16, 8);
-            $this->check_message_id($message_id,  ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
+            $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
 
             $seq_no = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 24, 4))[0];
             // Dunno how to handle any incorrect sequence numbers

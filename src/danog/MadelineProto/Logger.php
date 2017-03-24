@@ -29,8 +29,6 @@ class Logger
     const ERROR = 1;
     const FATAL_ERROR = 0;
 
-    
-
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -53,7 +51,6 @@ class Logger
 
     public static function log($params, $level = self::NOTICE)
     {
-    
         if (!self::$constructed) {
             throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
         }

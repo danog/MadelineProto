@@ -244,6 +244,7 @@ trait TL
                     if (strlen($object) !== 8) {
                         throw new Exception('Given value is not 8 bytes long');
                     }
+
                     return $object;
                 }
 
@@ -256,16 +257,19 @@ trait TL
                 if (strlen($object) !== 16) {
                     throw new Exception('Given value is not 16 bytes long');
                 }
+
                 return (string) $object;
             case 'int256':
                 if (strlen($object) !== 32) {
                     throw new Exception('Given value is not 32 bytes long');
                 }
+
                 return (string) $object;
             case 'int512':
                 if (strlen($object) !== 64) {
                     throw new Exception('Given value is not 64 bytes long');
                 }
+
                 return (string) $object;
             case 'double':
                 return \danog\PHP\Struct::pack('<d', $object);
@@ -561,5 +565,4 @@ trait TL
 
         return $x;
     }
-
 }

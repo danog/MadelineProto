@@ -49,7 +49,6 @@ trait ResponseHandler
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!in_array($msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages)) {
-                
                 $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
                 if ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $cur_info |= 3;
@@ -135,7 +134,7 @@ trait ResponseHandler
                 case 'msg_container':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
-                        $this->check_message_id($message['msg_id'],  ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
+                        $this->check_message_id($message['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
                         $this->datacenter->sockets[$datacenter]->new_incoming[$message['msg_id']] = $message['msg_id'];
 
@@ -148,7 +147,7 @@ trait ResponseHandler
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id'], $datacenter); // Acknowledge that I received the server's response
                     } else {
-                        $this->check_message_id($message['orig_message']['msg_id'],  ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
+                        $this->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']];
                         $this->datacenter->sockets[$datacenter]->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
 
@@ -286,15 +285,16 @@ trait ResponseHandler
                 unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
             }
         }
+
         return $only_updates;
     }
-    public function handle_rpc_error($server_answer, &$datacenter) {
-        
-                        switch ($server_answer['error_code']) {
+
+    public function handle_rpc_error($server_answer, &$datacenter)
+    {
+        switch ($server_answer['error_code']) {
                             case 303:
                                 $this->datacenter->curdc = $datacenter = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
                                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
-                                
                             case 401:
                                 switch ($server_answer['error_message']) {
                                     case 'USER_DEACTIVATED':
@@ -325,6 +325,7 @@ trait ResponseHandler
                                 break;
                         }
     }
+
     public function handle_pending_updates()
     {
         \danog\MadelineProto\Logger::log(['Parsing pending updates...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -341,7 +342,7 @@ trait ResponseHandler
         \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         if ($this->getting_state) {
             \danog\MadelineProto\Logger::log(['Getting state, handle later'], \danog\MadelineProto\Logger::VERBOSE);
-            $this->pending_updates []= $updates;
+            $this->pending_updates[] = $updates;
 
             return false;
         }

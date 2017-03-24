@@ -25,7 +25,9 @@ trait CallHandler
         if (!is_array($aargs)) {
             throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
         }
-        if (!isset($aargs['datacenter'])) throw new \danog\MadelineProto\Exception("No datacenter provided");
+        if (!isset($aargs['datacenter'])) {
+            throw new \danog\MadelineProto\Exception('No datacenter provided');
+        }
         $args = $this->botAPI_to_MTProto($args);
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
@@ -44,7 +46,7 @@ trait CallHandler
                 $server_answer = null;
                 $update_count = 0;
                 $only_updates = false;
-                while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response']+1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
+                while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                         $this->start_threads();
@@ -52,7 +54,7 @@ trait CallHandler
                             if ($only_updates) {
                                 if ($update_count > 50) {
                                     $update_count = 0;
-                                } else { 
+                                } else {
                                     $res_count--;
                                     $update_count++;
                                 }
@@ -66,7 +68,6 @@ trait CallHandler
                             $this->recv_message($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                         //}
-                        
                     } catch (\danog\MadelineProto\Exception $e) {
                         if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
                             continue 2;
@@ -97,7 +98,7 @@ trait CallHandler
                             case 16:
                             case 17:
                                 \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$aargs['datacenter']]->timedelta = (int)((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
+                                $this->datacenter->sockets[$aargs['datacenter']]->timedelta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
                                 \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->timedelta], \danog\MadelineProto\Logger::WARNING);
                                 $this->reset_session();
                                 $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
@@ -149,13 +150,16 @@ var_dump($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
         if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
-        if (!isset($aargs['datacenter'])) throw new \danog\MadelineProto\Exception("No datacenter provided");
-
+        if (!isset($aargs['datacenter'])) {
+            throw new \danog\MadelineProto\Exception('No datacenter provided');
+        }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log([$object === 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $int_message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object), $aargs);
-                if ($object !== 'msgs_ack') $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['content'] = ['method' => $object, 'args' => $args];
+                if ($object !== 'msgs_ack') {
+                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['content'] = ['method' => $object, 'args' => $args];
+                }
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log(['An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...'], \danog\MadelineProto\Logger::WARNING);
                 $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();

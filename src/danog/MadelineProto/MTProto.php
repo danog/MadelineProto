@@ -55,7 +55,7 @@ class MTProto
         $this->bigint = PHP_INT_SIZE < 8;
         // Parse settings
         $this->parse_settings($settings);
-        
+
         // Connect to servers
         \danog\MadelineProto\Logger::log(['Istantiating DataCenter...'], Logger::ULTRA_VERBOSE);
         if (isset($this->datacenter)) {
@@ -75,7 +75,7 @@ class MTProto
          * Define some needed numbers for BigInteger
          */
         \danog\MadelineProto\Logger::log(['Executing dh_prime checks (0/3)...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        
+
         $this->zero = new \phpseclib\Math\BigInteger(0);
         $this->one = new \phpseclib\Math\BigInteger(1);
         $this->three = new \phpseclib\Math\BigInteger(3);
@@ -100,20 +100,25 @@ class MTProto
         $this->v = $this->getV();
         $this->should_serialize = true;
     }
-    public function setup_threads() {
-        if ($this->threads = $this->run_workers = class_exists('\Pool') && php_sapi_name() == "cli" && $this->settings['threading']['allow_threading']) {
+
+    public function setup_threads()
+    {
+        if ($this->threads = $this->run_workers = class_exists('\Pool') && php_sapi_name() == 'cli' && $this->settings['threading']['allow_threading']) {
             \danog\MadelineProto\Logger::log(['THREADING IS ENABLED'], \danog\MadelineProto\Logger::NOTICE);
             $this->start_threads();
         }
-        
     }
-    public function start_threads() {
+
+    public function start_threads()
+    {
         if ($this->threads) {
             $dcs = $this->datacenter->get_dcs();
-            if (!isset($this->reader_pool)) $this->reader_pool = new \Pool(count($dcs));
+            if (!isset($this->reader_pool)) {
+                $this->reader_pool = new \Pool(count($dcs));
+            }
             foreach ($dcs as $dc) {
                 if (!isset($this->readers[$dc])) {
-                    $this->readers [$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
+                    $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
                 }
                 if (!$this->readers[$dc]->isRunning()) {
                     $this->readers[$dc]->garbage = false;
@@ -125,14 +130,22 @@ class MTProto
             }
         }
     }
-    public function __sleep() {
+
+    public function __sleep()
+    {
         $t = get_object_vars($this);
-        if (isset($t['reader_pool'])) unset($t['reader_pool']);
+        if (isset($t['reader_pool'])) {
+            unset($t['reader_pool']);
+        }
+
         return array_keys($t);
     }
+
     public function __wakeup()
     {
-        if (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117)) return;
+        if (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117)) {
+            return;
+        }
         $this->bigint = PHP_INT_SIZE < 8;
         $this->setup_logger();
         if (!isset($this->v) || $this->v !== $this->getV()) {
@@ -147,13 +160,16 @@ class MTProto
             $this->get_updates_difference();
         }
     }
-    public function __destruct() {
+
+    public function __destruct()
+    {
         if (isset($this->reader_pool)) {
             $this->run_workers = false;
             \danog\MadelineProto\Logger::log(['Shutting down reader pool...'], Logger::NOTICE);
             $this->reader_pool->shutdown();
         }
     }
+
     public function parse_settings($settings)
     {
         // Detect ipv6
@@ -304,7 +320,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?
-                'handler_workers' => 10 // How many workers should every message handler pool of each socket reader have
+                'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
@@ -325,14 +341,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             case 'ERROR': $settings['logger']['logger_level'] = 1; break;
             case 'FATAL ERROR': $settings['logger']['logger_level'] = 0; break;
         }
-        
+
         $this->settings = $settings;
 
         // Setup logger
         $this->setup_logger();
         $this->should_serialize = true;
     }
-    
 
     public function setup_logger()
     {
@@ -360,11 +375,15 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
     public function connect_to_all_dcs()
     {
         foreach ($old = $this->datacenter->get_dcs() as $new_dc) {
-            if (!isset($this->datacenter->sockets[$new_dc])) $this->datacenter->dc_connect($new_dc);
+            if (!isset($this->datacenter->sockets[$new_dc])) {
+                $this->datacenter->dc_connect($new_dc);
+            }
         }
         $this->setup_threads();
         $this->init_authorization();
-        if ($old !== $this->datacenter->get_dcs()) $this->connect_to_all_dcs();
+        if ($old !== $this->datacenter->get_dcs()) {
+            $this->connect_to_all_dcs();
+        }
     }
 
     // Creates authorization keys
@@ -393,9 +412,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             }
         }
     }
-    public function sync_authorization($authorized_dc) {
+
+    public function sync_authorization($authorized_dc)
+    {
         foreach ($this->datacenter->sockets as $new_dc => &$socket) {
-            if ($new_dc === $authorized_dc) continue;
+            if ($new_dc === $authorized_dc) {
+                continue;
+            }
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
             $this->should_serialize = true;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);

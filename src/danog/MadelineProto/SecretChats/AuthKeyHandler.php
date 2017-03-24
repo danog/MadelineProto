@@ -39,6 +39,7 @@ trait AuthKeyHandler
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
     }
+
     public function request_secret_chat($user)
     {
         $user = $this->get_info($user)['InputUser'];
@@ -81,7 +82,6 @@ trait AuthKeyHandler
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
     }
-
 
     public function notify_layer($chat)
     {
