@@ -58,7 +58,7 @@ trait TD
 
     public function tdcli_to_td(&$params, $key = null)
     {
-        if (!is_array($params)) {
+        if (!$this->is_array($params)) {
             return $params;
         }
         if (!isset($params['ID'])) {
@@ -84,7 +84,7 @@ trait TD
         $newparams = ['_' => $this->reverse[$params['_']]];
 
         foreach ($this->td_params_conversion[$newparams['_']] as $td => $mtproto) {
-            if (is_array($mtproto)) {
+            if ($this->is_array($mtproto)) {
                 switch (end($mtproto)) {
                     case 'choose_message_content':
                     switch ($params[$td]['_']) {
@@ -100,7 +100,7 @@ trait TD
                     break;
                     default:
                     $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
-                    if (is_array($newparams[$mtproto[0]])) {
+                    if ($this->is_array($newparams[$mtproto[0]])) {
                         $newparams[$mtproto[0]] = $this->mtproto_to_td($newparams[$mtproto[0]]);
                     }
                 }
@@ -117,7 +117,7 @@ trait TD
 
     public function mtproto_to_td(&$params)
     {
-        if (!is_array($params)) {
+        if (!$this->is_array($params)) {
             return $params;
         }
         if (!isset($params['_'])) {
@@ -188,7 +188,7 @@ trait TD
                     } else {
                         $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
                     }
-                    if (is_array($newparams[$td])) {
+                    if ($this->is_array($newparams[$td])) {
                         $newparams[$td] = $this->mtproto_to_td($newparams[$td]);
                     }
                 }
@@ -200,7 +200,7 @@ trait TD
 
     public function td_to_tdcli($params)
     {
-        if (!is_array($params)) {
+        if (!$this->is_array($params)) {
             return $params;
         }
         $newparams = [];

@@ -19,10 +19,10 @@ trait CallHandler
 {
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
-        if (!is_array($args)) {
+        if (!$this->is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
-        if (!is_array($aargs)) {
+        if (!$this->is_array($aargs)) {
             throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
         }
         if (!isset($aargs['datacenter'])) {
@@ -146,7 +146,7 @@ trait CallHandler
 
     public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
-        if (!is_array($args)) {
+        if (!$this->is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
         if (!isset($aargs['datacenter'])) {

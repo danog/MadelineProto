@@ -143,18 +143,18 @@ class MTProto
 
     public function __wakeup()
     {
-        if (isset(debug_backtrace()[0]['file']) && (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117))) {
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
             return;
         }
         $this->bigint = PHP_INT_SIZE < 8;
         $this->setup_logger();
+        $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $this->__construct($this->settings);
         }
         $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
-        $this->reset_session();
         if ($this->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();

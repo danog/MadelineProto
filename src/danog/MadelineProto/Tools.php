@@ -52,4 +52,7 @@ trait Tools
 
         return $d;
     }
+    public function is_array($elem) {
+        return is_array($elem) || (is_object($elem) && get_class($elem) === 'Volatile');
+    }
 }

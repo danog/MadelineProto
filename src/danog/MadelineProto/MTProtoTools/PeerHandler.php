@@ -134,7 +134,7 @@ trait PeerHandler
 
     public function get_info($id, $recursive = true)
     {
-        if (is_array($id)) {
+        if ($this->is_array($id)) {
             switch ($id['_']) {
                 case 'inputUserSelf':
                 case 'inputPeerSelf':

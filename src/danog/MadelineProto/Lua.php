@@ -86,7 +86,7 @@ class Lua
 
     private function convert_array($array)
     {
-        if (!is_array($value)) {
+        if (!$this->is_array($value)) {
             return $array;
         }
         if ($this->is_seqential($value)) {
