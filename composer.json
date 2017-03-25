@@ -18,7 +18,6 @@
         "danog/primemodule": "dev-master",
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
-        "krakjoe/pthreads-polyfill": "dev-master",
         "erusev/parsedown": "^1.6",
         "ext-mbstring": "*"
     },

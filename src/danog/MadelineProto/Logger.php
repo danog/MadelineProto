@@ -58,7 +58,7 @@ class Logger
             return false;
         }
         $prefix = self::$prefix;
-        if (class_exists('\Thread') && is_object(\Thread::getCurrentThread())) {
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
         foreach (is_array($params) ? $params : [$params] as $param) {
