@@ -105,7 +105,6 @@ trait CallHandler
                                 $this->init_authorization();
                                 continue 3;
                         }
-var_dump($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
                         break;
                     case 'boolTrue':

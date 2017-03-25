@@ -59,7 +59,7 @@ class SocketReader extends \Threaded implements \Collectable
             try {
                 $this->API->recv_message($this->current);
                 $this->handler_pool->submit(new SocketHandler($this->API, $this->current));
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            } catch (\danog\MadelineProto\Exception $e) {
             }
         }
         $this->setGarbage();

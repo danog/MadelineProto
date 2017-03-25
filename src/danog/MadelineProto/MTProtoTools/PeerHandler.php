@@ -90,7 +90,10 @@ trait PeerHandler
 
     public function peer_isset($id)
     {
+    
         try {
+        
+        
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
@@ -134,6 +137,7 @@ trait PeerHandler
 
     public function get_info($id, $recursive = true)
     {
+    
         if (is_array($id)) {
             switch ($id['_']) {
                 case 'inputUserSelf':
@@ -181,6 +185,7 @@ trait PeerHandler
             }
         }
 
+        
         if (preg_match('/^channel#/', $id)) {
             $id = preg_replace('|\D+|', '-100', $id);
         }
@@ -202,7 +207,10 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
+            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
+                    'timeout' => 1,
+                ],
+            ])), true);
             if ($dbres['ok']) {
                 return $this->get_info('@'.$dbres['result']);
             }

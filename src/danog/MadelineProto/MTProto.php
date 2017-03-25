@@ -143,7 +143,7 @@ class MTProto
 
     public function __wakeup()
     {
-        if (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117)) {
+        if (isset(debug_backtrace()[0]['file']) && (debug_backtrace()[0]['file'] === __DIR__.'/Threads/SocketReader.php' || (debug_backtrace()[0]['file'] === __FILE__ && debug_backtrace()[0]['line'] === 117))) {
             return;
         }
         $this->bigint = PHP_INT_SIZE < 8;

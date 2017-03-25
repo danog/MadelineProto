@@ -308,6 +308,7 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
+            
                 if ((isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
                     !$this->peer_isset($update['message']['to_id']) ||
                     (isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id'])) ||
@@ -345,7 +346,7 @@ trait UpdateHandler
             if ($update['pts'] > $new_pts) {
                 \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
 
-                $this->cur_state['pending_pts_updates'] = arrray_merge($this->cur_state['pending_pts_updates'], [$update]);
+                $this->cur_state['pending_pts_updates'][] = $update;
 
                 if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
                     $this->get_channel_difference($channel_id);
