@@ -68,7 +68,7 @@ trait BotAPIFiles
         $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']], '.jpg');
         $photo['location']['access_hash'] = isset($message_media['access_hash']) ? $message_media['access_hash'] : 0;
         $photo['location']['id'] = isset($message_media['id']) ? $message_media['id'] : 0;
-        
+
         $data = $this->serialize_object(['type' => $thumbnail ? 'bot_thumbnail' : 'bot_photo'], $photo['location']).chr(2);
 
         return [
@@ -84,7 +84,9 @@ trait BotAPIFiles
     public function unpack_file_id($file_id)
     {
         $file_id = $this->rle_decode($this->base64url_decode($file_id));
-        if ($file_id[strlen($file_id) - 1] !== chr(2)) throw new Exception('Invalid last byte');
+        if ($file_id[strlen($file_id) - 1] !== chr(2)) {
+            throw new Exception('Invalid last byte');
+        }
         $deserialized = $this->deserialize($file_id);
         $res = ['type' => str_replace('bot_', $deserialized['_'])];
         switch ($deserialized['_']) {

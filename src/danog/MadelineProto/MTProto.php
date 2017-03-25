@@ -276,10 +276,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'tl_schema'     => [ // TL scheme files
                 'layer'         => 62, // layer version
                 'src'           => [
-                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram' => __DIR__.'/TL_telegram_v62.tl', // telegram TL scheme
-                    'secret'   => __DIR__.'/TL_secret.tl', // secret chats TL scheme
-                    'td'       => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
+                    'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
+                    'telegram'     => __DIR__.'/TL_telegram_v62.tl', // telegram TL scheme
+                    'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
+                    'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
                     'botAPI'       => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
                 ],
             ],
