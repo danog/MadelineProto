@@ -323,7 +323,7 @@ trait ResponseHandler
     {
         switch ($server_answer['error_code']) {
                             case 303:
-                                $this->datacenter->curdc = $datacenter = (int)preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+                                $this->datacenter->curdc = $datacenter = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
                                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
                             case 401:
                                 switch ($server_answer['error_message']) {
