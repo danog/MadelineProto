@@ -14,7 +14,7 @@ Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).
 
 PHP implementation of MTProto, based on [telepy](https://github.com/griganton/telepy_old).
 
-This project can run on PHP 7 and HHVM, only 64 bit systems are supported ATM. You must also install the mbstring, curl extensions and the PHP Lua extension if you want to use the lua binding.   
+This project can run on PHP 7 and HHVM, both 32 bit and 64 bit systems are supported. You must also install the mbstring, curl extensions and the PHP Lua extension if you want to use the lua binding.   
 
 Also note that MadelineProto will perform better if python and a big math extension like gmp or bcmath are installed.
 
@@ -340,7 +340,7 @@ Before sending any message, you must check if the secret chat was accepted by th
 
 
 ```
-$status = $MadelineProto->secret_chat_info($chat);
+$status = $MadelineProto->secret_chat_status($chat);
 ```
 
 Returns 0 if the chat cannot be found in the local database, 1 if the chat was requested but not yet accepted, and 2 if it is a valid accepted secret chat.
@@ -459,7 +459,7 @@ The same operation should be done when serializing to another destination manual
 
 ### Exceptions
 
-MadelineProto can throw three different exceptions:  
+MadelineProto can throw lots of different exceptions:  
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
 
 * \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API)
@@ -470,7 +470,7 @@ MadelineProto can throw three different exceptions:
 
 * \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
 
-* \danog\MadelineProto\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
+* \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
 
 
 
