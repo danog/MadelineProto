@@ -203,7 +203,7 @@ trait PeerHandler
                 }
             }
             $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
-                    'timeout' => 1,
+                    'timeout' => 2,
                 ],
             ])), true);
             if ($dbres['ok']) {

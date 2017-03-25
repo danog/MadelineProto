@@ -243,7 +243,6 @@ trait BotAPI
             return [];
 
             case 'messageMediaDocument':
-            $type = 5;
             $type_name = 'document';
             $res = [];
             if ($data['document']['thumb']['_'] === 'photoSize') {
@@ -260,9 +259,7 @@ trait BotAPI
                     case 'documentAttributeAudio':
                     $audio = $attribute;
                     $type_name = 'audio';
-                    $type = 9;
                     if ($attribute['voice']) {
-                        $type = 3;
                         $type_name = 'voice';
                     }
                     $res['duration'] = $attribute['duration'];
@@ -278,7 +275,6 @@ trait BotAPI
                     break;
 
                     case 'documentAttributeVideo':
-                    $type = 4;
                     $type_name = 'video';
                     $res['width'] = $attribute['w'];
                     $res['height'] = $attribute['h'];
@@ -300,7 +296,6 @@ trait BotAPI
 
                     case 'documentAttributeSticker':
                     $type_name = 'sticker';
-                    $type = 8;
                     $res['mask'] = $attribute['mask'];
                     $res['emoji'] = $attribute['alt'];
                     $res['sticker_set'] = $attribute['stickerset'];
@@ -329,7 +324,7 @@ trait BotAPI
             }
             $res['file_size'] = $data['document']['size'];
             $res['mime_type'] = $data['document']['mime_type'];
-            $res['file_id'] = $this->base64url_encode($this->rle_encode(\danog\PHP\Struct::pack('<iiqqb', $type, $data['document']['dc_id'], $data['document']['id'], $data['document']['access_hash'], 2)));
+            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'bot_'.$type_name], $data['document']).chr(2)));
 
             return [$type_name => $res, 'caption' => $data['caption']];
             default:

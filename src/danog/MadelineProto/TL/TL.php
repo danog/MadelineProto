@@ -119,7 +119,7 @@ trait TL
                         '',
                         '', ], $line);
                     $id = hash('crc32b', $clean);
-                    if (preg_match('/^[^\s]+#/', $line)) {
+                    if (preg_match('/^[^\s]+#/', $line) && $scheme_type !== 'botAPI') {
                         $nid = str_pad(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line), 8, '0', \STR_PAD_LEFT);
                         if ($id !== $nid) {
                             \danog\MadelineProto\Logger::log(['CRC32 mismatch ('.$id.', '.$nid.') for '.$line], \danog\MadelineProto\Logger::ERROR);
@@ -554,7 +554,7 @@ trait TL
                         break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt'])) {
+            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints'])) {
                 $arg['strlong'] = true;
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);

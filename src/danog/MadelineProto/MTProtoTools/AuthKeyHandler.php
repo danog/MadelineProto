@@ -68,7 +68,7 @@ trait AuthKeyHandler
                 if (!isset($this->key->keydata['fp'])) {
                     $this->key = new \danog\MadelineProto\RSA($this->settings['authorization']['rsa_key']);
                 }
-                if (in_array($this->key->keydata['fp'], $ResPQ['server_public_key_fingerprints'])) {
+                if (!in_array($this->key->keydata['fp'], $ResPQ['server_public_key_fingerprints'])) {
                     throw new \danog\MadelineProto\SecurityException("Couldn't find our key in the server_public_key_fingerprints vector.");
                 }
                 $pq_bytes = $ResPQ['pq'];

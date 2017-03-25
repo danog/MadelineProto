@@ -66,7 +66,10 @@ trait BotAPIFiles
     public function photosize_to_botapi($photo, $message_media, $thumbnail = false)
     {
         $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']], '.jpg');
-        $data = \danog\PHP\Struct::pack('<iiqqqqib', $thumbnail ? 0 : 2, $photo['location']['dc_id'], isset($message_media['id']) ? $message_media['id'] : 0, isset($message_media['access_hash']) ? $message_media['access_hash'] : 0, $photo['location']['volume_id'], $photo['location']['secret'], $photo['location']['local_id'], 2);
+        $photo['location']['access_hash'] = isset($message_media['access_hash']) ? $message_media['access_hash'] : 0;
+        $photo['location']['id'] = isset($message_media['id']) ? $message_media['id'] : 0;
+        
+        $data = $this->serialize_object(['type' => $thumbnail ? 'bot_thumbnail' : 'bot_photo'], $photo['location']).chr(2);
 
         return [
             'file_id'   => $this->base64url_encode($this->rle_encode($data)),
@@ -81,79 +84,57 @@ trait BotAPIFiles
     public function unpack_file_id($file_id)
     {
         $file_id = $this->rle_decode($this->base64url_decode($file_id));
-        $res = [];
-        $type = \danog\PHP\Struct::unpack('<i', substr($file_id, 0, 4))[0];
-        switch ($type) {
-            case 0:
+        if ($file_id[strlen($file_id) - 1] !== chr(2)) throw new Exception('Invalid last byte');
+        $deserialized = $this->deserialize($file_id);
+        $res = ['type' => str_replace('bot_', $deserialized['_'])];
+        switch ($deserialized['_']) {
+            case 'bot_thumbnail':
+            case 'bot_photo':
             $constructor = ['_' => 'photo', 'sizes' => []];
 
-            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'], $constructor['sizes'][0]['location']['secret'], $constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
-            $res['type'] = 'photo';
+            $constructor['id'] = $deserialized['id'];
+            $constructor['access_hash'] = $deserialized['access_hash'];
+            unset($deserialized['id']);
+            unset($deserialized['access_hash']);
+            unset($deserialized['_']);
+
+            $constructor['sizes'][0]['location'] = $deserialized;
+
             $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
 
             return $res;
-            case 2:
-            $constructor = ['_' => 'photo', 'sizes' => []];
-            list($type, $constructor['sizes'][0]['location']['dc_id'], $constructor['id'], $constructor['access_hash'], $constructor['sizes'][0]['location']['volume_id'], $constructor['sizes'][0]['location']['secret'], $constructor['sizes'][0]['location']['local_id'], $verify) = \danog\PHP\Struct::unpack('<iiqqqqib', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
-            $res['type'] = 'photo';
-            $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
 
-            return $res;
-            case 3:
-            $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true]]];
-            list($type, $constructor['dc_id'], $constructor['id'], $constructor['access_hash'], $verify) = \danog\PHP\Struct::unpack('<iiqqb', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
-            $res['type'] = 'voice';
+            case 'bot_voice':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true]]]);
+
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
 
-            case 4:
-            $res['type'] = 'videos';
-            $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo']]];
-            list($type, $constructor['dc_id'], $constructor['id'], $constructor['access_hash'], $verify) = \danog\PHP\Struct::unpack('<iiqqb', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
+            case 'bot_video':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo']]]);
+
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
-            case 5:
-            $res['type'] = 'document';
-            $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => []];
-            list($type, $constructor['dc_id'], $constructor['id'], $constructor['access_hash'], $verify) = \danog\PHP\Struct::unpack('<iiqqb', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
+            case 'bot_document':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => []]);
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
-            case 8:
-            $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeSticker']]];
-            list($type, $constructor['dc_id'], $constructor['id'], $constructor['access_hash'], $verify) = \danog\PHP\Struct::unpack('<iiqqb', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
-            $res['type'] = 'sticker';
+            case 'bot_sticker':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeSticker']]]);
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
 
-            case 9:
-            $constructor = ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false]]];
-            list($type, $constructor['dc_id'], $constructor['id'], $constructor['access_hash'], $verify) = \danog\PHP\Struct::unpack('<iiqqb', $file_id);
-            if ($verify !== 2) {
-                throw new Exception('Invalid last byte');
-            }
-            $res['type'] = 'music';
+            case 'bot_audio':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false]]]);
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
             return $res;
