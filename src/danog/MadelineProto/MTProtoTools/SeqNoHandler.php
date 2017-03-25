@@ -25,17 +25,20 @@ trait SeqNoHandler
 
         return ($value * 2) + $in;
     }
-    public function check_in_seq_no($datacenter, $current_msg_id) {
-    
-                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
-                        \danog\MadelineProto\Logger::log(['Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
-                    }
+
+    public function check_in_seq_no($datacenter, $current_msg_id)
+    {
+        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
+            \danog\MadelineProto\Logger::log(['Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
+        }
     }
+
     public function generate_in_seq_no($datacenter, $content_related)
     {
         $in = $content_related ? 1 : 0;
         $value = $this->datacenter->sockets[$datacenter]->session_in_seq_no;
         $this->datacenter->sockets[$datacenter]->session_in_seq_no += $in;
+
         return ($value * 2) + $in;
     }
 

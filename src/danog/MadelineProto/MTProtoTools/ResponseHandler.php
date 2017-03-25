@@ -290,7 +290,7 @@ trait ResponseHandler
                     }
                     break;
             }
-            
+
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users'])) {
                 $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users']);
             }
