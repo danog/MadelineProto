@@ -56,7 +56,7 @@ trait MsgIdHandler
                 }
             } else {
                 if ($new_message_id->compare($key) <= 0) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$message_id.').'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             }
 
