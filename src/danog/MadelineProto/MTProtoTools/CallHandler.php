@@ -29,6 +29,9 @@ trait CallHandler
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
         $args = $this->botAPI_to_MTProto($args);
+        if (isset($args['ping_id']) && is_integer($args['ping_id'])) {
+            $args['ping_id'] = \danog\PHP\Struct::pack('<q', $args['ping_id']);
+        }
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];

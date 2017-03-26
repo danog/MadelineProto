@@ -554,7 +554,7 @@ trait TL
                         break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints'])) {
+            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id'])) {
                 $arg['strlong'] = true;
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);

@@ -48,7 +48,6 @@ class MTProto
     public $bigint = false;
     public $run_workers = false;
     public $threads = false;
-    public $readers = [];
 
     public function __construct($settings = [])
     {
@@ -116,6 +115,9 @@ class MTProto
             if (!isset($this->reader_pool)) {
                 $this->reader_pool = new \Pool(count($dcs));
             }
+            if (!isset($this->readers)) {
+                $this->readers = [];
+            }
             foreach ($dcs as $dc) {
                 if (!isset($this->readers[$dc])) {
                     $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
@@ -136,6 +138,9 @@ class MTProto
         $t = get_object_vars($this);
         if (isset($t['reader_pool'])) {
             unset($t['reader_pool']);
+        }
+        if (isset($t['readers'])) {
+            unset($t['readers']);
         }
 
         return array_keys($t);
