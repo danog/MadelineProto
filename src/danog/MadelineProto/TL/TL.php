@@ -119,11 +119,12 @@ trait TL
                         '',
                         '', ], $line);
                     $id = hash('crc32b', $clean);
-                    if (preg_match('/^[^\s]+#/', $line) && $scheme_type !== 'botAPI') {
+                    if (preg_match('/^[^\s]+#/', $line)) {
                         $nid = str_pad(preg_replace(['/^[^#]+#/', '/\s.+/'], '', $line), 8, '0', \STR_PAD_LEFT);
-                        if ($id !== $nid) {
+                        if ($id !== $nid && $scheme_type !== 'botAPI') {
                             \danog\MadelineProto\Logger::log(['CRC32 mismatch ('.$id.', '.$nid.') for '.$line], \danog\MadelineProto\Logger::ERROR);
                         }
+                        $id = $nid;
                     }
                     if (!is_null($e)) {
                         $this->td_descriptions[$type][$name] = ['description' => $e, 'params' => $dparams];

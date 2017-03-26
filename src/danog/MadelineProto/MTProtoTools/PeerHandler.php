@@ -404,9 +404,9 @@ trait PeerHandler
         }
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants']) {
             $res['participants'] = [];
-            $limit = 400;
+            $limit = 200;
             $offset = -$limit;
-            $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => 200], ['datacenter' => $this->datacenter->curdc]);
+            $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
             $count = $gres['count'];
             $key = -1;
             while ($offset <= $count) {

@@ -322,9 +322,10 @@ trait BotAPI
             } else {
                 $res['file_name'] .= $this->get_extension_from_mime($data['document']['mime_type']);
             }
+            $data['document']['_'] = 'bot_'.$type_name;
             $res['file_size'] = $data['document']['size'];
             $res['mime_type'] = $data['document']['mime_type'];
-            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'bot_'.$type_name], $data['document']).chr(2)));
+            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document']).chr(2)));
 
             return [$type_name => $res, 'caption' => $data['caption']];
             default:
