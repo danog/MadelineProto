@@ -513,6 +513,7 @@ trait UpdateHandler
             if ($update['qts'] > $cur_state['qts'] + 1) {
                 \danog\MadelineProto\Logger::log(['Qts hole. update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
                 $this->get_updates_difference();
+
                 return false;
             }
             \danog\MadelineProto\Logger::log(['Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::VERBOSE);

@@ -343,6 +343,7 @@ trait TL
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
+
         return $concat.$this->serialize_params($constructorData, $object, $layer);
     }
 
@@ -390,7 +391,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15+(4*(random_int(0, PHP_INT_MAX) % 3))));
+                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + (4 * (random_int(0, PHP_INT_MAX) % 3))));
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($arguments['message'])) {
@@ -561,7 +562,9 @@ trait TL
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');
-                } else unset($x[$arg['name']]);
+                } else {
+                    unset($x[$arg['name']]);
+                }
             }
         }
         if (isset($x['flags'])) { // I don't think we need this anymore

@@ -56,11 +56,14 @@ class TLConstructor extends TLParams
                     $key = $k;
                     $newlayer = $this->layer[$k];
                 }
-                if (!isset($key)) $key = $keys[0];
+                if (!isset($key)) {
+                    $key = $keys[0];
+                }
             }
         } else {
             $key = array_search($predicate, $this->predicate);
         }
+
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],

@@ -192,7 +192,9 @@ trait PeerHandler
         }
 
         if (is_numeric($id)) {
-            if (is_string($id)) $id = $this->bigint ? ((float) $id) : ((int) $id);
+            if (is_string($id)) {
+                $id = $this->bigint ? ((float) $id) : ((int) $id);
+            }
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
             }
@@ -505,7 +507,9 @@ trait PeerHandler
         }
         throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($res, true));
     }
-    public function to_supergroup($id) {
-        return -($id + pow(10, (int) floor(log($id, 10)+3)));
+
+    public function to_supergroup($id)
+    {
+        return -($id + pow(10, (int) floor(log($id, 10) + 3)));
     }
 }

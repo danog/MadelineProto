@@ -43,6 +43,7 @@ trait MessageHandler
         $this->secret_chats[$chat_id]['out_seq_no']++;
 
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message, $aes_key, $aes_iv);
+
         return $message;
     }
 
@@ -57,10 +58,13 @@ trait MessageHandler
         $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
-                if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+                if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
+                    throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+                }
                 $old = true;
-            } else throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
-
+            } else {
+                throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+            }
         }
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
