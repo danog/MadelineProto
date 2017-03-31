@@ -284,7 +284,7 @@ trait Files
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
             if ($end !== -1 && strlen($res['bytes']) + $downloaded_size >= $size) {
-                $res['bytes'] = substr($res['bytes'], 0, $size-$downloaded_size);
+                $res['bytes'] = substr($res['bytes'], 0, $size - $downloaded_size);
                 $theend = true;
             }
             $offset += strlen($res['bytes']);
@@ -300,6 +300,7 @@ trait Files
         if ($end === -1) {
             $cb(100);
         }
+
         return true;
     }
 }
