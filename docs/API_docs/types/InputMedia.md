@@ -35,6 +35,8 @@ description: constructors and methods of type InputMedia
 
 [inputMediaGame](../constructors/inputMediaGame.md)  
 
+[inputMediaInvoice](../constructors/inputMediaInvoice.md)  
+
 
 
 ### Methods that return an object of this type (methods):

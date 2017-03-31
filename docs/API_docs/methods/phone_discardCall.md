@@ -16,7 +16,7 @@ description: phone.discardCall parameters, return type and example
 |connection\_id|[long](../types/long.md) | Yes|
 
 
-### Return type: [Bool](../types/Bool.md)
+### Return type: [Updates](../types/Updates.md)
 
 ### Example:
 
@@ -36,12 +36,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->phone->discardCall(['peer' => InputPhoneCall, 'duration' => int, 'reason' => PhoneCallDiscardReason, 'connection_id' => long, ]);
+$Updates = $MadelineProto->phone->discardCall(['peer' => InputPhoneCall, 'duration' => int, 'reason' => PhoneCallDiscardReason, 'connection_id' => long, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Bool = phone.discardCall({peer=InputPhoneCall, duration=int, reason=PhoneCallDiscardReason, connection_id=long, })
+Updates = phone.discardCall({peer=InputPhoneCall, duration=int, reason=PhoneCallDiscardReason, connection_id=long, })
 ```
 

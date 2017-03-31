@@ -30,10 +30,7 @@ class SocketReader extends \Threaded implements \Collectable
 
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log(['Shutting down handler pool for DC '.$this->current], \danog\MadelineProto\Logger::NOTICE);
-        if (isset($this->handler_pool)) {
-            $this->handler_pool->shutdown();
-        }
+        \danog\MadelineProto\Logger::log(['Shutting down reader pool '.$this->current], \danog\MadelineProto\Logger::NOTICE);
     }
 
     /**
@@ -48,20 +45,16 @@ class SocketReader extends \Threaded implements \Collectable
         require_once __DIR__.'/../TL/Exception.php';
         require_once __DIR__.'/../NothingInTheSocketException.php';
         require_once __DIR__.'/../Exception.php';
-        var_dump($this->API->settings['threading']);
-        if (!isset($this->handler_pool)) {
-            $this->handler_pool = new \Pool(2);
-        }
-
-        var_dump($this->API->settings['threading']);
+        $handler_pool = new \Pool(2);
 
         while ($this->API->run_workers) {
             try {
                 $this->API->recv_message($this->current);
-                $this->handler_pool->submit(new SocketHandler($this->API, $this->current));
+                $handler_pool->submit(new SocketHandler($this->API, $this->current));
             } catch (\danog\MadelineProto\Exception $e) {
             }
         }
+        while ($handler_pool->collect());
         $this->setGarbage();
     }
 

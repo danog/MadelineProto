@@ -279,7 +279,6 @@ updateContactRegistered#2575bbb9 user_id:int date:int = Update;
 updateContactLink#9d2e67c5 user_id:int my_link:ContactLink foreign_link:ContactLink = Update;
 updateNewEncryptedMessage#12bcbd9a message:EncryptedMessage qts:int = Update;
 
-//updateNewDecryptedMessage#8de1330e message:DecryptedMessage peer:InputEncryptedChat in_seq_no:int out_seq_no:int = Update
 
 updateEncryptedChatTyping#1710f156 chat_id:int = Update;
 updateEncryption#b4a2e88d chat:EncryptedChat date:int = Update;

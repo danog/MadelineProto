@@ -26,11 +26,10 @@ trait MsgIdHandler
         if ($min_message_id->compare($new_message_id) > 0) {
             \danog\MadelineProto\Logger::log(['Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').'], \danog\MadelineProto\Logger::WARNING);
         }
-        /*
-        if (((int) ((time() + $this->datacenter->sockets[$datacenter]->time_delta + 30) << 32)) < $new_message_id) {
+        $max_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta + 30))->bitwise_leftShift(32);
+        if ($max_message_id->compare($new_message_id) < 0) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
         }
-        */
         if ($aargs['outgoing']) {
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
@@ -71,13 +70,6 @@ trait MsgIdHandler
     public function generate_message_id($datacenter)
     {
         $message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta))->bitwise_leftShift(32);
-        /*
-        $int_message_id = (int) (
-            ((int) ($ms_time / 1000) << 32) |
-            ($this->posmod($ms_time, 1000) << 22) |
-            rand(0, 524288) << 2
-        );
-        */
         $key = $this->get_max_id($datacenter, false);
         if ($message_id->compare($key) <= 0) {
             $message_id = $key->add($this->four);

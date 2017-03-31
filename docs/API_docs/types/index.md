@@ -10,6 +10,8 @@ description: List of types
 
 [Authorization](Authorization.md)<a name="Authorization"></a>  
 
+[BadMsgNotification](BadMsgNotification.md)<a name="BadMsgNotification"></a>  
+
 [Bool](Bool.md)<a name="Bool"></a>  
 
 [BotCommand](BotCommand.md)<a name="BotCommand"></a>  
@@ -40,6 +42,8 @@ description: List of types
 
 [ChatPhoto](ChatPhoto.md)<a name="ChatPhoto"></a>  
 
+[Client\_DH\_Inner\_Data](Client_DH_Inner_Data.md)<a name="Client_DH_Inner_Data"></a>  
+
 [Config](Config.md)<a name="Config"></a>  
 
 [Contact](Contact.md)<a name="Contact"></a>  
@@ -50,7 +54,11 @@ description: List of types
 
 [ContactStatus](ContactStatus.md)<a name="ContactStatus"></a>  
 
+[DataJSON](DataJSON.md)<a name="DataJSON"></a>  
+
 [DcOption](DcOption.md)<a name="DcOption"></a>  
+
+[DecryptedDataBlock](DecryptedDataBlock.md)<a name="DecryptedDataBlock"></a>  
 
 [DecryptedMessage](DecryptedMessage.md)<a name="DecryptedMessage"></a>  
 
@@ -61,6 +69,8 @@ description: List of types
 [DecryptedMessageMedia](DecryptedMessageMedia.md)<a name="DecryptedMessageMedia"></a>  
 
 [DestroyAuthKeyRes](DestroyAuthKeyRes.md)<a name="DestroyAuthKeyRes"></a>  
+
+[DestroySessionRes](DestroySessionRes.md)<a name="DestroySessionRes"></a>  
 
 [Dialog](Dialog.md)<a name="Dialog"></a>  
 
@@ -88,11 +98,17 @@ description: List of types
 
 [FoundGif](FoundGif.md)<a name="FoundGif"></a>  
 
+[FutureSalt](FutureSalt.md)<a name="FutureSalt"></a>  
+
+[FutureSalts](FutureSalts.md)<a name="FutureSalts"></a>  
+
 [Game](Game.md)<a name="Game"></a>  
 
 [GeoPoint](GeoPoint.md)<a name="GeoPoint"></a>  
 
 [HighScore](HighScore.md)<a name="HighScore"></a>  
+
+[HttpWait](HttpWait.md)<a name="HttpWait"></a>  
 
 [ImportedContact](ImportedContact.md)<a name="ImportedContact"></a>  
 
@@ -130,6 +146,8 @@ description: List of types
 
 [InputNotifyPeer](InputNotifyPeer.md)<a name="InputNotifyPeer"></a>  
 
+[InputPaymentCredentials](InputPaymentCredentials.md)<a name="InputPaymentCredentials"></a>  
+
 [InputPeer](InputPeer.md)<a name="InputPeer"></a>  
 
 [InputPeerNotifyEvents](InputPeerNotifyEvents.md)<a name="InputPeerNotifyEvents"></a>  
@@ -150,9 +168,17 @@ description: List of types
 
 [InputUser](InputUser.md)<a name="InputUser"></a>  
 
+[InputWebDocument](InputWebDocument.md)<a name="InputWebDocument"></a>  
+
+[InputWebFileLocation](InputWebFileLocation.md)<a name="InputWebFileLocation"></a>  
+
+[Invoice](Invoice.md)<a name="Invoice"></a>  
+
 [KeyboardButton](KeyboardButton.md)<a name="KeyboardButton"></a>  
 
 [KeyboardButtonRow](KeyboardButtonRow.md)<a name="KeyboardButtonRow"></a>  
+
+[LabeledPrice](LabeledPrice.md)<a name="LabeledPrice"></a>  
 
 [MaskCoords](MaskCoords.md)<a name="MaskCoords"></a>  
 
@@ -170,15 +196,37 @@ description: List of types
 
 [MessagesFilter](MessagesFilter.md)<a name="MessagesFilter"></a>  
 
+[MsgDetailedInfo](MsgDetailedInfo.md)<a name="MsgDetailedInfo"></a>  
+
+[MsgResendReq](MsgResendReq.md)<a name="MsgResendReq"></a>  
+
+[MsgsAck](MsgsAck.md)<a name="MsgsAck"></a>  
+
+[MsgsAllInfo](MsgsAllInfo.md)<a name="MsgsAllInfo"></a>  
+
+[MsgsStateInfo](MsgsStateInfo.md)<a name="MsgsStateInfo"></a>  
+
+[MsgsStateReq](MsgsStateReq.md)<a name="MsgsStateReq"></a>  
+
 [NearestDc](NearestDc.md)<a name="NearestDc"></a>  
+
+[NewSession](NewSession.md)<a name="NewSession"></a>  
 
 [NotifyPeer](NotifyPeer.md)<a name="NotifyPeer"></a>  
 
 [Null](Null.md)<a name="Null"></a>  
 
+[P\_Q\_inner\_data](P_Q_inner_data.md)<a name="P_Q_inner_data"></a>  
+
 [Page](Page.md)<a name="Page"></a>  
 
 [PageBlock](PageBlock.md)<a name="PageBlock"></a>  
+
+[PaymentCharge](PaymentCharge.md)<a name="PaymentCharge"></a>  
+
+[PaymentRequestedInfo](PaymentRequestedInfo.md)<a name="PaymentRequestedInfo"></a>  
+
+[PaymentSavedCredentials](PaymentSavedCredentials.md)<a name="PaymentSavedCredentials"></a>  
 
 [Peer](Peer.md)<a name="Peer"></a>  
 
@@ -200,6 +248,10 @@ description: List of types
 
 [PhotoSize](PhotoSize.md)<a name="PhotoSize"></a>  
 
+[Pong](Pong.md)<a name="Pong"></a>  
+
+[PostAddress](PostAddress.md)<a name="PostAddress"></a>  
+
 [PrivacyKey](PrivacyKey.md)<a name="PrivacyKey"></a>  
 
 [PrivacyRule](PrivacyRule.md)<a name="PrivacyRule"></a>  
@@ -210,9 +262,23 @@ description: List of types
 
 [ReportReason](ReportReason.md)<a name="ReportReason"></a>  
 
+[ResPQ](ResPQ.md)<a name="ResPQ"></a>  
+
 [RichText](RichText.md)<a name="RichText"></a>  
 
+[RpcDropAnswer](RpcDropAnswer.md)<a name="RpcDropAnswer"></a>  
+
+[RpcError](RpcError.md)<a name="RpcError"></a>  
+
 [SendMessageAction](SendMessageAction.md)<a name="SendMessageAction"></a>  
+
+[Server\_DH\_Params](Server_DH_Params.md)<a name="Server_DH_Params"></a>  
+
+[Server\_DH\_inner\_data](Server_DH_inner_data.md)<a name="Server_DH_inner_data"></a>  
+
+[Set\_client\_DH\_params\_answer](Set_client_DH_params_answer.md)<a name="Set_client_DH_params_answer"></a>  
+
+[ShippingOption](ShippingOption.md)<a name="ShippingOption"></a>  
 
 [StickerPack](StickerPack.md)<a name="StickerPack"></a>  
 
@@ -256,6 +322,8 @@ description: List of types
 
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
 
+[WebDocument](WebDocument.md)<a name="WebDocument"></a>  
+
 [WebPage](WebPage.md)<a name="WebPage"></a>  
 
 [X](X.md)<a name="X"></a>  
@@ -269,6 +337,8 @@ description: List of types
 [account\_PasswordSettings](account_PasswordSettings.md)<a name="account_PasswordSettings"></a>  
 
 [account\_PrivacyRules](account_PrivacyRules.md)<a name="account_PrivacyRules"></a>  
+
+[account\_TmpPassword](account_TmpPassword.md)<a name="account_TmpPassword"></a>  
 
 [auth\_Authorization](auth_Authorization.md)<a name="auth_Authorization"></a>  
 
@@ -301,8 +371,6 @@ description: List of types
 [contacts\_ResolvedPeer](contacts_ResolvedPeer.md)<a name="contacts_ResolvedPeer"></a>  
 
 [contacts\_TopPeers](contacts_TopPeers.md)<a name="contacts_TopPeers"></a>  
-
-[help\_AppChangelog](help_AppChangelog.md)<a name="help_AppChangelog"></a>  
 
 [help\_AppUpdate](help_AppUpdate.md)<a name="help_AppUpdate"></a>  
 
@@ -356,6 +424,16 @@ description: List of types
 
 [messages\_Stickers](messages_Stickers.md)<a name="messages_Stickers"></a>  
 
+[payments\_PaymentForm](payments_PaymentForm.md)<a name="payments_PaymentForm"></a>  
+
+[payments\_PaymentReceipt](payments_PaymentReceipt.md)<a name="payments_PaymentReceipt"></a>  
+
+[payments\_PaymentResult](payments_PaymentResult.md)<a name="payments_PaymentResult"></a>  
+
+[payments\_SavedInfo](payments_SavedInfo.md)<a name="payments_SavedInfo"></a>  
+
+[payments\_ValidatedRequestedInfo](payments_ValidatedRequestedInfo.md)<a name="payments_ValidatedRequestedInfo"></a>  
+
 [phone\_PhoneCall](phone_PhoneCall.md)<a name="phone_PhoneCall"></a>  
 
 [photos\_Photo](photos_Photo.md)<a name="photos_Photo"></a>  
@@ -371,4 +449,6 @@ description: List of types
 [updates\_State](updates_State.md)<a name="updates_State"></a>  
 
 [upload\_File](upload_File.md)<a name="upload_File"></a>  
+
+[upload\_WebFile](upload_WebFile.md)<a name="upload_WebFile"></a>  
 

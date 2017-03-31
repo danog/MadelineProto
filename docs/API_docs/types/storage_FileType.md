@@ -11,6 +11,8 @@ description: constructors and methods of type storage_FileType
 
 [storage\_fileUnknown](../constructors/storage_fileUnknown.md)  
 
+[storage\_filePartial](../constructors/storage_filePartial.md)  
+
 [storage\_fileJpeg](../constructors/storage_fileJpeg.md)  
 
 [storage\_fileGif](../constructors/storage_fileGif.md)  
@@ -22,8 +24,6 @@ description: constructors and methods of type storage_FileType
 [storage\_fileMp3](../constructors/storage_fileMp3.md)  
 
 [storage\_fileMov](../constructors/storage_fileMov.md)  
-
-[storage\_filePartial](../constructors/storage_filePartial.md)  
 
 [storage\_fileMp4](../constructors/storage_fileMp4.md)  
 

@@ -117,11 +117,19 @@ Contains notifications about data changes
 
 [updateChannelWebPage](../constructors/updateChannelWebPage.md)  
 
-[updatePhoneCall](../constructors/updatePhoneCall.md)  
-
 [updateDialogPinned](../constructors/updateDialogPinned.md)  
 
 [updatePinnedDialogs](../constructors/updatePinnedDialogs.md)  
+
+[updateBotWebhookJSON](../constructors/updateBotWebhookJSON.md)  
+
+[updateBotWebhookJSONQuery](../constructors/updateBotWebhookJSONQuery.md)  
+
+[updateBotShippingQuery](../constructors/updateBotShippingQuery.md)  
+
+[updateBotPrecheckoutQuery](../constructors/updateBotPrecheckoutQuery.md)  
+
+[updatePhoneCall](../constructors/updatePhoneCall.md)  
 
 
 

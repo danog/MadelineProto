@@ -19,5 +19,7 @@ description: constructors and methods of type phone_PhoneCall
 
 [$MadelineProto->phone->acceptCall](../methods/phone_acceptCall.md)  
 
+[$MadelineProto->phone->confirmCall](../methods/phone_confirmCall.md)  
+
 
 

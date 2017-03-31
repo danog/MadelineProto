@@ -61,6 +61,8 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->messages->setGameScore](../methods/messages_setGameScore.md)  
 
+[$MadelineProto->help->getAppChangelog](../methods/help_getAppChangelog.md)  
+
 [$MadelineProto->channels->createChannel](../methods/channels_createChannel.md)  
 
 [$MadelineProto->channels->editAdmin](../methods/channels_editAdmin.md)  
@@ -84,6 +86,10 @@ description: constructors and methods of type Updates
 [$MadelineProto->channels->toggleSignatures](../methods/channels_toggleSignatures.md)  
 
 [$MadelineProto->channels->updatePinnedMessage](../methods/channels_updatePinnedMessage.md)  
+
+[$MadelineProto->phone->discardCall](../methods/phone_discardCall.md)  
+
+[$MadelineProto->phone->setCallRating](../methods/phone_setCallRating.md)  
 
 
 

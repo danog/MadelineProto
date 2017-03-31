@@ -129,9 +129,13 @@ trait CallHandler
                 //sleep(1); // To avoid flooding
                 continue;
             } finally {
-                if (((isset($aargs['heavy']) && $aargs['heavy']) || $method === 'req_pq') && isset($int_message_id)) {
+                if (isset($aargs['heavy']) && $aargs['heavy'] && isset($int_message_id)) {
                     //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['args'] = [];
                     $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id] = [];
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$int_message_id]);
+                }
+                if (isset($int_message_id) && $method === 'req_pq') {
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]);
                     unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$int_message_id]);
                 }
             }

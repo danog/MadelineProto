@@ -91,3 +91,4 @@ b.php
 telegram-cli*
 src/danog/MadelineProto/Fuzzer.php
 fuzzer.php
+tests/500mb

@@ -69,11 +69,11 @@ trait PeerHandler
                     break;
                 case 'channel':
                 case 'channelForbidden':
-                    if (!isset($this->chats[(int) ('-100'.$chat['id'])]) || $this->chats[(int) ('-100'.$chat['id'])] !== $chat) {
-                        $this->chats[(int) ('-100'.$chat['id'])] = $chat;
+                    if (!isset($this->chats[$this->to_supergroup($chat['id'])]) || $this->chats[$this->to_supergroup($chat['id'])] !== $chat) {
+                        $this->chats[$this->to_supergroup($chat['id'])] = $chat;
                         $this->should_serialize = true;
                         try {
-                            $this->get_pwr_chat('-100'.$chat['id'], true, true);
+                            $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
                         } catch (\danog\MadelineProto\Exception $e) {
                             \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -164,16 +164,16 @@ trait PeerHandler
                     break;
 
                 case 'channel':
-                    $id = '-100'.$id['id'];
+                    $id = $this->to_supergroup($id['id']);
                     break;
                 case 'channelFull':
-                    $id = '-100'.$id['id'];
+                    $id = $this->to_supergroup($id['id']);
                     break;
 
                 case 'inputPeerChannel':
                 case 'inputChannel':
                 case 'peerChannel':
-                    $id = '-100'.$id['channel_id'];
+                    $id = $this->to_supergroup($id['channel_id']);
                     break;
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
@@ -182,7 +182,7 @@ trait PeerHandler
         }
 
         if (preg_match('/^channel#/', $id)) {
-            $id = preg_replace('|\D+|', '-100', $id);
+            $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
         }
         if (preg_match('/^chat#/', $id)) {
             $id = preg_replace('|\D+|', '-', $id);
@@ -192,7 +192,7 @@ trait PeerHandler
         }
 
         if (is_numeric($id)) {
-            $id = (int) $id;
+            if (is_string($id)) $id = $this->bigint ? ((float) $id) : ((int) $id);
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
             }
@@ -257,7 +257,7 @@ trait PeerHandler
                 }
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
-                $res['bot_api_id'] = (int) ('-100'.$constructor['id']);
+                $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
                 break;
             default:
@@ -504,5 +504,8 @@ trait PeerHandler
             return $res;
         }
         throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($res, true));
+    }
+    public function to_supergroup($id) {
+        return -($id + pow(10, (int) floor(log($id, 10)+3)));
     }
 }

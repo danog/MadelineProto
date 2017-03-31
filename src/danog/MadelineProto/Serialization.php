@@ -52,7 +52,7 @@ class Serialization
 
         if (file_exists($filename)) {
             $file = fopen($filename, 'r+');
-            flock($file, LOCK_EX);
+            flock($file, LOCK_SH);
             $unserialized = stream_get_contents($file);
             flock($file, LOCK_UN);
             fclose($file);

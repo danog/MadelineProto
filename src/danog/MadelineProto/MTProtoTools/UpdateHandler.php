@@ -316,7 +316,7 @@ trait UpdateHandler
                     (isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from']))) {
                     \danog\MadelineProto\Logger::log(['Not enough data for message update, getting difference...'], \danog\MadelineProto\Logger::VERBOSE);
 
-                    if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
+                    if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                         $this->get_channel_difference($channel_id);
                     } else {
                         $this->force_get_updates_difference();
@@ -348,7 +348,7 @@ trait UpdateHandler
 
                 $this->cur_state['pending_pts_updates'][] = $update;
 
-                if ($channel_id !== false && $this->peer_isset('-100'.$channel_id)) {
+                if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                     $this->get_channel_difference($channel_id);
                 } else {
                     $this->get_updates_difference();
@@ -513,7 +513,6 @@ trait UpdateHandler
             if ($update['qts'] > $cur_state['qts'] + 1) {
                 \danog\MadelineProto\Logger::log(['Qts hole. update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
                 $this->get_updates_difference();
-
                 return false;
             }
             \danog\MadelineProto\Logger::log(['Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::VERBOSE);

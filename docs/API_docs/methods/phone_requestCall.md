@@ -11,7 +11,7 @@ description: phone.requestCall parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
-|g\_a|[bytes](../types/bytes.md) | Yes|
+|g\_a\_hash|[bytes](../types/bytes.md) | Yes|
 |protocol|[PhoneCallProtocol](../types/PhoneCallProtocol.md) | Yes|
 
 
@@ -35,12 +35,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$phone_PhoneCall = $MadelineProto->phone->requestCall(['user_id' => InputUser, 'g_a' => bytes, 'protocol' => PhoneCallProtocol, ]);
+$phone_PhoneCall = $MadelineProto->phone->requestCall(['user_id' => InputUser, 'g_a_hash' => bytes, 'protocol' => PhoneCallProtocol, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-phone_PhoneCall = phone.requestCall({user_id=InputUser, g_a=bytes, protocol=PhoneCallProtocol, })
+phone_PhoneCall = phone.requestCall({user_id=InputUser, g_a_hash=bytes, protocol=PhoneCallProtocol, })
 ```
 

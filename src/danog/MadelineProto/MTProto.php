@@ -31,6 +31,8 @@ class MTProto
     use \danog\MadelineProto\MTProtoTools\Files;
     use \danog\MadelineProto\SecretChats\AuthKeyHandler;
     use \danog\MadelineProto\SecretChats\MessageHandler;
+    use \danog\MadelineProto\SecretChats\ResponseHandler;
+    use \danog\MadelineProto\SecretChats\SeqNoHandler;
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\TL\Conversion\BotAPI;
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -170,6 +172,7 @@ class MTProto
     {
         if (isset($this->reader_pool)) {
             $this->run_workers = false;
+            while ($this->reader_pool->collect());
             \danog\MadelineProto\Logger::log(['Shutting down reader pool...'], Logger::NOTICE);
             $this->reader_pool->shutdown();
         }
@@ -279,11 +282,12 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
-                'layer'         => 62, // layer version
+                'layer'         => 65, // layer version
                 'src'           => [
                     'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram'     => __DIR__.'/TL_telegram_v62.tl', // telegram TL scheme
+                    'telegram'     => __DIR__.'/TL_telegram_v65.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
+                    'calls'       => __DIR__.'/TL_calls.tl', // calls TL scheme
                     'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
                     'botAPI'       => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
                 ],
@@ -483,7 +487,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 6;
+        return 8;
     }
 
     public function get_self()

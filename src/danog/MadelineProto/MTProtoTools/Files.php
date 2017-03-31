@@ -69,7 +69,8 @@ trait Files
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
-            $constructor['key'] = $iv;
+            $constructor['iv'] = $iv;
+            $constructor['md5_checksum'] = '';
         }
 
         return $constructor;

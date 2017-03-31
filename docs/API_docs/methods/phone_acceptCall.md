@@ -12,7 +12,6 @@ description: phone.acceptCall parameters, return type and example
 |----------|:-------------:|---------:|
 |peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 |g\_b|[bytes](../types/bytes.md) | Yes|
-|key\_fingerprint|[long](../types/long.md) | Yes|
 |protocol|[PhoneCallProtocol](../types/PhoneCallProtocol.md) | Yes|
 
 
@@ -36,12 +35,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$phone_PhoneCall = $MadelineProto->phone->acceptCall(['peer' => InputPhoneCall, 'g_b' => bytes, 'key_fingerprint' => long, 'protocol' => PhoneCallProtocol, ]);
+$phone_PhoneCall = $MadelineProto->phone->acceptCall(['peer' => InputPhoneCall, 'g_b' => bytes, 'protocol' => PhoneCallProtocol, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-phone_PhoneCall = phone.acceptCall({peer=InputPhoneCall, g_b=bytes, key_fingerprint=long, protocol=PhoneCallProtocol, })
+phone_PhoneCall = phone.acceptCall({peer=InputPhoneCall, g_b=bytes, protocol=PhoneCallProtocol, })
 ```
 

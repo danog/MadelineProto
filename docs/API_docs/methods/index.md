@@ -28,6 +28,8 @@ $MadelineProto->[account->getPasswordSettings](account_getPasswordSettings.md)(\
 
 $MadelineProto->[account->getPrivacy](account_getPrivacy.md)(\['key' => [InputPrivacyKey](../types/InputPrivacyKey.md), \]) === [$account\_PrivacyRules](../types/account_PrivacyRules.md)<a name="account_getPrivacy"></a>  
 
+$MadelineProto->[account->getTmpPassword](account_getTmpPassword.md)(\['password_hash' => [bytes](../types/bytes.md), 'period' => [int](../types/int.md), \]) === [$account\_TmpPassword](../types/account_TmpPassword.md)<a name="account_getTmpPassword"></a>  
+
 $MadelineProto->[account->getWallPapers](account_getWallPapers.md)(\[\]) === [$Vector\_of\_WallPaper](../types/WallPaper.md)<a name="account_getWallPapers"></a>  
 
 $MadelineProto->[account->registerDevice](account_registerDevice.md)(\['token_type' => [int](../types/int.md), 'token' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="account_registerDevice"></a>  
@@ -94,6 +96,11 @@ $MadelineProto->[auth->sendInvites](auth_sendInvites.md)(\['phone_numbers' => \[
 $MadelineProto->[auth->signIn](auth_signIn.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_signIn"></a>  
 
 $MadelineProto->[auth->signUp](auth_signUp.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_signUp"></a>  
+
+***
+<br><br>$MadelineProto->[bots->answerWebhookJSONQuery](bots_answerWebhookJSONQuery.md)(\['query_id' => [long](../types/long.md), 'data' => [DataJSON](../types/DataJSON.md), \]) === [$Bool](../types/Bool.md)<a name="bots_answerWebhookJSONQuery"></a>  
+
+$MadelineProto->[bots->sendCustomRequest](bots_sendCustomRequest.md)(\['custom_method' => [string](../types/string.md), 'params' => [DataJSON](../types/DataJSON.md), \]) === [$DataJSON](../types/DataJSON.md)<a name="bots_sendCustomRequest"></a>  
 
 ***
 <br><br>$MadelineProto->[channels->checkUsername](channels_checkUsername.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'username' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="channels_checkUsername"></a>  
@@ -180,10 +187,18 @@ $MadelineProto->[contacts->search](contacts_search.md)(\['q' => [string](../type
 $MadelineProto->[contacts->unblock](contacts_unblock.md)(\['id' => [InputUser](../types/InputUser.md), \]) === [$Bool](../types/Bool.md)<a name="contacts_unblock"></a>  
 
 ***
-<br><br>$MadelineProto->[destroy_auth_key](destroy_auth_key.md)(\[\]) === [$DestroyAuthKeyRes](../types/DestroyAuthKeyRes.md)<a name="destroy_auth_key"></a>  
+<br><br>$MadelineProto->[contest->saveDeveloperInfo](contest_saveDeveloperInfo.md)(\['vk_id' => [int](../types/int.md), 'name' => [string](../types/string.md), 'phone_number' => [string](../types/string.md), 'age' => [int](../types/int.md), 'city' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="contest_saveDeveloperInfo"></a>  
 
 ***
-<br><br>$MadelineProto->[help->getAppChangelog](help_getAppChangelog.md)(\[\]) === [$help\_AppChangelog](../types/help_AppChangelog.md)<a name="help_getAppChangelog"></a>  
+<br><br>$MadelineProto->[destroy_auth_key](destroy_auth_key.md)(\[\]) === [$DestroyAuthKeyRes](../types/DestroyAuthKeyRes.md)<a name="destroy_auth_key"></a>  
+
+$MadelineProto->[destroy_session](destroy_session.md)(\['session_id' => [long](../types/long.md), \]) === [$DestroySessionRes](../types/DestroySessionRes.md)<a name="destroy_session"></a>  
+
+***
+<br><br>$MadelineProto->[get_future_salts](get_future_salts.md)(\['num' => [int](../types/int.md), \]) === [$FutureSalts](../types/FutureSalts.md)<a name="get_future_salts"></a>  
+
+***
+<br><br>$MadelineProto->[help->getAppChangelog](help_getAppChangelog.md)(\['prev_app_version' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="help_getAppChangelog"></a>  
 
 $MadelineProto->[help->getAppUpdate](help_getAppUpdate.md)(\[\]) === [$help\_AppUpdate](../types/help_AppUpdate.md)<a name="help_getAppUpdate"></a>  
 
@@ -365,6 +380,10 @@ $MadelineProto->[messages->sendMessage](messages_sendMessage.md)(\['no_webpage' 
 
 $MadelineProto->[messages->setBotCallbackAnswer](messages_setBotCallbackAnswer.md)(\['alert' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'message' => [string](../types/string.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setBotCallbackAnswer"></a>  
 
+$MadelineProto->[messages->setBotPrecheckoutResults](messages_setBotPrecheckoutResults.md)(\['success' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'error' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setBotPrecheckoutResults"></a>  
+
+$MadelineProto->[messages->setBotShippingResults](messages_setBotShippingResults.md)(\['query_id' => [long](../types/long.md), 'error' => [string](../types/string.md), 'shipping_options' => \[[ShippingOption](../types/ShippingOption.md)\], \]) === [$Bool](../types/Bool.md)<a name="messages_setBotShippingResults"></a>  
+
 $MadelineProto->[messages->setEncryptedTyping](messages_setEncryptedTyping.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'typing' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setEncryptedTyping"></a>  
 
 $MadelineProto->[messages->setGameScore](messages_setGameScore.md)(\['edit_message' => [Bool](../types/Bool.md), 'force' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), 'score' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_setGameScore"></a>  
@@ -384,13 +403,34 @@ $MadelineProto->[messages->toggleDialogPin](messages_toggleDialogPin.md)(\['pinn
 $MadelineProto->[messages->uninstallStickerSet](messages_uninstallStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="messages_uninstallStickerSet"></a>  
 
 ***
-<br><br>$MadelineProto->[phone->acceptCall](phone_acceptCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), 'protocol' => [PhoneCallProtocol](../types/PhoneCallProtocol.md), \]) === [$phone\_PhoneCall](../types/phone_PhoneCall.md)<a name="phone_acceptCall"></a>  
+<br><br>$MadelineProto->[payments->clearSavedInfo](payments_clearSavedInfo.md)(\['credentials' => [Bool](../types/Bool.md), 'info' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="payments_clearSavedInfo"></a>  
 
-$MadelineProto->[phone->discardCall](phone_discardCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'duration' => [int](../types/int.md), 'reason' => [PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md), 'connection_id' => [long](../types/long.md), \]) === [$Bool](../types/Bool.md)<a name="phone_discardCall"></a>  
+$MadelineProto->[payments->getPaymentForm](payments_getPaymentForm.md)(\['msg_id' => [int](../types/int.md), \]) === [$payments\_PaymentForm](../types/payments_PaymentForm.md)<a name="payments_getPaymentForm"></a>  
+
+$MadelineProto->[payments->getPaymentReceipt](payments_getPaymentReceipt.md)(\['msg_id' => [int](../types/int.md), \]) === [$payments\_PaymentReceipt](../types/payments_PaymentReceipt.md)<a name="payments_getPaymentReceipt"></a>  
+
+$MadelineProto->[payments->getSavedInfo](payments_getSavedInfo.md)(\[\]) === [$payments\_SavedInfo](../types/payments_SavedInfo.md)<a name="payments_getSavedInfo"></a>  
+
+$MadelineProto->[payments->sendPaymentForm](payments_sendPaymentForm.md)(\['msg_id' => [int](../types/int.md), 'requested_info_id' => [string](../types/string.md), 'shipping_option_id' => [string](../types/string.md), 'credentials' => [InputPaymentCredentials](../types/InputPaymentCredentials.md), \]) === [$payments\_PaymentResult](../types/payments_PaymentResult.md)<a name="payments_sendPaymentForm"></a>  
+
+$MadelineProto->[payments->validateRequestedInfo](payments_validateRequestedInfo.md)(\['save' => [Bool](../types/Bool.md), 'msg_id' => [int](../types/int.md), 'info' => [PaymentRequestedInfo](../types/PaymentRequestedInfo.md), \]) === [$payments\_ValidatedRequestedInfo](../types/payments_ValidatedRequestedInfo.md)<a name="payments_validateRequestedInfo"></a>  
+
+***
+<br><br>$MadelineProto->[phone->acceptCall](phone_acceptCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'g_b' => [bytes](../types/bytes.md), 'protocol' => [PhoneCallProtocol](../types/PhoneCallProtocol.md), \]) === [$phone\_PhoneCall](../types/phone_PhoneCall.md)<a name="phone_acceptCall"></a>  
+
+$MadelineProto->[phone->confirmCall](phone_confirmCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'g_a' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), 'protocol' => [PhoneCallProtocol](../types/PhoneCallProtocol.md), \]) === [$phone\_PhoneCall](../types/phone_PhoneCall.md)<a name="phone_confirmCall"></a>  
+
+$MadelineProto->[phone->discardCall](phone_discardCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'duration' => [int](../types/int.md), 'reason' => [PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md), 'connection_id' => [long](../types/long.md), \]) === [$Updates](../types/Updates.md)<a name="phone_discardCall"></a>  
+
+$MadelineProto->[phone->getCallConfig](phone_getCallConfig.md)(\[\]) === [$DataJSON](../types/DataJSON.md)<a name="phone_getCallConfig"></a>  
 
 $MadelineProto->[phone->receivedCall](phone_receivedCall.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), \]) === [$Bool](../types/Bool.md)<a name="phone_receivedCall"></a>  
 
-$MadelineProto->[phone->requestCall](phone_requestCall.md)(\['user_id' => [InputUser](../types/InputUser.md), 'g_a' => [bytes](../types/bytes.md), 'protocol' => [PhoneCallProtocol](../types/PhoneCallProtocol.md), \]) === [$phone\_PhoneCall](../types/phone_PhoneCall.md)<a name="phone_requestCall"></a>  
+$MadelineProto->[phone->requestCall](phone_requestCall.md)(\['user_id' => [InputUser](../types/InputUser.md), 'g_a_hash' => [bytes](../types/bytes.md), 'protocol' => [PhoneCallProtocol](../types/PhoneCallProtocol.md), \]) === [$phone\_PhoneCall](../types/phone_PhoneCall.md)<a name="phone_requestCall"></a>  
+
+$MadelineProto->[phone->saveCallDebug](phone_saveCallDebug.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'debug' => [DataJSON](../types/DataJSON.md), \]) === [$Bool](../types/Bool.md)<a name="phone_saveCallDebug"></a>  
+
+$MadelineProto->[phone->setCallRating](phone_setCallRating.md)(\['peer' => [InputPhoneCall](../types/InputPhoneCall.md), 'rating' => [int](../types/int.md), 'comment' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="phone_setCallRating"></a>  
 
 ***
 <br><br>$MadelineProto->[photos->deletePhotos](photos_deletePhotos.md)(\['id' => \[[InputPhoto](../types/InputPhoto.md)\], \]) === [$Vector\_of\_long](../types/long.md)<a name="photos_deletePhotos"></a>  
@@ -402,6 +442,22 @@ $MadelineProto->[photos->updateProfilePhoto](photos_updateProfilePhoto.md)(\['id
 $MadelineProto->[photos->uploadProfilePhoto](photos_uploadProfilePhoto.md)(\['file' => [InputFile](../types/InputFile.md), \]) === [$photos\_Photo](../types/photos_Photo.md)<a name="photos_uploadProfilePhoto"></a>  
 
 ***
+<br><br>$MadelineProto->[ping](ping.md)(\['ping_id' => [long](../types/long.md), \]) === [$Pong](../types/Pong.md)<a name="ping"></a>  
+
+$MadelineProto->[ping_delay_disconnect](ping_delay_disconnect.md)(\['ping_id' => [long](../types/long.md), 'disconnect_delay' => [int](../types/int.md), \]) === [$Pong](../types/Pong.md)<a name="ping_delay_disconnect"></a>  
+
+***
+<br><br>$MadelineProto->[req_DH_params](req_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'p' => [string](../types/string.md), 'q' => [string](../types/string.md), 'public_key_fingerprint' => [long](../types/long.md), 'encrypted_data' => [string](../types/string.md), \]) === [$Server\_DH\_Params](../types/Server_DH_Params.md)<a name="req_DH_params"></a>  
+
+$MadelineProto->[req_pq](req_pq.md)(\['nonce' => [int128](../types/int128.md), \]) === [$ResPQ](../types/ResPQ.md)<a name="req_pq"></a>  
+
+***
+<br><br>$MadelineProto->[rpc_drop_answer](rpc_drop_answer.md)(\['req_msg_id' => [long](../types/long.md), \]) === [$RpcDropAnswer](../types/RpcDropAnswer.md)<a name="rpc_drop_answer"></a>  
+
+***
+<br><br>$MadelineProto->[set_client_DH_params](set_client_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'encrypted_data' => [string](../types/string.md), \]) === [$Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)<a name="set_client_DH_params"></a>  
+
+***
 <br><br>$MadelineProto->[updates->getChannelDifference](updates_getChannelDifference.md)(\['force' => [Bool](../types/Bool.md), 'channel' => [InputChannel](../types/InputChannel.md), 'filter' => [ChannelMessagesFilter](../types/ChannelMessagesFilter.md), 'pts' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$updates\_ChannelDifference](../types/updates_ChannelDifference.md)<a name="updates_getChannelDifference"></a>  
 
 $MadelineProto->[updates->getDifference](updates_getDifference.md)(\['pts' => [int](../types/int.md), 'pts_total_limit' => [int](../types/int.md), 'date' => [int](../types/int.md), 'qts' => [int](../types/int.md), \]) === [$updates\_Difference](../types/updates_Difference.md)<a name="updates_getDifference"></a>  
@@ -410,6 +466,8 @@ $MadelineProto->[updates->getState](updates_getState.md)(\[\]) === [$updates\_St
 
 ***
 <br><br>$MadelineProto->[upload->getFile](upload_getFile.md)(\['location' => [InputFileLocation](../types/InputFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_File](../types/upload_File.md)<a name="upload_getFile"></a>  
+
+$MadelineProto->[upload->getWebFile](upload_getWebFile.md)(\['location' => [InputWebFileLocation](../types/InputWebFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_WebFile](../types/upload_WebFile.md)<a name="upload_getWebFile"></a>  
 
 $MadelineProto->[upload->saveBigFilePart](upload_saveBigFilePart.md)(\['file_id' => [long](../types/long.md), 'file_part' => [int](../types/int.md), 'file_total_parts' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_saveBigFilePart"></a>  
 

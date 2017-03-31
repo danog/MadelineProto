@@ -49,20 +49,18 @@ class TLConstructor extends TLParams
     public function find_by_predicate($predicate, $layer = -1)
     {
         if ($layer !== -1) {
-            $key = 0;
+            $newlayer = -1;
             $keys = array_keys($this->predicate, $predicate);
             foreach ($keys as $k) {
-                if ($this->layer[$k] === $layer) {
+                if ($this->layer[$k] <= $layer && $this->layer[$k] > $newlayer) {
                     $key = $k;
+                    $newlayer = $this->layer[$k];
                 }
-            }
-            if ($key === 0) {
-                $key = array_search($predicate, $this->predicate);
+                if (!isset($key)) $key = $keys[0];
             }
         } else {
             $key = array_search($predicate, $this->predicate);
         }
-
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],

@@ -7,6 +7,22 @@
 
 namespace danog\MadelineProto;
 
+interface contest
+{
+    /**
+     * @param array params [
+     *               int vk_id,
+     *               string name,
+     *               string phone_number,
+     *               int age,
+     *               string city,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveDeveloperInfo(array $params);
+}
+
 interface auth
 {
     /**
@@ -400,6 +416,16 @@ interface account
      * @return bool
      */
     public function confirmPhone(array $params);
+
+    /**
+     * @param array params [
+     *               bytes password_hash,
+     *               int period,
+     *              ]
+     *
+     * @return account_TmpPassword
+     */
+    public function getTmpPassword(array $params);
 }
 
 interface users
@@ -1429,6 +1455,28 @@ interface messages
      * @return messages_PeerDialogs
      */
     public function getPinnedDialogs();
+
+    /**
+     * @param array params [
+     *               long query_id,
+     *               string error,
+     *               ShippingOption shipping_options,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setBotShippingResults(array $params);
+
+    /**
+     * @param array params [
+     *               boolean success,
+     *               long query_id,
+     *               string error,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setBotPrecheckoutResults(array $params);
 }
 
 interface updates
@@ -1541,6 +1589,17 @@ interface upload
      * @return bool
      */
     public function saveBigFilePart(array $params);
+
+    /**
+     * @param array params [
+     *               InputWebFileLocation location,
+     *               int offset,
+     *               int limit,
+     *              ]
+     *
+     * @return upload_WebFile
+     */
+    public function getWebFile(array $params);
 }
 
 interface help
@@ -1580,9 +1639,13 @@ interface help
     public function getSupport();
 
     /**
-     * @return help_AppChangelog
+     * @param array params [
+     *               string prev_app_version,
+     *              ]
+     *
+     * @return Updates
      */
-    public function getAppChangelog();
+    public function getAppChangelog(array $params);
 
     /**
      * @return help_TermsOfService
@@ -1870,12 +1933,99 @@ interface channels
     public function getAdminedPublicChannels();
 }
 
-interface phone
+interface bots
 {
     /**
      * @param array params [
+     *               string custom_method,
+     *               DataJSON params,
+     *              ]
+     *
+     * @return DataJSON
+     */
+    public function sendCustomRequest(array $params);
+
+    /**
+     * @param array params [
+     *               long query_id,
+     *               DataJSON data,
+     *              ]
+     *
+     * @return bool
+     */
+    public function answerWebhookJSONQuery(array $params);
+}
+
+interface payments
+{
+    /**
+     * @param array params [
+     *               int msg_id,
+     *              ]
+     *
+     * @return payments_PaymentForm
+     */
+    public function getPaymentForm(array $params);
+
+    /**
+     * @param array params [
+     *               int msg_id,
+     *              ]
+     *
+     * @return payments_PaymentReceipt
+     */
+    public function getPaymentReceipt(array $params);
+
+    /**
+     * @param array params [
+     *               boolean save,
+     *               int msg_id,
+     *               PaymentRequestedInfo info,
+     *              ]
+     *
+     * @return payments_ValidatedRequestedInfo
+     */
+    public function validateRequestedInfo(array $params);
+
+    /**
+     * @param array params [
+     *               int msg_id,
+     *               string requested_info_id,
+     *               string shipping_option_id,
+     *               InputPaymentCredentials credentials,
+     *              ]
+     *
+     * @return payments_PaymentResult
+     */
+    public function sendPaymentForm(array $params);
+
+    /**
+     * @return payments_SavedInfo
+     */
+    public function getSavedInfo();
+
+    /**
+     * @param array params [
+     *               boolean credentials,
+     *               boolean info,
+     *              ]
+     *
+     * @return bool
+     */
+    public function clearSavedInfo(array $params);
+}
+
+interface phone
+{
+    /**
+     * @return DataJSON
+     */
+    public function getCallConfig();
+
+    /**
+     * @param array params [
      *               InputUser user_id,
-     *               bytes g_a,
+     *               bytes g_a_hash,
      *               PhoneCallProtocol protocol,
      *              ]
      *
@@ -1887,7 +2037,6 @@ interface phone
      * @param array params [
      *               InputPhoneCall peer,
      *               bytes g_b,
-     *               long key_fingerprint,
      *               PhoneCallProtocol protocol,
      *              ]
      *
@@ -1898,14 +2047,14 @@ interface phone
     /**
      * @param array params [
      *               InputPhoneCall peer,
-     *               int duration,
-     *               PhoneCallDiscardReason reason,
-     *               long connection_id,
+     *               bytes g_a,
+     *               long key_fingerprint,
+     *               PhoneCallProtocol protocol,
      *              ]
      *
-     * @return bool
+     * @return phone_PhoneCall
      */
-    public function discardCall(array $params);
+    public function confirmCall(array $params);
 
     /**
      * @param array params [
@@ -1915,4 +2064,37 @@ interface phone
      * @return bool
      */
     public function receivedCall(array $params);
+
+    /**
+     * @param array params [
+     *               InputPhoneCall peer,
+     *               int duration,
+     *               PhoneCallDiscardReason reason,
+     *               long connection_id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function discardCall(array $params);
+
+    /**
+     * @param array params [
+     *               InputPhoneCall peer,
+     *               int rating,
+     *               string comment,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function setCallRating(array $params);
+
+    /**
+     * @param array params [
+     *               InputPhoneCall peer,
+     *               DataJSON debug,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveCallDebug(array $params);
 }

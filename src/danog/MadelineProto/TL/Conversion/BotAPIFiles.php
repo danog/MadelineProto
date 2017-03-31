@@ -87,7 +87,7 @@ trait BotAPIFiles
             throw new Exception('Invalid last byte');
         }
         $deserialized = $this->deserialize($file_id);
-        $res = ['type' => str_replace('bot_', $deserialized['_'])];
+        $res = ['type' => str_replace('bot_', '', $deserialized['_'])];
         switch ($deserialized['_']) {
             case 'bot_thumbnail':
             case 'bot_photo':

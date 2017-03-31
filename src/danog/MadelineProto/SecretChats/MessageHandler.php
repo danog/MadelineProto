@@ -24,19 +24,25 @@ trait MessageHandler
 
             return false;
         }
-        $message = $this->serialize_object(['type' => $message['_']], $message, $this->secret_chats[$chat_id]['layer']);
-        $this->secret_chats[$chat_id]['outgoing'][] = $message;
+
         $this->secret_chats[$chat_id]['ttr']--;
-        if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'] === 0) {
+        if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
             $this->rekey($chat_id);
         }
-
+        if ($this->secret_chats[$chat_id]['layer'] !== 8) {
+            $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->secret_chats[$chat_id]['layer'], 'in_seq_no' => $this->generate_secret_in_seq_no($chat_id), 'out_seq_no' => $this->generate_secret_out_seq_no($chat_id), 'message' => $message];
+        }
+        $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
+        $message = $this->serialize_object(['type' => $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $this->secret_chats[$chat_id]['layer']);
         $message = \danog\PHP\Struct::pack('<I', strlen($message)).$message;
+
         $message_key = substr(sha1($message, true), -16);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
-        $padding = $this->random($this->posmod(-strlen($message), 16));
-        $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message.$padding, $aes_key, $aes_iv);
 
+        $message .= $this->random($this->posmod(-strlen($message), 16));
+        $this->secret_chats[$chat_id]['out_seq_no']++;
+
+        $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message, $aes_key, $aes_iv);
         return $message;
     }
 
@@ -48,12 +54,17 @@ trait MessageHandler
             return false;
         }
         $auth_key_id = substr($message['message']['bytes'], 0, 8);
+        $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
-            throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+            if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
+                if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+                $old = true;
+            } else throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
+
         }
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
-        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']]['key']['auth_key'], 'to server');
+        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']][$old ? 'old_key' : 'key']['auth_key'], 'to server');
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
         $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 0, 4))[0];
         if ($message_data_length > strlen($decrypted_data)) {
@@ -64,23 +75,21 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('difference between message_data_length and the length of the remaining decrypted buffer is too big');
         }
 
-        if ($message_data_length % 4 != 0) {
-            throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
+        if (strlen($decrypted_data) % 16 != 0) {
+            throw new \danog\MadelineProto\SecurityException('length of decrypted data is not divisible by 16');
         }
         $message_data = substr($decrypted_data, 4, $message_data_length);
         if ($message_key != substr(sha1(substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
             throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '']);
-        if (strlen($deserialized['random_bytes']) < 15) {
-            throw new \danog\MadelineProto\SecurityException('random_bytes is too short');
-        }
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
-        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'] === 0) {
+        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
             $this->rekey($message['message']['chat_id']);
         }
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
+        $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']++] = $message['message'];
         $this->handle_decrypted_update($message);
     }
 }

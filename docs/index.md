@@ -20,7 +20,7 @@ Also note that MadelineProto will perform better if python and a big math extens
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here (layer 62)](https://daniil.it/MadelineProto/API_docs/).  
+The MadelineProto API documentation can be found [here (layer 65)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
 
 The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/).  
 
@@ -60,6 +60,9 @@ Features:
 
 * Secret chats
 
+* PFS
+
+* PFS in secret chats
 
 
 ## Acknowledgements

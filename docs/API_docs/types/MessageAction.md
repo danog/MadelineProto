@@ -37,6 +37,10 @@ description: constructors and methods of type MessageAction
 
 [messageActionGameScore](../constructors/messageActionGameScore.md)  
 
+[messageActionPaymentSentMe](../constructors/messageActionPaymentSentMe.md)  
+
+[messageActionPaymentSent](../constructors/messageActionPaymentSent.md)  
+
 [messageActionPhoneCall](../constructors/messageActionPhoneCall.md)  
 
 

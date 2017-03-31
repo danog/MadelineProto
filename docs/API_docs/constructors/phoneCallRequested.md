@@ -16,7 +16,7 @@ description: phoneCallRequested attributes, type and example
 |date|[int](../types/int.md) | Yes|
 |admin\_id|[int](../types/int.md) | Yes|
 |participant\_id|[int](../types/int.md) | Yes|
-|g\_a|[bytes](../types/bytes.md) | Yes|
+|g\_a\_hash|[bytes](../types/bytes.md) | Yes|
 |protocol|[PhoneCallProtocol](../types/PhoneCallProtocol.md) | Yes|
 
 
@@ -27,14 +27,14 @@ description: phoneCallRequested attributes, type and example
 ### Example:
 
 ```
-$phoneCallRequested = ['_' => 'phoneCallRequested', 'id' => long, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, 'protocol' => PhoneCallProtocol, ];
+$phoneCallRequested = ['_' => 'phoneCallRequested', 'id' => long, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a_hash' => bytes, 'protocol' => PhoneCallProtocol, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-phoneCallRequested={_='phoneCallRequested', id=long, access_hash=long, date=int, admin_id=int, participant_id=int, g_a=bytes, protocol=PhoneCallProtocol, }
+phoneCallRequested={_='phoneCallRequested', id=long, access_hash=long, date=int, admin_id=int, participant_id=int, g_a_hash=bytes, protocol=PhoneCallProtocol, }
 
 ```
 

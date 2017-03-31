@@ -27,6 +27,8 @@ description: constructors and methods of type MessageMedia
 
 [messageMediaGame](../constructors/messageMediaGame.md)  
 
+[messageMediaInvoice](../constructors/messageMediaInvoice.md)  
+
 
 
 ### Methods that return an object of this type (methods):

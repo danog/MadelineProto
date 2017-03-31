@@ -79,7 +79,7 @@ trait TL
                         continue;
                     }
                     if (preg_match('|^===\d*===$|', $line)) {
-                        $layer = preg_replace('|\D*|', '', $line);
+                        $layer = (int) preg_replace('|\D*|', '', $line);
                         continue;
                     }
                     if (preg_match('/^vector#/', $line)) {
@@ -280,7 +280,7 @@ trait TL
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
-                    $concat .= \danog\PHP\Struct::pack('<B', $l);
+                    $concat .= chr($l);
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod((-$l - 1), 4));
                 } else {
@@ -322,7 +322,7 @@ trait TL
         }
         $predicate = $object['_'];
 
-        $constructorData = $this->constructors->find_by_predicate($predicate);
+        $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
         if ($constructorData === false) {
             \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_ERROR);
             throw new Exception('Could not extract type');
@@ -343,8 +343,7 @@ trait TL
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
-
-        return $concat.$this->serialize_params($constructorData, $object);
+        return $concat.$this->serialize_params($constructorData, $object, $layer);
     }
 
     public function serialize_method($method, $arguments)
@@ -357,7 +356,7 @@ trait TL
         return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
     }
 
-    public function serialize_params($tl, $arguments)
+    public function serialize_params($tl, $arguments, $layer = -1)
     {
         $serialized = '';
 
@@ -391,7 +390,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->random(15 + random_int(0, 10));
+                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15+(4*(random_int(0, PHP_INT_MAX) % 3))));
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($arguments['message'])) {
@@ -421,7 +420,7 @@ trait TL
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
-            $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']]);
+            $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $layer);
         }
 
         return $serialized;
@@ -555,10 +554,15 @@ trait TL
                         break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id'])) {
+            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
+            if ($arg['name'] === 'random_bytes') {
+                if (strlen($x[$arg['name']]) < 15) {
+                    throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');
+                } else unset($x[$arg['name']]);
+            }
         }
         if (isset($x['flags'])) { // I don't think we need this anymore
             unset($x['flags']);

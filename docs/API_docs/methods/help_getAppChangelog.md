@@ -6,9 +6,14 @@ description: help.getAppChangelog parameters, return type and example
 [Back to methods index](index.md)
 
 
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|prev\_app\_version|[string](../types/string.md) | Yes|
 
 
-### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)
+### Return type: [Updates](../types/Updates.md)
 
 ### Example:
 
@@ -28,12 +33,12 @@ if (isset($number)) {
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_AppChangelog = $MadelineProto->help->getAppChangelog();
+$Updates = $MadelineProto->help->getAppChangelog(['prev_app_version' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-help_AppChangelog = help.getAppChangelog({})
+Updates = help.getAppChangelog({prev_app_version=string, })
 ```
 

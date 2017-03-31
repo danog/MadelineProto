@@ -23,6 +23,8 @@ description: constructors and methods of type KeyboardButton
 
 [keyboardButtonGame](../constructors/keyboardButtonGame.md)  
 
+[keyboardButtonBuy](../constructors/keyboardButtonBuy.md)  
+
 
 
 ### Methods that return an object of this type (methods):

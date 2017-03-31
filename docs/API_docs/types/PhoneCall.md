@@ -15,6 +15,8 @@ description: constructors and methods of type PhoneCall
 
 [phoneCallRequested](../constructors/phoneCallRequested.md)  
 
+[phoneCallAccepted](../constructors/phoneCallAccepted.md)  
+
 [phoneCall](../constructors/phoneCall.md)  
 
 [phoneCallDiscarded](../constructors/phoneCallDiscarded.md)  
