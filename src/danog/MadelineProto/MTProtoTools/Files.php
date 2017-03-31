@@ -272,7 +272,6 @@ trait Files
                     throw $e;
                 }
             }
-
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 1;
                 $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], ['heavy' => true, 'datacenter' => $datacenter]);
@@ -285,12 +284,13 @@ trait Files
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
             if ($end !== -1 && strlen($res['bytes']) + $downloaded_size >= $size) {
-                $res['bytes'] = substr($res['bytes'], 0, (strlen($res['bytes']) + $downloaded_size) - $size);
+                $res['bytes'] = substr($res['bytes'], 0, $size-$downloaded_size);
                 $theend = true;
             }
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
             \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
             if ($theend) {
                 break;
             }
@@ -300,7 +300,6 @@ trait Files
         if ($end === -1) {
             $cb(100);
         }
-
         return true;
     }
 }
