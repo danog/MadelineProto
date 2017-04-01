@@ -103,7 +103,6 @@ class MTProto
         $this->should_serialize = true;
     }
 
-
     public function __wakeup()
     {
         if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {

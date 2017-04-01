@@ -98,5 +98,4 @@ trait AuthKeyHandler
     {
         return $this->calls[$chat];
     }
-
 }
