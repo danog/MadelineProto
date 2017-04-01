@@ -52,7 +52,7 @@ trait CallHandler
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        $this->start_threads();
+                        //$this->start_threads();
                         if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($only_updates) {
                                 if ($update_count > 50) {
@@ -86,7 +86,7 @@ trait CallHandler
                     throw new \danog\MadelineProto\Exception("Couldn't get response");
                 }
                 if (!isset($server_answer['_'])) {
-                    \danog\MadelineProto\Logger::log(['Response does not have a type!', $server_answer], \danog\MadelineProto\Logger::FATAL_ERROR);
+                    return $server_answer;
                 }
                 switch ($server_answer['_']) {
                     case 'rpc_error':

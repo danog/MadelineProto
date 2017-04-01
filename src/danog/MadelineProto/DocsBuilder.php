@@ -694,6 +694,16 @@ description: Represents a boolean.
 
 Represents a boolean.');
 
+        file_put_contents('types/DataJSON.md', '---
+title: DataJSON
+description: Any json-encodable data
+---
+## Type: DataJSON
+[Back to constructor index](index.md)
+
+Any json-encodable data.');
+
+
         \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }
 }

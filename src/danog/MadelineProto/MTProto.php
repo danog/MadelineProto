@@ -39,6 +39,7 @@ class MTProto
     use \danog\MadelineProto\TL\Conversion\Extension;
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\Tools;
+    use \danog\MadelineProto\VoIP\AuthKeyHandler;
 
     public $settings = [];
     public $config = ['expires' => -1];
@@ -102,51 +103,6 @@ class MTProto
         $this->should_serialize = true;
     }
 
-    public function setup_threads()
-    {
-        if ($this->threads = $this->run_workers = class_exists('\Pool') && php_sapi_name() == 'cli' && $this->settings['threading']['allow_threading']) {
-            \danog\MadelineProto\Logger::log(['THREADING IS ENABLED'], \danog\MadelineProto\Logger::NOTICE);
-            $this->start_threads();
-        }
-    }
-
-    public function start_threads()
-    {
-        if ($this->threads) {
-            $dcs = $this->datacenter->get_dcs();
-            if (!isset($this->reader_pool)) {
-                $this->reader_pool = new \Pool(count($dcs));
-            }
-            if (!isset($this->readers)) {
-                $this->readers = [];
-            }
-            foreach ($dcs as $dc) {
-                if (!isset($this->readers[$dc])) {
-                    $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
-                }
-                if (!$this->readers[$dc]->isRunning()) {
-                    $this->readers[$dc]->garbage = false;
-                    $this->reader_pool->submit($this->readers[$dc]);
-                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
-                } else {
-                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
-                }
-            }
-        }
-    }
-
-    public function __sleep()
-    {
-        $t = get_object_vars($this);
-        if (isset($t['reader_pool'])) {
-            unset($t['reader_pool']);
-        }
-        if (isset($t['readers'])) {
-            unset($t['readers']);
-        }
-
-        return array_keys($t);
-    }
 
     public function __wakeup()
     {
@@ -160,7 +116,6 @@ class MTProto
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $this->__construct($this->settings);
         }
-        $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         if ($this->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
@@ -329,7 +284,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
             ],
             'threading' => [
-                'allow_threading' => false, // Should I use threading, if it is enabled?
+                'allow_threading' => true, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
@@ -389,7 +344,6 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->datacenter->dc_connect($new_dc);
             }
         }
-        $this->setup_threads();
         $this->init_authorization();
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();

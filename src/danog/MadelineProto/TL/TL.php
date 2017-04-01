@@ -340,6 +340,9 @@ trait TL
         if ($constructorData['predicate'] === 'messageEntityMentionName') {
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
+        if ($constructorData['predicate'] === 'dataJSON') {
+            $object['data'] = json_encode($object['data']);
+        }
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
@@ -444,7 +447,7 @@ trait TL
         } elseif (!is_object($bytes_io)) {
             throw new Exception('An invalid bytes_io handle was provided.');
         }
-        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos);
+        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos]);
         switch ($type['type']) {
             case 'Bool':
                 return $this->deserialize_bool($bytes_io->read(4));
@@ -570,7 +573,9 @@ trait TL
         if (isset($x['flags'])) { // I don't think we need this anymore
             unset($x['flags']);
         }
-
+        if ($x['_'] === 'dataJSON') {
+            return json_decode($x['data'], true);
+        }
         return $x;
     }
 }

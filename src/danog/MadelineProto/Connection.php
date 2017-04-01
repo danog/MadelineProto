@@ -142,7 +142,7 @@ class Connection
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 if (($wrote = fwrite($this->sock, $what)) !== strlen($what)) {
-                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've written ".strlen($what).', wrote '.$wrote.')!');
+                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was written (should've written ".strlen($what).', wrote '.$wrote.')!');
                 }
 
                 return $wrote;
