@@ -80,6 +80,7 @@ class MTProto
 
         $this->zero = new \phpseclib\Math\BigInteger(0);
         $this->one = new \phpseclib\Math\BigInteger(1);
+        $this->two = new \phpseclib\Math\BigInteger(2);
         $this->three = new \phpseclib\Math\BigInteger(3);
         $this->four = new \phpseclib\Math\BigInteger(4);
         $this->twoe1984 = new \phpseclib\Math\BigInteger('1751908409537131537220509645351687597690304110853111572994449976845956819751541616602568796259317428464425605223064365804210081422215355425149431390635151955247955156636234741221447435733643262808668929902091770092492911737768377135426590363166295684370498604708288556044687341394398676292971255828404734517580702346564613427770683056761383955397564338690628093211465848244049196353703022640400205739093118270803778352768276670202698397214556629204420309965547056893233608758387329699097930255380715679250799950923553703740673620901978370802540218870279314810722790539899334271514365444369275682816');
@@ -282,9 +283,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'calls' => [
                 'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
+                'allow_p2p' => false // Should I accept p2p calls?
             ],
             'threading' => [
-                'allow_threading' => true, // Should I use threading, if it is enabled?
+                'allow_threading' => false, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
@@ -441,7 +443,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 8;
+        return 9;
     }
 
     public function get_self()

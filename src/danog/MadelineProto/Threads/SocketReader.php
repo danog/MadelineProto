@@ -45,7 +45,7 @@ class SocketReader extends \Threaded implements \Collectable
         require_once __DIR__.'/../TL/Exception.php';
         require_once __DIR__.'/../NothingInTheSocketException.php';
         require_once __DIR__.'/../Exception.php';
-        $handler_pool = new \Pool(2);
+        $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
 
         while ($this->API->run_workers) {
             try {

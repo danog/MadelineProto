@@ -212,4 +212,5 @@ trait AuthKeyHandler
 
         return 0;
     }
+    public function get_secret_chat($chat) { return $this->secret_chats[$chat]; }
 }

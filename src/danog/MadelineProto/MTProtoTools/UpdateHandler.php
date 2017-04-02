@@ -495,8 +495,18 @@ trait UpdateHandler
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
                 return $this->accept_call($update['phone_call']);
+                case 'phoneCallAccepted':
+                $this->confirm_call($update['phone_call']);
+                return;
                 case 'phoneCall':
-                return $this->complete_call($update['phone_call']);
+                $this->complete_call($update['phone_call']);
+                break;
+                case 'phoneCallDiscarded':
+                \danog\MadelineProto\Logger::log(['Revoking call '.$update['phone_call']['id']], \danog\MadelineProto\Logger::NOTICE);
+                if (isset($this->secret_chats[$update['phone_call']['id']])) {
+                    unset($this->secret_chats[$update['phone_call']['id']]);
+                }
+                break;
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
@@ -546,15 +556,15 @@ trait UpdateHandler
                     unset($this->temp_requested_secret_chats[$update['chat']['id']]);
                 }
 
-                return;
+                break;
                 case 'encryptedChat':
                 \danog\MadelineProto\Logger::log(['Completing creation of secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
 
-                return $this->complete_secret_chat($update['chat']);
+                $this->complete_secret_chat($update['chat']);
+                return;
             }
-            \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::NOTICE);
+            //\danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::NOTICE);
 
-            return;
         }
         if (!$this->settings['updates']['handle_updates']) {
             return;

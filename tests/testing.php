@@ -66,11 +66,17 @@ if ($MadelineProto === false) {
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-//$MadelineProto->API->request_call('@danogentili');
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
-
+/*
+$call = $MadelineProto->API->request_call(getenv('TEST_SECRET_CHAT'));
+echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the call...'.PHP_EOL;
+while ($MadelineProto->call_status($call) !== $MadelineProto->API->READY) {
+    $MadelineProto->get_updates();
+}
+var_dump($MadelineProto->get_call($call));
+*/
 $secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
 echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the secret chat...'.PHP_EOL;
 while ($MadelineProto->secret_chat_status($secret) !== 2) {
