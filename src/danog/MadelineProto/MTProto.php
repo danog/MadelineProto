@@ -282,7 +282,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'calls' => [
                 'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
-                'allow_p2p' => false // Should I accept p2p calls?
+                'allow_p2p'         => false, // Should I accept p2p calls?
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?

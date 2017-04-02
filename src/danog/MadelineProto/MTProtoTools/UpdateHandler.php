@@ -497,6 +497,7 @@ trait UpdateHandler
                 return $this->accept_call($update['phone_call']);
                 case 'phoneCallAccepted':
                 $this->confirm_call($update['phone_call']);
+
                 return;
                 case 'phoneCall':
                 $this->complete_call($update['phone_call']);
@@ -561,10 +562,10 @@ trait UpdateHandler
                 \danog\MadelineProto\Logger::log(['Completing creation of secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
 
                 $this->complete_secret_chat($update['chat']);
+
                 return;
             }
             //\danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::NOTICE);
-
         }
         if (!$this->settings['updates']['handle_updates']) {
             return;
