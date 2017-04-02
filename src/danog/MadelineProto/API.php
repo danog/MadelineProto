@@ -96,7 +96,9 @@ class API extends APIFactory
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->setup_threads();
-        if (!isset($this->messages)) $this->APIFactory();
+        if (!isset($this->messages)) {
+            $this->APIFactory();
+        }
     }
 
     public function __destruct()

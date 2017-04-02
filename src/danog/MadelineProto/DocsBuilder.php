@@ -703,7 +703,6 @@ description: Any json-encodable data
 
 Any json-encodable data.');
 
-
         \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }
 }

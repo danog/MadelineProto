@@ -576,6 +576,7 @@ trait TL
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
         }
+
         return $x;
     }
 }
