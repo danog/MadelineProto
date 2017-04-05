@@ -576,7 +576,9 @@ trait TL
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']) && stripos($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type'], '<') !== false) {
                 $arg['subtype'] = preg_replace(['|Vector[<]|', '|[>]|'], '', $this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']);
             }
-            if (isset($type['datacenter'])) $arg['datacenter'] = $type['datacenter'];
+            if (isset($type['datacenter'])) {
+                $arg['datacenter'] = $type['datacenter'];
+            }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
