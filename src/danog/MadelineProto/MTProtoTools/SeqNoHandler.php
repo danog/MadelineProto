@@ -28,7 +28,7 @@ trait SeqNoHandler
 
     public function check_in_seq_no($datacenter, $current_msg_id)
     {
-        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
+        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
             \danog\MadelineProto\Logger::log(['SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
         }
     }
@@ -44,9 +44,9 @@ trait SeqNoHandler
 
     public function content_related($method)
     {
-        //var_dump($method);
-        return !in_array(
-            $method,
+        
+        return isset($method['_']) ? !in_array(
+            $method['_'],
             [
                 'rpc_result',
 //                'rpc_error',
@@ -79,6 +79,6 @@ trait SeqNoHandler
                 'msg_resend_req',
                 'msg_resend_ans_req',
             ]
-        );
+        ) : true;
     }
 }

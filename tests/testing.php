@@ -69,14 +69,16 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
-/*
+
+
 $call = $MadelineProto->API->request_call(getenv('TEST_SECRET_CHAT'));
+
 echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the call...'.PHP_EOL;
 while ($MadelineProto->call_status($call) !== $MadelineProto->API->READY) {
     $MadelineProto->get_updates();
 }
 var_dump($MadelineProto->get_call($call));
-*/
+
 $secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
 echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the secret chat...'.PHP_EOL;
 while ($MadelineProto->secret_chat_status($secret) !== 2) {
@@ -156,9 +158,9 @@ $inputEncryptedFile = $MadelineProto->upload_encrypted('tests/60', 'magic'); // 
 var_dump(time() - $time);
 $secret_media['document'] = ['peer' => $secret, 'file' => $inputEncryptedFile, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'key' => $inputEncryptedFile['key'], 'iv' => $inputEncryptedFile['iv'], 'file_name' => 'magic.magic', 'size' => filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
-    foreach ($secret_media as $type => $smessage) {
-        $type = $MadelineProto->messages->sendEncryptedFile($smessage);
-    }
+foreach ($secret_media as $type => $smessage) {
+    $type = $MadelineProto->messages->sendEncryptedFile($smessage);
+}
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
