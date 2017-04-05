@@ -534,14 +534,17 @@ trait TL
             }
         }
         if ($constructorData['predicate'] === 'gzip_packed') {
-            if (!isset($type['subtype'])) $type['subtype'] = '';
+            if (!isset($type['subtype'])) {
+                $type['subtype'] = '';
+            }
+
             return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'bytes'])), ['type' => '', 'datacenter' => $type['datacenter'], 'subtype' => $type['subtype']]);
         }
         if ($constructorData['type'] === 'Vector t') {
-        
             $constructorData['datacenter'] = $type['datacenter'];
             $constructorData['subtype'] = $type['subtype'];
             $constructorData['type'] = 'vector';
+
             return $this->deserialize($bytes_io, $constructorData);
         }
         $x = ['_' => $constructorData['predicate']];
@@ -569,9 +572,8 @@ trait TL
             if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
-            
+
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']) && stripos($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type'], '<') !== false) {
-            
                 $arg['subtype'] = preg_replace(['|Vector[<]|', '|[>]|'], '', $this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']);
             }
             $arg['datacenter'] = $type['datacenter'];

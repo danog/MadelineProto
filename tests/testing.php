@@ -70,7 +70,6 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
 
-
 $call = $MadelineProto->API->request_call(getenv('TEST_SECRET_CHAT'));
 
 echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the call...'.PHP_EOL;
