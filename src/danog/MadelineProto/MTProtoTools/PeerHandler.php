@@ -352,7 +352,9 @@ trait PeerHandler
                         $res[$key] = $full['Chat'][$key];
                     }
                 }
-                if (isset($res['admins_enabled'])) $res['all_members_are_administrators']= $res['admins_enabled'];
+                if (isset($res['admins_enabled'])) {
+                    $res['all_members_are_administrators'] = $res['admins_enabled'];
+                }
 
                 if (isset($full['full']['chat_photo']['sizes'])) {
                     $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
