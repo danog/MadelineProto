@@ -340,9 +340,6 @@ trait TL
         if ($constructorData['predicate'] === 'messageEntityMentionName') {
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
-        if ($constructorData['predicate'] === 'dataJSON') {
-            $object['data'] = json_encode($object['data']);
-        }
         if (!$bare) {
             $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
         }
@@ -423,6 +420,10 @@ trait TL
             if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
+            if ($current_argument['type'] === 'DataJSON') {
+                $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
+            }
+
             //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $layer);
         }

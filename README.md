@@ -437,6 +437,8 @@ var_dump($authorization);
 
 See tests/testing.php for more examples.
 
+Use `get_pwr_chat` to get chat info, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_pwr_chat.html).  
+
 Methods that allow sending message entities (messages.sendMessage for example) also have an additional parse_mode parameter that enables or disables html/markdown parsing of the message to be sent. See the method-specific documentation for more info.  
 
 To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true.

@@ -322,6 +322,15 @@ trait PeerHandler
                 if (isset($full['full']['bot_info'])) {
                     $res['bot_info'] = $full['full']['bot_info'];
                 }
+                if (isset($full['full']['phone_calls_available'])) {
+                    $res['phone_calls_available'] = $full['full']['phone_calls_available'];
+                }
+                if (isset($full['full']['phone_calls_private'])) {
+                    $res['phone_calls_private'] = $full['full']['phone_calls_private'];
+                }
+                if (isset($full['full']['common_chats_count'])) {
+                    $res['common_chats_count'] = $full['full']['common_chats_count'];
+                }
                 if (isset($full['full']['profile_photo']['sizes'])) {
                     $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), []);
                 }
@@ -343,6 +352,7 @@ trait PeerHandler
                         $res[$key] = $full['Chat'][$key];
                     }
                 }
+                if (isset($res['admins_enabled'])) $res['all_members_are_administrators']= $res['admins_enabled'];
 
                 if (isset($full['full']['chat_photo']['sizes'])) {
                     $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
@@ -432,7 +442,7 @@ trait PeerHandler
                         break;
 
                         case 'channelParticipantEditor':
-                        $newres['role'] = 'moderator';
+                        $newres['role'] = 'editor';
                         break;
 
                         case 'channelParticipantCreator':

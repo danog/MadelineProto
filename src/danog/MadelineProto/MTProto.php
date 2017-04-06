@@ -114,7 +114,9 @@ class MTProto
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
-            $this->__construct($this->settings);
+            $settings = $this->settings;
+            unset($settings['tl_schema']);
+            $this->__construct($settings);
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         if ($this->authorized && $this->settings['updates']['handle_updates']) {
