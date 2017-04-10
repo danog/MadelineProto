@@ -136,6 +136,7 @@ description: '.$this->settings['description'].'
             }
 
             $hasentities = false;
+            $hasreplymarkup = false;
             foreach ($this->methods->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
@@ -161,6 +162,9 @@ description: '.$this->settings['description'].'
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
+                if ($param['name'] === 'reply_markup') {
+                    $hasreplymarkup = true;
+                }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
                     $table .= '|parse\_mode| [string](../types/string.md) | Optional |
@@ -191,10 +195,10 @@ description: '.$description.'
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a normal bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo \'Enter the code you received: \';
     $code = \'\';
@@ -214,6 +218,14 @@ Or, if you\'re into Lua:
 ```
 
 ');
+            if ($hasreplymarkup) {
+                $example .= '
+## Usage of reply_markup:
+
+You can provide bot API reply_markup objects here.  
+
+';
+            }
             if ($hasentities) {
                 $example .= '
 ## Usage of parse_mode:
@@ -361,6 +373,7 @@ description: List of methods
 
             $params = '';
             $lua_params = '';
+            $hasreplymarkup = false;
             foreach ($this->constructors->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
@@ -390,7 +403,7 @@ description: List of methods
                     $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
-
+                if ($param['name'] === 'reply_markup) $hasreplymarkup = true;
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
@@ -437,6 +450,14 @@ Or, if you\'re into Lua:
 
 
 ';
+            if ($hasreplymarkup) {
+                $example .= '
+## Usage of reply_markup:
+
+You can provide bot API reply_markup objects here.  
+
+';
+
             file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
 
