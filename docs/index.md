@@ -447,6 +447,8 @@ Methods that allow sending message entities (messages.sendMessage for example) a
 
 To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true.
 
+reply_markup accepts bot API reply markup objects as well as MTProto ones.
+
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
 
 ### Storing sessions

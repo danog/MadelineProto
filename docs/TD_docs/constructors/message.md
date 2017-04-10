@@ -51,3 +51,9 @@ message={_='message', id=long, sender_user_id=int, chat_id=long, send_state=Mess
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

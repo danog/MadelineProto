@@ -33,3 +33,9 @@ inputBotInlineMessageGame={_='inputBotInlineMessageGame', reply_markup=ReplyMark
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

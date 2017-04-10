@@ -50,3 +50,9 @@ message={_='message', out=Bool, mentioned=Bool, media_unread=Bool, silent=Bool, 
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

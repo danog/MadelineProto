@@ -22,10 +22,10 @@ Sends notification about screenshot taken in a chat. Works only in secret chats
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';

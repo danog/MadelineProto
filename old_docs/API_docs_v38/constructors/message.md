@@ -44,3 +44,9 @@ message={_='message', id=int, from_id=int, to_id=Peer, fwd_from_id=Peer, fwd_dat
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

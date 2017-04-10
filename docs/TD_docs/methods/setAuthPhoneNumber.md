@@ -24,10 +24,10 @@ Sets user's phone number and sends authentication code to the user. Works only w
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';

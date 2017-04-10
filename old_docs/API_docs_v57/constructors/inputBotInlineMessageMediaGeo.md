@@ -34,3 +34,9 @@ inputBotInlineMessageMediaGeo={_='inputBotInlineMessageMediaGeo', geo_point=Inpu
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

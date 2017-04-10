@@ -287,6 +287,7 @@ trait BotAPI
                     break;
 
                     case 'documentAttributeAnimated':
+                    $type_name = 'gif';
                     $res['animated'] = true;
                     break;
 

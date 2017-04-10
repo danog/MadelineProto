@@ -41,3 +41,9 @@ inputInlineQueryResultSticker={_='inputInlineQueryResultSticker', id=string, thu
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

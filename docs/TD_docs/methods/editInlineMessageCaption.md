@@ -24,10 +24,10 @@ Bots only. Edits caption of an inline message content sent via bot
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';
@@ -45,4 +45,10 @@ Or, if you're into Lua:
 ```
 Ok = editInlineMessageCaption({inline_message_id=string, reply_markup=ReplyMarkup, caption=string, })
 ```
+
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
 

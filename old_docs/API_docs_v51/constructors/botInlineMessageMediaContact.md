@@ -36,3 +36,9 @@ botInlineMessageMediaContact={_='botInlineMessageMediaContact', phone_number=str
 ```
 
 
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
+

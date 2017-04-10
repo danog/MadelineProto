@@ -24,10 +24,10 @@ Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can'
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';

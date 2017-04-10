@@ -27,10 +27,10 @@ Sends a message. Returns sent message. UpdateChatTopMessage will not be sent, so
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';
@@ -48,4 +48,10 @@ Or, if you're into Lua:
 ```
 Message = sendMessage({chat_id=long, reply_to_message_id=long, disable_notification=Bool, from_background=Bool, reply_markup=ReplyMarkup, input_message_content=InputMessageContent, })
 ```
+
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
 

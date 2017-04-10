@@ -134,6 +134,13 @@ trait BotAPIFiles
 
             return $res;
 
+            case 'bot_gif':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]]);
+            $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
+
+            return $res;
+
             case 'bot_audio':
             unset($deserialized['_']);
             $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false]]]);

@@ -24,10 +24,10 @@ Bots only. Edits message reply markup. Returns edited message after edit is comp
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
+if (isset($token)) { // Login as a bot
     $this->bot_login($token);
 }
-if (isset($number)) {
+if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
     $code = '';
@@ -45,4 +45,10 @@ Or, if you're into Lua:
 ```
 Message = editMessageReplyMarkup({chat_id=long, message_id=long, reply_markup=ReplyMarkup, })
 ```
+
+
+## Usage of reply_markup
+
+You can provide bot API reply_markup objects here.  
+
 
