@@ -162,7 +162,9 @@ description: '.$this->settings['description'].'
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
-                if ($param['name'] === 'reply_markup') $hasreplymarkup = true;
+                if ($param['name'] === 'reply_markup') {
+                    $hasreplymarkup = true;
+                }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
                     $table .= '|parse\_mode| [string](../types/string.md) | Optional |
@@ -407,8 +409,9 @@ description: List of methods
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
-                if ($param['name'] === 'reply_markup') $hasreplymarkup = true;
-
+                if ($param['name'] === 'reply_markup') {
+                    $hasreplymarkup = true;
+                }
             }
             $params = "['_' => '".$rconstructor."', ".$params.']';
             $lua_params = "{_='".$rconstructor."', ".$lua_params.'}';
