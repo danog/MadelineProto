@@ -11,7 +11,7 @@ description: messages.startBot parameters, return type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |bot|[InputUser](../types/InputUser.md) | Yes|
-|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |start\_param|[string](../types/string.md) | Yes|
 
 
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'chat_id' => InputChat, 'start_param' => string, ]);
+$Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'chat_id' => InputPeer, 'start_param' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.startBot({bot=InputUser, chat_id=InputChat, start_param=string, })
+Updates = messages.startBot({bot=InputUser, chat_id=InputPeer, start_param=string, })
 ```
 

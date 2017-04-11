@@ -13,7 +13,7 @@ Sends inline query to a bot and returns its results. Unavailable for bots
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
 |bot\_user\_id|[int](../types/int.md) | Yes|Identifier of the bot send query to|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat, where the query is sent|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, where the query is sent|
 |user\_location|[location](../types/location.md) | Yes|User location, only if needed|
 |query|[string](../types/string.md) | Yes|Text of the query|
 |offset|[string](../types/string.md) | Yes|Offset of the first entry to return|
@@ -39,12 +39,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$InlineQueryResults = $MadelineProto->getInlineQueryResults(['bot_user_id' => int, 'chat_id' => long, 'user_location' => location, 'query' => string, 'offset' => string, ]);
+$InlineQueryResults = $MadelineProto->getInlineQueryResults(['bot_user_id' => int, 'chat_id' => InputPeer, 'user_location' => location, 'query' => string, 'offset' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-InlineQueryResults = getInlineQueryResults({bot_user_id=int, chat_id=long, user_location=location, query=string, offset=string, })
+InlineQueryResults = getInlineQueryResults({bot_user_id=int, chat_id=InputPeer, user_location=location, query=string, offset=string, })
 ```
 

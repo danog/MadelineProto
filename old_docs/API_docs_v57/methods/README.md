@@ -214,7 +214,7 @@ $MadelineProto->[help->saveAppLog](help_saveAppLog.md)(\['events' => \[[InputApp
 ***
 <br><br>$MadelineProto->[messages->acceptEncryption](messages_acceptEncryption.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \]) === [$EncryptedChat](../types/EncryptedChat.md)<a name="messages_acceptEncryption"></a>  
 
-$MadelineProto->[messages->addChatUser](messages_addChatUser.md)(\['chat_id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), 'fwd_limit' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_addChatUser"></a>  
+$MadelineProto->[messages->addChatUser](messages_addChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), 'fwd_limit' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_addChatUser"></a>  
 
 $MadelineProto->[messages->checkChatInvite](messages_checkChatInvite.md)(\['hash' => [string](../types/string.md), \]) === [$ChatInvite](../types/ChatInvite.md)<a name="messages_checkChatInvite"></a>  
 
@@ -222,7 +222,7 @@ $MadelineProto->[messages->clearRecentStickers](messages_clearRecentStickers.md)
 
 $MadelineProto->[messages->createChat](messages_createChat.md)(\['users' => \[[InputUser](../types/InputUser.md)\], 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_createChat"></a>  
 
-$MadelineProto->[messages->deleteChatUser](messages_deleteChatUser.md)(\['chat_id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$Updates](../types/Updates.md)<a name="messages_deleteChatUser"></a>  
+$MadelineProto->[messages->deleteChatUser](messages_deleteChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$Updates](../types/Updates.md)<a name="messages_deleteChatUser"></a>  
 
 $MadelineProto->[messages->deleteHistory](messages_deleteHistory.md)(\['just_clear' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'max_id' => [int](../types/int.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="messages_deleteHistory"></a>  
 
@@ -230,17 +230,17 @@ $MadelineProto->[messages->deleteMessages](messages_deleteMessages.md)(\['id' =>
 
 $MadelineProto->[messages->discardEncryption](messages_discardEncryption.md)(\['chat_id' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_discardEncryption"></a>  
 
-$MadelineProto->[messages->editChatAdmin](messages_editChatAdmin.md)(\['chat_id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), 'is_admin' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_editChatAdmin"></a>  
+$MadelineProto->[messages->editChatAdmin](messages_editChatAdmin.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), 'is_admin' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_editChatAdmin"></a>  
 
-$MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id' => [int](../types/int.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatPhoto"></a>  
+$MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatPhoto"></a>  
 
-$MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [int](../types/int.md), 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatTitle"></a>  
+$MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatTitle"></a>  
 
 $MadelineProto->[messages->editInlineBotMessage](messages_editInlineBotMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Bool](../types/Bool.md)<a name="messages_editInlineBotMessage"></a>  
 
 $MadelineProto->[messages->editMessage](messages_editMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Updates](../types/Updates.md)<a name="messages_editMessage"></a>  
 
-$MadelineProto->[messages->exportChatInvite](messages_exportChatInvite.md)(\['chat_id' => [int](../types/int.md), \]) === [$ExportedChatInvite](../types/ExportedChatInvite.md)<a name="messages_exportChatInvite"></a>  
+$MadelineProto->[messages->exportChatInvite](messages_exportChatInvite.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$ExportedChatInvite](../types/ExportedChatInvite.md)<a name="messages_exportChatInvite"></a>  
 
 $MadelineProto->[messages->forwardMessage](messages_forwardMessage.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_forwardMessage"></a>  
 
@@ -266,7 +266,7 @@ $MadelineProto->[messages->getDocumentByHash](messages_getDocumentByHash.md)(\['
 
 $MadelineProto->[messages->getFeaturedStickers](messages_getFeaturedStickers.md)(\['hash' => [int](../types/int.md), \]) === [$messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)<a name="messages_getFeaturedStickers"></a>  
 
-$MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => [int](../types/int.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="messages_getFullChat"></a>  
+$MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="messages_getFullChat"></a>  
 
 $MadelineProto->[messages->getGameHighScores](messages_getGameHighScores.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$messages\_HighScores](../types/messages_HighScores.md)<a name="messages_getGameHighScores"></a>  
 
@@ -302,7 +302,7 @@ $MadelineProto->[messages->importChatInvite](messages_importChatInvite.md)(\['ha
 
 $MadelineProto->[messages->installStickerSet](messages_installStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'archived' => [Bool](../types/Bool.md), \]) === [$messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)<a name="messages_installStickerSet"></a>  
 
-$MadelineProto->[messages->migrateChat](messages_migrateChat.md)(\['chat_id' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_migrateChat"></a>  
+$MadelineProto->[messages->migrateChat](messages_migrateChat.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$Updates](../types/Updates.md)<a name="messages_migrateChat"></a>  
 
 $MadelineProto->[messages->readEncryptedHistory](messages_readEncryptedHistory.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'max_date' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_readEncryptedHistory"></a>  
 
@@ -360,7 +360,7 @@ $MadelineProto->[messages->setTyping](messages_setTyping.md)(\['peer' => [InputP
 
 $MadelineProto->[messages->startBot](messages_startBot.md)(\['bot' => [InputUser](../types/InputUser.md), 'peer' => [InputPeer](../types/InputPeer.md), 'start_param' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_startBot"></a>  
 
-$MadelineProto->[messages->toggleChatAdmins](messages_toggleChatAdmins.md)(\['chat_id' => [int](../types/int.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="messages_toggleChatAdmins"></a>  
+$MadelineProto->[messages->toggleChatAdmins](messages_toggleChatAdmins.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="messages_toggleChatAdmins"></a>  
 
 $MadelineProto->[messages->uninstallStickerSet](messages_uninstallStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="messages_uninstallStickerSet"></a>  
 

@@ -12,7 +12,7 @@ Deletes chat from the list of recently found chats
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat to delete|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat to delete|
 
 
 ### Return type: [Ok](../types/Ok.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->deleteRecentlyFoundChat(['chat_id' => long, ]);
+$Ok = $MadelineProto->deleteRecentlyFoundChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = deleteRecentlyFoundChat({chat_id=long, })
+Ok = deleteRecentlyFoundChat({chat_id=InputPeer, })
 ```
 

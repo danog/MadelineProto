@@ -10,7 +10,7 @@ description: messages.migrateChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)
@@ -33,12 +33,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->migrateChat(['chat_id' => int, ]);
+$Updates = $MadelineProto->messages->migrateChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.migrateChat({chat_id=int, })
+Updates = messages.migrateChat({chat_id=InputPeer, })
 ```
 

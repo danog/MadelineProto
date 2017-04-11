@@ -12,7 +12,7 @@ Changes chat photo. Photo can't be changed for private chats. Photo will not cha
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |photo|[InputFile](../types/InputFile.md) | Yes|New chat photo. You can use zero InputFileId to delete photo. Files accessible only by HTTP URL are not acceptable|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChatPhoto(['chat_id' => long, 'photo' => InputFile, ]);
+$Ok = $MadelineProto->changeChatPhoto(['chat_id' => InputPeer, 'photo' => InputFile, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = changeChatPhoto({chat_id=long, photo=InputFile, })
+Ok = changeChatPhoto({chat_id=InputPeer, photo=InputFile, })
 ```
 

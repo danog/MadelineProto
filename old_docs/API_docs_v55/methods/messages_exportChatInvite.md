@@ -10,7 +10,7 @@ description: messages.exportChatInvite parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [ExportedChatInvite](../types/ExportedChatInvite.md)
@@ -33,12 +33,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$ExportedChatInvite = $MadelineProto->messages->exportChatInvite(['chat_id' => int, ]);
+$ExportedChatInvite = $MadelineProto->messages->exportChatInvite(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-ExportedChatInvite = messages.exportChatInvite({chat_id=int, })
+ExportedChatInvite = messages.exportChatInvite({chat_id=InputPeer, })
 ```
 

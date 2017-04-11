@@ -12,7 +12,7 @@ Sends notification about screenshot taken in a chat. Works only in secret chats
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->sendChatScreenshotTakenNotification(['chat_id' => long, ]);
+$Ok = $MadelineProto->sendChatScreenshotTakenNotification(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = sendChatScreenshotTakenNotification({chat_id=long, })
+Ok = sendChatScreenshotTakenNotification({chat_id=InputPeer, })
 ```
 

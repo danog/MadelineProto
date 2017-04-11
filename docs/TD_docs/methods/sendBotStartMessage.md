@@ -13,7 +13,7 @@ Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can'
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
 |bot\_user\_id|[int](../types/int.md) | Yes|Identifier of the bot|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat|
 |parameter|[string](../types/string.md) | Yes|Hidden parameter sent to bot for deep linking (https: api.telegram.org/bots#deep-linking)|
 
 
@@ -37,12 +37,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->sendBotStartMessage(['bot_user_id' => int, 'chat_id' => long, 'parameter' => string, ]);
+$Message = $MadelineProto->sendBotStartMessage(['bot_user_id' => int, 'chat_id' => InputPeer, 'parameter' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = sendBotStartMessage({bot_user_id=int, chat_id=long, parameter=string, })
+Message = sendBotStartMessage({bot_user_id=int, chat_id=InputPeer, parameter=string, })
 ```
 

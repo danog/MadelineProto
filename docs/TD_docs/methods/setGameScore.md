@@ -12,7 +12,7 @@ Bots only. Updates game score of the specified user in the game
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat a message with the game belongs to|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat a message with the game belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message|
 |edit\_message|[Bool](../types/Bool.md) | Yes|True, if message should be edited|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
@@ -40,12 +40,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->setGameScore(['chat_id' => long, 'message_id' => long, 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
+$Message = $MadelineProto->setGameScore(['chat_id' => InputPeer, 'message_id' => long, 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = setGameScore({chat_id=long, message_id=long, edit_message=Bool, user_id=int, score=int, force=Bool, })
+Message = setGameScore({chat_id=InputPeer, message_id=long, edit_message=Bool, user_id=int, score=int, force=Bool, })
 ```
 

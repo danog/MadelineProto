@@ -12,7 +12,7 @@ Returns current chat report spam state
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 
 
 ### Return type: [ChatReportSpamState](../types/ChatReportSpamState.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$ChatReportSpamState = $MadelineProto->getChatReportSpamState(['chat_id' => long, ]);
+$ChatReportSpamState = $MadelineProto->getChatReportSpamState(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-ChatReportSpamState = getChatReportSpamState({chat_id=long, })
+ChatReportSpamState = getChatReportSpamState({chat_id=InputPeer, })
 ```
 

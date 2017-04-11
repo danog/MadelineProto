@@ -92,6 +92,9 @@ description: '.$this->settings['description'].'
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
                 }
+                if ($param['name'] === 'chat_id' && $rmethod !== 'messages.discardEncryption') {
+                    $param['type'] = 'InputPeer';
+                }
                 $stype = 'type';
                 $link_type = 'types';
                 if (isset($param['subtype'])) {
@@ -144,6 +147,9 @@ description: '.$this->settings['description'].'
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
+                }
+                if ($param['name'] === 'chat_id' && $rmethod !== 'messages.discardEncryption') {
+                    $param['type'] = 'InputPeer';
                 }
 
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);

@@ -12,7 +12,7 @@ Messages are viewed by the user. Many useful activities depends on message being
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of viewed messages|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->viewMessages(['chat_id' => long, 'message_ids' => [long], ]);
+$Ok = $MadelineProto->viewMessages(['chat_id' => InputPeer, 'message_ids' => [long], ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = viewMessages({chat_id=long, message_ids={long}, })
+Ok = viewMessages({chat_id=InputPeer, message_ids={long}, })
 ```
 

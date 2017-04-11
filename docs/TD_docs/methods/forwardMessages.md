@@ -12,7 +12,7 @@ Forwards previously sent messages. Returns forwarded messages in the same order 
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of a chat to forward messages|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of a chat to forward messages|
 |from\_chat\_id|[long](../types/long.md) | Yes|Identifier of a chat to forward from|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of messages to forward|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|Pass true, to disable notification about the message, doesn't works if messages are forwarded to secret chat|
@@ -39,12 +39,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Messages = $MadelineProto->forwardMessages(['chat_id' => long, 'from_chat_id' => long, 'message_ids' => [long], 'disable_notification' => Bool, 'from_background' => Bool, ]);
+$Messages = $MadelineProto->forwardMessages(['chat_id' => InputPeer, 'from_chat_id' => long, 'message_ids' => [long], 'disable_notification' => Bool, 'from_background' => Bool, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Messages = forwardMessages({chat_id=long, from_chat_id=long, message_ids={long}, disable_notification=Bool, from_background=Bool, })
+Messages = forwardMessages({chat_id=InputPeer, from_chat_id=long, message_ids={long}, disable_notification=Bool, from_background=Bool, })
 ```
 

@@ -12,7 +12,7 @@ Message content is opened, for example the user has opened a photo, a video, a d
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier of the message|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier of the message|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message with opened content|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->openMessageContent(['chat_id' => long, 'message_id' => long, ]);
+$Ok = $MadelineProto->openMessageContent(['chat_id' => InputPeer, 'message_id' => long, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = openMessageContent({chat_id=long, message_id=long, })
+Ok = openMessageContent({chat_id=InputPeer, message_id=long, })
 ```
 

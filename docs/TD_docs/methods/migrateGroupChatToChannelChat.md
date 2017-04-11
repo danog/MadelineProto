@@ -12,7 +12,7 @@ Creates new channel supergroup chat from existing group chat and send correspond
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Group chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Group chat identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Chat = $MadelineProto->migrateGroupChatToChannelChat(['chat_id' => long, ]);
+$Chat = $MadelineProto->migrateGroupChatToChannelChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Chat = migrateGroupChatToChannelChat({chat_id=long, })
+Chat = migrateGroupChatToChannelChat({chat_id=InputPeer, })
 ```
 

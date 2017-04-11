@@ -12,7 +12,7 @@ Changes chat draft message
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |draft\_message|[draftMessage](../types/draftMessage.md) | Yes|New draft message, nullable|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChatDraftMessage(['chat_id' => long, 'draft_message' => draftMessage, ]);
+$Ok = $MadelineProto->changeChatDraftMessage(['chat_id' => InputPeer, 'draft_message' => draftMessage, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = changeChatDraftMessage({chat_id=long, draft_message=draftMessage, })
+Ok = changeChatDraftMessage({chat_id=InputPeer, draft_message=draftMessage, })
 ```
 

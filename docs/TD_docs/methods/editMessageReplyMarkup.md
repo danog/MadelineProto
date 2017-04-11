@@ -12,7 +12,7 @@ Bots only. Edits message reply markup. Returns edited message after edit is comp
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat the message belongs to|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat the message belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup|
 
@@ -37,13 +37,13 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->editMessageReplyMarkup(['chat_id' => long, 'message_id' => long, 'reply_markup' => ReplyMarkup, ]);
+$Message = $MadelineProto->editMessageReplyMarkup(['chat_id' => InputPeer, 'message_id' => long, 'reply_markup' => ReplyMarkup, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = editMessageReplyMarkup({chat_id=long, message_id=long, reply_markup=ReplyMarkup, })
+Message = editMessageReplyMarkup({chat_id=InputPeer, message_id=long, reply_markup=ReplyMarkup, })
 ```
 
 

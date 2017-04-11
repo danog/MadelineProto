@@ -12,7 +12,7 @@ Returns information about messages. If message is not found, returns null on the
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat, messages belongs to|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, messages belongs to|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of the messages to get|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Messages = $MadelineProto->getMessages(['chat_id' => long, 'message_ids' => [long], ]);
+$Messages = $MadelineProto->getMessages(['chat_id' => InputPeer, 'message_ids' => [long], ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Messages = getMessages({chat_id=long, message_ids={long}, })
+Messages = getMessages({chat_id=InputPeer, message_ids={long}, })
 ```
 

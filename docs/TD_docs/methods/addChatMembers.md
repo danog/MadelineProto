@@ -12,7 +12,7 @@ Adds many new members to the chat. Currently, available only for channels. Can't
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_ids|Array of [int](../types/int.md) | Yes|Identifiers of the users to add|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->addChatMembers(['chat_id' => long, 'user_ids' => [int], ]);
+$Ok = $MadelineProto->addChatMembers(['chat_id' => InputPeer, 'user_ids' => [int], ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = addChatMembers({chat_id=long, user_ids={int}, })
+Ok = addChatMembers({chat_id=InputPeer, user_ids={int}, })
 ```
 

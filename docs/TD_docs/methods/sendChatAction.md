@@ -12,7 +12,7 @@ Sends notification about user activity in a chat
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|Action description|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->sendChatAction(['chat_id' => long, 'action' => SendMessageAction, ]);
+$Ok = $MadelineProto->sendChatAction(['chat_id' => InputPeer, 'action' => SendMessageAction, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = sendChatAction({chat_id=long, action=SendMessageAction, })
+Ok = sendChatAction({chat_id=InputPeer, action=SendMessageAction, })
 ```
 

@@ -12,7 +12,7 @@ Deletes all messages in the chat sent by the specified user. Works only in super
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->deleteMessagesFromUser(['chat_id' => long, 'user_id' => int, ]);
+$Ok = $MadelineProto->deleteMessagesFromUser(['chat_id' => InputPeer, 'user_id' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = deleteMessagesFromUser({chat_id=long, user_id=int, })
+Ok = deleteMessagesFromUser({chat_id=InputPeer, user_id=int, })
 ```
 

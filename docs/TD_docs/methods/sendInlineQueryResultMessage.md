@@ -12,7 +12,7 @@ Sends result of the inline query as a message. Returns sent message. UpdateChatT
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat to send message|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat to send message|
 |reply\_to\_message\_id|[long](../types/long.md) | Yes|Identifier of a message to reply to or 0|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|Pass true, to disable notification about the message, doesn't works in secret chats|
 |from\_background|[Bool](../types/Bool.md) | Yes|Pass true, if the message is sent from background|
@@ -40,12 +40,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->sendInlineQueryResultMessage(['chat_id' => long, 'reply_to_message_id' => long, 'disable_notification' => Bool, 'from_background' => Bool, 'query_id' => long, 'result_id' => string, ]);
+$Message = $MadelineProto->sendInlineQueryResultMessage(['chat_id' => InputPeer, 'reply_to_message_id' => long, 'disable_notification' => Bool, 'from_background' => Bool, 'query_id' => long, 'result_id' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = sendInlineQueryResultMessage({chat_id=long, reply_to_message_id=long, disable_notification=Bool, from_background=Bool, query_id=long, result_id=string, })
+Message = sendInlineQueryResultMessage({chat_id=InputPeer, reply_to_message_id=long, disable_notification=Bool, from_background=Bool, query_id=long, result_id=string, })
 ```
 

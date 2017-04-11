@@ -10,7 +10,7 @@ description: messages.editChatTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 
 
@@ -34,12 +34,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->editChatTitle(['chat_id' => InputChat, 'title' => string, ]);
+$Updates = $MadelineProto->messages->editChatTitle(['chat_id' => InputPeer, 'title' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.editChatTitle({chat_id=InputChat, title=string, })
+Updates = messages.editChatTitle({chat_id=InputPeer, title=string, })
 ```
 

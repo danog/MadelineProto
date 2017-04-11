@@ -12,7 +12,7 @@ Changes status of the chat member, need appropriate privileges. In channel chats
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the user to edit status, bots can be editors in the channel chats|
 |status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|New status of the member in the chat|
 
@@ -37,12 +37,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChatMemberStatus(['chat_id' => long, 'user_id' => int, 'status' => ChatMemberStatus, ]);
+$Ok = $MadelineProto->changeChatMemberStatus(['chat_id' => InputPeer, 'user_id' => int, 'status' => ChatMemberStatus, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = changeChatMemberStatus({chat_id=long, user_id=int, status=ChatMemberStatus, })
+Ok = changeChatMemberStatus({chat_id=InputPeer, user_id=int, status=ChatMemberStatus, })
 ```
 

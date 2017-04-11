@@ -12,7 +12,7 @@ Reports chat as a spam chat or as not a spam chat. Can be used only if ChatRepor
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |is\_spam\_chat|[Bool](../types/Bool.md) | Yes|If true, chat will be reported as a spam chat, otherwise it will be marked as not a spam chat|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChatReportSpamState(['chat_id' => long, 'is_spam_chat' => Bool, ]);
+$Ok = $MadelineProto->changeChatReportSpamState(['chat_id' => InputPeer, 'is_spam_chat' => Bool, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = changeChatReportSpamState({chat_id=long, is_spam_chat=Bool, })
+Ok = changeChatReportSpamState({chat_id=InputPeer, is_spam_chat=Bool, })
 ```
 

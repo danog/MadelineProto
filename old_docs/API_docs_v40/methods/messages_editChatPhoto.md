@@ -10,7 +10,7 @@ description: messages.editChatPhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |photo|[InputChatPhoto](../types/InputChatPhoto.md) | Yes|
 
 
@@ -34,12 +34,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->editChatPhoto(['chat_id' => InputChat, 'photo' => InputChatPhoto, ]);
+$Updates = $MadelineProto->messages->editChatPhoto(['chat_id' => InputPeer, 'photo' => InputChatPhoto, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.editChatPhoto({chat_id=InputChat, photo=InputChatPhoto, })
+Updates = messages.editChatPhoto({chat_id=InputPeer, photo=InputChatPhoto, })
 ```
 

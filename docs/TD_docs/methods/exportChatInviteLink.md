@@ -12,7 +12,7 @@ Generates new chat invite link, previously generated link is revoked. Available 
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 
 
 ### Return type: [ChatInviteLink](../types/ChatInviteLink.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$ChatInviteLink = $MadelineProto->exportChatInviteLink(['chat_id' => long, ]);
+$ChatInviteLink = $MadelineProto->exportChatInviteLink(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-ChatInviteLink = exportChatInviteLink({chat_id=long, })
+ChatInviteLink = exportChatInviteLink({chat_id=InputPeer, })
 ```
 

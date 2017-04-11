@@ -32,6 +32,11 @@ trait CallHandler
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
             $args['ping_id'] = \danog\PHP\Struct::pack('<q', $args['ping_id']);
         }
+        if (isset($args['chat_id']) && $method !== 'messages.discardEncryption' && (is_object($args['chat_id']) || $args['chat_id'] < 0)) {
+            $res = $this->get_info($args['chat_id']);
+            if ($res['type'] !== 'chat') throw new \danog\MadelineProto\Exception('chat_id is not a chat id!');
+            $args['chat_id'] = $res['chat_id'];
+        }
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];

@@ -126,11 +126,11 @@ $MadelineProto->[help->saveAppLog](help_saveAppLog.md)(\['events' => \[[InputApp
 ***
 <br><br>$MadelineProto->[messages->acceptEncryption](messages_acceptEncryption.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \]) === [$EncryptedChat](../types/EncryptedChat.md)<a name="messages_acceptEncryption"></a>  
 
-$MadelineProto->[messages->addChatUser](messages_addChatUser.md)(\['chat_id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), 'fwd_limit' => [int](../types/int.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_addChatUser"></a>  
+$MadelineProto->[messages->addChatUser](messages_addChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), 'fwd_limit' => [int](../types/int.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_addChatUser"></a>  
 
 $MadelineProto->[messages->createChat](messages_createChat.md)(\['users' => \[[InputUser](../types/InputUser.md)\], 'title' => [string](../types/string.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_createChat"></a>  
 
-$MadelineProto->[messages->deleteChatUser](messages_deleteChatUser.md)(\['chat_id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_deleteChatUser"></a>  
+$MadelineProto->[messages->deleteChatUser](messages_deleteChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_deleteChatUser"></a>  
 
 $MadelineProto->[messages->deleteHistory](messages_deleteHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset' => [int](../types/int.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="messages_deleteHistory"></a>  
 
@@ -138,9 +138,9 @@ $MadelineProto->[messages->deleteMessages](messages_deleteMessages.md)(\['id' =>
 
 $MadelineProto->[messages->discardEncryption](messages_discardEncryption.md)(\['chat_id' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_discardEncryption"></a>  
 
-$MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id' => [int](../types/int.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_editChatPhoto"></a>  
+$MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_editChatPhoto"></a>  
 
-$MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [int](../types/int.md), 'title' => [string](../types/string.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_editChatTitle"></a>  
+$MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'title' => [string](../types/string.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_editChatTitle"></a>  
 
 $MadelineProto->[messages->forwardMessage](messages_forwardMessage.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), \]) === [$messages\_StatedMessage](../types/messages_StatedMessage.md)<a name="messages_forwardMessage"></a>  
 
@@ -154,7 +154,7 @@ $MadelineProto->[messages->getDhConfig](messages_getDhConfig.md)(\['version' => 
 
 $MadelineProto->[messages->getDialogs](messages_getDialogs.md)(\['offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Dialogs](../types/messages_Dialogs.md)<a name="messages_getDialogs"></a>  
 
-$MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => [int](../types/int.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="messages_getFullChat"></a>  
+$MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="messages_getFullChat"></a>  
 
 $MadelineProto->[messages->getHistory](messages_getHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getHistory"></a>  
 

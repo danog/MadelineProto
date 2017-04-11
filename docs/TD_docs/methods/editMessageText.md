@@ -12,7 +12,7 @@ Edits text of text or game message. Non-bots can edit message in a limited perio
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat the message belongs to|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat the message belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|Bots only. New message reply markup|
 |input\_message\_content|[InputMessageContent](../types/InputMessageContent.md) | Yes|New text content of the message. Should be of type InputMessageText|
@@ -38,13 +38,13 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->editMessageText(['chat_id' => long, 'message_id' => long, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ]);
+$Message = $MadelineProto->editMessageText(['chat_id' => InputPeer, 'message_id' => long, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = editMessageText({chat_id=long, message_id=long, reply_markup=ReplyMarkup, input_message_content=InputMessageContent, })
+Message = editMessageText({chat_id=InputPeer, message_id=long, reply_markup=ReplyMarkup, input_message_content=InputMessageContent, })
 ```
 
 

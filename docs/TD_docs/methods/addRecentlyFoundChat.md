@@ -12,7 +12,7 @@ Adds chat to the list of recently found chats. The chat is added to the beginnin
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat to add|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat to add|
 
 
 ### Return type: [Ok](../types/Ok.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->addRecentlyFoundChat(['chat_id' => long, ]);
+$Ok = $MadelineProto->addRecentlyFoundChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = addRecentlyFoundChat({chat_id=long, })
+Ok = addRecentlyFoundChat({chat_id=InputPeer, })
 ```
 

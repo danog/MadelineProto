@@ -12,7 +12,7 @@ Returns information about one participant of the chat
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$ChatMember = $MadelineProto->getChatMember(['chat_id' => long, 'user_id' => int, ]);
+$ChatMember = $MadelineProto->getChatMember(['chat_id' => InputPeer, 'user_id' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-ChatMember = getChatMember({chat_id=long, user_id=int, })
+ChatMember = getChatMember({chat_id=InputPeer, user_id=int, })
 ```
 

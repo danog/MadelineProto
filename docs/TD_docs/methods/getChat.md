@@ -12,7 +12,7 @@ Returns information about a chat by its identifier, offline request if current u
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Chat = $MadelineProto->getChat(['chat_id' => long, ]);
+$Chat = $MadelineProto->getChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Chat = getChat({chat_id=long, })
+Chat = getChat({chat_id=InputPeer, })
 ```
 

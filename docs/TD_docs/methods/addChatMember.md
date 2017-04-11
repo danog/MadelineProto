@@ -12,7 +12,7 @@ Adds new member to chat. Members can't be added to private or secret chats. Memb
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the user to add|
 |forward\_limit|[int](../types/int.md) | Yes|Number of previous messages from chat to forward to new member, ignored for channel chats|
 
@@ -37,12 +37,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->addChatMember(['chat_id' => long, 'user_id' => int, 'forward_limit' => int, ]);
+$Ok = $MadelineProto->addChatMember(['chat_id' => InputPeer, 'user_id' => int, 'forward_limit' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = addChatMember({chat_id=long, user_id=int, forward_limit=int, })
+Ok = addChatMember({chat_id=InputPeer, user_id=int, forward_limit=int, })
 ```
 

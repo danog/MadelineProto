@@ -10,7 +10,7 @@ description: messages.getFullChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[InputChat](../types/InputChat.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
@@ -33,12 +33,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_ChatFull = $MadelineProto->messages->getFullChat(['chat_id' => InputChat, ]);
+$messages_ChatFull = $MadelineProto->messages->getFullChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-messages_ChatFull = messages.getFullChat({chat_id=InputChat, })
+messages_ChatFull = messages.getFullChat({chat_id=InputPeer, })
 ```
 

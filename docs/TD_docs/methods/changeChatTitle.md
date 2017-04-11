@@ -12,7 +12,7 @@ Changes chat title. Title can't be changed for private chats. Title will not cha
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |title|[string](../types/string.md) | Yes|New title of a chat, 0-255 characters|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChatTitle(['chat_id' => long, 'title' => string, ]);
+$Ok = $MadelineProto->changeChatTitle(['chat_id' => InputPeer, 'title' => string, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = changeChatTitle({chat_id=long, title=string, })
+Ok = changeChatTitle({chat_id=InputPeer, title=string, })
 ```
 

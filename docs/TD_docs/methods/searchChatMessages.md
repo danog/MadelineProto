@@ -12,7 +12,7 @@ Searches for messages with given words in the chat. Returns result in reverse ch
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier to search in|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier to search in|
 |query|[string](../types/string.md) | Yes|Query to search for|
 |from\_message\_id|[long](../types/long.md) | Yes|Identifier of the message from which we need a history, you can use 0 to get results from beginning|
 |limit|[int](../types/int.md) | Yes|Maximum number of messages to be returned, can't be greater than 100|
@@ -39,12 +39,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Messages = $MadelineProto->searchChatMessages(['chat_id' => long, 'query' => string, 'from_message_id' => long, 'limit' => int, 'filter' => SearchMessagesFilter, ]);
+$Messages = $MadelineProto->searchChatMessages(['chat_id' => InputPeer, 'query' => string, 'from_message_id' => long, 'limit' => int, 'filter' => SearchMessagesFilter, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Messages = searchChatMessages({chat_id=long, query=string, from_message_id=long, limit=int, filter=SearchMessagesFilter, })
+Messages = searchChatMessages({chat_id=InputPeer, query=string, from_message_id=long, limit=int, filter=SearchMessagesFilter, })
 ```
 

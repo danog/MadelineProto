@@ -10,7 +10,7 @@ description: messages.deactivateChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |enabled|[Bool](../types/Bool.md) | Yes|
 
 
@@ -34,12 +34,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->deactivateChat(['chat_id' => int, 'enabled' => Bool, ]);
+$Updates = $MadelineProto->messages->deactivateChat(['chat_id' => InputPeer, 'enabled' => Bool, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.deactivateChat({chat_id=int, enabled=Bool, })
+Updates = messages.deactivateChat({chat_id=InputPeer, enabled=Bool, })
 ```
 

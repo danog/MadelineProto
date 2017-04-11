@@ -12,7 +12,7 @@ Changes current ttl setting in a secret chat and sends corresponding message
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |ttl|[int](../types/int.md) | Yes|New value of ttl in seconds|
 
 
@@ -36,12 +36,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->sendChatSetTtlMessage(['chat_id' => long, 'ttl' => int, ]);
+$Message = $MadelineProto->sendChatSetTtlMessage(['chat_id' => InputPeer, 'ttl' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Message = sendChatSetTtlMessage({chat_id=long, ttl=int, })
+Message = sendChatSetTtlMessage({chat_id=InputPeer, ttl=int, })
 ```
 

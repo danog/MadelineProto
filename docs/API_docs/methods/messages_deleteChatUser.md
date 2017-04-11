@@ -10,7 +10,7 @@ description: messages.deleteChatUser parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 
 
@@ -34,12 +34,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->deleteChatUser(['chat_id' => int, 'user_id' => InputUser, ]);
+$Updates = $MadelineProto->messages->deleteChatUser(['chat_id' => InputPeer, 'user_id' => InputUser, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Updates = messages.deleteChatUser({chat_id=int, user_id=InputUser, })
+Updates = messages.deleteChatUser({chat_id=InputPeer, user_id=InputUser, })
 ```
 

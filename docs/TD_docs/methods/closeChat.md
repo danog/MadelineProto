@@ -12,7 +12,7 @@ Chat is closed by the user. Many useful activities depends on chat being opened 
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->closeChat(['chat_id' => long, ]);
+$Ok = $MadelineProto->closeChat(['chat_id' => InputPeer, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Ok = closeChat({chat_id=long, })
+Ok = closeChat({chat_id=InputPeer, })
 ```
 

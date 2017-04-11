@@ -10,7 +10,7 @@ description: messages.editChatAdmin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|chat\_id|[int](../types/int.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |is\_admin|[Bool](../types/Bool.md) | Yes|
 
@@ -35,12 +35,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->editChatAdmin(['chat_id' => int, 'user_id' => InputUser, 'is_admin' => Bool, ]);
+$Bool = $MadelineProto->messages->editChatAdmin(['chat_id' => InputPeer, 'user_id' => InputUser, 'is_admin' => Bool, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-Bool = messages.editChatAdmin({chat_id=int, user_id=InputUser, is_admin=Bool, })
+Bool = messages.editChatAdmin({chat_id=InputPeer, user_id=InputUser, is_admin=Bool, })
 ```
 

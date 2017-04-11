@@ -12,7 +12,7 @@ Sends callback query to a bot and returns answer to it. Unavailable for bots
 
 | Name     |    Type       | Required | Description |
 |----------|:-------------:|:--------:|------------:|
-|chat\_id|[long](../types/long.md) | Yes|Identifier of the chat with a message|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat with a message|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message, from which the query is originated|
 |payload|[CallbackQueryPayload](../types/CallbackQueryPayload.md) | Yes|Query payload|
 
@@ -37,12 +37,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$CallbackQueryAnswer = $MadelineProto->getCallbackQueryAnswer(['chat_id' => long, 'message_id' => long, 'payload' => CallbackQueryPayload, ]);
+$CallbackQueryAnswer = $MadelineProto->getCallbackQueryAnswer(['chat_id' => InputPeer, 'message_id' => long, 'payload' => CallbackQueryPayload, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-CallbackQueryAnswer = getCallbackQueryAnswer({chat_id=long, message_id=long, payload=CallbackQueryPayload, })
+CallbackQueryAnswer = getCallbackQueryAnswer({chat_id=InputPeer, message_id=long, payload=CallbackQueryPayload, })
 ```
 
