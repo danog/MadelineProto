@@ -21,7 +21,7 @@ $Chat = 'chat#492772765'; // tg-cli style id (chats)
 $Chat = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
-A [Chat](API_docs/types/Chat.md), a [User](API_docs/types/User.md), an [InputPeer](API_docs/types/InputPeer.md), an [InputUser](API_docs/types/InputUser.md), an [InputChannel](API_docs/types/InputChannel.md), a [Peer](API_docs/types/Peer.md), or a [Chat](API_docs/types/Chat.md) object can also be used.
+A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.
 
 
 ### Possible values (constructors):
