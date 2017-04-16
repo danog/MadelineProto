@@ -349,7 +349,10 @@ trait UpdateHandler
                 $this->cur_state['pending_pts_updates'][] = $update;
 
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
-                    $this->get_channel_difference($channel_id);
+                    try {
+                        $this->get_channel_difference($channel_id);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
                 } else {
                     $this->get_updates_difference();
                 }
