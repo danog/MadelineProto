@@ -14,13 +14,19 @@ namespace danog\MadelineProto;
 
 abstract class SerializableVolatile
 {
-    public function unserialized($data) {
-        if (!isset($data['_']) || $data['_'] !== 'pony') return false;
+    public function unserialized($data)
+    {
+        if (!isset($data['_']) || $data['_'] !== 'pony') {
+            return false;
+        }
         unset($data['_']);
         foreach ($data as $key => $data) {
             $this->{$key} = $data;
         }
-        if (method_exists($this, '__wakeup')) $this->__wakeup();
+        if (method_exists($this, '__wakeup')) {
+            $this->__wakeup();
+        }
+
         return true;
     }
 }

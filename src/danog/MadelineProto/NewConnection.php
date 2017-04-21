@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class Connection extends SerializableVolatile
+class NewConnection extends SerializableVolatile
 {
     use \danog\MadelineProto\Tools;
     public $sock = null;
@@ -39,7 +39,9 @@ class Connection extends SerializableVolatile
 
     public function __construct($ip, $port = null, $protocol = null, $timeout = null, $ipv6 = null)
     {
-        if ($this->unserialized($ip)) return true;
+        if ($this->unserialized($ip)) {
+            return true;
+        }
         // Can use:
         /*
         - tcp_full
@@ -54,32 +56,32 @@ class Connection extends SerializableVolatile
         $this->ipv6 = $ipv6;
         $this->ip = $ip;
         $this->port = $port;
-        $this->sock = new \Volatile;
+        $this->sock = new \Volatile();
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock["pony"] = new \Volatile;
-                $this->sock["pony"]['socket'] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                if (!$this->sock["pony"]->connect($ip, $port)) {
+                $this->sock['pony'] = new \Volatile();
+                $this->sock['pony']['socket'] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock['pony']->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock["pony"] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                if (!$this->sock["pony"]->connect($ip, $port)) {
+                $this->sock['pony'] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock['pony']->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
-                $this->sock["pony"] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock['pony'] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                if (!$this->sock["pony"]->connect($ip, $port)) {
+                if (!$this->sock['pony']->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->out_seq_no = -1;
@@ -88,10 +90,10 @@ class Connection extends SerializableVolatile
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                $this->sock["pony"] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                if (!$this->sock["pony"]->connect($this->parsed['host'], $port)) {
+                $this->sock['pony'] = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock['pony']->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock['pony']->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 break;
@@ -112,7 +114,7 @@ class Connection extends SerializableVolatile
             case 'http':
             case 'https':
                 try {
-                    unset($this->sock["pony"]);
+                    unset($this->sock['pony']);
                 } catch (\danog\MadelineProto\Exception $e) {
                 }
                 break;
@@ -129,6 +131,7 @@ class Connection extends SerializableVolatile
         $this->__destruct();
         $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
+
     public function __sleep()
     {
         $t = get_object_vars($this);
@@ -155,7 +158,7 @@ class Connection extends SerializableVolatile
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (($wrote = $this->sock["pony"]->write($what)) !== strlen($what)) {
+                if (($wrote = $this->sock['pony']->write($what)) !== strlen($what)) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was written (should've written ".strlen($what).', wrote '.$wrote.')!');
                 }
 
@@ -172,15 +175,14 @@ class Connection extends SerializableVolatile
 
     public function read($length)
     {
-    
         switch ($this->protocol) {
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
             case 'http':
             case 'https':
-                $packet = $this->sock["pony"]->read($length);
-                
+                $packet = $this->sock['pony']->read($length);
+
                 if ($packet === false || strlen($packet) === 0) {
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }

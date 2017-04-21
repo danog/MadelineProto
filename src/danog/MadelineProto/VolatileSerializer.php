@@ -14,10 +14,12 @@ namespace danog\MadelineProto;
 
 class VolatileSerializer
 {
-    public function wakeup() {
+    public function wakeup()
+    {
         $elements = $this;
         $elements['_'] = 'pony';
-        $class = "\\".str_replace('Serializable', '', get_class($this));
+        $class = '\\'.str_replace('Serializable', '', get_class($this));
+
         return new $class($elements);
     }
 }
