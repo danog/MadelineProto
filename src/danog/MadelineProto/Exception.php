@@ -14,13 +14,15 @@ namespace danog\MadelineProto;
 
 class Exception extends \Exception
 {
-    public function __construct($message = null, $code = 0, Exception $previous = null)
+    public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
     {
         parent::__construct($message, $code, $previous);
         if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-        \Rollbar\Rollbar::report_exception($this);
+        if ($line !== null) $this->line = $line;
+        if ($file !== null) $this->file = $file;
+        \Rollbar\Rollbar::log($this);
     }
 
     /**
@@ -37,9 +39,7 @@ class Exception extends \Exception
         if (\danog\MadelineProto\Logger::$constructed) {
             \danog\MadelineProto\Logger::log([$errstr.' in '.basename($errfile).':'.$errline], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-        $e = new self($errstr, $errno);
-        $e->file = $errfile;
-        $e->line = $errline;
+        $e = new self($errstr, $errno, null, $errfile, $errline);
         throw $e;
     }
 }

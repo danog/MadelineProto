@@ -28,7 +28,7 @@ trait CallHandler
         if (!isset($aargs['datacenter'])) {
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
-        if (isset($args['message']) && mb_strlen($args['message']) > 4096) {
+        if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);
             $args['message'] = array_shift($message_chunks);
         }
