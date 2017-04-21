@@ -17,11 +17,11 @@ class RPCErrorException extends \Exception
     public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         switch ($message) {
-            case 'RPC_CALL_FAIL': $message = 'Telegram is having internal issues, please try again later.';break;
-            case 'CHANNEL_PRIVATE':$message = "You haven't joined this channel/supergroup";break;
-            case 'FLOOD_WAIT_666':$message = 'Spooky af m8';break;
-            case 'BOT_METHOD_INVALID':$message = 'This method cannot be run by a bot';break;
-                
+            case 'RPC_CALL_FAIL': $message = 'Telegram is having internal issues, please try again later.'; break;
+            case 'CHANNEL_PRIVATE':$message = "You haven't joined this channel/supergroup"; break;
+            case 'FLOOD_WAIT_666':$message = 'Spooky af m8'; break;
+            case 'BOT_METHOD_INVALID':$message = 'This method cannot be run by a bot'; break;
+
         }
         parent::__construct($message, $code, $previous);
     }
