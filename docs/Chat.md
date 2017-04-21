@@ -15,6 +15,7 @@ description: chat attributes, type and example
 |access\_hash|[long](API_docs/types/long.md) | Yes|access hash of peer|
 |first\_name|[string](API_docs/types/string.md) | Yes|First name of the user|
 |last\_name|[string](API_docs/types/string.md) | Optional|Last name of the user|
+|lang\_code|[string](API_docs/types/string.md) | Optional|Language of the user|
 |username|[string](API_docs/types/string.md) | Optional|Username|
 |verified|[Bool](API_docs/types/Bool.md) | Optional|Is the peer official?|
 |restricted|[Bool](API_docs/types/Bool.md) | Optional|Is the peer restricted to the current user?|

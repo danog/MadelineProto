@@ -51,3 +51,9 @@ messages_SentMessage = messages.sendMessage({peer=InputPeer, reply_to_msg_id=int
 You can provide bot API reply_markup objects here.  
 
 
+
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [messages\_SentMessage](../types/messages_SentMessage.md) will be returned instead.
+
+

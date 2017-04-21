@@ -76,11 +76,11 @@ description: '.$this->settings['description'].'
             $rtype = $this->methods->type[$key];
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
-            if (!isset($types[$rtype])) {
-                $types[$rtype] = ['constructors' => [], 'methods' => []];
+            if (!isset($types[$real_type])) {
+                $types[$real_type] = ['constructors' => [], 'methods' => []];
             }
-            if (!in_array($key, $types[$rtype]['methods'])) {
-                $types[$rtype]['methods'][] = $key;
+            if (!in_array($key, $types[$real_type]['methods'])) {
+                $types[$real_type]['methods'][] = $key;
             }
 
             $params = '';
@@ -140,6 +140,7 @@ description: '.$this->settings['description'].'
 
             $hasentities = false;
             $hasreplymarkup = false;
+            $hasmessage = false;
             foreach ($this->methods->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
@@ -170,6 +171,9 @@ description: '.$this->settings['description'].'
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
+                }
+                if ($param['name'] === 'message') {
+                    $hasmessage = true;
                 }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
@@ -229,6 +233,15 @@ Or, if you\'re into Lua:
 ## Usage of reply_markup
 
 You can provide bot API reply_markup objects here.  
+
+
+';
+            }
+            if ($hasmessage) {
+                $example .= '
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md) will be returned instead.
 
 
 ';
@@ -312,16 +325,19 @@ description: List of methods
             }
             $layer = isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '';
             $rtype = $this->constructors->type[$key];
-            if (!isset($types[$rtype])) {
-                $types[$rtype] = ['constructors' => [], 'methods' => []];
-            }
-            if (!in_array($key, $types[$rtype]['constructors'])) {
-                $types[$rtype]['constructors'][] = $key;
-            }
+            
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
             $real_constructor = preg_replace('/.*_of_/', '', $constructor);
+
+            if (!isset($types[$real_type])) {
+                $types[$real_type] = ['constructors' => [], 'methods' => []];
+            }
+            if (!in_array($key, $types[$real_type]['constructors'])) {
+                $types[$real_type]['constructors'][] = $key;
+            }
+
 
             $params = '';
             foreach ($this->constructors->params[$key] as $param) {
@@ -508,6 +524,7 @@ description: List of constructors
 
         \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
         foreach ($types as $otype => $keys) {
+            
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
@@ -585,6 +602,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 '.$methods.'
 
 ';
+if (file_exists('types/'.$type.'.md')) var_dump($type);
             file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }

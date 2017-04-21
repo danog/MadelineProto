@@ -48,6 +48,12 @@ Bool = messages.saveDraft({no_webpage=Bool, reply_to_msg_id=int, peer=InputPeer,
 ```
 
 
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [Bool](../types/Bool.md) will be returned instead.
+
+
+
 ## Usage of parse_mode:
 
 Set parse_mode to html to enable HTML parsing of the message.  

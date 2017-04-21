@@ -21,6 +21,7 @@ trait MessageHandler
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
+    private $last_recv = 0;
     public function send_message($message_data, $content_related, $aargs = [])
     {
         if (!isset($aargs['message_id']) || $aargs['message_id'] === null) {
@@ -54,6 +55,7 @@ trait MessageHandler
      */
     public function recv_message($datacenter)
     {
+
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
             $error = \danog\PHP\Struct::unpack('<i', $payload)[0];
@@ -125,5 +127,6 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
+        $this->last_recv = time();
     }
 }

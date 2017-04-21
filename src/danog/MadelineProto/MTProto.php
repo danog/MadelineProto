@@ -51,9 +51,10 @@ class MTProto
     public $bigint = false;
     public $run_workers = false;
     public $threads = false;
-
+    
     public function __construct($settings = [])
     {
+        //if ($this->unserialized($settings)) return true;
         $this->bigint = PHP_INT_SIZE < 8;
         // Parse settings
         $this->parse_settings($settings);
@@ -67,7 +68,8 @@ class MTProto
         }
         // Load rsa key
         \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
-        $this->key = new RSA($this->settings['authorization']['rsa_key']);
+        $key = new RSA($this->settings['authorization']['rsa_key']);
+        $this->rsa_keys[$key->fp] = $key;
 
         // Istantiate TL class
         \danog\MadelineProto\Logger::log(['Translating tl schemas...'], Logger::ULTRA_VERBOSE);
@@ -87,6 +89,8 @@ class MTProto
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
+        $this->setup_threads();
+
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
@@ -103,35 +107,97 @@ class MTProto
         $this->v = $this->getV();
         $this->should_serialize = true;
     }
+    
+    public function __sleep()
+    {
+        $t = get_object_vars($this);
+        if (isset($t['reader_pool'])) {
+            unset($t['reader_pool']);
+        }
+        if (isset($t['readers'])) {
+            unset($t['readers']);
+        }
+
+        return array_keys($t);
+    }
 
     public function __wakeup()
     {
+        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+        $this->setup_logger();
         if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
             return;
         }
+        /*
+        if (method_exists($this->datacenter, 'wakeup')) $this->datacenter = $this->datacenter->wakeup();
+        foreach ($this->rsa_keys as $key => $elem) {
+            if (method_exists($elem, 'wakeup')) $this->rsa_keys[$key] = $elem->wakeup();
+        }
+        foreach ($this->datacenter->sockets as $key => $elem) {
+            if (method_exists($elem, 'wakeup')) $this->datacenter->sockets[$key] = $elem->wakeup();
+        }
+        */
         $this->bigint = PHP_INT_SIZE < 8;
-        $this->setup_logger();
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $settings = $this->settings;
+            if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) $settings['updates']['callback'] = 'get_updates_update_handler';
             unset($settings['tl_schema']);
+            $this->reset_session(true, true);
             $this->__construct($settings);
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $this->setup_threads();
         if ($this->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
+
     }
 
     public function __destruct()
     {
         if (isset($this->reader_pool)) {
             $this->run_workers = false;
-            while ($this->reader_pool->collect());
-            \danog\MadelineProto\Logger::log(['Shutting down reader pool...'], Logger::NOTICE);
+            while ($number = $this->reader_pool->collect()) {
+                \danog\MadelineProto\Logger::log(['Shutting down reader pool, '.$number .' jobs left'], \danog\MadelineProto\Logger::NOTICE);
+            }
             $this->reader_pool->shutdown();
+        }
+    }
+    public function setup_threads()
+    {
+        if ($this->threads = $this->run_workers = class_exists('\Pool') && in_array(php_sapi_name(), ['cli', 'phpdbg']) && $this->settings['threading']['allow_threading'] && extension_loaded("pthreads")) {
+            \danog\MadelineProto\Logger::log(['THREADING IS ENABLED'], \danog\MadelineProto\Logger::NOTICE);
+            $this->start_threads();
+        }
+    }
+
+    public function start_threads()
+    {
+        if ($this->threads) {
+            $dcs = $this->datacenter->get_dcs();
+            if (!isset($this->reader_pool)) {
+                $this->reader_pool = new \Pool(count($dcs));
+            }
+            if (!isset($this->readers)) {
+                $this->readers = [];
+            }
+            foreach ($dcs as $dc) {
+                if (!isset($this->readers[$dc])) {
+                    $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
+                }
+                if (!$this->readers[$dc]->isRunning()) {
+                    $this->readers[$dc]->garbage = false;
+                    $this->reader_pool->submit($this->readers[$dc]);
+                    var_dump('hey');
+                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
+                    while (!$this->readers[$dc]->ready);
+                } else {
+                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
+                }
+            }
         }
     }
 
@@ -140,11 +206,7 @@ class MTProto
         // Detect ipv6
         $google = '';
         try {
-            $ctx = stream_context_create(['http'=> [
-                    'timeout' => 1,
-                ],
-            ]);
-            $google = file_get_contents('http://ipv6.test-ipv6.com/', false, $ctx);
+            $google = file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]));
         } catch (Exception $e) {
         }
         $this->ipv6 = strlen($google) > 0;
@@ -239,10 +301,10 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
-                'layer'         => 65, // layer version
+                'layer'         => 66, // layer version
                 'src'           => [
                     'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram'     => __DIR__.'/TL_telegram_v65.tl', // telegram TL scheme
+                    'telegram'     => __DIR__.'/TL_telegram_v66.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
                     'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
@@ -277,7 +339,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'peer'      => ['full_info_cache_time' => 60],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
-                'callback'            => [$this, 'get_updates_update_handler'], // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+                'callback'            => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
             'secret_chats' => [
                 'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
@@ -292,15 +354,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
-        $settings = array_replace_recursive($default_settings, $settings);
-        if (isset($settings['connection_settings']['all'])) {
-            for ($n = 1; $n <= 6; $n++) {
-                if (!isset($settings['connection_settings'][$n])) {
-                    $settings['connection_settings'][$n] = $settings['connection_settings']['all'];
-                }
-            }
-            unset($settings['connection_settings']['all']);
-        }
+        $settings = $this->array_replace_recursive($default_settings, $settings);
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
             case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;
@@ -310,8 +364,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             case 'FATAL ERROR': $settings['logger']['logger_level'] = 0; break;
         }
 
+        
         $this->settings = $settings;
-
         // Setup logger
         $this->setup_logger();
         $this->should_serialize = true;
@@ -319,17 +373,24 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function setup_logger()
     {
-        \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+
+        \danog\MadelineProto\Logger::constructor(
+$this->settings['logger']['logger'],
+ $this->settings['logger']['logger_param'], 
+isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 
-    public function reset_session($de = true)
+    public function reset_session($de = true, $auth_key = false)
     {
-        foreach ($this->datacenter->sockets as $id => &$socket) {
+        foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
-                \danog\MadelineProto\Logger::log(['Resetting session id and seq_no in DC '.$id.'...'], Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log(['Resetting session id'.($auth_key ? ', authorization key':'').' and seq_no in DC '.$id.'...'], Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
+            }
+            if ($auth_key) {
+                $socket->temp_auth_key = null;
             }
             $socket->incoming_messages = [];
             $socket->outgoing_messages = [];
@@ -352,11 +413,13 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->connect_to_all_dcs();
         }
     }
-
+    private $initing_authorization = false;
     // Creates authorization keys
     public function init_authorization()
     {
-        foreach ($this->datacenter->sockets as $id => &$socket) {
+        $this->initing_authorization = true;
+        foreach ($this->datacenter->sockets as $id => $socket) {
+            if (strpos($id, 'media')) continue;
             if ($socket->session_id === null) {
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
@@ -378,14 +441,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->should_serialize = true;
             }
         }
+        $this->initing_authorization = true;
     }
 
     public function sync_authorization($authorized_dc)
     {
-        foreach ($this->datacenter->sockets as $new_dc => &$socket) {
-            if ($new_dc === $authorized_dc) {
+        foreach ($this->datacenter->sockets as $new_dc => $socket) {
+            if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
             }
+            if ($int_dc != $new_dc) continue;
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
             $this->should_serialize = true;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
@@ -402,11 +467,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'invokeWithLayer',
             [
                 'layer' => $this->settings['tl_schema']['layer'],
-                'query' => $this->serialize_method('initConnection',
-                    array_merge(
-                        $this->settings['app_info'],
-                        ['query' => $this->serialize_method($method, $arguments)]
-                    )
+                'query' => $this->serialize_method('initConnection', 
+                    [
+                        'api_id' => $this->settings['app_info']['api_id'],
+                        'api_hash' => $this->settings['app_info']['api_hash'],
+                        'device_model' => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : "n/a",
+                        'system_version' => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : "n/a",
+                        'app_version' => $this->settings['app_info']['app_version'],
+                        'lang_code' => $this->settings['app_info']['lang_code'],
+                        'query' => $this->serialize_method($method, $arguments)
+                    ]
                 ),
             ],
             $options
@@ -429,14 +499,16 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
         unset($this->config['dc_options']);
         \danog\MadelineProto\Logger::log(['Updated config!', $this->config], Logger::NOTICE);
     }
-
+    
     public function parse_dc_options($dc_options)
     {
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
-            $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
             $id = $dc['id'];
-            $test .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
+            $id .= $dc['cdn'] ? '_cdn' : '';
+            $id .= $dc['media_only'] ? '_media' : '';
+            $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
+            $id .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $this->should_serialize = true;
@@ -444,7 +516,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 12;
+        return 23;
     }
 
     public function get_self()

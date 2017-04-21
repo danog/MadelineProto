@@ -16,7 +16,7 @@ class TLParams
 {
     public function parse_params($key, $mtproto = false)
     {
-        foreach ($this->params[$key] as &$param) {
+        foreach ($this->params[$key] as $kkey => $param) {
             $param['flag'] = false;
             if (preg_match('/^flags\.\d*\?/', $param['type'])) {
                 $param['flag'] = true;
@@ -38,6 +38,7 @@ class TLParams
             }
             $param['type'] = (($mtproto && $param['type'] === 'Message') ? 'MT' : '').$param['type'];
             $param['type'] = (($mtproto && $param['type'] === '%Message') ? '%MTMessage' : $param['type']);
+            $this->params[$key][$kkey] = $param;
         }
     }
 }

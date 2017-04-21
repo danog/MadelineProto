@@ -28,6 +28,10 @@ trait CallHandler
         if (!isset($aargs['datacenter'])) {
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
+        if (isset($args['message']) && mb_strlen($args['message']) > 4096) {
+            $message_chunks = $this->split_to_chunks($args['message']);
+            $args['message'] = array_shift($message_chunks);
+        }
         $args = $this->botAPI_to_MTProto($args);
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
             $args['ping_id'] = \danog\PHP\Struct::pack('<q', $args['ping_id']);
@@ -42,12 +46,13 @@ trait CallHandler
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];
+        $last_recv = $this->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
 
                 $int_message_id = $this->send_message($serialized, $content_related, $aargs);
-                if ($method === 'http_wait') {
+                if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
                     return true;
                 }
                 $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['content'] = ['method' => $method, 'args' => $args];
@@ -56,9 +61,11 @@ trait CallHandler
                 $server_answer = null;
                 $update_count = 0;
                 $only_updates = false;
+                if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) $this->getting_state = true;
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        //sleep(2);
                         //$this->start_threads();
                         if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($only_updates) {
@@ -74,10 +81,10 @@ trait CallHandler
                             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]['response']]['content'] = [];
                             break;
                         }
-                        //if (!$this->threads && !$this->run_workers) {
+                        if (!$this->threads && !$this->run_workers) {
                             $this->recv_message($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
-                        //}
+                        }
                     } catch (\danog\MadelineProto\Exception $e) {
                         if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
                             continue 2;
@@ -88,6 +95,11 @@ trait CallHandler
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
                         continue;
                     }
+                }
+                
+                if ($canunset) {
+                    $this->getting_state = false;
+                    $this->handle_pending_updates();
                 }
                 if ($server_answer === null) {
                     throw new \danog\MadelineProto\Exception("Couldn't get response");
@@ -145,13 +157,30 @@ trait CallHandler
                     unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id]);
                     unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$int_message_id]);
                 }
+                if ($canunset) {
+                    $this->getting_state = false;
+                    $this->handle_pending_updates();
+                }
             }
+            
             if ($server_answer === null) {
+                if ($last_recv === $this->last_recv && $this->datacenter->sockets[$args['datacenter']]->temp_auth_key != null) {
+                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                    $this->datacenter->sockets[$args['datacenter']]->temp_auth_key = null;
+                    $this->init_authorization();
+                    return $this->method_call($method, $args, $aargs);
+                }
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
             }
             \danog\MadelineProto\Logger::log(['Got response for method '.$method.' @ try '.$count.' (response try '.$res_count.')'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$int_message_id] = [];
-
+            if (isset($message_chunks) && count($message_chunks)) {
+                $server_answer = [$server_answer];
+                foreach ($message_chunks as $message) {
+                    $args['message'] = $message;
+                    $server_answer []= $this->method_call($method, $args, $aargs);
+                }
+            }
             return $server_answer;
         }
 

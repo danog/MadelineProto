@@ -22,6 +22,10 @@ description: List of types
 
 [BotInlineResult](BotInlineResult.md)<a name="BotInlineResult"></a>  
 
+[CdnConfig](CdnConfig.md)<a name="CdnConfig"></a>  
+
+[CdnPublicKey](CdnPublicKey.md)<a name="CdnPublicKey"></a>  
+
 [ChannelMessagesFilter](ChannelMessagesFilter.md)<a name="ChannelMessagesFilter"></a>  
 
 [ChannelParticipant](ChannelParticipant.md)<a name="ChannelParticipant"></a>  
@@ -306,20 +310,6 @@ description: List of types
 
 [UserStatus](UserStatus.md)<a name="UserStatus"></a>  
 
-[ContactStatus](ContactStatus.md)<a name="ContactStatus"></a>  
-
-[ReceivedNotifyMessage](ReceivedNotifyMessage.md)<a name="ReceivedNotifyMessage"></a>  
-
-[StickerSetCovered](StickerSetCovered.md)<a name="StickerSetCovered"></a>  
-
-[User](User.md)<a name="User"></a>  
-
-[WallPaper](WallPaper.md)<a name="WallPaper"></a>  
-
-[int](int.md)<a name="int"></a>  
-
-[long](long.md)<a name="long"></a>  
-
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
 
 [WebDocument](WebDocument.md)<a name="WebDocument"></a>  
@@ -379,6 +369,10 @@ description: List of types
 [help\_Support](help_Support.md)<a name="help_Support"></a>  
 
 [help\_TermsOfService](help_TermsOfService.md)<a name="help_TermsOfService"></a>  
+
+[int](int.md)<a name="int"></a>  
+
+[long](long.md)<a name="long"></a>  
 
 [messages\_AffectedHistory](messages_AffectedHistory.md)<a name="messages_AffectedHistory"></a>  
 
@@ -447,6 +441,8 @@ description: List of types
 [updates\_Difference](updates_Difference.md)<a name="updates_Difference"></a>  
 
 [updates\_State](updates_State.md)<a name="updates_State"></a>  
+
+[upload\_CdnFile](upload_CdnFile.md)<a name="upload_CdnFile"></a>  
 
 [upload\_File](upload_File.md)<a name="upload_File"></a>  
 

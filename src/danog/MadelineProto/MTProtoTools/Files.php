@@ -53,11 +53,14 @@ trait Files
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
         }
+        $ctx = hash_init('md5');
+
         while (ftell($f) !== $file_size) {
             $bytes = stream_get_contents($f, $part_size);
             if ($encrypted === true) {
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
+            hash_update($ctx, $bytes);
             if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => $datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
@@ -65,12 +68,12 @@ trait Files
         }
         fclose($f);
 
-        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => md5_file($file)];
+        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => hash_final($ctx)];
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
-            $constructor['md5_checksum'] = '';
+//            $constructor['md5_checksum'] = '';
         }
 
         return $constructor;
@@ -261,10 +264,10 @@ trait Files
             $ige->enableContinuousBuffer();
         }
         $theend = false;
+        $cdn = false;
         while (true) {
-            //$real_part_size = (($offset + $part_size > $end) && $end !== -1) ? $part_size - (($offset + $part_size) - $end) : $part_size;
             try {
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $info['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->getMessage() === 'OFFSET_INVALID') {
                     break;
@@ -272,13 +275,30 @@ trait Files
                     throw $e;
                 }
             }
+            if ($res['_'] === 'upload.fileCdnRedirect') {
+                $cdn = true;
+                $info['file_token'] = $res['file_token'];
+                $info['cdn_key'] = $res['key'];
+                $info['cdn_iv'] = $res['iv'];
+                $datacenter = $res['dc_id'].'_cdn';
+                \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
+                continue;
+            }
+            if ($res['type']['_'] === 'upload.cdnFileReuploadNeeded') {
+                \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
+                $this->method_call('upload.reuploadCdnFile', ['file_token' => $info['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $datacenter]);
+                continue;
+            }
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 1;
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
                 $datacenter++;
             }
             if ($res['bytes'] === '') {
                 break;
+            }
+            if (isset($info['cdn_key'])) {
+                $res['bytes'] = $this->encrypt_ctr($res['bytes'], $info['cdn_key'], $info['cdn_iv'], $offset);
             }
             if (isset($info['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);

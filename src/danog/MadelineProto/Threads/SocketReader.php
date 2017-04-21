@@ -17,10 +17,14 @@ namespace danog\MadelineProto\Threads;
  */
 class SocketReader extends \Threaded implements \Collectable
 {
+    public $ready = false;
     public function __construct($me, $current)
     {
+        return;
         $this->API = $me;
         $this->current = $current;
+
+        var_dump('OK');
     }
 
     public function __sleep()
@@ -38,6 +42,8 @@ class SocketReader extends \Threaded implements \Collectable
      */
     public function run()
     {
+var_dump("BLOCK");
+        while (true);
         require_once __DIR__.'/../SecurityException.php';
         require_once __DIR__.'/../RPCErrorException.php';
         require_once __DIR__.'/../ResponseException.php';
@@ -45,16 +51,21 @@ class SocketReader extends \Threaded implements \Collectable
         require_once __DIR__.'/../TL/Exception.php';
         require_once __DIR__.'/../NothingInTheSocketException.php';
         require_once __DIR__.'/../Exception.php';
+        
         $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
 
-        while ($this->API->run_workers) {
-            try {
-                $this->API->recv_message($this->current);
-                $handler_pool->submit(new SocketHandler($this->API, $this->current));
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-            }
+        $this->ready = true;
+
+        //while ($this->API->run_workers) {
+           //try {
+           //var_dump('READING');
+             //   $this->API->recv_message($this->current);
+            //    $handler_pool->submit(new SocketHandler($this->API, $this->current));
+            //} catch (\danog\MadelineProto\NothingInTheSocketException $e) { \danog\MadelineProto\Logger::log(['Nothing in the socket for dc '.$this->current], \danog\MadelineProto\Logger::VERBOSE); }
+        //}
+        while ($number = $handler_pool->collect()) {
+            \danog\MadelineProto\Logger::log(['Shutting down handler pool for dc '.$this->current.', '.$number .' jobs left'], \danog\MadelineProto\Logger::NOTICE);
         }
-        while ($handler_pool->collect());
         $this->setGarbage();
     }
 

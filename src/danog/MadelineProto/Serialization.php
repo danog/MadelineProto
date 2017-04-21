@@ -54,6 +54,13 @@ class Serialization
             $file = fopen($filename, 'r+');
             flock($file, LOCK_SH);
             $unserialized = stream_get_contents($file);
+            /*
+            foreach (['MTProto', 'DataCenter', 'Connection', 'RSA'] as $class) {
+                $oclass = "danog\\MadelineProto\\".$class;
+                $nclass = $oclass.'Serializable';
+                $unserialized = str_replace('O:'.strlen($oclass).':"'.$oclass.'":', 'O:'.strlen($nclass).':"'.$nclass.'":', $unserialized);
+            }
+            */
             flock($file, LOCK_UN);
             fclose($file);
             $unserialized = unserialize($unserialized);

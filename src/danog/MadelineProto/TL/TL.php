@@ -182,8 +182,9 @@ trait TL
                 if ($this->constructors->find_by_id($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
-                    foreach ($this->td_descriptions['constructors'][$name]['params'] as &$param) {
-                        $param = str_replace('nullable', 'optional', $param);
+                    if (!count($this->td_descriptions['constructors'][$name]['params'])) continue;
+                    foreach ($this->td_descriptions['constructors'][$name]['params'] as $k => $param) {
+                        $this->td_descriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -192,8 +193,8 @@ trait TL
                 if ($this->methods->find_by_id($id) === false) {
                     unset($this->td_descriptions['methods'][$name]);
                 } else {
-                    foreach ($this->td_descriptions['methods'][$name]['params'] as &$param) {
-                        $param = str_replace('nullable', 'optional', $param);
+                    foreach ($this->td_descriptions['methods'][$name]['params'] as $k => $param) {
+                        $this->td_descriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -241,11 +242,7 @@ trait TL
                     return str_pad(strrev($object->toBytes()), 8, chr(0));
                 }
 
-                if (is_string($object)) {
-                    if (strlen($object) !== 8) {
-                        throw new Exception('Given value is not 8 bytes long');
-                    }
-
+                if (is_string($object) && strlen($object) === 8) {
                     return $object;
                 }
 

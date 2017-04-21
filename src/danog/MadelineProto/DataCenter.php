@@ -29,15 +29,15 @@ class DataCenter
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
-    public function __construct(&$dclist, &$settings)
+    public function __construct($dclist, $settings)
     {
-        $this->dclist = &$dclist;
-        $this->settings = &$settings;
-        foreach ($this->sockets as &$socket) {
+        //if ($this->unserialized($dclist)) return true;
+        $this->dclist = $dclist;
+        $this->settings = $settings;
+        foreach ($this->sockets as $socket) {
             $socket->close_and_reopen();
         }
     }
-
     public function dc_disconnect($dc_number)
     {
         if ($this->curdc === $dc_number) {
@@ -55,36 +55,39 @@ class DataCenter
         if (isset($this->sockets[$dc_number])) {
             return false;
         }
-        $test = $this->settings[$dc_number]['test_mode'] ? 'test' : 'main';
-        $ipv6 = $this->settings[$dc_number]['ipv6'] ? 'ipv6' : 'ipv4';
+        $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
+        $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
+        $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
         $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
-        $address = $this->settings[$dc_number]['ipv6'] ? '['.$address.']' : $address;
+        $address = $this->settings[$dc_config_number]['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
-        if ($this->settings[$dc_number]['protocol'] === 'https') {
-            $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
-            $path = $this->settings[$dc_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
-            $address = $this->settings[$dc_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
+        if ($this->settings[$dc_config_number]['protocol'] === 'https') {
+            $subdomain = $this->dclist['ssl_subdomains'][$dc_config_number];
+            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
+            $address = $this->settings[$dc_config_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
         }
 
-        if ($this->settings[$dc_number]['protocol'] === 'http') {
-            $address = $this->settings[$dc_number]['protocol'].'://'.$address.'/api';
+        if ($this->settings[$dc_config_number]['protocol'] === 'http') {
+            $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.'/api';
             $port = 80;
         }
-        \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$this->settings[$dc_number]['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$this->settings[$dc_config_number]['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
 
-        $this->sockets[$dc_number] = new Connection($address, $port, $this->settings[$dc_number]['protocol'], $this->settings[$dc_number]['timeout']);
+        $this->sockets[$dc_number] = new Connection($address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout']);
 
         return true;
     }
 
     public function get_dcs()
     {
-        $test = $this->settings[2]['test_mode'] ? 'test' : 'main';
-        $ipv6 = $this->settings[2]['ipv6'] ? 'ipv6' : 'ipv4';
+        $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
+        $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';
 
         return array_keys($this->dclist[$test][$ipv6]);
     }
-
+    
+    
+    /*
     public function &__get($name)
     {
         return $this->sockets[$this->curdc]->{$name};
@@ -103,5 +106,5 @@ class DataCenter
     public function __call($name, $arguments)
     {
         return call_user_func_array([$this->sockets[$this->curdc], $name], $arguments);
-    }
+    }*/
 }

@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 /**
- * Manages connection to telegram servers.
+ * Just a stream wrapper
  */
 class Stream
 {

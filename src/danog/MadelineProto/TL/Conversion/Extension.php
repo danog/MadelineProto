@@ -417,7 +417,8 @@ trait Extension
 
     public function get_extension_from_location($location, $default)
     {
-        $res = $this->method_call('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1], ['heavy' => true, 'datacenter' => $location['dc_id']]);
+        return $default;
+        $res = $this->method_call('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
         if (!isset($res['type']['_'])) {
             return $default;
         }

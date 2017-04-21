@@ -17,5 +17,7 @@ description: constructors and methods of type WallPaper
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->account->getWallPapers](../methods/account_getWallPapers.md)  
+
 
 

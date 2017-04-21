@@ -63,13 +63,29 @@ trait AuthKeyHandler
 
                 /*
                 * ***********************************************************************
+                * Fetch RSA keys for CDN datacenters
+                */
+                if (strpos($datacenter, 'cdn') !== false) {
+                    foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
+                        $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
+                        $this->rsa_keys[$tempkey->fp] = $tempkey;
+                        $this->should_serialize = true;
+                    }
+                }
+                
+                /*
+                * ***********************************************************************
                 * Find our key in the server_public_key_fingerprints vector
                 */
-                if (!isset($this->key->keydata['fp'])) {
-                    $this->key = new \danog\MadelineProto\RSA($this->settings['authorization']['rsa_key']);
+                
+                foreach ($this->rsa_keys as $fp => $curkey) {
+                    if (in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
+                        $key = $curkey;
+                    }
                 }
-                if (!in_array($this->key->keydata['fp'], $ResPQ['server_public_key_fingerprints'])) {
-                    throw new \danog\MadelineProto\SecurityException("Couldn't find our key in the server_public_key_fingerprints vector.");
+                
+                if (!isset($key)) {
+                    throw new \danog\MadelineProto\SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
                 }
                 $pq_bytes = $ResPQ['pq'];
                 $server_nonce = $ResPQ['server_nonce'];
@@ -118,7 +134,7 @@ trait AuthKeyHandler
                 $sha_digest = sha1($p_q_inner_data, true);
                 $random_bytes = $this->random(255 - strlen($p_q_inner_data) - strlen($sha_digest));
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
-                $encrypted_data = $this->key->encrypt($to_encrypt);
+                $encrypted_data = $key->encrypt($to_encrypt);
 
                 \danog\MadelineProto\Logger::log(['Starting Diffie Hellman key exchange'], \danog\MadelineProto\Logger::VERBOSE);
                 /*
@@ -147,7 +163,7 @@ trait AuthKeyHandler
                         'server_nonce'           => $server_nonce,
                         'p'                      => $p_bytes,
                         'q'                      => $q_bytes,
-                        'public_key_fingerprint' => $this->key->keydata['fp'],
+                        'public_key_fingerprint' => $key->fp,
                         'encrypted_data'         => $encrypted_data,
                     ],
                     ['datacenter' => $datacenter]

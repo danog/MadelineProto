@@ -93,7 +93,7 @@ trait PeerHandler
         try {
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
-            return false;
+            return $e->getMessage() === 'Chat forbidden';
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             return false;
         }
@@ -180,15 +180,16 @@ trait PeerHandler
                     break;
             }
         }
-
-        if (preg_match('/^channel#/', $id)) {
-            $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
-        }
-        if (preg_match('/^chat#/', $id)) {
-            $id = preg_replace('|\D+|', '-', $id);
-        }
-        if (preg_match('/^user#/', $id)) {
-            $id = preg_replace('|\D+|', '', $id);
+        if (is_string($id) && strpos('#', $id) !== false) {
+            if (preg_match('/^channel#/', $id)) {
+                $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
+            }
+            if (preg_match('/^chat#/', $id)) {
+                $id = preg_replace('|\D+|', '-', $id);
+            }
+            if (preg_match('/^user#/', $id)) {
+                $id = preg_replace('|\D+|', '', $id);
+            }
         }
 
         if (is_numeric($id)) {
@@ -262,6 +263,10 @@ trait PeerHandler
                 $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
                 break;
+            case 'channelForbidden':
+                throw new \danog\MadelineProto\Exception('Chat forbidden');
+                break;
+
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
                 break;
@@ -311,7 +316,7 @@ trait PeerHandler
         switch ($full['type']) {
             case 'user':
             case 'bot':
-                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone'] as $key) {
+                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone', 'lang_code'] as $key) {
                     if (isset($full['User'][$key])) {
                         $res[$key] = $full['User'][$key];
                     }

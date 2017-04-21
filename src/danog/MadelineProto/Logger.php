@@ -37,13 +37,13 @@ class Logger
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
      */
-    public static function constructor(&$mode, &$optional = null, $prefix = '', $level = self::NOTICE)
+    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
     {
         if ($mode === null) {
             throw new Exception('No mode was specified!');
         }
-        self::$mode = &$mode;
-        self::$optional = &$optional;
+        self::$mode = $mode;
+        self::$optional = $optional;
         self::$constructed = true;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;

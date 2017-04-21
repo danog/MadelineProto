@@ -9,6 +9,8 @@ description: constructors and methods of type ContactStatus
 
 ### Possible values (constructors):
 
+[contactStatus](../constructors/contactStatus.md)  
+
 
 
 ### Methods that return an object of this type (methods):

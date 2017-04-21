@@ -35,6 +35,16 @@ trait Crypt
 
         return $cipher->encrypt($message);
     }
+    
+    public function ctr_encrypt($message, $key, $iv, $length)
+    {
+        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR);
+        $iv .= \danog\PHP\Struct::pack('<i', $length);
+        $cipher->setKey($key);
+        $cipher->setIV($iv);
+
+        return $cipher->encrypt($message);
+    }
 
     public function ige_decrypt($message, $key, $iv)
     {

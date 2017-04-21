@@ -11,6 +11,8 @@ description: constructors and methods of type upload_File
 
 [upload\_file](../constructors/upload_file.md)  
 
+[upload\_fileCdnRedirect](../constructors/upload_fileCdnRedirect.md)  
+
 
 
 ### Methods that return an object of this type (methods):

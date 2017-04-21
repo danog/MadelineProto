@@ -20,9 +20,9 @@ Also note that MadelineProto will perform better if python and a big math extens
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here (layer 65)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
+The MadelineProto API documentation can be found [here (layer 66)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
 
-The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/).  
+The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/). (you cannot use the methods described here in MadelineProto without the lua extension)  
 
 The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
 
@@ -84,14 +84,21 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 ### RTFM
 
-If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili).  
+If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili). 
 
-But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo.
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, bots/, tests/testing.php).
 
 If you don't understand something, read everything again.
 
+You MUST know OOP programming in order to use this library.
+
 I will NOT answer to questions that can be answered simply by reading this page; I will instead ask you to read it carefully twice.
 
+A very important page you must read is the [API documentation](https://daniil.it/MadelineProto/API_docs/): if it's the first time you see a link to that page it means you didn't read the documentation carefully.
+
+I can offer support, however, when it comes to MadelineProto bugs or problems in the documentation. I will not write code for you for free, however you can hire me to do that if you want (my rate is 50$ per hour); you can also buy an easy to use, customized MadelineProto base for only 30$.
+
+If you're selling a MadelineProto base too, you really should consider donating at least 20% of the price of the base: [this is my PayPal](https://paypal.me/danog).
 
 ### Installation
 
@@ -446,6 +453,8 @@ Use `get_pwr_chat` to get chat info, see [here for the parameters and the result
 Methods that allow sending message entities (messages.sendMessage for example) also have an additional parse_mode parameter that enables or disables html/markdown parsing of the message to be sent. See the method-specific documentation for more info.  
 
 To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true.
+
+To disable fetching the result of a method, the array that must be provided as second parameter to method wrapper must have the `noResponse` key set to true.
 
 reply_markup accepts bot API reply markup objects as well as MTProto ones.
 
