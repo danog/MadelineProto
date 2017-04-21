@@ -20,6 +20,7 @@ class Exception extends \Exception
         if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
+        \Rollbar\Rollbar::report_exception($this);
     }
 
     /**
