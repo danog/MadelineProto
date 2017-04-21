@@ -374,10 +374,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function setup_logger()
     {
-        \danog\MadelineProto\Logger::constructor(
-$this->settings['logger']['logger'],
- $this->settings['logger']['logger_param'],
-isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => '31979a2053e045548573d29232dde9c5'], true, false);
+        \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'],isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 
     public function reset_session($de = true, $auth_key = false)

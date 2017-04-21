@@ -47,6 +47,9 @@ trait CallHandler
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];
         $last_recv = $this->last_recv;
+        if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) {
+            $this->getting_state = true;
+        }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -61,9 +64,6 @@ trait CallHandler
                 $server_answer = null;
                 $update_count = 0;
                 $only_updates = false;
-                if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) {
-                    $this->getting_state = true;
-                }
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);

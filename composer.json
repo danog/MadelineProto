@@ -19,6 +19,7 @@
         "phpseclib/phpseclib": "dev-ige",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
+        "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*"
     },
     "require-dev": {

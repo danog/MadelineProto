@@ -145,7 +145,7 @@ trait UpdateHandler
         try {
             $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->getMessage() === 'CHANNEL_PRIVATE') {
+            if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
             } else {
                 throw $e;
