@@ -1071,6 +1071,9 @@ description: List of constructors
 <br><br>[$pageBlockBlockquote](../constructors/pageBlockBlockquote.md) = \['text' => [RichText](../types/RichText.md), 'caption' => [RichText](../types/RichText.md), \];<a name="pageBlockBlockquote"></a>  
 
 ***
+<br><br>[$pageBlockChannel](../constructors/pageBlockChannel.md) = \['channel' => [Chat](../types/Chat.md), \];<a name="pageBlockChannel"></a>  
+
+***
 <br><br>[$pageBlockCollage](../constructors/pageBlockCollage.md) = \['items' => \[[PageBlock](../types/PageBlock.md)\], 'caption' => [RichText](../types/RichText.md), \];<a name="pageBlockCollage"></a>  
 
 ***
@@ -1331,7 +1334,7 @@ description: List of constructors
 <br><br>[$sendMessageUploadPhotoAction\_17](../constructors/sendMessageUploadPhotoAction_17.md) = \[\];<a name="sendMessageUploadPhotoAction_17"></a>  
 
 ***
-<br><br>[$sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md) = \[\];<a name="sendMessageUploadRoundAction"></a>  
+<br><br>[$sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadRoundAction"></a>  
 
 ***
 <br><br>[$sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md) = \[\];<a name="sendMessageUploadVideoAction_17"></a>  

@@ -51,6 +51,8 @@ description: constructors and methods of type PageBlock
 
 [pageBlockSlideshow](../constructors/pageBlockSlideshow.md)  
 
+[pageBlockChannel](../constructors/pageBlockChannel.md)  
+
 
 
 ### Methods that return an object of this type (methods):

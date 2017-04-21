@@ -18,12 +18,6 @@ This project is in beta state.
 
 The MadelineProto API documentation can be found [here (layer 66)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
 
-The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/). (you cannot use the methods described here in MadelineProto without the lua extension)  
-
-The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
-
-The MadelineProto API documentations (old layers) can be found [here](https://github.com/danog/MadelineProto/tree/master/old_docs).  
-
 
 Features:
 
