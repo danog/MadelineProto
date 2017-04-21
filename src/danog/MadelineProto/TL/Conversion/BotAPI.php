@@ -448,35 +448,43 @@ trait BotAPI
 
         return $arguments;
     }
-    function split_to_chunks($text){
-	$total_length = 4096;
-	$text_arr = multipleExplodeKeepDelimiters(array("\n"),$text);
-	$i=0;
-	$message[0]="";
-	foreach ($text_arr as $word){
-		if ( strlen($message[$i] . $word . ' ') <= $total_length ){
-			if ($text_arr[count($text_arr)-1] == $word){
-				$message[$i] .= $word;
-			} else {
-				$message[$i] .= $word . ' ';
-			}
-		} else {
-			$i++;
-			if ($text_arr[count($text_arr)-1] == $word){
-				$message[$i] = $word;
-			} else {
-				$message[$i] = $word . ' ';
-			}
-		}
-	}
-	return $message;
+
+    public function split_to_chunks($text)
+    {
+        $total_length = 4096;
+        $text_arr = multipleExplodeKeepDelimiters(["\n"], $text);
+        $i = 0;
+        $message[0] = '';
+        foreach ($text_arr as $word) {
+            if (strlen($message[$i].$word.' ') <= $total_length) {
+                if ($text_arr[count($text_arr) - 1] == $word) {
+                    $message[$i] .= $word;
+                } else {
+                    $message[$i] .= $word.' ';
+                }
+            } else {
+                $i++;
+                if ($text_arr[count($text_arr) - 1] == $word) {
+                    $message[$i] = $word;
+                } else {
+                    $message[$i] = $word.' ';
+                }
+            }
+        }
+
+        return $message;
     }
-function multipleExplodeKeepDelimiters($delimiters, $string) {
-    $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
-    $finalArray = array();
-    foreach($initialArray as $item) {
-        if(strlen($item) > 0) array_push($finalArray, $item . $string[strpos($string, $item) + strlen($item)]);
+
+    public function multipleExplodeKeepDelimiters($delimiters, $string)
+    {
+        $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
+        $finalArray = [];
+        foreach ($initialArray as $item) {
+            if (strlen($item) > 0) {
+                array_push($finalArray, $item.$string[strpos($string, $item) + strlen($item)]);
+            }
+        }
+
+        return $finalArray;
     }
-    return $finalArray;
-}
 }

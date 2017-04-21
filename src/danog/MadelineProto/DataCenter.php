@@ -38,6 +38,7 @@ class DataCenter
             $socket->close_and_reopen();
         }
     }
+
     public function dc_disconnect($dc_number)
     {
         if ($this->curdc === $dc_number) {
@@ -85,8 +86,7 @@ class DataCenter
 
         return array_keys($this->dclist[$test][$ipv6]);
     }
-    
-    
+
     /*
     public function &__get($name)
     {

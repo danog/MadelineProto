@@ -61,7 +61,9 @@ trait CallHandler
                 $server_answer = null;
                 $update_count = 0;
                 $only_updates = false;
-                if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) $this->getting_state = true;
+                if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) {
+                    $this->getting_state = true;
+                }
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -96,7 +98,7 @@ trait CallHandler
                         continue;
                     }
                 }
-                
+
                 if ($canunset) {
                     $this->getting_state = false;
                     $this->handle_pending_updates();
@@ -162,12 +164,13 @@ trait CallHandler
                     $this->handle_pending_updates();
                 }
             }
-            
+
             if ($server_answer === null) {
                 if ($last_recv === $this->last_recv && $this->datacenter->sockets[$args['datacenter']]->temp_auth_key != null) {
                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
                     $this->datacenter->sockets[$args['datacenter']]->temp_auth_key = null;
                     $this->init_authorization();
+
                     return $this->method_call($method, $args, $aargs);
                 }
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
@@ -178,9 +181,10 @@ trait CallHandler
                 $server_answer = [$server_answer];
                 foreach ($message_chunks as $message) {
                     $args['message'] = $message;
-                    $server_answer []= $this->method_call($method, $args, $aargs);
+                    $server_answer[] = $this->method_call($method, $args, $aargs);
                 }
             }
+
             return $server_answer;
         }
 

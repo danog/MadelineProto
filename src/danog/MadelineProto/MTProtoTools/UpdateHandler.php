@@ -145,7 +145,11 @@ trait UpdateHandler
         try {
             $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->getMessage() === 'CHANNEL_PRIVATE') return false; else throw $e;
+            if ($e->getMessage() === 'CHANNEL_PRIVATE') {
+                return false;
+            } else {
+                throw $e;
+            }
         }
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_channel_state($channel)['sync_loading'] = false;

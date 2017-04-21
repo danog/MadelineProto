@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 /**
- * Just a stream wrapper
+ * Just a stream wrapper.
  */
 class Stream
 {

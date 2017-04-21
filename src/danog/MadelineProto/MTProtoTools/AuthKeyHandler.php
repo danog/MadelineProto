@@ -72,18 +72,18 @@ trait AuthKeyHandler
                         $this->should_serialize = true;
                     }
                 }
-                
+
                 /*
                 * ***********************************************************************
                 * Find our key in the server_public_key_fingerprints vector
                 */
-                
+
                 foreach ($this->rsa_keys as $fp => $curkey) {
                     if (in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
                         $key = $curkey;
                     }
                 }
-                
+
                 if (!isset($key)) {
                     throw new \danog\MadelineProto\SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
                 }

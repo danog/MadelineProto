@@ -36,16 +36,24 @@ class API extends APIFactory
         $this->API->v = $this->API->getV();
         \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
     }
-    public function __wakeup() {
+
+    public function __wakeup()
+    {
         //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
 
         $this->APIFactory();
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         restore_error_handler();
     }
-    public function __sleep() { return ['API']; }
+
+    public function __sleep()
+    {
+        return ['API'];
+    }
+
     public function APIFactory()
     {
         foreach ($this->API->get_method_namespaces() as $namespace) {

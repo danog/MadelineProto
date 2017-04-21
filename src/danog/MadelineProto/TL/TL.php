@@ -182,7 +182,9 @@ trait TL
                 if ($this->constructors->find_by_id($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
-                    if (!count($this->td_descriptions['constructors'][$name]['params'])) continue;
+                    if (!count($this->td_descriptions['constructors'][$name]['params'])) {
+                        continue;
+                    }
                     foreach ($this->td_descriptions['constructors'][$name]['params'] as $k => $param) {
                         $this->td_descriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }

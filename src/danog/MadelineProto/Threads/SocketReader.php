@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Threads;
 class SocketReader extends \Threaded implements \Collectable
 {
     public $ready = false;
+
     public function __construct($me, $current)
     {
         return;
@@ -42,7 +43,7 @@ class SocketReader extends \Threaded implements \Collectable
      */
     public function run()
     {
-var_dump("BLOCK");
+        var_dump('BLOCK');
         while (true);
         require_once __DIR__.'/../SecurityException.php';
         require_once __DIR__.'/../RPCErrorException.php';
@@ -51,7 +52,7 @@ var_dump("BLOCK");
         require_once __DIR__.'/../TL/Exception.php';
         require_once __DIR__.'/../NothingInTheSocketException.php';
         require_once __DIR__.'/../Exception.php';
-        
+
         $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
 
         $this->ready = true;
@@ -64,7 +65,7 @@ var_dump("BLOCK");
             //} catch (\danog\MadelineProto\NothingInTheSocketException $e) { \danog\MadelineProto\Logger::log(['Nothing in the socket for dc '.$this->current], \danog\MadelineProto\Logger::VERBOSE); }
         //}
         while ($number = $handler_pool->collect()) {
-            \danog\MadelineProto\Logger::log(['Shutting down handler pool for dc '.$this->current.', '.$number .' jobs left'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(['Shutting down handler pool for dc '.$this->current.', '.$number.' jobs left'], \danog\MadelineProto\Logger::NOTICE);
         }
         $this->setGarbage();
     }

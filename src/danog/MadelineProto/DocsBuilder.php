@@ -325,7 +325,7 @@ description: List of methods
             }
             $layer = isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '';
             $rtype = $this->constructors->type[$key];
-            
+
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
@@ -337,7 +337,6 @@ description: List of methods
             if (!in_array($key, $types[$real_type]['constructors'])) {
                 $types[$real_type]['constructors'][] = $key;
             }
-
 
             $params = '';
             foreach ($this->constructors->params[$key] as $param) {
@@ -524,7 +523,6 @@ description: List of constructors
 
         \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
         foreach ($types as $otype => $keys) {
-            
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
@@ -602,7 +600,9 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 '.$methods.'
 
 ';
-if (file_exists('types/'.$type.'.md')) var_dump($type);
+            if (file_exists('types/'.$type.'.md')) {
+                var_dump($type);
+            }
             file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }
