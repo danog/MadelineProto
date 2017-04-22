@@ -27,7 +27,9 @@ class RPCErrorException extends \Exception
             case 'USERNAME_INVALID': $message = 'The provided username is not valid';
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($message, ['The provided username is not valid'])) return;
+        if (in_array($message, ['The provided username is not valid'])) {
+            return;
+        }
         \Rollbar\Rollbar::log($this);
     }
 }
