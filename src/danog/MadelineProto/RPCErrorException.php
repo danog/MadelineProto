@@ -24,34 +24,36 @@ class RPCErrorException extends \Exception
             case 'FLOOD_WAIT_666':$message = 'Spooky af m8'; break;
             case 'USER_IS_BOT':
             case 'BOT_METHOD_INVALID':$message = 'This method cannot be run by a bot'; break;
-            case 'PHONE_CODE_EXPIRED': $message = 'The phone code you provided has expired, this may happen if it was sent to any chat on telegram (if the code is sent through a telegram chat (not the official account) to avoid it append or prepend to the code some chars)';break;
-            case 'USERNAME_INVALID': $message = 'The provided username is not valid';break;
-            case 'ACCESS_TOKEN_INVALID': $message = 'The provided token is not valid';break;
-            case 'ACTIVE_USER_REQUIRED': $message = 'The method is only available to already activated users';break;
-            case 'FIRSTNAME_INVALID': $message = 'The first name is invalid';break;
-            case 'LASTNAME_INVALID': $message = 'The last name is invalid';break;
-            case 'PHONE_NUMBER_INVALID': $message = 'The phone number is invalid';break;
-            case 'PHONE_CODE_HASH_EMPTY': $message = 'phone_code_hash is missing';break;
-            case 'PHONE_CODE_EMPTY': $message = 'phone_code is missing';break;
-            case 'PHONE_CODE_EXPIRED': $message = 'The confirmation code has expired';break;
-            case 'API_ID_INVALID': $message = 'The api_id/api_hash combination is invalid';break;
-            case 'PHONE_NUMBER_OCCUPIED': $message = 'The phone number is already in use';break;
-            case 'PHONE_NUMBER_UNOCCUPIED': $message = 'The phone number is not yet being used';break;
-            case 'USERS_TOO_FEW': $message = 'Not enough users (to create a chat, for example)';break;
-            case 'USERS_TOO_MUCH': $message = 'The maximum number of users has been exceeded (to create a chat, for example)';break;
-            case 'TYPE_CONSTRUCTOR_INVALID': $message = 'The type constructor is invalid';break;
-            case 'FILE_PART_INVALID': $message = 'The file part number is invalid';break;
-            case 'FILE_PARTS_INVALID': $message = 'The number of file parts is invalid';break;
-            case 'FILE_PART_Х_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage';break;
-            case 'MD5_CHECKSUM_INVALID': $message = 'The MD5 checksums do not match';break;
-            case 'PHOTO_INVALID_DIMENSIONS': $message = 'The photo dimensions are invalid';break;
-            case 'FIELD_NAME_INVALID': $message = 'The field with the name FIELD_NAME is invalid';break;
-            case 'FIELD_NAME_EMPTY': $message = 'The field with the name FIELD_NAME is missing';break;
-            case 'MSG_WAIT_FAILED': $message = 'A waiting call returned an error';break;
+            case 'PHONE_CODE_EXPIRED': $message = 'The phone code you provided has expired, this may happen if it was sent to any chat on telegram (if the code is sent through a telegram chat (not the official account) to avoid it append or prepend to the code some chars)'; break;
+            case 'USERNAME_INVALID': $message = 'The provided username is not valid'; break;
+            case 'ACCESS_TOKEN_INVALID': $message = 'The provided token is not valid'; break;
+            case 'ACTIVE_USER_REQUIRED': $message = 'The method is only available to already activated users'; break;
+            case 'FIRSTNAME_INVALID': $message = 'The first name is invalid'; break;
+            case 'LASTNAME_INVALID': $message = 'The last name is invalid'; break;
+            case 'PHONE_NUMBER_INVALID': $message = 'The phone number is invalid'; break;
+            case 'PHONE_CODE_HASH_EMPTY': $message = 'phone_code_hash is missing'; break;
+            case 'PHONE_CODE_EMPTY': $message = 'phone_code is missing'; break;
+            case 'PHONE_CODE_EXPIRED': $message = 'The confirmation code has expired'; break;
+            case 'API_ID_INVALID': $message = 'The api_id/api_hash combination is invalid'; break;
+            case 'PHONE_NUMBER_OCCUPIED': $message = 'The phone number is already in use'; break;
+            case 'PHONE_NUMBER_UNOCCUPIED': $message = 'The phone number is not yet being used'; break;
+            case 'USERS_TOO_FEW': $message = 'Not enough users (to create a chat, for example)'; break;
+            case 'USERS_TOO_MUCH': $message = 'The maximum number of users has been exceeded (to create a chat, for example)'; break;
+            case 'TYPE_CONSTRUCTOR_INVALID': $message = 'The type constructor is invalid'; break;
+            case 'FILE_PART_INVALID': $message = 'The file part number is invalid'; break;
+            case 'FILE_PARTS_INVALID': $message = 'The number of file parts is invalid'; break;
+            case 'FILE_PART_Х_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage'; break;
+            case 'MD5_CHECKSUM_INVALID': $message = 'The MD5 checksums do not match'; break;
+            case 'PHOTO_INVALID_DIMENSIONS': $message = 'The photo dimensions are invalid'; break;
+            case 'FIELD_NAME_INVALID': $message = 'The field with the name FIELD_NAME is invalid'; break;
+            case 'FIELD_NAME_EMPTY': $message = 'The field with the name FIELD_NAME is missing'; break;
+            case 'MSG_WAIT_FAILED': $message = 'A waiting call returned an error'; break;
 
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($message, ['The provided username is not valid', 'The provided token is not valid'])) return;
+        if (in_array($message, ['The provided username is not valid', 'The provided token is not valid'])) {
+            return;
+        }
         \Rollbar\Rollbar::log($this);
     }
 }
