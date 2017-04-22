@@ -21,9 +21,9 @@ class RPCErrorException extends \Exception
             case 'CHANNEL_PRIVATE':$message = "You haven't joined this channel/supergroup"; break;
             case 'FLOOD_WAIT_666':$message = 'Spooky af m8'; break;
             case 'BOT_METHOD_INVALID':$message = 'This method cannot be run by a bot'; break;
-            default: \Rollbar\Rollbar::log($this);
 
         }
         parent::__construct($message, $code, $previous);
+        \Rollbar\Rollbar::log($this);
     }
 }
