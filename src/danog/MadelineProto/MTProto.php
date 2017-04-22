@@ -93,7 +93,7 @@ class MTProto
 
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
-
+        if (!isset($this->authorization['bot']) || !$this->authorization['bot']) {
         $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
         \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
 
@@ -102,7 +102,7 @@ class MTProto
             $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
             $this->should_serialize = true;
         }
-
+        }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = $this->getV();
         $this->should_serialize = true;
