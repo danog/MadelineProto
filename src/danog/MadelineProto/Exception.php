@@ -20,8 +20,12 @@ class Exception extends \Exception
         if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-        if ($line !== null) $this->line = $line;
-        if ($file !== null) $this->file = $file;
+        if ($line !== null) {
+            $this->line = $line;
+        }
+        if ($file !== null) {
+            $this->file = $file;
+        }
         \Rollbar\Rollbar::log($this);
     }
 
