@@ -1,6 +1,2 @@
-env:
-- ACCESS_TOKEN=31979a2053e045548573d29232dde9c5
-- ENVIRONMENT=production
-
 script:
-- curl https://api.rollbar.com/api/1/deploy/ -F access_token=$ACCESS_TOKEN -F environment=$ENVIRONMENT -F revision=`git log -n 1 --pretty=format:"%H"` -F local_username=$USER
+- curl https://api.rollbar.com/api/1/deploy/ -F access_token=31979a2053e045548573d29232dde9c5 -F environment=production -F revision=`git log -n 1 --pretty=format:"%H"` -F local_username=$USER
