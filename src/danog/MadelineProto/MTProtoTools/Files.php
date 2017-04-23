@@ -266,6 +266,9 @@ trait Files
         $theend = false;
         $cdn = false;
         while (true) {
+            if ($resto = $offset % $part_size) {
+                $offset -= $resto;
+            }
             try {
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $info['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -302,6 +305,9 @@ trait Files
             }
             if (isset($info['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
+            }
+            if ($resto) {
+                $res['bytes'] = substr($res['bytes'], $resto);
             }
             if ($end !== -1 && strlen($res['bytes']) + $downloaded_size >= $size) {
                 $res['bytes'] = substr($res['bytes'], 0, $size - $downloaded_size);
