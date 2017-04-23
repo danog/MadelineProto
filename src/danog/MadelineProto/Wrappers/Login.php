@@ -109,14 +109,14 @@ trait Login
                 ], ['datacenter' => $this->API->datacenter->curdc]
             );
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->getMessage() === 'SESSION_PASSWORD_NEEDED') {
+            if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 \danog\MadelineProto\Logger::log(['2FA enabled, you will have to call the complete_2fa_login function...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->API->login_temp_status = 'waiting_password';
                 $this->API->should_serialize = true;
 
                 return $this->API->authorization = $this->account->getPassword();
             }
-            if ($e->getMessage() === 'PHONE_NUMBER_UNOCCUPIED') {
+            if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->API->login_temp_status = 'waiting_signup';
                 $this->API->should_serialize = true;
