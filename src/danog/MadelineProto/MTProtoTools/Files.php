@@ -270,6 +270,8 @@ trait Files
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $info['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->getMessage() === 'OFFSET_INVALID') {
+                    \Rollbar\Rollbar::log($info);
+                    \Rollbar\Rollbar::log($offset);
                     break;
                 } else {
                     throw $e;
