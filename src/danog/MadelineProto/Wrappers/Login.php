@@ -140,7 +140,7 @@ trait Login
     public function complete_signup($first_name, $last_name)
     {
         if ($this->API->login_temp_status !== 'waiting_signup') {
-            throw new \danog\MadelineProto\Exception("I'm not waiting for the password! Please call the phone_login and the complete_phone_login methods first!");
+            throw new \danog\MadelineProto\Exception("I'm not waiting to signup! Please call the phone_login and the complete_phone_login methods first!");
         }
         $this->API->login_temp_status = 'none';
         \danog\MadelineProto\Logger::log(['Signing up as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
