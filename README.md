@@ -117,7 +117,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L99) for the default values for the settings arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L232) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
