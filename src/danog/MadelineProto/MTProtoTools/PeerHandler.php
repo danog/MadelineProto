@@ -180,7 +180,7 @@ trait PeerHandler
                     break;
             }
         }
-        if (is_string($id) && strpos('#', $id) !== false) {
+        if (is_string($id) && strpos($id, '#') !== false) {
             if (preg_match('/^channel#/', $id)) {
                 $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
             }

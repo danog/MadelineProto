@@ -46,7 +46,7 @@ trait UpdateHandler
             }
         }
         if (isset($this->settings['pwr']['update_handler'])) {
-            $this->settings['pwr']['update_handler']($update);
+            $this->settings['pwr']['update_handler'] === 'get_updates_update_handler' ? $this->get_updates_update_handler($update) : $this->settings['pwr']['update_handler']($update);
         }
     }
 
