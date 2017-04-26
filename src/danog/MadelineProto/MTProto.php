@@ -296,8 +296,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
-                'api_id'          => 2496,
-                'api_hash'        => '8da85b0d5bfe62527e5b244c209159c3',
+                'api_id'          => 65536,
+                'api_hash'        => '4251a2777e179232705e2462706f4143',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // 🌚
