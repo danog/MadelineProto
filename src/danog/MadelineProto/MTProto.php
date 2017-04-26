@@ -296,8 +296,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
-                'api_id'          => 65536,
-                'api_hash'        => '4251a2777e179232705e2462706f4143',
+                //'api_id'          => 65536,
+                //'api_hash'        => '4251a2777e179232705e2462706f4143',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // 🌚
@@ -359,6 +359,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
         ];
         $settings = $this->array_replace_recursive($default_settings, $settings);
+        if (!isset($settings['app_info']['api_id'])) throw new Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
             case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;
