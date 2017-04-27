@@ -309,7 +309,9 @@ trait TL
         $auto = false;
 
         if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-            $object = $this->get_info($object)[$type['type']];
+            $object = $this->get_info($object);
+            if (!isset($object[$type['type']])) throw new \danog\MadelineProto\Exception("This peer is not present in the internal peer database");
+            $object = $object[$type['type']];
         }
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);

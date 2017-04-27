@@ -51,9 +51,16 @@ class RPCErrorException extends \Exception
 
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($message, ['The provided username is not valid', 'The provided token is not valid'])) {
+        if (in_array($this->rpc, ['CHANNEL_PRIVATE'])) {
             return;
         }
-        \Rollbar\Rollbar::log($this);
+        $additional = [];
+        foreach (debug_backtrace() as $level) {
+            if (isset($level['function']) && $level['function'] === 'method_call') {
+                $additional = $level['args'];
+                break;
+            }
+        }
+        \Rollbar\Rollbar::log($this, $additional, 'error');
     }
 }

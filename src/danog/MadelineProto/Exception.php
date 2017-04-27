@@ -26,7 +26,8 @@ class Exception extends \Exception
         if ($file !== null) {
             $this->file = $file;
         }
-        \Rollbar\Rollbar::log($this);
+        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response"])) return;
+        \Rollbar\Rollbar::log($this, debug_backtrace(), 'error');
     }
 
     /**
