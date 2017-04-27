@@ -29,7 +29,9 @@ class Exception extends \Exception
         if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response"])) {
             return;
         }
-        if (strpos($message, 'Received request to switch to DC ') !== false) return;
+        if (strpos($message, 'Received request to switch to DC ') !== false) {
+            return;
+        }
         \Rollbar\Rollbar::log($this, debug_backtrace(), 'error');
     }
 
