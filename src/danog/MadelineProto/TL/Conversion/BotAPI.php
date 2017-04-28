@@ -452,7 +452,7 @@ trait BotAPI
     public function split_to_chunks($text)
     {
         $total_length = 4096;
-        $text_arr = multipleExplodeKeepDelimiters(["\n"], $text);
+        $text_arr = $this->multipleExplodeKeepDelimiters(["\n"], $text);
         $i = 0;
         $message[0] = '';
         foreach ($text_arr as $word) {
