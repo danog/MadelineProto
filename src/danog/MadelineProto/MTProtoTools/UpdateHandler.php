@@ -211,6 +211,7 @@ trait UpdateHandler
             $this->got_state = $this->should_serialize = true;
             $this->get_updates_state();
         }
+
         return $this->updates_state;
     }
 
