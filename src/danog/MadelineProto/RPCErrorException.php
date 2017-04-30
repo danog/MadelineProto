@@ -54,7 +54,9 @@ class RPCErrorException extends \Exception
         if (in_array($this->rpc, ['CHANNEL_PRIVATE'])) {
             return;
         }
-        if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) return;
+        if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
+            return;
+        }
         $additional = [];
         foreach (debug_backtrace() as $level) {
             if (isset($level['function']) && $level['function'] === 'method_call') {

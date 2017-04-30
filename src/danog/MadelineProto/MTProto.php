@@ -327,7 +327,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'logger_param'       => '/tmp/MadelineProto.log',
                 'logger'             => 3, // overwrite previous setting and echo logs
                 'logger_level'       => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
-                'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d'
+                'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d',
             ],
             'max_tries'         => [
                 'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
