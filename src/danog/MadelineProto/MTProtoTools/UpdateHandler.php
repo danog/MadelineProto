@@ -18,6 +18,7 @@ namespace danog\MadelineProto\MTProtoTools;
 trait UpdateHandler
 {
     public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
+    public $got_state = false;
     public $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
@@ -206,7 +207,10 @@ trait UpdateHandler
             $this->should_serialize = true;
             $this->updates_state['qts'] = 0;
         }
-
+        if (!$this->got_state) {
+            $this->got_state = $this->should_serialize = true;
+            $this->get_updates_state();
+        }
         return $this->updates_state;
     }
 

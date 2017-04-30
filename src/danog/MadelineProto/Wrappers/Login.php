@@ -51,7 +51,6 @@ trait Login
         $this->API->sync_authorization($this->API->datacenter->curdc);
         $this->API->updates = [];
         $this->API->updates_key = 0;
-        $this->API->get_updates_state();
         $this->API->should_serialize = true;
         if (!isset($this->API->settings['pwr']['pwr']) || !$this->API->settings['pwr']['pwr']) {
             try {
@@ -129,7 +128,6 @@ trait Login
         $this->API->authorization = $authorization;
         $this->API->authorized = true;
         $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->get_updates_state();
         $this->API->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
@@ -156,7 +154,6 @@ trait Login
         );
         $this->API->authorized = true;
         $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->get_updates_state();
         $this->API->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Signed up in successfully!'], \danog\MadelineProto\Logger::NOTICE);
@@ -179,7 +176,6 @@ trait Login
         );
         $this->API->authorized = true;
         $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->get_updates_state();
         $this->API->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
