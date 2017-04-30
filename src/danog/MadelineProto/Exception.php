@@ -32,7 +32,7 @@ class Exception extends \Exception
         if (strpos($message, 'Received request to switch to DC ') !== false) {
             return;
         }
-        \Rollbar\Rollbar::log($this, debug_backtrace(), 'error');
+        \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
     }
 
     /**
