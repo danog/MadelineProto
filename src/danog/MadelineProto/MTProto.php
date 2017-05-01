@@ -15,8 +15,9 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto
+class MTProto extends \Volatile
 {
+    use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
@@ -51,8 +52,8 @@ class MTProto
     public $bigint = false;
     public $run_workers = false;
     public $threads = false;
-
-    public function __construct($settings = [])
+    public $rsa_keys = [];
+    public function ___construct($settings = [])
     {
         //if ($this->unserialized($settings)) return true;
         $this->bigint = PHP_INT_SIZE < 8;
@@ -89,8 +90,6 @@ class MTProto
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
-        $this->setup_threads();
-
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
@@ -119,7 +118,7 @@ class MTProto
             unset($t['readers']);
         }
 
-        return array_keys($t);
+        return array_keys((array)$t);
     }
 
     public function __wakeup()
@@ -181,7 +180,7 @@ class MTProto
     public function start_threads()
     {
         if ($this->threads) {
-            $dcs = $this->datacenter->get_dcs();
+            $dcs = $this->datacenter->get_dcs(false);
             if (!isset($this->reader_pool)) {
                 $this->reader_pool = new \Pool(count($dcs));
             }
@@ -354,7 +353,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'allow_p2p'         => false, // Should I accept p2p calls?
             ],
             'threading' => [
-                'allow_threading' => false, // Should I use threading, if it is enabled?
+                'allow_threading' => true, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
             'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
@@ -412,6 +411,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->datacenter->dc_connect($new_dc);
             }
         }
+        $this->setup_threads();
         $this->init_authorization();
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();
@@ -461,7 +461,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($int_dc != $new_dc) {
                 continue;
             }
-            if (preg_match('|media|', $new_dc)) {
+            \danog\MadelineProto\Logger::log([$int_dc, $new_dc]);
+            if (preg_match('|_|', $new_dc)) {
                 continue;
             }
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
@@ -530,7 +531,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 24;
+        return 25;
     }
 
     public function get_self()

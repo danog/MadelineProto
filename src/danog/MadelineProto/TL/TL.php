@@ -89,7 +89,7 @@ trait TL
                         continue;
                     }
                     $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
-                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                    if ($this->in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
                         continue;
                     }
                     $clean = preg_replace([
@@ -205,7 +205,7 @@ trait TL
 
     public function get_method_namespaces()
     {
-        return array_unique(array_values($this->methods->method_namespace));
+        return array_unique($this->array_values($this->methods->method_namespace));
     }
 
     public function serialize_bool($bool)
@@ -247,7 +247,6 @@ trait TL
                 if (is_string($object) && strlen($object) === 8) {
                     return $object;
                 }
-
                 if (!is_numeric($object)) {
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
@@ -308,7 +307,7 @@ trait TL
         }
         $auto = false;
 
-        if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+        if ((!$this->is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && $this->in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
@@ -389,7 +388,7 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if ($current_argument['flag'] && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
@@ -420,7 +419,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+            if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             if ($current_argument['type'] === 'DataJSON') {
@@ -573,7 +572,7 @@ trait TL
                         break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
 

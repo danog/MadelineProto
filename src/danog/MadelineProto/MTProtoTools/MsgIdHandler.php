@@ -34,7 +34,7 @@ trait MsgIdHandler
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $keys = array_keys($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
+            $keys = array_keys((array)$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
             $key = $this->get_max_id($aargs['datacenter'], false);
             if ($new_message_id->compare($key) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').', 1);
@@ -81,7 +81,7 @@ trait MsgIdHandler
 
     public function get_max_id($datacenter, $incoming)
     {
-        $keys = array_keys($this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
+        $keys = array_keys((array)$this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
         if (empty($keys)) {
             return $this->zero;
         }

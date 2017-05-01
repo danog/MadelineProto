@@ -15,8 +15,9 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class NewConnection extends SerializableVolatile
+class NewConnection extends \Volatile
 {
+    use \danog\Serializable;
     use \danog\MadelineProto\Tools;
     public $sock = null;
 
@@ -37,7 +38,7 @@ class NewConnection extends SerializableVolatile
     public $new_incoming = [];
     public $new_outgoing = [];
 
-    public function __construct($ip, $port = null, $protocol = null, $timeout = null, $ipv6 = null)
+    public function ___construct($ip, $port = null, $protocol = null, $timeout = null, $ipv6 = null)
     {
         if ($this->unserialized($ip)) {
             return true;
@@ -139,7 +140,7 @@ class NewConnection extends SerializableVolatile
             unset($t['sock']);
         }
 
-        return array_keys($t);
+        return array_keys((array)$t);
     }
 
     public function __wakeup()

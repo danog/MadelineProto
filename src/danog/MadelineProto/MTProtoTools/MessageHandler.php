@@ -33,6 +33,7 @@ trait MessageHandler
         if (!is_string($message_id)) {
             throw new \danog\MadelineProto\Exception("Specified message id isn't a string");
         }
+        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
             $message = str_repeat(chr(0), 8).$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;

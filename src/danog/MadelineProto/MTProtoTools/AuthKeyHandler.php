@@ -79,7 +79,7 @@ trait AuthKeyHandler
                 */
 
                 foreach ($this->rsa_keys as $fp => $curkey) {
-                    if (in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
+                    if ($this->in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
                         $key = $curkey;
                     }
                 }

@@ -44,7 +44,7 @@ trait SeqNoHandler
 
     public function content_related($method)
     {
-        return isset($method['_']) ? !in_array(
+        return isset($method['_']) ? !$this->in_array(
             $method['_'],
             [
                 'rpc_result',

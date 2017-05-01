@@ -80,7 +80,7 @@ trait UpdateHandler
             return [];
         }
         if ($params['offset'] < 0) {
-            $params['offset'] = array_reverse(array_keys($this->updates))[abs($params['offset']) - 1];
+            $params['offset'] = array_reverse(array_keys((array)$this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
         ksort($this->updates);
@@ -306,7 +306,7 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
+        if ($cur_state['sync_loading'] && $this->in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
             \danog\MadelineProto\Logger::log(['Sync loading, not handling update'], \danog\MadelineProto\Logger::NOTICE);
 
             return false;
@@ -555,7 +555,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
-                if ($this->settings['secret_chats']['accept_chats'] === false || ($this->is_array($this->settings['secret_chats']['accept_chats']) && !in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
+                if ($this->settings['secret_chats']['accept_chats'] === false || ($this->is_array($this->settings['secret_chats']['accept_chats']) && !$this->in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
                     return;
                 }
                 \danog\MadelineProto\Logger::log(['Accepting secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);

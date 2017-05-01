@@ -16,11 +16,12 @@ class API extends APIFactory
 {
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\SettingsManager;
+    use \danog\Serializable;
 
     public $API;
     public $namespace = '';
 
-    public function __construct($params = [])
+    public function ___construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);

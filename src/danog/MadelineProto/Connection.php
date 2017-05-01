@@ -15,8 +15,9 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class Connection
+class Connection extends \Volatile
 {
+    use \danog\Serializable;
     use \danog\MadelineProto\Tools;
     public $sock = null;
 
@@ -31,14 +32,15 @@ class Connection
     public $session_id;
     public $session_out_seq_no = 0;
     public $session_in_seq_no = 0;
-
+    public $ipv6 = false;
     public $incoming_messages = [];
     public $outgoing_messages = [];
     public $new_incoming = [];
     public $new_outgoing = [];
 
-    public function __construct($ip, $port, $protocol, $timeout)
+    public function ___construct($ip, $port, $protocol, $timeout, $ipv6)
     {
+        
         // Can use:
         /*
         - tcp_full
@@ -50,40 +52,47 @@ class Connection
         */
         $this->protocol = $protocol;
         $this->timeout = $timeout;
+        $this->ipv6 = $ipv6;
         $this->ip = $ip;
         $this->port = $port;
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
+                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
+                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
-                $this->sock = fsockopen('tcp://'.$ip.':'.$port);
-                stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
+                
+                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
                 break;
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                $this->sock = fsockopen(($this->protocol === 'https' ? 'tls' : 'tcp').'://'.$this->parsed['host'].':'.$port);
-                stream_set_timeout($this->sock, $timeout);
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
+                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
                 break;
@@ -104,7 +113,7 @@ class Connection
             case 'http':
             case 'https':
                 try {
-                    fclose($this->sock);
+                    unset($this->sock);
                 } catch (\danog\MadelineProto\Exception $e) {
                 }
                 break;
@@ -119,16 +128,27 @@ class Connection
     public function close_and_reopen()
     {
         $this->__destruct();
-        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
+        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+    }
+
+    public function __sleep()
+    {
+        $t = get_object_vars($this);
+        if (isset($t['sock'])) {
+            unset($t['sock']);
+        }
+
+        return array_keys((array)$t);
     }
 
     public function __wakeup()
     {
-        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout);
+        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
     public function write($what, $length = null)
     {
+    
         if ($length !== null) {
             $what = substr($what, 0, $length);
         }
@@ -138,10 +158,7 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
-                    throw new Exception("Connection: couldn't connect to socket.");
-                }
-                if (($wrote = fwrite($this->sock, $what)) !== strlen($what)) {
+                if (($wrote = $this->sock->write($what)) !== strlen($what)) {
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was written (should've written ".strlen($what).', wrote '.$wrote.')!');
                 }
 
@@ -164,10 +181,10 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (!(get_resource_type($this->sock) === 'file' || get_resource_type($this->sock) === 'stream')) {
-                    throw new Exception("Connection: couldn't connect to socket.");
-                }
-                $packet = stream_get_contents($this->sock, $length);
+                
+                $packet = $this->sock->read($length);
+                
+
                 if ($packet === false || strlen($packet) === 0) {
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }

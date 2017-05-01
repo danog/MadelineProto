@@ -51,7 +51,7 @@ trait AuthKeyHandler
         if ($this->settings['calls']['accept_calls'] === false) {
             return false;
         }
-        if (is_array($this->settings['calls']['accept_calls']) && !in_array($this->settings['calls']['accept_calls'])) {
+        if ($this->is_array($this->settings['calls']['accept_calls']) && !$this->in_array($this->settings['calls']['accept_calls'])) {
             return false;
         }
         if ($params['protocol']['udp_p2p'] && !$this->settings['calls']['allow_p2p']) {

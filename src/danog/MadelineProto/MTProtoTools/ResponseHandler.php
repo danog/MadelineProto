@@ -48,7 +48,7 @@ trait ResponseHandler
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
-            if (!in_array($msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages)) {
+            if (!$this->in_array($msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages)) {
                 $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
                 if ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $cur_info |= 3;

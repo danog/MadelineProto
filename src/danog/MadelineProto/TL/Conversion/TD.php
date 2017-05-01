@@ -126,7 +126,7 @@ trait TD
             return $params;
         }
         $newparams = ['_' => $params['_']];
-        if (in_array($params['_'], $this->ignore)) {
+        if ($this->in_array($params['_'], $this->ignore)) {
             return $params;
         }
         foreach ($this->td_params_conversion[$params['_']] as $td => $mtproto) {
