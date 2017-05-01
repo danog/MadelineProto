@@ -372,13 +372,13 @@ trait ResponseHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         if ($this->getting_state) {
             \danog\MadelineProto\Logger::log(['Getting state, handle later'], \danog\MadelineProto\Logger::VERBOSE);
             $this->pending_updates[] = $updates;
 
             return false;
         }
+        \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         $opts = [];
         foreach (['date', 'seq', 'seq_start'] as $key) {
             if (isset($updates[$key])) {

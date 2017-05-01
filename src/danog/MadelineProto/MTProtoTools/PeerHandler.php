@@ -24,6 +24,7 @@ trait PeerHandler
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
+            if (!isset($user['access_hash'])) continue;
             switch ($user['_']) {
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
@@ -49,6 +50,7 @@ trait PeerHandler
     public function add_chats($chats)
     {
         foreach ($chats as $key => $chat) {
+            if (!isset($chat['access_hash'])) continue;
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
