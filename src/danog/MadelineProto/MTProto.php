@@ -454,6 +454,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function sync_authorization($authorized_dc)
     {
+        $this->getting_state = true;
         foreach ($this->datacenter->sockets as $new_dc => $socket) {
             if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
@@ -470,6 +471,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
+        $this->getting_state = false;
     }
 
     public function write_client_info($method, $arguments = [], $options = [])
