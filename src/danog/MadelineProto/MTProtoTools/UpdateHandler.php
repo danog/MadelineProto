@@ -138,7 +138,9 @@ trait UpdateHandler
         }
         try {
             $input = $this->get_info('channel#'.$channel);
-            if (!isset($input['InputChannel'])) throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            if (!isset($input['InputChannel'])) {
+                throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            }
             $input = $input['InputChannel'];
         } catch (\danog\MadelineProto\Exception $e) {
             return false;

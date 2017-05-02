@@ -296,7 +296,9 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-            if (!isset($partial['InputUser'])) throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            if (!isset($partial['InputUser'])) {
+                throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            }
             $full = $this->method_call('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
             break;
 
