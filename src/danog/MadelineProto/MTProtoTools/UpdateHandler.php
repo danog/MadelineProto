@@ -153,7 +153,7 @@ trait UpdateHandler
             if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
             }
-            if ($e->rpc === "PERSISTENT_TIMESTAMP_INVALID") {
+            if ($e->rpc === 'PERSISTENT_TIMESTAMP_INVALID') {
                 return false;
             }
             throw $e;
