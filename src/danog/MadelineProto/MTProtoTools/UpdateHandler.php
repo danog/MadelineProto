@@ -152,9 +152,11 @@ trait UpdateHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
-            } else {
-                throw $e;
             }
+            if ($e->rpc === "PERSISTENT_TIMESTAMP_INVALID") {
+                return false;
+            }
+            throw $e;
         }
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_channel_state($channel)['sync_loading'] = false;
