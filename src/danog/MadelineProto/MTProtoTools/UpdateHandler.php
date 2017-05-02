@@ -137,7 +137,9 @@ trait UpdateHandler
             $this->get_channel_state($channel)['pending_pts_updates'] = [];
         }
         try {
-            $input = $this->get_info('channel#'.$channel)['InputChannel'];
+            $input = $this->get_info('channel#'.$channel);
+            if (!isset($input['InputChannel'])) throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            $input = $input['InputChannel'];
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -611,7 +613,7 @@ trait UpdateHandler
         curl_setopt($ch, CURLOPT_URL, $this->hook_url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         $parse = parse_url($this->hook_url);
         if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
             if (isset($this->pem_path) && file_exists($this->pem_path)) {

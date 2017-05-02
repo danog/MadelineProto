@@ -29,7 +29,9 @@ trait AuthKeyHandler
 
     public function request_call($user)
     {
-        $user = $this->get_info($user)['InputUser'];
+        $user = $this->get_info($user);
+        if (!isset($user['InputUser'])) throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+        $user = $user['InputUser'];
         \danog\MadelineProto\Logger::log(['Calling '.$user['user_id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
