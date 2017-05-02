@@ -16,7 +16,7 @@
         "php": ">=5.6.0",
         "danog/phpstruct": "dev-fast",
         "danog/primemodule": "dev-master",
-        "phpseclib/phpseclib": "dev-ige",
+        "phpseclib/phpseclib": "dev-master#12dc23d9",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
