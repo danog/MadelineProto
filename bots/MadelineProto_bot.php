@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require '../vendor/autoload.php';
 $settings = [];
-$settings = ["app_info"=>["api_id"=>6,"api_hash"=>"eb06d4abfb49dc3eeb1aeb98ae0f581e"]];
+$settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 $MadelineProto = false;
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('MadelineProto_bot.madeline');
@@ -67,7 +67,7 @@ while (true) {
                     continue;
                 }
                 try {
-                    if (isset($update['update']['message']['message']) &&preg_match('|/start|', $update['update']['message']['message'])) {
+                    if (isset($update['update']['message']['message']) && preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {

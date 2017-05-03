@@ -12,18 +12,18 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require '../vendor/autoload.php';
-$settings = ["app_info"=>["api_id"=>6,"api_hash"=>"eb06d4abfb49dc3eeb1aeb98ae0f581e"]];
+$settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 $MadelineProto = false;
 $uMadelineProto = false;
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-var_dump($e->getMessage());
+    var_dump($e->getMessage());
 }
 try {
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-var_dump($e->getMessage());
+    var_dump($e->getMessage());
 }
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
