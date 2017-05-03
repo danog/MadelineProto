@@ -211,12 +211,14 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
-                    'timeout' => 2,
-                ],
-            ])), true);
-            if ($dbres['ok']) {
-                return $this->get_info('@'.$dbres['result']);
+            if (!isset($this->settings['pwr']) || $this->settings['pwr']['requests'] === true) {
+                $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
+                        'timeout' => 2,
+                    ],
+                ])), true);
+                if ($dbres['ok']) {
+                    return $this->get_info('@'.$dbres['result']);
+                }
             }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }
