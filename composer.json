@@ -15,7 +15,7 @@
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
-        "ext-curl"
+        "ext-curl": "*"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
