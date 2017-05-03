@@ -6,12 +6,6 @@
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
 
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/danog/phpseclib"
-        }
-    ],
     "require": {
         "php": ">=5.6.0",
         "danog/phpstruct": "dev-fast",
@@ -20,7 +14,8 @@
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-curl"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
