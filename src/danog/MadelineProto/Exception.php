@@ -26,10 +26,10 @@ class Exception extends \Exception
         if ($file !== null) {
             $this->file = $file;
         }
-        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response"])) {
+        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden'])) {
             return;
         }
-        if (strpos($message, 'Received request to switch to DC ') !== false) {
+        if (strpos($message, 'Received request to switch to DC ') !== false || strpos($message, 'Re-executing query...') !== false) {
             return;
         }
         \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
