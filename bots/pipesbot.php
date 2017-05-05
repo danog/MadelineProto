@@ -12,13 +12,19 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require '../vendor/autoload.php';
-$settings = [];
+$settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 $MadelineProto = false;
+$uMadelineProto = false;
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
+    var_dump($e->getMessage());
 }
-$uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
+try {
+    $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
+} catch (\danog\MadelineProto\Exception $e) {
+    var_dump($e->getMessage());
+}
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -27,7 +33,7 @@ if (file_exists('token.php') && $MadelineProto === false) {
 }
 if ($uMadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
-    $uMadelineProto = new \danog\MadelineProto\API(['updates' => ['handle_updates' => false]]);
+    $uMadelineProto = new \danog\MadelineProto\API(array_merge($settings, ['updates' => ['handle_updates' => false]]));
     $sentCode = $uMadelineProto->phone_login(readline());
     \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
     echo 'Enter the code you received: ';
@@ -145,7 +151,7 @@ var_dump($update);
                             $query = array_shift($exploded);
                             foreach ($exploded as $current => $botq) {
                                 $bot = preg_replace('|:.*|', '', $botq);
-                                if ($bot === '' || $uMadelineProto->get_info($bot)['bot_api_id'] === $MadelineProto->API->datacenter->authorization['user']['id']) {
+                                if ($bot === '' || $uMadelineProto->get_info($bot)['bot_api_id'] === $MadelineProto->API->authorization['user']['id']) {
                                     $toset['switch_pm'] = $sswitch;
                                     break;
                                 }
@@ -213,6 +219,6 @@ var_dump($update);
                 }
         }
     }
-    \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto);
+    \danog\MadelineProto\Serialization::serialize('pipesbot.madeline', $MadelineProto);
     \danog\MadelineProto\Serialization::serialize('pwr.madeline', $uMadelineProto);
 }

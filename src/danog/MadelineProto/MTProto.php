@@ -362,7 +362,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'allow_threading' => true, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
-            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false],
+            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false, 'requests' => true],
         ];
         $settings = $this->array_replace_recursive($default_settings, $settings);
         if (!isset($settings['app_info']['api_id'])) {

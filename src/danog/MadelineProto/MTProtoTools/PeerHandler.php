@@ -24,6 +24,9 @@ trait PeerHandler
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
+            if (!isset($user['access_hash'])) {
+                continue;
+            }
             switch ($user['_']) {
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
@@ -49,6 +52,9 @@ trait PeerHandler
     public function add_chats($chats)
     {
         foreach ($chats as $key => $chat) {
+            if (!isset($chat['access_hash'])) {
+                continue;
+            }
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
@@ -205,12 +211,14 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
-                    'timeout' => 2,
-                ],
-            ])), true);
-            if ($dbres['ok']) {
-                return $this->get_info('@'.$dbres['result']);
+            if (!isset($this->settings['pwr']['request']) || $this->settings['pwr']['requests'] === true) {
+                $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
+                        'timeout' => 2,
+                    ],
+                ])), true);
+                if ($dbres['ok']) {
+                    return $this->get_info('@'.$dbres['result']);
+                }
             }
             throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
         }
@@ -239,6 +247,8 @@ trait PeerHandler
                 } elseif (isset($constructor['access_hash'])) {
                     $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                     $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                } else {
+                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
                 $res['user_id'] = $constructor['id'];
@@ -254,10 +264,11 @@ trait PeerHandler
                 $res['type'] = 'chat';
                 break;
             case 'channel':
-                if (isset($constructor['access_hash'])) {
-                    $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                if (!isset($constructor['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
+                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
