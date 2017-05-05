@@ -19,7 +19,7 @@ class DataCenter extends \Volatile
 {
     use \danog\MadelineProto\Tools;
     use \danog\Serializable;
-    
+
     public $sockets = [];
     public $curdc = 0;
     public $dclist = [];
@@ -84,7 +84,7 @@ class DataCenter extends \Volatile
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';
 
-        return $all ? array_keys((array)$this->dclist[$test][$ipv6]) : array_keys((array)$this->sockets);
+        return $all ? array_keys((array) $this->dclist[$test][$ipv6]) : array_keys((array) $this->sockets);
     }
 
     /*

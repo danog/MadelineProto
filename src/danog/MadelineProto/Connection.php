@@ -40,7 +40,7 @@ class Connection extends \Volatile
 
     public function ___construct($ip, $port, $protocol, $timeout, $ipv6)
     {
-        
+
         // Can use:
         /*
         - tcp_full
@@ -75,14 +75,14 @@ class Connection extends \Volatile
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
-                
+
                 $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                
+
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
                 break;
@@ -141,7 +141,7 @@ class Connection extends \Volatile
             unset($t['sock']);
         }
 
-        return array_keys((array)$t);
+        return array_keys((array) $t);
     }
 
     public function __wakeup()
@@ -154,7 +154,6 @@ class Connection extends \Volatile
 
     public function write($what, $length = null)
     {
-    
         if ($length !== null) {
             $what = substr($what, 0, $length);
         }
@@ -188,7 +187,6 @@ class Connection extends \Volatile
             case 'http':
             case 'https':
                 $packet = $this->sock->read($length);
-                
 
                 if ($packet === false || strlen($packet) === 0) {
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
@@ -213,7 +211,7 @@ class Connection extends \Volatile
                 $packet_length_data = $this->read(4);
                 $packet_length = unpack('V', $packet_length_data)[1];
                 $packet = $this->read($packet_length - 4);
-                
+
                 if (strrev(hash('crc32b', $packet_length_data.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }

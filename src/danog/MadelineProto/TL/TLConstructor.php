@@ -17,7 +17,7 @@ class TLConstructor extends \Volatile
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;
     use TLParams;
-    
+
     public $id = [];
     public $predicate = [];
     public $type = [];
@@ -40,7 +40,7 @@ class TLConstructor extends \Volatile
 
     public function find_by_type($type)
     {
-        $key = array_search($type, (array)$this->type);
+        $key = array_search($type, (array) $this->type);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
@@ -54,7 +54,7 @@ class TLConstructor extends \Volatile
     {
         if ($layer !== -1) {
             $newlayer = -1;
-            $keys = array_keys((array)$this->predicate, $predicate);
+            $keys = array_keys((array) $this->predicate, $predicate);
             foreach ($keys as $k) {
                 if ($this->layer[$k] <= $layer && $this->layer[$k] > $newlayer) {
                     $key = $k;
@@ -65,7 +65,7 @@ class TLConstructor extends \Volatile
                 }
             }
         } else {
-            $key = array_search($predicate, (array)$this->predicate);
+            $key = array_search($predicate, (array) $this->predicate);
         }
 
         return ($key === false) ? false : [
@@ -78,7 +78,7 @@ class TLConstructor extends \Volatile
 
     public function find_by_id($id)
     {
-        $key = array_search($id, (array)$this->id);
+        $key = array_search($id, (array) $this->id);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],

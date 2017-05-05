@@ -407,7 +407,7 @@ trait Extension
     public function get_extension_from_mime($mime)
     {
         foreach ($this->all_mimes as $key => $value) {
-            if (array_search($mime, (array)$value) !== false) {
+            if (array_search($mime, (array) $value) !== false) {
                 return '.'.$key;
             }
         }

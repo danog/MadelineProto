@@ -583,7 +583,7 @@ trait TL
                 $arg['datacenter'] = $type['datacenter'];
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
-        
+
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');

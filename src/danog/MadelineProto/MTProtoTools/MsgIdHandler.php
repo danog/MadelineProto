@@ -80,7 +80,7 @@ trait MsgIdHandler
 
     public function get_max_id($datacenter, $incoming)
     {
-        $keys = array_keys((array)$this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
+        $keys = array_keys((array) $this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
         if (empty($keys)) {
             return $this->zero;
         }

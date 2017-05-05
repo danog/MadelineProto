@@ -80,7 +80,7 @@ trait UpdateHandler
             return [];
         }
         if ($params['offset'] < 0) {
-            $params['offset'] = array_reverse(array_keys((array)$this->updates))[abs($params['offset']) - 1];
+            $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
         ksort($this->updates);

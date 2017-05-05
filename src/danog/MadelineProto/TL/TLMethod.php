@@ -41,25 +41,25 @@ class TLMethod extends \Volatile
 
     public function find_by_method($method)
     {
-        $key = array_search($method, (array)$this->method);
+        $key = array_search($method, (array) $this->method);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],
-            'params'    => $this->array_cast_recursive($this->params[$key]),
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
     public function find_by_id($id)
     {
-        $key = array_search($id, (array)$this->id);
+        $key = array_search($id, (array) $this->id);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],
-            'params'    => $this->array_cast_recursive($this->params[$key]),
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 }

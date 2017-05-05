@@ -1,28 +1,35 @@
 <?php
 
-class a extends Volatile {
+class a extends Volatile
+{
     public $a = [];
-    public function run() {
-$this->a[1] = new b;
-$this->a[1]->a['a'] = [];
-var_dump($this);
+
+    public function run()
+    {
+        $this->a[1] = new b();
+        $this->a[1]->a['a'] = [];
+        var_dump($this);
     }
 }
-class b extends \Volatile{
-public $a = [];
+class b extends \Volatile
+{
+    public $a = [];
 }
-class main extends Threaded {
-    public function __construct() {
-        $this->a = new a;
-var_dump($this->a);
-$this->a->run();
+class main extends Threaded
+{
+    public function __construct()
+    {
+        $this->a = new a();
+        var_dump($this->a);
+        $this->a->run();
  // One of the OH NOES (b) is printed here
     }
-    public function run() {
-//        $this->a;
+
+    public function run()
+    {
+        //        $this->a;
     }
 }
-$a = new main;
+$a = new main();
 $pool = new Pool(1);
 //$pool->submit($a); // One of the OH NOES (a) is printed here
-
