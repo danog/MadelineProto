@@ -111,9 +111,6 @@ class MTProto extends \Volatile
     public function __sleep()
     {
         $t = get_object_vars($this);
-        if (isset($t['reader_pool'])) {
-            unset($t['reader_pool']);
-        }
         if (isset($t['readers'])) {
             unset($t['readers']);
         }
@@ -160,12 +157,15 @@ class MTProto extends \Volatile
 
     public function __destruct()
     {
-        if (isset($this->reader_pool)) {
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+            return;
+        }
+        if (isset(Logger::$storage[spl_object_hash($this)])) {
             $this->run_workers = false;
-            while ($number = $this->reader_pool->collect()) {
+            while ($number = Logger::$storage[spl_object_hash($this)]->collect()) {
                 \danog\MadelineProto\Logger::log(['Shutting down reader pool, '.$number.' jobs left'], \danog\MadelineProto\Logger::NOTICE);
             }
-            $this->reader_pool->shutdown();
+            Logger::$storage[spl_object_hash($this)]->shutdown();
         }
     }
 
@@ -179,29 +179,35 @@ class MTProto extends \Volatile
 
     public function start_threads()
     {
-        if ($this->threads) {
+        if ($this->threads && !is_object(\Thread::getCurrentThread())) {
             $dcs = $this->datacenter->get_dcs(false);
-            if (!isset($this->reader_pool)) {
-                $this->reader_pool = new \Pool(count($dcs));
+            if (!isset(Logger::$storage[spl_object_hash($this)])) {
+                Logger::$storage[spl_object_hash($this)] = new \Pool(count($dcs));
             }
             if (!isset($this->readers)) {
                 $this->readers = [];
             }
             foreach ($dcs as $dc) {
+            
                 if (!isset($this->readers[$dc])) {
+                    Logger::log(['Socket reader on DC '.$dc.': CREATING'], Logger::WARNING);
                     $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
                 }
                 if (!$this->readers[$dc]->isRunning()) {
+                    Logger::log(['Socket reader on DC '.$dc.': SUBMITTING'], Logger::WARNING);
                     $this->readers[$dc]->garbage = false;
-                    $this->reader_pool->submit($this->readers[$dc]);
-                    var_dump('hey');
-                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
+                    Logger::$storage[spl_object_hash($this)]->submit($this->readers[$dc]);
+                    
+                    Logger::log(['Socket reader on DC '.$dc.': WAITING'], Logger::WARNING);
                     while (!$this->readers[$dc]->ready);
+                    Logger::log(['Socket reader on DC '.$dc.': READY'], Logger::WARNING);
+                    
                 } else {
                     Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
                 }
             }
         }
+        return true;
     }
 
     public function parse_settings($settings)
@@ -454,6 +460,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function sync_authorization($authorized_dc)
     {
+        $this->getting_state = true;
         foreach ($this->datacenter->sockets as $new_dc => $socket) {
             if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
@@ -471,6 +478,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
+        $this->getting_state = false;
     }
 
     public function write_client_info($method, $arguments = [], $options = [])

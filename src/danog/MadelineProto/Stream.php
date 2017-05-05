@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Just a stream wrapper.
  */
-class Stream
+class Stream extends \Volatile
 {
     public $pos = 0;
 

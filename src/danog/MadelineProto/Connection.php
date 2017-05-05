@@ -25,7 +25,7 @@ class Connection extends \Volatile
     public $ip = null;
     public $port = null;
     public $timeout = null;
-
+//    public $parsed = [];
     public $time_delta = 0;
     public $temp_auth_key;
     public $auth_key;
@@ -57,7 +57,7 @@ class Connection extends \Volatile
         $this->port = $port;
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
@@ -66,7 +66,7 @@ class Connection extends \Volatile
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
@@ -89,9 +89,9 @@ class Connection extends \Volatile
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                $this->sock = new Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                //$this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                //$this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -106,6 +106,9 @@ class Connection extends \Volatile
 
     public function __destruct()
     {
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+            return;
+        }
         switch ($this->protocol) {
             case 'tcp_abridged':
             case 'tcp_intermediate':
@@ -143,6 +146,9 @@ class Connection extends \Volatile
 
     public function __wakeup()
     {
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+            return;
+        }
         $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
@@ -181,7 +187,6 @@ class Connection extends \Volatile
             case 'tcp_full':
             case 'http':
             case 'https':
-                
                 $packet = $this->sock->read($length);
                 
 
@@ -206,13 +211,14 @@ class Connection extends \Volatile
         switch ($this->protocol) {
             case 'tcp_full':
                 $packet_length_data = $this->read(4);
-                $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
+                $packet_length = unpack('V', $packet_length_data)[1];
                 $packet = $this->read($packet_length - 4);
+                
                 if (strrev(hash('crc32b', $packet_length_data.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
-                $in_seq_no = \danog\PHP\Struct::unpack('<I', substr($packet, 0, 4))[0];
+                $in_seq_no = unpack('V', substr($packet, 0, 4))[1];
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
@@ -220,7 +226,7 @@ class Connection extends \Volatile
                 return substr($packet, 4, $packet_length - 12);
             case 'tcp_intermediate':
                 $packet_length_data = $this->read(4);
-                $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data)[0];
+                $packet_length = unpack('V', $packet_length_data)[1];
 
                 return $this->read($packet_length);
             case 'tcp_abridged':
@@ -230,7 +236,7 @@ class Connection extends \Volatile
                     $packet_length <<= 2;
                 } else {
                     $packet_length_data = $this->read(3);
-                    $packet_length = \danog\PHP\Struct::unpack('<I', $packet_length_data.pack('x'))[0] << 2;
+                    $packet_length = unpack('V', $packet_length_data.pack('x'))[1] << 2;
                 }
 
                 return $this->read($packet_length);
@@ -277,19 +283,19 @@ class Connection extends \Volatile
         switch ($this->protocol) {
             case 'tcp_full':
                 $this->out_seq_no++;
-                $step1 = \danog\PHP\Struct::pack('<II', (strlen($message) + 12), $this->out_seq_no).$message;
+                $step1 = pack('VV', (strlen($message) + 12), $this->out_seq_no).$message;
                 $step2 = $step1.strrev(hash('crc32b', $step1, true));
                 $this->write($step2);
                 break;
             case 'tcp_intermediate':
-                $this->write(\danog\PHP\Struct::pack('<I', strlen($message)).$message);
+                $this->write(pack('V', strlen($message)).$message);
                 break;
             case 'tcp_abridged':
                 $len = strlen($message) / 4;
                 if ($len < 127) {
                     $step1 = chr($len).$message;
                 } else {
-                    $step1 = chr(127).substr(\danog\PHP\Struct::pack('<I', $len), 0, 3).$message;
+                    $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
                 $this->write($step1);
                 break;

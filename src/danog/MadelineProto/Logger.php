@@ -17,6 +17,7 @@ namespace danog\MadelineProto;
 
 class Logger
 {
+    public static $storage = [];
     public static $mode = null;
     public static $optional = null;
     public static $constructed = false;

@@ -28,14 +28,8 @@ class SocketHandler extends \Threaded implements \Collectable
      */
     public function run()
     {
-        require_once __DIR__.'/../SecurityException.php';
-        require_once __DIR__.'/../RPCErrorException.php';
-        require_once __DIR__.'/../ResponseException.php';
-        require_once __DIR__.'/../TL/Conversion/Exception.php';
-        require_once __DIR__.'/../TL/Exception.php';
-        require_once __DIR__.'/../NothingInTheSocketException.php';
-        require_once __DIR__.'/../Exception.php';
-        $this->API->handle_messages($current);
+        require __DIR__.'/../../../../vendor/autoload.php';
+        $this->API->handle_messages($this->current);
         $this->setGarbage();
     }
 

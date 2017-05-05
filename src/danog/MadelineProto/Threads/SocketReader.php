@@ -40,7 +40,7 @@ class SocketReader extends \Threaded implements \Collectable
      */
     public function run()
     {
-        require_once __DIR__.'/../../../../vendor/autoload.php';
+        require __DIR__.'/../../../../vendor/autoload.php';
 
         $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
 
@@ -48,9 +48,10 @@ class SocketReader extends \Threaded implements \Collectable
 
         while ($this->API->run_workers) {
            try {
-           var_dump(method_exists($this->API, 'recv_message'));
+                $this->API->datacenter->sockets[$this->current]->reading = true;
                 $this->API->recv_message($this->current);
                 $handler_pool->submit(new SocketHandler($this->API, $this->current));
+                $this->API->datacenter->sockets[$this->current]->reading = false;
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) { \danog\MadelineProto\Logger::log(['Nothing in the socket for dc '.$this->current], \danog\MadelineProto\Logger::VERBOSE); }
         }
         while ($number = $handler_pool->collect()) {

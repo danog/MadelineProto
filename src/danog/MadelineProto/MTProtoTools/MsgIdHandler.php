@@ -34,7 +34,6 @@ trait MsgIdHandler
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $keys = array_keys((array)$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
             $key = $this->get_max_id($aargs['datacenter'], false);
             if ($new_message_id->compare($key) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').', 1);
@@ -43,7 +42,7 @@ trait MsgIdHandler
                 reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
                 unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages)]);
             }
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[strrev($new_message_id->toBytes())] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.strrev($new_message_id->toBytes())] = [];
         } else {
             if (!$new_message_id->divide($this->four)[1]->equals($this->one) && !$new_message_id->divide($this->four)[1]->equals($this->three)) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
@@ -63,7 +62,7 @@ trait MsgIdHandler
                 reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                 unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages)]);
             }
-            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[strrev($new_message_id->toBytes())] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.strrev($new_message_id->toBytes())] = [];
         }
     }
 
@@ -86,7 +85,7 @@ trait MsgIdHandler
             return $this->zero;
         }
         array_walk($keys, function (&$value, $key) {
-            $value = is_int($value) ? new \phpseclib\Math\BigInteger($value) : new \phpseclib\Math\BigInteger(strrev($value), 256);
+            $value = new \phpseclib\Math\BigInteger(strrev(substr($value, 1)), 256);
         });
 
         return \phpseclib\Math\BigInteger::max(...$keys);

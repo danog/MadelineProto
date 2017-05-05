@@ -132,7 +132,7 @@ trait TL
                         $dparams = [];
                     }
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
-                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec($id)))[0];
+                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', pack('V', hexdec($id)))[0];
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
                     if ($layer !== null) {
@@ -238,7 +238,7 @@ trait TL
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
-                return \danog\PHP\Struct::pack('<I', $object);
+                return pack('V', $object);
             case 'long':
                 if (is_object($object)) {
                     return str_pad(strrev($object->toBytes()), 8, chr(0));
@@ -457,7 +457,7 @@ trait TL
             case 'int':
                 return \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
             case '#':
-                return \danog\PHP\Struct::unpack('<I', $bytes_io->read(4))[0];
+                return unpack('V', $bytes_io->read(4))[1];
             case 'long':
                 return $this->bigint || isset($type['strlong']) ? $bytes_io->read(8) : \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
             case 'double':
@@ -470,12 +470,12 @@ trait TL
                 return $bytes_io->read(64);
             case 'string':
             case 'bytes':
-                $l = \danog\PHP\Struct::unpack('<B', $bytes_io->read(1))[0];
+                $l = ord($bytes_io->read(1));
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l === 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', $bytes_io->read(3).chr(0))[0];
+                    $long_len = unpack('V', $bytes_io->read(3).chr(0))[1];
                     $x = $bytes_io->read($long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -583,6 +583,7 @@ trait TL
                 $arg['datacenter'] = $type['datacenter'];
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
+        
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');

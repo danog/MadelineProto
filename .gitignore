@@ -94,3 +94,6 @@ fuzzer.php
 tests/500mb
 *.save
 *.save.1
+a.php*
+b.php*
+ab.php
