@@ -30,6 +30,9 @@
     "autoload": {
         "psr-0": {
             "danog\\MadelineProto\\": "src/"
-        }
+        },
+        "files": [
+            "src/Socket.php"
+        ]
     }
 }

@@ -76,8 +76,7 @@ trait MessageHandler
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
             $message_length = unpack('V', substr($payload, 16, 4))[1];
             $message_data = substr($payload, 20, $message_length);
-            $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id] = new \Volatile();
-            var_dump($this->datacenter->sockets[$datacenter]->incoming_messages);
+            $this->datacenter->sockets->{$datacenter}->incoming_messages->{'a'.$message_id} = [];
         } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
             $message_key = substr($payload, 8, 16);
             $encrypted_data = substr($payload, 24);
@@ -127,7 +126,6 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-        var_dump($this->datacenter->sockets[$datacenter]->incoming_messages);
         $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming['a'.$message_id] = $message_id;

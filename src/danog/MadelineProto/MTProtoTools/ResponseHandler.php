@@ -73,7 +73,6 @@ trait ResponseHandler
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
-            var_dump($this->datacenter->sockets[$datacenter]);
             \danog\MadelineProto\Logger::log(['Received '.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_']) {

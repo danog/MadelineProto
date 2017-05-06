@@ -79,6 +79,7 @@ trait CallHandler
                                 }
                             }
                         } else {
+                            var_dump('a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']);
                             $server_answer = $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]['content'];
                             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]['content'] = [];
                             break;
@@ -87,7 +88,7 @@ trait CallHandler
                             $this->recv_message($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                         } else {
-                            while ($this->datacenter->sockets[$aargs['datacenter']]->reading);
+                            sleep(1);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
