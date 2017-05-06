@@ -77,9 +77,9 @@ trait MessageHandler
             $message_length = unpack('V', substr($payload, 16, 4))[1];
             $message_data = substr($payload, 20, $message_length);
             $this->datacenter->sockets->{$datacenter}->incoming_messages->{'a'.$message_id} = [];
-            var_dump("THIS IS BLAH");
+            var_dump('THIS IS BLAH');
         } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
-            var_dump("THIS IS SECURE");
+            var_dump('THIS IS SECURE');
             $message_key = substr($payload, 8, 16);
             $encrypted_data = substr($payload, 24);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 'from server');

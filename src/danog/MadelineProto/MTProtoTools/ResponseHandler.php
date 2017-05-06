@@ -67,25 +67,32 @@ trait ResponseHandler
         }
         $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->object_call('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['datacenter' => $datacenter])]['response'] = $req_msg_id;
     }
-public $stop = false;
+
+    public $stop = false;
+
     public function handle_messages($datacenter)
     {
-        if ($this->stop ) return;
+        if ($this->stop) {
+            return;
+        }
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
             \danog\MadelineProto\Logger::log(['Received '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
 
-            if (!$this->synchronized(function($zis, $datacenter, $current_msg_id){
-                if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['handling'])) return false;
+            if (!$this->synchronized(function ($zis, $datacenter, $current_msg_id) {
+                if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['handling'])) {
+                    return false;
+                }
                 $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['handling'] = true;
+
                 return true;
             }, $this, $datacenter, $current_msg_id) || $this->stop) {
                 \danog\MadelineProto\Logger::log([base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].' is already being handled'], \danog\MadelineProto\Logger::VERBOSE);
                 continue;
             }
             \danog\MadelineProto\Logger::log(['Handling '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
-            
+
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
@@ -103,7 +110,7 @@ public $stop = false;
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]);
                     $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
                     //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
-                    $content = (array)$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result'];
+                    $content = (array) $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result'];
                     $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content'] = $content;
                     var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
                     var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
@@ -337,10 +344,10 @@ public $stop = false;
         return $only_updates;
     }
 
-    public function handle_messages_threaded() 
+    public function handle_messages_threaded()
     {
-        
     }
+
     public function handle_rpc_error($server_answer, &$datacenter)
     {
         switch ($server_answer['error_code']) {
@@ -375,6 +382,7 @@ public $stop = false;
                 throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
         }
     }
+
     public function handle_pending_updates()
     {
         if (count($this->pending_updates)) {
