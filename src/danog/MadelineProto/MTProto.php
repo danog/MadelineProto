@@ -153,7 +153,7 @@ class MTProto
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->setup_threads();
-        if ($this->authorized && $this->settings['updates']['handle_updates'] && $this->settings['pwr']['db_token'] === false) {
+        if ($this->authorized && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
