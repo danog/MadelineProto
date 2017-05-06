@@ -633,7 +633,13 @@ trait UpdateHandler
         \danog\MadelineProto\Logger::log(['Result of webhook query is '.$result], \danog\MadelineProto\Logger::NOTICE);
         $result = json_decode($result, true);
         if ($this->is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
-            \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result, ['datacenter' => $this->datacenter->curdc])]);
+            try {
+                \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result, ['datacenter' => $this->datacenter->curdc])]);
+            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (\danog\MadelineProto\TL\Exception $e) {
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+            } catch (\danog\MadelineProto\SecurityException $e) {
+            }
         }
     }
 }
