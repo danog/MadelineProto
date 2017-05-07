@@ -211,7 +211,7 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            if (!isset($this->settings['pwr']['request']) || $this->settings['pwr']['requests'] === true) {
+            if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
                 $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
                         'timeout' => 2,
                     ],
