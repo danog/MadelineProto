@@ -340,7 +340,7 @@ trait ResponseHandler
                                     case 'AUTH_KEY_INVALID':
                                         $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                                         $this->init_authorization(); // idk
-                                        throw new \danog\MadelineProto\Exception($server_answer['error_message'], $server_answer['error_code']);
+                                        throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                                 }
 
                             case 420:
