@@ -358,9 +358,9 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
             'pwr' => [
-                'pwr' => false,      // Need info ?
+                'pwr'      => false,      // Need info ?
                 'db_token' => false, // Need info ?
-                'strict' => false,   // Need info ?
+                'strict'   => false,   // Need info ?
                 'requests' => true,  // Should I get info about unknown peers from PWRTelegram?
             ],
         ];
