@@ -488,7 +488,7 @@ trait BotAPI
 
         return $finalArray;
     }
-    
+
     public function html_fixtags($text)
     {
         preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
@@ -507,9 +507,10 @@ trait BotAPI
             foreach ($matches[1] as $match) {
                 $text = str_replace($match, htmlentities($match), $text);
             }
-            return($text);
+
+            return $text;
         } else {
-            return(htmlentities($text));
+            return htmlentities($text);
         }
     }
 }
