@@ -48,10 +48,20 @@ class RPCErrorException extends \Exception
             case 'FIELD_NAME_INVALID': $message = 'The field with the name FIELD_NAME is invalid'; break;
             case 'FIELD_NAME_EMPTY': $message = 'The field with the name FIELD_NAME is missing'; break;
             case 'MSG_WAIT_FAILED': $message = 'A waiting call returned an error'; break;
-
+            case 'USERNAME_NOT_OCCUPIED': $message = 'The provided username is not occupied'; break;
+            case 'PHONE_NUMBER_BANNED': $message = 'The provided phone number is banned from telegram'; break;
+            case 'AUTH_KEY_UNREGISTERED': $message = 'The authorization key has expired'; break;
+            case 'INVITE_HASH_EXPIRED': $message = 'The invite link has expired'; break;
+            case 'USER_DEACTIVATED': $message = 'The user was deactivated'; break;
+            case 'USER_ALREADY_PARTICIPANT': $message = 'The user is already in the group'; break;
+            case 'MESSAGE_ID_INVALID': $message = 'The provided message id is invalid'; break;
+            case 'PEER_ID_INVALID': $message = 'The provided peer id is invalid'; break;
+            case 'CHAT_ID_INVALID': $message = 'The provided chat id is invalid'; break;
+            case 'MESSAGE_DELETE_FORBIDDEN': $message = "You can't delete one of the messages you tried to delete, most likely because it is a service message."; break;
+            case -429: $message = 'Too many requests'; break;
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($this->rpc, ['CHANNEL_PRIVATE'])) {
+        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED'])) {
             return;
         }
         if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {

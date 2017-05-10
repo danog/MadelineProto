@@ -52,9 +52,6 @@ trait PeerHandler
     public function add_chats($chats)
     {
         foreach ($chats as $key => $chat) {
-            if (!isset($chat['access_hash'])) {
-                continue;
-            }
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
@@ -75,6 +72,9 @@ trait PeerHandler
                     break;
                 case 'channel':
                 case 'channelForbidden':
+                    if (!isset($chat['access_hash'])) {
+                        continue;
+                    }
                     if (!isset($this->chats[$this->to_supergroup($chat['id'])]) || $this->chats[$this->to_supergroup($chat['id'])] !== $chat) {
                         $this->chats[$this->to_supergroup($chat['id'])] = $chat;
                         $this->should_serialize = true;
@@ -211,7 +211,7 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            if (!isset($this->settings['pwr']['request']) || $this->settings['pwr']['requests'] === true) {
+            if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
                 $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
                         'timeout' => 2,
                     ],

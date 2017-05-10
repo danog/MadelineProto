@@ -202,7 +202,6 @@ class MTProto extends \Volatile
                     Logger::log(['Socket reader on DC '.$dc.': SUBMITTING'], Logger::WARNING);
                     $this->readers[$dc]->garbage = false;
                     Logger::$storage[spl_object_hash($this)]->submit($this->readers[$dc]);
-
                     Logger::log(['Socket reader on DC '.$dc.': WAITING'], Logger::WARNING);
                     while (!$this->readers[$dc]->ready);
                     Logger::log(['Socket reader on DC '.$dc.': READY'], Logger::WARNING);
@@ -336,6 +335,7 @@ class MTProto extends \Volatile
                 'logger'             => 3, // overwrite previous setting and echo logs
                 'logger_level'       => Logger::ULTRA_VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
                 'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d',
+                //'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
             ],
             'max_tries'         => [
                 'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
@@ -365,7 +365,12 @@ class MTProto extends \Volatile
                 'allow_threading' => false, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
             ],
-            'pwr' => ['pwr' => false, 'db_token' => false, 'strict' => false, 'requests' => true],
+            'pwr' => [
+                'pwr'      => false,      // Need info ?
+                'db_token' => false, // Need info ?
+                'strict'   => false,   // Need info ?
+                'requests' => true,  // Should I get info about unknown peers from PWRTelegram?
+            ],
         ];
         $settings = $this->array_replace_recursive($default_settings, $settings);
         if (!isset($settings['app_info']['api_id'])) {
@@ -388,7 +393,7 @@ class MTProto extends \Volatile
 
     public function setup_logger()
     {
-        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($this->settings['logger']['rollbar_token']) ? $this->settings['logger']['rollbar_token'] : 'f9fff6689aea4905b58eec73f66c791d'], false, false);
+        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => (isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d'])) ? $this->settings['logger']['rollbar_token'] : '300afd7ccef346ea84d0c185ae831718'], false, false);
         \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 

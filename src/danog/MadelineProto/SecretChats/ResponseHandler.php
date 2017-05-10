@@ -77,7 +77,7 @@ trait ResponseHandler
                 }
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized decrypted message received: '.var_export($update));
+                throw new \danog\MadelineProto\ResponseException('Unrecognized decrypted message received: '.var_export($update, true));
                 break;
         }
     }
