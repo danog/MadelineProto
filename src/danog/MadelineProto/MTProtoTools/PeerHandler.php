@@ -52,9 +52,6 @@ trait PeerHandler
     public function add_chats($chats)
     {
         foreach ($chats as $key => $chat) {
-            if (!isset($chat['access_hash'])) {
-                continue;
-            }
             switch ($chat['_']) {
                 case 'chat':
                 case 'chatEmpty':
@@ -75,6 +72,9 @@ trait PeerHandler
                     break;
                 case 'channel':
                 case 'channelForbidden':
+                    if (!isset($chat['access_hash'])) {
+                        continue;
+                    }
                     if (!isset($this->chats[$this->to_supergroup($chat['id'])]) || $this->chats[$this->to_supergroup($chat['id'])] !== $chat) {
                         $this->chats[$this->to_supergroup($chat['id'])] = $chat;
                         $this->should_serialize = true;

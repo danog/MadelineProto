@@ -60,7 +60,7 @@ trait MessageHandler
         if (strlen($payload) === 4) {
             $error = \danog\PHP\Struct::unpack('<i', $payload)[0];
             if ($error === -404) {
-                if ($this->datacenter->sockets[$datacenter]->temp_auth_key != null) {
+                if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                     $this->init_authorization();
