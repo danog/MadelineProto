@@ -18,12 +18,12 @@ $uMadelineProto = false;
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log([$e->getMessage()]);
 }
 try {
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log([$e->getMessage()]);
 }
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
@@ -110,7 +110,6 @@ while (true) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         switch ($update['update']['_']) {
             case 'updateNewMessage':
-var_dump($update);
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }

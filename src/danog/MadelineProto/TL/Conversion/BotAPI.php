@@ -431,6 +431,7 @@ trait BotAPI
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
             try {
+                $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();
                 $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
                 if (!isset($arguments['entities'])) {
@@ -486,5 +487,30 @@ trait BotAPI
         }
 
         return $finalArray;
+    }
+
+    public function html_fixtags($text)
+    {
+        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
+        if ($matches) {
+            $last = count($matches) - 1;
+            foreach ($matches as $val) {
+                if (trim($val[1]) != '') {
+                    $text = str_replace($val[1], htmlentities($val[1]), $text);
+                }
+                $text = str_replace($val[4], htmlentities(trim($val[4])), $text);
+                if ($val == $matches[$last]) {
+                    $text = str_replace($val[6], $this->html_fixtags($val[6]), $text);
+                }
+            }
+            preg_match_all("#<a href=\x22(.+?)\x22>#is", $text, $matches);
+            foreach ($matches[1] as $match) {
+                $text = str_replace($match, htmlentities($match), $text);
+            }
+
+            return $text;
+        } else {
+            return htmlentities($text);
+        }
     }
 }

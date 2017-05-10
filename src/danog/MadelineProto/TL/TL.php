@@ -297,6 +297,9 @@ trait TL
             case '!X':
                 return $object;
             case 'Vector t':
+                if (!$this->is_array($object)) {
+                    throw new Exception("You didn't provide a valid array");
+                }
                 $concat = \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
                 $concat .= \danog\PHP\Struct::pack('<i', count($object));
                 foreach ($object as $current_object) {

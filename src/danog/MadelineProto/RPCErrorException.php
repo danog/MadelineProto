@@ -42,16 +42,26 @@ class RPCErrorException extends \Exception
             case 'TYPE_CONSTRUCTOR_INVALID': $message = 'The type constructor is invalid'; break;
             case 'FILE_PART_INVALID': $message = 'The file part number is invalid'; break;
             case 'FILE_PARTS_INVALID': $message = 'The number of file parts is invalid'; break;
-            case 'FILE_PART_Х_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage'; break;
+            case 'FILE_PART_Ð¥_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage'; break;
             case 'MD5_CHECKSUM_INVALID': $message = 'The MD5 checksums do not match'; break;
             case 'PHOTO_INVALID_DIMENSIONS': $message = 'The photo dimensions are invalid'; break;
             case 'FIELD_NAME_INVALID': $message = 'The field with the name FIELD_NAME is invalid'; break;
             case 'FIELD_NAME_EMPTY': $message = 'The field with the name FIELD_NAME is missing'; break;
             case 'MSG_WAIT_FAILED': $message = 'A waiting call returned an error'; break;
-
+            case 'USERNAME_NOT_OCCUPIED': $message = 'The provided username is not occupied'; break;
+            case 'PHONE_NUMBER_BANNED': $message = 'The provided phone number is banned from telegram'; break;
+            case 'AUTH_KEY_UNREGISTERED': $message = 'The authorization key has expired'; break;
+            case 'INVITE_HASH_EXPIRED': $message = 'The invite link has expired'; break;
+            case 'USER_DEACTIVATED': $message = 'The user was deactivated'; break;
+            case 'USER_ALREADY_PARTICIPANT': $message = 'The user is already in the group'; break;
+            case 'MESSAGE_ID_INVALID': $message = 'The provided message id is invalid'; break;
+            case 'PEER_ID_INVALID': $message = 'The provided peer id is invalid'; break;
+            case 'CHAT_ID_INVALID': $message = 'The provided chat id is invalid'; break;
+            case 'MESSAGE_DELETE_FORBIDDEN': $message = "You can't delete one of the messages you tried to delete, most likely because it is a service message."; break;
+            case -429: $message = 'Too many requests'; break;
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($this->rpc, ['CHANNEL_PRIVATE'])) {
+        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED'])) {
             return;
         }
         if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
