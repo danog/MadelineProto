@@ -42,7 +42,7 @@ class RPCErrorException extends \Exception
             case 'TYPE_CONSTRUCTOR_INVALID': $message = 'The type constructor is invalid'; break;
             case 'FILE_PART_INVALID': $message = 'The file part number is invalid'; break;
             case 'FILE_PARTS_INVALID': $message = 'The number of file parts is invalid'; break;
-            case 'FILE_PART_Ð¥_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage'; break;
+            case 'FILE_PART_Х_MISSING': $message = 'Part X (where X is a number) of the file is missing from storage'; break;
             case 'MD5_CHECKSUM_INVALID': $message = 'The MD5 checksums do not match'; break;
             case 'PHOTO_INVALID_DIMENSIONS': $message = 'The photo dimensions are invalid'; break;
             case 'FIELD_NAME_INVALID': $message = 'The field with the name FIELD_NAME is invalid'; break;
