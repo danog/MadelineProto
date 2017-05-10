@@ -61,7 +61,7 @@ class RPCErrorException extends \Exception
             case -429: $message = 'Too many requests'; break;
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED'])) {
+        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTEREDÃ'])) {
             return;
         }
         if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
