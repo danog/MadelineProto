@@ -195,7 +195,6 @@ class MTProto
                 if (!$this->readers[$dc]->isRunning()) {
                     $this->readers[$dc]->garbage = false;
                     $this->reader_pool->submit($this->readers[$dc]);
-                    var_dump('hey');
                     Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
                     while (!$this->readers[$dc]->ready);
                 } else {

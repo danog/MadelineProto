@@ -97,16 +97,13 @@ function getfiles($token, &$params)
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-//var_dump($updates);
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-        //var_dump($update);
         switch ($update['update']['_']) {
             case 'updateNewMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
-var_dump($update);
 
                 try {
                     if (isset($update['update']['message']['media'])) {
@@ -142,7 +139,6 @@ var_dump($update);
                         if (isset($update['update']['message']['media']['document'])) {
                             $mtproto['access_hash'] = $update['update']['message']['media']['document']['access_hash'];
                         }
-                        //var_dump($mtproto);
                         foreach ($mtproto as $key => $n) {
                             foreach ($bot_api as $bn) {
                                 if ($bn['number'] === $n) {

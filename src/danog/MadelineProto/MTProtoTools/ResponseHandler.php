@@ -426,7 +426,7 @@ trait ResponseHandler
                 $this->force_get_updates_difference();
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates));
+                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
         }
     }

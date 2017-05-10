@@ -601,7 +601,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 
 ';
             if (file_exists('types/'.$type.'.md')) {
-                var_dump($type);
+                \danog\MadelineProto\Logger::log([$type]);
             }
             file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
@@ -628,7 +628,8 @@ description: A UTF8 string of variable length
 ## Type: string  
 [Back to constructor index](index.md)
 
-A string of variable length.');
+A string of variable length. The total length in bytes of the string must not be bigger than 16777215.
+');
         file_put_contents('types/bytes.md', '---
 title: bytes
 description: A string of variable length
@@ -636,7 +637,8 @@ description: A string of variable length
 ## Type: bytes  
 [Back to constructor index](index.md)
 
-A string of variable length.');
+A string of variable length, with length smaller than or equal to 16777215.
+');
 
         file_put_contents('types/int.md', '---
 title: integer
@@ -645,7 +647,8 @@ description: A 32 bit signed integer ranging from -2147483647 to 2147483647
 ## Type: int  
 [Back to constructor index](index.md)
 
-A 32 bit signed integer ranging from `-2147483647` to `2147483647`.');
+A 32 bit signed integer ranging from `-2147483647` to `2147483647`.
+');
 
         file_put_contents('types/long.md', '---
 title: long
@@ -654,7 +657,8 @@ description: A 32 bit signed integer ranging from -9223372036854775807 to 922337
 ## Type: long  
 [Back to constructor index](index.md)
 
-A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.');
+A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.
+');
 
         file_put_contents('types/int128.md', '---
 title: int128
@@ -663,7 +667,8 @@ description: A 128 bit signed integer
 ## Type: int128  
 [Back to constructor index](index.md)
 
-A 128 bit signed integer represented in little-endian base256 (`string`) format.');
+A 128 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/int256.md', '---
 title: int256
@@ -672,7 +677,8 @@ description: A 256 bit signed integer
 ## Type: int256
 [Back to constructor index](index.md)
 
-A 256 bit signed integer represented in little-endian base256 (`string`) format.');
+A 256 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/int512.md', '---
 title: int512
@@ -681,7 +687,8 @@ description: A 512 bit signed integer
 ## Type: int512  
 [Back to constructor index](index.md)
 
-A 512 bit signed integer represented in little-endian base256 (`string`) format.');
+A 512 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/double.md', '---
 title: double
@@ -690,7 +697,8 @@ description: A double precision floating point number
 ## Type: double  
 [Back to constructor index](index.md)
 
-A double precision floating point number, single precision can also be used (float).');
+A double precision floating point number, single precision can also be used (float).
+');
 
         file_put_contents('types/!X.md', '---
 title: !X
@@ -699,7 +707,8 @@ description: Represents a TL serialized payload
 ## Type: !X  
 [Back to constructor index](index.md)
 
-Represents a TL serialized payload.');
+Represents a TL serialized payload.
+');
 
         file_put_contents('types/X.md', '---
 title: X
@@ -708,7 +717,8 @@ description: Represents a TL serialized payload
 ## Type: X  
 [Back to constructor index](index.md)
 
-Represents a TL serialized payload.');
+Represents a TL serialized payload.
+');
 
         file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
@@ -717,7 +727,8 @@ description: Represents a boolean with value equal to false
 # boolFalse  
 [Back to constructor index](index.md)
 
-        Represents a boolean with value equal to `false`.');
+        Represents a boolean with value equal to `false`.
+');
 
         file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
@@ -726,7 +737,8 @@ description: Represents a boolean with value equal to true
 # boolTrue  
 [Back to constructor index](index.md)
 
-Represents a boolean with value equal to `true`.');
+Represents a boolean with value equal to `true`.
+');
 
         file_put_contents('constructors/null.md', '---
 title: null
@@ -735,7 +747,8 @@ description: Represents a null value
 # null  
 [Back to constructor index](index.md)
 
-Represents a `null` value.');
+Represents a `null` value.
+');
 
         file_put_contents('types/Bool.md', '---
 title: Bool
@@ -744,7 +757,8 @@ description: Represents a boolean.
 # Bool  
 [Back to types index](index.md)
 
-Represents a boolean.');
+Represents a boolean.
+');
 
         file_put_contents('types/DataJSON.md', '---
 title: DataJSON
@@ -753,7 +767,8 @@ description: Any json-encodable data
 ## Type: DataJSON
 [Back to constructor index](index.md)
 
-Any json-encodable data.');
+Any json-encodable data.
+');
 
         \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }
