@@ -11,7 +11,7 @@
         "danog/phpstruct": "dev-fast",
         "danog/primemodule": "dev-master",
         "danog/magicalserializer": "dev-master",
-        "phpseclib/phpseclib": "dev-master#12dc23d9",
+        "phpseclib/phpseclib": "dev-master#200c2a9",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
