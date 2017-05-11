@@ -85,6 +85,7 @@ trait ResponseHandler
                         return false;
                     }
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'] = true;
+
                     return true;
                 }, $this, $datacenter, $current_msg_id) || $this->stop) {
                     \danog\MadelineProto\Logger::log([base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' is already being handled'], \danog\MadelineProto\Logger::VERBOSE);

@@ -475,7 +475,10 @@ trait TL
             case '#':
                 return unpack('V', stream_get_contents($bytes_io, 4))[1];
             case 'long':
-                if (isset($type['idstrlong'])) return 'a'.stream_get_contents($bytes_io, 8);
+                if (isset($type['idstrlong'])) {
+                    return 'a'.stream_get_contents($bytes_io, 8);
+                }
+
                 return $this->bigint || isset($type['strlong']) ? stream_get_contents($bytes_io, 8) : \danog\PHP\Struct::unpack('<q', stream_get_contents($bytes_io, 8))[0];
             case 'double':
                 return \danog\PHP\Struct::unpack('<d', stream_get_contents($bytes_io, 8))[0];
