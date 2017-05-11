@@ -20,29 +20,30 @@ trait AckHandler
     public function ack_outgoing_message_id($message_id, $datacenter)
     {
         // The server acknowledges that it received my message
-//var_dump($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$message_id]);
-        if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$message_id])) {
+//var_dump($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]);
+        if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
             \danog\MadelineProto\Logger::log(["WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?'], \danog\MadelineProto\Logger::WARNING);
 
             return false;
         }
 
-        return $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$message_id]['ack'] = true;
+        return $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['ack'] = true;
     }
 
     public function ack_incoming_message_id($message_id, $datacenter)
     {
+var_dump($message_id);
         // I let the server know that I received its message
-        if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id])) {
+        if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id])) {
             \danog\MadelineProto\Logger::log(["WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?'], \danog\MadelineProto\Logger::WARNING);
             //throw new \danog\MadelineProto\Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
-        if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === str_repeat(chr(0), 8) || (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['ack'])) {
+        if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === str_repeat(chr(0), 8) || (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'])) {
             return;
         }
 
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]], ['datacenter' => $datacenter]);
 
-        return $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['ack'] = true;
+        return $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'] = true;
     }
 }

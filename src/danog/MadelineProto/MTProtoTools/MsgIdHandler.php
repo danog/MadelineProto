@@ -20,7 +20,7 @@ trait MsgIdHandler
     public function check_message_id($new_message_id, $aargs)
     {
         if (!is_object($new_message_id)) {
-            $new_message_id = new \phpseclib\Math\BigInteger(strrev($new_message_id), 256);
+            $new_message_id = new \phpseclib\Math\BigInteger(strrev(substr($new_message_id, 1)), 256);
         }
         $min_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta - 300))->bitwise_leftShift(32);
         if ($min_message_id->compare($new_message_id) > 0) {

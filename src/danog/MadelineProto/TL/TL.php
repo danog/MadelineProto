@@ -247,6 +247,9 @@ trait TL
                 if (is_string($object) && strlen($object) === 8) {
                     return $object;
                 }
+                if (is_string($object) && strlen($object) === 9 && $object[0] === 'a') {
+                    return substr($object, 1);
+                }
                 if (!is_numeric($object)) {
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
@@ -472,6 +475,7 @@ trait TL
             case '#':
                 return unpack('V', stream_get_contents($bytes_io, 4))[1];
             case 'long':
+                if (isset($type['idstrlong'])) return 'a'.stream_get_contents($bytes_io, 8);
                 return $this->bigint || isset($type['strlong']) ? stream_get_contents($bytes_io, 8) : \danog\PHP\Struct::unpack('<q', stream_get_contents($bytes_io, 8))[0];
             case 'double':
                 return \danog\PHP\Struct::unpack('<d', stream_get_contents($bytes_io, 8))[0];
@@ -585,7 +589,10 @@ trait TL
                         break;
                 }
             }
-            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
+                $arg['idstrlong'] = true;
+            }
+            if ($this->in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
 

@@ -32,7 +32,8 @@
             "danog\\MadelineProto\\": "src/"
         },
         "files": [
-            "src/Socket.php"
+            "src/Socket.php",
+            "src/Volatile.php"
         ]
     }
 }

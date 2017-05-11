@@ -58,8 +58,8 @@ trait CallHandler
                 if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
                     return true;
                 }
-                $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['content'] = ['method' => $method, 'args' => $args];
-                $this->datacenter->sockets[$aargs['datacenter']]->new_outgoing['a'.$message_id] = ['msg_id' => $message_id, 'method' => $method, 'type' => $type];
+                $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $method, 'args' => $args];
+                $this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id] = ['msg_id' => $message_id, 'method' => $method, 'type' => $type];
                 $res_count = 0;
                 $server_answer = null;
                 $update_count = 0;
@@ -69,7 +69,7 @@ trait CallHandler
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                         //sleep(2);
                         $this->start_threads();
-                        if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
+                        if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($only_updates) {
                                 if ($update_count > 50) {
                                     $update_count = 0;
@@ -79,9 +79,9 @@ trait CallHandler
                                 }
                             }
                         } else {
-                            var_dump(base64_encode($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']), $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]);
-                            $server_answer = (array) $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]['content'];
-                            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']]['content'] = [];
+                            //var_dump(base64_encode($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]);
+                            $server_answer = (array) $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'];
+                            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = [];
                             break;
                         }
                         if (!$this->threads && !$this->run_workers) {
@@ -89,7 +89,7 @@ trait CallHandler
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                         } else {
                             $res_count--;
-                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
+                            //var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                             sleep(1);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
@@ -127,7 +127,7 @@ trait CallHandler
                             case 16:
                             case 17:
                                 \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$aargs['datacenter']]->timedelta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
+                                $this->datacenter->sockets[$aargs['datacenter']]->timedelta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
                                 \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->timedelta], \danog\MadelineProto\Logger::WARNING);
                                 $this->reset_session();
                                 $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
@@ -156,13 +156,13 @@ trait CallHandler
                 continue;
             } finally {
                 if (isset($aargs['heavy']) && $aargs['heavy'] && isset($message_id)) {
-                    //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['args'] = [];
-                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing['a'.$message_id]);
+                    //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['args'] = [];
+                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
                 }
                 if (isset($message_id) && $method === 'req_pq') {
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]);
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing['a'.$message_id]);
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
                 }
                 if ($canunset) {
                     $this->getting_state = false;
@@ -181,7 +181,7 @@ trait CallHandler
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
             }
             \danog\MadelineProto\Logger::log(['Got response for method '.$method.' @ try '.$count.' (response try '.$res_count.')'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
             if (isset($message_chunks) && count($message_chunks)) {
                 $server_answer = [$server_answer];
                 foreach ($message_chunks as $message) {
@@ -209,7 +209,7 @@ trait CallHandler
                 \danog\MadelineProto\Logger::log([$object === 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object), $aargs);
                 if ($object !== 'msgs_ack') {
-                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['content'] = ['method' => $object, 'args' => $args];
+                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];
                 }
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log(['An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...'], \danog\MadelineProto\Logger::WARNING);

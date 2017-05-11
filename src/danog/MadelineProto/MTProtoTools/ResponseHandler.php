@@ -48,8 +48,8 @@ trait ResponseHandler
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
-            if (!$this->in_array($msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages)) {
-                $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
+            if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id])) {
+                $msg_id = new \phpseclib\Math\BigInteger(strrev(substr($msg_id, 1)), 256);
                 if ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $cur_info |= 3;
                 } elseif ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
@@ -59,13 +59,13 @@ trait ResponseHandler
                 }
             } else {
                 $cur_info |= 4;
-                if ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id]['ack']) {
+                if ($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['ack']) {
                     $cur_info |= 8;
                 }
             }
             $info .= chr($cur_info);
         }
-        $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->object_call('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['datacenter' => $datacenter])]['response'] = $req_msg_id;
+        $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->object_call('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['datacenter' => $datacenter])]['response'] = $req_msg_id;
     }
 
     public $stop = false;
@@ -78,44 +78,43 @@ trait ResponseHandler
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
-            \danog\MadelineProto\Logger::log(['Received '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
-
-            if (!$this->synchronized(function ($zis, $datacenter, $current_msg_id) {
-                if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['handling'])) {
-                    return false;
+            \danog\MadelineProto\Logger::log(['Received '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
+            if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+                if (!$this->synchronized(function ($zis, $datacenter, $current_msg_id) {
+                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'])) {
+                        return false;
+                    }
+                    $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'] = true;
+                    return true;
+                }, $this, $datacenter, $current_msg_id) || $this->stop) {
+                    \danog\MadelineProto\Logger::log([base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' is already being handled'], \danog\MadelineProto\Logger::VERBOSE);
+                    continue;
                 }
-                $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['handling'] = true;
-
-                return true;
-            }, $this, $datacenter, $current_msg_id) || $this->stop) {
-                \danog\MadelineProto\Logger::log([base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].' is already being handled'], \danog\MadelineProto\Logger::VERBOSE);
-                continue;
+                \danog\MadelineProto\Logger::log(['Handling '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
             }
-            \danog\MadelineProto\Logger::log(['Handling '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
-
-            switch ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_']) {
+            switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'] as $msg_id) {
+                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         $this->ack_outgoing_message_id($msg_id, $datacenter); // Acknowledge that the server received my message
                     }
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     break;
 
                 case 'rpc_result':
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
-                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]);
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
-                    //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
-                    $content = (array) $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result'];
-                    $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content'] = $content;
-                    var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
-                    var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
-                    var_dump($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]['response']]['content']);
-                    $this->stop = true;
+                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
+                    //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+                    $content = (array) $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
+                    $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $content;
+                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response']]['content']);
+                    ///$this->stop = true;
                     //var_dump(base64_encode($current_msg_id), $this->datacenter->sockets[$datacenter]->incoming_messages);
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
@@ -123,57 +122,57 @@ trait ResponseHandler
                 case 'future_salts':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]);
+                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     break;
                 case 'rpc_error':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content'], $datacenter);
+                    $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], $datacenter);
                     break;
 
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['bad_msg_id'], $datacenter); // Acknowledge that the server received my request
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['bad_msg_id']]['response'] = $current_msg_id;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['bad_msg_id']]);
+                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id'], $datacenter); // Acknowledge that the server received my request
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]['response'] = $current_msg_id;
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]);
                     break;
 
                 case 'pong':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
                     foreach ($this->datacenter->sockets[$datacenter]->outgoing_messages as $msg_id => &$omessage) {
-                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] === $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['ping_id']) {
+                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] === $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['ping_id']) {
                             $this->ack_outgoing_message_id($msg_id, $datacenter);
-                            $omessage['response'] = $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_id'];
-                            $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_id']]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content'];
-                            unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                            unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$msg_id]);
+                            $omessage['response'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id'];
+                            $this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'];
+                            unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                            unset($this->datacenter->sockets[$datacenter]->new_outgoing[$msg_id]);
                         }
                     }
                     break;
                 case 'new_session_created':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['server_salt'];
+                    $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['server_salt'];
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
                     if ($this->authorized && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
                         $this->force_get_updates_difference();
                     }
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $unset = true;
                     break;
                 case 'msg_container':
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['messages'] as $message) {
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
                         $this->check_message_id($message['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
-                        $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
-                        $this->datacenter->sockets[$datacenter]->new_incoming['a'.$message['msg_id']] = $message['msg_id'];
+                        $this->datacenter->sockets[$datacenter]->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body']];
+                        $this->datacenter->sockets[$datacenter]->new_incoming[$message['msg_id']] = $message['msg_id'];
 
                         $this->handle_messages($datacenter);
                     }
@@ -185,53 +184,53 @@ trait ResponseHandler
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
-                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['orig_message']['msg_id']])) {
-                        $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['orig_message']['msg_id'], $datacenter); // Acknowledge that I received the server's response
+                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
+                        $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id'], $datacenter); // Acknowledge that I received the server's response
                     } else {
                         $this->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
-                        $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message['orig_message']['msg_id']] = ['content' => $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['orig_message']];
-                        $this->datacenter->sockets[$datacenter]->new_incoming['a'.$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
+                        $this->datacenter->sockets[$datacenter]->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']];
+                        $this->datacenter->sockets[$datacenter]->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
 
                         $this->handle_messages($datacenter);
                     }
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $unset = true;
                     break;
                 case 'http_wait':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
 
-                    \danog\MadelineProto\Logger::log([$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']], \danog\MadelineProto\Logger::NOTICE);
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    \danog\MadelineProto\Logger::log([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']], \danog\MadelineProto\Logger::NOTICE);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $unset = true;
                     break;
                 case 'msgs_state_info':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['req_msg_id']]);
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     $unset = true;
                     break;
                 case 'msgs_state_req':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    $this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'], $datacenter);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    $this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter);
                     break;
                 case 'msgs_all_info':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
-                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
-                        $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
+                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
+                        $msg_id = new \phpseclib\Math\BigInteger(strrev(substr($msg_id, 1)), 256);
                         $status = 'Status for message id '.$msg_id.': ';
-                        if (($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['info'][$key] & 4) === 1) {
+                        if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & 4) !== 0) {
                             $this->ack_outgoing_message_id($msg_id, $datacenter);
                         }
                         foreach ($this->msgs_info_flags as $flag => $description) {
-                            if (($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['info'][$key] & $flag) === 1) {
+                            if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & $flag) !== 0) {
                                 $status .= $description;
                             }
                         }
@@ -241,58 +240,58 @@ trait ResponseHandler
                 case 'msg_detailed_info':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_id']])) {
-                        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['answer_msg_id']])) {
-                            $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_id']]['response'] = $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['answer_msg_id'];
-                            unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_id']]);
+                    if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']])) {
+                        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
+                            $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]['response'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id'];
+                            unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]);
                         }
                     }
                 case 'msg_new_detailed_info':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['answer_msg_id']])) {
-                        $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['answer_msg_id'], $datacenter);
+                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
+                        $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id'], $datacenter);
                     }
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     break;
                 case 'msg_resend_req':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
                     $ok = true;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$msg_id]) || isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id])) {
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
+                        if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$msg_id]) || isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id])) {
                             $ok = false;
                         }
                     }
                     if ($ok) {
-                        foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                            $this->object_call($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$msg_id]['content']['method'], $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$msg_id]['content']['args'], ['datacenter' => $datacenter]);
+                        foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
+                            $this->object_call($this->datacenter->sockets[$datacenter]->outgoing_messages[$msg_id]['content']['method'], $this->datacenter->sockets[$datacenter]->outgoing_messages[$msg_id]['content']['args'], ['datacenter' => $datacenter]);
                         }
                     } else {
-                        $this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'], $datacenter);
+                        $this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter);
                     }
                     break;
                 case 'msg_resend_ans_req':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
-                    $this->send_msgs_state_info($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'], $datacenter);
-                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id]) && isset($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id]['response']])) {
-                            $this->object_call($this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id]['response']]['method'], $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$this->datacenter->sockets[$datacenter]->incoming_messages['a'.$msg_id]['response']]['args'], ['datacenter' => $datacenter]);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    $this->send_msgs_state_info($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter);
+                    foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
+                        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]) && isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']])) {
+                            $this->object_call($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['method'], $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['args'], ['datacenter' => $datacenter]);
                         }
                     }
                     break;
                 default:
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
-                    $response_type = $this->constructors->find_by_predicate($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['_'])['type'];
+                    $response_type = $this->constructors->find_by_predicate($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'])['type'];
                     switch ($response_type) {
                         case 'Updates':
-                            unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                            unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                             $unset = true;
-                            $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']);
+                            $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                             $only_updates = true && $only_updates;
                             break;
                         default:
@@ -302,42 +301,42 @@ trait ResponseHandler
                                 \danog\MadelineProto\Logger::log(['Does the request of return type '.$expecting['type'].' match?'], \danog\MadelineProto\Logger::VERBOSE);
                                 if ($response_type === $expecting['type']) {
                                     \danog\MadelineProto\Logger::log(['Yes'], \danog\MadelineProto\Logger::VERBOSE);
-                                    $this->datacenter->sockets[$datacenter]->outgoing_messages['a'.$expecting['msg_id']]['response'] = $current_msg_id;
-                                    unset($this->datacenter->sockets[$datacenter]->new_outgoing['a'.$key]);
-                                    unset($this->datacenter->sockets[$datacenter]->new_incoming['a'.$current_msg_id]);
+                                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$expecting['msg_id']]['response'] = $current_msg_id;
+                                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$key]);
+                                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                                     break 2;
                                 }
                                 \danog\MadelineProto\Logger::log(['No'], \danog\MadelineProto\Logger::VERBOSE);
                             }
-                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content'], true));
+                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], true));
                             break;
                     }
                     break;
             }
 
-            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['users'])) {
-                $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['users']);
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users'])) {
+                $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users']);
             }
-            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['chats'])) {
-                $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['chats']);
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats'])) {
+                $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats']);
             }
-            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['users'])) {
-                $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['users']);
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users'])) {
+                $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users']);
             }
-            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['chats'])) {
-                $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['chats']);
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['chats'])) {
+                $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['chats']);
             }
-            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['_'])) {
-                switch ($this->constructors->find_by_predicate($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']['_'])['type']) {
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['_'])) {
+                switch ($this->constructors->find_by_predicate($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['_'])['type']) {
                     case 'Update':
-                    $this->handle_update($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]['content']['result']);
+                    $this->handle_update($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']);
                     break;
 
                 }
             }
             if ($unset) {
-                unset($this->datacenter->sockets[$datacenter]->incoming_messages['a'.$current_msg_id]);
+                unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
             }
         }
 
