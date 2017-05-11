@@ -230,7 +230,7 @@ trait AuthKeyHandler
                 * ***********************************************************************
                 * Do some checks
                 */
-                $server_DH_inner_data_length = $this->get_length(new \danog\MadelineProto\Stream($answer));
+                $server_DH_inner_data_length = $this->get_length($answer);
                 if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new \danog\MadelineProto\SecurityException('answer_hash mismatch.');
                 }

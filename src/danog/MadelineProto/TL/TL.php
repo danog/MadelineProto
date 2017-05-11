@@ -89,7 +89,7 @@ trait TL
                         continue;
                     }
                     $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
-                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                    if ($this->in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
                         continue;
                     }
                     $clean = preg_replace([
@@ -132,7 +132,7 @@ trait TL
                         $dparams = [];
                     }
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
-                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec($id)))[0];
+                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', pack('V', hexdec($id)))[0];
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
                     if ($layer !== null) {
@@ -205,7 +205,7 @@ trait TL
 
     public function get_method_namespaces()
     {
-        return array_unique(array_values($this->methods->method_namespace));
+        return array_unique($this->array_values($this->methods->method_namespace));
     }
 
     public function serialize_bool($bool)
@@ -238,7 +238,7 @@ trait TL
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
-                return \danog\PHP\Struct::pack('<I', $object);
+                return pack('V', $object);
             case 'long':
                 if (is_object($object)) {
                     return str_pad(strrev($object->toBytes()), 8, chr(0));
@@ -247,7 +247,6 @@ trait TL
                 if (is_string($object) && strlen($object) === 8) {
                     return $object;
                 }
-
                 if (!is_numeric($object)) {
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
@@ -311,7 +310,7 @@ trait TL
         }
         $auto = false;
 
-        if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+        if ((!$this->is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && $this->in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
@@ -392,7 +391,7 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if ($current_argument['flag'] && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
@@ -423,7 +422,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+            if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             if ($current_argument['type'] === 'DataJSON') {
@@ -439,9 +438,17 @@ trait TL
 
     public function get_length($bytes_io, $type = ['type' => ''])
     {
+        if (is_string($bytes_io)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $bytes_io);
+            fseek($res, 0);
+            $bytes_io = $res;
+        } elseif (!is_resource($bytes_io)) {
+            throw new Exception('An invalid bytes_io handle was provided.');
+        }
         $this->deserialize($bytes_io, $type);
 
-        return $bytes_io->pos;
+        return ftell($bytes_io);
     }
 
     /**
@@ -450,46 +457,48 @@ trait TL
     public function deserialize($bytes_io, $type = ['type' => ''])
     {
         if (is_string($bytes_io)) {
-            $bytes_io = new \danog\MadelineProto\Stream($bytes_io);
-        } elseif (!is_object($bytes_io)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $bytes_io);
+            fseek($res, 0);
+            $bytes_io = $res;
+        } elseif (!is_resource($bytes_io)) {
             throw new Exception('An invalid bytes_io handle was provided.');
         }
-        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos]);
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserialize_bool($bytes_io->read(4));
+                return $this->deserialize_bool(stream_get_contents($bytes_io, 4));
             case 'int':
-                return \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                return \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
             case '#':
-                return \danog\PHP\Struct::unpack('<I', $bytes_io->read(4))[0];
+                return unpack('V', stream_get_contents($bytes_io, 4))[1];
             case 'long':
-                return $this->bigint || isset($type['strlong']) ? $bytes_io->read(8) : \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
+                return $this->bigint || isset($type['strlong']) ? stream_get_contents($bytes_io, 8) : \danog\PHP\Struct::unpack('<q', stream_get_contents($bytes_io, 8))[0];
             case 'double':
-                return \danog\PHP\Struct::unpack('<d', $bytes_io->read(8))[0];
+                return \danog\PHP\Struct::unpack('<d', stream_get_contents($bytes_io, 8))[0];
             case 'int128':
-                return $bytes_io->read(16);
+                return stream_get_contents($bytes_io, 16);
             case 'int256':
-                return $bytes_io->read(32);
+                return stream_get_contents($bytes_io, 32);
             case 'int512':
-                return $bytes_io->read(64);
+                return stream_get_contents($bytes_io, 64);
             case 'string':
             case 'bytes':
-                $l = \danog\PHP\Struct::unpack('<B', $bytes_io->read(1))[0];
+                $l = ord(stream_get_contents($bytes_io, 1));
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l === 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', $bytes_io->read(3).chr(0))[0];
-                    $x = $bytes_io->read($long_len);
+                    $long_len = unpack('V', stream_get_contents($bytes_io, 3).chr(0))[1];
+                    $x = stream_get_contents($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($bytes_io, $resto);
                     }
                 } else {
-                    $x = $bytes_io->read($l);
+                    $x = stream_get_contents($bytes_io, $l);
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($bytes_io, $resto);
                     }
                 }
                 if (!is_string($x)) {
@@ -500,7 +509,7 @@ trait TL
             case 'true':
                 return true;
             case 'Vector t':
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
@@ -515,7 +524,7 @@ trait TL
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             case 'vector':
-                $count = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $count = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
@@ -533,7 +542,7 @@ trait TL
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
@@ -576,7 +585,7 @@ trait TL
                         break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
 
@@ -587,6 +596,7 @@ trait TL
                 $arg['datacenter'] = $type['datacenter'];
             }
             $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
+
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');

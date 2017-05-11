@@ -57,19 +57,19 @@ trait Tools
 
     public function is_array($elem)
     {
-        return is_array($elem) || (is_object($elem) && get_class($elem) === 'Volatile');
+        return is_array($elem) || ($elem instanceof \Volatile);
     }
 
-    public function array_replace_recursive($a, ...$b)
+    public function __call($method, $params)
     {
-        return array_replace_recursive($this->array_cast_recursive($a), ...$this->array_cast_recursive($b));
+        return $method(...$this->array_cast_recursive($params));
     }
 
     public function array_cast_recursive($array)
     {
         if ($this->is_array($array)) {
             if (!is_array($array)) {
-                $array = $array;
+                $array = (array) $array;
             }
             foreach ($array as $key => $value) {
                 $array[$key] = $this->array_cast_recursive($value);
