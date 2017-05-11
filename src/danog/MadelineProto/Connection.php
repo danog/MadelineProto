@@ -188,18 +188,20 @@ class Connection extends \Volatile
             case 'https':
                 $packet = '';
                 $try = 0;
-                while (strlen($packet) !== $length && $try++ < 3) {
+                $olength = $length;
+                while (strlen($packet) !== $length && $try++ < 1000) {
+                    $length = $olength - strlen($packet);
                     $packet .= $this->sock->read($length);
                     if ($packet === false || strlen($packet) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                     }
-                    if (strlen($packet) < $length) {
+                    if (strlen($packet) < $olength) {
                         \danog\MadelineProto\Logger::log(["WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!'], Logger::WARNING);
                     }
                 }
-                if (strlen($packet) !== $length) {
+                if (strlen($packet) !== $olength) {
                     $this->close_and_reopen();
-                    throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
+                    throw new Exception("WARNING: Wrong length was read (should've read ".($olength).', read '.strlen($packet).')!');
                 }
 
                 return $packet;
