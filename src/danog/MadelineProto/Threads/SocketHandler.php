@@ -33,7 +33,7 @@ class SocketHandler extends \Threaded implements \Collectable
         $this->setGarbage();
     }
 
-    private $garbage = false;
+    protected $garbage = false;
 
     public function setGarbage():void
     {

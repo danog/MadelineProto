@@ -21,7 +21,7 @@ trait MessageHandler
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-    private $last_recv = 0;
+    protected $last_recv = 0;
 
     public function send_message($message_data, $content_related, $aargs = [])
     {

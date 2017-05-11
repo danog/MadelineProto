@@ -16,8 +16,8 @@ class Lua
 {
     use \danog\Serializable;
     public $MadelineProto;
-    private $Lua;
-    private $script;
+    protected $Lua;
+    protected $script;
 
     public function ___construct($script, $MadelineProto)
     {

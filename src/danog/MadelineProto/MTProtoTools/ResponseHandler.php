@@ -17,8 +17,8 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait ResponseHandler
 {
-    private $pending_updates = [];
-    private $bad_msg_error_codes = [
+    protected $pending_updates = [];
+    protected $bad_msg_error_codes = [
         16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
         17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
         18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
@@ -31,7 +31,7 @@ trait ResponseHandler
         48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
         64 => 'invalid container.',
     ];
-    private $msgs_info_flags = [
+    protected $msgs_info_flags = [
         1   => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
         2   => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
         3   => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',

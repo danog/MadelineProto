@@ -432,7 +432,7 @@ class MTProto extends \Volatile
         }
     }
 
-    private $initing_authorization = false;
+    protected $initing_authorization = false;
 
     // Creates authorization keys
     public function init_authorization()

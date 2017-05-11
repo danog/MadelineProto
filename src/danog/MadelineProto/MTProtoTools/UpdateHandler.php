@@ -22,9 +22,9 @@ trait UpdateHandler
     public $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
-    private $getting_state = false;
+    protected $getting_state = false;
     public $full_chats;
-    private $msg_ids = [];
+    protected $msg_ids = [];
 
     public function pwr_update_handler($update)
     {
