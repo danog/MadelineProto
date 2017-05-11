@@ -1,6 +1,7 @@
 <?php
-if (!extension_loaded("pthreads")) {
 
-	class Volatile {
-	}
+if (!extension_loaded('pthreads')) {
+    class Volatile
+    {
+    }
 }
