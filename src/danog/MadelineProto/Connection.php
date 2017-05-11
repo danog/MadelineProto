@@ -186,14 +186,20 @@ class Connection extends \Volatile
             case 'tcp_full':
             case 'http':
             case 'https':
-                $packet = $this->sock->read($length);
-
-                if ($packet === false || strlen($packet) === 0) {
-                    throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
+                $packet = '';
+                $try = 0;
+                while (strlen($packet) !== $length && $try++ < 3) {
+                    $packet .= $this->sock->read($length);
+                    if ($packet === false || strlen($packet) === 0) {
+                        throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
+                    }
+                    if (strlen($packet) < $length) {
+                        \danog\MadelineProto\Logger::log(["WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!'], Logger::WARNING);
+                    }
                 }
-                if (strlen($packet) != $length) {
+                if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
-                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
+                    throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
                 return $packet;
