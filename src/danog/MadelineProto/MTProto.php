@@ -525,8 +525,10 @@ class MTProto extends \Volatile
 
     public function parse_config()
     {
-        $this->parse_dc_options($this->config['dc_options']);
-        unset($this->config['dc_options']);
+        if (isset($this->config['dc_options'])) {
+            $this->parse_dc_options($this->config['dc_options']);
+            unset($this->config['dc_options']);
+        }
         \danog\MadelineProto\Logger::log(['Updated config!', $this->config], Logger::NOTICE);
     }
 

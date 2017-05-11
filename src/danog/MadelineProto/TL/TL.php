@@ -438,9 +438,17 @@ trait TL
 
     public function get_length($bytes_io, $type = ['type' => ''])
     {
+        if (is_string($bytes_io)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $bytes_io);
+            fseek($res, 0);
+            $bytes_io = $res;
+        } elseif (!is_resource($bytes_io)) {
+            throw new Exception('An invalid bytes_io handle was provided.');
+        }
         $this->deserialize($bytes_io, $type);
 
-        return $bytes_io->pos;
+        return ftell($bytes_io);
     }
 
     /**
@@ -449,46 +457,48 @@ trait TL
     public function deserialize($bytes_io, $type = ['type' => ''])
     {
         if (is_string($bytes_io)) {
-            $bytes_io = new \danog\MadelineProto\Stream($bytes_io);
-        } elseif (!is_object($bytes_io)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $bytes_io);
+            fseek($res, 0);
+            $bytes_io = $res;
+        } elseif (!is_resource($bytes_io)) {
             throw new Exception('An invalid bytes_io handle was provided.');
         }
-        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos]);
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserialize_bool($bytes_io->read(4));
+                return $this->deserialize_bool(stream_get_contents($bytes_io, 4));
             case 'int':
-                return \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                return \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
             case '#':
-                return unpack('V', $bytes_io->read(4))[1];
+                return unpack('V', stream_get_contents($bytes_io, 4))[1];
             case 'long':
-                return $this->bigint || isset($type['strlong']) ? $bytes_io->read(8) : \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
+                return $this->bigint || isset($type['strlong']) ? stream_get_contents($bytes_io, 8) : \danog\PHP\Struct::unpack('<q', stream_get_contents($bytes_io, 8))[0];
             case 'double':
-                return \danog\PHP\Struct::unpack('<d', $bytes_io->read(8))[0];
+                return \danog\PHP\Struct::unpack('<d', stream_get_contents($bytes_io, 8))[0];
             case 'int128':
-                return $bytes_io->read(16);
+                return stream_get_contents($bytes_io, 16);
             case 'int256':
-                return $bytes_io->read(32);
+                return stream_get_contents($bytes_io, 32);
             case 'int512':
-                return $bytes_io->read(64);
+                return stream_get_contents($bytes_io, 64);
             case 'string':
             case 'bytes':
-                $l = ord($bytes_io->read(1));
+                $l = ord(stream_get_contents($bytes_io, 1));
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l === 254) {
-                    $long_len = unpack('V', $bytes_io->read(3).chr(0))[1];
-                    $x = $bytes_io->read($long_len);
+                    $long_len = unpack('V', stream_get_contents($bytes_io, 3).chr(0))[1];
+                    $x = stream_get_contents($bytes_io, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($bytes_io, $resto);
                     }
                 } else {
-                    $x = $bytes_io->read($l);
+                    $x = stream_get_contents($bytes_io, $l);
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($bytes_io, $resto);
                     }
                 }
                 if (!is_string($x)) {
@@ -499,7 +509,7 @@ trait TL
             case 'true':
                 return true;
             case 'Vector t':
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
@@ -514,7 +524,7 @@ trait TL
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             case 'vector':
-                $count = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $count = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
@@ -532,7 +542,7 @@ trait TL
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = \danog\PHP\Struct::unpack('<i', stream_get_contents($bytes_io, 4))[0];
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
