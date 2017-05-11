@@ -140,8 +140,13 @@ trait Files
             }
 
             return $res;
+            case 'photo':
             case 'messageMediaPhoto':
-            $photo = end($message_media['photo']['sizes']);
+            if ($message_media['_'] == 'photo') {
+                $photo = end($message_media['sizes']);
+            } else {
+                $photo = end($message_media['photo']['sizes']);
+            }
             $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
 
@@ -318,7 +323,7 @@ trait Files
             $downloaded_size += strlen($res['bytes']);
             \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-            if ($theend) {
+            if ($theend || !$offset) {
                 break;
             }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
