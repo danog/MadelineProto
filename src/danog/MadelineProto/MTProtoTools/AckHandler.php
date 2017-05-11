@@ -32,7 +32,6 @@ trait AckHandler
 
     public function ack_incoming_message_id($message_id, $datacenter)
     {
-        var_dump($message_id);
         // I let the server know that I received its message
         if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id])) {
             \danog\MadelineProto\Logger::log(["WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?'], \danog\MadelineProto\Logger::WARNING);

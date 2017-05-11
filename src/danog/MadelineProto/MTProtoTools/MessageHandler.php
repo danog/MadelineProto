@@ -76,7 +76,7 @@ trait MessageHandler
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
             $message_length = unpack('V', substr($payload, 16, 4))[1];
             $message_data = substr($payload, 20, $message_length);
-            $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id] = [];
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = [];
         } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
             $message_key = substr($payload, 8, 16);
             $encrypted_data = substr($payload, 24);
@@ -121,14 +121,14 @@ trait MessageHandler
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
-            $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id] = ['seq_no' => $seq_no];
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
         } else {
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-        $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['content'] = $deserialized;
-        $this->datacenter->sockets[$datacenter]->incoming_messages['a'.$message_id]['response'] = -1;
-        $this->datacenter->sockets[$datacenter]->new_incoming['a'.$message_id] = 'a'.$message_id;
+        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
+        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
+        $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->last_recv = time();
     }
 }
