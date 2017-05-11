@@ -192,6 +192,7 @@ class Connection extends \Volatile
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }
                 if (strlen($packet) != $length) {
+                    $this->close_and_reopen();
                     throw new \danog\MadelineProto\Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
