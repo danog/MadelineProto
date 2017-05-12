@@ -26,7 +26,7 @@ class TLMethod extends \Volatile
 
     public function add($json_dict)
     {
-        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->id[$this->key] = $json_dict['id'];
         $this->method[$this->key] = $json_dict['method'];
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];

@@ -334,7 +334,7 @@ class MTProto extends \Volatile
                 'logger'             => 1, // write to
                 'logger_param'       => '/tmp/MadelineProto.log',
                 'logger'             => 3, // overwrite previous setting and echo logs
-                'logger_level'       => Logger::ULTRA_VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
+                'logger_level'       => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
                 'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d',
                 //'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
             ],
@@ -550,7 +550,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 27;
+        return 28;
     }
 
     public function get_self()

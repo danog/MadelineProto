@@ -47,7 +47,7 @@ trait Files
             $key = $this->random(32);
             $iv = $this->random(32);
             $digest = hash('md5', $key.$iv, true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -254,7 +254,7 @@ trait Files
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
             $digest = hash('md5', $message_media['key'].$message_media['iv'], true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }

@@ -34,7 +34,7 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = $this->serialize_object(['type' => $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $this->secret_chats[$chat_id]['layer']);
-        $message = pack('V', strlen($message)).$message;
+        $message = $this->pack_unsigned_int(strlen($message)).$message;
 
         $message_key = substr(sha1($message, true), -16);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');

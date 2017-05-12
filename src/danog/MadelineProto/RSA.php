@@ -26,6 +26,7 @@ class RSA extends \Volatile
     {
         //if ($this->unserialized($rsa_key)) return true;
         \danog\MadelineProto\Logger::log(['Istantiating \phpseclib\Crypt\RSA...'], Logger::ULTRA_VERBOSE);
+        $this->BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         $key = new \phpseclib\Crypt\RSA();
 
         \danog\MadelineProto\Logger::log(['Loading key...'], Logger::ULTRA_VERBOSE);

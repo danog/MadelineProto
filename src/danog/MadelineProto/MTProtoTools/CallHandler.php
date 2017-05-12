@@ -34,7 +34,7 @@ trait CallHandler
         }
         $args = $this->botAPI_to_MTProto($args);
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
-            $args['ping_id'] = \danog\PHP\Struct::pack('<q', $args['ping_id']);
+            $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
         }
         if (isset($args['chat_id']) && !isset($args['peer']) && $method !== 'messages.discardEncryption' && (is_object($args['chat_id']) || $args['chat_id'] < 0)) {
             $res = $this->get_info($args['chat_id']);

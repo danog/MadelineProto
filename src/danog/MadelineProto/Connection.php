@@ -143,15 +143,15 @@ class Connection extends \Volatile
 
         return array_keys((array) $t);
     }
-
+/*
     public function __wakeup()
     {
         if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
             return;
         }
-        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+        //$this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
-
+*/
     public function write($what, $length = null)
     {
         if ($length !== null) {
@@ -227,7 +227,6 @@ class Connection extends \Volatile
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
-
                 return substr($packet, 4, $packet_length - 12);
             case 'tcp_intermediate':
                 $packet_length_data = $this->read(4);

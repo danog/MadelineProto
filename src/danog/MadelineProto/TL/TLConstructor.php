@@ -27,7 +27,7 @@ class TLConstructor extends \Volatile
 
     public function add($json_dict, $scheme_type)
     {
-        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->id[$this->key] = $json_dict['id'];
         $this->predicate[$this->key] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
         $this->type[$this->key] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
@@ -79,7 +79,6 @@ class TLConstructor extends \Volatile
     public function find_by_id($id)
     {
         $key = array_search($id, (array) $this->id);
-
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],

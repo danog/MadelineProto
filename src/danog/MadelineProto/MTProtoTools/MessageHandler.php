@@ -36,7 +36,7 @@ trait MessageHandler
         $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
-            $message = "\0\0\0\0\0\0\0\0".$message_id.pack('V', strlen($message_data)).$message_data;
+            $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
             $data2enc = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
@@ -59,7 +59,7 @@ trait MessageHandler
     {
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
-            $error = \danog\PHP\Struct::unpack('<i', $payload)[0];
+            $error = $this->unpack_signed_int($payload);
             if ($error === -404) {
                 if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
