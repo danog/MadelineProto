@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 $settings = [];
-// $token="Uncomment and put your Token here"; 
+// $token="Uncomment and put your Token here";
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
