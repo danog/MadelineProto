@@ -367,6 +367,7 @@ trait TL
         if ($tl === false) {
             throw new Exception('Could not find method: '.$method);
         }
+
         return $tl['id'].$this->serialize_params($tl, $arguments);
     }
 

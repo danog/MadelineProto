@@ -77,13 +77,17 @@ trait Tools
 
     public function unpack_signed_int($value)
     {
-        if (strlen($value) !== 4) throw new TL\Exception('Length is not equal to 4');
+        if (strlen($value) !== 4) {
+            throw new TL\Exception('Length is not equal to 4');
+        }
         return unpack('l', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
     public function unpack_signed_long($value)
     {
-        if (strlen($value) !== 8) throw new TL\Exception('Length is not equal to 8');
+        if (strlen($value) !== 8) {
+            throw new TL\Exception('Length is not equal to 8');
+        }
         return unpack('q', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
@@ -112,6 +116,7 @@ trait Tools
 
         return $this->BIG_ENDIAN ? strrev($res) : $res;
     }
+
     public function pack_unsigned_int($value)
     {
         if ($value > 4294967295) {
@@ -120,21 +125,24 @@ trait Tools
         if ($value < 0) {
             throw new TL\Exception('Provided value '.$value.' is smaller than 0');
         }
+
         return pack('V', $value);
     }
 
     public function pack_signed_double($value)
     {
         $res = pack('d', $value);
-        if (strlen($res) !== 8) throw new TL\Exception('Could not properly encode double');
+        if (strlen($res) !== 8) {
+            throw new TL\Exception('Could not properly encode double');
+        }
         return $this->BIG_ENDIAN ? strrev($res) : $res;
     }
 
     public function unpack_double($value)
     {
-        if (strlen($value) !== 8) throw new TL\Exception('Length is not equal to 8');
+        if (strlen($value) !== 8) {
+            throw new TL\Exception('Length is not equal to 8');
+        }
         return unpack('d', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-
-
 }

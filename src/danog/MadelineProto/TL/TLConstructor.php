@@ -79,6 +79,7 @@ class TLConstructor extends \Volatile
     public function find_by_id($id)
     {
         $key = array_search($id, (array) $this->id);
+
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
