@@ -188,20 +188,18 @@ class Connection extends \Volatile
             case 'https':
                 $packet = '';
                 $try = 0;
-                $olength = $length;
-                while (strlen($packet) !== $length && $try++ < 1000) {
-                    $length = $olength - strlen($packet);
+                while (strlen($packet) !== $length && $try++ < 3) {
                     $packet .= $this->sock->read($length);
                     if ($packet === false || strlen($packet) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                     }
-                    if (strlen($packet) < $olength) {
+                    if (strlen($packet) < $length) {
                         \danog\MadelineProto\Logger::log(["WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!'], Logger::WARNING);
                     }
                 }
-                if (strlen($packet) !== $olength) {
+                if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
-                    throw new Exception("WARNING: Wrong length was read (should've read ".($olength).', read '.strlen($packet).')!');
+                    throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
                 return $packet;
@@ -243,7 +241,7 @@ class Connection extends \Volatile
                     $packet_length <<= 2;
                 } else {
                     $packet_length_data = $this->read(3);
-                    $packet_length = unpack('V', $packet_length_data.pack('x'))[1] << 2;
+                    $packet_length = unpack('V', $packet_length_data."\0")[1] << 2;
                 }
 
                 return $this->read($packet_length);

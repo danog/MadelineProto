@@ -31,7 +31,7 @@ class Serialization
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
             $instance->API->should_serialize = false;
 
-            return file_put_contents($filename, \danog\Serialization::serialize($instance), LOCK_EX);
+            return file_put_contents($filename, class_exists('\Thread') ? \danog\Serialization::serialize($instance) : serialize($instance), LOCK_EX);
         }
 
         return false;
@@ -60,7 +60,7 @@ class Serialization
                 class_exists('\danog\MadelineProto\\'.$class);
             }
 
-            $unserialized = \danog\Serialization::unserialize($unserialized);
+            $unserialized = class_exists('\Thread') ? \danog\Serialization::unserialize($unserialized) : unserialize($unserialized);
         } else {
             throw new Exception('File does not exist');
         }

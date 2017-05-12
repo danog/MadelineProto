@@ -36,7 +36,7 @@ trait MessageHandler
         $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
-            $message = str_repeat(chr(0), 8).$message_id.pack('V', strlen($message_data)).$message_data;
+            $message = "\0\0\0\0\0\0\0\0".$message_id.pack('V', strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
             $data2enc = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
@@ -71,7 +71,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
         $auth_key_id = substr($payload, 0, 8);
-        if ($auth_key_id === str_repeat(chr(0), 8)) {
+        if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
             $message_id = 'a'.substr($payload, 8, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
             $message_length = unpack('V', substr($payload, 16, 4))[1];

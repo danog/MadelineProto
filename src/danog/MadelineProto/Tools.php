@@ -62,11 +62,18 @@ trait Tools
 
     public function __call($method, $params)
     {
-        return $method(...$this->array_cast_recursive($params));
+        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+            return $method(...$this->array_cast_recursive($params));
+        }
+        return $method(...$params);
+
     }
 
     public function array_cast_recursive($array)
     {
+        if (!class_exists('\Thread')) {
+            return $array;
+        }
         if ($this->is_array($array)) {
             if (!is_array($array)) {
                 $array = (array) $array;
