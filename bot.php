@@ -13,17 +13,17 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require 'vendor/autoload.php';
 $settings = [];
-
+// $token="Uncomment and put your Token here"; 
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    if (file_exists('token.php')) {
-        include_once 'token.php';
+    if (isset($token)) {
+
         $MadelineProto = new \danog\MadelineProto\API($settings);
         $authorization = $MadelineProto->bot_login($token);
         \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
     } else {
-        echo 'token.php does not exist';
+        echo 'token does not exist';
         die;
     }
 }
