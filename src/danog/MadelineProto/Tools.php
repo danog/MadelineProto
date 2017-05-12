@@ -29,6 +29,7 @@ trait Tools
     public function posmod($a, $b)
     {
         $resto = $a % $b;
+
         return $resto > 0 ? $resto + abs($b) : $resto;
     }
 
@@ -73,23 +74,40 @@ trait Tools
 
         return $array;
     }
-    public function unpack_signed_int($value) {
+
+    public function unpack_signed_int($value)
+    {
         return unpack('l', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-    public function unpack_signed_long($value) {
+
+    public function unpack_signed_long($value)
+    {
         return unpack('q', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-    public function pack_signed_int($value) {
-        if ($value > 2147483647) throw new TL\Exception('Provided value '.$value.' is bigger than 2147483647');
-        if ($value < -2147483648) throw new TL\Exception('Provided value '.$value.' is smaller than -2147483648');
+
+    public function pack_signed_int($value)
+    {
+        if ($value > 2147483647) {
+            throw new TL\Exception('Provided value '.$value.' is bigger than 2147483647');
+        }
+        if ($value < -2147483648) {
+            throw new TL\Exception('Provided value '.$value.' is smaller than -2147483648');
+        }
         $res = pack('l', $value);
-        return $this->BIG_ENDIAN ? strrev($res) : $res;
-    }
-    public function pack_signed_long($value) {
-        if ($value > 9223372036854775807) throw new TL\Exception('Provided value '.$value.' is bigger than 9223372036854775807');
-        if ($value < -9223372036854775808) throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
-        $res = pack('q', $value);
+
         return $this->BIG_ENDIAN ? strrev($res) : $res;
     }
 
+    public function pack_signed_long($value)
+    {
+        if ($value > 9223372036854775807) {
+            throw new TL\Exception('Provided value '.$value.' is bigger than 9223372036854775807');
+        }
+        if ($value < -9223372036854775808) {
+            throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
+        }
+        $res = pack('q', $value);
+
+        return $this->BIG_ENDIAN ? strrev($res) : $res;
+    }
 }
