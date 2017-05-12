@@ -19,11 +19,7 @@ trait Tools
 {
     public function random($length)
     {
-        if ($length === 0) {
-            return '';
-        }
-
-        return \phpseclib\Crypt\Random::string($length);
+        return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
     }
 
     /**
@@ -33,18 +29,14 @@ trait Tools
     public function posmod($a, $b)
     {
         $resto = $a % $b;
-        if ($resto < 0) {
-            $resto += abs($b);
-        }
-
-        return $resto;
+        return $resto > 0 ? $resto + abs($b) : $resto;
     }
 
     public function utf8ize($d)
     {
         if ($this->is_array($d)) {
             foreach ($d as $k => $v) {
-                if ($k === 'bytes') {
+                if ($k === 'bytes' || $this->is_array($v)) {
                     $d[$k] = $this->utf8ize($v);
                 }
             }
@@ -62,11 +54,7 @@ trait Tools
 
     public function __call($method, $params)
     {
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
-            return $method(...$this->array_cast_recursive($params));
-        }
-        return $method(...$params);
-
+        return class_exists('\Thread') ? $method(...$this->array_cast_recursive($params)) : $method(...$params);
     }
 
     public function array_cast_recursive($array)
@@ -85,4 +73,23 @@ trait Tools
 
         return $array;
     }
+    public function unpack_signed_int($value) {
+        return unpack('l', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+    public function unpack_signed_long($value) {
+        return unpack('q', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+    public function pack_signed_int($value) {
+        if ($value > 2147483647) throw new TL\Exception('Provided value '.$value.' is bigger than 2147483647');
+        if ($value < -2147483648) throw new TL\Exception('Provided value '.$value.' is smaller than -2147483648');
+        $res = pack('l', $value);
+        return $this->BIG_ENDIAN ? strrev($res) : $res;
+    }
+    public function pack_signed_long($value) {
+        if ($value > 9223372036854775807) throw new TL\Exception('Provided value '.$value.' is bigger than 9223372036854775807');
+        if ($value < -9223372036854775808) throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
+        $res = pack('q', $value);
+        return $this->BIG_ENDIAN ? strrev($res) : $res;
+    }
+
 }

@@ -58,6 +58,7 @@ class MTProto extends \Volatile
     {
         //if ($this->unserialized($settings)) return true;
         $this->bigint = PHP_INT_SIZE < 8;
+        $this->BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         // Parse settings
         $this->parse_settings($settings);
 
@@ -549,7 +550,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 26;
+        return 27;
     }
 
     public function get_self()
