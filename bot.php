@@ -18,7 +18,6 @@ try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     if (isset($token)) {
-
         $MadelineProto = new \danog\MadelineProto\API($settings);
         $authorization = $MadelineProto->bot_login($token);
         \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
