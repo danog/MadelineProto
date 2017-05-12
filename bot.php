@@ -35,6 +35,7 @@ while (true) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         switch ($update['update']['_']) {
             case 'updateNewMessage':
+                 $update['update']['message']['to_id']= $update['update']['message']['from_id'];
             case 'updateNewChannelMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
