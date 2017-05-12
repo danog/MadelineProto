@@ -119,7 +119,7 @@ class MTProto extends \Volatile
             unset($t['readers']);
         }
 
-        return array_keys((array) $t);
+        return array_unique(array_keys((array) $t));
     }
 
     public function __wakeup()

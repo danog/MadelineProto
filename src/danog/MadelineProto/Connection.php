@@ -90,11 +90,12 @@ class Connection extends \Volatile
             case 'https':
                 $this->parsed = parse_url($ip);
                 $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
-                //$this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                //$this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 break;
             case 'udp':
                 throw new Exception("Connection: This protocol isn't implemented yet.");
@@ -141,7 +142,7 @@ class Connection extends \Volatile
             unset($t['sock']);
         }
 
-        return array_keys((array) $t);
+        return array_unique(array_keys((array) $t));
     }
 
 /*
@@ -188,14 +189,10 @@ class Connection extends \Volatile
             case 'http':
             case 'https':
                 $packet = '';
-                $try = 0;
-                while (strlen($packet) !== $length && $try++ < 3) {
-                    $packet .= $this->sock->read($length);
+                while (strlen($packet) < $length) {
+                    $packet .= $this->sock->read($length - strlen($packet));
                     if ($packet === false || strlen($packet) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
-                    }
-                    if (strlen($packet) < $length) {
-                        \danog\MadelineProto\Logger::log(["WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!'], Logger::WARNING);
                     }
                 }
                 if (strlen($packet) !== $length) {
