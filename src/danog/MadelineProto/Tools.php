@@ -80,6 +80,7 @@ trait Tools
         if (strlen($value) !== 4) {
             throw new TL\Exception('Length is not equal to 4');
         }
+
         return unpack('l', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
@@ -88,6 +89,7 @@ trait Tools
         if (strlen($value) !== 8) {
             throw new TL\Exception('Length is not equal to 8');
         }
+
         return unpack('q', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
@@ -135,6 +137,7 @@ trait Tools
         if (strlen($res) !== 8) {
             throw new TL\Exception('Could not properly encode double');
         }
+
         return $this->BIG_ENDIAN ? strrev($res) : $res;
     }
 
@@ -143,6 +146,7 @@ trait Tools
         if (strlen($value) !== 8) {
             throw new TL\Exception('Length is not equal to 8');
         }
+
         return unpack('d', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 }

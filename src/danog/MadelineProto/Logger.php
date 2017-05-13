@@ -31,9 +31,10 @@ class Logger
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
-    public static function class_exists() {
-        self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
 
+    public static function class_exists()
+    {
+        self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
     }
 
     /*
