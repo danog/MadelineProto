@@ -146,9 +146,9 @@ class Connection extends \Volatile
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
         }
+
         return $keys;
     }
-
 
     public function __wakeup()
     {
@@ -159,7 +159,6 @@ class Connection extends \Volatile
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
         }
-
 
         //$this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
