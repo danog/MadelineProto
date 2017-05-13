@@ -142,18 +142,28 @@ class Connection extends \Volatile
             unset($t['sock']);
         }
 
-        return array_unique(array_keys((array) $t));
+        $keys = array_keys((array) $t);
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+        return $keys;
     }
 
-/*
+
     public function __wakeup()
     {
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
+        $keys = array_keys((array) get_object_vars($this));
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+
+
         //$this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
-*/
+
     public function write($what, $length = null)
     {
         if ($length !== null) {

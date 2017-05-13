@@ -59,8 +59,11 @@ class Serialization
             foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection'] as $class) {
                 class_exists('\danog\MadelineProto\\'.$class);
             }
-
-            $unserialized = \danog\MadelineProto\Logger::$has_thread ? \danog\Serialization::unserialize($unserialized) : unserialize($unserialized);
+            try {
+                $unserialized = \danog\MadelineProto\Logger::$has_thread ? \danog\Serialization::unserialize($unserialized) : unserialize($unserialized);
+            } catch (Bug74586Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($unserialized);
+            }
         } else {
             throw new Exception('File does not exist');
         }

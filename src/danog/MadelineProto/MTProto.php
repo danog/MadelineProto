@@ -120,7 +120,11 @@ class MTProto extends \Volatile
             unset($t['readers']);
         }
 
-        return array_unique(array_keys((array) $t));
+        $keys = array_keys((array) $t);
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+        return $keys;
     }
 
     public function __wakeup()
@@ -130,6 +134,11 @@ class MTProto extends \Volatile
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
+        $keys = array_keys((array) get_object_vars($this));
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+
         /*
         if (method_exists($this->datacenter, 'wakeup')) $this->datacenter = $this->datacenter->wakeup();
         foreach ($this->rsa_keys as $key => $elem) {
