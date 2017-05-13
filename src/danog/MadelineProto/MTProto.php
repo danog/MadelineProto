@@ -57,6 +57,7 @@ class MTProto extends \Volatile
     public function ___construct($settings = [])
     {
         //if ($this->unserialized($settings)) return true;
+        \danog\MadelineProto\Logger::class_exists();
         $this->bigint = PHP_INT_SIZE < 8;
         $this->BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         // Parse settings
@@ -126,7 +127,7 @@ class MTProto extends \Volatile
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->setup_logger();
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         /*
@@ -164,7 +165,7 @@ class MTProto extends \Volatile
 
     public function __destruct()
     {
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         if (isset(Logger::$storage[spl_object_hash($this)])) {

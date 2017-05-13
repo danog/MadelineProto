@@ -47,7 +47,7 @@ class API extends APIFactory
 
     public function __destruct()
     {
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         restore_error_handler();

@@ -107,7 +107,7 @@ class Connection extends \Volatile
 
     public function __destruct()
     {
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         switch ($this->protocol) {
@@ -148,7 +148,7 @@ class Connection extends \Volatile
 /*
     public function __wakeup()
     {
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         //$this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);

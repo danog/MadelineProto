@@ -23,12 +23,18 @@ class Logger
     public static $constructed = false;
     public static $prefix = '';
     public static $level = 3;
+    public static $has_thread = false;
+
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
+    public static function class_exists() {
+        self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
+
+    }
 
     /*
      * Constructor function
@@ -48,6 +54,7 @@ class Logger
         self::$constructed = true;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;
+        self::class_exists();
     }
 
     public static function log($params, $level = self::NOTICE)
@@ -59,7 +66,7 @@ class Logger
             return false;
         }
         $prefix = self::$prefix;
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
         foreach (is_array($params) ? $params : [$params] as $param) {

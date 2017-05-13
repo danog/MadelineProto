@@ -55,12 +55,12 @@ trait Tools
 
     public function __call($method, $params)
     {
-        return class_exists('\Thread') ? $method(...$this->array_cast_recursive($params)) : $method(...$params);
+        return \danog\MadelineProto\Logger::$has_thread ? $method(...$this->array_cast_recursive($params)) : $method(...$params);
     }
 
     public function array_cast_recursive($array)
     {
-        if (!class_exists('\Thread')) {
+        if (!\danog\MadelineProto\Logger::$has_thread) {
             return $array;
         }
         if ($this->is_array($array)) {
