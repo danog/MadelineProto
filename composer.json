@@ -5,7 +5,9 @@
     "license": "AGPLV3",
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
-
+    "conflict": {
+        "krakjoe/pthreads-polyfill": "*"
+    },
     "require": {
         "php": ">=5.6.0",
         "danog/primemodule": "dev-master",
