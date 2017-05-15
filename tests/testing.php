@@ -41,6 +41,7 @@ if ($MadelineProto === false) {
                 'phone_number'     => getenv('MTPROTO_NUMBER'),
            ]
         );
+
         \danog\MadelineProto\Logger::log([$checkedPhone], \danog\MadelineProto\Logger::NOTICE);
         $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
         \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
