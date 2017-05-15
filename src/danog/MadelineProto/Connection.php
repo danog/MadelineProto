@@ -58,8 +58,11 @@ class Connection extends \Volatile
         switch ($this->protocol) {
             case 'tcp_abridged':
                 $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!\danog\MadelineProto\Logger::$has_thread) {
+                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                     $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                }
+                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -72,16 +75,24 @@ class Connection extends \Volatile
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                if (!\danog\MadelineProto\Logger::$has_thread) {
+                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                }
+                $this->sock->setBlocking(true);
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
 
                 $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
-                //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                //$this->sock["pony"]->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
+                if (!\danog\MadelineProto\Logger::$has_thread) {
+                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                }
+                $this->sock->setBlocking(true);
 
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
@@ -93,8 +104,10 @@ class Connection extends \Volatile
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                if (!\danog\MadelineProto\Logger::$has_thread) {
+                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                }
                 $this->sock->setBlocking(true);
                 break;
             case 'udp':
@@ -269,7 +282,7 @@ class Connection extends \Volatile
                         throw new Exception('No data in the socket!');
                     }
                     if (preg_match('|^Content-Length: |i', $current_header)) {
-                        $length = preg_replace('|Content-Length: |i', '', $current_header);
+                        $length = (int) preg_replace('|Content-Length: |i', '', $current_header);
                     }
                     if (preg_match('|^Connection: close|i', $current_header)) {
                         $close = true;

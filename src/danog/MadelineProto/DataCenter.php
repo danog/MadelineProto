@@ -63,7 +63,7 @@ class DataCenter extends \Volatile
         $address = $this->settings[$dc_config_number]['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($this->settings[$dc_config_number]['protocol'] === 'https') {
-            $subdomain = $this->dclist['ssl_subdomains'][$dc_config_number];
+            $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
             $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
             $address = $this->settings[$dc_config_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
         }

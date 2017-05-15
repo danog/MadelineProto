@@ -1,5 +1,8 @@
 <?php
 
+$service_port = getservbyname('www', 'tcp');
+$address = gethostbyname('www.google.com');
+var_dump($service_port, $address);
 class a extends Volatile
 {
     public $a = [];
