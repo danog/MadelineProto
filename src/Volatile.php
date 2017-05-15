@@ -16,7 +16,7 @@ if (!extension_loaded('pthreads')) {
 
         public function offsetGet($offset)
         {
-            return $this->__get($offset);
+            return $this->{$offset};
         }
 
         public function offsetUnset($offset)
@@ -26,7 +26,7 @@ if (!extension_loaded('pthreads')) {
 
         public function offsetExists($offset)
         {
-            return $this->__isset($offset);
+            return isset($this->{$offset});
         }
 
         public function count()
