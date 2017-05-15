@@ -16,7 +16,9 @@ class Button extends \Volatile implements \JsonSerializable
 {
     use \danog\Serializable;
     private $API;
-    public function __construct($API, $message, $button) {
+
+    public function __construct($API, $message, $button)
+    {
         foreach ($button as $key => $value) {
             $this->{$key} = $value;
         }
@@ -24,12 +26,17 @@ class Button extends \Volatile implements \JsonSerializable
         $this->id = $message['id'];
         $this->API = $API;
     }
-    public static function __set_state() {
+
+    public static function __set_state()
+    {
         $res = (array) $this;
         unset($res['API']);
+
         return $this->API->array_cast_recursive($this);
     }
-    public function click($donotwait = false) {
+
+    public function click($donotwait = false)
+    {
         switch ($this->_) {
             default: return false;
             case 'keyboardButtonUrl': return $this->url;
@@ -37,9 +44,12 @@ class Button extends \Volatile implements \JsonSerializable
             case 'keyboardButtonGame': return $this->API->method_call('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true], ['noResponse' => $donotwait]);
         }
     }
-    public function jsonSerialize() {
+
+    public function jsonSerialize()
+    {
         $res = (array) $this;
         unset($res['API']);
+
         return $this->API->array_cast_recursive($this);
     }
 }
