@@ -59,8 +59,8 @@ class Connection extends \Volatile
             case 'tcp_abridged':
                 $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if (!\danog\MadelineProto\Logger::$has_thread) {
-                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                     $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 }
                 $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
