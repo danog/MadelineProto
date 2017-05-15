@@ -330,7 +330,7 @@ class MTProto extends \Volatile
                     'telegram'     => __DIR__.'/TL_telegram_v66.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
-                    'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
+                    //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
                     'botAPI'       => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
                 ],
             ],
@@ -561,7 +561,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 28;
+        return 29;
     }
 
     public function get_self()
