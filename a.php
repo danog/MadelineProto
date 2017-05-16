@@ -2,7 +2,7 @@
 
 $service_port = getservbyname('www', 'tcp');
 $address = gethostbyname('www.google.com');
-var_dump($service_port, $address);
+var_dump(unpack('q', pack('l', 200).chr(0).chr(0).chr(0).chr(0)));
 class a extends Volatile
 {
     public $a = [];

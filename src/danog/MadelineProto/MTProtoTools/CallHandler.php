@@ -171,9 +171,9 @@ trait CallHandler
             }
 
             if ($server_answer === null) {
-                if ($last_recv === $this->last_recv && $this->datacenter->sockets[$args['datacenter']]->temp_auth_key !== null) {
+                if ($last_recv === $this->last_recv && $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                    $this->datacenter->sockets[$args['datacenter']]->temp_auth_key = null;
+                    $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                     $this->init_authorization();
 
                     return $this->method_call($method, $args, $aargs);

@@ -114,9 +114,9 @@ trait Tools
         if ($value < -9223372036854775808) {
             throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
         }
-        $res = pack('q', $value);
+        $res = $this->bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : ($this->BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
 
-        return $this->BIG_ENDIAN ? strrev($res) : $res;
+        return $res;
     }
 
     public function pack_unsigned_int($value)

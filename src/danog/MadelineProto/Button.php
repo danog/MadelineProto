@@ -15,24 +15,16 @@ namespace danog\MadelineProto;
 class Button extends \Volatile implements \JsonSerializable
 {
     use \danog\Serializable;
-    private $API;
+    private $info = [];
 
     public function __construct($API, $message, $button)
     {
         foreach ($button as $key => $value) {
             $this->{$key} = $value;
         }
-        $this->peer = $message['to_id'];
-        $this->id = $message['id'];
-        $this->API = $API;
-    }
-
-    public static function __set_state()
-    {
-        $res = (array) $this;
-        unset($res['API']);
-
-        return $this->API->array_cast_recursive($this);
+        $this->info['peer'] = $message['to_id'];
+        $this->info['id'] = $message['id'];
+        $this->info['API'] = $API;
     }
 
     public function click($donotwait = false)
@@ -40,16 +32,16 @@ class Button extends \Volatile implements \JsonSerializable
         switch ($this->_) {
             default: return false;
             case 'keyboardButtonUrl': return $this->url;
-            case 'keyboardButtonCallback': return $this->API->method_call('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->data], ['noResponse' => $donotwait]);
-            case 'keyboardButtonGame': return $this->API->method_call('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true], ['noResponse' => $donotwait]);
+            case 'keyboardButtonCallback': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+            case 'keyboardButtonGame': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
         }
     }
 
     public function jsonSerialize()
     {
-        $res = (array) $this;
-        unset($res['API']);
+        $res = get_object_vars($this);
+        unset($res['info']);
 
-        return $this->API->array_cast_recursive($this);
+        return $res;
     }
 }

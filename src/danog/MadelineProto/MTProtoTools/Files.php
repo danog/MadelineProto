@@ -61,7 +61,7 @@ trait Files
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
             hash_update($ctx, $bytes);
-            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => $datacenter])) {
+            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => &$datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
@@ -270,7 +270,7 @@ trait Files
                 $offset -= $start_at;
             }
             try {
-                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'OFFSET_INVALID') {
                     \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);

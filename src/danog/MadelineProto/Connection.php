@@ -187,10 +187,11 @@ class Connection extends \Volatile
             case 'tcp_full':
             case 'http':
             case 'https':
-                if (($wrote = $this->sock->write($what)) !== strlen($what)) {
-                    throw new \danog\MadelineProto\Exception("WARNING: Wrong length was written (should've written ".strlen($what).', wrote '.$wrote.')!');
+                $wrote = 0;
+                $len = strlen($what);
+                if (($wrote += $this->sock->write($what)) !== $len) {
+                    while (($wrote += $this->sock->write(substr($what, $wrote))) !== $len);
                 }
-
                 return $wrote;
                 break;
             case 'udp':

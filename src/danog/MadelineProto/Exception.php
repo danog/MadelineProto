@@ -29,7 +29,7 @@ class Exception extends \Exception
         if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden'])) {
             return;
         }
-        if (strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false) {
+        if (strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, "id.pwrtelegram.xyz") !== false) {
             return;
         }
         \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
