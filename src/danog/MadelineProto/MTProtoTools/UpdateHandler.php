@@ -365,7 +365,7 @@ trait UpdateHandler
             if ($update['pts'] > $new_pts) {
                 \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$new_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
 
-                $this->cur_state['pending_pts_updates'][] = $update;
+                $cur_state['pending_pts_updates'][] = $update;
 
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                     $this->get_channel_difference($channel_id);
