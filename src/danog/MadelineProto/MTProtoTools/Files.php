@@ -253,7 +253,9 @@ trait Files
             fseek($stream, $offset);
         }
         $downloaded_size = 0;
-        if ($end === -1 && isset($message_media['size'])) $end = $message_media['size'];
+        if ($end === -1 && isset($message_media['size'])) {
+            $end = $message_media['size'];
+        }
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
@@ -286,11 +288,15 @@ trait Files
                     throw $e;
                 }
             }
-            if ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') $datacenter = 1;
+            if ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+                $datacenter = 1;
+            }
             while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
                 $datacenter++;
-                if (!isset($this->datacenter->sockets[$datacenter])) break;
+                if (!isset($this->datacenter->sockets[$datacenter])) {
+                    break;
+                }
             }
             if ($res['_'] === 'upload.fileCdnRedirect') {
                 $cdn = true;
@@ -330,7 +336,9 @@ trait Files
                 break;
             }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($end !== -1) $cb($percent = $downloaded_size * 100 / $size);
+            if ($end !== -1) {
+                $cb($percent = $downloaded_size * 100 / $size);
+            }
         }
         if ($end === -1) {
             $cb(100);
