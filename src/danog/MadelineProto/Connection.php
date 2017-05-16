@@ -192,6 +192,7 @@ class Connection extends \Volatile
                 if (($wrote += $this->sock->write($what)) !== $len) {
                     while (($wrote += $this->sock->write(substr($what, $wrote))) !== $len);
                 }
+
                 return $wrote;
                 break;
             case 'udp':

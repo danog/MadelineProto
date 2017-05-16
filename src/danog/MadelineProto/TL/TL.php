@@ -628,7 +628,7 @@ trait TL
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
         }
-        
+
         if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
             foreach ($x['reply_markup']['rows'] as $key => $row) {
                 foreach ($row['buttons'] as $bkey => $button) {
@@ -636,6 +636,7 @@ trait TL
                 }
             }
         }
+
         return $x;
     }
 }
