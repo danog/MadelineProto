@@ -212,15 +212,15 @@ trait PeerHandler
                 }
             }
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
-                $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
+                $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
                         'timeout' => 2,
                     ],
                 ])), true);
-                if ($dbres['ok']) {
+                if (isset($dbres['ok']) && $dbres['ok']) {
                     return $this->get_info('@'.$dbres['result']);
                 }
             }
-            throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
+            throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         $id = str_replace('@', '', $id);
         foreach ($this->chats as $chat) {
@@ -233,7 +233,7 @@ trait PeerHandler
 
             return $this->get_info($id, false);
         }
-        throw new \danog\MadelineProto\Exception("Couldn't find peer by provided username ".$id);
+        throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
 
     public function gen_all($constructor)

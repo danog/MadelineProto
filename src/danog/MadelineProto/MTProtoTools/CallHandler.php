@@ -192,7 +192,7 @@ trait CallHandler
 
             return $server_answer;
         }
-
+        if ($method === 'req_pq') throw new \danog\MadelineProto\RPCErrorException('RPC_CALL_FAIL');
         throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
     }
 
