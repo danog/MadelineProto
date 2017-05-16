@@ -27,7 +27,7 @@ trait Files
         }
         $datacenter = is_null($datacenter) ? $this->datacenter->curdc : $datacenter;
         $file_size = filesize($file);
-        if ($file_size > 1500 * 1024 * 1024) {
+        if ($file_size > 1610612736) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         if ($cb === null) {
@@ -47,7 +47,7 @@ trait Files
             $key = $this->random(32);
             $iv = $this->random(32);
             $digest = hash('md5', $key.$iv, true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -61,7 +61,7 @@ trait Files
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
             hash_update($ctx, $bytes);
-            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => $datacenter])) {
+            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => &$datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
@@ -254,7 +254,7 @@ trait Files
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
             $digest = hash('md5', $message_media['key'].$message_media['iv'], true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
@@ -270,7 +270,7 @@ trait Files
                 $offset -= $start_at;
             }
             try {
-                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'OFFSET_INVALID') {
                     \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);

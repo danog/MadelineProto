@@ -39,7 +39,7 @@ trait Crypt
     public function ctr_encrypt($message, $key, $iv, $length)
     {
         $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR);
-        $iv .= \danog\PHP\Struct::pack('<i', $length);
+        $iv .= $this->pack_signed_int($length);
         $cipher->setKey($key);
         $cipher->setIV($iv);
 

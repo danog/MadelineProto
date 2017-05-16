@@ -19,11 +19,7 @@ trait Tools
 {
     public function random($length)
     {
-        if ($length === 0) {
-            return '';
-        }
-
-        return \phpseclib\Crypt\Random::string($length);
+        return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
     }
 
     /**
@@ -33,18 +29,15 @@ trait Tools
     public function posmod($a, $b)
     {
         $resto = $a % $b;
-        if ($resto < 0) {
-            $resto += abs($b);
-        }
 
-        return $resto;
+        return $resto < 0 ? ($resto + abs($b)) : $resto;
     }
 
     public function utf8ize($d)
     {
-        if (is_array($d)) {
+        if ($this->is_array($d)) {
             foreach ($d as $k => $v) {
-                if ($k === 'bytes') {
+                if ($k === 'bytes' || $this->is_array($v)) {
                     $d[$k] = $this->utf8ize($v);
                 }
             }
@@ -62,11 +55,14 @@ trait Tools
 
     public function __call($method, $params)
     {
-        return $method(...$this->array_cast_recursive($params));
+        return \danog\MadelineProto\Logger::$has_thread ? $method(...$this->array_cast_recursive($params)) : $method(...$params);
     }
 
     public function array_cast_recursive($array)
     {
+        if (!\danog\MadelineProto\Logger::$has_thread) {
+            return $array;
+        }
         if ($this->is_array($array)) {
             if (!is_array($array)) {
                 $array = (array) $array;
@@ -77,5 +73,80 @@ trait Tools
         }
 
         return $array;
+    }
+
+    public function unpack_signed_int($value)
+    {
+        if (strlen($value) !== 4) {
+            throw new TL\Exception('Length is not equal to 4');
+        }
+
+        return unpack('l', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+
+    public function unpack_signed_long($value)
+    {
+        if (strlen($value) !== 8) {
+            throw new TL\Exception('Length is not equal to 8');
+        }
+
+        return unpack('q', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+
+    public function pack_signed_int($value)
+    {
+        if ($value > 2147483647) {
+            throw new TL\Exception('Provided value '.$value.' is bigger than 2147483647');
+        }
+        if ($value < -2147483648) {
+            throw new TL\Exception('Provided value '.$value.' is smaller than -2147483648');
+        }
+        $res = pack('l', $value);
+
+        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
+    }
+
+    public function pack_signed_long($value)
+    {
+        if ($value > 9223372036854775807) {
+            throw new TL\Exception('Provided value '.$value.' is bigger than 9223372036854775807');
+        }
+        if ($value < -9223372036854775808) {
+            throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
+        }
+        $res = \danog\MadelineProto\Logger::$bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
+
+        return $res;
+    }
+
+    public function pack_unsigned_int($value)
+    {
+        if ($value > 4294967295) {
+            throw new TL\Exception('Provided value '.$value.' is bigger than 4294967296');
+        }
+        if ($value < 0) {
+            throw new TL\Exception('Provided value '.$value.' is smaller than 0');
+        }
+
+        return pack('V', $value);
+    }
+
+    public function pack_signed_double($value)
+    {
+        $res = pack('d', $value);
+        if (strlen($res) !== 8) {
+            throw new TL\Exception('Could not properly encode double');
+        }
+
+        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
+    }
+
+    public function unpack_double($value)
+    {
+        if (strlen($value) !== 8) {
+            throw new TL\Exception('Length is not equal to 8');
+        }
+
+        return unpack('d', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 }

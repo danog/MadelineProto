@@ -12,6 +12,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class DataCenterSerializable extends VolatileSerializer
+class Bug74586Exception extends \Exception
 {
 }

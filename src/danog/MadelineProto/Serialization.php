@@ -31,7 +31,7 @@ class Serialization
         if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
             $instance->API->should_serialize = false;
 
-            return file_put_contents($filename, serialize($instance), LOCK_EX);
+            return file_put_contents($filename, \danog\MadelineProto\Logger::$has_thread ? \danog\Serialization::serialize($instance) : serialize($instance), LOCK_EX);
         }
 
         return false;
@@ -54,16 +54,16 @@ class Serialization
             $file = fopen($filename, 'r+');
             flock($file, LOCK_SH);
             $unserialized = stream_get_contents($file);
-            /*
-            foreach (['MTProto', 'DataCenter', 'Connection', 'RSA'] as $class) {
-                $oclass = "danog\\MadelineProto\\".$class;
-                $nclass = $oclass.'Serializable';
-                $unserialized = str_replace('O:'.strlen($oclass).':"'.$oclass.'":', 'O:'.strlen($nclass).':"'.$nclass.'":', $unserialized);
-            }
-            */
             flock($file, LOCK_UN);
             fclose($file);
-            $unserialized = unserialize($unserialized);
+            foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection'] as $class) {
+                class_exists('\danog\MadelineProto\\'.$class);
+            }
+            try {
+                $unserialized = \danog\MadelineProto\Logger::$has_thread ? \danog\Serialization::unserialize($unserialized) : unserialize($unserialized);
+            } catch (Bug74586Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($unserialized);
+            }
         } else {
             throw new Exception('File does not exist');
         }

@@ -14,7 +14,7 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait TD
 {
-    private $td_params_conversion = [
+    protected $td_params_conversion = [
         'updateNewMessage' => [
             '_'                    => 'updateNewMessage',
             'disable_notification' => ['message', 'silent'],
@@ -51,10 +51,10 @@ trait TD
          ],
 
     ];
-    private $reverse = [
+    protected $reverse = [
         'sendMessage'=> 'messages.sendMessage',
     ];
-    private $ignore = ['updateMessageID'];
+    protected $ignore = ['updateMessageID'];
 
     public function tdcli_to_td(&$params, $key = null)
     {
@@ -126,7 +126,7 @@ trait TD
             return $params;
         }
         $newparams = ['_' => $params['_']];
-        if (in_array($params['_'], $this->ignore)) {
+        if ($this->in_array($params['_'], $this->ignore)) {
             return $params;
         }
         foreach ($this->td_params_conversion[$params['_']] as $td => $mtproto) {

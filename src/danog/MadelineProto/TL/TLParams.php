@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLParams
+trait TLParams
 {
     public function parse_params($key, $mtproto = false)
     {

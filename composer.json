@@ -5,12 +5,14 @@
     "license": "AGPLV3",
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
-
+    "conflict": {
+        "krakjoe/pthreads-polyfill": "*"
+    },
     "require": {
         "php": ">=5.6.0",
-        "danog/phpstruct": "dev-fast",
         "danog/primemodule": "dev-master",
-        "phpseclib/phpseclib": "dev-master#12dc23d9",
+        "danog/magicalserializer": "dev-master",
+        "phpseclib/phpseclib": "dev-master#200c2a9",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
@@ -29,6 +31,10 @@
     "autoload": {
         "psr-0": {
             "danog\\MadelineProto\\": "src/"
-        }
+        },
+        "files": [
+            "src/Socket.php",
+            "src/Volatile.php"
+        ]
     }
 }

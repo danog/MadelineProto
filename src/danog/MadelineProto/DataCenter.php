@@ -15,9 +15,10 @@ namespace danog\MadelineProto;
 /**
  * Manages datacenters.
  */
-class DataCenter
+class DataCenter extends \Volatile
 {
     use \danog\MadelineProto\Tools;
+    use \danog\Serializable;
 
     public $sockets = [];
     public $curdc = 0;
@@ -29,9 +30,8 @@ class DataCenter
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
-    public function __construct($dclist, $settings)
+    public function ___construct($dclist, $settings)
     {
-        //if ($this->unserialized($dclist)) return true;
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $socket) {
@@ -63,7 +63,7 @@ class DataCenter
         $address = $this->settings[$dc_config_number]['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($this->settings[$dc_config_number]['protocol'] === 'https') {
-            $subdomain = $this->dclist['ssl_subdomains'][$dc_config_number];
+            $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
             $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
             $address = $this->settings[$dc_config_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
         }
@@ -74,17 +74,17 @@ class DataCenter
         }
         \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$this->settings[$dc_config_number]['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
 
-        $this->sockets[$dc_number] = new Connection($address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout']);
+        $this->sockets[$dc_number] = new Connection($address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
 
         return true;
     }
 
-    public function get_dcs()
+    public function get_dcs($all = true)
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';
 
-        return array_keys($this->dclist[$test][$ipv6]);
+        return $all ? array_keys((array) $this->dclist[$test][$ipv6]) : array_keys((array) $this->sockets);
     }
 
     /*

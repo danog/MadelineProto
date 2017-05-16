@@ -12,8 +12,12 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLConstructor extends TLParams
+class TLConstructor extends \Volatile
 {
+    use \danog\Serializable;
+    use \danog\MadelineProto\Tools;
+    use TLParams;
+
     public $id = [];
     public $predicate = [];
     public $type = [];
@@ -23,7 +27,7 @@ class TLConstructor extends TLParams
 
     public function add($json_dict, $scheme_type)
     {
-        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->id[$this->key] = $json_dict['id'];
         $this->predicate[$this->key] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
         $this->type[$this->key] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
@@ -36,13 +40,13 @@ class TLConstructor extends TLParams
 
     public function find_by_type($type)
     {
-        $key = array_search($type, $this->type);
+        $key = array_search($type, (array) $this->type);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
             'type'      => $this->type[$key],
-            'params'    => $this->params[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
@@ -50,7 +54,7 @@ class TLConstructor extends TLParams
     {
         if ($layer !== -1) {
             $newlayer = -1;
-            $keys = array_keys($this->predicate, $predicate);
+            $keys = array_keys((array) $this->predicate, $predicate);
             foreach ($keys as $k) {
                 if ($this->layer[$k] <= $layer && $this->layer[$k] > $newlayer) {
                     $key = $k;
@@ -61,26 +65,26 @@ class TLConstructor extends TLParams
                 }
             }
         } else {
-            $key = array_search($predicate, $this->predicate);
+            $key = array_search($predicate, (array) $this->predicate);
         }
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
             'type'      => $this->type[$key],
-            'params'    => $this->params[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
     public function find_by_id($id)
     {
-        $key = array_search($id, $this->id);
+        $key = array_search($id, (array) $this->id);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
             'predicate' => $this->predicate[$key],
             'type'      => $this->type[$key],
-            'params'    => $this->params[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 }

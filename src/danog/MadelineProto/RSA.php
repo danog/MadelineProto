@@ -12,16 +12,17 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class RSA
+class RSA extends \Volatile
 {
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
+    use \danog\Serializable;
 
     public $e;
     public $n;
     public $fp;
 
-    public function __construct($rsa_key)
+    public function ___construct($rsa_key)
     {
         //if ($this->unserialized($rsa_key)) return true;
         \danog\MadelineProto\Logger::log(['Istantiating \phpseclib\Crypt\RSA...'], Logger::ULTRA_VERBOSE);

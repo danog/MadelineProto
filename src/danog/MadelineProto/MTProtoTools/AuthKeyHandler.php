@@ -79,7 +79,7 @@ trait AuthKeyHandler
                 */
 
                 foreach ($this->rsa_keys as $fp => $curkey) {
-                    if (in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
+                    if ($this->in_array($fp, $ResPQ['server_public_key_fingerprints'])) {
                         $key = $curkey;
                     }
                 }
@@ -546,7 +546,7 @@ trait AuthKeyHandler
                 $message_id = $this->generate_message_id($datacenter);
 
                 $seq_no = 0;
-                $encrypted_data = $this->random(16).$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+                $encrypted_data = $this->random(16).$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
                 $message_key = substr(sha1($encrypted_data, true), -16);
                 $padding = $this->random($this->posmod(-strlen($encrypted_data), 16));
                 list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->auth_key['auth_key']);

@@ -34,7 +34,7 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = $this->serialize_object(['type' => $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $this->secret_chats[$chat_id]['layer']);
-        $message = \danog\PHP\Struct::pack('<I', strlen($message)).$message;
+        $message = $this->pack_unsigned_int(strlen($message)).$message;
 
         $message_key = substr(sha1($message, true), -16);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
@@ -70,7 +70,7 @@ trait MessageHandler
         $encrypted_data = substr($message['message']['bytes'], 24);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']][$old ? 'old_key' : 'key']['auth_key'], 'to server');
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-        $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 0, 4))[0];
+        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
         if ($message_data_length > strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
         }

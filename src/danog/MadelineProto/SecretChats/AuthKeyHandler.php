@@ -19,8 +19,8 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait AuthKeyHandler
 {
-    private $temp_requested_secret_chats = [];
-    private $secret_chats = [];
+    protected $temp_requested_secret_chats = [];
+    protected $secret_chats = [];
 
     public function accept_secret_chat($params)
     {
@@ -95,7 +95,7 @@ trait AuthKeyHandler
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->encrypted_layer]]], ['datacenter' => $this->datacenter->curdc]);
     }
 
-    private $temp_rekeyed_secret_chats = [];
+    protected $temp_rekeyed_secret_chats = [];
 
     public function rekey($chat)
     {

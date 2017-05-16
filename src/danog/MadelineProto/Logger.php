@@ -17,17 +17,29 @@ namespace danog\MadelineProto;
 
 class Logger
 {
+    public static $storage = [];
     public static $mode = null;
     public static $optional = null;
     public static $constructed = false;
     public static $prefix = '';
     public static $level = 3;
+    public static $has_thread = false;
+    public static $BIG_ENDIAN = false;
+    public static $bigint = true;
+
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
+
+    public static function class_exists()
+    {
+        self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
+        self::$BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
+        self::$bigint = PHP_INT_SIZE < 8;
+    }
 
     /*
      * Constructor function
@@ -47,6 +59,7 @@ class Logger
         self::$constructed = true;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;
+        self::class_exists();
     }
 
     public static function log($params, $level = self::NOTICE)
@@ -58,12 +71,12 @@ class Logger
             return false;
         }
         $prefix = self::$prefix;
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
         foreach (is_array($params) ? $params : [$params] as $param) {
             if (!is_string($param)) {
-                $param = var_export($param, true);
+                $param = json_encode($param, JSON_PRETTY_PRINT);
             }
             $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
             switch (self::$mode) {

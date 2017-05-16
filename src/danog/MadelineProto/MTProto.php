@@ -15,8 +15,9 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto
+class MTProto extends \Volatile
 {
+    use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
@@ -51,11 +52,12 @@ class MTProto
     public $bigint = false;
     public $run_workers = false;
     public $threads = false;
+    public $rsa_keys = [];
 
-    public function __construct($settings = [])
+    public function ___construct($settings = [])
     {
         //if ($this->unserialized($settings)) return true;
-        $this->bigint = PHP_INT_SIZE < 8;
+        \danog\MadelineProto\Logger::class_exists();
         // Parse settings
         $this->parse_settings($settings);
 
@@ -68,8 +70,10 @@ class MTProto
         }
         // Load rsa key
         \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
-        $key = new RSA($this->settings['authorization']['rsa_key']);
-        $this->rsa_keys[$key->fp] = $key;
+        foreach ($this->settings['authorization']['rsa_keys'] as $key) {
+            $key = new RSA($key);
+            $this->rsa_keys[$key->fp] = $key;
+        }
 
         // Istantiate TL class
         \danog\MadelineProto\Logger::log(['Translating tl schemas...'], Logger::ULTRA_VERBOSE);
@@ -88,8 +92,6 @@ class MTProto
         $this->twoe1984 = new \phpseclib\Math\BigInteger('1751908409537131537220509645351687597690304110853111572994449976845956819751541616602568796259317428464425605223064365804210081422215355425149431390635151955247955156636234741221447435733643262808668929902091770092492911737768377135426590363166295684370498604708288556044687341394398676292971255828404734517580702346564613427770683056761383955397564338690628093211465848244049196353703022640400205739093118270803778352768276670202698397214556629204420309965547056893233608758387329699097930255380715679250799950923553703740673620901978370802540218870279314810722790539899334271514365444369275682816');
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
-
-        $this->setup_threads();
 
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
@@ -112,23 +114,30 @@ class MTProto
     public function __sleep()
     {
         $t = get_object_vars($this);
-        if (isset($t['reader_pool'])) {
-            unset($t['reader_pool']);
-        }
         if (isset($t['readers'])) {
             unset($t['readers']);
         }
 
-        return array_keys($t);
+        $keys = array_keys((array) $t);
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+
+        return $keys;
     }
 
     public function __wakeup()
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->setup_logger();
-        if (class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread') && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
+        $keys = array_keys((array) get_object_vars($this));
+        if (count($keys) !== count(array_unique($keys))) {
+            throw new Bug74586Exception();
+        }
+
         /*
         if (method_exists($this->datacenter, 'wakeup')) $this->datacenter = $this->datacenter->wakeup();
         foreach ($this->rsa_keys as $key => $elem) {
@@ -139,7 +148,6 @@ class MTProto
         }
         */
         $this->getting_state = false;
-        $this->bigint = PHP_INT_SIZE < 8;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
@@ -148,6 +156,9 @@ class MTProto
                 $settings['updates']['callback'] = 'get_updates_update_handler';
             }
             unset($settings['tl_schema']);
+            if (isset($settings['authorization']['rsa_key'])) {
+                unset($settings['authorization']['rsa_key']);
+            }
             $this->reset_session(true, true);
             $this->__construct($settings);
         }
@@ -161,12 +172,15 @@ class MTProto
 
     public function __destruct()
     {
-        if (isset($this->reader_pool)) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+            return;
+        }
+        if (isset(Logger::$storage[spl_object_hash($this)])) {
             $this->run_workers = false;
-            while ($number = $this->reader_pool->collect()) {
+            while ($number = Logger::$storage[spl_object_hash($this)]->collect()) {
                 \danog\MadelineProto\Logger::log(['Shutting down reader pool, '.$number.' jobs left'], \danog\MadelineProto\Logger::NOTICE);
             }
-            $this->reader_pool->shutdown();
+            Logger::$storage[spl_object_hash($this)]->shutdown();
         }
     }
 
@@ -180,28 +194,33 @@ class MTProto
 
     public function start_threads()
     {
-        if ($this->threads) {
-            $dcs = $this->datacenter->get_dcs();
-            if (!isset($this->reader_pool)) {
-                $this->reader_pool = new \Pool(count($dcs));
+        if ($this->threads && !is_object(\Thread::getCurrentThread())) {
+            $dcs = $this->datacenter->get_dcs(false);
+            if (!isset(Logger::$storage[spl_object_hash($this)])) {
+                Logger::$storage[spl_object_hash($this)] = new \Pool(count($dcs));
             }
             if (!isset($this->readers)) {
                 $this->readers = [];
             }
             foreach ($dcs as $dc) {
                 if (!isset($this->readers[$dc])) {
+                    Logger::log(['Socket reader on DC '.$dc.': CREATING'], Logger::WARNING);
                     $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
                 }
                 if (!$this->readers[$dc]->isRunning()) {
+                    Logger::log(['Socket reader on DC '.$dc.': SUBMITTING'], Logger::WARNING);
                     $this->readers[$dc]->garbage = false;
-                    $this->reader_pool->submit($this->readers[$dc]);
-                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
+                    Logger::$storage[spl_object_hash($this)]->submit($this->readers[$dc]);
+                    Logger::log(['Socket reader on DC '.$dc.': WAITING'], Logger::WARNING);
                     while (!$this->readers[$dc]->ready);
+                    Logger::log(['Socket reader on DC '.$dc.': READY'], Logger::WARNING);
                 } else {
-                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
+                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::ULTRA_VERBOSE);
                 }
             }
         }
+
+        return true;
     }
 
     public function parse_settings($settings)
@@ -232,14 +251,12 @@ class MTProto
         $default_settings = [
             'authorization' => [ // Authorization settings
                 'default_temp_auth_key_expires_in' => 31557600, // validity of temporary keys and the binding of the temporary and permanent keys
-                'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
-MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
-lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
-an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
-Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
-8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
-Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----', // RSA public key
+                'rsa_keys'                         => [
+                    "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6\nlyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS\nan9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw\nEfzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+\n8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n\nSlv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB\n-----END RSA PUBLIC KEY-----",
+                    "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAxq7aeLAqJR20tkQQMfRn+ocfrtMlJsQ2Uksfs7Xcoo77jAid0bRt\nksiVmT2HEIJUlRxfABoPBV8wY9zRTUMaMA654pUX41mhyVN+XoerGxFvrs9dF1Ru\nvCHbI02dM2ppPvyytvvMoefRoL5BTcpAihFgm5xCaakgsJ/tH5oVl74CdhQw8J5L\nxI/K++KJBUyZ26Uba1632cOiq05JBUW0Z2vWIOk4BLysk7+U9z+SxynKiZR3/xdi\nXvFKk01R3BHV+GUKM2RYazpS/P8v7eyKhAbKxOdRcFpHLlVwfjyM1VlDQrEZxsMp\nNTLYXb6Sce1Uov0YtNx5wEowlREH1WOTlwIDAQAB\n-----END RSA PUBLIC KEY-----",
+                    "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAsQZnSWVZNfClk29RcDTJQ76n8zZaiTGuUsi8sUhW8AS4PSbPKDm+\nDyJgdHDWdIF3HBzl7DHeFrILuqTs0vfS7Pa2NW8nUBwiaYQmPtwEa4n7bTmBVGsB\n1700/tz8wQWOLUlL2nMv+BPlDhxq4kmJCyJfgrIrHlX8sGPcPA4Y6Rwo0MSqYn3s\ng1Pu5gOKlaT9HKmE6wn5Sut6IiBjWozrRQ6n5h2RXNtO7O2qCDqjgB2vBxhV7B+z\nhRbLbCmW0tYMDsvPpX5M8fsO05svN+lKtCAuz1leFns8piZpptpSCFn7bWxiA9/f\nx5x17D7pfah3Sy2pA+NDXyzSlGcKdaUmwQIDAQAB\n-----END RSA PUBLIC KEY-----",
+                    "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwqjFW0pi4reKGbkc9pK83Eunwj/k0G8ZTioMMPbZmW99GivMibwa\nxDM9RDWabEMyUtGoQC2ZcDeLWRK3W8jMP6dnEKAlvLkDLfC4fXYHzFO5KHEqF06i\nqAqBdmI1iBGdQv/OQCBcbXIWCGDY2AsiqLhlGQfPOI7/vvKc188rTriocgUtoTUc\n/n/sIUzkgwTqRyvWYynWARWzQg0I9olLBBC2q5RQJJlnYXZwyTL3y9tdb7zOHkks\nWV9IMQmZmyZh/N7sMbGWQpt4NMchGpPGeJ2e5gHBjDnlIf2p1yZOYeUYrdbwcS0t\nUiggS4UeE8TzIuXFQxw7fzEIlmhIaq3FnwIDAQAB\n-----END RSA PUBLIC KEY-----",
+                ], // RSA public keys
             ],
             'connection' => [ // List of datacenters/subdomains where to connect
                 'ssl_subdomains' => [ // Subdomains of web.telegram.org for https protocol
@@ -310,7 +327,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                     'telegram'     => __DIR__.'/TL_telegram_v66.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
-                    'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
+                    //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
                     'botAPI'       => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
                 ],
             ],
@@ -326,6 +343,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 'logger_param'       => '/tmp/MadelineProto.log',
                 'logger'             => 3, // overwrite previous setting and echo logs
                 'logger_level'       => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
+                'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d',
                 //'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
             ],
             'max_tries'         => [
@@ -384,7 +402,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function setup_logger()
     {
-        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => (isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d'])) ? $this->settings['logger']['rollbar_token'] : '300afd7ccef346ea84d0c185ae831718'], false, false);
+        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => (isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718'])) ? $this->settings['logger']['rollbar_token'] : '11a8c2fe4c474328b40a28193f8d63f5'], false, false);
         \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 
@@ -416,13 +434,14 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
                 $this->datacenter->dc_connect($new_dc);
             }
         }
+        $this->setup_threads();
         $this->init_authorization();
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();
         }
     }
 
-    private $initing_authorization = false;
+    protected $initing_authorization = false;
 
     // Creates authorization keys
     public function init_authorization()
@@ -466,7 +485,8 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
             if ($int_dc != $new_dc) {
                 continue;
             }
-            if (preg_match('|media|', $new_dc)) {
+            \danog\MadelineProto\Logger::log([$int_dc, $new_dc]);
+            if (preg_match('|_|', $new_dc)) {
                 continue;
             }
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
@@ -538,7 +558,7 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
     public function getV()
     {
-        return 24;
+        return 29;
     }
 
     public function get_self()

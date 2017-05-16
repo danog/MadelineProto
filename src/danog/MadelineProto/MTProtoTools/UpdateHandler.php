@@ -22,9 +22,9 @@ trait UpdateHandler
     public $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
-    private $getting_state = false;
+    protected $getting_state = false;
     public $full_chats;
-    private $msg_ids = [];
+    protected $msg_ids = [];
 
     public function pwr_update_handler($update)
     {
@@ -80,7 +80,7 @@ trait UpdateHandler
             return [];
         }
         if ($params['offset'] < 0) {
-            $params['offset'] = array_reverse(array_keys($this->updates))[abs($params['offset']) - 1];
+            $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
         ksort($this->updates);
@@ -158,7 +158,6 @@ trait UpdateHandler
             }
             throw $e;
         }
-        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
         $this->get_channel_state($channel)['sync_loading'] = false;
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
@@ -175,6 +174,7 @@ trait UpdateHandler
                 }
                 break;
             case 'updates.channelDifferenceTooLong':
+                \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
                 $this->set_channel_state($channel, $difference);
                 $this->handle_update_messages($difference['messages'], $channel);
                 unset($difference);
@@ -239,7 +239,7 @@ trait UpdateHandler
             $this->get_update_state()['pending_seq_updates'] = [];
         }
         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
-        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->get_update_state()['sync_loading'] = false;
 
         switch ($difference['_']) {
@@ -312,7 +312,7 @@ trait UpdateHandler
         } else {
             $cur_state = &$this->get_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
-        if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
+        if ($cur_state['sync_loading'] && $this->in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
             \danog\MadelineProto\Logger::log(['Sync loading, not handling update'], \danog\MadelineProto\Logger::NOTICE);
 
             return false;
@@ -561,7 +561,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
-                if ($this->settings['secret_chats']['accept_chats'] === false || ($this->is_array($this->settings['secret_chats']['accept_chats']) && !in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
+                if ($this->settings['secret_chats']['accept_chats'] === false || ($this->is_array($this->settings['secret_chats']['accept_chats']) && !$this->in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
                     return;
                 }
                 \danog\MadelineProto\Logger::log(['Accepting secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
