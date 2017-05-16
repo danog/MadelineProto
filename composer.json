@@ -34,7 +34,12 @@
         },
         "files": [
             "src/Socket.php",
-            "src/Volatile.php"
+			"src/Collectable.php",
+			"src/Threaded.php",
+			"src/Volatile.php",
+			"src/Thread.php",
+			"src/Worker.php",
+			"src/Pool.php"
         ]
     }
 }
