@@ -140,8 +140,13 @@ trait Files
             }
 
             return $res;
+            case 'photo':
             case 'messageMediaPhoto':
-            $photo = end($message_media['photo']['sizes']);
+            if ($message_media['_'] == 'photo') {
+                $photo = end($message_media['sizes']);
+            } else {
+                $photo = end($message_media['photo']['sizes']);
+            }
             $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
 
@@ -248,6 +253,7 @@ trait Files
             fseek($stream, $offset);
         }
         $downloaded_size = 0;
+        if ($end === -1 && isset($message_media['size'])) $end = $message_media['size'];
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
@@ -269,6 +275,7 @@ trait Files
             if ($start_at = $offset % $part_size) {
                 $offset -= $start_at;
             }
+
             try {
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -278,6 +285,12 @@ trait Files
                 } else {
                     throw $e;
                 }
+            }
+            if ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') $datacenter = 1;
+            while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+                $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $datacenter++;
+                if (!isset($this->datacenter->sockets[$datacenter])) break;
             }
             if ($res['_'] === 'upload.fileCdnRedirect') {
                 $cdn = true;
@@ -293,14 +306,6 @@ trait Files
                 $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $datacenter]);
                 continue;
             }
-            while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
-                $datacenter = 1;
-                $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
-                $datacenter++;
-            }
-            if ($res['bytes'] === '') {
-                break;
-            }
             if (isset($message_media['cdn_key'])) {
                 $res['bytes'] = $this->encrypt_ctr($res['bytes'], $message_media['cdn_key'], $message_media['cdn_iv'], $offset);
             }
@@ -314,6 +319,9 @@ trait Files
                 $res['bytes'] = substr($res['bytes'], 0, $size - $downloaded_size);
                 $theend = true;
             }
+            if ($res['bytes'] === '') {
+                break;
+            }
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
             \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -322,7 +330,7 @@ trait Files
                 break;
             }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            $cb($percent = $downloaded_size * 100 / $size);
+            if ($end !== -1) $cb($percent = $downloaded_size * 100 / $size);
         }
         if ($end === -1) {
             $cb(100);
