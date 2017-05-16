@@ -16,6 +16,7 @@ class DocsBuilder
 {
     use \danog\MadelineProto\TL\TL;
     use Tools;
+
     public function __construct($settings)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
