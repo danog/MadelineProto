@@ -176,7 +176,7 @@ if (!extension_loaded('pthreads')) {
             return true;
         }
 
-        private function convertToVolatile($value)
+        public function convertToVolatile($value)
         {
             /*
             if (is_array($value)) {
