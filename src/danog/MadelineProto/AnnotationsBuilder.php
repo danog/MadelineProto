@@ -17,6 +17,7 @@ use phpDocumentor\Reflection\DocBlockFactory;
 class AnnotationsBuilder
 {
     use \danog\MadelineProto\TL\TL;
+    use Tools;
 
     public function __construct($settings)
     {

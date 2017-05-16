@@ -81,7 +81,7 @@ trait Tools
             throw new TL\Exception('Length is not equal to 4');
         }
 
-        return unpack('l', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('l', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
     public function unpack_signed_long($value)
@@ -90,7 +90,7 @@ trait Tools
             throw new TL\Exception('Length is not equal to 8');
         }
 
-        return unpack('q', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('q', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
     public function pack_signed_int($value)
@@ -103,7 +103,7 @@ trait Tools
         }
         $res = pack('l', $value);
 
-        return $this->BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
     public function pack_signed_long($value)
@@ -114,7 +114,7 @@ trait Tools
         if ($value < -9223372036854775808) {
             throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
         }
-        $res = $this->bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : ($this->BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
+        $res = \danog\MadelineProto\Logger::$bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
 
         return $res;
     }
@@ -138,7 +138,7 @@ trait Tools
             throw new TL\Exception('Could not properly encode double');
         }
 
-        return $this->BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
     public function unpack_double($value)
@@ -147,6 +147,6 @@ trait Tools
             throw new TL\Exception('Length is not equal to 8');
         }
 
-        return unpack('d', $this->BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('d', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 }

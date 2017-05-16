@@ -24,6 +24,8 @@ class Logger
     public static $prefix = '';
     public static $level = 3;
     public static $has_thread = false;
+    public static $BIG_ENDIAN = false;
+    public static $bigint = true;
 
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
@@ -35,6 +37,8 @@ class Logger
     public static function class_exists()
     {
         self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
+        self::$BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
+        self::$bigint = PHP_INT_SIZE < 8;
     }
 
     /*

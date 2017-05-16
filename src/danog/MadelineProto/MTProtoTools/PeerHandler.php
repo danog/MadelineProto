@@ -200,7 +200,7 @@ trait PeerHandler
 
         if (is_numeric($id)) {
             if (is_string($id)) {
-                $id = $this->bigint ? ((float) $id) : ((int) $id);
+                $id = \danog\MadelineProto\Logger::$bigint ? ((float) $id) : ((int) $id);
             }
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);

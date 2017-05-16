@@ -58,8 +58,6 @@ class MTProto extends \Volatile
     {
         //if ($this->unserialized($settings)) return true;
         \danog\MadelineProto\Logger::class_exists();
-        $this->bigint = PHP_INT_SIZE < 8;
-        $this->BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         // Parse settings
         $this->parse_settings($settings);
 
@@ -150,7 +148,6 @@ class MTProto extends \Volatile
         }
         */
         $this->getting_state = false;
-        $this->bigint = PHP_INT_SIZE < 8;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);

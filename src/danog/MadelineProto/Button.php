@@ -32,6 +32,7 @@ class Button extends \Volatile implements \JsonSerializable
         switch ($this->_) {
             default: return false;
             case 'keyboardButtonUrl': return $this->url;
+            case 'keyboardButton': return $this->info['API']->method_call('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->text, 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
             case 'keyboardButtonCallback': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
             case 'keyboardButtonGame': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
         }
