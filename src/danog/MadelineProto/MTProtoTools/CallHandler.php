@@ -127,8 +127,8 @@ trait CallHandler
                             case 16:
                             case 17:
                                 \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$aargs['datacenter']]->timedelta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
-                                \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->timedelta], \danog\MadelineProto\Logger::WARNING);
+                                $this->datacenter->sockets[$aargs['datacenter']]->time_delta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
+                                \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->time_delta], \danog\MadelineProto\Logger::WARNING);
                                 $this->reset_session();
                                 $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                                 $this->init_authorization();
