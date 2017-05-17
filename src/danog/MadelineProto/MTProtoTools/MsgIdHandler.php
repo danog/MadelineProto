@@ -28,7 +28,7 @@ trait MsgIdHandler
         }
         $max_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta + 30))->bitwise_leftShift(32);
         if ($max_message_id->compare($new_message_id) < 0) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new.');
+            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.').');
         }
         if ($aargs['outgoing']) {
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
