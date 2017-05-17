@@ -162,6 +162,7 @@ class Connection extends \Volatile
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
         }
+
         return $keys;
     }
 

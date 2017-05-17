@@ -152,7 +152,9 @@ class MTProto extends \Volatile
         }
         */
         if (isset($this->data)) {
-            foreach ($this->data as $k => $v) { $this->{$k} = $v; }
+            foreach ($this->data as $k => $v) {
+                $this->{$k} = $v;
+            }
             unset($this->data);
         }
         $this->getting_state = false;

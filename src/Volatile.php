@@ -6,7 +6,7 @@ if (!extension_loaded('pthreads')) {
         public function __set($offset, $value)
         {
             if ($offset === null) {
-                $offset = count((array)$this);
+                $offset = count((array) $this);
             }
 
             if (is_array($value)) {

@@ -1,12 +1,14 @@
 <?php
+
 require 'vendor/autoload.php';
 class a extends Volatile
 {
-//    public $a = [];
-    public function __construct() {
+    //    public $a = [];
+    public function __construct()
+    {
         $this->a = 'le';
     }
 }
-$a = new a;
+$a = new a();
 
 var_dump($a);

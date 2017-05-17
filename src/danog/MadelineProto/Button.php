@@ -17,6 +17,7 @@ class Button extends \Volatile implements \JsonSerializable
     use \danog\Serializable;
     private $info = [];
     private $data = [];
+
     public function ___construct($API, $message, $button)
     {
         $this->data = $button;

@@ -31,7 +31,7 @@ if (!extension_loaded('pthreads')) {
 
         public function count()
         {
-            return count((array)$this);
+            return count((array) $this);
         }
 
         public function getIterator()
@@ -85,7 +85,6 @@ if (!extension_loaded('pthreads')) {
 
         public function shift()
         {
-            
         }
 
         public function chunk($size)
