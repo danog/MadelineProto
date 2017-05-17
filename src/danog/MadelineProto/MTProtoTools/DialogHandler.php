@@ -15,7 +15,9 @@ namespace danog\MadelineProto\MTProtoTools;
 trait DialogHandler
 {
     public $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
-    public function get_dialogs() {
+
+    public function get_dialogs()
+    {
         $this->getting_state = true;
         $res = ['dialogs' => [0]];
         $datacenter = $this->datacenter->curdc;
@@ -28,7 +30,9 @@ trait DialogHandler
             $this->dialog_params['offset_date'] = end($res['messages'])['date'];
             $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
             $this->dialog_params['offset_id'] = end($res['messages'])['id'];
-            if ($this->dialog_params === $old_params) break;
+            if ($this->dialog_params === $old_params) {
+                break;
+            }
         }
 
         $this->getting_state = false;
