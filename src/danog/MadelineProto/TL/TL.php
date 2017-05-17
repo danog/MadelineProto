@@ -283,7 +283,22 @@ trait TL
                 return $this->pack_double($object);
             case 'string':
                 $object = pack('C*', ...unpack('C*', $object));
+                $l = strlen($object);
+                $concat = '';
+                if ($l <= 253) {
+                    $concat .= chr($l);
+                    $concat .= $object;
+                    $concat .= pack('@'.$this->posmod((-$l - 1), 4));
+                } else {
+                    $concat .= chr(254);
+                    $concat .= substr($this->pack_signed_int($l), 0, 3);
+                    $concat .= $object;
+                    $concat .= pack('@'.$this->posmod(-$l, 4));
+                }
+
+                return $concat;
             case 'bytes':
+                if (is_array($object)) $object = pack('C*', ...$object);
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
@@ -519,6 +534,7 @@ trait TL
                     throw new Exception("deserialize: generated value isn't a string");
                 }
 
+                //return $type['type'] === 'bytes' ? unpack('C*', $x) : $x;
                 return $x;
             case 'true':
                 return true;

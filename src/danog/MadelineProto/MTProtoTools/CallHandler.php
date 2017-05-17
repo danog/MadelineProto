@@ -116,7 +116,7 @@ trait CallHandler
                 }
                 switch ($server_answer['_']) {
                     case 'rpc_error':
-                        $this->handle_rpc_error($server_answer, $aargs['datacenter']);
+                        $this->handle_rpc_error($server_answer, $aargs);
                         break;
                     case 'bad_server_salt':
                     case 'bad_msg_notification':

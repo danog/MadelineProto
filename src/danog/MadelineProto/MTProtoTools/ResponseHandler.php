@@ -131,7 +131,9 @@ trait ResponseHandler
                 case 'rpc_error':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], $datacenter);
+                    $aargs = ['datacenter' => &$datacenter];
+                    $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], $aargs);
+                    unset($aargs);
                     break;
 
                 case 'bad_server_salt':
@@ -348,32 +350,33 @@ trait ResponseHandler
     {
     }
 
-    public function handle_rpc_error($server_answer, &$datacenter)
+    public function handle_rpc_error($server_answer, &$aargs)
     {
         switch ($server_answer['error_code']) {
             case 303:
-                $this->datacenter->curdc = $datacenter = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+                $this->datacenter->curdc = $aargs['datacenter'] = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
             case 401:
                 switch ($server_answer['error_message']) {
                     case 'USER_DEACTIVATED':
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
-                        $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                        $this->datacenter->sockets[$datacenter]->auth_key = null;
+                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
+                        $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
                         $this->authorized = false;
                         $this->authorization = null;
                         $this->init_authorization(); // idk
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
-                        $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                         $this->init_authorization(); // idk
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                 }
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
-                if (is_numeric($seconds) && isset($this->settings['flood_timeout']['wait_if_lt']) && $seconds < $this->settings['flood_timeout']['wait_if_lt']) {
+                $limit = isset($aargs['FloodWaitLimit']) ? $aargs['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
+                if (is_numeric($seconds) && $seconds < $limit) {
                     \danog\MadelineProto\Logger::log(['Flood, waiting '.$seconds.' seconds...'], \danog\MadelineProto\Logger::NOTICE);
                     sleep($seconds);
                     throw new \danog\MadelineProto\Exception('Re-executing query...');

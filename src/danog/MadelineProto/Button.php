@@ -19,9 +19,7 @@ class Button extends \Volatile implements \JsonSerializable
 
     public function __construct($API, $message, $button)
     {
-        foreach ($button as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->data = $button;
         $this->info['peer'] = $message['to_id'];
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;

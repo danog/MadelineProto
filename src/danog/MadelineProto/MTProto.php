@@ -22,6 +22,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
     use \danog\MadelineProto\MTProtoTools\Crypt;
+    use \danog\MadelineProto\MTProtoTools\DialogHandler;
     use \danog\MadelineProto\MTProtoTools\MessageHandler;
     use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;

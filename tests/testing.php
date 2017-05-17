@@ -71,7 +71,7 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-echo 'Size of MadelineProto instance is '.strlen(serialize($MadelineProto)).' bytes'.PHP_EOL;
+
 if (stripos(readline('Do you want to make the secret chat tests? (y/n)'), 'y') !== false) {
 
 /*
