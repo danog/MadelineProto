@@ -16,8 +16,8 @@ class Button extends \Volatile implements \JsonSerializable
 {
     use \danog\Serializable;
     private $info = [];
-
-    public function __construct($API, $message, $button)
+    private $data = [];
+    public function ___construct($API, $message, $button)
     {
         $this->data = $button;
         $this->info['peer'] = $message['to_id'];
@@ -27,20 +27,17 @@ class Button extends \Volatile implements \JsonSerializable
 
     public function click($donotwait = false)
     {
-        switch ($this->_) {
+        switch ($this->data['_']) {
             default: return false;
-            case 'keyboardButtonUrl': return $this->url;
-            case 'keyboardButton': return $this->info['API']->method_call('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->text, 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
-            case 'keyboardButtonCallback': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+            case 'keyboardButtonUrl': return $this->data['url'];
+            case 'keyboardButton': return $this->info['API']->method_call('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+            case 'keyboardButtonCallback': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
             case 'keyboardButtonGame': return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
         }
     }
 
     public function jsonSerialize()
     {
-        $res = get_object_vars($this);
-        unset($res['info']);
-
-        return $res;
+        return (array) $this->data;
     }
 }

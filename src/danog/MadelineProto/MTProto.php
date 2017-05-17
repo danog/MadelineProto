@@ -118,6 +118,9 @@ class MTProto extends \Volatile
         if (isset($t['readers'])) {
             unset($t['readers']);
         }
+        if (isset($t['data'])) {
+            unset($t['data']);
+        }
 
         $keys = array_keys((array) $t);
         if (count($keys) !== count(array_unique($keys))) {
@@ -148,6 +151,10 @@ class MTProto extends \Volatile
             if (method_exists($elem, 'wakeup')) $this->datacenter->sockets[$key] = $elem->wakeup();
         }
         */
+        if (isset($this->data)) {
+            foreach ($this->data as $k => $v) { $this->{$k} = $v; }
+            unset($this->data);
+        }
         $this->getting_state = false;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {

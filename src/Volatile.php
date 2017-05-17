@@ -6,7 +6,7 @@ if (!extension_loaded('pthreads')) {
         public function __set($offset, $value)
         {
             if ($offset === null) {
-                $offset = count($this->data);
+                $offset = count((array)$this);
             }
 
             if (is_array($value)) {
@@ -17,7 +17,7 @@ if (!extension_loaded('pthreads')) {
                 $value = $safety;
             }
 
-            return $this->data[$offset] = $value;
+            return $this->{$offset} = $value;
         }
     }
 }

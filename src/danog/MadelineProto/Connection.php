@@ -154,12 +154,14 @@ class Connection extends \Volatile
         if (isset($t['sock'])) {
             unset($t['sock']);
         }
+        if (isset($t['data'])) {
+            unset($t['data']);
+        }
 
         $keys = array_keys((array) $t);
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
         }
-
         return $keys;
     }
 

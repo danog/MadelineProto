@@ -31,23 +31,23 @@ if (!extension_loaded('pthreads')) {
 
         public function count()
         {
-            return count($this->data);
+            return count((array)$this);
         }
 
         public function getIterator()
         {
-            return new ArrayIterator($this->data);
+            return new ArrayIterator($this);
         }
 
         public function __set($offset, $value)
         {
             if ($offset === null) {
-                $offset = count($this->data);
+                $offset = count($this);
             }
 
             if (!$this instanceof Volatile) {
-                if (isset($this->data[$offset]) &&
-                    $this->data[$offset] instanceof self) {
+                if (isset($this->{$offset}) &&
+                    $this->{$offset} instanceof self) {
                     throw new \RuntimeException();
                 }
             }
@@ -60,32 +60,32 @@ if (!extension_loaded('pthreads')) {
                 $value = $safety;
             }
 
-            return $this->data[$offset] = $value;
+            return $this->{$offset} = $value;
         }
 
         public function __get($offset)
         {
-            return $this->data[$offset];
+            return $this->{$offset};
         }
 
         public function __isset($offset)
         {
-            return isset($this->data[$offset]);
+            return isset($this->{$offset});
         }
 
         public function __unset($offset)
         {
             if (!$this instanceof Volatile) {
-                if (isset($this->data[$offset]) && $this->data[$offset] instanceof self) {
+                if (isset($this->{$offset}) && $this->{$offset} instanceof self) {
                     throw new \RuntimeException();
                 }
             }
-            unset($this->data[$offset]);
+            unset($this->{$offset});
         }
 
         public function shift()
         {
-            return array_shift($this->data);
+            
         }
 
         public function chunk($size)
@@ -100,13 +100,12 @@ if (!extension_loaded('pthreads')) {
 
         public function pop()
         {
-            return array_pop($this->data);
         }
 
         public function merge($merge)
         {
             foreach ($merge as $k => $v) {
-                $this->data[$k] = $v;
+                $this->{$k} = $v;
             }
         }
 
@@ -193,7 +192,6 @@ if (!extension_loaded('pthreads')) {
             return $value;
         }
 
-        protected $data;
         protected $state;
     }
 }
