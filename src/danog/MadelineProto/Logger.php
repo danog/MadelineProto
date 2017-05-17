@@ -76,6 +76,7 @@ class Logger
 
         return $d;
     }
+
     public static function log($params, $level = self::NOTICE)
     {
         if (!self::$constructed) {

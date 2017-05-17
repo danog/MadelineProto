@@ -298,7 +298,9 @@ trait TL
 
                 return $concat;
             case 'bytes':
-                if (is_array($object)) $object = pack('C*', ...$object);
+                if (is_array($object)) {
+                    $object = pack('C*', ...$object);
+                }
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
