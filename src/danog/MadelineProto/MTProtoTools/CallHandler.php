@@ -52,7 +52,7 @@ trait CallHandler
         }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
-                \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $this->send_message($serialized, $content_related, $aargs);
                 if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
