@@ -82,8 +82,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
                     //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
-                    $content = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
-                    $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $content;
+                    $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
                     //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response']]['content']);
