@@ -21,7 +21,6 @@ trait MessageHandler
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-
     public function send_message($message_data, $content_related, $aargs = [])
     {
         if (!isset($aargs['message_id']) || $aargs['message_id'] === null) {
@@ -120,6 +119,7 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->last_recv = time();
+
         return true;
     }
 }

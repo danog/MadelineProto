@@ -25,7 +25,12 @@ class Button extends \Volatile implements \JsonSerializable
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;
     }
-    public function __sleep() { return ['data', 'info']; }
+
+    public function __sleep()
+    {
+        return ['data', 'info'];
+    }
+
     public function click($donotwait = false)
     {
         switch ($this->data['_']) {

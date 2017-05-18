@@ -594,7 +594,9 @@ trait TL
 
             return $this->deserialize($stream, $constructorData);
         }
-        if ($constructorData['type'] === 'Bool') return $constructorData['predicate'] === 'boolTrue';
+        if ($constructorData['type'] === 'Bool') {
+            return $constructorData['predicate'] === 'boolTrue';
+        }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {
             if ($arg['flag']) {
@@ -654,6 +656,7 @@ trait TL
                 }
             }
         }
+
         return $x;
     }
 }

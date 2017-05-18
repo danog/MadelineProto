@@ -24,7 +24,11 @@ class TLConstructor extends \Volatile
     public $params = [];
     public $layer = [];
     public $key = 0;
-    public function __sleep() { return ['id', 'predicate', 'type', 'params', 'layer', 'key']; }
+
+    public function __sleep()
+    {
+        return ['id', 'predicate', 'type', 'params', 'layer', 'key'];
+    }
 
     public function add($json_dict, $scheme_type)
     {

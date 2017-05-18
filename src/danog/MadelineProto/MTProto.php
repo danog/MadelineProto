@@ -154,6 +154,7 @@ class MTProto extends \Volatile
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = $this->getV();
         $this->should_serialize = true;
+
         return $this->settings;
     }
 

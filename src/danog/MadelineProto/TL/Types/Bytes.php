@@ -21,8 +21,17 @@ class Bytes extends \Volatile implements \JsonSerializable
     {
         $this->bytes = $bytes;
     }
-    public function __sleep() { return ['bytes']; }
-    public function __toString() { return $this->bytes; }
+
+    public function __sleep()
+    {
+        return ['bytes'];
+    }
+
+    public function __toString()
+    {
+        return $this->bytes;
+    }
+
     public function jsonSerialize()
     {
         return utf8_encode($this->bytes);
