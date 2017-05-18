@@ -262,7 +262,7 @@ trait TL
                     return substr($object, 1);
                 }
                 if (!is_numeric($object)) {
-                    throw new Exception('given value ('.$object.") isn't numeric");
+                    throw new Exception("given value isn't numeric");
                 }
 
                 return $this->pack_signed_long($object);

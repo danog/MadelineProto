@@ -40,12 +40,12 @@ trait Tools
 
     public function __call($method, $params)
     {
-        return \danog\MadelineProto\Logger::$has_thread ? $method(...$this->array_cast_recursive($params)) : $method(...$params);
+        return (is_object($params[0]) || \danog\MadelineProto\Logger::$has_thread) ? $method(...$this->array_cast_recursive($params, true)) : $method(...$params);
     }
 
-    public function array_cast_recursive($array)
+    public function array_cast_recursive($array, $force = false)
     {
-        if (!\danog\MadelineProto\Logger::$has_thread) {
+        if (!\danog\MadelineProto\Logger::$has_thread && !$force) {
             return $array;
         }
         if ($this->is_array($array)) {
@@ -53,7 +53,7 @@ trait Tools
                 $array = (array) $array;
             }
             foreach ($array as $key => $value) {
-                $array[$key] = $this->array_cast_recursive($value);
+                $array[$key] = $this->array_cast_recursive($value, $force);
             }
         }
 

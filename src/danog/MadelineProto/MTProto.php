@@ -617,7 +617,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 29;
+        return 30;
     }
 
     public function get_self()

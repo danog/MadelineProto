@@ -46,7 +46,7 @@ class TLMethod extends \Volatile
 
     public function find_by_method($method)
     {
-        $key = array_search($method, (array) $this->method);
+        $key = array_search($method, (array) $this->method, true);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
@@ -58,7 +58,7 @@ class TLMethod extends \Volatile
 
     public function find_by_id($id)
     {
-        $key = array_search($id, (array) $this->id);
+        $key = array_search($id, (array) $this->id, true);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],

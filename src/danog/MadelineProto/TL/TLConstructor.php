@@ -45,7 +45,7 @@ class TLConstructor extends \Volatile
 
     public function find_by_type($type)
     {
-        $key = array_search($type, (array) $this->type);
+        $key = array_search($type, (array) $this->type, true);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
@@ -70,7 +70,7 @@ class TLConstructor extends \Volatile
                 }
             }
         } else {
-            $key = array_search($predicate, (array) $this->predicate);
+            $key = array_search($predicate, (array) $this->predicate, true);
         }
 
         return ($key === false) ? false : [
@@ -83,7 +83,7 @@ class TLConstructor extends \Volatile
 
     public function find_by_id($id)
     {
-        $key = array_search($id, (array) $this->id);
+        $key = array_search($id, (array) $this->id, true);
 
         return ($key === false) ? false : [
             'id'        => $this->id[$key],
