@@ -65,7 +65,7 @@ class API extends APIFactory
         return $this->{$name};
     }
 
-    public function &__set($name, $value)
+    public function __set($name, $value)
     {
         if ($name === 'settings') {
             return $this->API->__construct($value);

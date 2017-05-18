@@ -68,6 +68,8 @@ class Serialization
                 $unserialized = \danog\Serialization::unserialize($unserialized);
             } catch (Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
+            } catch (\Error $e) {
+                $unserialized = \danog\Serialization::unserialize($unserialized);
             }
         } else {
             throw new Exception('File does not exist');
