@@ -9,14 +9,6 @@ if (!extension_loaded('pthreads')) {
                 $offset = count((array) $this);
             }
 
-            if (is_array($value)) {
-                $safety =
-                    new self();
-                $safety->merge(
-                    $this->convertToVolatile($value));
-                $value = $safety;
-            }
-
             return $this->{$offset} = $value;
         }
     }

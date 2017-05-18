@@ -52,14 +52,6 @@ if (!extension_loaded('pthreads')) {
                 }
             }
 
-            if (is_array($value)) {
-                $safety =
-                    new Volatile();
-                $safety->merge(
-                    $this->convertToVolatile($value));
-                $value = $safety;
-            }
-
             return $this->{$offset} = $value;
         }
 
