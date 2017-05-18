@@ -39,7 +39,9 @@ trait MsgIdHandler
             }
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
-                unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages)]);
+                $key = key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
+                if ($key[0] === "\0") $key = 'a'.$key;
+                unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]);
             }
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.strrev($new_message_id->toBytes())] = [];
         } else {
@@ -59,7 +61,9 @@ trait MsgIdHandler
 
             if (count($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
-                unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages)]);
+                $key = key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
+                if ($key[0] === "\0") $key = 'a'.$key;
+                unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]);
             }
             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.strrev($new_message_id->toBytes())] = [];
         }
