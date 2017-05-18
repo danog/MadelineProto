@@ -74,8 +74,9 @@ trait UpdateHandler
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
-        ksort($this->updates);
-        foreach ($this->updates as $key => $value) {
+        $supdates = (array) $this->updates;
+        ksort($supdates);
+        foreach ($supdates as $key => $value) {
             if ($params['offset'] > $key) {
                 $this->should_serialize = true;
                 unset($this->updates[$key]);
@@ -446,11 +447,12 @@ trait UpdateHandler
         if (empty($cur_state['pending_pts_updates'])) {
             return false;
         }
-        sort($cur_state['pending_pts_updates']);
+        $pending_updates = (array) $cur_state['pending_pts_updates'];
+        sort($pending_updates);
         $cur_pts = $cur_state['pts'];
         $good_pts = false;
         $good_index = false;
-        foreach ($cur_state['pending_pts_updates'] as $i => $update) {
+        foreach ($pending_updates as $i => $update) {
             $cur_pts += $update['pts_count'];
             if ($cur_pts >= $update['pts']) {
                 $good_pts = $update['pts'];
@@ -462,7 +464,7 @@ trait UpdateHandler
         }
         $cur_state['pts'] = $good_pts;
         for ($i = 0; $i <= $good_index; $i++) {
-            $this->save_update($cur_state['pending_pts_updates'][$i]);
+            $this->save_update($pending_updates[$i]);
         }
         array_splice($cur_state['pending_pts_updates'], 0, $good_index + 1);
     }
