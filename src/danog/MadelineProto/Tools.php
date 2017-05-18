@@ -33,21 +33,6 @@ trait Tools
         return $resto < 0 ? ($resto + abs($b)) : $resto;
     }
 
-    public function utf8ize($d)
-    {
-        if ($this->is_array($d)) {
-            foreach ($d as $k => $v) {
-                if ($k === 'bytes' || $this->is_array($v)) {
-                    $d[$k] = $this->utf8ize($v);
-                }
-            }
-        } elseif (is_string($d)) {
-            return utf8_encode($d);
-        }
-
-        return $d;
-    }
-
     public function is_array($elem)
     {
         return is_array($elem) || ($elem instanceof \Volatile);

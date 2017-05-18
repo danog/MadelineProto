@@ -6,6 +6,10 @@ description: help.getCdnConfig parameters, return type and example
 [Back to methods index](index.md)
 
 
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 ### Return type: [CdnConfig](../types/CdnConfig.md)

@@ -7,6 +7,10 @@ description: help_appChangelogEmpty attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

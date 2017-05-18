@@ -7,6 +7,10 @@ description: messages_stickerSetInstallResultSuccess attributes, type and exampl
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -73,6 +73,6 @@ class RPCErrorException extends \Exception
                 break;
             }
         }
-        \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, $additional);
+        $message === 'Telegram is having internal issues, please try again later.' ? \Rollbar\Rollbar::log(\Rollbar\Payload\Level::critical(), $message) : \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, $additional);
     }
 }

@@ -17,32 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait ResponseHandler
 {
-    protected $pending_updates = [];
-    protected $bad_msg_error_codes = [
-        16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
-        17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
-        18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
-        19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)',
-        20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not',
-        32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)',
-        33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)',
-        34 => 'an even msg_seqno expected (irrelevant message), but odd received',
-        35 => 'odd msg_seqno expected (relevant message), but even received',
-        48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
-        64 => 'invalid container.',
-    ];
-    protected $msgs_info_flags = [
-        1   => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
-        2   => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
-        3   => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
-        4   => 'message received (note that this response is also at the same time a receipt acknowledgment)',
-        8   => ' and message already acknowledged',
-        16  => ' and message not requiring acknowledgment',
-        32  => ' and RPC query contained in message being processed or processing already complete',
-        64  => ' and content-related response to message already generated',
-        128 => ' and other party knows for a fact that message is already received',
-    ];
-
     public function send_msgs_state_info($req_msg_id, $msg_ids, $datacenter)
     {
         $info = '';
@@ -67,8 +41,6 @@ trait ResponseHandler
         }
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->object_call('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['datacenter' => $datacenter])]['response'] = $req_msg_id;
     }
-
-    public $stop = false;
 
     public function handle_messages($datacenter)
     {
@@ -110,9 +82,9 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
                     //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
-                    $content = (array) $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
+                    $content = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $content;
-                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+                    //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response']]['content']);
                     ///$this->stop = true;

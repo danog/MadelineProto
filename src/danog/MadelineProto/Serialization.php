@@ -56,6 +56,7 @@ class Serialization
             $unserialized = stream_get_contents($file);
             flock($file, LOCK_UN);
             fclose($file);
+            $unserialized = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
             foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection'] as $class) {
                 class_exists('\danog\MadelineProto\\'.$class);
             }

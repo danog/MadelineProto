@@ -10,20 +10,21 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto\TL\Types;
 
-/**
- * Manages changing API instance settings.
- */
-trait SettingsManager
+class Bytes extends \Volatile implements \JsonSerializable
 {
-    public function get_settings()
-    {
-        return $this->API->settings;
-    }
+    use \danog\Serializable;
+    private $bytes = [];
 
-    public function update_settings($settings)
+    public function ___construct($bytes)
     {
-        $this->API->__construct($settings);
+        $this->bytes = $bytes;
+    }
+    public function __sleep() { return ['bytes']; }
+    public function __toString() { return $this->bytes; }
+    public function jsonSerialize()
+    {
+        return utf8_encode($this->bytes);
     }
 }

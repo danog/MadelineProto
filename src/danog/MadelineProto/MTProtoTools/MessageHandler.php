@@ -21,7 +21,6 @@ trait MessageHandler
      * Forming the message frame and sending message to server
      * :param message: byte string to send.
      */
-    protected $last_recv = 0;
 
     public function send_message($message_data, $content_related, $aargs = [])
     {
@@ -59,16 +58,7 @@ trait MessageHandler
     {
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
-            $error = $this->unpack_signed_int($payload);
-            if ($error === -404) {
-                if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                    $this->init_authorization();
-                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                }
-            }
-            throw new \danog\MadelineProto\RPCErrorException($error, $error);
+            return $this->unpack_signed_int($payload);
         }
         $auth_key_id = substr($payload, 0, 8);
         if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
@@ -130,5 +120,6 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->last_recv = time();
+        return true;
     }
 }

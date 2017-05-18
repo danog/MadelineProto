@@ -7,6 +7,10 @@ description: inputChatEmpty attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

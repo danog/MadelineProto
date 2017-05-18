@@ -22,7 +22,6 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
     use \danog\MadelineProto\MTProtoTools\Crypt;
-    use \danog\MadelineProto\MTProtoTools\DialogHandler;
     use \danog\MadelineProto\MTProtoTools\MessageHandler;
     use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
@@ -42,10 +41,12 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\Tools;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
+    use \danog\MadelineProto\Wrappers\DialogHandler;
+    use \danog\MadelineProto\Wrappers\Login;
 
     public $settings = [];
-    public $config = ['expires' => -1];
-    public $ipv6 = false;
+    private $config = ['expires' => -1];
+    private $ipv6 = false;
     public $should_serialize = true;
     public $authorization = null;
     public $authorized = false;
@@ -53,7 +54,50 @@ class MTProto extends \Volatile
     public $bigint = false;
     public $run_workers = false;
     public $threads = false;
-    public $rsa_keys = [];
+    private $rsa_keys = [];
+    private $last_recv = 0;
+    private $dh_config = ['version' => 0];
+    public $chats = [];
+    public $last_stored = 0;
+    public $qres = [];
+    private $pending_updates = [];
+    private $bad_msg_error_codes = [
+        16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
+        17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
+        18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
+        19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)',
+        20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not',
+        32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)',
+        33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)',
+        34 => 'an even msg_seqno expected (irrelevant message), but odd received',
+        35 => 'odd msg_seqno expected (relevant message), but even received',
+        48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
+        64 => 'invalid container.',
+    ];
+    private $msgs_info_flags = [
+        1   => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
+        2   => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
+        3   => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
+        4   => 'message received (note that this response is also at the same time a receipt acknowledgment)',
+        8   => ' and message already acknowledged',
+        16  => ' and message not requiring acknowledgment',
+        32  => ' and RPC query contained in message being processed or processing already complete',
+        64  => ' and content-related response to message already generated',
+        128 => ' and other party knows for a fact that message is already received',
+    ];
+
+    private $stop = false;
+
+    private $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
+    private $got_state = false;
+    private $channels_state = [];
+    public $updates = [];
+    public $updates_key = 0;
+    private $getting_state = false;
+    public $full_chats;
+    private $msg_ids = [];
+
+    private $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
 
     public function ___construct($settings = [])
     {
@@ -110,6 +154,7 @@ class MTProto extends \Volatile
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = $this->getV();
         $this->should_serialize = true;
+        return $this->settings;
     }
 
     public function __sleep()
@@ -454,7 +499,7 @@ class MTProto extends \Volatile
         }
     }
 
-    protected $initing_authorization = false;
+    private $initing_authorization = false;
 
     // Creates authorization keys
     public function init_authorization()

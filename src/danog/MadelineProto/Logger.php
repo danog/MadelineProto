@@ -62,21 +62,6 @@ class Logger
         self::class_exists();
     }
 
-    public static function utf8ize($d)
-    {
-        if (is_array($d) || $d instanceof \Volatile) {
-            foreach ($d as $k => $v) {
-                if ($k === 'bytes' || is_array($v) || $v instanceof \Volatile) {
-                    $d[$k] = self::utf8ize($v);
-                }
-            }
-        } elseif (is_string($d)) {
-            return utf8_encode($d);
-        }
-
-        return $d;
-    }
-
     public static function log($params, $level = self::NOTICE)
     {
         if (!self::$constructed) {
@@ -91,7 +76,7 @@ class Logger
         }
         foreach (is_array($params) ? $params : [$params] as $param) {
             if (!is_string($param)) {
-                $param = json_encode(self::utf8ize($param), JSON_PRETTY_PRINT);
+                $param = json_encode($param, JSON_PRETTY_PRINT);
             }
             $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
             switch (self::$mode) {

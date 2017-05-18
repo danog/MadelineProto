@@ -17,10 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait PeerHandler
 {
-    public $chats = [];
-    public $last_stored = 0;
-    public $qres = [];
-
     public function add_users($users)
     {
         foreach ($users as $key => $user) {

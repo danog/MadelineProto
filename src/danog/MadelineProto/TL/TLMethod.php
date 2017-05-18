@@ -23,7 +23,7 @@ class TLMethod extends \Volatile
     public $params = [];
     public $method_namespace = [];
     public $key = 0;
-
+    public function __sleep() { return ['id', 'method', 'type', 'params', 'method_namespace', 'key']; }
     public function add($json_dict)
     {
         $this->id[$this->key] = $json_dict['id'];

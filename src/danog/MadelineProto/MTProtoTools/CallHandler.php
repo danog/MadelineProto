@@ -85,7 +85,17 @@ trait CallHandler
                             break;
                         }
                         if (!$this->threads && !$this->run_workers) {
-                            $this->recv_message($aargs['datacenter']); // This method receives data from the socket, and parses stuff
+                            if ($error = $this->recv_message($aargs['datacenter']) !== true) {
+                                if ($error === -404) {
+                                    if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
+                                        \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                                        $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                                        $this->init_authorization();
+                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                    }
+                                }
+                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                            }
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                         } else {
                             $res_count--;
@@ -145,6 +155,16 @@ trait CallHandler
                     $server_answer = $this->MTProto_to_botAPI($server_answer, $args);
                 }
             } catch (\danog\MadelineProto\Exception $e) {
+                $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
+                \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
+                if ($this->in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
+                    //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
+                } else {
+                    $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
+                }
+                //sleep(1); // To avoid flooding
+                continue;
+            } catch (\RuntimeException $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
                 if ($this->in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {

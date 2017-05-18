@@ -7,6 +7,10 @@ description: vector attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

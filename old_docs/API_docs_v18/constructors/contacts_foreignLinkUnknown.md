@@ -7,6 +7,10 @@ description: contacts_foreignLinkUnknown attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -10,7 +10,7 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\TL\Types;
 
 class Button extends \Volatile implements \JsonSerializable
 {
@@ -25,7 +25,7 @@ class Button extends \Volatile implements \JsonSerializable
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;
     }
-
+    public function __sleep() { return ['data', 'info']; }
     public function click($donotwait = false)
     {
         switch ($this->data['_']) {

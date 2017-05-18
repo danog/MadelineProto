@@ -7,6 +7,10 @@ description: messages_stickersNotModified attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

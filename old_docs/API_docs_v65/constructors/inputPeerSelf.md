@@ -7,6 +7,10 @@ description: inputPeerSelf attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -6,6 +6,10 @@ description: test.testNet parameters, return type and example
 [Back to methods index](index.md)
 
 
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 ### Return type: [test\_Empty](../types/test_Empty.md)

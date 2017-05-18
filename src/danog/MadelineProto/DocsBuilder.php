@@ -652,7 +652,7 @@ description: A UTF8 string of variable length
 ## Type: string  
 [Back to constructor index](index.md)
 
-A string of variable length. The total length in bytes of the string must not be bigger than 16777215.
+A UTF8 string of variable length. The total length in bytes of the string must not be bigger than 16777215.
 ');
         file_put_contents('types/bytes.md', '---
 title: bytes
@@ -661,7 +661,7 @@ description: A string of variable length
 ## Type: bytes  
 [Back to constructor index](index.md)
 
-A string of variable length, with length smaller than or equal to 16777215.
+A string of bytes of variable length, with length smaller than or equal to 16777215.
 ');
 
         file_put_contents('types/int.md', '---

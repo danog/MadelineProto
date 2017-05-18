@@ -17,15 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait UpdateHandler
 {
-    public $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
-    public $got_state = false;
-    public $channels_state = [];
-    public $updates = [];
-    public $updates_key = 0;
-    protected $getting_state = false;
-    public $full_chats;
-    protected $msg_ids = [];
-
     public function pwr_update_handler($update)
     {
         if (isset($update['message']['to_id'])) {
@@ -605,7 +596,7 @@ trait UpdateHandler
 
     public function pwr_webhook($update)
     {
-        $payload = json_encode($this->utf8ize($update));
+        $payload = json_encode($update);
         \danog\MadelineProto\Logger::log([$update, $payload, json_last_error()]);
         if ($payload === '') {
             \danog\MadelineProto\Logger::log(['EMPTY UPDATE']);

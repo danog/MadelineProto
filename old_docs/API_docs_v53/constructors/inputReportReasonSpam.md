@@ -7,6 +7,10 @@ description: inputReportReasonSpam attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -6,6 +6,10 @@ description: contacts.getStatuses parameters, return type and example
 [Back to methods index](index.md)
 
 
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 ### Return type: [Vector\_of\_ContactStatus](../types/ContactStatus.md)

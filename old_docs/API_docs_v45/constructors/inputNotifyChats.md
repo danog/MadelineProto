@@ -7,6 +7,10 @@ description: inputNotifyChats attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

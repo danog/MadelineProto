@@ -7,6 +7,10 @@ description: auth_codeTypeSms attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

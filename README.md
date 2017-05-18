@@ -136,14 +136,7 @@ Becomes:
 $settings = [
     'authorization' => [ // Authorization settings
         'default_temp_auth_key_expires_in' => 86400,
-        'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
-MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
-lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
-an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
-Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
-8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
-Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----',
+        'rsa_keys'                          => array with default rsa keys
     ]
     // The remaining subsetting arrays are the set to default
 ]
@@ -151,20 +144,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
 Note that only settings arrays or values of a settings array will be set to default.
 
-The settings array can be accessed in the instantiated class like this:
+The settings array can be accessed and modified in the instantiated class by accessing the `settings` attribute of the API class:
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-var_dump($MadelineProto->get_settings());
-```
-
-The settings array can be modified in the instantiated class like this:
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-$settings = $MadelineProto->get_settings();
-// Make changes to $settings
-$MadelineProto->update_settings($settings);
+var_dump($MadelineProto->settings);
 ```
 
 ### Handling updates

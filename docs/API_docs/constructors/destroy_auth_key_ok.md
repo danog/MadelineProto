@@ -7,6 +7,10 @@ description: destroy_auth_key_ok attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

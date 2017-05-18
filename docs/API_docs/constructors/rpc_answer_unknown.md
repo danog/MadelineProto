@@ -7,6 +7,10 @@ description: rpc_answer_unknown attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

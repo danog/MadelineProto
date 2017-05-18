@@ -19,40 +19,45 @@ trait Login
 {
     public function logout()
     {
-        if (!$this->API->method_call('auth.logOut', [], ['datacenter' => $this->API->datacenter->curdc])) {
+        if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
             throw new \danog\MadelineProto\Exception('An error occurred while logging out!');
         }
-        $this->API->authorized = false;
-        $this->API->authorization = null;
-        $this->API->updates = [];
+        $this->authorized = false;
+        $this->authorization = null;
+        $this->updates = [];
+        $this->secret_chats = [];
+        $this->chats = [];
+        $this->users = [];
+        $this->state = [];
+
         \danog\MadelineProto\Logger::log(['Logged out successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        $this->API->should_serialize = true;
+        $this->should_serialize = true;
 
         return true;
     }
 
     public function bot_login($token)
     {
-        if ($this->API->authorized) {
+        if ($this->authorized) {
             \danog\MadelineProto\Logger::log(['This instance of MadelineProto is already logged in. Logging out first...'], \danog\MadelineProto\Logger::NOTICE);
             $this->logout();
         }
         \danog\MadelineProto\Logger::log(['Logging in as a bot...'], \danog\MadelineProto\Logger::NOTICE);
-        $this->API->authorization = $this->API->method_call(
+        $this->authorization = $this->method_call(
             'auth.importBotAuthorization',
             [
                 'bot_auth_token'     => $token,
-                'api_id'             => $this->API->settings['app_info']['api_id'],
-                'api_hash'           => $this->API->settings['app_info']['api_hash'],
-            ], ['datacenter' => $this->API->datacenter->curdc]
+                'api_id'             => $this->settings['app_info']['api_id'],
+                'api_hash'           => $this->settings['app_info']['api_hash'],
+            ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->updates = [];
-        $this->API->updates_key = 0;
-        $this->API->should_serialize = true;
-        if (!isset($this->API->settings['pwr']['pwr']) || !$this->API->settings['pwr']['pwr']) {
+        $this->authorized = true;
+        $this->sync_authorization($this->datacenter->curdc);
+        $this->updates = [];
+        $this->updates_key = 0;
+        $this->should_serialize = true;
+        if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
             try {
                 file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
             } catch (\danog\MadelineProto\Exception $e) {
@@ -60,125 +65,125 @@ trait Login
         }
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        return $this->API->authorization;
+        return $this->authorization;
     }
 
     public function phone_login($number, $sms_type = 5)
     {
-        if ($this->API->authorized) {
+        if ($this->authorized) {
             \danog\MadelineProto\Logger::log(['This instance of MadelineProto is already logged in. Logging out first...'], \danog\MadelineProto\Logger::NOTICE);
             $this->logout();
         }
         \danog\MadelineProto\Logger::log(['Sending code...'], \danog\MadelineProto\Logger::NOTICE);
-        $this->API->authorization = $this->API->method_call(
+        $this->authorization = $this->method_call(
             'auth.sendCode',
             [
                 'phone_number' => $number,
                 'sms_type'     => $sms_type,
-                'api_id'       => $this->API->settings['app_info']['api_id'],
-                'api_hash'     => $this->API->settings['app_info']['api_hash'],
-                'lang_code'    => $this->API->settings['app_info']['lang_code'],
-            ], ['datacenter' => $this->API->datacenter->curdc]
+                'api_id'       => $this->settings['app_info']['api_id'],
+                'api_hash'     => $this->settings['app_info']['api_hash'],
+                'lang_code'    => $this->settings['app_info']['lang_code'],
+            ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->API->authorization['phone_number'] = $number;
-        $this->API->login_temp_status = 'waiting_code';
-        $this->API->should_serialize = true;
-        $this->API->updates = [];
-        $this->API->updates_key = 0;
+        $this->authorization['phone_number'] = $number;
+        $this->login_temp_status = 'waiting_code';
+        $this->should_serialize = true;
+        $this->updates = [];
+        $this->updates_key = 0;
 
         \danog\MadelineProto\Logger::log(['Code sent successfully! Once you receive the code you should use the complete_phone_login function.'], \danog\MadelineProto\Logger::NOTICE);
 
-        return $this->API->authorization;
+        return $this->authorization;
     }
 
     public function complete_phone_login($code)
     {
-        if ($this->API->login_temp_status !== 'waiting_code') {
+        if ($this->login_temp_status !== 'waiting_code') {
             throw new \danog\MadelineProto\Exception("I'm not waiting for the code! Please call the phone_login method first");
         }
-        $this->API->login_temp_status = 'none';
+        $this->login_temp_status = 'none';
         \danog\MadelineProto\Logger::log(['Logging in as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
         try {
-            $authorization = $this->API->method_call(
+            $authorization = $this->method_call(
                 'auth.signIn',
                 [
-                    'phone_number'    => $this->API->authorization['phone_number'],
-                    'phone_code_hash' => $this->API->authorization['phone_code_hash'],
+                    'phone_number'    => $this->authorization['phone_number'],
+                    'phone_code_hash' => $this->authorization['phone_code_hash'],
                     'phone_code'      => $code,
-                ], ['datacenter' => $this->API->datacenter->curdc]
+                ], ['datacenter' => $this->datacenter->curdc]
             );
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 \danog\MadelineProto\Logger::log(['2FA enabled, you will have to call the complete_2fa_login function...'], \danog\MadelineProto\Logger::NOTICE);
-                $this->API->login_temp_status = 'waiting_password';
-                $this->API->should_serialize = true;
+                $this->login_temp_status = 'waiting_password';
+                $this->should_serialize = true;
 
-                return $this->API->authorization = $this->account->getPassword();
+                return $this->authorization = $this->account->getPassword();
             }
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
-                $this->API->login_temp_status = 'waiting_signup';
-                $this->API->should_serialize = true;
-                $this->API->authorization['phone_code'] = $code;
+                $this->login_temp_status = 'waiting_signup';
+                $this->should_serialize = true;
+                $this->authorization['phone_code'] = $code;
 
                 return ['_' => 'account.needSignup'];
             }
             throw $e;
         }
-        $this->API->authorization = $authorization;
-        $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->should_serialize = true;
+        $this->authorization = $authorization;
+        $this->authorized = true;
+        $this->sync_authorization($this->datacenter->curdc);
+        $this->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        return $this->API->authorization;
+        return $this->authorization;
     }
 
     public function complete_signup($first_name, $last_name)
     {
-        if ($this->API->login_temp_status !== 'waiting_signup') {
+        if ($this->login_temp_status !== 'waiting_signup') {
             throw new \danog\MadelineProto\Exception("I'm not waiting to signup! Please call the phone_login and the complete_phone_login methods first!");
         }
-        $this->API->login_temp_status = 'none';
+        $this->login_temp_status = 'none';
         \danog\MadelineProto\Logger::log(['Signing up as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
-        $this->API->authorization = $this->API->method_call(
+        $this->authorization = $this->method_call(
             'auth.signUp',
             [
-                    'phone_number'    => $this->API->authorization['phone_number'],
-                    'phone_code_hash' => $this->API->authorization['phone_code_hash'],
-                    'phone_code'      => $this->API->authorization['phone_code'],
+                    'phone_number'    => $this->authorization['phone_number'],
+                    'phone_code_hash' => $this->authorization['phone_code_hash'],
+                    'phone_code'      => $this->authorization['phone_code'],
                     'first_name'      => $first_name,
                     'last_name'       => $last_name,
-            ], ['datacenter' => $this->API->datacenter->curdc]
+            ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->should_serialize = true;
+        $this->authorized = true;
+        $this->sync_authorization($this->datacenter->curdc);
+        $this->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Signed up in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        return $this->API->authorization;
+        return $this->authorization;
     }
 
     public function complete_2fa_login($password)
     {
-        if ($this->API->login_temp_status !== 'waiting_password') {
+        if ($this->login_temp_status !== 'waiting_password') {
             throw new \danog\MadelineProto\Exception("I'm not waiting for the password! Please call the phone_login and the complete_phone_login methods first!");
         }
-        $this->API->login_temp_status = 'none';
+        $this->login_temp_status = 'none';
         \danog\MadelineProto\Logger::log(['Logging in as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
-        $this->API->authorization = $this->API->method_call(
+        $this->authorization = $this->method_call(
             'auth.checkPassword',
             [
-                'password_hash' => hash('sha256', $this->API->authorization['current_salt'].$password.$this->API->authorization['current_salt'], true),
-            ], ['datacenter' => $this->API->datacenter->curdc]
+                'password_hash' => hash('sha256', $this->authorization['current_salt'].$password.$this->authorization['current_salt'], true),
+            ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->API->authorized = true;
-        $this->API->sync_authorization($this->API->datacenter->curdc);
-        $this->API->should_serialize = true;
+        $this->authorized = true;
+        $this->sync_authorization($this->datacenter->curdc);
+        $this->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        return $this->API->authorization;
+        return $this->authorization;
     }
 }

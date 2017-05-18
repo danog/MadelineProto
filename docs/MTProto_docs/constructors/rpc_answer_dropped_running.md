@@ -7,6 +7,10 @@ description: rpc_answer_dropped_running attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -6,6 +6,10 @@ description: destroy_auth_key parameters, return type and example
 [Back to methods index](index.md)
 
 
+### Parameters:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 ### Return type: [DestroyAuthKeyRes](../types/DestroyAuthKeyRes.md)

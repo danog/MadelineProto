@@ -7,6 +7,10 @@ description: topPeerCategoryBotsInline attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

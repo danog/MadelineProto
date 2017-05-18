@@ -7,6 +7,10 @@ description: storage_fileMp4 attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
 
 
 

@@ -10,12 +10,10 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto\MTProtoTools;
+namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
 {
-    public $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
-
     public function get_dialogs()
     {
         $this->getting_state = true;

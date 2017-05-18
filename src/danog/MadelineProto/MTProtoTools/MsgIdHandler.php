@@ -34,8 +34,7 @@ trait MsgIdHandler
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
             }
-            $key = $this->get_max_id($aargs['datacenter'], false);
-            if ($new_message_id->compare($key) <= 0) {
+            if (!\danog\MadelineProto\Logger::$has_thread && $new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], false)) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').', 1);
             }
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
@@ -49,11 +48,11 @@ trait MsgIdHandler
             }
             $key = $this->get_max_id($aargs['datacenter'], true);
             if ($aargs['container']) {
-                if ($new_message_id->compare($key) >= 0) {
+                if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) >= 0) {
                     \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal than the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
-                if ($new_message_id->compare($key) <= 0) {
+                if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) <= 0) {
                     \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal than the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
                 }
             }
@@ -69,8 +68,7 @@ trait MsgIdHandler
     public function generate_message_id($datacenter)
     {
         $message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta))->bitwise_leftShift(32);
-        $key = $this->get_max_id($datacenter, false);
-        if ($message_id->compare($key) <= 0) {
+        if ($message_id->compare($key = $this->get_max_id($datacenter, false)) <= 0) {
             $message_id = $key->add($this->four);
         }
         $this->check_message_id($message_id, ['outgoing' => true, 'datacenter' => $datacenter, 'container' => false]);

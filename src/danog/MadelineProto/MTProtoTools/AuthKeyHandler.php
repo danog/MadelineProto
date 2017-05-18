@@ -20,7 +20,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait AuthKeyHandler
 {
-    public $dh_config = ['version' => 0];
 
     public function create_auth_key($expires_in, $datacenter)
     {

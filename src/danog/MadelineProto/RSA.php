@@ -52,7 +52,7 @@ class RSA extends \Volatile
 
         return true;
     }
-
+    public function __sleep() { return ['e', 'n', 'fp']; }
     public function encrypt($data)
     {
         \danog\MadelineProto\Logger::log(['Encrypting with rsa key...'], Logger::VERBOSE);

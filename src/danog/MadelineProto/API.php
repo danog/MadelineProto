@@ -14,8 +14,6 @@ namespace danog\MadelineProto;
 
 class API extends APIFactory
 {
-    use \danog\MadelineProto\Wrappers\Login;
-    use \danog\MadelineProto\Wrappers\SettingsManager;
     use \danog\Serializable;
 
     public $API;
@@ -57,7 +55,14 @@ class API extends APIFactory
     {
         return ['API'];
     }
-
+    public function &__get($name) {
+        if ($name === 'settings') return $this->API->settings;
+        return $this->{$name};
+    }
+    public function &__set($name, $value) {
+        if ($name === 'settings') return $this->API->__construct($value);
+        return $this->{$name} = $value;
+    }
     public function APIFactory()
     {
         foreach ($this->API->get_method_namespaces() as $namespace) {
