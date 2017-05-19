@@ -182,6 +182,5 @@ if (!extension_loaded('pthreads')) {
                         */
             return $value;
         }
-
     }
 }
