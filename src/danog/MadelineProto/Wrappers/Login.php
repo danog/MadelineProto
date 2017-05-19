@@ -118,7 +118,7 @@ trait Login
                 $this->login_temp_status = 'waiting_password';
                 $this->should_serialize = true;
 
-                return $this->authorization = $this->account->getPassword();
+                return $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
             }
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
