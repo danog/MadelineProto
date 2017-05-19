@@ -536,15 +536,15 @@ trait BotAPI
         $buttons = [];
         $cols = 0;
         foreach ($button_list as $button) {
-             if (isset($button['new'])) {
-                 if (count($buttons) == 0) {
-                     $buttons[] = $button;
-                 } else {
-                     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                     $rows[] = $row;
-                     $buttons = [$button];
-                 }
-             } else {
+            if (isset($button['new'])) {
+                if (count($buttons) == 0) {
+                    $buttons[] = $button;
+                } else {
+                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
+                    $rows[] = $row;
+                    $buttons = [$button];
+                }
+            } else {
                 $buttons[] = $button;
                 $end = true;
             }
