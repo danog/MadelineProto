@@ -64,6 +64,9 @@ if (!extension_loaded('pthreads')) {
         private function runCollectable($idx, Collectable $collectable)
         {
             $collectable->worker = $this;
+            if (!isset($collectable->state)) {
+                $collectable->state = 0;
+            }
             $collectable->state |= THREAD::RUNNING;
             $collectable->run();
             $collectable->state &= ~THREAD::RUNNING;
