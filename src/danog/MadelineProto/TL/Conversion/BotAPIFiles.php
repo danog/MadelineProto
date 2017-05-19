@@ -116,7 +116,15 @@ trait BotAPIFiles
 
             case 'bot_video':
             unset($deserialized['_']);
-            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo']]]);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo', 'round_message' => false]]]);
+
+            $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
+
+            return $res;
+
+            case 'bot_video_note':
+            unset($deserialized['_']);
+            $constructor = array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo', 'round_message' => true]]]);
 
             $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
 
