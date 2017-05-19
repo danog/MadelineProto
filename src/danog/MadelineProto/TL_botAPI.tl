@@ -6,4 +6,4 @@ bot_document#5 dc_id:int id:long access_hash:long = File;
 bot_sticker#8 dc_id:int id:long access_hash:long = File;
 bot_audio#9 dc_id:int id:long access_hash:long = File;
 bot_gif#A dc_id:int id:long access_hash:long = File;
-bot_roundvideo#D dc_id:int id:long access_hash:long = File;
+bot_video_note#D dc_id:int id:long access_hash:long = File;

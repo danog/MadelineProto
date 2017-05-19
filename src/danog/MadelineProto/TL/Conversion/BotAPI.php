@@ -275,7 +275,7 @@ trait BotAPI
                     break;
 
                     case 'documentAttributeVideo':
-                    $type_name = 'video';
+                    $type_name = $attribute['round_message'] ? 'video_note' : 'video';
                     $res['width'] = $attribute['w'];
                     $res['height'] = $attribute['h'];
                     $res['duration'] = $attribute['duration'];
