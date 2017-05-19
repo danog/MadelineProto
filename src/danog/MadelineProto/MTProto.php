@@ -99,6 +99,14 @@ class MTProto extends \Volatile
 
     private $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
     public $storage = [];
+    private $zero;
+    private $one;
+    private $two;
+    private $three;
+    private $four;
+    private $twoe1984;
+    private $twoe2047;
+    private $twoe2048;
 
     public function ___construct($settings = [])
     {
@@ -161,7 +169,7 @@ class MTProto extends \Volatile
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'ipv6', 'should_serialize', 'authorization', 'authorized', 'login_temp_status', 'bigint', 'run_workers', 'threads', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'bad_msg_error_codes', 'msgs_info_flags', 'stop', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'getting_state', 'full_chats', 'msg_ids', 'dialog_params', 'storage', 'datacenter'];
+        return ['encrypted_layer', 'settings', 'config', 'ipv6', 'should_serialize', 'authorization', 'authorized', 'login_temp_status', 'bigint', 'run_workers', 'threads', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'bad_msg_error_codes', 'msgs_info_flags', 'stop', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'getting_state', 'full_chats', 'msg_ids', 'dialog_params', 'storage', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four'];
     }
 
     public function __wakeup()
@@ -605,7 +613,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 32;
+        return 34;
     }
 
     public function get_self()

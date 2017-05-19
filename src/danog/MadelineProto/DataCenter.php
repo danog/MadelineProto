@@ -60,7 +60,7 @@ class DataCenter extends \Volatile
         $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
         $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
-        $address = $this->settings[$dc_config_number]['ipv6'] ? '['.$address.']' : $address;
+        //$address = $this->settings[$dc_config_number]['ipv6'] ? '['.$address.']' : $address;
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
         if ($this->settings[$dc_config_number]['protocol'] === 'https') {
             $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
