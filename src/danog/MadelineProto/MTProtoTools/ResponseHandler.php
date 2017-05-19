@@ -323,6 +323,10 @@ trait ResponseHandler
 
     public function handle_rpc_error($server_answer, &$aargs)
     {
+        if ($server_answer['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
+            $this->got_state = false;
+            throw new \danog\MadelineProto\Exception('Update the timestamp pls');
+        }
         switch ($server_answer['error_code']) {
             case 303:
                 $this->datacenter->curdc = $aargs['datacenter'] = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
