@@ -98,6 +98,7 @@ class MTProto extends \Volatile
     private $msg_ids = [];
 
     private $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
+    public $storage = [];
 
     public function ___construct($settings = [])
     {
@@ -160,20 +161,7 @@ class MTProto extends \Volatile
 
     public function __sleep()
     {
-        $t = get_object_vars($this);
-        if (isset($t['readers'])) {
-            unset($t['readers']);
-        }
-        if (isset($t['data'])) {
-            unset($t['data']);
-        }
-
-        $keys = array_keys((array) $t);
-        if (count($keys) !== count(array_unique($keys))) {
-            throw new Bug74586Exception();
-        }
-
-        return $keys;
+        return ['encrypted_layer', 'settings', 'config', 'ipv6', 'should_serialize', 'authorization', 'authorized', 'login_temp_status', 'bigint', 'run_workers', 'threads', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'bad_msg_error_codes', 'msgs_info_flags', 'stop', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'getting_state', 'full_chats', 'msg_ids', 'dialog_params', 'storage', 'datacenter'];
     }
 
     public function __wakeup()
@@ -440,7 +428,7 @@ class MTProto extends \Volatile
                 'requests' => true,  // Should I get info about unknown peers from PWRTelegram?
             ],
         ];
-        $settings = $this->array_replace_recursive($default_settings, $settings);
+        $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (!isset($settings['app_info']['api_id'])) {
             throw new Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
@@ -617,7 +605,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 30;
+        return 32;
     }
 
     public function get_self()

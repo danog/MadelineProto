@@ -25,7 +25,7 @@ class Connection extends \Volatile
     public $ip = null;
     public $port = null;
     public $timeout = null;
-//    public $parsed = [];
+    public $parsed = [];
     public $time_delta = 0;
     public $temp_auth_key;
     public $auth_key;
@@ -150,20 +150,7 @@ class Connection extends \Volatile
 
     public function __sleep()
     {
-        $t = get_object_vars($this);
-        if (isset($t['sock'])) {
-            unset($t['sock']);
-        }
-        if (isset($t['data'])) {
-            unset($t['data']);
-        }
-
-        $keys = array_keys((array) $t);
-        if (count($keys) !== count(array_unique($keys))) {
-            throw new Bug74586Exception();
-        }
-
-        return $keys;
+        return ['protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing'];
     }
 
     public function __wakeup()

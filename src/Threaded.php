@@ -183,6 +183,5 @@ if (!extension_loaded('pthreads')) {
             return $value;
         }
 
-        protected $state;
     }
 }

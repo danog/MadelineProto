@@ -74,6 +74,7 @@ trait UpdateHandler
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
+        if (isset($this->updates["\0*\0state"])) unset($this->updates["\0*\0state"]);
         $supdates = (array) $this->updates;
         ksort($supdates);
         foreach ($supdates as $key => $value) {
