@@ -470,8 +470,12 @@ trait BotAPI
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $text) as $word) {
             if (strlen($word) > 4096) {
-                foreach (str_split($word, 4096) as $vv) { $text_arr []= $vv; }
-            } else $text_arr []= $word;
+                foreach (str_split($word, 4096) as $vv) {
+                    $text_arr[] = $vv;
+                }
+            } else {
+                $text_arr[] = $word;
+            }
         }
         $i = 0;
         $message[0] = '';
@@ -501,7 +505,7 @@ trait BotAPI
         $finalArray = [];
         foreach ($initialArray as $item) {
             if (strlen($item) > 0) {
-                $finalArray []= $item.$string[strpos($string, $item)+strlen($item)];
+                $finalArray[] = $item.$string[strpos($string, $item) + strlen($item)];
             }
         }
 

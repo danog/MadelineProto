@@ -109,7 +109,7 @@ while (true) {
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         try {
-        switch ($update['update']['_']) {
+            switch ($update['update']['_']) {
             case 'updateNewMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
@@ -218,8 +218,8 @@ while (true) {
                     }
                 }
         }
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {}
-
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        }
     }
     \danog\MadelineProto\Serialization::serialize('pipesbot.madeline', $MadelineProto);
     \danog\MadelineProto\Serialization::serialize('pwr.madeline', $uMadelineProto);
