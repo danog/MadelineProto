@@ -414,7 +414,6 @@ trait BotAPI
                 if (preg_match('|:new|', substr($href, -4))) {
                     $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', str_replace(':new', '', $href)), 'new' => true];
                 } else {
-                    var_dump(true);
                     $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', $href)];
                 }
                 break;
@@ -468,7 +467,12 @@ trait BotAPI
     public function split_to_chunks($text)
     {
         $total_length = 4096;
-        $text_arr = $this->multipleExplodeKeepDelimiters(["\n"], $text);
+        $text_arr = [];
+        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $text) as $word) {
+            if (strlen($word) > 4096) {
+                foreach (str_split($word, 4096) as $vv) { $text_arr []= $vv; }
+            } else $text_arr []= $word;
+        }
         $i = 0;
         $message[0] = '';
         foreach ($text_arr as $word) {
@@ -497,7 +501,7 @@ trait BotAPI
         $finalArray = [];
         foreach ($initialArray as $item) {
             if (strlen($item) > 0) {
-                array_push($finalArray, $item.$string[strpos($string, $item) + strlen($item)]);
+                $finalArray []= $item.$string[strpos($string, $item)+strlen($item)];
             }
         }
 
