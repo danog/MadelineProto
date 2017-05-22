@@ -18,12 +18,12 @@ $uMadelineProto = false;
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log([$e->getMessage()]);
+    var_dump($e->getMessage());
 }
 try {
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log([$e->getMessage()]);
+    var_dump($e->getMessage());
 }
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
@@ -108,7 +108,8 @@ while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-        switch ($update['update']['_']) {
+        try {
+            switch ($update['update']['_']) {
             case 'updateNewMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
@@ -216,6 +217,8 @@ while (true) {
                     } catch (\danog\MadelineProto\Exception $e) {
                     }
                 }
+        }
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
         }
     }
     \danog\MadelineProto\Serialization::serialize('pipesbot.madeline', $MadelineProto);

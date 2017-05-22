@@ -27,6 +27,8 @@ try {
         die;
     }
 }
+var_dump($MadelineProto->rle_decode($MadelineProto->base64url_decode('gRuWfE2EXVJtaecDLpxYs39tElkZtzLo2mwsdmkuRbZQLO6ofKSoTHedbY1N9lAeUfvgE8wqHIF1VJ95YIyCCLswdZlmf-RWdph_C8wcUeSxtNCTE1gdbmiZp77uIT77bDbUHHbNyfgsKwY30aZS91snXwIrOulsGGA_j7VQ0k9TzGO9AczSj0LZt6kVpPpXKqSraHopH59Tpv4UCX3qXPa5XbcyodpOIL_VN5TtpfEUxoF5asavCOgNj6V4KInLDjkpLr-8dgViLUGRZagxr0EFHUs7DT9dW66_A4_qnszPlIw6GHOIlhLxV8emke0JV_hvATN11uT_RlnHNY83vQ')));
+
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
