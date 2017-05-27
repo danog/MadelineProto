@@ -28,6 +28,11 @@ trait CallHandler
         if (!isset($aargs['datacenter'])) {
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
+        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
+            if ($method === 'channels.getParticipants' && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
+                \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);
+            }  else throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
+        }
         if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);
             $args['message'] = array_shift($message_chunks);
@@ -80,16 +85,22 @@ trait CallHandler
                             }
                         } else {
                             //var_dump(base64_encode($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]);
+                            /*
+                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']);
+                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
+                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]);
+                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content']);
+                            */
                             $server_answer = $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'];
-                            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = [];
+                            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = '';
                             break;
                         }
                         if (!$this->threads && !$this->run_workers) {
-                            if ($error = $this->recv_message($aargs['datacenter']) !== true) {
+                            if (($error = $this->recv_message($aargs['datacenter'])) !== true) {
                                 if ($error === -404) {
-                                    if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
+                                    if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
                                         \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                                        $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                                         $this->init_authorization();
                                         throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                                     }
@@ -136,7 +147,7 @@ trait CallHandler
                                 continue 3;
                             case 16:
                             case 17:
-                                \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
+                                \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
                                 $this->datacenter->sockets[$aargs['datacenter']]->time_delta = (int) ((new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString());
                                 \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->time_delta], \danog\MadelineProto\Logger::WARNING);
                                 $this->reset_session();
@@ -144,7 +155,7 @@ trait CallHandler
                                 $this->init_authorization();
                                 continue 3;
                         }
-                        throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.$this->bad_msg_error_codes[$server_answer['error_code']], $server_answer['error_code']);
+                        throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$server_answer['error_code']], $server_answer['error_code']);
                         break;
                     case 'boolTrue':
                     case 'boolFalse':
@@ -177,7 +188,7 @@ trait CallHandler
             } finally {
                 if (isset($aargs['heavy']) && $aargs['heavy'] && isset($message_id)) {
                     //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['args'] = [];
-                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
+                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
                     unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
                 }
                 if (isset($message_id) && $method === 'req_pq') {

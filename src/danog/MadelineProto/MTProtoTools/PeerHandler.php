@@ -71,15 +71,18 @@ trait PeerHandler
                     if (!isset($chat['access_hash'])) {
                         continue;
                     }
-                    if (!isset($this->chats[$this->to_supergroup($chat['id'])]) || $this->chats[$this->to_supergroup($chat['id'])] !== $chat) {
-                        $this->chats[$this->to_supergroup($chat['id'])] = $chat;
+                    $bot_api_id = $this->to_supergroup($chat['id']);
+                    if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
+                        $this->chats[$bot_api_id] = $chat;
                         $this->should_serialize = true;
-                        try {
-                            $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
-                        } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                        if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
+                            try {
+                                $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
+                            } catch (\danog\MadelineProto\Exception $e) {
+                                \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            }
                         }
                     }
                     break;

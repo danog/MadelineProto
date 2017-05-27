@@ -44,24 +44,43 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    public $settings = [];
-    private $config = ['expires' => -1];
-    private $ipv6 = false;
-    public $should_serialize = true;
-    public $authorization = null;
-    public $authorized = false;
-    public $login_temp_status = 'none';
-    public $bigint = false;
-    public $run_workers = false;
-    public $threads = false;
-    private $rsa_keys = [];
-    private $last_recv = 0;
-    private $dh_config = ['version' => 0];
-    public $chats = [];
-    public $last_stored = 0;
-    public $qres = [];
-    private $pending_updates = [];
-    private $bad_msg_error_codes = [
+    const NOT_LOGGED_IN = 0;
+    const WAITING_CODE = 1;
+    const WAITING_PASSWORD = 2;
+    const LOGGED_IN = 3;
+    const DISALLOWED_METHODS = [
+        'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://daniil.it/MadelineProto for more info)',
+        'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'channels.getParticipants' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+
+        'messages.acceptEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
+        'messages.discardEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
+        'messages.requestEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
+/*
+        'phone.requestCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
+        'phone.acceptCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
+        'phone.confirmCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
+        'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
+*/
+        'updates.getChannelDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
+        'updates.getDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
+        'updates.getState' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
+
+        'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+
+    ];
+    const BAD_MSG_ERROR_CODES = [
         16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the “correct” msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
         17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
         18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
@@ -74,7 +93,7 @@ class MTProto extends \Volatile
         48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
         64 => 'invalid container.',
     ];
-    private $msgs_info_flags = [
+    const MSGS_INFO_FLAGS = [
         1   => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
         2   => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
         3   => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
@@ -85,20 +104,35 @@ class MTProto extends \Volatile
         64  => ' and content-related response to message already generated',
         128 => ' and other party knows for a fact that message is already received',
     ];
+    const REQUESTED = 0;
+    const ACCEPTED = 1;
+    const CONFIRMED = 2;
+    const READY = 3;
+    const EMOJIS = ['😉', '😍', '😛', '😭', '😱', '😡', '😎', '😴', '😵', '😈', '😬', '😇', '😏', '👮', '👷', '💂', '👶', '👨', '👩', '👴', '👵', '😻', '😽', '🙀', '👺', '🙈', '🙉', '🙊', '💀', '👽', '💩', '🔥', '💥', '💤', '👂', '👀', '👃', '👅', '👄', '👍', '👎', '👌', '👊', '✌', '✋', '👐', '👆', '👇', '👉', '👈', '🙏', '👏', '💪', '🚶', '🏃', '💃', '👫', '👪', '👬', '👭', '💅', '🎩', '👑', '👒', '👟', '👞', '👠', '👕', '👗', '👖', '👙', '👜', '👓', '🎀', '💄', '💛', '💙', '💜', '💚', '💍', '💎', '🐶', '🐺', '🐱', '🐭', '🐹', '🐰', '🐸', '🐯', '🐨', '🐻', '🐷', '🐮', '🐗', '🐴', '🐑', '🐘', '🐼', '🐧', '🐥', '🐔', '🐍', '🐢', '🐛', '🐝', '🐜', '🐞', '🐌', '🐙', '🐚', '🐟', '🐬', '🐋', '🐐', '🐊', '🐫', '🍀', '🌹', '🌻', '🍁', '🌾', '🍄', '🌵', '🌴', '🌳', '🌞', '🌚', '🌙', '🌎', '🌋', '⚡', '☔', '❄', '⛄', '🌀', '🌈', '🌊', '🎓', '🎆', '🎃', '👻', '🎅', '🎄', '🎁', '🎈', '🔮', '🎥', '📷', '💿', '💻', '☎', '📡', '📺', '📻', '🔉', '🔔', '⏳', '⏰', '⌚', '🔒', '🔑', '🔎', '💡', '🔦', '🔌', '🔋', '🚿', '🚽', '🔧', '🔨', '🚪', '🚬', '💣', '🔫', '🔪', '💊', '💉', '💰', '💵', '💳', '✉', '📫', '📦', '📅', '📁', '✂', '📌', '📎', '✒', '✏', '📐', '📚', '🔬', '🔭', '🎨', '🎬', '🎤', '🎧', '🎵', '🎹', '🎻', '🎺', '🎸', '👾', '🎮', '🃏', '🎲', '🎯', '🏈', '🏀', '⚽', '⚾', '🎾', '🎱', '🏉', '🎳', '🏁', '🏇', '🏆', '🏊', '🏄', '☕', '🍼', '🍺', '🍷', '🍴', '🍕', '🍔', '🍟', '🍗', '🍱', '🍚', '🍜', '🍡', '🍳', '🍞', '🍩', '🍦', '🎂', '🍰', '🍪', '🍫', '🍭', '🍯', '🍎', '🍏', '🍊', '🍋', '🍒', '🍇', '🍉', '🍓', '🍑', '🍌', '🍐', '🍍', '🍆', '🍅', '🌽', '🏡', '🏥', '🏦', '⛪', '🏰', '⛺', '🏭', '🗻', '🗽', '🎠', '🎡', '⛲', '🎢', '🚢', '🚤', '⚓', '🚀', '✈', '🚁', '🚂', '🚋', '🚎', '🚌', '🚙', '🚗', '🚕', '🚛', '🚨', '🚔', '🚒', '🚑', '🚲', '🚠', '🚜', '🚦', '⚠', '🚧', '⛽', '🎰', '🗿', '🎪', '🎭', '🇯🇵', '🇰🇷', '🇩🇪', '🇨🇳', '🇺🇸', '🇫🇷', '🇪🇸', '🇮🇹', '🇷🇺', '🇬🇧', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '0⃣', '🔟', '❗', '❓', '♥', '♦', '💯', '🔗', '🔱', '🔴', '🔵', '🔶', '🔷'];
 
-    private $stop = false;
+    public $settings = [];
+    private $config = ['expires' => -1];
+    public $authorization = null;
+    public $authorized = 0;
 
-    private $updates_state = ['pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
+    private $rsa_keys = [];
+    private $last_recv = 0;
+    private $dh_config = ['version' => 0];
+    public $chats = [];
+    public $last_stored = 0;
+    public $qres = [];
+    private $pending_updates = [];
+    private $updates_state = ['_' => 'MadelineProto.Updates_state', 'pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
     private $got_state = false;
     private $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
     private $getting_state = false;
-    public $full_chats;
+    public $full_chats = [];
     private $msg_ids = [];
+    private $v = 0;
 
-    private $dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
-    public $storage = [];
+    private $dialog_params = ['_' => 'MadelineProto.DialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
     private $zero;
     private $one;
     private $two;
@@ -108,10 +142,21 @@ class MTProto extends \Volatile
     private $twoe2047;
     private $twoe2048;
 
+
+
+    private $ipv6 = false;
+    public $should_serialize = false;
+    public $run_workers = false;
+    public $threads = false;
+
+
     public function ___construct($settings = [])
     {
-        //if ($this->unserialized($settings)) return true;
         \danog\MadelineProto\Logger::class_exists();
+
+        // Detect ipv6
+        $this->ipv6 = strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+
         // Parse settings
         $this->parse_settings($settings);
 
@@ -122,8 +167,8 @@ class MTProto extends \Volatile
         } else {
             $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         }
-        // Load rsa key
-        \danog\MadelineProto\Logger::log(['Loading RSA key...'], Logger::ULTRA_VERBOSE);
+        // Load rsa keys
+        \danog\MadelineProto\Logger::log(['Loading RSA keys...'], Logger::ULTRA_VERBOSE);
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = new RSA($key);
             $this->rsa_keys[$key->fp] = $key;
@@ -147,6 +192,8 @@ class MTProto extends \Volatile
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
+        $this->setup_threads();
+
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
@@ -169,7 +216,7 @@ class MTProto extends \Volatile
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'ipv6', 'should_serialize', 'authorization', 'authorized', 'login_temp_status', 'bigint', 'run_workers', 'threads', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'bad_msg_error_codes', 'msgs_info_flags', 'stop', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'getting_state', 'full_chats', 'msg_ids', 'dialog_params', 'storage', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four'];
+        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'getting_state', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'secret_chats', 'calls'];
     }
 
     public function __wakeup()
@@ -179,6 +226,10 @@ class MTProto extends \Volatile
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
+        // Detect ipv6
+        $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+
+
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
@@ -214,12 +265,12 @@ class MTProto extends \Volatile
             $this->reset_session(true, true);
             $this->__construct($settings);
         }
-        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         $this->setup_threads();
-        if ($this->authorized && !$this->authorization['user']['bot']) {
+        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs();
         }
-        if ($this->authorized && $this->settings['updates']['handle_updates']) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
@@ -280,14 +331,6 @@ class MTProto extends \Volatile
 
     public function parse_settings($settings)
     {
-        // Detect ipv6
-        $google = '';
-        try {
-            $google = @file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]));
-        } catch (Exception $e) {
-        }
-        $this->ipv6 = strlen($google) > 0;
-
         // Detect device model
         try {
             $device_model = php_uname('s');
@@ -613,7 +656,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 34;
+        return 35;
     }
 
     public function get_self()

@@ -7,10 +7,6 @@ description: userProfilePhotoEmpty attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

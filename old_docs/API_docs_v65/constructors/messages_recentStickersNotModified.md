@@ -7,10 +7,6 @@ description: messages_recentStickersNotModified attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

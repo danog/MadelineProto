@@ -7,10 +7,6 @@ description: messageActionHistoryClear attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

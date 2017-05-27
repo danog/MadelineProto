@@ -7,10 +7,6 @@ description: storage_fileJpeg attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

@@ -9,31 +9,31 @@ description: constructors and methods of type DecryptedMessageAction
 
 ### Possible values (constructors):
 
-[decryptedMessageActionSetMessageTTL\_8](../constructors/decryptedMessageActionSetMessageTTL_8.md)  
+[decryptedMessageActionSetMessageTTL8](../constructors/decryptedMessageActionSetMessageTTL8.md)  
 
-[decryptedMessageActionReadMessages\_8](../constructors/decryptedMessageActionReadMessages_8.md)  
+[decryptedMessageActionReadMessages8](../constructors/decryptedMessageActionReadMessages8.md)  
 
-[decryptedMessageActionDeleteMessages\_8](../constructors/decryptedMessageActionDeleteMessages_8.md)  
+[decryptedMessageActionDeleteMessages8](../constructors/decryptedMessageActionDeleteMessages8.md)  
 
-[decryptedMessageActionScreenshotMessages\_8](../constructors/decryptedMessageActionScreenshotMessages_8.md)  
+[decryptedMessageActionScreenshotMessages8](../constructors/decryptedMessageActionScreenshotMessages8.md)  
 
-[decryptedMessageActionFlushHistory\_8](../constructors/decryptedMessageActionFlushHistory_8.md)  
+[decryptedMessageActionFlushHistory8](../constructors/decryptedMessageActionFlushHistory8.md)  
 
-[decryptedMessageActionResend\_17](../constructors/decryptedMessageActionResend_17.md)  
+[decryptedMessageActionResend17](../constructors/decryptedMessageActionResend17.md)  
 
-[decryptedMessageActionNotifyLayer\_17](../constructors/decryptedMessageActionNotifyLayer_17.md)  
+[decryptedMessageActionNotifyLayer17](../constructors/decryptedMessageActionNotifyLayer17.md)  
 
-[decryptedMessageActionTyping\_17](../constructors/decryptedMessageActionTyping_17.md)  
+[decryptedMessageActionTyping17](../constructors/decryptedMessageActionTyping17.md)  
 
-[decryptedMessageActionRequestKey\_20](../constructors/decryptedMessageActionRequestKey_20.md)  
+[decryptedMessageActionRequestKey20](../constructors/decryptedMessageActionRequestKey20.md)  
 
-[decryptedMessageActionAcceptKey\_20](../constructors/decryptedMessageActionAcceptKey_20.md)  
+[decryptedMessageActionAcceptKey20](../constructors/decryptedMessageActionAcceptKey20.md)  
 
-[decryptedMessageActionAbortKey\_20](../constructors/decryptedMessageActionAbortKey_20.md)  
+[decryptedMessageActionAbortKey20](../constructors/decryptedMessageActionAbortKey20.md)  
 
-[decryptedMessageActionCommitKey\_20](../constructors/decryptedMessageActionCommitKey_20.md)  
+[decryptedMessageActionCommitKey20](../constructors/decryptedMessageActionCommitKey20.md)  
 
-[decryptedMessageActionNoop\_20](../constructors/decryptedMessageActionNoop_20.md)  
+[decryptedMessageActionNoop20](../constructors/decryptedMessageActionNoop20.md)  
 
 
 

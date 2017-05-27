@@ -7,10 +7,6 @@ description: inputStickerSetEmpty attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

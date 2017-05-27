@@ -76,7 +76,7 @@ class Logger
         }
         foreach (is_array($params) ? $params : [$params] as $param) {
             if (!is_string($param)) {
-                $param = json_encode($param, JSON_PRETTY_PRINT);
+                $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             $param = str_pad(basename(debug_backtrace()[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
             switch (self::$mode) {

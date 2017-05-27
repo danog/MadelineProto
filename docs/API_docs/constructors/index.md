@@ -259,82 +259,106 @@ description: List of constructors
 <br><br>[$decryptedDataBlock](../constructors/decryptedDataBlock.md) = \['voice_call_id' => [int128](../types/int128.md), 'in_seq_no' => [int](../types/int.md), 'out_seq_no' => [int](../types/int.md), 'recent_received_mask' => [int](../types/int.md), 'proto' => [int](../types/int.md), 'extra' => [string](../types/string.md), 'raw_data' => [string](../types/string.md), \];<a name="decryptedDataBlock"></a>  
 
 ***
-<br><br>[$decryptedMessage\_45](../constructors/decryptedMessage_45.md) = \['ttl' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'via_bot_name' => [string](../types/string.md), 'reply_to_random_id' => [long](../types/long.md), \];<a name="decryptedMessage_45"></a>  
+<br><br>[$decryptedMessage17](../constructors/decryptedMessage17.md) = \['ttl' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), \];<a name="decryptedMessage17"></a>  
 
 ***
-<br><br>[$decryptedMessageActionAbortKey\_20](../constructors/decryptedMessageActionAbortKey_20.md) = \['exchange_id' => [long](../types/long.md), \];<a name="decryptedMessageActionAbortKey_20"></a>  
+<br><br>[$decryptedMessage45](../constructors/decryptedMessage45.md) = \['ttl' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'via_bot_name' => [string](../types/string.md), 'reply_to_random_id' => [long](../types/long.md), \];<a name="decryptedMessage45"></a>  
 
 ***
-<br><br>[$decryptedMessageActionAcceptKey\_20](../constructors/decryptedMessageActionAcceptKey_20.md) = \['exchange_id' => [long](../types/long.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \];<a name="decryptedMessageActionAcceptKey_20"></a>  
+<br><br>[$decryptedMessage8](../constructors/decryptedMessage8.md) = \['message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), \];<a name="decryptedMessage8"></a>  
 
 ***
-<br><br>[$decryptedMessageActionCommitKey\_20](../constructors/decryptedMessageActionCommitKey_20.md) = \['exchange_id' => [long](../types/long.md), 'key_fingerprint' => [long](../types/long.md), \];<a name="decryptedMessageActionCommitKey_20"></a>  
+<br><br>[$decryptedMessageActionAbortKey20](../constructors/decryptedMessageActionAbortKey20.md) = \['exchange_id' => [long](../types/long.md), \];<a name="decryptedMessageActionAbortKey20"></a>  
 
 ***
-<br><br>[$decryptedMessageActionDeleteMessages\_8](../constructors/decryptedMessageActionDeleteMessages_8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionDeleteMessages_8"></a>  
+<br><br>[$decryptedMessageActionAcceptKey20](../constructors/decryptedMessageActionAcceptKey20.md) = \['exchange_id' => [long](../types/long.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \];<a name="decryptedMessageActionAcceptKey20"></a>  
 
 ***
-<br><br>[$decryptedMessageActionFlushHistory\_8](../constructors/decryptedMessageActionFlushHistory_8.md) = \[\];<a name="decryptedMessageActionFlushHistory_8"></a>  
+<br><br>[$decryptedMessageActionCommitKey20](../constructors/decryptedMessageActionCommitKey20.md) = \['exchange_id' => [long](../types/long.md), 'key_fingerprint' => [long](../types/long.md), \];<a name="decryptedMessageActionCommitKey20"></a>  
 
 ***
-<br><br>[$decryptedMessageActionNoop\_20](../constructors/decryptedMessageActionNoop_20.md) = \[\];<a name="decryptedMessageActionNoop_20"></a>  
+<br><br>[$decryptedMessageActionDeleteMessages8](../constructors/decryptedMessageActionDeleteMessages8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionDeleteMessages8"></a>  
 
 ***
-<br><br>[$decryptedMessageActionNotifyLayer\_17](../constructors/decryptedMessageActionNotifyLayer_17.md) = \['layer' => [int](../types/int.md), \];<a name="decryptedMessageActionNotifyLayer_17"></a>  
+<br><br>[$decryptedMessageActionFlushHistory8](../constructors/decryptedMessageActionFlushHistory8.md) = \[\];<a name="decryptedMessageActionFlushHistory8"></a>  
 
 ***
-<br><br>[$decryptedMessageActionReadMessages\_8](../constructors/decryptedMessageActionReadMessages_8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionReadMessages_8"></a>  
+<br><br>[$decryptedMessageActionNoop20](../constructors/decryptedMessageActionNoop20.md) = \[\];<a name="decryptedMessageActionNoop20"></a>  
 
 ***
-<br><br>[$decryptedMessageActionRequestKey\_20](../constructors/decryptedMessageActionRequestKey_20.md) = \['exchange_id' => [long](../types/long.md), 'g_a' => [bytes](../types/bytes.md), \];<a name="decryptedMessageActionRequestKey_20"></a>  
+<br><br>[$decryptedMessageActionNotifyLayer17](../constructors/decryptedMessageActionNotifyLayer17.md) = \['layer' => [int](../types/int.md), \];<a name="decryptedMessageActionNotifyLayer17"></a>  
 
 ***
-<br><br>[$decryptedMessageActionResend\_17](../constructors/decryptedMessageActionResend_17.md) = \['start_seq_no' => [int](../types/int.md), 'end_seq_no' => [int](../types/int.md), \];<a name="decryptedMessageActionResend_17"></a>  
+<br><br>[$decryptedMessageActionReadMessages8](../constructors/decryptedMessageActionReadMessages8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionReadMessages8"></a>  
 
 ***
-<br><br>[$decryptedMessageActionScreenshotMessages\_8](../constructors/decryptedMessageActionScreenshotMessages_8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionScreenshotMessages_8"></a>  
+<br><br>[$decryptedMessageActionRequestKey20](../constructors/decryptedMessageActionRequestKey20.md) = \['exchange_id' => [long](../types/long.md), 'g_a' => [bytes](../types/bytes.md), \];<a name="decryptedMessageActionRequestKey20"></a>  
 
 ***
-<br><br>[$decryptedMessageActionSetMessageTTL\_8](../constructors/decryptedMessageActionSetMessageTTL_8.md) = \['ttl_seconds' => [int](../types/int.md), \];<a name="decryptedMessageActionSetMessageTTL_8"></a>  
+<br><br>[$decryptedMessageActionResend17](../constructors/decryptedMessageActionResend17.md) = \['start_seq_no' => [int](../types/int.md), 'end_seq_no' => [int](../types/int.md), \];<a name="decryptedMessageActionResend17"></a>  
 
 ***
-<br><br>[$decryptedMessageActionTyping\_17](../constructors/decryptedMessageActionTyping_17.md) = \['action' => [SendMessageAction](../types/SendMessageAction.md), \];<a name="decryptedMessageActionTyping_17"></a>  
+<br><br>[$decryptedMessageActionScreenshotMessages8](../constructors/decryptedMessageActionScreenshotMessages8.md) = \['random_ids' => \[[long](../types/long.md)\], \];<a name="decryptedMessageActionScreenshotMessages8"></a>  
 
 ***
-<br><br>[$decryptedMessageLayer\_17](../constructors/decryptedMessageLayer_17.md) = \['layer' => [int](../types/int.md), 'in_seq_no' => [int](../types/int.md), 'out_seq_no' => [int](../types/int.md), 'message' => [DecryptedMessage](../types/DecryptedMessage.md), \];<a name="decryptedMessageLayer_17"></a>  
+<br><br>[$decryptedMessageActionSetMessageTTL8](../constructors/decryptedMessageActionSetMessageTTL8.md) = \['ttl_seconds' => [int](../types/int.md), \];<a name="decryptedMessageActionSetMessageTTL8"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaAudio\_17](../constructors/decryptedMessageMediaAudio_17.md) = \['duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaAudio_17"></a>  
+<br><br>[$decryptedMessageActionTyping17](../constructors/decryptedMessageActionTyping17.md) = \['action' => [SendMessageAction](../types/SendMessageAction.md), \];<a name="decryptedMessageActionTyping17"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaContact\_8](../constructors/decryptedMessageMediaContact_8.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];<a name="decryptedMessageMediaContact_8"></a>  
+<br><br>[$decryptedMessageLayer17](../constructors/decryptedMessageLayer17.md) = \['layer' => [int](../types/int.md), 'in_seq_no' => [int](../types/int.md), 'out_seq_no' => [int](../types/int.md), 'message' => [DecryptedMessage](../types/DecryptedMessage.md), \];<a name="decryptedMessageLayer17"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaDocument\_45](../constructors/decryptedMessageMediaDocument_45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaDocument_45"></a>  
+<br><br>[$decryptedMessageMediaAudio17](../constructors/decryptedMessageMediaAudio17.md) = \['duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaAudio17"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaEmpty\_8](../constructors/decryptedMessageMediaEmpty_8.md) = \[\];<a name="decryptedMessageMediaEmpty_8"></a>  
+<br><br>[$decryptedMessageMediaAudio8](../constructors/decryptedMessageMediaAudio8.md) = \['duration' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaAudio8"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaExternalDocument\_23](../constructors/decryptedMessageMediaExternalDocument_23.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'thumb' => [PhotoSize](../types/PhotoSize.md), 'dc_id' => [int](../types/int.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], \];<a name="decryptedMessageMediaExternalDocument_23"></a>  
+<br><br>[$decryptedMessageMediaContact8](../constructors/decryptedMessageMediaContact8.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];<a name="decryptedMessageMediaContact8"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaGeoPoint\_8](../constructors/decryptedMessageMediaGeoPoint_8.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), \];<a name="decryptedMessageMediaGeoPoint_8"></a>  
+<br><br>[$decryptedMessageMediaDocument45](../constructors/decryptedMessageMediaDocument45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaDocument45"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaPhoto\_45](../constructors/decryptedMessageMediaPhoto_45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaPhoto_45"></a>  
+<br><br>[$decryptedMessageMediaDocument8](../constructors/decryptedMessageMediaDocument8.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'file_name' => [string](../types/string.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaDocument8"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaVenue\_46](../constructors/decryptedMessageMediaVenue_46.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];<a name="decryptedMessageMediaVenue_46"></a>  
+<br><br>[$decryptedMessageMediaEmpty8](../constructors/decryptedMessageMediaEmpty8.md) = \[\];<a name="decryptedMessageMediaEmpty8"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaVideo\_45](../constructors/decryptedMessageMediaVideo_45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaVideo_45"></a>  
+<br><br>[$decryptedMessageMediaExternalDocument23](../constructors/decryptedMessageMediaExternalDocument23.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'thumb' => [PhotoSize](../types/PhotoSize.md), 'dc_id' => [int](../types/int.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], \];<a name="decryptedMessageMediaExternalDocument23"></a>  
 
 ***
-<br><br>[$decryptedMessageMediaWebPage\_46](../constructors/decryptedMessageMediaWebPage_46.md) = \['url' => [string](../types/string.md), \];<a name="decryptedMessageMediaWebPage_46"></a>  
+<br><br>[$decryptedMessageMediaGeoPoint8](../constructors/decryptedMessageMediaGeoPoint8.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), \];<a name="decryptedMessageMediaGeoPoint8"></a>  
 
 ***
-<br><br>[$decryptedMessageService\_17](../constructors/decryptedMessageService_17.md) = \['action' => [DecryptedMessageAction](../types/DecryptedMessageAction.md), \];<a name="decryptedMessageService_17"></a>  
+<br><br>[$decryptedMessageMediaPhoto45](../constructors/decryptedMessageMediaPhoto45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaPhoto45"></a>  
+
+***
+<br><br>[$decryptedMessageMediaPhoto8](../constructors/decryptedMessageMediaPhoto8.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaPhoto8"></a>  
+
+***
+<br><br>[$decryptedMessageMediaVenue46](../constructors/decryptedMessageMediaVenue46.md) = \['lat' => [double](../types/double.md), 'long' => [double](../types/double.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), \];<a name="decryptedMessageMediaVenue46"></a>  
+
+***
+<br><br>[$decryptedMessageMediaVideo17](../constructors/decryptedMessageMediaVideo17.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaVideo17"></a>  
+
+***
+<br><br>[$decryptedMessageMediaVideo45](../constructors/decryptedMessageMediaVideo45.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), 'caption' => [string](../types/string.md), \];<a name="decryptedMessageMediaVideo45"></a>  
+
+***
+<br><br>[$decryptedMessageMediaVideo8](../constructors/decryptedMessageMediaVideo8.md) = \['thumb' => [bytes](../types/bytes.md), 'thumb_w' => [int](../types/int.md), 'thumb_h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), 'key' => [bytes](../types/bytes.md), 'iv' => [bytes](../types/bytes.md), \];<a name="decryptedMessageMediaVideo8"></a>  
+
+***
+<br><br>[$decryptedMessageMediaWebPage46](../constructors/decryptedMessageMediaWebPage46.md) = \['url' => [string](../types/string.md), \];<a name="decryptedMessageMediaWebPage46"></a>  
+
+***
+<br><br>[$decryptedMessageService17](../constructors/decryptedMessageService17.md) = \['action' => [DecryptedMessageAction](../types/DecryptedMessageAction.md), \];<a name="decryptedMessageService17"></a>  
+
+***
+<br><br>[$decryptedMessageService8](../constructors/decryptedMessageService8.md) = \['action' => [DecryptedMessageAction](../types/DecryptedMessageAction.md), \];<a name="decryptedMessageService8"></a>  
 
 ***
 <br><br>[$destroy\_auth\_key\_fail](../constructors/destroy_auth_key_fail.md) = \[\];<a name="destroy_auth_key_fail"></a>  
@@ -364,25 +388,34 @@ description: List of constructors
 <br><br>[$document](../constructors/document.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'thumb' => [PhotoSize](../types/PhotoSize.md), 'dc_id' => [int](../types/int.md), 'version' => [int](../types/int.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], \];<a name="document"></a>  
 
 ***
-<br><br>[$documentAttributeAnimated\_23](../constructors/documentAttributeAnimated_23.md) = \[\];<a name="documentAttributeAnimated_23"></a>  
+<br><br>[$documentAttributeAnimated23](../constructors/documentAttributeAnimated23.md) = \[\];<a name="documentAttributeAnimated23"></a>  
 
 ***
-<br><br>[$documentAttributeAudio\_23](../constructors/documentAttributeAudio_23.md) = \['duration' => [int](../types/int.md), \];<a name="documentAttributeAudio_23"></a>  
+<br><br>[$documentAttributeAudio](../constructors/documentAttributeAudio.md) = \['voice' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), 'waveform' => [bytes](../types/bytes.md), \];<a name="documentAttributeAudio"></a>  
 
 ***
-<br><br>[$documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md) = \['file_name' => [string](../types/string.md), \];<a name="documentAttributeFilename_23"></a>  
+<br><br>[$documentAttributeAudio23](../constructors/documentAttributeAudio23.md) = \['duration' => [int](../types/int.md), \];<a name="documentAttributeAudio23"></a>  
+
+***
+<br><br>[$documentAttributeFilename23](../constructors/documentAttributeFilename23.md) = \['file_name' => [string](../types/string.md), \];<a name="documentAttributeFilename23"></a>  
 
 ***
 <br><br>[$documentAttributeHasStickers](../constructors/documentAttributeHasStickers.md) = \[\];<a name="documentAttributeHasStickers"></a>  
 
 ***
-<br><br>[$documentAttributeImageSize\_23](../constructors/documentAttributeImageSize_23.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeImageSize_23"></a>  
+<br><br>[$documentAttributeImageSize23](../constructors/documentAttributeImageSize23.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeImageSize23"></a>  
 
 ***
-<br><br>[$documentAttributeSticker\_23](../constructors/documentAttributeSticker_23.md) = \[\];<a name="documentAttributeSticker_23"></a>  
+<br><br>[$documentAttributeSticker](../constructors/documentAttributeSticker.md) = \['mask' => [Bool](../types/Bool.md), 'alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'mask_coords' => [MaskCoords](../types/MaskCoords.md), \];<a name="documentAttributeSticker"></a>  
 
 ***
-<br><br>[$documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_23"></a>  
+<br><br>[$documentAttributeSticker23](../constructors/documentAttributeSticker23.md) = \[\];<a name="documentAttributeSticker23"></a>  
+
+***
+<br><br>[$documentAttributeVideo](../constructors/documentAttributeVideo.md) = \['round_message' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo"></a>  
+
+***
+<br><br>[$documentAttributeVideo23](../constructors/documentAttributeVideo23.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo23"></a>  
 
 ***
 <br><br>[$documentEmpty](../constructors/documentEmpty.md) = \['id' => [long](../types/long.md), \];<a name="documentEmpty"></a>  
@@ -427,10 +460,10 @@ description: List of constructors
 <br><br>[$exportedMessageLink](../constructors/exportedMessageLink.md) = \['link' => [string](../types/string.md), \];<a name="exportedMessageLink"></a>  
 
 ***
-<br><br>[$fileLocation\_23](../constructors/fileLocation_23.md) = \['dc_id' => [int](../types/int.md), 'volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];<a name="fileLocation_23"></a>  
+<br><br>[$fileLocation23](../constructors/fileLocation23.md) = \['dc_id' => [int](../types/int.md), 'volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];<a name="fileLocation23"></a>  
 
 ***
-<br><br>[$fileLocationUnavailable\_23](../constructors/fileLocationUnavailable_23.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];<a name="fileLocationUnavailable_23"></a>  
+<br><br>[$fileLocationUnavailable23](../constructors/fileLocationUnavailable23.md) = \['volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];<a name="fileLocationUnavailable23"></a>  
 
 ***
 <br><br>[$foundGif](../constructors/foundGif.md) = \['url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="foundGif"></a>  
@@ -1222,16 +1255,16 @@ description: List of constructors
 <br><br>[$photo](../constructors/photo.md) = \['has_stickers' => [Bool](../types/Bool.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'date' => [int](../types/int.md), 'sizes' => \[[PhotoSize](../types/PhotoSize.md)\], \];<a name="photo"></a>  
 
 ***
-<br><br>[$photoCachedSize\_23](../constructors/photoCachedSize_23.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];<a name="photoCachedSize_23"></a>  
+<br><br>[$photoCachedSize23](../constructors/photoCachedSize23.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];<a name="photoCachedSize23"></a>  
 
 ***
 <br><br>[$photoEmpty](../constructors/photoEmpty.md) = \['id' => [long](../types/long.md), \];<a name="photoEmpty"></a>  
 
 ***
-<br><br>[$photoSize\_23](../constructors/photoSize_23.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), \];<a name="photoSize_23"></a>  
+<br><br>[$photoSize23](../constructors/photoSize23.md) = \['type' => [string](../types/string.md), 'location' => [FileLocation](../types/FileLocation.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'size' => [int](../types/int.md), \];<a name="photoSize23"></a>  
 
 ***
-<br><br>[$photoSizeEmpty\_23](../constructors/photoSizeEmpty_23.md) = \['type' => [string](../types/string.md), \];<a name="photoSizeEmpty_23"></a>  
+<br><br>[$photoSizeEmpty23](../constructors/photoSizeEmpty23.md) = \['type' => [string](../types/string.md), \];<a name="photoSizeEmpty23"></a>  
 
 ***
 <br><br>[$photos\_photo](../constructors/photos_photo.md) = \['photo' => [Photo](../types/Photo.md), 'users' => \[[User](../types/User.md)\], \];<a name="photos_photo"></a>  
@@ -1301,43 +1334,55 @@ description: List of constructors
 [$rpc\_error](../constructors/rpc_error.md) = \['error_code' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \];<a name="rpc_error"></a>  
 
 ***
-<br><br>[$sendMessageCancelAction\_17](../constructors/sendMessageCancelAction_17.md) = \[\];<a name="sendMessageCancelAction_17"></a>  
+<br><br>[$sendMessageCancelAction17](../constructors/sendMessageCancelAction17.md) = \[\];<a name="sendMessageCancelAction17"></a>  
 
 ***
-<br><br>[$sendMessageChooseContactAction\_17](../constructors/sendMessageChooseContactAction_17.md) = \[\];<a name="sendMessageChooseContactAction_17"></a>  
+<br><br>[$sendMessageChooseContactAction17](../constructors/sendMessageChooseContactAction17.md) = \[\];<a name="sendMessageChooseContactAction17"></a>  
 
 ***
 <br><br>[$sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md) = \[\];<a name="sendMessageGamePlayAction"></a>  
 
 ***
-<br><br>[$sendMessageGeoLocationAction\_17](../constructors/sendMessageGeoLocationAction_17.md) = \[\];<a name="sendMessageGeoLocationAction_17"></a>  
+<br><br>[$sendMessageGeoLocationAction17](../constructors/sendMessageGeoLocationAction17.md) = \[\];<a name="sendMessageGeoLocationAction17"></a>  
 
 ***
-<br><br>[$sendMessageRecordAudioAction\_17](../constructors/sendMessageRecordAudioAction_17.md) = \[\];<a name="sendMessageRecordAudioAction_17"></a>  
+<br><br>[$sendMessageRecordAudioAction17](../constructors/sendMessageRecordAudioAction17.md) = \[\];<a name="sendMessageRecordAudioAction17"></a>  
 
 ***
 <br><br>[$sendMessageRecordRoundAction](../constructors/sendMessageRecordRoundAction.md) = \[\];<a name="sendMessageRecordRoundAction"></a>  
 
 ***
-<br><br>[$sendMessageRecordVideoAction\_17](../constructors/sendMessageRecordVideoAction_17.md) = \[\];<a name="sendMessageRecordVideoAction_17"></a>  
+<br><br>[$sendMessageRecordVideoAction17](../constructors/sendMessageRecordVideoAction17.md) = \[\];<a name="sendMessageRecordVideoAction17"></a>  
 
 ***
-<br><br>[$sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md) = \[\];<a name="sendMessageTypingAction_17"></a>  
+<br><br>[$sendMessageTypingAction17](../constructors/sendMessageTypingAction17.md) = \[\];<a name="sendMessageTypingAction17"></a>  
 
 ***
-<br><br>[$sendMessageUploadAudioAction\_17](../constructors/sendMessageUploadAudioAction_17.md) = \[\];<a name="sendMessageUploadAudioAction_17"></a>  
+<br><br>[$sendMessageUploadAudioAction](../constructors/sendMessageUploadAudioAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadAudioAction"></a>  
 
 ***
-<br><br>[$sendMessageUploadDocumentAction\_17](../constructors/sendMessageUploadDocumentAction_17.md) = \[\];<a name="sendMessageUploadDocumentAction_17"></a>  
+<br><br>[$sendMessageUploadAudioAction17](../constructors/sendMessageUploadAudioAction17.md) = \[\];<a name="sendMessageUploadAudioAction17"></a>  
 
 ***
-<br><br>[$sendMessageUploadPhotoAction\_17](../constructors/sendMessageUploadPhotoAction_17.md) = \[\];<a name="sendMessageUploadPhotoAction_17"></a>  
+<br><br>[$sendMessageUploadDocumentAction](../constructors/sendMessageUploadDocumentAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadDocumentAction"></a>  
+
+***
+<br><br>[$sendMessageUploadDocumentAction17](../constructors/sendMessageUploadDocumentAction17.md) = \[\];<a name="sendMessageUploadDocumentAction17"></a>  
+
+***
+<br><br>[$sendMessageUploadPhotoAction](../constructors/sendMessageUploadPhotoAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadPhotoAction"></a>  
+
+***
+<br><br>[$sendMessageUploadPhotoAction17](../constructors/sendMessageUploadPhotoAction17.md) = \[\];<a name="sendMessageUploadPhotoAction17"></a>  
 
 ***
 <br><br>[$sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadRoundAction"></a>  
 
 ***
-<br><br>[$sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md) = \[\];<a name="sendMessageUploadVideoAction_17"></a>  
+<br><br>[$sendMessageUploadVideoAction](../constructors/sendMessageUploadVideoAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadVideoAction"></a>  
+
+***
+<br><br>[$sendMessageUploadVideoAction17](../constructors/sendMessageUploadVideoAction17.md) = \[\];<a name="sendMessageUploadVideoAction17"></a>  
 
 ***
 <br><br>[$server\_DH\_inner\_data](../constructors/server_DH_inner_data.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'g' => [int](../types/int.md), 'dh_prime' => [string](../types/string.md), 'g_a' => [string](../types/string.md), 'server_time' => [int](../types/int.md), \];<a name="server_DH_inner_data"></a>  

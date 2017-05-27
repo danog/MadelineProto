@@ -6,10 +6,6 @@ description: contacts.exportCard parameters, return type and example
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

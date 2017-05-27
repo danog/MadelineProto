@@ -15,9 +15,7 @@ namespace danog\MadelineProto;
 class API extends APIFactory
 {
     use \danog\Serializable;
-
-    public $API;
-    public $namespace = '';
+    private $storage = [];
 
     public function ___construct($params = [])
     {
@@ -50,10 +48,10 @@ class API extends APIFactory
         }
         restore_error_handler();
     }
-
+    
     public function __sleep()
     {
-        return ['API'];
+        return ['API', 'storage'];
     }
 
     public function &__get($name)
@@ -62,7 +60,7 @@ class API extends APIFactory
             return $this->API->settings;
         }
 
-        return $this->{$name};
+        return $this->storage[$name];
     }
 
     public function __set($name, $value)
@@ -71,7 +69,7 @@ class API extends APIFactory
             return $this->API->__construct($value);
         }
 
-        return $this->{$name} = $value;
+        return $this->storage[$name] = $value;
     }
 
     public function APIFactory()

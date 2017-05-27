@@ -7,10 +7,6 @@ description: contacts_myLinkEmpty attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

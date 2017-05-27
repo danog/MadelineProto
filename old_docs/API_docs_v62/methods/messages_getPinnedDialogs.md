@@ -6,10 +6,6 @@ description: messages.getPinnedDialogs parameters, return type and example
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [messages\_PeerDialogs](../types/messages_PeerDialogs.md)

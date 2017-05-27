@@ -14,7 +14,7 @@ namespace danog\MadelineProto\TL;
 
 trait TL
 {
-    private $encrypted_layer = -1;
+    private $encrypted_layer = '';
     private $constructors;
     private $methods;
     private $td_constructors;
@@ -189,8 +189,8 @@ trait TL
             }
         }
         if (isset($files['td']) && isset($files['telegram'])) {
-            foreach ($this->td_constructors->id as $key => $id) {
-                $name = $this->td_constructors->predicate[$key];
+            foreach ($this->td_constructors->id as $name => $id) {
+                $id = substr($id, 1);
                 if ($this->constructors->find_by_id($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
@@ -202,8 +202,8 @@ trait TL
                     }
                 }
             }
-            foreach ($this->td_methods->id as $key => $id) {
-                $name = $this->td_methods->method[$key];
+            foreach ($this->td_methods->id as $name => $id) {
+                $id = substr($id, 1);
                 if ($this->methods->find_by_id($id) === false) {
                     unset($this->td_descriptions['methods'][$name]);
                 } else {
@@ -235,7 +235,7 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object($type, $object, $layer = -1)
+    public function serialize_object($type, $object, $layer = '')
     {
         switch ($type['type']) {
             case 'int':
@@ -390,14 +390,14 @@ trait TL
         return $tl['id'].$this->serialize_params($tl, $arguments);
     }
 
-    public function serialize_params($tl, $arguments, $layer = -1)
+    public function serialize_params($tl, $arguments, $layer = '')
     {
         $serialized = '';
 
         $arguments = $this->botAPI_to_MTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
-            if ($cur_flag['flag']) {
+            if (isset($cur_flag['pow'])) {
                 switch ($cur_flag['type']) {
                     case 'true':
                     case 'false':
@@ -419,7 +419,7 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if (isset($current_argument['pow']) && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
@@ -599,13 +599,12 @@ trait TL
         }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {
-            if ($arg['flag']) {
+            if (isset($arg['pow'])) {
                 switch ($arg['type']) {
                     case 'true':
                     case 'false':
                         $x[$arg['name']] = ($x['flags'] & $arg['pow']) !== 0;
                         continue 2;
-                        break;
                     case 'Bool':
                         if (($x['flags'] & $arg['pow']) === 0) {
                             $x[$arg['name']] = false;
@@ -613,10 +612,8 @@ trait TL
                         }
                     default:
                         if (($x['flags'] & $arg['pow']) === 0) {
-                            //$x[$arg['name']] = $default;
                             continue 2;
                         }
-                        break;
                 }
             }
             if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {

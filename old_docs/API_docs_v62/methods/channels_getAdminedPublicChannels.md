@@ -6,10 +6,6 @@ description: channels.getAdminedPublicChannels parameters, return type and examp
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

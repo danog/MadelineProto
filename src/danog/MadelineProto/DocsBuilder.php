@@ -57,7 +57,7 @@ description: '.$this->settings['description'].'
 [Back to main documentation](..)
 ');
 
-        foreach (glob('methods/*') as $unlink) {
+        foreach (glob('methods/'.$any) as $unlink) {
             unlink($unlink);
         }
 
@@ -160,7 +160,7 @@ description: '.$this->settings['description'].'
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$rmethod])) {
                     $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
                 }
@@ -421,7 +421,7 @@ description: List of methods
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']])) {
                     $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
                 }

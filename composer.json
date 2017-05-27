@@ -18,6 +18,8 @@
         "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
         "ext-curl": "*"
+        "ext-xml": "*"
+
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"

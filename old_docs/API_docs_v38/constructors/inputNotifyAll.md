@@ -7,10 +7,6 @@ description: inputNotifyAll attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

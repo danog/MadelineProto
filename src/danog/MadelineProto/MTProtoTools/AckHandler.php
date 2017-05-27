@@ -42,7 +42,6 @@ trait AckHandler
         }
 
         $this->object_call('msgs_ack', ['msg_ids' => [$message_id]], ['datacenter' => $datacenter]);
-
         return $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'] = true;
     }
 }

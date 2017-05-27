@@ -6,10 +6,6 @@ description: help.getAppChangelog parameters, return type and example
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)

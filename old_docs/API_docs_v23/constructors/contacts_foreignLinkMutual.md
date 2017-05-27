@@ -7,10 +7,6 @@ description: contacts_foreignLinkMutual attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

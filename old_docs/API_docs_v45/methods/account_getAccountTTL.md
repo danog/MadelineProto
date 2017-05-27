@@ -6,10 +6,6 @@ description: account.getAccountTTL parameters, return type and example
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [AccountDaysTTL](../types/AccountDaysTTL.md)

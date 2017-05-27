@@ -7,10 +7,6 @@ description: inputMessagesFilterPhotos attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

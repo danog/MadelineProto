@@ -37,6 +37,8 @@ class Connection extends \Volatile
     public $outgoing_messages = [];
     public $new_incoming = [];
     public $new_outgoing = [];
+    public $max_incoming_id;
+    public $max_outgoing_id;
 
     public function ___construct($ip, $port, $protocol, $timeout, $ipv6)
     {
@@ -150,7 +152,7 @@ class Connection extends \Volatile
 
     public function __sleep()
     {
-        return ['protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing'];
+        return ['protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id'];
     }
 
     public function __wakeup()
@@ -213,7 +215,6 @@ class Connection extends \Volatile
                     $this->close_and_reopen();
                     throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
-
                 return $packet;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");

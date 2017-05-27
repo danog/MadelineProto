@@ -7,10 +7,6 @@ description: inputMessagesFilterAudioDocuments attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

@@ -12,8 +12,8 @@ description: chat attributes, type and example
 |----------|:-------------:|:--------:|----------:|
 |type|[string](API_docs/types/string.md) | Yes|bot, user, channel, supergroup or chat|
 |id|[long](API_docs/types/long.md) | Yes|bot API chat id|
-|access\_hash|[long](API_docs/types/long.md) | Yes|access hash of peer|
-|first\_name|[string](API_docs/types/string.md) | Yes|First name of the user|
+|access\_hash|[long](API_docs/types/long.md) | Optional|access hash of peer|
+|first\_name|[string](API_docs/types/string.md) | Optional|First name of the user|
 |last\_name|[string](API_docs/types/string.md) | Optional|Last name of the user|
 |lang\_code|[string](API_docs/types/string.md) | Optional|Language of the user|
 |username|[string](API_docs/types/string.md) | Optional|Username|
@@ -26,7 +26,7 @@ description: chat attributes, type and example
 |bot\_info|[BotInfo](API_docs/types/BotInfo.md) | Optional|Bot info of bots|
 |phone\_calls\_available|[Bool](API_docs/types/Bool.md) | Optional|Are phone calls available for that user?|
 |phone\_calls\_private|[Bool](API_docs/types/Bool.md) | Optional||
-|common\_chats\_count|[int](API_docs/types/int.md) | Yes|Number of chats in common with that user|
+|common\_chats\_count|[int](API_docs/types/int.md) | Optional|Number of chats in common with that user|
 |photo|[string](API_docs/types/string.md) | Optional|bot API file id of the profile picture|
 |title|[string](API_docs/types/string.md) | Optional|Chat title|
 |participants\_count|[int](API_docs/types/int.md) | Optional|Number of participants in the chat.|

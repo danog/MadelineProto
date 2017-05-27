@@ -22,7 +22,7 @@ trait Login
         if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
             throw new \danog\MadelineProto\Exception('An error occurred while logging out!');
         }
-        $this->authorized = false;
+        $this->authorized = self::NOT_LOGGED_IN;
         $this->authorization = null;
         $this->updates = [];
         $this->secret_chats = [];
@@ -52,16 +52,13 @@ trait Login
                 'api_hash'           => $this->settings['app_info']['api_hash'],
             ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->authorized = true;
+        $this->authorized = self::LOGGED_IN;
         $this->sync_authorization($this->datacenter->curdc);
         $this->updates = [];
         $this->updates_key = 0;
         $this->should_serialize = true;
         if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
-            try {
-                file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
-            } catch (\danog\MadelineProto\Exception $e) {
-            }
+            @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
         }
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -86,7 +83,8 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorization['phone_number'] = $number;
-        $this->login_temp_status = 'waiting_code';
+        //$this->authorization['_'] .= 'MP';
+        $this->authorized = self::WAITING_CODE;
         $this->should_serialize = true;
         $this->updates = [];
         $this->updates_key = 0;
@@ -98,10 +96,10 @@ trait Login
 
     public function complete_phone_login($code)
     {
-        if ($this->login_temp_status !== 'waiting_code') {
+        if ($this->authorized !== self::WAITING_CODE) {
             throw new \danog\MadelineProto\Exception("I'm not waiting for the code! Please call the phone_login method first");
         }
-        $this->login_temp_status = 'none';
+        $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log(['Logging in as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
         try {
             $authorization = $this->method_call(
@@ -115,14 +113,16 @@ trait Login
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 \danog\MadelineProto\Logger::log(['2FA enabled, you will have to call the complete_2fa_login function...'], \danog\MadelineProto\Logger::NOTICE);
-                $this->login_temp_status = 'waiting_password';
+                $this->authorized = self::WAITING_PASSWORD;
                 $this->should_serialize = true;
 
-                return $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                //$this->authorization['_'] .= 'MP';
+                return $this->authorization;
             }
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
-                $this->login_temp_status = 'waiting_signup';
+                $this->authorized = self::WAITING_SIGNUP;
                 $this->should_serialize = true;
                 $this->authorization['phone_code'] = $code;
 
@@ -130,8 +130,8 @@ trait Login
             }
             throw $e;
         }
+        $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
-        $this->authorized = true;
         $this->sync_authorization($this->datacenter->curdc);
         $this->should_serialize = true;
 
@@ -142,10 +142,10 @@ trait Login
 
     public function complete_signup($first_name, $last_name)
     {
-        if ($this->login_temp_status !== 'waiting_signup') {
+        if ($this->authorized !== self::WAITING_SIGNUP) {
             throw new \danog\MadelineProto\Exception("I'm not waiting to signup! Please call the phone_login and the complete_phone_login methods first!");
         }
-        $this->login_temp_status = 'none';
+        $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log(['Signing up as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = $this->method_call(
             'auth.signUp',
@@ -157,6 +157,7 @@ trait Login
                     'last_name'       => $last_name,
             ], ['datacenter' => $this->datacenter->curdc]
         );
+        $this->authorized = self::LOGGED_IN;
         $this->authorized = true;
         $this->sync_authorization($this->datacenter->curdc);
         $this->should_serialize = true;
@@ -168,10 +169,10 @@ trait Login
 
     public function complete_2fa_login($password)
     {
-        if ($this->login_temp_status !== 'waiting_password') {
+        if ($this->authorized !== self::WAITING_PASSWORD) {
             throw new \danog\MadelineProto\Exception("I'm not waiting for the password! Please call the phone_login and the complete_phone_login methods first!");
         }
-        $this->login_temp_status = 'none';
+        $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log(['Logging in as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = $this->method_call(
             'auth.checkPassword',
@@ -179,7 +180,7 @@ trait Login
                 'password_hash' => hash('sha256', $this->authorization['current_salt'].$password.$this->authorization['current_salt'], true),
             ], ['datacenter' => $this->datacenter->curdc]
         );
-        $this->authorized = true;
+        $this->authorized = self::LOGGED_IN;
         $this->sync_authorization($this->datacenter->curdc);
         $this->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);

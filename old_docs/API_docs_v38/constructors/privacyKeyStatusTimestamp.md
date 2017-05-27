@@ -7,10 +7,6 @@ description: privacyKeyStatusTimestamp attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

@@ -9,9 +9,9 @@ description: constructors and methods of type DocumentAttribute
 
 ### Possible values (constructors):
 
-[documentAttributeImageSize](../constructors/documentAttributeImageSize.md)  
+[documentAttributeImageSize23](../constructors/documentAttributeImageSize23.md)  
 
-[documentAttributeAnimated](../constructors/documentAttributeAnimated.md)  
+[documentAttributeAnimated23](../constructors/documentAttributeAnimated23.md)  
 
 [documentAttributeSticker](../constructors/documentAttributeSticker.md)  
 
@@ -19,21 +19,15 @@ description: constructors and methods of type DocumentAttribute
 
 [documentAttributeAudio](../constructors/documentAttributeAudio.md)  
 
-[documentAttributeFilename](../constructors/documentAttributeFilename.md)  
+[documentAttributeFilename23](../constructors/documentAttributeFilename23.md)  
 
 [documentAttributeHasStickers](../constructors/documentAttributeHasStickers.md)  
 
-[documentAttributeImageSize\_23](../constructors/documentAttributeImageSize_23.md)  
+[documentAttributeSticker23](../constructors/documentAttributeSticker23.md)  
 
-[documentAttributeAnimated\_23](../constructors/documentAttributeAnimated_23.md)  
+[documentAttributeVideo23](../constructors/documentAttributeVideo23.md)  
 
-[documentAttributeSticker\_23](../constructors/documentAttributeSticker_23.md)  
-
-[documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md)  
-
-[documentAttributeAudio\_23](../constructors/documentAttributeAudio_23.md)  
-
-[documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md)  
+[documentAttributeAudio23](../constructors/documentAttributeAudio23.md)  
 
 
 

@@ -7,10 +7,6 @@ description: inputPeerNotifyEventsAll attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

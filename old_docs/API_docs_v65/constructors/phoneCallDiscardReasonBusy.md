@@ -7,10 +7,6 @@ description: phoneCallDiscardReasonBusy attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

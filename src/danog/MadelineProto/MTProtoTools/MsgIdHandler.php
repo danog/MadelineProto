@@ -45,6 +45,7 @@ trait MsgIdHandler
                 }
                 unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]);
             }
+            $this->datacenter->sockets[$aargs['datacenter']]->max_outgoing_id = $new_message_id;
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.strrev($new_message_id->toBytes())] = [];
         } else {
             if (!$new_message_id->divide($this->four)[1]->equals($this->one) && !$new_message_id->divide($this->four)[1]->equals($this->three)) {
@@ -69,6 +70,7 @@ trait MsgIdHandler
                 }
                 unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]);
             }
+            $this->datacenter->sockets[$aargs['datacenter']]->max_incoming_id = $new_message_id;
             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.strrev($new_message_id->toBytes())] = [];
         }
     }
@@ -80,13 +82,18 @@ trait MsgIdHandler
             $message_id = $key->add($this->four);
         }
         $this->check_message_id($message_id, ['outgoing' => true, 'datacenter' => $datacenter, 'container' => false]);
-
         return strrev($message_id->toBytes());
     }
 
     public function get_max_id($datacenter, $incoming)
     {
-        $keys = array_keys((array) $this->datacenter->sockets[$datacenter]->{$incoming ? 'incoming_messages' : 'outgoing_messages'});
+        $incoming = $incoming ? 'incoming' : 'outgoing';
+        if (isset($this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'}) && is_object($this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'})) {
+            return $this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'};
+        }
+        return $this->zero;
+        /*
+        $keys = array_keys((array) $this->datacenter->sockets[$datacenter]->{$incoming.'_messages'});
         if (empty($keys)) {
             return $this->zero;
         }
@@ -95,5 +102,6 @@ trait MsgIdHandler
         });
 
         return \phpseclib\Math\BigInteger::max(...$keys);
+        */
     }
 }

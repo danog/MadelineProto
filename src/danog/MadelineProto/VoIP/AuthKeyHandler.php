@@ -20,12 +20,7 @@ namespace danog\MadelineProto\VoIP;
  */
 trait AuthKeyHandler
 {
-    protected $calls = [];
-    public $REQUESTED = 0;
-    public $ACCEPTED = 1;
-    public $CONFIRMED = 2;
-    public $READY = 3;
-    protected $emojis = ['😉', '😍', '😛', '😭', '😱', '😡', '😎', '😴', '😵', '😈', '😬', '😇', '😏', '👮', '👷', '💂', '👶', '👨', '👩', '👴', '👵', '😻', '😽', '🙀', '👺', '🙈', '🙉', '🙊', '💀', '👽', '💩', '🔥', '💥', '💤', '👂', '👀', '👃', '👅', '👄', '👍', '👎', '👌', '👊', '✌', '✋', '👐', '👆', '👇', '👉', '👈', '🙏', '👏', '💪', '🚶', '🏃', '💃', '👫', '👪', '👬', '👭', '💅', '🎩', '👑', '👒', '👟', '👞', '👠', '👕', '👗', '👖', '👙', '👜', '👓', '🎀', '💄', '💛', '💙', '💜', '💚', '💍', '💎', '🐶', '🐺', '🐱', '🐭', '🐹', '🐰', '🐸', '🐯', '🐨', '🐻', '🐷', '🐮', '🐗', '🐴', '🐑', '🐘', '🐼', '🐧', '🐥', '🐔', '🐍', '🐢', '🐛', '🐝', '🐜', '🐞', '🐌', '🐙', '🐚', '🐟', '🐬', '🐋', '🐐', '🐊', '🐫', '🍀', '🌹', '🌻', '🍁', '🌾', '🍄', '🌵', '🌴', '🌳', '🌞', '🌚', '🌙', '🌎', '🌋', '⚡', '☔', '❄', '⛄', '🌀', '🌈', '🌊', '🎓', '🎆', '🎃', '👻', '🎅', '🎄', '🎁', '🎈', '🔮', '🎥', '📷', '💿', '💻', '☎', '📡', '📺', '📻', '🔉', '🔔', '⏳', '⏰', '⌚', '🔒', '🔑', '🔎', '💡', '🔦', '🔌', '🔋', '🚿', '🚽', '🔧', '🔨', '🚪', '🚬', '💣', '🔫', '🔪', '💊', '💉', '💰', '💵', '💳', '✉', '📫', '📦', '📅', '📁', '✂', '📌', '📎', '✒', '✏', '📐', '📚', '🔬', '🔭', '🎨', '🎬', '🎤', '🎧', '🎵', '🎹', '🎻', '🎺', '🎸', '👾', '🎮', '🃏', '🎲', '🎯', '🏈', '🏀', '⚽', '⚾', '🎾', '🎱', '🏉', '🎳', '🏁', '🏇', '🏆', '🏊', '🏄', '☕', '🍼', '🍺', '🍷', '🍴', '🍕', '🍔', '🍟', '🍗', '🍱', '🍚', '🍜', '🍡', '🍳', '🍞', '🍩', '🍦', '🎂', '🍰', '🍪', '🍫', '🍭', '🍯', '🍎', '🍏', '🍊', '🍋', '🍒', '🍇', '🍉', '🍓', '🍑', '🍌', '🍐', '🍍', '🍆', '🍅', '🌽', '🏡', '🏥', '🏦', '⛪', '🏰', '⛺', '🏭', '🗻', '🗽', '🎠', '🎡', '⛲', '🎢', '🚢', '🚤', '⚓', '🚀', '✈', '🚁', '🚂', '🚋', '🚎', '🚌', '🚙', '🚗', '🚕', '🚛', '🚨', '🚔', '🚒', '🚑', '🚲', '🚠', '🚜', '🚦', '⚠', '🚧', '⛽', '🎰', '🗿', '🎪', '🎭', '🇯🇵', '🇰🇷', '🇩🇪', '🇨🇳', '🇺🇸', '🇫🇷', '🇪🇸', '🇮🇹', '🇷🇺', '🇬🇧', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '0⃣', '🔟', '❗', '❓', '♥', '♦', '💯', '🔗', '🔱', '🔴', '🔵', '🔶', '🔷'];
+    private $calls = [];
 
     public function request_call($user)
     {
@@ -43,7 +38,7 @@ trait AuthKeyHandler
         $this->check_G($g_a, $dh_config['p']);
 
         $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
-        $this->calls[$res['phone_call']['id']] = ['status' => $this->REQUESTED, 'a' => $a, 'g_a' => $g_a];
+        $this->calls[$res['phone_call']['id']] = ['status' => self::REQUESTED, 'a' => $a, 'g_a' => $g_a];
         $this->handle_pending_updates();
         $this->get_updates_difference();
 
@@ -66,7 +61,7 @@ trait AuthKeyHandler
         $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
-        $this->calls[$res['phone_call']['id']] = ['status' => $this->ACCEPTED, 'b' => $b, 'g_a_hash' => $params['g_a_hash']];
+        $this->calls[$res['phone_call']['id']] = ['status' => self::ACCEPTED, 'b' => $b, 'g_a_hash' => $params['g_a_hash']];
         $res = $this->method_call('phone.acceptCall', ['user_id' => $user, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
         $this->get_updates_difference();
@@ -74,7 +69,7 @@ trait AuthKeyHandler
 
     public function confirm_call($params)
     {
-        if ($this->call_status($params['id']) !== $this->REQUESTED) {
+        if ($this->call_status($params['id']) !== self::REQUESTED) {
             \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
 
             return false;
@@ -86,18 +81,18 @@ trait AuthKeyHandler
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         $res = $this->method_call('phone.confirmCall', ['user_id' => $user, 'g_a' => $this->calls[$params['id']]['g_a']->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
         $key['visualization'] = '';
-        $length = new \phpseclib\Math\BigInteger(count($this->emojis));
+        $length = new \phpseclib\Math\BigInteger(count(self::EMOJIS));
         foreach (str_split(strrev(substr(hash('sha256', $this->calls[$params['id']]['g_a']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
-            $key['visualization'] .= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+            $key['visualization'] .= self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
-        $this->calls[$params['id']] = ['status' => $this->READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
         $this->handle_pending_updates();
     }
 
     public function complete_call($params)
     {
-        if ($this->call_status($params['id']) !== $this->ACCEPTED) {
+        if ($this->call_status($params['id']) !== self::ACCEPTED) {
             \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
 
             return false;
@@ -114,12 +109,12 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $key['visualization'] = '';
-        $length = new \phpseclib\Math\BigInteger(count($this->emojis));
+        $length = new \phpseclib\Math\BigInteger(count($self::EMOJIS));
         foreach (str_split(strrev(substr(hash('sha256', $params['g_a_or_b']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
-            $key['visualization'] .= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+            $key['visualization'] .= $self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
-        $this->calls[$params['id']] = ['status' => $this->READY, 'key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
     }
 
     public function call_status($id)

@@ -44,9 +44,6 @@ trait ResponseHandler
 
     public function handle_messages($datacenter)
     {
-        if ($this->stop) {
-            return;
-        }
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
@@ -59,7 +56,7 @@ trait ResponseHandler
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'] = true;
 
                     return true;
-                }, $this, $datacenter, $current_msg_id) || $this->stop) {
+                }, $this, $datacenter, $current_msg_id)) {
                     \danog\MadelineProto\Logger::log([base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' is already being handled'], \danog\MadelineProto\Logger::VERBOSE);
                     continue;
                 }
@@ -81,7 +78,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
-                    //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+                    //¹var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
                     //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
@@ -135,7 +132,7 @@ trait ResponseHandler
                     $only_updates = false;
                     $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['server_salt'];
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
-                    if ($this->authorized && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
+                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
                         $this->force_get_updates_difference();
                     }
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -203,7 +200,7 @@ trait ResponseHandler
                         if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & 4) !== 0) {
                             $this->ack_outgoing_message_id($msg_id, $datacenter);
                         }
-                        foreach ($this->msgs_info_flags as $flag => $description) {
+                        foreach (self::MSGS_INFO_FLAGS as $flag => $description) {
                             if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & $flag) !== 0) {
                                 $status .= $description;
                             }
@@ -323,8 +320,9 @@ trait ResponseHandler
 
     public function handle_rpc_error($server_answer, &$aargs)
     {
-        if ($server_answer['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
+        if (in_array($server_answer['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED'])) {
             $this->got_state = false;
+            $this->get_update_state();
             throw new \danog\MadelineProto\Exception('Update the timestamp pls');
         }
         switch ($server_answer['error_code']) {
@@ -338,7 +336,7 @@ trait ResponseHandler
                     case 'SESSION_EXPIRED':
                         $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                         $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
-                        $this->authorized = false;
+                        $this->authorized = self::NOT_LOGGED_IN;
                         $this->authorization = null;
                         $this->init_authorization(); // idk
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);

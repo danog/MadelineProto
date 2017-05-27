@@ -27,7 +27,7 @@ trait Files
         }
         $datacenter = is_null($datacenter) ? $this->datacenter->curdc : $datacenter;
         $file_size = filesize($file);
-        if ($file_size > 1610612736) {
+        if ($file_size > 512*1024*3000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         if ($cb === null) {

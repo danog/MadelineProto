@@ -6,10 +6,6 @@ description: payments.getSavedInfo parameters, return type and example
 [Back to methods index](index.md)
 
 
-### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 ### Return type: [payments\_SavedInfo](../types/payments_SavedInfo.md)

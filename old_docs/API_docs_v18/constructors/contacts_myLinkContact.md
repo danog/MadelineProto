@@ -7,10 +7,6 @@ description: contacts_myLinkContact attributes, type and example
 
 
 
-### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
 
 
 

@@ -9,13 +9,9 @@ description: constructors and methods of type FileLocation
 
 ### Possible values (constructors):
 
-[fileLocationUnavailable](../constructors/fileLocationUnavailable.md)  
+[fileLocationUnavailable23](../constructors/fileLocationUnavailable23.md)  
 
-[fileLocation](../constructors/fileLocation.md)  
-
-[fileLocationUnavailable\_23](../constructors/fileLocationUnavailable_23.md)  
-
-[fileLocation\_23](../constructors/fileLocation_23.md)  
+[fileLocation23](../constructors/fileLocation23.md)  
 
 
 
