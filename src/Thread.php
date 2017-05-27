@@ -32,6 +32,7 @@ if (!extension_loaded('pthreads')) {
 
         public function start()
         {
+            if (!isset($this->state)) $this->state = 0;
             if ($this->state & self::STARTED) {
                 throw new \RuntimeException();
             }
