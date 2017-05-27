@@ -416,7 +416,9 @@ trait AuthKeyHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->rpc === 'RPC_CALL_FAIL') throw $e;
+                if ($e->rpc === 'RPC_CALL_FAIL') {
+                    throw $e;
+                }
                 \danog\MadelineProto\Logger::log(['An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...'], \danog\MadelineProto\Logger::WARNING);
             } finally {
                 $this->datacenter->sockets[$datacenter]->new_outgoing = [];

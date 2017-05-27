@@ -31,7 +31,9 @@ trait CallHandler
         if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
             if ($method === 'channels.getParticipants' && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
                 \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);
-            }  else throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
+            } else {
+                throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
+            }
         }
         if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);

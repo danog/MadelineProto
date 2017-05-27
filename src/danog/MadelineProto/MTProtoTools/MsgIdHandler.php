@@ -82,6 +82,7 @@ trait MsgIdHandler
             $message_id = $key->add($this->four);
         }
         $this->check_message_id($message_id, ['outgoing' => true, 'datacenter' => $datacenter, 'container' => false]);
+
         return strrev($message_id->toBytes());
     }
 
@@ -91,6 +92,7 @@ trait MsgIdHandler
         if (isset($this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'}) && is_object($this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'})) {
             return $this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'};
         }
+
         return $this->zero;
         /*
         $keys = array_keys((array) $this->datacenter->sockets[$datacenter]->{$incoming.'_messages'});

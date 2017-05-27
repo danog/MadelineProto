@@ -49,18 +49,18 @@ class MTProto extends \Volatile
     const WAITING_PASSWORD = 2;
     const LOGGED_IN = 3;
     const DISALLOWED_METHODS = [
-        'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.logOut'                 => 'You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)',
         'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://daniil.it/MadelineProto for more info)',
-        'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://daniil.it/MadelineProto for more info)',
-        'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://daniil.it/MadelineProto for more info)',
-        'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://daniil.it/MadelineProto for more info)',
-        'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
-        'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
-        'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
-        'channels.getParticipants' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
-        'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.sendCode'               => 'You cannot use this method directly, use the phone_login method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.signIn'                 => 'You cannot use this method directly, use the complete_phone_login method instead (see https://daniil.it/MadelineProto for more info)',
+        'auth.signUp'                 => 'You cannot use this method directly, use the complete_signup method instead (see https://daniil.it/MadelineProto for more info)',
+        'users.getFullUser'           => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'channels.getFullChannel'     => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'messages.getFullChat'        => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'channels.getParticipants'    => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
+        'contacts.resolveUsername'    => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)',
 
-        'messages.acceptEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
+        'messages.acceptEncryption'  => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
         'messages.discardEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
         'messages.requestEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
 /*
@@ -70,13 +70,13 @@ class MTProto extends \Volatile
         'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
 */
         'updates.getChannelDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
-        'updates.getDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
-        'updates.getState' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
+        'updates.getDifference'        => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
+        'updates.getState'             => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
 
-        'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getCdnFile'      => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
         'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getFile'         => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.saveFilePart'    => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
         'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
 
     ];
@@ -142,13 +142,10 @@ class MTProto extends \Volatile
     private $twoe2047;
     private $twoe2048;
 
-
-
     private $ipv6 = false;
     public $should_serialize = false;
     public $run_workers = false;
     public $threads = false;
-
 
     public function ___construct($settings = [])
     {
@@ -228,7 +225,6 @@ class MTProto extends \Volatile
         }
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-
 
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {

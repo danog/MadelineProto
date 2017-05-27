@@ -215,6 +215,7 @@ class Connection extends \Volatile
                     $this->close_and_reopen();
                     throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
+
                 return $packet;
             case 'udp':
                 throw new Exception("Connection: This protocol wasn't implemented yet.");

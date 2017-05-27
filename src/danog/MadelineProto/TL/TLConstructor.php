@@ -47,6 +47,7 @@ class TLConstructor extends \Volatile
     public function find_by_type($type)
     {
         $id = array_search($type, (array) $this->type, true);
+
         return ($id === false) ? false : [
             'id'        => substr($id, 1),
             'predicate' => $this->predicate[$id],
@@ -59,13 +60,18 @@ class TLConstructor extends \Volatile
     {
         if ($layer !== '' && !isset($this->id[$predicate.$layer])) {
             foreach ($this->layers as $newlayer) {
-                if (isset($this->id[$predicate.$newlayer]) || $newlayer > $layer) break;
+                if (isset($this->id[$predicate.$newlayer]) || $newlayer > $layer) {
+                    break;
+                }
                 $nlayer = $newlayer;
             }
             $layer = $nlayer;
         }
-        if (!isset($this->id[$predicate.$layer])) return false;
+        if (!isset($this->id[$predicate.$layer])) {
+            return false;
+        }
         $id = $this->id[$predicate.$layer];
+
         return [
             'id'        => substr($id, 1),
             'predicate' => $this->predicate[$id],
@@ -77,7 +83,10 @@ class TLConstructor extends \Volatile
     public function find_by_id($oid)
     {
         $id = 'a'.$oid;
-        if (!isset($this->predicate[$id])) return false;
+        if (!isset($this->predicate[$id])) {
+            return false;
+        }
+
         return [
             'id'        => $oid,
             'predicate' => $this->predicate[$id],

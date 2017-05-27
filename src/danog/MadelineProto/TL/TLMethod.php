@@ -45,7 +45,9 @@ class TLMethod extends \Volatile
 
     public function find_by_method($method)
     {
-        if (!isset($this->id[$method])) return false;
+        if (!isset($this->id[$method])) {
+            return false;
+        }
         $id = $this->id[$method];
 
         return [
@@ -59,7 +61,10 @@ class TLMethod extends \Volatile
     public function find_by_id($oid)
     {
         $id = 'a'.$oid;
-        if (!isset($this->method[$id])) return false;
+        if (!isset($this->method[$id])) {
+            return false;
+        }
+
         return [
             'id'                => $oid,
             'method'            => $this->method[$id],

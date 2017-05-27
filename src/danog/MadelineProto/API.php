@@ -48,7 +48,7 @@ class API extends APIFactory
         }
         restore_error_handler();
     }
-    
+
     public function __sleep()
     {
         return ['API', 'storage'];
