@@ -236,7 +236,9 @@ trait UpdateHandler
         while (!isset($difference)) {
             try {
                 $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
-            } catch (\danog\MadelineProto\PTSException $e) { $this->got_state = false; }
+            } catch (\danog\MadelineProto\PTSException $e) {
+                $this->got_state = false;
+            }
         }
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->get_update_state()['sync_loading'] = false;
