@@ -458,6 +458,8 @@ MadelineProto can throw lots of different exceptions:
 
 * \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
 
+* \danog\MadelineProto\PTSException - Thrown if the PTS is unrecoverably corrupted
+
 * \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
 
 * \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)

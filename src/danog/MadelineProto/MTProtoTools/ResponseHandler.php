@@ -96,13 +96,14 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]);
                     break;
+                /*
                 case 'rpc_error':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
                     $aargs = ['datacenter' => &$datacenter];
                     $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], $aargs);
                     unset($aargs);
-                    break;
+                    break;*/
 
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
@@ -320,10 +321,8 @@ trait ResponseHandler
 
     public function handle_rpc_error($server_answer, &$aargs)
     {
-        if (in_array($server_answer['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED'])) {
-            $this->got_state = false;
-            $this->get_update_state();
-            throw new \danog\MadelineProto\Exception('Update the timestamp pls');
+        if (in_array($server_answer['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {
+            throw new \danog\MadelineProto\PTSException($server_answer['error_message']);
         }
         switch ($server_answer['error_code']) {
             case 303:
