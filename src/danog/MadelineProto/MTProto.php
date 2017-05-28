@@ -151,7 +151,6 @@ class MTProto extends \Volatile
     ];
     const TD_IGNORE = ['updateMessageID'];
 
-
     public $settings = [];
     private $config = ['expires' => -1];
     public $authorization = null;
@@ -288,7 +287,9 @@ class MTProto extends \Volatile
             }
             unset($this->data);
         }
-        if ($this->authorized === true) $this->authorized = self::LOGGED_IN;
+        if ($this->authorized === true) {
+            $this->authorized = self::LOGGED_IN;
+        }
         $this->getting_state = false;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== $this->getV()) {
@@ -702,6 +703,7 @@ class MTProto extends \Volatile
     {
         return $this->authorization['user'];
     }
+
     const ALL_MIMES = [
       'png' => [
         0 => 'image/png',

@@ -19,7 +19,6 @@ namespace danog\MadelineProto\TL\Conversion;
  */
 trait Extension
 {
-
     public function get_extension_from_mime($mime)
     {
         foreach (self::ALL_MIMES as $key => $value) {
