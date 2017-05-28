@@ -46,6 +46,7 @@ class MTProto extends \Volatile
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
+    const WAITING_SIGNUP = -1;
     const WAITING_PASSWORD = 2;
     const LOGGED_IN = 3;
     const DISALLOWED_METHODS = [
