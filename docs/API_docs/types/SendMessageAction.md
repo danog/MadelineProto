@@ -11,15 +11,15 @@ Notifies about activity in chat
 
 ### Possible values (constructors):
 
-[sendMessageTypingAction17](../constructors/sendMessageTypingAction17.md)  
+[sendMessageTypingAction](../constructors/sendMessageTypingAction.md)  
 
-[sendMessageCancelAction17](../constructors/sendMessageCancelAction17.md)  
+[sendMessageCancelAction](../constructors/sendMessageCancelAction.md)  
 
-[sendMessageRecordVideoAction17](../constructors/sendMessageRecordVideoAction17.md)  
+[sendMessageRecordVideoAction](../constructors/sendMessageRecordVideoAction.md)  
 
 [sendMessageUploadVideoAction](../constructors/sendMessageUploadVideoAction.md)  
 
-[sendMessageRecordAudioAction17](../constructors/sendMessageRecordAudioAction17.md)  
+[sendMessageRecordAudioAction](../constructors/sendMessageRecordAudioAction.md)  
 
 [sendMessageUploadAudioAction](../constructors/sendMessageUploadAudioAction.md)  
 
@@ -27,9 +27,9 @@ Notifies about activity in chat
 
 [sendMessageUploadDocumentAction](../constructors/sendMessageUploadDocumentAction.md)  
 
-[sendMessageGeoLocationAction17](../constructors/sendMessageGeoLocationAction17.md)  
+[sendMessageGeoLocationAction](../constructors/sendMessageGeoLocationAction.md)  
 
-[sendMessageChooseContactAction17](../constructors/sendMessageChooseContactAction17.md)  
+[sendMessageChooseContactAction](../constructors/sendMessageChooseContactAction.md)  
 
 [sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md)  
 
@@ -37,13 +37,25 @@ Notifies about activity in chat
 
 [sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md)  
 
-[sendMessageUploadVideoAction17](../constructors/sendMessageUploadVideoAction17.md)  
+[sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md)  
 
-[sendMessageUploadAudioAction17](../constructors/sendMessageUploadAudioAction17.md)  
+[sendMessageCancelAction\_17](../constructors/sendMessageCancelAction_17.md)  
 
-[sendMessageUploadPhotoAction17](../constructors/sendMessageUploadPhotoAction17.md)  
+[sendMessageRecordVideoAction\_17](../constructors/sendMessageRecordVideoAction_17.md)  
 
-[sendMessageUploadDocumentAction17](../constructors/sendMessageUploadDocumentAction17.md)  
+[sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md)  
+
+[sendMessageRecordAudioAction\_17](../constructors/sendMessageRecordAudioAction_17.md)  
+
+[sendMessageUploadAudioAction\_17](../constructors/sendMessageUploadAudioAction_17.md)  
+
+[sendMessageUploadPhotoAction\_17](../constructors/sendMessageUploadPhotoAction_17.md)  
+
+[sendMessageUploadDocumentAction\_17](../constructors/sendMessageUploadDocumentAction_17.md)  
+
+[sendMessageGeoLocationAction\_17](../constructors/sendMessageGeoLocationAction_17.md)  
+
+[sendMessageChooseContactAction\_17](../constructors/sendMessageChooseContactAction_17.md)  
 
 
 

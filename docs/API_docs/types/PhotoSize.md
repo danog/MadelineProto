@@ -9,11 +9,17 @@ description: constructors and methods of type PhotoSize
 
 ### Possible values (constructors):
 
-[photoSizeEmpty23](../constructors/photoSizeEmpty23.md)  
+[photoSizeEmpty](../constructors/photoSizeEmpty.md)  
 
-[photoSize23](../constructors/photoSize23.md)  
+[photoSize](../constructors/photoSize.md)  
 
-[photoCachedSize23](../constructors/photoCachedSize23.md)  
+[photoCachedSize](../constructors/photoCachedSize.md)  
+
+[photoSizeEmpty\_23](../constructors/photoSizeEmpty_23.md)  
+
+[photoSize\_23](../constructors/photoSize_23.md)  
+
+[photoCachedSize\_23](../constructors/photoCachedSize_23.md)  
 
 
 

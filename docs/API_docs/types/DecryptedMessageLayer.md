@@ -9,7 +9,7 @@ description: constructors and methods of type DecryptedMessageLayer
 
 ### Possible values (constructors):
 
-[decryptedMessageLayer17](../constructors/decryptedMessageLayer17.md)  
+[decryptedMessageLayer\_17](../constructors/decryptedMessageLayer_17.md)  
 
 
 

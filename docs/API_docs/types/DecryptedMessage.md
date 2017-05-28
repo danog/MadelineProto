@@ -9,15 +9,15 @@ description: constructors and methods of type DecryptedMessage
 
 ### Possible values (constructors):
 
-[decryptedMessage8](../constructors/decryptedMessage8.md)  
+[decryptedMessage\_8](../constructors/decryptedMessage_8.md)  
 
-[decryptedMessageService8](../constructors/decryptedMessageService8.md)  
+[decryptedMessageService\_8](../constructors/decryptedMessageService_8.md)  
 
-[decryptedMessage17](../constructors/decryptedMessage17.md)  
+[decryptedMessage\_17](../constructors/decryptedMessage_17.md)  
 
-[decryptedMessageService17](../constructors/decryptedMessageService17.md)  
+[decryptedMessageService\_17](../constructors/decryptedMessageService_17.md)  
 
-[decryptedMessage45](../constructors/decryptedMessage45.md)  
+[decryptedMessage\_45](../constructors/decryptedMessage_45.md)  
 
 
 
