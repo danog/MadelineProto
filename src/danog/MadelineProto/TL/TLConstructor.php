@@ -22,76 +22,74 @@ class TLConstructor extends \Volatile
     public $predicate = [];
     public $type = [];
     public $params = [];
-    public $layers = [];
+    public $layer = [];
+    public $key = 0;
 
     public function __sleep()
     {
-        return ['id', 'predicate', 'type', 'params', 'layers'];
+        return ['id', 'predicate', 'type', 'params', 'layer', 'key'];
     }
 
     public function add($json_dict, $scheme_type)
     {
-        $json_dict['id'] = 'a'.$json_dict['id'];
-        $json_dict['predicate'] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
-        $json_dict['predicate'] .= $scheme_type === 'secret' ? $json_dict['layer'] : '';
-        $this->id[$json_dict['predicate']] = $json_dict['id'];
-        $this->predicate[$json_dict['id']] = $json_dict['predicate'];
-        $this->type[$json_dict['id']] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
-        $this->params[$json_dict['id']] = $json_dict['params'];
-        $this->parse_params($json_dict['id'], $scheme_type === 'mtproto');
+        $this->id[$this->key] = $json_dict['id'];
+        $this->predicate[$this->key] = (string) ((($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message') ? 'MT' : '').$json_dict['predicate']);
+        $this->type[$this->key] = (($scheme_type === 'mtproto' && $json_dict['type'] === 'Message') ? 'MT' : '').$json_dict['type'];
+        $this->params[$this->key] = $json_dict['params'];
         if ($scheme_type === 'secret') {
-            $this->layers[$json_dict['layer']] = $json_dict['layer'];
+            $this->layer[$this->key] = $json_dict['layer'];
         }
+        $this->parse_params($this->key, $scheme_type === 'mtproto');
+        $this->key++;
     }
 
     public function find_by_type($type)
     {
-        $id = array_search($type, (array) $this->type, true);
+        $key = array_search($type, (array) $this->type, true);
 
-        return ($id === false) ? false : [
-            'id'        => substr($id, 1),
-            'predicate' => $this->predicate[$id],
-            'type'      => $this->type[$id],
-            'params'    => $this->array_cast_recursive($this->params[$id]),
+        return ($key === false) ? false : [
+            'id'        => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
-    public function find_by_predicate($predicate, $layer = '')
+    public function find_by_predicate($predicate, $layer = -1)
     {
-        if ($layer !== '' && !isset($this->id[$predicate.$layer])) {
-            foreach ($this->layers as $newlayer) {
-                if (isset($this->id[$predicate.$newlayer]) || $newlayer > $layer) {
-                    break;
+        if ($layer !== -1) {
+            $newlayer = -1;
+            $keys = array_keys((array) $this->predicate, $predicate);
+            foreach ($keys as $k) {
+                if ($this->layer[$k] <= $layer && $this->layer[$k] > $newlayer) {
+                    $key = $k;
+                    $newlayer = $this->layer[$k];
                 }
-                $nlayer = $newlayer;
+                if (!isset($key)) {
+                    $key = $keys[0];
+                }
             }
-            $layer = $nlayer;
+        } else {
+            $key = array_search($predicate, (array) $this->predicate, true);
         }
-        if (!isset($this->id[$predicate.$layer])) {
-            return false;
-        }
-        $id = $this->id[$predicate.$layer];
 
-        return [
-            'id'        => substr($id, 1),
-            'predicate' => $this->predicate[$id],
-            'type'      => $this->type[$id],
-            'params'    => $this->array_cast_recursive($this->params[$id]),
+        return ($key === false) ? false : [
+            'id'        => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
-    public function find_by_id($oid)
+    public function find_by_id($id)
     {
-        $id = 'a'.$oid;
-        if (!isset($this->predicate[$id])) {
-            return false;
-        }
+        $key = array_search($id, (array) $this->id, true);
 
-        return [
-            'id'        => $oid,
-            'predicate' => $this->predicate[$id],
-            'type'      => $this->type[$id],
-            'params'    => $this->array_cast_recursive($this->params[$id]),
+        return ($key === false) ? false : [
+            'id'        => $this->id[$key],
+            'predicate' => $this->predicate[$key],
+            'type'      => $this->type[$key],
+            'params'    => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 }

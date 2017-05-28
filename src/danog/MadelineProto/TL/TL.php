@@ -235,7 +235,7 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object($type, $object, $layer = '')
+    public function serialize_object($type, $object, $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
@@ -390,7 +390,7 @@ trait TL
         return $tl['id'].$this->serialize_params($tl, $arguments);
     }
 
-    public function serialize_params($tl, $arguments, $layer = '')
+    public function serialize_params($tl, $arguments, $layer = -1)
     {
         $serialized = '';
 

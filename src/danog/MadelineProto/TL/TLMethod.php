@@ -22,54 +22,49 @@ class TLMethod extends \Volatile
     public $type = [];
     public $params = [];
     public $method_namespace = [];
+    public $key = 0;
 
     public function __sleep()
     {
-        return ['id', 'method', 'type', 'params', 'method_namespace'];
+        return ['id', 'method', 'type', 'params', 'method_namespace', 'key'];
     }
 
     public function add($json_dict)
     {
-        $json_dict['id'] = 'a'.$json_dict['id'];
-        $this->id[$json_dict['method']] = $json_dict['id'];
-        $this->method[$json_dict['id']] = $json_dict['method'];
-        $this->type[$json_dict['id']] = $json_dict['type'];
-        $this->params[$json_dict['id']] = $json_dict['params'];
+        $this->id[$this->key] = $json_dict['id'];
+        $this->method[$this->key] = $json_dict['method'];
+        $this->type[$this->key] = $json_dict['type'];
+        $this->params[$this->key] = $json_dict['params'];
         $namespace = explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
             $this->method_namespace[$namespace[1]] = $namespace[0];
         }
 
-        $this->parse_params($json_dict['id']);
+        $this->parse_params($this->key);
+        $this->key++;
     }
 
     public function find_by_method($method)
     {
-        if (!isset($this->id[$method])) {
-            return false;
-        }
-        $id = $this->id[$method];
+        $key = array_search($method, (array) $this->method, true);
 
-        return [
-            'id'                => substr($id, 1),
-            'method'            => $this->method[$id],
-            'type'              => $this->type[$id],
-            'params'            => $this->array_cast_recursive($this->params[$id]),
+        return ($key === false) ? false : [
+            'id'                => $this->id[$key],
+            'method'            => $this->method[$key],
+            'type'              => $this->type[$key],
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
-    public function find_by_id($oid)
+    public function find_by_id($id)
     {
-        $id = 'a'.$oid;
-        if (!isset($this->method[$id])) {
-            return false;
-        }
+        $key = array_search($id, (array) $this->id, true);
 
-        return [
-            'id'                => $oid,
-            'method'            => $this->method[$id],
-            'type'              => $this->type[$id],
-            'params'            => $this->array_cast_recursive($this->params[$id]),
+        return ($key === false) ? false : [
+            'id'                => $this->id[$key],
+            'method'            => $this->method[$key],
+            'type'              => $this->type[$key],
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 }
