@@ -18,6 +18,7 @@
         "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
         "ext-curl": "*",
+        "ext-sockets": "*",
         "ext-xml": "*"
 
     },

@@ -43,6 +43,7 @@ trait TL
                 $class = null;
                 $dparams = [];
                 foreach ($tl_file as $line) {
+                    $line = rtrim($line);
                     if (preg_match('|^//@|', $line)) {
                         $list = explode(' @', str_replace('//', ' ', $line));
                         foreach ($list as $elem) {
@@ -83,7 +84,7 @@ trait TL
                         $type = 'constructors';
                         continue;
                     }
-                    if (preg_match('|^===\d*===$|', $line)) {
+                    if (preg_match('|^===\d*===|', $line)) {
                         $layer = (int) preg_replace('|\D*|', '', $line);
                         continue;
                     }
