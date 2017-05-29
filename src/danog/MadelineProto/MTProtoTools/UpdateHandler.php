@@ -601,7 +601,7 @@ trait UpdateHandler
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
             $this->pwr_update_handler($update);
         } else {
-            $this->settings['updates']['callback'] === 'get_updates_update_handler' ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
+            in_array($this->settings['updates']['callback'], [['danog\MadelineProto\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
         }
     }
 
