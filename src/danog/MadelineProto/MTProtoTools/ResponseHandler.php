@@ -48,7 +48,7 @@ trait ResponseHandler
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
             \danog\MadelineProto\Logger::log(['Received '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            \danog\MadelineProto\Logger::log([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            //\danog\MadelineProto\Logger::log([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
                 if (!$this->synchronized(function ($zis, $datacenter, $current_msg_id) {
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'])) {

@@ -21,7 +21,7 @@ class Button extends \Volatile implements \JsonSerializable
     public function ___construct($API, $message, $button)
     {
         $this->data = $button;
-        $this->info['peer'] = $message['to_id'];
+        $this->info['peer'] = $message['to_id'] === ['_' => 'peerUser', 'user_id' => $API->authorization['user']['id']] ? $message['from_id'] : $message['to_id'];
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;
     }
