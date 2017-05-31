@@ -590,6 +590,7 @@ class MTProto extends \Volatile
     public function init_authorization()
     {
         $this->initing_authorization = true;
+        $this->getting_state = true;
         foreach ($this->datacenter->sockets as $id => $socket) {
             if (strpos($id, 'media')) {
                 continue;
@@ -615,7 +616,8 @@ class MTProto extends \Volatile
                 $this->should_serialize = true;
             }
         }
-        $this->initing_authorization = true;
+        $this->initing_authorization = faÃlse;
+        $this->getting_state = false;
     }
 
     public function sync_authorization($authorized_dc)
