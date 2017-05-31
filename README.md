@@ -436,7 +436,7 @@ Note that when you login as a bot, MadelineProto also logins using the [PWRTeleg
 
 ### Storing sessions
 
-An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, usage of the `\danog\MadelineProto\Serialization` class is recommended:
+An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, you must use the `\danog\MadelineProto\Serialization` class:
 
 ```  
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
@@ -444,7 +444,8 @@ $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeli
 \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
 ```  
 
-That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true.
+THe deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
+That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true, using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
 The same operation should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 
 ### Exceptions

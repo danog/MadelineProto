@@ -46,7 +46,7 @@ class Serialization
      *
      * @return API
      */
-    public static function deserialize($filename)
+    public static function deserialize($filename, $no_updates = false)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
