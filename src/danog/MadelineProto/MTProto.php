@@ -713,7 +713,10 @@ class MTProto extends \Volatile
 
     public function get_self()
     {
-        if ($this->authorization === null) $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
+        if ($this->authorization === null) {
+            $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
+        }
+
         return $this->authorization['user'];
     }
 
