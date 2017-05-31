@@ -247,7 +247,9 @@ class MTProto extends \Volatile
                     $this->should_serialize = true;
                 }
             } catch (RPCErrorException $e) {
-                if ($e->rpc !== "BOT_METHOD_INVALID") throw $e;
+                if ($e->rpc !== 'BOT_METHOD_INVALID') {
+                    throw $e;
+                }
             }
         }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
