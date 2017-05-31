@@ -35,7 +35,11 @@ class DataCenter extends \Volatile
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
-            if ($socket instanceof Connection) $socket->close_and_reopen(); else unset($this->sockets[$key]);
+            if ($socket instanceof Connection) {
+                $socket->close_and_reopen();
+            } else {
+                unset($this->sockets[$key]);
+            }
         }
     }
 
