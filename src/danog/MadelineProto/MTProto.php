@@ -314,6 +314,9 @@ class MTProto extends \Volatile
         }
         $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        if ($this->authorized === self::LOGGED_IN) {
+            $this->get_self();
+        }
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs();
         }
@@ -710,6 +713,7 @@ class MTProto extends \Volatile
 
     public function get_self()
     {
+        if ($this->authorization === null) $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
         return $this->authorization['user'];
     }
 
