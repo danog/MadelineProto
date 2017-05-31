@@ -237,13 +237,17 @@ class MTProto extends \Volatile
         $this->datacenter->curdc = 2;
 
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
-            $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
-            \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
+            try {
+                $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
+                \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
 
-            if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                $this->datacenter->curdc = $nearest_dc['nearest_dc'];
-                $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
-                $this->should_serialize = true;
+                if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
+                    $this->datacenter->curdc = $nearest_dc['nearest_dc'];
+                    $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
+                    $this->should_serialize = true;
+                }
+            } catch (RPCErrorException $e) {
+                if ($e->rpc !== "BOT_METHOD_INVALID") throw $e;
             }
         }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
