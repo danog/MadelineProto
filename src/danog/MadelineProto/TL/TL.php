@@ -544,7 +544,7 @@ trait TL
                 $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
-                    throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
+                    throw new Exception('Could not extract type: '.$type['type'].' with id '.bin2hex(strrev($id)));
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
@@ -577,7 +577,7 @@ trait TL
                 $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
-                    throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
+                    throw new Exception('Could not extract type: '.$type['type'].' with id '.bin2hex(strrev($id)));
                 }
             }
         }
