@@ -79,13 +79,7 @@ trait ResponseHandler
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
                     $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
-                    //¹var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
-                    //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
-                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
-                    ///var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response']]['content']);
-                    ///$this->stop = true;
-                    //var_dump(base64_encode($current_msg_id), $this->datacenter->sockets[$datacenter]->incoming_messages);
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
                     break;
@@ -119,16 +113,12 @@ trait ResponseHandler
                 case 'pong':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;
-                    foreach ($this->datacenter->sockets[$datacenter]->outgoing_messages as $msg_id => &$omessage) {
-                        if (isset($omessage['content']['args']['ping_id']) && $omessage['content']['args']['ping_id'] === $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['ping_id']) {
-                            $this->ack_outgoing_message_id($msg_id, $datacenter);
-                            $omessage['response'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id'];
-                            $this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'];
-                            unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
-                            unset($this->datacenter->sockets[$datacenter]->new_outgoing[$msg_id]);
-                        }
-                    }
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                    unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]);
+                    $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id'], $datacenter); // Acknowledge that the server received my request
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']]['response'] = $current_msg_id;
                     break;
+
                 case 'new_session_created':
                     $this->check_in_seq_no($datacenter, $current_msg_id);
                     $only_updates = false;

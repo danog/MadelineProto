@@ -40,6 +40,15 @@ class Connection extends \Volatile
     public $max_incoming_id;
     public $max_outgoing_id;
 
+    public $i = [];
+/*    public function __get($name) {
+        echo "GETTING $name\n";
+        if (isset($this->i[$name]) && $this->{$name} === null) var_dump($this->i[$name]);
+        if ($this->{$name} instanceof \Volatile) $this->i[$name] = debug_backtrace(0);
+var_dump(is_null($this->{$name}));
+        return $this->{$name};
+    }*/
+
     public function ___construct($ip, $port, $protocol, $timeout, $ipv6)
     {
 

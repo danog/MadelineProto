@@ -242,8 +242,8 @@ class MTProto extends \Volatile
                 \danog\MadelineProto\Logger::log(["We're in ".$nearest_dc['country'].', current dc is '.$nearest_dc['this_dc'].', nearest dc is '.$nearest_dc['nearest_dc'].'.'], Logger::NOTICE);
 
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                    $this->datacenter->curdc = $nearest_dc['nearest_dc'];
-                    $this->settings['connection_settings']['default_dc'] = $nearest_dc['nearest_dc'];
+                    $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
+                    $this->settings['connection_settings']['default_dc'] = (int)$nearest_dc['nearest_dc'];
                     $this->should_serialize = true;
                 }
             } catch (RPCErrorException $e) {
@@ -706,6 +706,7 @@ class MTProto extends \Volatile
             $id .= $dc['media_only'] ? '_media' : '';
             $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
             $id .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
+            if (is_numeric($id)) $id = (int)$id;
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
