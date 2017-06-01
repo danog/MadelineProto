@@ -68,3 +68,6 @@ decryptedMessageMediaWebPage#e50511d8 url:string = DecryptedMessageMedia;
 
 ===55===
 documentAttributeSticker#3a556302 alt:string stickerset:InputStickerSet = DocumentAttribute;
+
+===66===
+documentAttributeVideo#ef02ce6 flags:# round_message:flags.0?true duration:int w:int h:int = DocumentAttribute;
