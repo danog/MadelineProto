@@ -249,6 +249,7 @@ trait UpdateHandler
                 break;
             case 'updates.difference':
                 $this->set_update_state($difference['state']);
+                //var_dump($difference['new_encrypted_messages']);
                 foreach ($difference['new_encrypted_messages'] as $encrypted) {
                     $this->handle_encrypted_update(['_' => 'updateNewEncryptedMessage', 'message' => $encrypted]);
                 }

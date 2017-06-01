@@ -94,6 +94,7 @@ trait MessageHandler
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']++] = $message['message'];
+        //var_dump($message);
         $this->handle_decrypted_update($message);
     }
 }
