@@ -63,6 +63,7 @@ trait AuthKeyHandler
         $this->get_updates_difference();
 
         \danog\MadelineProto\Logger::log(['Secret chat '.$res['id'].' requested successfully!'], \danog\MadelineProto\Logger::NOTICE);
+
         return $res['id'];
     }
 
@@ -134,6 +135,7 @@ trait AuthKeyHandler
             }
             if ($my['exchange_id'] === $params['exchange_id']) {
                 $this->secret_chats[$chat]['rekeying'] = [0];
+
                 return;
             }
         }
@@ -207,6 +209,7 @@ trait AuthKeyHandler
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]], ['datacenter' => $this->datacenter->curdc]);
         \danog\MadelineProto\Logger::log(['Secret chat '.$chat.' rekeyed successfully!'], \danog\MadelineProto\Logger::VERBOSE);
+
         return true;
     }
 
