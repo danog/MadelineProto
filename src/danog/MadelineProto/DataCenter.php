@@ -24,6 +24,7 @@ class DataCenter extends \Volatile
     public $curdc = 0;
     public $dclist = [];
     public $settings = [];
+
 /*
     public $i = [];
     public function __get($name) {
