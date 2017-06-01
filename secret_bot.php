@@ -81,7 +81,9 @@ while (true) {
         switch ($update['update']['_']) {
             case 'updateNewEncryptedMessage':
                 $i = 0;
-                while (true) { $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]); }
+                while (true) {
+                    $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]);
+                }
         }
     }
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
