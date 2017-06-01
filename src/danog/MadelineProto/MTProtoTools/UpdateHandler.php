@@ -550,7 +550,7 @@ trait UpdateHandler
                 return false;
             }
             \danog\MadelineProto\Logger::log(['Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::VERBOSE);
-            $cur_state['qts'] = $update['qts'];
+            $this->method_call('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->datacenter->curdc]);
             $this->should_serialize = true;
             $this->handle_encrypted_update($update);
 

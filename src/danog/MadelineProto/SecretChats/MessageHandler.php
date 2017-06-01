@@ -57,6 +57,7 @@ trait MessageHandler
         $auth_key_id = substr($message['message']['bytes'], 0, 8);
         $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
+//var_dump($auth_key_id, $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']);
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
                     throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
