@@ -72,6 +72,13 @@ trait ResponseHandler
                 break;
             case 'decryptedMessageLayer':
                 if ($this->check_secret_out_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && $this->check_secret_in_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no'])) {
+                    $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
+                    if ($update['message']['decrypted_message']['layer'] >= 17) {
+                        $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['layer'];
+                        if ($update['message']['decrypted_message']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
+                            $this->notify_layer($update['message']['chat_id']);
+                        }
+                    }
                     $update['message']['decrypted_message'] = $update['message']['decrypted_message']['message'];
                     $this->handle_decrypted_update($update);
                 }

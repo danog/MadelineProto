@@ -22,7 +22,6 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
-var_dump(file_exists('.env'));
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
@@ -74,17 +73,19 @@ echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $Madel
 
 $offset = 0;
 while (true) {
-    $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-    //\danog\MadelineProto\Logger::log([$updates]);
-    foreach ($updates as $update) {
-        $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-        switch ($update['update']['_']) {
-            case 'updateNewEncryptedMessage':
-                $i = 0;
-                while (true) {
-                    $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]);
-                }
+    try {
+        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        //\danog\MadelineProto\Logger::log([$updates]);
+        foreach ($updates as $update) {
+            $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
+            switch ($update['update']['_']) {
+                case 'updateNewEncryptedMessage':
+                    $i = 0;
+                    while (true) {
+                        $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]);
+                    }
+           }
         }
-    }
+    } catch (\danog\MadelineProto\SecurityException $e) { ; }
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }

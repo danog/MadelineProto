@@ -24,6 +24,12 @@ trait AuthKeyHandler
 
     public function accept_secret_chat($params)
     {
+        if ($this->secret_chat_status($params['id']) !== 0) {
+            //var_dump($this->secret_chat_status($params['id']));
+            \danog\MadelineProto\Logger::log(["I've already accepted secret chat ".$params['id']]);
+
+            return false;
+        }
         $this->should_serialize = true;
         $dh_config = $this->get_dh_config();
         \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -85,9 +91,8 @@ trait AuthKeyHandler
         unset($this->temp_requested_secret_chats[$params['id']]);
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         //var_dump($key);
-
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            $this->method_call('messages.discardEncryption', ['chat_id' => $params['id']], ['datacenter' => $this->datacenter->curdc]);
+            $this->discard_secret_chat($params['id']);
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
@@ -231,5 +236,23 @@ trait AuthKeyHandler
     public function get_secret_chat($chat)
     {
         return $this->secret_chats[$chat];
+    }
+
+    public function discard_secret_chat($chat) {
+        if (isset($this->secret_chats[$chat])) {
+            unset($this->secret_chats[$chat]);
+        }
+        if (isset($this->temp_requested_secret_chats[$chat])) {
+            unset($this->temp_requested_secret_chats[$chat]);
+        }
+        if (isset($this->temp_rekeyed_secret_chats[$chat])) {
+            unset($this->temp_rekeyed_secret_chats[$chat]);
+        }
+        try {
+            $this->method_call('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            if ($e->rpc !== "ENCRYPTION_ALREADY_DECLINED") throw $e;
+        }
+
     }
 }
