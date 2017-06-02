@@ -132,14 +132,14 @@ trait AuthKeyHandler
     public function accept_rekey($chat, $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
-            $my = $this->temp_rekeyed_secret_chats[$this->secret_chats[$chat]['rekeying'][1]];
+            $my_exchange_id = new \phpseclib\Math\BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
+            $other_exchange_id = new \phpseclib\Math\BigInteger($params['exchange_id'], -256);
             //var_dump($my, $params);
-            if ($my['exchange_id'] > $params['exchange_id']) {
+            if ($my_exchange_id > $other_exchange_id) {
                 return;
             }
-            if ($my['exchange_id'] === $params['exchange_id']) {
+            if ($my_exchange_id === $other_exchange_id) {
                 $this->secret_chats[$chat]['rekeying'] = [0];
-
                 return;
             }
         }
@@ -232,6 +232,8 @@ trait AuthKeyHandler
     }
 
     public function discard_secret_chat($chat) {
+        \danog\MadelineProto\Logger::log(['Discarding secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+
         if (isset($this->secret_chats[$chat])) {
             unset($this->secret_chats[$chat]);
         }

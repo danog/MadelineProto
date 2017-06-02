@@ -71,6 +71,7 @@ trait ResponseHandler
                 $this->save_update($update);
                 break;
             case 'decryptedMessageLayer':
+                var_dump($update['message']);
                 if ($this->check_secret_out_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && $this->check_secret_in_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no'])) {
                     $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
                     if ($update['message']['decrypted_message']['layer'] >= 17) {

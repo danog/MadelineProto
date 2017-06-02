@@ -43,7 +43,6 @@ trait SeqNoHandler
         $seqno = ($seqno - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
         $C = 0;
         foreach ($this->secret_chats[$chat_id]['incoming'] as $message) {
-            var_dump($message);
             if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->secret_chats[$chat_id]['in_seq_no']) {
                 if (($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2 !== $C) {
                     $this->discard_secret_chat($chat_id);
@@ -56,7 +55,6 @@ trait SeqNoHandler
         var_dump($C, $seqno);
         if ($seqno < $C) { // <= C
             \danog\MadelineProto\Logger::log(['WARNING: dropping repeated message with seqno '.$seqno]);
-            $this->secret_chats[$chat_id]['in_seq_no']--;
 
             return false;
         }

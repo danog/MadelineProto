@@ -452,6 +452,9 @@ trait TL
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
             if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+                if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
+                    throw new \danog\MadelineProto\Exception('This secret peer is not present in the internal peer database');
+                }
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             if ($current_argument['type'] === 'DataJSON') {

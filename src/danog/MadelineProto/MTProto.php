@@ -508,6 +508,7 @@ class MTProto extends \Volatile
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
                 'incoming' => 200,
                 'outgoing' => 200,
+                'call_queue' => 200
             ],
             'peer'      => ['full_info_cache_time' => 60],
             'updates'   => [
@@ -707,7 +708,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 38;
+        return 39;
     }
 
     public function get_self()

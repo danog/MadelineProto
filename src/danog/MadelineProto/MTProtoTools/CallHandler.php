@@ -17,6 +17,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait CallHandler
 {
+    public $call_queue = [];
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
         if (!$this->is_array($args)) {
@@ -50,9 +51,15 @@ trait CallHandler
             }
             $args['chat_id'] = $res['chat_id'];
         }
+        $queue = (isset($aargs['queue']) && $aargs['queue']) || in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue']);
+
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];
+        if ($queue) {
+            $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->call_queue, 'query' => $serialized]);
+        }
+
         $last_recv = $this->last_recv;
         if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) {
             $this->getting_state = true;
@@ -62,6 +69,17 @@ trait CallHandler
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $this->send_message($serialized, $content_related, $aargs);
+                if ($queue) {
+                    $this->call_queue[] = $message_id;
+                    if (count($this->call_queue) > $this->settings['msg_array_limit']['call_queue']) {
+                        reset($this->call_queue);
+                        $key = key($this->call_queue);
+                        if ($key[0] === "\0") {
+                            $key = 'a'.$key;
+                        }
+                        unset($this->call_queue[$key]);
+                    }
+                }
                 if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
                     return true;
                 }

@@ -31,6 +31,7 @@ if (file_exists('.env')) {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
+
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -71,6 +72,8 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 echo 'Serializing MadelineProto to s.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 
+$sent = [-440592694=>true];
+
 $offset = 0;
 while (true) {
     try {
@@ -80,12 +83,16 @@ while (true) {
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updateNewEncryptedMessage':
+                    if (isset($sent[$update['update']['message']['chat_id']])) continue;
                     $i = 0;
-                    while (true) {
+                    while ($i < $argv[1]) {
+                        echo "SENDING MESSAGE $i TO ".$update['update']['message']['chat_id'].PHP_EOL;
                         $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]);
                     }
+                    $sent[$update['update']['message']['chat_id']] = true;
            }
         }
-    } catch (\danog\MadelineProto\SecurityException $e) { ; }
+//    } catch (\danog\MadelineProto\SecurityException $e) {
+    } catch (\danog\MadelineProto\Exception $e) { var_dump($e->getMessage()); }
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
