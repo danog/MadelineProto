@@ -27,7 +27,6 @@ trait PeerHandler
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                         $this->chats[$user['id']] = $user;
-                        $this->should_serialize = true;
                         try {
                             $this->get_pwr_chat($user['id'], false, true);
                         } catch (\danog\MadelineProto\Exception $e) {
@@ -54,7 +53,6 @@ trait PeerHandler
                 case 'chatForbidden':
                     if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
                         $this->chats[-$chat['id']] = $chat;
-                        $this->should_serialize = true;
                         try {
                             $this->get_pwr_chat(-$chat['id'], true, true);
                         } catch (\danog\MadelineProto\Exception $e) {
@@ -74,7 +72,6 @@ trait PeerHandler
                     $bot_api_id = $this->to_supergroup($chat['id']);
                     if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
                         $this->chats[$bot_api_id] = $chat;
-                        $this->should_serialize = true;
                         if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
                             try {
                                 $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);

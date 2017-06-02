@@ -67,7 +67,6 @@ trait AuthKeyHandler
                     foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
                         $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
                         $this->rsa_keys[$tempkey->fp] = $tempkey;
-                        $this->should_serialize = true;
                     }
                 }
 

@@ -24,17 +24,11 @@ class Serialization
      * @param API    $instance
      * @param bool   $force
      *
-     * @return number|bool
+     * @return number
      */
     public static function serialize($filename, $instance, $force = false)
     {
-        if ($instance->API->should_serialize || !(file_exists($filename) && !empty(file_get_contents($filename))) || $force) {
-            $instance->API->should_serialize = false;
-
-            return file_put_contents($filename, \danog\Serialization::serialize($instance, true), LOCK_EX);
-        }
-
-        return false;
+        return file_put_contents($filename, \danog\Serialization::serialize($instance, true), LOCK_EX);
     }
 
     /**

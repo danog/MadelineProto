@@ -185,7 +185,6 @@ class MTProto extends \Volatile
     private $twoe2048;
 
     private $ipv6 = false;
-    public $should_serialize = false;
     public $run_workers = false;
     public $threads = false;
 
@@ -244,7 +243,6 @@ class MTProto extends \Volatile
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
                     $this->settings['connection_settings']['default_dc'] = (int) $nearest_dc['nearest_dc'];
-                    $this->should_serialize = true;
                 }
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'BOT_METHOD_INVALID') {
@@ -254,7 +252,6 @@ class MTProto extends \Volatile
         }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = $this->getV();
-        $this->should_serialize = true;
 
         return $this->settings;
     }
@@ -551,7 +548,6 @@ class MTProto extends \Volatile
         $this->settings = $settings;
         // Setup logger
         $this->setup_logger();
-        $this->should_serialize = true;
     }
 
     public function setup_logger()
@@ -576,7 +572,6 @@ class MTProto extends \Volatile
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];
             $socket->new_incoming = [];
-            $this->should_serialize = true;
         }
     }
 
@@ -610,7 +605,6 @@ class MTProto extends \Volatile
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
-                $this->should_serialize = true;
             }
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                 if ($socket->auth_key === null) {
@@ -624,7 +618,6 @@ class MTProto extends \Volatile
                 if (in_array($socket->protocol, ['http', 'https'])) {
                     $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
                 }
-                $this->should_serialize = true;
             }
         }
         $this->initing_authorization = false;
@@ -646,7 +639,6 @@ class MTProto extends \Volatile
                 continue;
             }
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
-            $this->should_serialize = true;
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
@@ -684,7 +676,6 @@ class MTProto extends \Volatile
             return;
         }
         $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
-        $this->should_serialize = true;
         $this->parse_config();
     }
 
@@ -712,7 +703,6 @@ class MTProto extends \Volatile
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
-        $this->should_serialize = true;
     }
 
     public function getV()

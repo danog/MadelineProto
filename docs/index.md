@@ -1,7 +1,3 @@
----
-title: MadelineProto documentation
-description: PHP implementation of telegram's MTProto protocol
----
 # MadelineProto
 [![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
 [![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
@@ -449,8 +445,8 @@ $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeli
 ```  
 
 THe deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
-That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true, using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
-The same operation should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
+That class serializes using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
+The same should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 
 ### Exceptions
 

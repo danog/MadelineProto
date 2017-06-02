@@ -48,7 +48,6 @@ trait UpdateHandler
             return;
         }
         $this->updates[$this->updates_key++] = $update;
-        $this->should_serialize = true;
         //\danog\MadelineProto\Logger::log(['Stored ', $update);
     }
 
@@ -81,7 +80,6 @@ trait UpdateHandler
         ksort($supdates);
         foreach ($supdates as $key => $value) {
             if ($params['offset'] > $key) {
-                $this->should_serialize = true;
                 unset($this->updates[$key]);
             } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
@@ -103,7 +101,6 @@ trait UpdateHandler
     public function set_channel_state($channel, $data)
     {
         if (isset($data['pts']) && $data['pts'] !== 0) {
-            $this->should_serialize = true;
             $this->get_channel_state($channel)['pts'] = $data['pts'];
         }
     }
@@ -119,7 +116,6 @@ trait UpdateHandler
     {
         $id = $this->get_info($peer)['bot_api_id'];
         $this->msg_ids[$id] = $msg_id;
-        $this->should_serialize = true;
     }
 
     public function get_channel_difference($channel)
@@ -185,19 +181,15 @@ trait UpdateHandler
     public function set_update_state($data)
     {
         if (isset($data['pts']) && $data['pts'] !== 0) {
-            $this->should_serialize = true;
             $this->get_update_state()['pts'] = $data['pts'];
         }
         if (isset($data['qts']) && $data['qts'] !== 0) {
-            $this->should_serialize = true;
             $this->get_update_state()['qts'] = $data['qts'];
         }
         if (isset($data['seq']) && $data['seq'] !== 0) {
-            $this->should_serialize = true;
             $this->get_update_state()['seq'] = $data['seq'];
         }
         if (isset($data['date']) && $data['date'] > $this->get_update_state()['date']) {
-            $this->should_serialize = true;
             $this->get_update_state()['date'] = $data['date'];
         }
     }
@@ -205,11 +197,9 @@ trait UpdateHandler
     public function &get_update_state()
     {
         if (!isset($this->updates_state['qts'])) {
-            $this->should_serialize = true;
             $this->updates_state['qts'] = 0;
         }
         if (!$this->got_state) {
-            $this->got_state = $this->should_serialize = true;
             $this->get_updates_state();
         }
 
@@ -380,12 +370,10 @@ trait UpdateHandler
             if ($update['pts'] > $cur_state['pts']) {
                 \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$new_pts.', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
                 $cur_state['pts'] = $update['pts'];
-                $this->should_serialize = true;
                 $pop_pts = true;
             }
             if ($channel_id !== false && isset($options['date']) && $this->get_update_state()['date'] < $options['date']) {
                 $this->get_update_state()['date'] = $options['date'];
-                $this->should_serialize = true;
             }
         } elseif ($channel_id === false && isset($options['seq']) && $options['seq'] > 0) {
             $seq = $options['seq'];
@@ -403,7 +391,6 @@ trait UpdateHandler
             }
 
             if ($cur_state['seq'] != $seq) {
-                $this->should_serialize = true;
                 $cur_state['seq'] = $seq;
                 if (isset($options['date']) && $cur_state['date'] < $options['date']) {
                     $cur_state['date'] = $options['date'];
@@ -425,7 +412,6 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        $this->should_serialize = true;
         $next_seq = $this->get_update_state()['seq'] + 1;
         if (empty($this->get_update_state()['pending_seq_updates'][$next_seq]['updates'])) {
             return false;
@@ -448,7 +434,6 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        $this->should_serialize = true;
         if ($channel_id === false) {
             $cur_state = &$this->get_update_state();
         } else {
@@ -536,7 +521,6 @@ trait UpdateHandler
             $cur_state = $this->get_update_state();
             if ($cur_state['qts'] === -1) {
                 $cur_state['qts'] = $update['qts'];
-                $this->should_serialize = true;
             }
             if ($update['qts'] < $cur_state['qts']) {
                 \danog\MadelineProto\Logger::log(['Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::ERROR);
@@ -551,7 +535,6 @@ trait UpdateHandler
             }
             \danog\MadelineProto\Logger::log(['Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id']], \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->datacenter->curdc]);
-            $this->should_serialize = true;
             $this->handle_encrypted_update($update);
 
             return;

@@ -32,7 +32,6 @@ trait Login
 
         \danog\MadelineProto\Logger::log(['Logged out successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-        $this->should_serialize = true;
 
         return true;
     }
@@ -56,7 +55,6 @@ trait Login
         $this->sync_authorization($this->datacenter->curdc);
         $this->updates = [];
         $this->updates_key = 0;
-        $this->should_serialize = true;
         if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
             @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
         }
@@ -85,7 +83,6 @@ trait Login
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
         $this->authorized = self::WAITING_CODE;
-        $this->should_serialize = true;
         $this->updates = [];
         $this->updates_key = 0;
 
@@ -114,7 +111,6 @@ trait Login
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 \danog\MadelineProto\Logger::log(['2FA enabled, you will have to call the complete_2fa_login function...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorized = self::WAITING_PASSWORD;
-                $this->should_serialize = true;
 
                 $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
                 //$this->authorization['_'] .= 'MP';
@@ -123,7 +119,6 @@ trait Login
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 \danog\MadelineProto\Logger::log(['An account has not been created for this number, you will have to call the complete_signup function...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorized = self::WAITING_SIGNUP;
-                $this->should_serialize = true;
                 $this->authorization['phone_code'] = $code;
 
                 return ['_' => 'account.needSignup'];
@@ -133,7 +128,6 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
         $this->sync_authorization($this->datacenter->curdc);
-        $this->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -160,7 +154,6 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         $this->authorized = true;
         $this->sync_authorization($this->datacenter->curdc);
-        $this->should_serialize = true;
 
         \danog\MadelineProto\Logger::log(['Signed up in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -182,7 +175,6 @@ trait Login
         );
         $this->authorized = self::LOGGED_IN;
         $this->sync_authorization($this->datacenter->curdc);
-        $this->should_serialize = true;
         \danog\MadelineProto\Logger::log(['Logged in successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
