@@ -360,6 +360,15 @@ Works exactly like the [socket_send](http://php.net/manual/en/function.socket-se
 Works exactly like the [socket_close](http://php.net/manual/en/function.socket-close.php) function.
 
 
+```public function getPeerName(bool $port = true);```
+
+Works like [socket_getpeername](http://php.net/manual/en/function.socket-getpeername.php): the difference is that it returns an array with the `host` and the `port`.
+
+
+```public function getSockName(bool $port = true);```
+
+Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsockname.php): the difference is that it returns an array with the `host` and the `port`.
+
 
 ### Uploading and downloading files
 
