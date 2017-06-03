@@ -464,7 +464,7 @@ class MTProto extends \Volatile
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                     'timeout'      => 2, // timeout for sockets
                     'proxy'        => '\Socket', // The proxy class to use
-                    'proxy_extra'  => [] // Extra parameters to pass to the proxy class using setExtra
+                    'proxy_extra'  => [], // Extra parameters to pass to the proxy class using setExtra
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org

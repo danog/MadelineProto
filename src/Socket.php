@@ -14,6 +14,7 @@ if (!extension_loaded('pthreads')) {
     class Socket
     {
         private $sock;
+
         public function __construct(int $domain, int $type, int $protocol)
         {
             $this->sock = socket_create($domain, $type, $protocol);
@@ -41,50 +42,67 @@ if (!extension_loaded('pthreads')) {
 
             return socket_set_nonblock($this->sock);
         }
-        
-        public function bind(string $address, int $port = 0) {
+
+        public function bind(string $address, int $port = 0)
+        {
             return socket_bind($this->sock, $address, $port);
         }
 
-        public function listen(int $backlog = 0) {
+        public function listen(int $backlog = 0)
+        {
             return socket_listen($this->sock, $backlog);
         }
-        public function accept() {
+
+        public function accept()
+        {
             return socket_accept($this->sock);
         }
-        
-        public function connect(string $address, int $port = 0) {
+
+        public function connect(string $address, int $port = 0)
+        {
             return socket_connect($this->sock, $address, $port);
         }
-        public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0) {
+
+        public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
+        {
             return socket_select($read, $write, $except, $tv_sec, $tv_usec);
         }
 
-        public function read(int $length, int $flags = 0) {
+        public function read(int $length, int $flags = 0)
+        {
             return socket_read($this->sock, $length, $flags);
         }
-        
-        public function write(string $buffer, int $length = -1) {
+
+        public function write(string $buffer, int $length = -1)
+        {
             return $length === -1 ? socket_write($this->sock, $buffer) : socket_write($this->sock, $buffer, $Length);
         }
-        public function send(string $data, int $length, int $flags) {
+
+        public function send(string $data, int $length, int $flags)
+        {
             return socket_send($data, $length, $flags);
         }
 
-        public function close() {
+        public function close()
+        {
             return socket_close($this->sock);
         }
 
-        public function getPeerName(bool $port = true) {
+        public function getPeerName(bool $port = true)
+        {
             $address = '';
             $port = 0;
             $port ? socket_getpeername($this->sock, $address, $ip) : socket_getpeername($this->sock, $address);
+
             return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
         }
-        public function getSockName(bool $port = true) {
+
+        public function getSockName(bool $port = true)
+        {
             $address = '';
             $port = 0;
             $port ? socket_getsockname($this->sock, $address, $ip) : socket_getsockname($this->sock, $address);
+
             return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
         }
     }

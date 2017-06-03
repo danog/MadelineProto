@@ -70,7 +70,7 @@ var_dump(is_null($this->{$name}));
         $this->port = $port;
         $this->proxy = $proxy;
         $this->extra = $extra;
-        
+
         if (($has_proxy = $proxy !== '\Socket') && !isset(class_implements($proxy)['\danog\MadelineProto\Proxy'])) {
             throw new \danog\MadelineProto\Exception('Invalid proxy class provided!');
         }
