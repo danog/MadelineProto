@@ -367,7 +367,7 @@ description: List of constructors
 <br><br>[$documentAttributeAnimated\_23](../constructors/documentAttributeAnimated_23.md) = \[\];<a name="documentAttributeAnimated_23"></a>  
 
 ***
-<br><br>[$documentAttributeAudio\_23](../constructors/documentAttributeAudio_23.md) = \['duration' => [int](../types/int.md), \];<a name="documentAttributeAudio_23"></a>  
+<br><br>[$documentAttributeAudio\_46](../constructors/documentAttributeAudio_46.md) = \['duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), \];<a name="documentAttributeAudio_46"></a>  
 
 ***
 <br><br>[$documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md) = \['file_name' => [string](../types/string.md), \];<a name="documentAttributeFilename_23"></a>  
@@ -379,10 +379,10 @@ description: List of constructors
 <br><br>[$documentAttributeImageSize\_23](../constructors/documentAttributeImageSize_23.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeImageSize_23"></a>  
 
 ***
-<br><br>[$documentAttributeSticker\_23](../constructors/documentAttributeSticker_23.md) = \[\];<a name="documentAttributeSticker_23"></a>  
+<br><br>[$documentAttributeSticker\_55](../constructors/documentAttributeSticker_55.md) = \['alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), \];<a name="documentAttributeSticker_55"></a>  
 
 ***
-<br><br>[$documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_23"></a>  
+<br><br>[$documentAttributeVideo\_66](../constructors/documentAttributeVideo_66.md) = \['round_message' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_66"></a>  
 
 ***
 <br><br>[$documentEmpty](../constructors/documentEmpty.md) = \['id' => [long](../types/long.md), \];<a name="documentEmpty"></a>  

@@ -35,6 +35,12 @@ description: constructors and methods of type DocumentAttribute
 
 [documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md)  
 
+[documentAttributeAudio\_46](../constructors/documentAttributeAudio_46.md)  
+
+[documentAttributeSticker\_55](../constructors/documentAttributeSticker_55.md)  
+
+[documentAttributeVideo\_66](../constructors/documentAttributeVideo_66.md)  
+
 
 
 ### Methods that return an object of this type (methods):
