@@ -14,23 +14,33 @@ namespace danog\MadelineProto;
 
 interface Proxy
 {
-        public function __construct(int $domain, int $type, int $protocol);
+    public function __construct(int $domain, int $type, int $protocol);
 
-        public function setOption(int $level, int $name, $value);
-        public function getOption(int $level, int $name);
-        public function setBlocking(bool $blocking);
-        
-        public function bind(string $address, int $port = 0);
-        public function listen(int $backlog = 0);
-        public function accept();
-        public function connect(string $address, int $port = 0);
-        public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);
-        public function read(int $length, int $flags = 0);
-        
-        public function write(string $buffer, int $length = -1);
-        public function send(string $data, int $length, int $flags);
-        public function close();
+    public function setOption(int $level, int $name, $value);
 
-        public function getPeerName(bool $port = true);
-        public function getSockName(bool $port = true);
+    public function getOption(int $level, int $name);
+
+    public function setBlocking(bool $blocking);
+
+    public function bind(string $address, int $port = 0);
+
+    public function listen(int $backlog = 0);
+
+    public function accept();
+
+    public function connect(string $address, int $port = 0);
+
+    public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);
+
+    public function read(int $length, int $flags = 0);
+
+    public function write(string $buffer, int $length = -1);
+
+    public function send(string $data, int $length, int $flags);
+
+    public function close();
+
+    public function getPeerName(bool $port = true);
+
+    public function getSockName(bool $port = true);
 }
