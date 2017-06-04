@@ -14,15 +14,20 @@ namespace danog\MadelineProto\TL;
 
 trait TL
 {
-    public $encrypted_layer = -1;
+    private $encrypted_layer = -1;
+    private $constructors;
+    private $methods;
+    private $td_constructors;
+    private $td_methods;
+    private $td_descriptions;
 
     public function construct_tl($files)
     {
         \danog\MadelineProto\Logger::log(['Loading TL schemes...'], \danog\MadelineProto\Logger::VERBOSE);
-        $this->constructors = new \danog\MadelineProto\TL\TLConstructor();
-        $this->methods = new \danog\MadelineProto\TL\TLMethod();
-        $this->td_constructors = new \danog\MadelineProto\TL\TLConstructor();
-        $this->td_methods = new \danog\MadelineProto\TL\TLMethod();
+        $this->constructors = new TLConstructor();
+        $this->methods = new TLMethod();
+        $this->td_constructors = new TLConstructor();
+        $this->td_methods = new TLMethod();
         $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
             \danog\MadelineProto\Logger::log(['Parsing '.basename($file).'...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -38,6 +43,7 @@ trait TL
                 $class = null;
                 $dparams = [];
                 foreach ($tl_file as $line) {
+                    $line = rtrim($line);
                     if (preg_match('|^//@|', $line)) {
                         $list = explode(' @', str_replace('//', ' ', $line));
                         foreach ($list as $elem) {
@@ -78,7 +84,7 @@ trait TL
                         $type = 'constructors';
                         continue;
                     }
-                    if (preg_match('|^===\d*===$|', $line)) {
+                    if (preg_match('|^===\d*===|', $line)) {
                         $layer = (int) preg_replace('|\D*|', '', $line);
                         continue;
                     }
@@ -89,7 +95,7 @@ trait TL
                         continue;
                     }
                     $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
-                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                    if ($this->in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
                         continue;
                     }
                     $clean = preg_replace([
@@ -132,7 +138,7 @@ trait TL
                         $dparams = [];
                     }
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
-                    $TL_dict[$type][$key]['id'] = \danog\PHP\Struct::unpack('<i', \danog\PHP\Struct::pack('<I', hexdec($id)))[0];
+                    $TL_dict[$type][$key]['id'] = strrev(hex2bin($id));
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = preg_replace(['/.+\s/', '/;/'], '', $line);
                     if ($layer !== null) {
@@ -149,6 +155,13 @@ trait TL
                         $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                     }
                     $key++;
+                }
+            } else {
+                foreach ($TL_dict['constructors'] as $key => $value) {
+                    $TL_dict['constructors'][$key]['id'] = $this->pack_signed_int($TL_dict['constructors'][$key]['id']);
+                }
+                foreach ($TL_dict['methods'] as $key => $value) {
+                    $TL_dict['methods'][$key]['id'] = $this->pack_signed_int($TL_dict['methods'][$key]['id']);
                 }
             }
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
@@ -182,8 +195,11 @@ trait TL
                 if ($this->constructors->find_by_id($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
-                    foreach ($this->td_descriptions['constructors'][$name]['params'] as &$param) {
-                        $param = str_replace('nullable', 'optional', $param);
+                    if (!count($this->td_descriptions['constructors'][$name]['params'])) {
+                        continue;
+                    }
+                    foreach ($this->td_descriptions['constructors'][$name]['params'] as $k => $param) {
+                        $this->td_descriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -192,8 +208,8 @@ trait TL
                 if ($this->methods->find_by_id($id) === false) {
                     unset($this->td_descriptions['methods'][$name]);
                 } else {
-                    foreach ($this->td_descriptions['methods'][$name]['params'] as &$param) {
-                        $param = str_replace('nullable', 'optional', $param);
+                    foreach ($this->td_descriptions['methods'][$name]['params'] as $k => $param) {
+                        $this->td_descriptions['constructors'][$name]['params'][$k] = str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -202,17 +218,16 @@ trait TL
 
     public function get_method_namespaces()
     {
-        return array_unique(array_values($this->methods->method_namespace));
+        return array_unique($this->array_values($this->methods->method_namespace));
     }
 
     public function serialize_bool($bool)
     {
-        return \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('bool'.($bool ? 'True' : 'False'))['id']);
+        return $this->constructors->find_by_predicate($bool ? 'boolTrue' : 'boolFalse')['id'];
     }
 
-    public function deserialize_bool($data)
+    public function deserialize_bool($id)
     {
-        $id = \danog\PHP\Struct::unpack('<i', $data)[0];
         $tl_elem = $this->constructors->find_by_id($id);
         if ($tl_elem === false) {
             throw new Exception('Could not extract boolean');
@@ -229,31 +244,29 @@ trait TL
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
-                return \danog\PHP\Struct::pack('<i', $object);
+                return $this->pack_signed_int($object);
             case '#':
                 if (!is_numeric($object)) {
                     throw new Exception('given value ('.$object.") isn't numeric");
                 }
 
-                return \danog\PHP\Struct::pack('<I', $object);
+                return $this->pack_unsigned_int($object);
             case 'long':
                 if (is_object($object)) {
                     return str_pad(strrev($object->toBytes()), 8, chr(0));
                 }
 
-                if (is_string($object)) {
-                    if (strlen($object) !== 8) {
-                        throw new Exception('Given value is not 8 bytes long');
-                    }
-
+                if (is_string($object) && strlen($object) === 8) {
                     return $object;
                 }
-
+                if (is_string($object) && strlen($object) === 9 && $object[0] === 'a') {
+                    return substr($object, 1);
+                }
                 if (!is_numeric($object)) {
-                    throw new Exception('given value ('.$object.") isn't numeric");
+                    throw new Exception("given value isn't numeric");
                 }
 
-                return \danog\PHP\Struct::pack('<q', $object);
+                return $this->pack_signed_long($object);
             case 'int128':
                 if (strlen($object) !== 16) {
                     throw new Exception('Given value is not 16 bytes long');
@@ -273,9 +286,23 @@ trait TL
 
                 return (string) $object;
             case 'double':
-                return \danog\PHP\Struct::pack('<d', $object);
+                return $this->pack_double($object);
             case 'string':
                 $object = pack('C*', ...unpack('C*', $object));
+                $l = strlen($object);
+                $concat = '';
+                if ($l <= 253) {
+                    $concat .= chr($l);
+                    $concat .= $object;
+                    $concat .= pack('@'.$this->posmod((-$l - 1), 4));
+                } else {
+                    $concat .= chr(254);
+                    $concat .= substr($this->pack_signed_int($l), 0, 3);
+                    $concat .= $object;
+                    $concat .= pack('@'.$this->posmod(-$l, 4));
+                }
+
+                return $concat;
             case 'bytes':
                 $l = strlen($object);
                 $concat = '';
@@ -285,7 +312,7 @@ trait TL
                     $concat .= pack('@'.$this->posmod((-$l - 1), 4));
                 } else {
                     $concat .= chr(254);
-                    $concat .= substr(\danog\PHP\Struct::pack('<i', $l), 0, 3);
+                    $concat .= substr($this->pack_signed_int($l), 0, 3);
                     $concat .= $object;
                     $concat .= pack('@'.$this->posmod(-$l, 4));
                 }
@@ -298,8 +325,11 @@ trait TL
             case '!X':
                 return $object;
             case 'Vector t':
-                $concat = \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
-                $concat .= \danog\PHP\Struct::pack('<i', count($object));
+                if (!$this->is_array($object)) {
+                    throw new Exception("You didn't provide a valid array");
+                }
+                $concat = $this->constructors->find_by_predicate('vector')['id'];
+                $concat .= $this->pack_unsigned_int(count($object));
                 foreach ($object as $current_object) {
                     $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object);
                 }
@@ -309,8 +339,12 @@ trait TL
         }
         $auto = false;
 
-        if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-            $object = $this->get_info($object)[$type['type']];
+        if ((!$this->is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && $this->in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+            $object = $this->get_info($object);
+            if (!isset($object[$type['type']])) {
+                throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+            }
+            $object = $object[$type['type']];
         }
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);
@@ -325,7 +359,7 @@ trait TL
         $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
         if ($constructorData === false) {
             \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_ERROR);
-            throw new Exception('Could not extract type');
+            throw new Exception('Could not extract type "'.$predicate.'"');
         }
 
         if ($bare = ($type['type'] != '' && $type['type'][0] === '%')) {
@@ -341,7 +375,7 @@ trait TL
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
         if (!$bare) {
-            $concat .= \danog\PHP\Struct::pack('<i', $constructorData['id']);
+            $concat .= $constructorData['id'];
         }
 
         return $concat.$this->serialize_params($constructorData, $object, $layer);
@@ -354,7 +388,7 @@ trait TL
             throw new Exception('Could not find method: '.$method);
         }
 
-        return \danog\PHP\Struct::pack('<i', $tl['id']).$this->serialize_params($tl, $arguments);
+        return $tl['id'].$this->serialize_params($tl, $arguments);
     }
 
     public function serialize_params($tl, $arguments, $layer = -1)
@@ -364,7 +398,7 @@ trait TL
         $arguments = $this->botAPI_to_MTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
-            if ($cur_flag['flag']) {
+            if (isset($cur_flag['pow'])) {
                 switch ($cur_flag['type']) {
                     case 'true':
                     case 'false':
@@ -386,7 +420,7 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if ($current_argument['flag'] && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if (isset($current_argument['pow']) && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
@@ -408,8 +442,8 @@ trait TL
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
-                                $serialized .= \danog\PHP\Struct::pack('<i', $this->constructors->find_by_predicate('vector')['id']);
-                                $serialized .= \danog\PHP\Struct::pack('<i', count($arguments['id']));
+                                $serialized .= $this->constructors->find_by_predicate('vector')['id'];
+                                $serialized .= $this->pack_unsigned_int(count($arguments['id']));
                                 $serialized .= $this->random(8 * count($arguments['id']));
                                 continue 2;
                             }
@@ -417,7 +451,7 @@ trait TL
                 }
                 throw new Exception('Missing required parameter ('.$current_argument['name'].')');
             }
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+            if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             if ($current_argument['type'] === 'DataJSON') {
@@ -431,77 +465,90 @@ trait TL
         return $serialized;
     }
 
-    public function get_length($bytes_io, $type = ['type' => ''])
+    public function get_length($stream, $type = ['type' => ''])
     {
-        $this->deserialize($bytes_io, $type);
+        if (is_string($stream)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $stream);
+            fseek($res, 0);
+            $stream = $res;
+        } elseif (!is_resource($stream)) {
+            throw new Exception('An invalid stream handle was provided.');
+        }
+        $this->deserialize($stream, $type);
 
-        return $bytes_io->pos;
+        return ftell($stream);
     }
 
     /**
-     * :type bytes_io: io.BytesIO object.
+     * :type stream: io.BytesIO object.
      */
-    public function deserialize($bytes_io, $type = ['type' => ''])
+    public function deserialize($stream, $type = ['type' => ''])
     {
-        if (is_string($bytes_io)) {
-            $bytes_io = new \danog\MadelineProto\Stream($bytes_io);
-        } elseif (!is_object($bytes_io)) {
-            throw new Exception('An invalid bytes_io handle was provided.');
+        if (is_string($stream)) {
+            $res = fopen('php://memory', 'rw+b');
+            fwrite($res, $stream);
+            fseek($res, 0);
+            $stream = $res;
+        } elseif (!is_resource($stream)) {
+            throw new Exception('An invalid stream handle was provided.');
         }
-        //\danog\MadelineProto\Logger::log(['Deserializing '.$type['type'].' at byte '.$bytes_io->pos]);
+
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserialize_bool($bytes_io->read(4));
+                return $this->deserialize_bool(stream_get_contents($stream, 4));
             case 'int':
-                return \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                return $this->unpack_signed_int(stream_get_contents($stream, 4));
             case '#':
-                return \danog\PHP\Struct::unpack('<I', $bytes_io->read(4))[0];
+                return unpack('V', stream_get_contents($stream, 4))[1];
             case 'long':
-                return $this->bigint || isset($type['strlong']) ? $bytes_io->read(8) : \danog\PHP\Struct::unpack('<q', $bytes_io->read(8))[0];
+                if (isset($type['idstrlong'])) {
+                    return 'a'.stream_get_contents($stream, 8);
+                }
+
+                return \danog\MadelineProto\Logger::$bigint || isset($type['strlong']) ? stream_get_contents($stream, 8) : $this->unpack_signed_long(stream_get_contents($stream, 8));
             case 'double':
-                return \danog\PHP\Struct::unpack('<d', $bytes_io->read(8))[0];
+                return $this->unpack_double(stream_get_contents($stream, 8));
             case 'int128':
-                return $bytes_io->read(16);
+                return stream_get_contents($stream, 16);
             case 'int256':
-                return $bytes_io->read(32);
+                return stream_get_contents($stream, 32);
             case 'int512':
-                return $bytes_io->read(64);
+                return stream_get_contents($stream, 64);
             case 'string':
             case 'bytes':
-                $l = \danog\PHP\Struct::unpack('<B', $bytes_io->read(1))[0];
+                $l = ord(stream_get_contents($stream, 1));
                 if ($l > 254) {
                     throw new Exception('Length is too big');
                 }
                 if ($l === 254) {
-                    $long_len = \danog\PHP\Struct::unpack('<I', $bytes_io->read(3).chr(0))[0];
-                    $x = $bytes_io->read($long_len);
+                    $long_len = unpack('V', stream_get_contents($stream, 3).chr(0))[1];
+                    $x = stream_get_contents($stream, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($stream, $resto);
                     }
                 } else {
-                    $x = $bytes_io->read($l);
+                    $x = stream_get_contents($stream, $l);
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
-                        $bytes_io->pos += $resto;
+                        stream_get_contents($stream, $resto);
                     }
                 }
                 if (!is_string($x)) {
                     throw new Exception("deserialize: generated value isn't a string");
                 }
 
-                return $x;
-            case 'true':
-                return true;
+                return $type['type'] === 'bytes' ? (new Types\Bytes($x)) : $x;
             case 'Vector t':
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
-                    throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
+                    throw new Exception('Could not extract type: '.$type['type'].' with id '.bin2hex(strrev($id)));
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'bytes', 'datacenter' => $type['datacenter']])), ['type' => '', 'datacenter' => $type['datacenter']]);
+                        return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes', 'datacenter' => $type['datacenter']])), ['type' => '', 'datacenter' => $type['datacenter']]);
                     case 'Vector t':
                     case 'vector':
                         break;
@@ -509,11 +556,11 @@ trait TL
                         throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             case 'vector':
-                $count = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $count = unpack('V', stream_get_contents($stream, 4))[1];
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserialize($bytes_io, $type);
+                    $result[] = $this->deserialize($stream, $type);
                 }
 
                 return $result;
@@ -527,10 +574,10 @@ trait TL
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
             if ($constructorData === false) {
-                $id = \danog\PHP\Struct::unpack('<i', $bytes_io->read(4))[0];
+                $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
-                    throw new Exception('Could not extract type: '.$type['type'].' with id '.$id);
+                    throw new Exception('Could not extract type: '.$type['type'].' with id '.bin2hex(strrev($id)));
                 }
             }
         }
@@ -539,24 +586,26 @@ trait TL
                 $type['subtype'] = '';
             }
 
-            return $this->deserialize(gzdecode($this->deserialize($bytes_io, ['type' => 'bytes'])), ['type' => '', 'datacenter' => $type['datacenter'], 'subtype' => $type['subtype']]);
+            return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes'])), ['type' => '', 'datacenter' => $type['datacenter'], 'subtype' => $type['subtype']]);
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['datacenter'] = $type['datacenter'];
             $constructorData['subtype'] = $type['subtype'];
             $constructorData['type'] = 'vector';
 
-            return $this->deserialize($bytes_io, $constructorData);
+            return $this->deserialize($stream, $constructorData);
+        }
+        if ($constructorData['type'] === 'Bool') {
+            return $constructorData['predicate'] === 'boolTrue';
         }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {
-            if ($arg['flag']) {
+            if (isset($arg['pow'])) {
                 switch ($arg['type']) {
                     case 'true':
                     case 'false':
                         $x[$arg['name']] = ($x['flags'] & $arg['pow']) !== 0;
                         continue 2;
-                        break;
                     case 'Bool':
                         if (($x['flags'] & $arg['pow']) === 0) {
                             $x[$arg['name']] = false;
@@ -564,13 +613,14 @@ trait TL
                         }
                     default:
                         if (($x['flags'] & $arg['pow']) === 0) {
-                            //$x[$arg['name']] = $default;
                             continue 2;
                         }
-                        break;
                 }
             }
-            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id', 'key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
+                $arg['idstrlong'] = true;
+            }
+            if ($this->in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
 
@@ -580,7 +630,8 @@ trait TL
             if (isset($type['datacenter'])) {
                 $arg['datacenter'] = $type['datacenter'];
             }
-            $x[$arg['name']] = $this->deserialize($bytes_io, $arg);
+            $x[$arg['name']] = $this->deserialize($stream, $arg);
+
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException('random_bytes is too small!');
@@ -594,6 +645,14 @@ trait TL
         }
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
+        }
+
+        if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
+            foreach ($x['reply_markup']['rows'] as $key => $row) {
+                foreach ($row['buttons'] as $bkey => $button) {
+                    $x['reply_markup']['rows'][$key]['buttons'][$bkey] = new Types\Button($this, $x, $button);
+                }
+            }
         }
 
         return $x;

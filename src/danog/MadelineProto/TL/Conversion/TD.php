@@ -14,48 +14,6 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait TD
 {
-    private $td_params_conversion = [
-        'updateNewMessage' => [
-            '_'                    => 'updateNewMessage',
-            'disable_notification' => ['message', 'silent'],
-            'message'              => ['message'],
-         ],
-         'message' => [
-              '_'                  => 'message',
-             'id'                  => ['id'],
-             'sender_user_id'      => ['from_id'],
-             'chat_id'             => ['to_id', 'choose_chat_id_from_botapi'],
-             'send_state'          => ['choose_incoming_or_sent'],
-             'can_be_edited'       => ['choose_can_edit'],
-             'can_be_deleted'      => ['choose_can_delete'],
-             'is_post'             => ['post'],
-             'date'                => ['date'],
-             'edit_date'           => ['edit_date'],
-             'forward_info'        => ['fwd_info', 'choose_forward_info'],
-             'reply_to_message_id' => ['reply_to_msg_id'],
-             'ttl'                 => ['choose_ttl'],
-             'ttl_expires_in'      => ['choose_ttl_expires_in'],
-             'via_bot_user_id'     => ['via_bot_id'],
-             'views'               => ['views'],
-             'content'             => ['choose_message_content'],
-             'reply_markup'        => ['reply_markup'],
-         ],
-
-         'messages.sendMessage' => [
-             'chat_id'               => ['peer'],
-             'reply_to_message_id'   => ['reply_to_msg_id'],
-             'disable_notification'  => ['silent'],
-             'from_background'       => ['background'],
-             'input_message_content' => ['choose_message_content'],
-             'reply_markup'          => ['reply_markup'],
-         ],
-
-    ];
-    private $reverse = [
-        'sendMessage'=> 'messages.sendMessage',
-    ];
-    private $ignore = ['updateMessageID'];
-
     public function tdcli_to_td(&$params, $key = null)
     {
         if (!$this->is_array($params)) {
@@ -81,9 +39,9 @@ trait TD
 
     public function td_to_mtproto($params)
     {
-        $newparams = ['_' => $this->reverse[$params['_']]];
+        $newparams = ['_' => self::REVERSE[$params['_']]];
 
-        foreach ($this->td_params_conversion[$newparams['_']] as $td => $mtproto) {
+        foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
             if ($this->is_array($mtproto)) {
                 switch (end($mtproto)) {
                     case 'choose_message_content':
@@ -126,10 +84,10 @@ trait TD
             return $params;
         }
         $newparams = ['_' => $params['_']];
-        if (in_array($params['_'], $this->ignore)) {
+        if ($this->in_array($params['_'], self::TD_IGNORE)) {
             return $params;
         }
-        foreach ($this->td_params_conversion[$params['_']] as $td => $mtproto) {
+        foreach (self::TD_PARAMS_CONVERSION[$params['_']] as $td => $mtproto) {
             if (is_string($mtproto)) {
                 $newparams[$td] = $mtproto;
             } else {

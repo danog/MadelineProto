@@ -63,4 +63,11 @@ decryptedMessageMediaDocument#7afe8ae2 thumb:bytes thumb_w:int thumb_h:int mime_
 
 ===46===
 decryptedMessageMediaVenue#8a0df56f lat:double long:double title:string address:string provider:string venue_id:string = DecryptedMessageMedia;
+documentAttributeAudio#ded218e0 duration:int title:string performer:string = DocumentAttribute;
 decryptedMessageMediaWebPage#e50511d8 url:string = DecryptedMessageMedia;
+
+===55===
+documentAttributeSticker#3a556302 alt:string stickerset:InputStickerSet = DocumentAttribute;
+
+===66===
+documentAttributeVideo#ef02ce6 flags:# round_message:flags.0?true duration:int w:int h:int = DocumentAttribute;

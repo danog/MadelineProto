@@ -1600,6 +1600,27 @@ interface upload
      * @return upload_WebFile
      */
     public function getWebFile(array $params);
+
+    /**
+     * @param array params [
+     *               bytes file_token,
+     *               int offset,
+     *               int limit,
+     *              ]
+     *
+     * @return upload_CdnFile
+     */
+    public function getCdnFile(array $params);
+
+    /**
+     * @param array params [
+     *               bytes file_token,
+     *               bytes request_token,
+     *              ]
+     *
+     * @return bool
+     */
+    public function reuploadCdnFile(array $params);
 }
 
 interface help
@@ -1661,6 +1682,11 @@ interface help
      * @return bool
      */
     public function setBotUpdatesStatus(array $params);
+
+    /**
+     * @return CdnConfig
+     */
+    public function getCdnConfig();
 }
 
 interface channels

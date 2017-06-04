@@ -45,3 +45,9 @@ Or, if you're into Lua:
 Bool = messages.setBotCallbackAnswer({alert=Bool, query_id=long, message=string, url=string, })
 ```
 
+
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [Bool](../types/Bool.md) will be returned instead.
+
+

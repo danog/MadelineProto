@@ -33,6 +33,10 @@ Notifies about activity in chat
 
 [sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md)  
 
+[sendMessageRecordRoundAction](../constructors/sendMessageRecordRoundAction.md)  
+
+[sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md)  
+
 [sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md)  
 
 [sendMessageCancelAction\_17](../constructors/sendMessageCancelAction_17.md)  

@@ -9,6 +9,10 @@ description: constructors and methods of type StickerSetCovered
 
 ### Possible values (constructors):
 
+[stickerSetCovered](../constructors/stickerSetCovered.md)  
+
+[stickerSetMultiCovered](../constructors/stickerSetMultiCovered.md)  
+
 
 
 ### Methods that return an object of this type (methods):

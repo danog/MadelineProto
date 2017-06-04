@@ -17,6 +17,8 @@ namespace danog\MadelineProto\Threads;
  */
 class SocketReader extends \Threaded implements \Collectable
 {
+    public $ready = false;
+
     public function __construct($me, $current)
     {
         $this->API = $me;
@@ -38,23 +40,28 @@ class SocketReader extends \Threaded implements \Collectable
      */
     public function run()
     {
-        require_once __DIR__.'/../SecurityException.php';
-        require_once __DIR__.'/../RPCErrorException.php';
-        require_once __DIR__.'/../ResponseException.php';
-        require_once __DIR__.'/../TL/Conversion/Exception.php';
-        require_once __DIR__.'/../TL/Exception.php';
-        require_once __DIR__.'/../NothingInTheSocketException.php';
-        require_once __DIR__.'/../Exception.php';
+        require __DIR__.'/../../../../vendor/autoload.php';
+
         $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
+
+        $this->ready = true;
 
         while ($this->API->run_workers) {
             try {
-                $this->API->recv_message($this->current);
-                $handler_pool->submit(new SocketHandler($this->API, $this->current));
+                $this->API->datacenter->sockets[$this->current]->reading = true;
+                //var_dump('RECEIVING');
+                $error = $this->API->recv_message($this->current);
+                var_dump('NOW HANDLE');
+                $handler_pool->submit(new SocketHandler($this->API, $this->current, $error));
+                var_dump('SUBMITTED');
+                $this->API->datacenter->sockets[$this->current]->reading = false;
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                //\danog\MadelineProto\Logger::log(['Nothing in the socket for dc '.$this->current], \danog\MadelineProto\Logger::VERBOSE);
             }
         }
-        while ($handler_pool->collect());
+        while ($number = $handler_pool->collect()) {
+            \danog\MadelineProto\Logger::log(['Shutting down handler pool for dc '.$this->current.', '.$number.' jobs left'], \danog\MadelineProto\Logger::NOTICE);
+        }
         $this->setGarbage();
     }
 

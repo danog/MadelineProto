@@ -68,11 +68,11 @@ trait SeqNoHandler
 
     public function generate_secret_in_seq_no($chat)
     {
-        return ($this->secret_chats[$chat]['in_seq_no'] * 2) + $this->secret_chats[$chat]['in_seq_no_x'];
+        return $this->secret_chats[$chat]['layer'] > 8 ? ($this->secret_chats[$chat]['in_seq_no'] * 2) + $this->secret_chats[$chat]['in_seq_no_x'] : -1;
     }
 
     public function generate_secret_out_seq_no($chat)
     {
-        return ($this->secret_chats[$chat]['out_seq_no'] * 2) + $this->secret_chats[$chat]['out_seq_no_x'];
+        return $this->secret_chats[$chat]['layer'] > 8 ? ($this->secret_chats[$chat]['out_seq_no'] * 2) + $this->secret_chats[$chat]['out_seq_no_x'] : -1;
     }
 }

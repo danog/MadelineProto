@@ -202,6 +202,8 @@ $MadelineProto->[destroy_session](destroy_session.md)(\['session_id' => [long](.
 
 $MadelineProto->[help->getAppUpdate](help_getAppUpdate.md)(\[\]) === [$help\_AppUpdate](../types/help_AppUpdate.md)<a name="help_getAppUpdate"></a>  
 
+$MadelineProto->[help->getCdnConfig](help_getCdnConfig.md)(\[\]) === [$CdnConfig](../types/CdnConfig.md)<a name="help_getCdnConfig"></a>  
+
 $MadelineProto->[help->getConfig](help_getConfig.md)(\[\]) === [$Config](../types/Config.md)<a name="help_getConfig"></a>  
 
 $MadelineProto->[help->getInviteText](help_getInviteText.md)(\[\]) === [$help\_InviteText](../types/help_InviteText.md)<a name="help_getInviteText"></a>  
@@ -465,9 +467,13 @@ $MadelineProto->[updates->getDifference](updates_getDifference.md)(\['pts' => [i
 $MadelineProto->[updates->getState](updates_getState.md)(\[\]) === [$updates\_State](../types/updates_State.md)<a name="updates_getState"></a>  
 
 ***
-<br><br>$MadelineProto->[upload->getFile](upload_getFile.md)(\['location' => [InputFileLocation](../types/InputFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_File](../types/upload_File.md)<a name="upload_getFile"></a>  
+<br><br>$MadelineProto->[upload->getCdnFile](upload_getCdnFile.md)(\['file_token' => [bytes](../types/bytes.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_CdnFile](../types/upload_CdnFile.md)<a name="upload_getCdnFile"></a>  
+
+$MadelineProto->[upload->getFile](upload_getFile.md)(\['location' => [InputFileLocation](../types/InputFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_File](../types/upload_File.md)<a name="upload_getFile"></a>  
 
 $MadelineProto->[upload->getWebFile](upload_getWebFile.md)(\['location' => [InputWebFileLocation](../types/InputWebFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_WebFile](../types/upload_WebFile.md)<a name="upload_getWebFile"></a>  
+
+$MadelineProto->[upload->reuploadCdnFile](upload_reuploadCdnFile.md)(\['file_token' => [bytes](../types/bytes.md), 'request_token' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_reuploadCdnFile"></a>  
 
 $MadelineProto->[upload->saveBigFilePart](upload_saveBigFilePart.md)(\['file_id' => [long](../types/long.md), 'file_part' => [int](../types/int.md), 'file_total_parts' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_saveBigFilePart"></a>  
 

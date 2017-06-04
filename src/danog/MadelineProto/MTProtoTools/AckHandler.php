@@ -37,7 +37,7 @@ trait AckHandler
             \danog\MadelineProto\Logger::log(["WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?'], \danog\MadelineProto\Logger::WARNING);
             //throw new \danog\MadelineProto\Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
-        if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === str_repeat(chr(0), 8) || (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'])) {
+        if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0" || (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'])) {
             return;
         }
 

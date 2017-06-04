@@ -14,13 +14,10 @@ namespace danog\MadelineProto;
 
 class API extends APIFactory
 {
-    use \danog\MadelineProto\Wrappers\Login;
-    use \danog\MadelineProto\Wrappers\SettingsManager;
+    use \danog\Serializable;
+    private $storage = [];
 
-    public $API;
-    public $namespace = '';
-
-    public function __construct($params = [])
+    public function ___construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
@@ -35,75 +32,44 @@ class API extends APIFactory
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
         $this->API->v = $this->API->getV();
         \danog\MadelineProto\Logger::log(['MadelineProto is ready!'], Logger::NOTICE);
-        $this->setup_threads();
-    }
-
-    /*
-    public function __sleep()
-    {
-        //$this->API->reset_session(false);
-
-        return ['API'];
-    }
-    */
-    public function setup_threads()
-    {
-        if ($this->API->threads = $this->API->run_workers = class_exists('\Pool') && php_sapi_name() == 'cli' && $this->API->settings['threading']['allow_threading']) {
-            \danog\MadelineProto\Logger::log(['THREADING IS ENABLED'], \danog\MadelineProto\Logger::NOTICE);
-            $this->start_threads();
-        }
-    }
-
-    public function start_threads()
-    {
-        if ($this->API->threads) {
-            $dcs = $this->API->datacenter->get_dcs();
-            if (!isset($this->reader_pool)) {
-                $this->reader_pool = new \Pool(count($dcs));
-            }
-            if (!isset($this->readers)) {
-                $this->readers = [];
-            }
-            foreach ($dcs as $dc) {
-                if (!isset($this->readers[$dc])) {
-                    $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this->API, $dc);
-                }
-                if (!$this->readers[$dc]->isRunning()) {
-                    $this->readers[$dc]->garbage = false;
-                    $this->reader_pool->submit($this->readers[$dc]);
-                    Logger::log(['Socket reader on DC '.$dc.': RESTARTED'], Logger::WARNING);
-                } else {
-                    Logger::log(['Socket reader on DC '.$dc.': WORKING'], Logger::NOTICE);
-                }
-            }
-        }
-    }
-
-    public function __sleep()
-    {
-        $t = get_object_vars($this);
-        if (isset($t['reader_pool'])) {
-            unset($t['reader_pool']);
-        }
-        if (isset($t['readers'])) {
-            unset($t['readers']);
-        }
-
-        return array_keys($t);
     }
 
     public function __wakeup()
     {
-        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
-        $this->setup_threads();
-        if (!isset($this->bots) || $this->bots === null) {
-            $this->APIFactory();
-        }
+        //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
+
+        $this->APIFactory();
     }
 
     public function __destruct()
     {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+            return;
+        }
         restore_error_handler();
+    }
+
+    public function __sleep()
+    {
+        return ['API', 'storage'];
+    }
+
+    public function &__get($name)
+    {
+        if ($name === 'settings') {
+            return $this->API->settings;
+        }
+
+        return $this->storage[$name];
+    }
+
+    public function __set($name, $value)
+    {
+        if ($name === 'settings') {
+            return $this->API->__construct($value);
+        }
+
+        return $this->storage[$name] = $value;
     }
 
     public function APIFactory()

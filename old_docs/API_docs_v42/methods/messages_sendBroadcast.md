@@ -44,3 +44,9 @@ Or, if you're into Lua:
 Updates = messages.sendBroadcast({contacts={InputUser}, message=string, media=InputMedia, })
 ```
 
+
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [Updates](../types/Updates.md) will be returned instead.
+
+

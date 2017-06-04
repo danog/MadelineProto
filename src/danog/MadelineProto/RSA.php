@@ -12,46 +12,56 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class RSA
+class RSA extends \Volatile
 {
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
+    use \danog\Serializable;
 
-    public $keydata = [];
+    public $e;
+    public $n;
+    public $fp;
 
-    public function __construct($rsa_key)
+    public function ___construct($rsa_key)
     {
+        //if ($this->unserialized($rsa_key)) return true;
         \danog\MadelineProto\Logger::log(['Istantiating \phpseclib\Crypt\RSA...'], Logger::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
 
         \danog\MadelineProto\Logger::log(['Loading key...'], Logger::ULTRA_VERBOSE);
         $key->load($rsa_key);
-        $this->keydata = ['n' => \phpseclib\Common\Functions\Objects::getVar($key, 'modulus'), 'e' => \phpseclib\Common\Functions\Objects::getVar($key, 'exponent')];
+        $this->n = \phpseclib\Common\Functions\Objects::getVar($key, 'modulus');
+        $this->e = \phpseclib\Common\Functions\Objects::getVar($key, 'exponent');
 
         \danog\MadelineProto\Logger::log(['Computing fingerprint...'], Logger::ULTRA_VERBOSE);
-        $this->keydata['fp'] = substr(
+        $this->fp = substr(
             sha1(
                 $this->serialize_object(
                     ['type' => 'bytes'],
-                    $this->keydata['n']->toBytes()
+                    $this->n->toBytes()
                 )
                 .
                 $this->serialize_object(
                     ['type' => 'bytes'],
-                    $this->keydata['e']->toBytes()
+                    $this->e->toBytes()
                 ),
                 true
             ),
             -8
         );
 
-        return $this->keydata;
+        return true;
+    }
+
+    public function __sleep()
+    {
+        return ['e', 'n', 'fp'];
     }
 
     public function encrypt($data)
     {
         \danog\MadelineProto\Logger::log(['Encrypting with rsa key...'], Logger::VERBOSE);
 
-        return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->keydata['e'], $this->keydata['n'])->toBytes();
+        return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

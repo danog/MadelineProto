@@ -17,13 +17,12 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait PeerHandler
 {
-    public $chats = [];
-    public $last_stored = 0;
-    public $qres = [];
-
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
+            if (!isset($user['access_hash'])) {
+                continue;
+            }
             switch ($user['_']) {
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
@@ -69,15 +68,21 @@ trait PeerHandler
                     break;
                 case 'channel':
                 case 'channelForbidden':
-                    if (!isset($this->chats[$this->to_supergroup($chat['id'])]) || $this->chats[$this->to_supergroup($chat['id'])] !== $chat) {
-                        $this->chats[$this->to_supergroup($chat['id'])] = $chat;
+                    if (!isset($chat['access_hash'])) {
+                        continue;
+                    }
+                    $bot_api_id = $this->to_supergroup($chat['id']);
+                    if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
+                        $this->chats[$bot_api_id] = $chat;
                         $this->should_serialize = true;
-                        try {
-                            $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
-                        } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                        if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
+                            try {
+                                $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
+                            } catch (\danog\MadelineProto\Exception $e) {
+                                \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            }
                         }
                     }
                     break;
@@ -93,7 +98,7 @@ trait PeerHandler
         try {
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
-            return false;
+            return $e->getMessage() === 'Chat forbidden';
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             return false;
         }
@@ -180,20 +185,21 @@ trait PeerHandler
                     break;
             }
         }
-
-        if (preg_match('/^channel#/', $id)) {
-            $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
-        }
-        if (preg_match('/^chat#/', $id)) {
-            $id = preg_replace('|\D+|', '-', $id);
-        }
-        if (preg_match('/^user#/', $id)) {
-            $id = preg_replace('|\D+|', '', $id);
+        if (is_string($id) && strpos($id, '#') !== false) {
+            if (preg_match('/^channel#/', $id)) {
+                $id = $this->to_supergroup(preg_replace('|\D+|', '', $id));
+            }
+            if (preg_match('/^chat#/', $id)) {
+                $id = preg_replace('|\D+|', '-', $id);
+            }
+            if (preg_match('/^user#/', $id)) {
+                $id = preg_replace('|\D+|', '', $id);
+            }
         }
 
         if (is_numeric($id)) {
             if (is_string($id)) {
-                $id = $this->bigint ? ((float) $id) : ((int) $id);
+                $id = \danog\MadelineProto\Logger::$bigint ? ((float) $id) : ((int) $id);
             }
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
@@ -204,14 +210,16 @@ trait PeerHandler
                     return $this->gen_all($this->chats[$id]);
                 }
             }
-            $dbres = json_decode(file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
-                    'timeout' => 2,
-                ],
-            ])), true);
-            if ($dbres['ok']) {
-                return $this->get_info('@'.$dbres['result']);
+            if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
+                $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
+                        'timeout' => 2,
+                    ],
+                ])), true);
+                if (isset($dbres['ok']) && $dbres['ok']) {
+                    return $this->get_info('@'.$dbres['result']);
+                }
             }
-            throw new \danog\MadelineProto\Exception("Couldn't find peer by provided chat id ".$id);
+            throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         $id = str_replace('@', '', $id);
         foreach ($this->chats as $chat) {
@@ -224,7 +232,7 @@ trait PeerHandler
 
             return $this->get_info($id, false);
         }
-        throw new \danog\MadelineProto\Exception("Couldn't find peer by provided username ".$id);
+        throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
 
     public function gen_all($constructor)
@@ -238,6 +246,8 @@ trait PeerHandler
                 } elseif (isset($constructor['access_hash'])) {
                     $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                     $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                } else {
+                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
                 $res['user_id'] = $constructor['id'];
@@ -253,15 +263,20 @@ trait PeerHandler
                 $res['type'] = 'chat';
                 break;
             case 'channel':
-                if (isset($constructor['access_hash'])) {
-                    $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                if (!isset($constructor['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
+                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
                 break;
+            case 'channelForbidden':
+                throw new \danog\MadelineProto\Exception('Chat forbidden');
+                break;
+
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
                 break;
@@ -311,7 +326,7 @@ trait PeerHandler
         switch ($full['type']) {
             case 'user':
             case 'bot':
-                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone'] as $key) {
+                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone', 'lang_code'] as $key) {
                     if (isset($full['User'][$key])) {
                         $res[$key] = $full['User'][$key];
                     }
@@ -513,6 +528,7 @@ trait PeerHandler
 
     public function resolve_username($username)
     {
+        //\Rollbar\Rollbar::log($username);
         $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;

@@ -15,6 +15,7 @@ namespace danog\MadelineProto;
 class DocsBuilder
 {
     use \danog\MadelineProto\TL\TL;
+    use Tools;
 
     public function __construct($settings)
     {
@@ -37,7 +38,7 @@ class DocsBuilder
     public function mk_docs()
     {
         $types = [];
-//        $any = '*';
+        $any = '*';
         \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents($this->index, '---
@@ -56,7 +57,7 @@ description: '.$this->settings['description'].'
 [Back to main documentation](..)
 ');
 
-        foreach (glob('methods/*') as $unlink) {
+        foreach (glob('methods/'.$any) as $unlink) {
             unlink($unlink);
         }
 
@@ -76,11 +77,11 @@ description: '.$this->settings['description'].'
             $rtype = $this->methods->type[$key];
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
-            if (!isset($types[$rtype])) {
-                $types[$rtype] = ['constructors' => [], 'methods' => []];
+            if (!isset($types[$real_type])) {
+                $types[$real_type] = ['constructors' => [], 'methods' => []];
             }
-            if (!in_array($key, $types[$rtype]['methods'])) {
-                $types[$rtype]['methods'][] = $key;
+            if (!in_array($key, $types[$real_type]['methods'])) {
+                $types[$real_type]['methods'][] = $key;
             }
 
             $params = '';
@@ -140,6 +141,7 @@ description: '.$this->settings['description'].'
 
             $hasentities = false;
             $hasreplymarkup = false;
+            $hasmessage = false;
             foreach ($this->methods->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
@@ -158,7 +160,7 @@ description: '.$this->settings['description'].'
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$rmethod])) {
                     $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
                 }
@@ -170,6 +172,9 @@ description: '.$this->settings['description'].'
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
+                }
+                if ($param['name'] === 'message') {
+                    $hasmessage = true;
                 }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
@@ -229,6 +234,15 @@ Or, if you\'re into Lua:
 ## Usage of reply_markup
 
 You can provide bot API reply_markup objects here.  
+
+
+';
+            }
+            if ($hasmessage) {
+                $example .= '
+## Return value 
+
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md) will be returned instead.
 
 
 ';
@@ -293,7 +307,7 @@ description: List of methods
 
 '.implode('', $methods));
 
-        foreach (glob('constructors/*') as $unlink) {
+        foreach (glob('constructors/'.$any) as $unlink) {
             unlink($unlink);
         }
 
@@ -312,16 +326,18 @@ description: List of methods
             }
             $layer = isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '';
             $rtype = $this->constructors->type[$key];
-            if (!isset($types[$rtype])) {
-                $types[$rtype] = ['constructors' => [], 'methods' => []];
-            }
-            if (!in_array($key, $types[$rtype]['constructors'])) {
-                $types[$rtype]['constructors'][] = $key;
-            }
+
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
             $real_type = preg_replace('/.*_of_/', '', $type);
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
             $real_constructor = preg_replace('/.*_of_/', '', $constructor);
+
+            if (!isset($types[$real_type])) {
+                $types[$real_type] = ['constructors' => [], 'methods' => []];
+            }
+            if (!in_array($key, $types[$real_type]['constructors'])) {
+                $types[$real_type]['constructors'][] = $key;
+            }
 
             $params = '';
             foreach ($this->constructors->params[$key] as $param) {
@@ -405,7 +421,7 @@ description: List of methods
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.($param['flag'] ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']])) {
                     $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
                 }
@@ -575,6 +591,29 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 
 ';
             }
+            if (in_array($type, ['KeyboardButton'])) {
+                $header .= 'Clicking these buttons:
+
+To click these buttons simply run the `click` method:  
+
+```
+$result = $'.$type.'->click();
+```
+
+`$result` can be one of the following:
+
+
+* A string - If the button is a keyboardButtonUrl
+
+* [Updates](Updates.md) - If the button is a keyboardButton, the message will be sent to the chat, in reply to the message with the keyboard
+
+* [messages_BotCallbackAnswer](messages_BotCallbackAnswer.md) - If the button is a keyboardButtonCallback or a keyboardButtonGame the button will be pressed and the result will be returned
+
+* `false` - If the button is an unsupported button, like keyboardButtonRequestPhone, keyboardButtonRequestGeoLocation, keyboardButtonSwitchInlinekeyboardButtonBuy; you will have to parse data from these buttons manually
+
+
+';
+            }
             $constructors = '### Possible values (constructors):
 
 '.$constructors.'
@@ -585,6 +624,9 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 '.$methods.'
 
 ';
+            if (file_exists('types/'.$type.'.md')) {
+                \danog\MadelineProto\Logger::log([$type]);
+            }
             file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }
@@ -610,7 +652,8 @@ description: A UTF8 string of variable length
 ## Type: string  
 [Back to constructor index](index.md)
 
-A string of variable length.');
+A UTF8 string of variable length. The total length in bytes of the string must not be bigger than 16777215.
+');
         file_put_contents('types/bytes.md', '---
 title: bytes
 description: A string of variable length
@@ -618,7 +661,8 @@ description: A string of variable length
 ## Type: bytes  
 [Back to constructor index](index.md)
 
-A string of variable length.');
+A string of bytes of variable length, with length smaller than or equal to 16777215.
+');
 
         file_put_contents('types/int.md', '---
 title: integer
@@ -627,7 +671,8 @@ description: A 32 bit signed integer ranging from -2147483647 to 2147483647
 ## Type: int  
 [Back to constructor index](index.md)
 
-A 32 bit signed integer ranging from `-2147483647` to `2147483647`.');
+A 32 bit signed integer ranging from `-2147483647` to `2147483647`.
+');
 
         file_put_contents('types/long.md', '---
 title: long
@@ -636,7 +681,8 @@ description: A 32 bit signed integer ranging from -9223372036854775807 to 922337
 ## Type: long  
 [Back to constructor index](index.md)
 
-A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.');
+A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.
+');
 
         file_put_contents('types/int128.md', '---
 title: int128
@@ -645,7 +691,8 @@ description: A 128 bit signed integer
 ## Type: int128  
 [Back to constructor index](index.md)
 
-A 128 bit signed integer represented in little-endian base256 (`string`) format.');
+A 128 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/int256.md', '---
 title: int256
@@ -654,7 +701,8 @@ description: A 256 bit signed integer
 ## Type: int256
 [Back to constructor index](index.md)
 
-A 256 bit signed integer represented in little-endian base256 (`string`) format.');
+A 256 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/int512.md', '---
 title: int512
@@ -663,7 +711,8 @@ description: A 512 bit signed integer
 ## Type: int512  
 [Back to constructor index](index.md)
 
-A 512 bit signed integer represented in little-endian base256 (`string`) format.');
+A 512 bit signed integer represented in little-endian base256 (`string`) format.
+');
 
         file_put_contents('types/double.md', '---
 title: double
@@ -672,7 +721,8 @@ description: A double precision floating point number
 ## Type: double  
 [Back to constructor index](index.md)
 
-A double precision floating point number, single precision can also be used (float).');
+A double precision floating point number, single precision can also be used (float).
+');
 
         file_put_contents('types/!X.md', '---
 title: !X
@@ -681,7 +731,8 @@ description: Represents a TL serialized payload
 ## Type: !X  
 [Back to constructor index](index.md)
 
-Represents a TL serialized payload.');
+Represents a TL serialized payload.
+');
 
         file_put_contents('types/X.md', '---
 title: X
@@ -690,7 +741,8 @@ description: Represents a TL serialized payload
 ## Type: X  
 [Back to constructor index](index.md)
 
-Represents a TL serialized payload.');
+Represents a TL serialized payload.
+');
 
         file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
@@ -699,7 +751,8 @@ description: Represents a boolean with value equal to false
 # boolFalse  
 [Back to constructor index](index.md)
 
-        Represents a boolean with value equal to `false`.');
+        Represents a boolean with value equal to `false`.
+');
 
         file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
@@ -708,7 +761,8 @@ description: Represents a boolean with value equal to true
 # boolTrue  
 [Back to constructor index](index.md)
 
-Represents a boolean with value equal to `true`.');
+Represents a boolean with value equal to `true`.
+');
 
         file_put_contents('constructors/null.md', '---
 title: null
@@ -717,7 +771,8 @@ description: Represents a null value
 # null  
 [Back to constructor index](index.md)
 
-Represents a `null` value.');
+Represents a `null` value.
+');
 
         file_put_contents('types/Bool.md', '---
 title: Bool
@@ -726,7 +781,8 @@ description: Represents a boolean.
 # Bool  
 [Back to types index](index.md)
 
-Represents a boolean.');
+Represents a boolean.
+');
 
         file_put_contents('types/DataJSON.md', '---
 title: DataJSON
@@ -735,7 +791,8 @@ description: Any json-encodable data
 ## Type: DataJSON
 [Back to constructor index](index.md)
 
-Any json-encodable data.');
+Any json-encodable data.
+');
 
         \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }

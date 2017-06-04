@@ -275,7 +275,7 @@ trait BotAPI
                     break;
 
                     case 'documentAttributeVideo':
-                    $type_name = 'video';
+                    $type_name = $attribute['round_message'] ? 'video_note' : 'video';
                     $res['width'] = $attribute['w'];
                     $res['height'] = $attribute['h'];
                     $res['duration'] = $attribute['duration'];
@@ -407,6 +407,16 @@ trait BotAPI
             $href = $node->getAttribute('href');
             if (preg_match('|mention:|', $href)) {
                 $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
+            } elseif (preg_match('|buttonurl:|', $href)) {
+                if (!isset($entities['buttons'])) {
+                    $entities['buttons'] = [];
+                }
+                if (preg_match('|:new|', substr($href, -4))) {
+                    $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', str_replace(':new', '', $href)), 'new' => true];
+                } else {
+                    $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', $href)];
+                }
+                break;
             } else {
                 $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
             }
@@ -431,6 +441,7 @@ trait BotAPI
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
             try {
+                $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();
                 $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
                 if (!isset($arguments['entities'])) {
@@ -438,6 +449,10 @@ trait BotAPI
                 }
                 foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
                     $this->parse_node($node, $arguments['entities'], $nmessage);
+                }
+                if (isset($arguments['entities']['buttons'])) {
+                    $arguments['reply_markup'] = $this->build_rows($arguments['entities']['buttons']);
+                    unset($arguments['entities']['buttons']);
                 }
                 unset($arguments['parse_mode']);
             } catch (\DOMException $e) {
@@ -447,5 +462,107 @@ trait BotAPI
         }
 
         return $arguments;
+    }
+
+    public function split_to_chunks($text)
+    {
+        $total_length = 4096;
+        $text_arr = [];
+        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $text) as $word) {
+            if (strlen($word) > 4096) {
+                foreach (str_split($word, 4096) as $vv) {
+                    $text_arr[] = $vv;
+                }
+            } else {
+                $text_arr[] = $word;
+            }
+        }
+        $i = 0;
+        $message[0] = '';
+        foreach ($text_arr as $word) {
+            if (strlen($message[$i].$word.' ') <= $total_length) {
+                if ($text_arr[count($text_arr) - 1] == $word) {
+                    $message[$i] .= $word;
+                } else {
+                    $message[$i] .= $word.' ';
+                }
+            } else {
+                $i++;
+                if ($text_arr[count($text_arr) - 1] == $word) {
+                    $message[$i] = $word;
+                } else {
+                    $message[$i] = $word.' ';
+                }
+            }
+        }
+
+        return $message;
+    }
+
+    public function multipleExplodeKeepDelimiters($delimiters, $string)
+    {
+        $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
+        $finalArray = [];
+        foreach ($initialArray as $item) {
+            if (strlen($item) > 0) {
+                $finalArray[] = $item.$string[strpos($string, $item) + strlen($item)];
+            }
+        }
+
+        return $finalArray;
+    }
+
+    public function html_fixtags($text)
+    {
+        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
+        if ($matches) {
+            $last = count($matches) - 1;
+            foreach ($matches as $val) {
+                if (trim($val[1]) != '') {
+                    $text = str_replace($val[1], htmlentities($val[1]), $text);
+                }
+                $text = str_replace($val[4], htmlentities(trim($val[4])), $text);
+                if ($val == $matches[$last]) {
+                    $text = str_replace($val[6], $this->html_fixtags($val[6]), $text);
+                }
+            }
+            preg_match_all("#<a href=\x22(.+?)\x22>#is", $text, $matches);
+            foreach ($matches[1] as $match) {
+                $text = str_replace($match, htmlentities($match), $text);
+            }
+
+            return $text;
+        } else {
+            return htmlentities($text);
+        }
+    }
+
+    public function build_rows($button_list)
+    {
+        $end = false;
+        $rows = [];
+        $buttons = [];
+        $cols = 0;
+        foreach ($button_list as $button) {
+            if (isset($button['new'])) {
+                if (count($buttons) == 0) {
+                    $buttons[] = $button;
+                } else {
+                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
+                    $rows[] = $row;
+                    $buttons = [$button];
+                }
+            } else {
+                $buttons[] = $button;
+                $end = true;
+            }
+        }
+
+        if ($end) {
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
+            $rows[] = $row;
+        }
+
+        return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

@@ -55,7 +55,7 @@ if ($MadelineProto === false) {
         }
         if ($authorization['_'] === 'account.needSignup') {
             \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $MadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+            $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
         echo 'Serializing MadelineProto to calls.madeline...'.PHP_EOL;
         echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('calls.madeline', $MadelineProto).' bytes'.PHP_EOL;

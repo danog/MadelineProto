@@ -16,13 +16,7 @@ Also note that MadelineProto will perform better if python and a big math extens
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here (layer 65)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
-
-The TD documentation can be found [here](https://daniil.it/MadelineProto/TD_docs/).  
-
-The MadelineProto API documentation (mtproto tl scheme) can be found [here](https://daniil.it/MadelineProto/MTProto_docs/).  
-
-The MadelineProto API documentations (old layers) can be found [here](https://github.com/danog/MadelineProto/tree/master/old_docs).  
+The MadelineProto API documentation can be found [here (layer 66)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
 
 
 Features:
@@ -80,14 +74,21 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 ### RTFM
 
-If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili).  
+If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili). 
 
-But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo.
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, bots/, tests/testing.php).
 
 If you don't understand something, read everything again.
 
+You MUST know OOP programming in order to use this library.
+
 I will NOT answer to questions that can be answered simply by reading this page; I will instead ask you to read it carefully twice.
 
+A very important page you must read is the [API documentation](https://daniil.it/MadelineProto/API_docs/): if it's the first time you see a link to that page it means you didn't read the documentation carefully.
+
+I can offer support, however, when it comes to MadelineProto bugs or problems in the documentation. I will not write code for you for free, however you can hire me to do that if you want (my rate is 50$ per hour); you can also buy an easy to use, customized MadelineProto base for only 30$.
+
+If you're selling a MadelineProto base too, you really should consider donating at least 20% of the price of the base: [this is my PayPal](https://paypal.me/danog).
 
 ### Installation
 
@@ -116,7 +117,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L99) for the default values for the settings arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L405) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
@@ -135,14 +136,7 @@ Becomes:
 $settings = [
     'authorization' => [ // Authorization settings
         'default_temp_auth_key_expires_in' => 86400,
-        'rsa_key'                          => '-----BEGIN RSA PUBLIC KEY-----
-MIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6
-lyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS
-an9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw
-Efzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+
-8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n
-Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
------END RSA PUBLIC KEY-----',
+        'rsa_keys'                          => array with default rsa keys
     ]
     // The remaining subsetting arrays are the set to default
 ]
@@ -150,20 +144,11 @@ Slv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB
 
 Note that only settings arrays or values of a settings array will be set to default.
 
-The settings array can be accessed in the instantiated class like this:
+The settings array can be accessed and modified in the instantiated class by accessing the `settings` attribute of the API class:
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-var_dump($MadelineProto->get_settings());
-```
-
-The settings array can be modified in the instantiated class like this:
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-$settings = $MadelineProto->get_settings();
-// Make changes to $settings
-$MadelineProto->update_settings($settings);
+var_dump($MadelineProto->settings);
 ```
 
 ### Handling updates
@@ -283,6 +268,106 @@ array(3) {
 ```
 
 To specify a custom callback change the correct value in the settings. The specified callable must accept one parameter for the update.
+
+
+### Using a proxy
+
+You can use a proxy with MadelineProto.
+
+To do that, simply create a class that implements the `\danog\MadelineProto\Proxy` interface, and enter its name in the settings.
+
+Your proxy class MUST use the `\Socket` class for all TCP/UDP communications.
+
+Your proxy class can also have a setExtra method that accepts an array as the first parameter, to pass the values provided in the proxy_extra setting.
+
+The `\Socket` class has the following methods (all of the following methods must also be implemented by your proxy class):
+
+
+```public function __construct(int $domain, int $type, int $protocol);```
+
+Works exactly like the [socket_connect](http://php.net/manual/en/function.socket-connect.php) function.
+
+
+
+```public function setOption(int $level, int $name, $value);```
+
+Works exactly like the [socket_set_option](http://php.net/manual/en/function.socket-set-option.php) function.
+
+
+
+```public function getOption(int $name, $value);```
+
+Works exactly like the [socket_get_option](http://php.net/manual/en/function.socket-get-option.php) function.
+
+
+
+```public function setBlocking(bool $blocking);```
+
+Works like the [socket_block](http://php.net/manual/en/function.socket-set-block.php) or [socket_nonblock](http://php.net/manual/en/function.socket-set-nonblock.php) functions.
+
+
+
+```public function bind(string $address, [ int $port = 0 ]);```
+
+Works exactly like the [socket_bind](http://php.net/manual/en/function.socket-bind.php) function.
+
+
+
+```public function listen([ int $backlog = 0 ]);```
+
+Works exactly like the [socket_listen](http://php.net/manual/en/function.socket-listen.php) function.
+
+
+
+```public function accept();```
+
+Works exactly like the [socket_accept](http://php.net/manual/en/function.socket-accept.php) function.
+
+
+
+```public function connect(string $address, [ int $port = 0 ]);```
+
+Works exactly like the [socket_accept](http://php.net/manual/en/function.socket-connect.php) function.
+
+
+
+```public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);```
+
+Works exactly like the [socket_select](http://php.net/manual/en/function.socket-select.php) function.
+
+
+
+```public function read(int $length, [ int $flags = 0 ]);```
+
+Works exactly like the [socket_read](http://php.net/manual/en/function.socket-read.php) function.
+
+
+
+```public function write(string $buffer, [ int $length ]);```
+
+Works exactly like the [socket_read](http://php.net/manual/en/function.socket-write.php) function.
+
+
+
+```public function send(string $data, int $length, int $flags);```
+
+Works exactly like the [socket_send](http://php.net/manual/en/function.socket-send.php) function.
+
+
+
+```public function close();```
+
+Works exactly like the [socket_close](http://php.net/manual/en/function.socket-close.php) function.
+
+
+```public function getPeerName(bool $port = true);```
+
+Works like [socket_getpeername](http://php.net/manual/en/function.socket-getpeername.php): the difference is that it returns an array with the `host` and the `port`.
+
+
+```public function getSockName(bool $port = true);```
+
+Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsockname.php): the difference is that it returns an array with the `host` and the `port`.
 
 
 ### Uploading and downloading files
@@ -443,13 +528,15 @@ Methods that allow sending message entities (messages.sendMessage for example) a
 
 To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true.
 
+To disable fetching the result of a method, the array that must be provided as second parameter to method wrapper must have the `noResponse` key set to true.
+
 reply_markup accepts bot API reply markup objects as well as MTProto ones.
 
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
 
 ### Storing sessions
 
-An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, usage of the `\danog\MadelineProto\Serialization` class is recommended:
+An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, you must use the `\danog\MadelineProto\Serialization` class:
 
 ```  
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
@@ -457,7 +544,8 @@ $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeli
 \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
 ```  
 
-That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true.
+THe deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
+That class serializes only if the `$MadelineProto->API->should_serialize` boolean is set to true, using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
 The same operation should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 
 ### Exceptions
@@ -470,6 +558,8 @@ MadelineProto can throw lots of different exceptions:
 * \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
 
 * \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
+
+* \danog\MadelineProto\PTSException - Thrown if the PTS is unrecoverably corrupted
 
 * \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
 

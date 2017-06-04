@@ -31,22 +31,23 @@ trait MessageHandler
         if (!is_string($message_id)) {
             throw new \danog\MadelineProto\Exception("Specified message id isn't a string");
         }
+        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
-            $message = str_repeat(chr(0), 8).$message_id.\danog\PHP\Struct::pack('<I', strlen($message_data)).$message_data;
+            $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
-            $data2enc = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.\danog\PHP\Struct::pack('<II', $seq_no, strlen($message_data)).$message_data;
+            $data2enc = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
             $padding = $this->random($this->posmod(-strlen($data2enc), 16));
             $message_key = substr(sha1($data2enc, true), -16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key']);
             $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($data2enc.$padding, $aes_key, $aes_iv);
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['seq_no'] = $seq_no;
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['seq_no'] = $seq_no;
         }
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
+        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response'] = -1;
         $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
 
-        return $message_id;
+        return 'a'.$message_id;
     }
 
     /**
@@ -56,23 +57,15 @@ trait MessageHandler
     {
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
-            $error = \danog\PHP\Struct::unpack('<i', $payload)[0];
-            if ($error === -404) {
-                if ($this->datacenter->sockets[$datacenter]->temp_auth_key != null) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                    $this->init_authorization();
-                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                }
-            }
-            throw new \danog\MadelineProto\RPCErrorException($error, $error);
+            return $this->unpack_signed_int($payload);
         }
         $auth_key_id = substr($payload, 0, 8);
-        if ($auth_key_id === str_repeat(chr(0), 8)) {
-            $message_id = substr($payload, 8, 8);
+        if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+            $message_id = 'a'.substr($payload, 8, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
-            $message_length = \danog\PHP\Struct::unpack('<I', substr($payload, 16, 4))[0];
+            $message_length = unpack('V', substr($payload, 16, 4))[1];
             $message_data = substr($payload, 20, $message_length);
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = [];
         } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
             $message_key = substr($payload, 8, 16);
             $encrypted_data = substr($payload, 24);
@@ -89,13 +82,13 @@ trait MessageHandler
                 throw new \danog\MadelineProto\Exception('Session id mismatch.');
             }
 
-            $message_id = substr($decrypted_data, 16, 8);
+            $message_id = 'a'.substr($decrypted_data, 16, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
 
-            $seq_no = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 24, 4))[0];
+            $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
             // Dunno how to handle any incorrect sequence numbers
 
-            $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 28, 4))[0];
+            $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
 
             if ($message_data_length > strlen($decrypted_data)) {
                 throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
@@ -117,7 +110,7 @@ trait MessageHandler
             if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
-            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['seq_no'] = $seq_no;
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
         } else {
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
@@ -125,5 +118,8 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
+        $this->last_recv = time();
+
+        return true;
     }
 }

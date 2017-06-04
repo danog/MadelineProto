@@ -21,17 +21,15 @@ try {
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-    var_dump($updates);
+    \danog\MadelineProto\Logger::log([$updates]);
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-        //var_dump($update);
         switch ($update['update']['_']) {
             case 'updateNewMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
                 try {
-                    //var_dump($update);
                     if ($update['update']['message']['message'] === 'callstorm') {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'callstorming you', 'reply_to_msg_id' => $update['update']['message']['id']]);
                         echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('calls.madeline', $MadelineProto).' bytes'.PHP_EOL;

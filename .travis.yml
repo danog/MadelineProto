@@ -1,20 +1,2 @@
-sudo: required
-dist: trusty
-group: edge
-language: php
-php:
-- '7.0'
-- '7.1'
-- nightly
-- hhvm
-
-addons:
-  apt:
-    packages:
-    - python3
-before_script:
-- composer update --dev
 script:
-- "tests/testing.php"
-before_install:
-- tar -xJpf enc.tar.xz
+- curl https://api.rollbar.com/api/1/deploy/ -F access_token=f9fff6689aea4905b58eec73f66c791d -F environment=production -F revision=`git log -n 1 --pretty=format:"%H"` -F local_username=$USER

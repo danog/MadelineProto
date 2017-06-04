@@ -14,12 +14,25 @@ namespace danog\MadelineProto;
 
 class Exception extends \Exception
 {
-    public function __construct($message = null, $code = 0, Exception $previous = null)
+    public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
     {
         parent::__construct($message, $code, $previous);
         if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
+        if ($line !== null) {
+            $this->line = $line;
+        }
+        if ($file !== null) {
+            $this->file = $file;
+        }
+        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden'])) {
+            return;
+        }
+        if (strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, "Couldn't get response") !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, 'id.pwrtelegram.xyz') !== false) {
+            return;
+        }
+        \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
     }
 
     /**
@@ -36,9 +49,7 @@ class Exception extends \Exception
         if (\danog\MadelineProto\Logger::$constructed) {
             \danog\MadelineProto\Logger::log([$errstr.' in '.basename($errfile).':'.$errline], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-        $e = new self($errstr, $errno);
-        $e->file = $errfile;
-        $e->line = $errline;
+        $e = new self($errstr, $errno, null, $errfile, $errline);
         throw $e;
     }
 }

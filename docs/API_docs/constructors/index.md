@@ -92,6 +92,12 @@ description: List of constructors
 <br><br>[$botInlineResult](../constructors/botInlineResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'url' => [string](../types/string.md), 'thumb_url' => [string](../types/string.md), 'content_url' => [string](../types/string.md), 'content_type' => [string](../types/string.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];<a name="botInlineResult"></a>  
 
 ***
+<br><br>[$cdnConfig](../constructors/cdnConfig.md) = \['public_keys' => \[[CdnPublicKey](../types/CdnPublicKey.md)\], \];<a name="cdnConfig"></a>  
+
+***
+<br><br>[$cdnPublicKey](../constructors/cdnPublicKey.md) = \['dc_id' => [int](../types/int.md), 'public_key' => [string](../types/string.md), \];<a name="cdnPublicKey"></a>  
+
+***
 <br><br>[$channel](../constructors/channel.md) = \['creator' => [Bool](../types/Bool.md), 'kicked' => [Bool](../types/Bool.md), 'left' => [Bool](../types/Bool.md), 'editor' => [Bool](../types/Bool.md), 'moderator' => [Bool](../types/Bool.md), 'broadcast' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'megagroup' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'democracy' => [Bool](../types/Bool.md), 'signatures' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'title' => [string](../types/string.md), 'username' => [string](../types/string.md), 'photo' => [ChatPhoto](../types/ChatPhoto.md), 'date' => [int](../types/int.md), 'version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), \];<a name="channel"></a>  
 
 ***
@@ -247,7 +253,7 @@ description: List of constructors
 <br><br>[$dataJSON](../constructors/dataJSON.md) = \['data' => [string](../types/string.md), \];<a name="dataJSON"></a>  
 
 ***
-<br><br>[$dcOption](../constructors/dcOption.md) = \['ipv6' => [Bool](../types/Bool.md), 'media_only' => [Bool](../types/Bool.md), 'tcpo_only' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'ip_address' => [string](../types/string.md), 'port' => [int](../types/int.md), \];<a name="dcOption"></a>  
+<br><br>[$dcOption](../constructors/dcOption.md) = \['ipv6' => [Bool](../types/Bool.md), 'media_only' => [Bool](../types/Bool.md), 'tcpo_only' => [Bool](../types/Bool.md), 'cdn' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'ip_address' => [string](../types/string.md), 'port' => [int](../types/int.md), \];<a name="dcOption"></a>  
 
 ***
 <br><br>[$decryptedDataBlock](../constructors/decryptedDataBlock.md) = \['voice_call_id' => [int128](../types/int128.md), 'in_seq_no' => [int](../types/int.md), 'out_seq_no' => [int](../types/int.md), 'recent_received_mask' => [int](../types/int.md), 'proto' => [int](../types/int.md), 'extra' => [string](../types/string.md), 'raw_data' => [string](../types/string.md), \];<a name="decryptedDataBlock"></a>  
@@ -361,7 +367,7 @@ description: List of constructors
 <br><br>[$documentAttributeAnimated\_23](../constructors/documentAttributeAnimated_23.md) = \[\];<a name="documentAttributeAnimated_23"></a>  
 
 ***
-<br><br>[$documentAttributeAudio\_23](../constructors/documentAttributeAudio_23.md) = \['duration' => [int](../types/int.md), \];<a name="documentAttributeAudio_23"></a>  
+<br><br>[$documentAttributeAudio\_46](../constructors/documentAttributeAudio_46.md) = \['duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), \];<a name="documentAttributeAudio_46"></a>  
 
 ***
 <br><br>[$documentAttributeFilename\_23](../constructors/documentAttributeFilename_23.md) = \['file_name' => [string](../types/string.md), \];<a name="documentAttributeFilename_23"></a>  
@@ -373,10 +379,10 @@ description: List of constructors
 <br><br>[$documentAttributeImageSize\_23](../constructors/documentAttributeImageSize_23.md) = \['w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeImageSize_23"></a>  
 
 ***
-<br><br>[$documentAttributeSticker\_23](../constructors/documentAttributeSticker_23.md) = \[\];<a name="documentAttributeSticker_23"></a>  
+<br><br>[$documentAttributeSticker\_55](../constructors/documentAttributeSticker_55.md) = \['alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), \];<a name="documentAttributeSticker_55"></a>  
 
 ***
-<br><br>[$documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_23"></a>  
+<br><br>[$documentAttributeVideo\_66](../constructors/documentAttributeVideo_66.md) = \['round_message' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_66"></a>  
 
 ***
 <br><br>[$documentEmpty](../constructors/documentEmpty.md) = \['id' => [long](../types/long.md), \];<a name="documentEmpty"></a>  
@@ -639,6 +645,12 @@ description: List of constructors
 
 ***
 <br><br>[$inputMessagesFilterPhotos](../constructors/inputMessagesFilterPhotos.md) = \[\];<a name="inputMessagesFilterPhotos"></a>  
+
+***
+<br><br>[$inputMessagesFilterRoundVideo](../constructors/inputMessagesFilterRoundVideo.md) = \[\];<a name="inputMessagesFilterRoundVideo"></a>  
+
+***
+<br><br>[$inputMessagesFilterRoundVoice](../constructors/inputMessagesFilterRoundVoice.md) = \[\];<a name="inputMessagesFilterRoundVoice"></a>  
 
 ***
 <br><br>[$inputMessagesFilterUrl](../constructors/inputMessagesFilterUrl.md) = \[\];<a name="inputMessagesFilterUrl"></a>  
@@ -1059,6 +1071,9 @@ description: List of constructors
 <br><br>[$pageBlockBlockquote](../constructors/pageBlockBlockquote.md) = \['text' => [RichText](../types/RichText.md), 'caption' => [RichText](../types/RichText.md), \];<a name="pageBlockBlockquote"></a>  
 
 ***
+<br><br>[$pageBlockChannel](../constructors/pageBlockChannel.md) = \['channel' => [Chat](../types/Chat.md), \];<a name="pageBlockChannel"></a>  
+
+***
 <br><br>[$pageBlockCollage](../constructors/pageBlockCollage.md) = \['items' => \[[PageBlock](../types/PageBlock.md)\], 'caption' => [RichText](../types/RichText.md), \];<a name="pageBlockCollage"></a>  
 
 ***
@@ -1301,6 +1316,9 @@ description: List of constructors
 <br><br>[$sendMessageRecordAudioAction\_17](../constructors/sendMessageRecordAudioAction_17.md) = \[\];<a name="sendMessageRecordAudioAction_17"></a>  
 
 ***
+<br><br>[$sendMessageRecordRoundAction](../constructors/sendMessageRecordRoundAction.md) = \[\];<a name="sendMessageRecordRoundAction"></a>  
+
+***
 <br><br>[$sendMessageRecordVideoAction\_17](../constructors/sendMessageRecordVideoAction_17.md) = \[\];<a name="sendMessageRecordVideoAction_17"></a>  
 
 ***
@@ -1314,6 +1332,9 @@ description: List of constructors
 
 ***
 <br><br>[$sendMessageUploadPhotoAction\_17](../constructors/sendMessageUploadPhotoAction_17.md) = \[\];<a name="sendMessageUploadPhotoAction_17"></a>  
+
+***
+<br><br>[$sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md) = \['progress' => [int](../types/int.md), \];<a name="sendMessageUploadRoundAction"></a>  
 
 ***
 <br><br>[$sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md) = \[\];<a name="sendMessageUploadVideoAction_17"></a>  
@@ -1637,12 +1658,18 @@ description: List of constructors
 [$updates\_state](../constructors/updates_state.md) = \['pts' => [int](../types/int.md), 'qts' => [int](../types/int.md), 'date' => [int](../types/int.md), 'seq' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), \];<a name="updates_state"></a>  
 
 ***
-<br><br>[$upload\_file](../constructors/upload_file.md) = \['type' => [storage\_FileType](../types/storage_FileType.md), 'mtime' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];<a name="upload_file"></a>  
+<br><br>[$upload\_cdnFile](../constructors/upload_cdnFile.md) = \['bytes' => [bytes](../types/bytes.md), \];<a name="upload_cdnFile"></a>  
+
+[$upload\_cdnFileReuploadNeeded](../constructors/upload_cdnFileReuploadNeeded.md) = \['request_token' => [bytes](../types/bytes.md), \];<a name="upload_cdnFileReuploadNeeded"></a>  
+
+[$upload\_file](../constructors/upload_file.md) = \['type' => [storage\_FileType](../types/storage_FileType.md), 'mtime' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];<a name="upload_file"></a>  
+
+[$upload\_fileCdnRedirect](../constructors/upload_fileCdnRedirect.md) = \['dc_id' => [int](../types/int.md), 'file_token' => [bytes](../types/bytes.md), 'encryption_key' => [bytes](../types/bytes.md), 'encryption_iv' => [bytes](../types/bytes.md), \];<a name="upload_fileCdnRedirect"></a>  
 
 [$upload\_webFile](../constructors/upload_webFile.md) = \['size' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'file_type' => [storage\_FileType](../types/storage_FileType.md), 'mtime' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \];<a name="upload_webFile"></a>  
 
 ***
-<br><br>[$user](../constructors/user.md) = \['self' => [Bool](../types/Bool.md), 'contact' => [Bool](../types/Bool.md), 'mutual_contact' => [Bool](../types/Bool.md), 'deleted' => [Bool](../types/Bool.md), 'bot' => [Bool](../types/Bool.md), 'bot_chat_history' => [Bool](../types/Bool.md), 'bot_nochats' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'bot_inline_geo' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), 'phone' => [string](../types/string.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'status' => [UserStatus](../types/UserStatus.md), 'bot_info_version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), 'bot_inline_placeholder' => [string](../types/string.md), \];<a name="user"></a>  
+<br><br>[$user](../constructors/user.md) = \['self' => [Bool](../types/Bool.md), 'contact' => [Bool](../types/Bool.md), 'mutual_contact' => [Bool](../types/Bool.md), 'deleted' => [Bool](../types/Bool.md), 'bot' => [Bool](../types/Bool.md), 'bot_chat_history' => [Bool](../types/Bool.md), 'bot_nochats' => [Bool](../types/Bool.md), 'verified' => [Bool](../types/Bool.md), 'restricted' => [Bool](../types/Bool.md), 'min' => [Bool](../types/Bool.md), 'bot_inline_geo' => [Bool](../types/Bool.md), 'id' => [int](../types/int.md), 'access_hash' => [long](../types/long.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'username' => [string](../types/string.md), 'phone' => [string](../types/string.md), 'photo' => [UserProfilePhoto](../types/UserProfilePhoto.md), 'status' => [UserStatus](../types/UserStatus.md), 'bot_info_version' => [int](../types/int.md), 'restriction_reason' => [string](../types/string.md), 'bot_inline_placeholder' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), \];<a name="user"></a>  
 
 ***
 <br><br>[$userEmpty](../constructors/userEmpty.md) = \['id' => [int](../types/int.md), \];<a name="userEmpty"></a>  

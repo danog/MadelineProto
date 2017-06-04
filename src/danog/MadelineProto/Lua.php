@@ -14,11 +14,12 @@ namespace danog\MadelineProto;
 
 class Lua
 {
+    use \danog\Serializable;
     public $MadelineProto;
-    private $Lua;
-    private $script;
+    protected $Lua;
+    protected $script;
 
-    public function __construct($script, $MadelineProto)
+    public function ___construct($script, $MadelineProto)
     {
         if (!file_exists($script)) {
             throw new Exception('Provided script does not exist');

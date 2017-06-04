@@ -34,7 +34,7 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = $this->serialize_object(['type' => $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $this->secret_chats[$chat_id]['layer']);
-        $message = \danog\PHP\Struct::pack('<I', strlen($message)).$message;
+        $message = $this->pack_unsigned_int(strlen($message)).$message;
 
         $message_key = substr(sha1($message, true), -16);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
@@ -57,6 +57,7 @@ trait MessageHandler
         $auth_key_id = substr($message['message']['bytes'], 0, 8);
         $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
+            //var_dump($auth_key_id, $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']);
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
                     throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
@@ -70,7 +71,7 @@ trait MessageHandler
         $encrypted_data = substr($message['message']['bytes'], 24);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']][$old ? 'old_key' : 'key']['auth_key'], 'to server');
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-        $message_data_length = \danog\PHP\Struct::unpack('<I', substr($decrypted_data, 0, 4))[0];
+        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
         if ($message_data_length > strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
         }
@@ -94,6 +95,7 @@ trait MessageHandler
         unset($message['message']['bytes']);
         $message['message']['decrypted_message'] = $deserialized;
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']++] = $message['message'];
+        //var_dump($message);
         $this->handle_decrypted_update($message);
     }
 }

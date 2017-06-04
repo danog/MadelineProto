@@ -33,6 +33,10 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterPhoneCalls](../constructors/inputMessagesFilterPhoneCalls.md)  
 
+[inputMessagesFilterRoundVoice](../constructors/inputMessagesFilterRoundVoice.md)  
+
+[inputMessagesFilterRoundVideo](../constructors/inputMessagesFilterRoundVideo.md)  
+
 
 
 ### Methods that return an object of this type (methods):

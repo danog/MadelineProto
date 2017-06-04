@@ -27,7 +27,7 @@ trait Files
         }
         $datacenter = is_null($datacenter) ? $this->datacenter->curdc : $datacenter;
         $file_size = filesize($file);
-        if ($file_size > 1500 * 1024 * 1024) {
+        if ($file_size > 512 * 1024 * 3000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         if ($cb === null) {
@@ -47,30 +47,33 @@ trait Files
             $key = $this->random(32);
             $iv = $this->random(32);
             $digest = hash('md5', $key.$iv, true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
             $ige->setIV($iv);
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
         }
+        $ctx = hash_init('md5');
+
         while (ftell($f) !== $file_size) {
             $bytes = stream_get_contents($f, $part_size);
             if ($encrypted === true) {
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
-            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => $datacenter])) {
+            hash_update($ctx, $bytes);
+            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'datacenter' => &$datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
         }
         fclose($f);
 
-        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => md5_file($file)];
+        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => hash_final($ctx)];
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
-            $constructor['md5_checksum'] = '';
+//            $constructor['md5_checksum'] = '';
         }
 
         return $constructor;
@@ -137,8 +140,13 @@ trait Files
             }
 
             return $res;
+            case 'photo':
             case 'messageMediaPhoto':
-            $photo = end($message_media['photo']['sizes']);
+            if ($message_media['_'] == 'photo') {
+                $photo = end($message_media['sizes']);
+            } else {
+                $photo = end($message_media['photo']['sizes']);
+            }
             $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
             $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
 
@@ -211,21 +219,21 @@ trait Files
 
     public function download_to_dir($message_media, $dir, $cb = null)
     {
-        $info = $this->get_download_info($message_media);
+        $message_media = $this->get_download_info($message_media);
 
-        return $this->download_to_file($info, $dir.'/'.$info['name'].$info['ext'], $cb);
+        return $this->download_to_file($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
     public function download_to_file($message_media, $file, $cb = null)
     {
         $file = str_replace('//', '/', $file);
-        $info = $this->get_download_info($message_media);
+        $message_media = $this->get_download_info($message_media);
         if (!file_exists($file)) {
             touch($file);
         }
         $stream = fopen($file, 'r+b');
         flock($stream, LOCK_EX);
-        $this->download_to_stream($info, $stream, $cb, filesize($file), -1);
+        $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);
         flock($stream, LOCK_UN);
         fclose($stream);
         clearstatcache();
@@ -240,52 +248,85 @@ trait Files
                 \danog\MadelineProto\Logger::log(['Download status: '.$percent.'%'], \danog\MadelineProto\Logger::NOTICE);
             };
         }
-        $info = $this->get_download_info($message_media);
+        $message_media = $this->get_download_info($message_media);
         if (stream_get_meta_data($stream)['seekable']) {
             fseek($stream, $offset);
         }
         $downloaded_size = 0;
+        if ($end === -1 && isset($message_media['size'])) {
+            $end = $message_media['size'];
+        }
         $size = $end - $offset;
         $part_size = 512 * 1024;
         $percent = 0;
-        $datacenter = isset($info['InputFileLocation']['dc_id']) ? $info['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
-        if (isset($info['key'])) {
-            $digest = hash('md5', $info['key'].$info['iv'], true);
-            $fingerprint = \danog\PHP\Struct::unpack('<i', substr($digest, 0, 4) ^ substr($digest, 4, 4))[0];
-            if ($fingerprint !== $info['key_fingerprint']) {
+        $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
+        if (isset($message_media['key'])) {
+            $digest = hash('md5', $message_media['key'].$message_media['iv'], true);
+            $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
+            if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
             $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
-            $ige->setIV($info['iv']);
-            $ige->setKey($info['key']);
+            $ige->setIV($message_media['iv']);
+            $ige->setKey($message_media['key']);
             $ige->enableContinuousBuffer();
         }
         $theend = false;
+        $cdn = false;
         while (true) {
-            //$real_part_size = (($offset + $part_size > $end) && $end !== -1) ? $part_size - (($offset + $part_size) - $end) : $part_size;
+            if ($start_at = $offset % $part_size) {
+                $offset -= $start_at;
+            }
+
             try {
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->getMessage() === 'OFFSET_INVALID') {
+                if ($e->rpc === 'OFFSET_INVALID') {
+                    \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);
                     break;
                 } else {
                     throw $e;
                 }
             }
-            while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+            if ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 1;
-                $res = $this->method_call('upload.getFile', ['location' => $info['InputFileLocation'], 'offset' => $offset, 'limit' => $real_part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+            }
+            while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+                $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
                 $datacenter++;
+                if (!isset($this->datacenter->sockets[$datacenter])) {
+                    break;
+                }
             }
-            if ($res['bytes'] === '') {
-                break;
+            if ($res['_'] === 'upload.fileCdnRedirect') {
+                $cdn = true;
+                $message_media['file_token'] = $res['file_token'];
+                $message_media['cdn_key'] = $res['key'];
+                $message_media['cdn_iv'] = $res['iv'];
+                $datacenter = $res['dc_id'].'_cdn';
+                \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
+                continue;
             }
-            if (isset($info['key'])) {
+            if ($res['type']['_'] === 'upload.cdnFileReuploadNeeded') {
+                \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
+                $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $datacenter]);
+                continue;
+            }
+            if (isset($message_media['cdn_key'])) {
+                $res['bytes'] = $this->encrypt_ctr($res['bytes'], $message_media['cdn_key'], $message_media['cdn_iv'], $offset);
+            }
+            if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
+            }
+            if ($start_at) {
+                $res['bytes'] = substr($res['bytes'], $start_at);
             }
             if ($end !== -1 && strlen($res['bytes']) + $downloaded_size >= $size) {
                 $res['bytes'] = substr($res['bytes'], 0, $size - $downloaded_size);
                 $theend = true;
+            }
+            if ($res['bytes'] === '') {
+                break;
             }
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
@@ -295,7 +336,9 @@ trait Files
                 break;
             }
             //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            $cb($percent = $downloaded_size * 100 / $size);
+            if ($end !== -1) {
+                $cb($percent = $downloaded_size * 100 / $size);
+            }
         }
         if ($end === -1) {
             $cb(100);

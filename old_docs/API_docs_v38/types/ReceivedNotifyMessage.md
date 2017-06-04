@@ -9,6 +9,8 @@ description: constructors and methods of type ReceivedNotifyMessage
 
 ### Possible values (constructors):
 
+[receivedNotifyMessage](../constructors/receivedNotifyMessage.md)  
+
 
 
 ### Methods that return an object of this type (methods):

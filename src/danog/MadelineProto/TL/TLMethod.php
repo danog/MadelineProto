@@ -12,8 +12,11 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLMethod extends TLParams
+class TLMethod extends \Volatile
 {
+    use \danog\Serializable;
+    use \danog\MadelineProto\Tools;
+    use TLParams;
     public $id = [];
     public $method = [];
     public $type = [];
@@ -21,9 +24,14 @@ class TLMethod extends TLParams
     public $method_namespace = [];
     public $key = 0;
 
+    public function __sleep()
+    {
+        return ['id', 'method', 'type', 'params', 'method_namespace', 'key'];
+    }
+
     public function add($json_dict)
     {
-        $this->id[$this->key] = (int) $json_dict['id'];
+        $this->id[$this->key] = $json_dict['id'];
         $this->method[$this->key] = $json_dict['method'];
         $this->type[$this->key] = $json_dict['type'];
         $this->params[$this->key] = $json_dict['params'];
@@ -38,25 +46,25 @@ class TLMethod extends TLParams
 
     public function find_by_method($method)
     {
-        $key = array_search($method, $this->method);
+        $key = array_search($method, (array) $this->method, true);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],
-            'params'            => $this->params[$key],
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 
     public function find_by_id($id)
     {
-        $key = array_search($id, $this->id);
+        $key = array_search($id, (array) $this->id, true);
 
         return ($key === false) ? false : [
             'id'                => $this->id[$key],
             'method'            => $this->method[$key],
             'type'              => $this->type[$key],
-            'params'            => $this->params[$key],
+            'params'            => $this->array_cast_recursive($this->params[$key]),
         ];
     }
 }

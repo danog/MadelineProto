@@ -14,6 +14,7 @@ description: dcOption attributes, type and example
 |ipv6|[Bool](../types/Bool.md) | Optional|
 |media\_only|[Bool](../types/Bool.md) | Optional|
 |tcpo\_only|[Bool](../types/Bool.md) | Optional|
+|cdn|[Bool](../types/Bool.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 |ip\_address|[string](../types/string.md) | Yes|
 |port|[int](../types/int.md) | Yes|
@@ -26,14 +27,14 @@ description: dcOption attributes, type and example
 ### Example:
 
 ```
-$dcOption = ['_' => 'dcOption', 'ipv6' => Bool, 'media_only' => Bool, 'tcpo_only' => Bool, 'id' => int, 'ip_address' => string, 'port' => int, ];
+$dcOption = ['_' => 'dcOption', 'ipv6' => Bool, 'media_only' => Bool, 'tcpo_only' => Bool, 'cdn' => Bool, 'id' => int, 'ip_address' => string, 'port' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-dcOption={_='dcOption', ipv6=Bool, media_only=Bool, tcpo_only=Bool, id=int, ip_address=string, port=int, }
+dcOption={_='dcOption', ipv6=Bool, media_only=Bool, tcpo_only=Bool, cdn=Bool, id=int, ip_address=string, port=int, }
 
 ```
 
