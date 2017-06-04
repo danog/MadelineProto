@@ -550,7 +550,7 @@ class MTProto extends \Volatile
             case 'NOTICE': $settings['logger']['logger_level'] = 3; break;
             case 'WARNING': $settings['logger']['logger_level'] = 2; break;
             case 'ERROR': $settings['logger']['logger_level'] = 1; break;
-            case 'FATAL ERROR': $settings['logger']['logger_level'] = 0; break;
+            case 'FATAL_ERROR': $settings['logger']['logger_level'] = 0; break;
         }
 
         $this->settings = $settings;
