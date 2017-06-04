@@ -514,7 +514,10 @@ class MTProto extends \Volatile
                 'incoming' => 200,
                 'outgoing' => 200,
             ],
-            'peer'      => ['full_info_cache_time' => 60],
+            'peer'      => [
+                'full_info_cache_time' => 60,
+                'light_mode' => false, // Don't save full_chats infos
+            ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
@@ -538,7 +541,7 @@ class MTProto extends \Volatile
             ],
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
-        if (!isset($settings['app_info']['api_id'])) {
+        if (!isset($settings['app_info']['api_id']) || !isset($settings['app_info']['api_hash'])) {
             throw new Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
         switch ($settings['logger']['logger_level']) {
@@ -547,7 +550,7 @@ class MTProto extends \Volatile
             case 'NOTICE': $settings['logger']['logger_level'] = 3; break;
             case 'WARNING': $settings['logger']['logger_level'] = 2; break;
             case 'ERROR': $settings['logger']['logger_level'] = 1; break;
-            case 'FATAL ERROR': $settings['logger']['logger_level'] = 0; break;
+            case 'FATAL_ERROR': $settings['logger']['logger_level'] = 0; break;
         }
 
         $this->settings = $settings;
