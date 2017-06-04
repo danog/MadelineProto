@@ -112,7 +112,8 @@ class APIFactory
     public function __call($name, $arguments)
     {
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
-
-        return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], (isset($arguments[1]) && $this->is_array($arguments[1])) ? $arguments[1] : ['datacenter' => $this->API->datacenter->curdc]);
+        $aargs = isset($arguments[1]) && $this->is_array($arguments[1]) ? $arguments[1] : [];
+        $aargs['datacenter'] = $this->API->datacenter->curdc;
+        return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
     }
 }
