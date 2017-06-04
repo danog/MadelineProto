@@ -314,7 +314,9 @@ trait PeerHandler
         }
         $partial['full'] = $full;
         $partial['last_update'] = time();
-        $this->full_chats[$partial['bot_api_id']] = $partial;
+        if (!isset($this->settings['peer']['light_mode']) || !$this->settings['peer']['light_mode']) {
+            $this->full_chats[$partial['bot_api_id']] = $partial;
+        }
 
         return $partial;
     }

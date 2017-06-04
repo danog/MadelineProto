@@ -514,7 +514,10 @@ class MTProto extends \Volatile
                 'incoming' => 200,
                 'outgoing' => 200,
             ],
-            'peer'      => ['full_info_cache_time' => 60],
+            'peer'      => [
+                'full_info_cache_time' => 60,
+                'light_mode' => false
+            ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
