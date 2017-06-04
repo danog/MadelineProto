@@ -516,7 +516,7 @@ class MTProto extends \Volatile
             ],
             'peer'      => [
                 'full_info_cache_time' => 60,
-                'light_mode' => false
+                'light_mode' => false, // Don't save full_chats infos
             ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
@@ -541,7 +541,7 @@ class MTProto extends \Volatile
             ],
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
-        if (!isset($settings['app_info']['api_id'])) {
+        if (!isset($settings['app_info']['api_id']) || !isset($settings['app_info']['api_hash'])) {
             throw new Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
         switch ($settings['logger']['logger_level']) {
