@@ -54,7 +54,8 @@ trait ResponseHandler
                 return;
 
                 case 'decryptedMessageActionResend':
-                foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $update['message']['decrypted_message']) {
+                foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $message) {
+                    $seq--;
                     if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
                         throw new \danog\MadelineProto\ResponseException('Resending of messages is not yet supported');
 //                        $this->send_encrypted_message($update['message']['chat_id'], $update['message']['decrypted_message']);
@@ -71,7 +72,6 @@ trait ResponseHandler
                 $this->save_update($update);
                 break;
             case 'decryptedMessageLayer':
-                var_dump($update['message']);
                 if ($this->check_secret_out_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && $this->check_secret_in_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no'])) {
                     $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
                     if ($update['message']['decrypted_message']['layer'] >= 17) {

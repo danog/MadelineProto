@@ -19,7 +19,7 @@ trait DialogHandler
         if (!isset($this->dialog_params['offset_date']) || $force) {
             $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
         }
-        $this->getting_state = true;
+        $this->updates_state["sync_loading"] = true;
         $res = ['dialogs' => [0]];
         $datacenter = $this->datacenter->curdc;
         $count = 0;
@@ -36,6 +36,6 @@ trait DialogHandler
             }
         }
 
-        $this->getting_state = false;
+        $this->updates_state["sync_loading"] = false;
     }
 }

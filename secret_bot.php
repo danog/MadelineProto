@@ -82,17 +82,27 @@ while (true) {
         foreach ($updates as $update) {
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
+                /*case 'updateNewChannelMessage':
+                    if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') continue;
+                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $update['update']['message']['message']]);
+                    break;*/
+                case 'updateNewMessage':
+                    if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') continue;
+var_dump($update);
+                    break;
                 case 'updateNewEncryptedMessage':
                     if (isset($sent[$update['update']['message']['chat_id']])) continue;
                     $i = 0;
                     while ($i < $argv[1]) {
                         echo "SENDING MESSAGE $i TO ".$update['update']['message']['chat_id'].PHP_EOL;
                         $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => $i++]]);
+                        \danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto);
                     }
                     $sent[$update['update']['message']['chat_id']] = true;
            }
         }
-//    } catch (\danog\MadelineProto\SecurityException $e) {
+    } catch (\danog\MadelineProto\RPCErrorException $e) {
+        var_dump($e);
     } catch (\danog\MadelineProto\Exception $e) { var_dump($e->getMessage()); }
-    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }

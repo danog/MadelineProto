@@ -40,6 +40,8 @@ class Connection extends \Volatile
     public $max_incoming_id;
     public $max_outgoing_id;
 
+    public $call_queue = [];
+
     public $i = [];
 /*    public function __get($name) {
         echo "GETTING $name\n";

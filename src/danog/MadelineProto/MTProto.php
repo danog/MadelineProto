@@ -163,13 +163,7 @@ class MTProto extends \Volatile
     public $chats = [];
     public $last_stored = 0;
     public $qres = [];
-    private $pending_updates = [];
-    private $updates_state = ['_' => 'MadelineProto.Updates_state', 'pending_seq_updates' => [], 'pending_pts_updates' => [], 'sync_loading' => true, 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
-    private $got_state = false;
-    private $channels_state = [];
-    public $updates = [];
-    public $updates_key = 0;
-    private $getting_state = false;
+
     public $full_chats = [];
     private $msg_ids = [];
     private $v = 0;
@@ -291,13 +285,17 @@ class MTProto extends \Volatile
             }
             unset($this->data);
         }
+        $this->secret_chats = [];
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
-        $this->getting_state = false;
+        $this->updates_state["sync_loading"] = false;
+        foreach ($this->channels_state as &$state) {
+            $state['sync_loading'] = false;
+        }
         foreach (debug_backtrace(0) as $trace) {
             if (isset($trace['function']) && isset($trace['class']) && $trace['function'] === 'deserialize' && $trace['class'] === 'danog\MadelineProto\Serialization') {
-                $this->getting_state = isset($trace['args'][1]) && $trace['args'][1];
+                $this->updates_state["sync_loading"] = isset($trace['args'][1]) && $trace['args'][1];
             }
         }
 
@@ -323,7 +321,7 @@ class MTProto extends \Volatile
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs();
         }
-        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->getting_state) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state["sync_loading"]) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
@@ -510,7 +508,9 @@ class MTProto extends \Volatile
                 'outgoing' => 200,
                 'call_queue' => 200
             ],
-            'peer'      => ['full_info_cache_time' => 60],
+            'peer'      => [
+                'full_info_cache_time' => 60
+            ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
                 'callback'            => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
@@ -597,7 +597,7 @@ class MTProto extends \Volatile
     public function init_authorization()
     {
         $this->initing_authorization = true;
-        $this->getting_state = true;
+        $this->updates_state["sync_loading"] = true;
         foreach ($this->datacenter->sockets as $id => $socket) {
             if (strpos($id, 'media')) {
                 continue;
@@ -622,12 +622,12 @@ class MTProto extends \Volatile
             }
         }
         $this->initing_authorization = false;
-        $this->getting_state = false;
+        $this->updates_state["sync_loading"] = false;
     }
 
     public function sync_authorization($authorized_dc)
     {
-        $this->getting_state = true;
+        $this->updates_state["sync_loading"] = true;
         foreach ($this->datacenter->sockets as $new_dc => $socket) {
             if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
@@ -644,7 +644,7 @@ class MTProto extends \Volatile
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
-        $this->getting_state = false;
+        $this->updates_state["sync_loading"] = false;
     }
 
     public function write_client_info($method, $arguments = [], $options = [])
@@ -708,7 +708,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 39;
+        return 40;
     }
 
     public function get_self()

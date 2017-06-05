@@ -17,7 +17,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait CallHandler
 {
-    public $call_queue = [];
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
         if (!$this->is_array($args)) {
@@ -51,33 +50,38 @@ trait CallHandler
             }
             $args['chat_id'] = $res['chat_id'];
         }
-        $queue = (isset($aargs['queue']) && $aargs['queue']) || in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue']);
+        if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) $aargs['queue'] = 'secret';
+        if (isset($aargs['queue'])) {
+            $queue = $aargs['queue'];
+            if (!isset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue])) $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue] = [];
+            unset($aargs['queue']);
+        }
 
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];
-        if ($queue) {
-            $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->call_queue, 'query' => $serialized]);
+        if (isset($queue)) {
+            $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue], 'query' => $serialized]);
         }
 
         $last_recv = $this->last_recv;
-        if ($canunset = !$this->getting_state && !$this->threads && !$this->run_workers) {
-            $this->getting_state = true;
+        if ($canunset = !$this->updates_state["sync_loading"] && !$this->threads && !$this->run_workers) {
+            $this->updates_state["sync_loading"] = true;
         }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $this->send_message($serialized, $content_related, $aargs);
-                if ($queue) {
-                    $this->call_queue[] = $message_id;
-                    if (count($this->call_queue) > $this->settings['msg_array_limit']['call_queue']) {
-                        reset($this->call_queue);
-                        $key = key($this->call_queue);
+                if (isset($queue)) {
+                    $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][] = $message_id;
+                    if (count($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]) > $this->settings['msg_array_limit']['call_queue']) {
+                        reset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
+                        $key = key($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
                         if ($key[0] === "\0") {
                             $key = 'a'.$key;
                         }
-                        unset($this->call_queue[$key]);
+                        unset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][$key]);
                     }
                 }
                 if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
@@ -146,7 +150,7 @@ trait CallHandler
                 }
 
                 if ($canunset) {
-                    $this->getting_state = false;
+                    $this->updates_state["sync_loading"] = false;
                     $this->handle_pending_updates();
                 }
                 if ($server_answer === null) {
@@ -216,7 +220,7 @@ trait CallHandler
                     unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
                 }
                 if ($canunset) {
-                    $this->getting_state = false;
+                    $this->updates_state["sync_loading"] = false;
                     $this->handle_pending_updates();
                 }
             }
@@ -259,7 +263,7 @@ trait CallHandler
         }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
-                \danog\MadelineProto\Logger::log([$object === 'msgs_ack' ? 'ack '.$args['msg_ids'][0] : 'Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                if ($object !== 'msgs_ack') \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object), $aargs);
                 if ($object !== 'msgs_ack') {
                     $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];

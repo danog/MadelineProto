@@ -72,7 +72,7 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 
-if (stripos(readline('Do you want to make the secret chat tests? (y/n)'), 'y') !== false) {
+if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
 
 /*
 $call = $MadelineProto->API->request_call(getenv('TEST_SECRET_CHAT'));
@@ -104,8 +104,8 @@ var_dump($MadelineProto->get_call($call));
                 case 'updateNewEncryptedMessage':
                 var_dump($update);
            }
+           echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
         }
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
     }
 
     $secret_media = [];

@@ -24,6 +24,7 @@ trait AuthKeyHandler
 
     public function accept_secret_chat($params)
     {
+        //var_dump($params['id'],$this->secret_chat_status($params['id']));
         if ($this->secret_chat_status($params['id']) !== 0) {
             //var_dump($this->secret_chat_status($params['id']));
             \danog\MadelineProto\Logger::log(["I've already accepted secret chat ".$params['id']]);
@@ -233,7 +234,7 @@ trait AuthKeyHandler
 
     public function discard_secret_chat($chat) {
         \danog\MadelineProto\Logger::log(['Discarding secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
-
+        //var_dump(debug_backtrace(0)[0]);
         if (isset($this->secret_chats[$chat])) {
             unset($this->secret_chats[$chat]);
         }

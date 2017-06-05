@@ -126,7 +126,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->ack_incoming_message_id($current_msg_id, $datacenter); // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                        $this->force_get_updates_difference();
+                        $this->get_updates_difference();
                     }
                     $unset = true;
                     break;
@@ -351,6 +351,7 @@ trait ResponseHandler
 
     public function handle_pending_updates()
     {
+        if ($this->updates_state["sync_loading"]) return false;
         if (count($this->pending_updates)) {
             \danog\MadelineProto\Logger::log(['Parsing pending updates...'], \danog\MadelineProto\Logger::VERBOSE);
             foreach ($this->pending_updates as $key => $updates) {
@@ -364,13 +365,14 @@ trait ResponseHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
-        }
-        if ($this->getting_state) {
+        }/*
+        if ($this->updates_state["sync_loading"]) {
             \danog\MadelineProto\Logger::log(['Getting state, handle later'], \danog\MadelineProto\Logger::VERBOSE);
+            var_dump($updates);
             $this->pending_updates[] = $updates;
 
             return false;
-        }
+        }*/
         \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         $opts = [];
         foreach (['date', 'seq', 'seq_start'] as $key) {
@@ -416,7 +418,7 @@ trait ResponseHandler
                 //$this->set_update_state(['date' => $updates['date']]);
                 break;
             case 'updatesTooLong':
-                $this->force_get_updates_difference();
+                $this->get_updates_difference();
                 break;
             default:
                 throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));

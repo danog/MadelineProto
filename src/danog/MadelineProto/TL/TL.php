@@ -593,7 +593,7 @@ trait TL
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['datacenter'] = $type['datacenter'];
-            $constructorData['subtype'] = $type['subtype'];
+            $constructorData['subtype'] = isset($type['subtype']) ? $type['subtype'] : '';
             $constructorData['type'] = 'vector';
 
             return $this->deserialize($stream, $constructorData);
