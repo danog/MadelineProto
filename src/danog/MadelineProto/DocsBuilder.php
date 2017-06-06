@@ -18,6 +18,7 @@ class DocsBuilder
     use Tools;
 
     public $td = false;
+
     public function __construct($settings)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
@@ -194,10 +195,12 @@ description: '.$description.'
 
 
 ';
-            if ($this->td) $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+            if ($this->td) {
+                $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
 ';
+            }
             $header .= isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
 
