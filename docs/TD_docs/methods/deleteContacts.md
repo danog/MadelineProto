@@ -6,6 +6,9 @@ description: Deletes users from contacts list
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes users from contacts list
 
 ### Params:

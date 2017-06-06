@@ -6,6 +6,9 @@ description: Edits message content caption. Non-bots can edit message in a limit
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Edits message content caption. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side
 
 ### Params:

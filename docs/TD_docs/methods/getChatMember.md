@@ -6,6 +6,9 @@ description: Returns information about one participant of the chat
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about one participant of the chat
 
 ### Params:

@@ -6,6 +6,9 @@ description: Enables or disables sender signature on sent messages in the channe
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Enables or disables sender signature on sent messages in the channel. Needs creator privileges in the channel. Not available for supergroups
 
 ### Params:

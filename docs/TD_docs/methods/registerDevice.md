@@ -6,6 +6,9 @@ description: Registers current used device for receiving push notifications
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Registers current used device for receiving push notifications
 
 ### Params:

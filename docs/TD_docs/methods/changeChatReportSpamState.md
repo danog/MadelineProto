@@ -6,6 +6,9 @@ description: Reports chat as a spam chat or as not a spam chat. Can be used only
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Reports chat as a spam chat or as not a spam chat. Can be used only if ChatReportSpamState.can_report_spam is true. After this request ChatReportSpamState.can_report_spam became false forever
 
 ### Params:

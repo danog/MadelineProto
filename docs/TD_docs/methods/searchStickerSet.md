@@ -6,6 +6,9 @@ description: Searches sticker set by its short name
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Searches sticker set by its short name
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns Ok after specified amount of the time passed
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns Ok after specified amount of the time passed
 
 ### Params:

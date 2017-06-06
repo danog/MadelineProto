@@ -6,6 +6,9 @@ description: Returns current state of two-step verification
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns current state of two-step verification
 
 ### Params:

@@ -6,6 +6,9 @@ description: Creates new secret chat, returns created chat
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Creates new secret chat, returns created chat
 
 ### Params:

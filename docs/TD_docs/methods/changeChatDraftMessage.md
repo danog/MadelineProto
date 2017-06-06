@@ -6,6 +6,9 @@ description: Changes chat draft message
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes chat draft message
 
 ### Params:

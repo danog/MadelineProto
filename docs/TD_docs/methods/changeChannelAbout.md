@@ -6,6 +6,9 @@ description: Changes information about the channel. Needs creator privileges in 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes information about the channel. Needs creator privileges in the broadcast channel or editor privileges in the supergroup channel
 
 ### Params:

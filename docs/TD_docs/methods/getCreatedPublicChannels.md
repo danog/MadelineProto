@@ -6,6 +6,9 @@ description: Returns list of created public channels
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns list of created public channels
 
 ### Params:

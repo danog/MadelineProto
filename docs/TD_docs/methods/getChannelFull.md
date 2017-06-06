@@ -6,6 +6,9 @@ description: Returns full information about a channel by its identifier, cached 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns full information about a channel by its identifier, cached for at most 1 minute
 
 ### Params:

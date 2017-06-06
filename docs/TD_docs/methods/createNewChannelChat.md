@@ -6,6 +6,9 @@ description: Creates new channel chat and send corresponding messageChannelChatC
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Creates new channel chat and send corresponding messageChannelChatCreate, returns created chat
 
 ### Params:

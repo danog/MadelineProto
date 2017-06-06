@@ -6,6 +6,9 @@ description: Returns current privacy settings
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns current privacy settings
 
 ### Params:

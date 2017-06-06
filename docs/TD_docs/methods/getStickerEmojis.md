@@ -6,6 +6,9 @@ description: Returns emojis corresponding to a sticker
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns emojis corresponding to a sticker
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns current chat report spam state
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns current chat report spam state
 
 ### Params:

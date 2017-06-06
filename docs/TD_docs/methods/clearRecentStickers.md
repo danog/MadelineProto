@@ -6,6 +6,9 @@ description: Clears list of recently used stickers
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Clears list of recently used stickers
 
 ### Params:

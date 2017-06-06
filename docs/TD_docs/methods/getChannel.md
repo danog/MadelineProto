@@ -6,6 +6,9 @@ description: Returns information about a channel by its identifier, offline requ
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about a channel by its identifier, offline request if current user is not a bot
 
 ### Params:

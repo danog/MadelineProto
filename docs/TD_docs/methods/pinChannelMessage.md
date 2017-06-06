@@ -6,6 +6,9 @@ description: Pins a message in a supergroup channel chat. Needs editor privilege
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Pins a message in a supergroup channel chat. Needs editor privileges in the channel
 
 ### Params:

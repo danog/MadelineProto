@@ -6,6 +6,9 @@ description: Removes animation from the list of saved animations
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Removes animation from the list of saved animations
 
 ### Params:

@@ -6,6 +6,9 @@ description: Bots only. Edits message reply markup. Returns edited message after
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Edits message reply markup. Returns edited message after edit is complete server side
 
 ### Params:

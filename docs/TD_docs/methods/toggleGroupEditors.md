@@ -6,6 +6,9 @@ description: Gives or revokes all members of the group editor rights. Needs crea
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Gives or revokes all members of the group editor rights. Needs creator privileges in the group
 
 ### Params:

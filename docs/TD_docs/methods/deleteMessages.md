@@ -6,6 +6,9 @@ description: Deletes messages. UpdateDeleteMessages will not be sent for message
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes messages. UpdateDeleteMessages will not be sent for messages deleted through that function
 
 ### Params:

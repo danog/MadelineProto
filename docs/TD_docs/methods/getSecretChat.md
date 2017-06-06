@@ -6,6 +6,9 @@ description: Returns information about a secret chat by its identifier, offline 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about a secret chat by its identifier, offline request
 
 ### Params:

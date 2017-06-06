@@ -6,6 +6,9 @@ description: Deletes all messages in the chat. Can't be used for channel chats
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes all messages in the chat. Can't be used for channel chats
 
 ### Params:

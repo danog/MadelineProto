@@ -6,6 +6,9 @@ description: Changes the order of installed sticker sets
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes the order of installed sticker sets
 
 ### Params:

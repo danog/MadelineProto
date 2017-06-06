@@ -6,6 +6,9 @@ description: Removes pinned message in the supergroup channel. Needs editor priv
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Removes pinned message in the supergroup channel. Needs editor privileges in the channel
 
 ### Params:

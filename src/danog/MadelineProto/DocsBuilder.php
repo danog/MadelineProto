@@ -17,15 +17,15 @@ class DocsBuilder
     use \danog\MadelineProto\TL\TL;
     use Tools;
 
+    public $td = false;
     public function __construct($settings)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->constructors = $this->td_constructors;
-        }
-        if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->methods = $this->td_methods;
+            $this->td = true;
         }
         $this->settings = $settings;
         if (!file_exists($this->settings['output_dir'])) {
@@ -191,6 +191,10 @@ description: '.$description.'
 ---
 ## Method: '.str_replace('_', '\_', $rmethod).'  
 [Back to methods index](index.md)
+
+
+';
+            if ($this->td) $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
 ';

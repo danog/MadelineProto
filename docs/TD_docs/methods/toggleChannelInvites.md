@@ -6,6 +6,9 @@ description: Gives or revokes right to invite new members to all current members
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Gives or revokes right to invite new members to all current members of the channel. Needs creator privileges in the channel. Available only for supergroups
 
 ### Params:

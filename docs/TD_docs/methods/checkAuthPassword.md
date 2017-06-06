@@ -6,6 +6,9 @@ description: Checks password for correctness. Works only when authGetState retur
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Checks password for correctness. Works only when authGetState returns authStateWaitPassword. Returns authStateOk on success
 
 ### Params:

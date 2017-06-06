@@ -6,6 +6,9 @@ description: Creates new group chat and send corresponding messageGroupChatCreat
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Creates new group chat and send corresponding messageGroupChatCreate, returns created chat
 
 ### Params:

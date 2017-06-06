@@ -6,6 +6,9 @@ description: Get web page preview by text of the message. Do not call this funct
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Get web page preview by text of the message. Do not call this function to often
 
 ### Params:

@@ -6,6 +6,9 @@ description: Recovers password with recovery code sent to email
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Recovers password with recovery code sent to email
 
 ### Params:

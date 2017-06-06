@@ -6,6 +6,9 @@ description: Deletes the account of currently logged in user, deleting from the 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes the account of currently logged in user, deleting from the server all information associated with it. Account's phone number can be used to create new account, but only once in two weeks
 
 ### Params:

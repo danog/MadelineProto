@@ -6,6 +6,9 @@ description: Chat is opened by the user. Many useful activities depends on chat 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Chat is opened by the user. Many useful activities depends on chat being opened or closed. For example, in channels all updates are received only for opened chats
 
 ### Params:

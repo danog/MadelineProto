@@ -6,6 +6,9 @@ description: Returns value of an option by its name. See list of available optio
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options
 
 ### Params:

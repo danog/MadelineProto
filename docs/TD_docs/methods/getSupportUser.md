@@ -6,6 +6,9 @@ description: Returns user that can be contacted to get support
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns user that can be contacted to get support
 
 ### Params:

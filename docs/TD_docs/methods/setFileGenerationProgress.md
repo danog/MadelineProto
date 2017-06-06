@@ -6,6 +6,9 @@ description: Next part of a file was generated
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Next part of a file was generated
 
 ### Params:

@@ -6,6 +6,9 @@ description: Changes chat title. Title can't be changed for private chats. Title
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes chat title. Title can't be changed for private chats. Title will not change until change will be synchronized with the server. Title will not be changed if application is killed before it can send request to the server. - There will be update about change of the title on success. Otherwise error will be returned
 
 ### Params:

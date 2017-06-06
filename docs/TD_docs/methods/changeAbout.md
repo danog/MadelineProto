@@ -6,6 +6,9 @@ description: Changes about information of logged in user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes about information of logged in user
 
 ### Params:

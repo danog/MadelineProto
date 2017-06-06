@@ -6,6 +6,9 @@ description: Returns profile photos of the user. Result of this query can't be i
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns profile photos of the user. Result of this query can't be invalidated, so it must be used with care
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns list of recently used stickers
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns list of recently used stickers
 
 ### Params:

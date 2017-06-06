@@ -6,6 +6,9 @@ description: Searches public chat by its username. Currently only private and ch
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Searches public chat by its username. Currently only private and channel chats can be public. Returns chat if found, otherwise some error is returned
 
 ### Params:

@@ -6,6 +6,9 @@ description: Sends notification about screenshot taken in a chat. Works only in 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sends notification about screenshot taken in a chat. Works only in secret chats
 
 ### Params:

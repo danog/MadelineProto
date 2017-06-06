@@ -6,6 +6,9 @@ description: Returns list of installed sticker sets without archived sticker set
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns list of installed sticker sets without archived sticker sets
 
 ### Params:

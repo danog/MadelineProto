@@ -6,6 +6,9 @@ description: Finishes file generation
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Finishes file generation
 
 ### Params:

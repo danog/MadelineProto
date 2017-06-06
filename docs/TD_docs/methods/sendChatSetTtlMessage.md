@@ -6,6 +6,9 @@ description: Changes current ttl setting in a secret chat and sends correspondin
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes current ttl setting in a secret chat and sends corresponding message
 
 ### Params:

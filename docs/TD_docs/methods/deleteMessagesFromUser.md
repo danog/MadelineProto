@@ -6,6 +6,9 @@ description: Deletes all messages in the chat sent by the specified user. Works 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs appropriate privileges
 
 ### Params:

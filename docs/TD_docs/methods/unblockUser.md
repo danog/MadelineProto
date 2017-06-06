@@ -6,6 +6,9 @@ description: Removes user from black list
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Removes user from black list
 
 ### Params:

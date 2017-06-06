@@ -6,6 +6,9 @@ description: Requests to send password recovery code to email. Works only when a
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Requests to send password recovery code to email. Works only when authGetState returns authStateWaitPassword. Returns authStateWaitPassword on success
 
 ### Params:

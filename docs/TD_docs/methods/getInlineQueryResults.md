@@ -6,6 +6,9 @@ description: Sends inline query to a bot and returns its results. Unavailable fo
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sends inline query to a bot and returns its results. Unavailable for bots
 
 ### Params:

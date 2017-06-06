@@ -6,6 +6,9 @@ description: Returns messages in a chat. Automatically calls openChat. Returns r
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns messages in a chat. Automatically calls openChat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id
 
 ### Params:

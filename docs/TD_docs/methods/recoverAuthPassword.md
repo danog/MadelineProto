@@ -6,6 +6,9 @@ description: Recovers password with recovery code sent to email. Works only when
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Recovers password with recovery code sent to email. Works only when authGetState returns authStateWaitPassword. Returns authStateOk on success
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns information about channel members or kicked from channel us
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about channel members or kicked from channel users. Can be used only if channel_full->can_get_members == true
 
 ### Params:

@@ -6,6 +6,9 @@ description: Bots only. Edits reply markup of an inline message sent via bot
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Edits reply markup of an inline message sent via bot
 
 ### Params:

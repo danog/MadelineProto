@@ -6,6 +6,9 @@ description: Searches for messages with given words in the chat. Returns result 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasimg message_id. Doesn't work in secret chats
 
 ### Params:

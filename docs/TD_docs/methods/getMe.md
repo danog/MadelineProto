@@ -6,6 +6,9 @@ description: Returns current logged in user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns current logged in user
 
 ### Params:

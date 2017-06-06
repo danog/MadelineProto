@@ -6,6 +6,9 @@ description: Message content is opened, for example the user has opened a photo,
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Message content is opened, for example the user has opened a photo, a video, a document, a location or a venue or have listened to an audio or a voice message
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns users blocked by the current user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns users blocked by the current user
 
 ### Params:

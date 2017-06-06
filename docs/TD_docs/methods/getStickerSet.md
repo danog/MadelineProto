@@ -6,6 +6,9 @@ description: Returns information about sticker set by its identifier
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about sticker set by its identifier
 
 ### Params:

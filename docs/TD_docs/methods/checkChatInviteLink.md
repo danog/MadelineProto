@@ -6,6 +6,9 @@ description: Checks chat invite link for validness and returns information about
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Checks chat invite link for validness and returns information about the corresponding chat
 
 ### Params:

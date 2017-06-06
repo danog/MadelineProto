@@ -6,6 +6,9 @@ description: Returns background wallpapers
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns background wallpapers
 
 ### Params:

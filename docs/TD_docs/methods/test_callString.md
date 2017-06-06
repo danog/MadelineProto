@@ -6,6 +6,9 @@ description: test.callString parameters, return type and example
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 ### Parameters:
 
 | Name     |    Type       | Required |

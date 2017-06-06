@@ -6,6 +6,9 @@ description: Returns full information about a user by its identifier
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns full information about a user by its identifier
 
 ### Params:

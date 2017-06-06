@@ -6,6 +6,9 @@ description: Changes username of logged in user. If something changes, updateUse
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes username of logged in user. If something changes, updateUser will be sent
 
 ### Params:

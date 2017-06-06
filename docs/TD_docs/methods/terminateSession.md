@@ -6,6 +6,9 @@ description: Terminates another session of logged in user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Terminates another session of logged in user
 
 ### Params:

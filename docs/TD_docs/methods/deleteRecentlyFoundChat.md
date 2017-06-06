@@ -6,6 +6,9 @@ description: Deletes chat from the list of recently found chats
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes chat from the list of recently found chats
 
 ### Params:

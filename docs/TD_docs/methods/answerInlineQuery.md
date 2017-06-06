@@ -6,6 +6,9 @@ description: Bots only. Sets result of the inline query
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Sets result of the inline query
 
 ### Params:

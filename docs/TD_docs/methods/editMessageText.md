@@ -6,6 +6,9 @@ description: Edits text of text or game message. Non-bots can edit message in a 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Edits text of text or game message. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side
 
 ### Params:

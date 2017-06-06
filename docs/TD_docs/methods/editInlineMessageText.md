@@ -6,6 +6,9 @@ description: Bots only. Edits text of an inline text or game message sent via bo
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Edits text of an inline text or game message sent via bot
 
 ### Params:

@@ -6,6 +6,9 @@ description: Returns current authorization state, offline request
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns current authorization state, offline request
 
 ### Params:

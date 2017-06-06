@@ -6,6 +6,9 @@ description: Sends callback query to a bot and returns answer to it. Unavailable
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sends callback query to a bot and returns answer to it. Unavailable for bots
 
 ### Params:

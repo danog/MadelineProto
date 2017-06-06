@@ -6,6 +6,9 @@ description: Closes secret chat
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Closes secret chat
 
 ### Params:

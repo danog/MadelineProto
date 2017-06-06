@@ -6,6 +6,9 @@ description: Returns existing chat corresponding to the known group
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns existing chat corresponding to the known group
 
 ### Params:

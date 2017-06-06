@@ -6,6 +6,9 @@ description: Changes status of the chat member, need appropriate privileges. In 
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes status of the chat member, need appropriate privileges. In channel chats, user will be added to chat members if he is yet not a member and there is less than 200 members in the channel. - Status will not be changed until chat state will be synchronized with the server. Status will not be changed if application is killed before it can send request to the server
 
 ### Params:

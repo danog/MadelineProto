@@ -6,6 +6,9 @@ description: Reports some supergroup channel messages from a user as spam messag
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Reports some supergroup channel messages from a user as spam messages
 
 ### Params:

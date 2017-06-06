@@ -6,6 +6,9 @@ description: Checks authentication code. Works only when authGetState returns au
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Checks authentication code. Works only when authGetState returns authStateWaitCode. Returns authStateWaitPassword or authStateOk on success
 
 ### Params:

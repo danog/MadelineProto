@@ -6,6 +6,9 @@ description: Sets value of an option. See list of available options on https: co
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set
 
 ### Params:

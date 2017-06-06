@@ -6,6 +6,9 @@ description: Returns information about messages. If message is not found, return
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about messages. If message is not found, returns null on the corresponding position of the result
 
 ### Params:

@@ -6,6 +6,9 @@ description: Manually adds new sticker to the list of recently used stickers. Ne
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list
 
 ### Params:

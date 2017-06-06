@@ -6,6 +6,9 @@ description: Checks authentication code sent to change user's phone number. Retu
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Checks authentication code sent to change user's phone number. Returns authStateOk on success
 
 ### Params:

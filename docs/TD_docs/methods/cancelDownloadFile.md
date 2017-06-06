@@ -6,6 +6,9 @@ description: Stops file downloading. If file already downloaded do nothing.
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Stops file downloading. If file already downloaded do nothing.
 
 ### Params:

@@ -6,6 +6,9 @@ description: Changes username of the channel. Needs creator privileges in the ch
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes username of the channel. Needs creator privileges in the channel
 
 ### Params:

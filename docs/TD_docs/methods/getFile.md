@@ -6,6 +6,9 @@ description: Returns information about a file, offline request
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns information about a file, offline request
 
 ### Params:

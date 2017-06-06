@@ -6,6 +6,9 @@ description: Creates new channel supergroup chat from existing group chat and se
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Creates new channel supergroup chat from existing group chat and send corresponding messageChatMigrateTo and messageChatMigrateFrom. Deactivates group
 
 ### Params:

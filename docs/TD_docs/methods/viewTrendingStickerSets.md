@@ -6,6 +6,9 @@ description: Trending sticker sets are viewed by the user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Trending sticker sets are viewed by the user
 
 ### Params:

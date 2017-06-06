@@ -6,6 +6,9 @@ description: Searches for specified query in the first name, last name and usern
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Searches for specified query in the first name, last name and username of the known user contacts
 
 ### Params:

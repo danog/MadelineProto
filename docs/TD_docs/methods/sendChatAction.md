@@ -6,6 +6,9 @@ description: Sends notification about user activity in a chat
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sends notification about user activity in a chat
 
 ### Params:

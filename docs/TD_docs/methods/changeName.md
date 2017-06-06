@@ -6,6 +6,9 @@ description: Changes first and last names of logged in user. If something change
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Changes first and last names of logged in user. If something changes, updateUser will be sent
 
 ### Params:

@@ -6,6 +6,9 @@ description: Asynchronously downloads file from cloud. Updates updateFileProgres
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Asynchronously downloads file from cloud. Updates updateFileProgress will notify about download progress. Update updateFile will notify about successful download
 
 ### Params:

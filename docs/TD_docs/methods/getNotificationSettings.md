@@ -6,6 +6,9 @@ description: Returns notification settings for a given scope
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns notification settings for a given scope
 
 ### Params:

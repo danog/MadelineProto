@@ -6,6 +6,9 @@ description: Searches for messages in all chats except secret chats. Returns res
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Searches for messages in all chats except secret chats. Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id)
 
 ### Params:

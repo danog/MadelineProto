@@ -6,6 +6,9 @@ description: Returns all active sessions of logged in user
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Returns all active sessions of logged in user
 
 ### Params:

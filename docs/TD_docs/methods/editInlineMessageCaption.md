@@ -6,6 +6,9 @@ description: Bots only. Edits caption of an inline message content sent via bot
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Edits caption of an inline message content sent via bot
 
 ### Params:

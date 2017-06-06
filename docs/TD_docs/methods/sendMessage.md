@@ -6,6 +6,9 @@ description: Sends a message. Returns sent message. UpdateChatTopMessage will no
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Sends a message. Returns sent message. UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
 
 ### Params:

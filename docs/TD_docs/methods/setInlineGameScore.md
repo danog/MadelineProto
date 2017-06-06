@@ -6,6 +6,9 @@ description: Bots only. Updates game score of the specified user in the game
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Bots only. Updates game score of the specified user in the game
 
 ### Params:

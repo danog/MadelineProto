@@ -6,6 +6,9 @@ description: Installs/uninstalls or enables/archives sticker set. Official stick
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Installs/uninstalls or enables/archives sticker set. Official sticker set can't be uninstalled, but it can be archived
 
 ### Params:

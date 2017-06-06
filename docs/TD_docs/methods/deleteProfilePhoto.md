@@ -6,6 +6,9 @@ description: Deletes profile photo. If something changes, updateUser will be sen
 [Back to methods index](index.md)
 
 
+YOU CANNOT USE THIS METHOD IN MADELINEPROTO
+
+
 Deletes profile photo. If something changes, updateUser will be sent
 
 ### Params:
