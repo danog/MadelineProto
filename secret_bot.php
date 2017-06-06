@@ -31,7 +31,6 @@ if (file_exists('.env')) {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -88,11 +87,15 @@ while (true) {
                     $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $update['update']['message']['message']]);
                     break;*/
                 case 'updateNewMessage':
-                    if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') continue;
+                    if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') {
+                        continue;
+                    }
                     break;
                 case 'updateNewEncryptedMessage':
                     var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
-                    if (isset($sent[$update['update']['message']['chat_id']])) continue;
+                    if (isset($sent[$update['update']['message']['chat_id']])) {
+                        continue;
+                    }
                     $i = 0;
                     while ($i < $argv[1]) {
                         echo "SENDING MESSAGE $i TO ".$update['update']['message']['chat_id'].PHP_EOL;
@@ -104,6 +107,8 @@ while (true) {
         }
     } catch (\danog\MadelineProto\RPCErrorException $e) {
         var_dump($e);
-    } catch (\danog\MadelineProto\Exception $e) { var_dump($e->getMessage()); }
+    } catch (\danog\MadelineProto\Exception $e) {
+        var_dump($e->getMessage());
+    }
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }

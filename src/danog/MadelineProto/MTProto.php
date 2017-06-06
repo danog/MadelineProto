@@ -289,13 +289,13 @@ class MTProto extends \Volatile
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
-        $this->updates_state["sync_loading"] = false;
+        $this->updates_state['sync_loading'] = false;
         foreach ($this->channels_state as &$state) {
             $state['sync_loading'] = false;
         }
         foreach (debug_backtrace(0) as $trace) {
             if (isset($trace['function']) && isset($trace['class']) && $trace['function'] === 'deserialize' && $trace['class'] === 'danog\MadelineProto\Serialization') {
-                $this->updates_state["sync_loading"] = isset($trace['args'][1]) && $trace['args'][1];
+                $this->updates_state['sync_loading'] = isset($trace['args'][1]) && $trace['args'][1];
             }
         }
 
@@ -321,7 +321,7 @@ class MTProto extends \Volatile
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs();
         }
-        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state["sync_loading"]) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);
             $this->get_updates_difference();
         }
@@ -506,12 +506,12 @@ class MTProto extends \Volatile
                 'wait_if_lt'    => 20, // Sleeps if flood block time is lower than this
             ],
             'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
-                'incoming' => 200,
-                'outgoing' => 200,
-                'call_queue' => 200
+                'incoming'   => 200,
+                'outgoing'   => 200,
+                'call_queue' => 200,
             ],
             'peer'      => [
-                'full_info_cache_time' => 60
+                'full_info_cache_time' => 60,
             ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
@@ -599,7 +599,7 @@ class MTProto extends \Volatile
     public function init_authorization()
     {
         $this->initing_authorization = true;
-        $this->updates_state["sync_loading"] = true;
+        $this->updates_state['sync_loading'] = true;
         foreach ($this->datacenter->sockets as $id => $socket) {
             if (strpos($id, 'media')) {
                 continue;
@@ -624,12 +624,12 @@ class MTProto extends \Volatile
             }
         }
         $this->initing_authorization = false;
-        $this->updates_state["sync_loading"] = false;
+        $this->updates_state['sync_loading'] = false;
     }
 
     public function sync_authorization($authorized_dc)
     {
-        $this->updates_state["sync_loading"] = true;
+        $this->updates_state['sync_loading'] = true;
         foreach ($this->datacenter->sockets as $new_dc => $socket) {
             if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
@@ -646,7 +646,7 @@ class MTProto extends \Volatile
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
-        $this->updates_state["sync_loading"] = false;
+        $this->updates_state['sync_loading'] = false;
     }
 
     public function write_client_info($method, $arguments = [], $options = [])

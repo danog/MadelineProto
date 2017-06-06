@@ -22,7 +22,8 @@ trait AuthKeyHandler
     protected $temp_requested_secret_chats = [];
     protected $secret_chats = [];
 
-    public function accept_secret_chat($params) {
+    public function accept_secret_chat($params)
+    {
         //var_dump($params['id'],$this->secret_chat_status($params['id']));
         if ($this->secret_chat_status($params['id']) !== 0) {
             //var_dump($this->secret_chat_status($params['id']));
@@ -140,6 +141,7 @@ trait AuthKeyHandler
             }
             if ($my_exchange_id === $other_exchange_id) {
                 $this->secret_chats[$chat]['rekeying'] = [0];
+
                 return;
             }
         }
@@ -231,7 +233,8 @@ trait AuthKeyHandler
         return $this->secret_chats[$chat];
     }
 
-    public function discard_secret_chat($chat) {
+    public function discard_secret_chat($chat)
+    {
         \danog\MadelineProto\Logger::log(['Discarding secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
         //var_dump(debug_backtrace(0)[0]);
         if (isset($this->secret_chats[$chat])) {
@@ -246,8 +249,9 @@ trait AuthKeyHandler
         try {
             $this->method_call('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== "ENCRYPTION_ALREADY_DECLINED") throw $e;
+            if ($e->rpc !== 'ENCRYPTION_ALREADY_DECLINED') {
+                throw $e;
+            }
         }
-
     }
 }

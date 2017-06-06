@@ -32,7 +32,6 @@ trait Login
 
         \danog\MadelineProto\Logger::log(['Logged out successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
-
         return true;
     }
 

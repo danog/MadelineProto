@@ -50,10 +50,14 @@ trait CallHandler
             }
             $args['chat_id'] = $res['chat_id'];
         }
-        if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) $aargs['queue'] = 'secret';
+        if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
+            $aargs['queue'] = 'secret';
+        }
         if (isset($aargs['queue'])) {
             $queue = $aargs['queue'];
-            if (!isset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue])) $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue] = [];
+            if (!isset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue])) {
+                $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue] = [];
+            }
             unset($aargs['queue']);
         }
 
@@ -65,8 +69,8 @@ trait CallHandler
         }
 
         $last_recv = $this->last_recv;
-        if ($canunset = !$this->updates_state["sync_loading"] && !$this->threads && !$this->run_workers) {
-            $this->updates_state["sync_loading"] = true;
+        if ($canunset = !$this->updates_state['sync_loading'] && !$this->threads && !$this->run_workers) {
+            $this->updates_state['sync_loading'] = true;
         }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
@@ -150,7 +154,7 @@ trait CallHandler
                 }
 
                 if ($canunset) {
-                    $this->updates_state["sync_loading"] = false;
+                    $this->updates_state['sync_loading'] = false;
                     $this->handle_pending_updates();
                 }
                 if ($server_answer === null) {
@@ -220,7 +224,7 @@ trait CallHandler
                     unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
                 }
                 if ($canunset) {
-                    $this->updates_state["sync_loading"] = false;
+                    $this->updates_state['sync_loading'] = false;
                     $this->handle_pending_updates();
                 }
             }
@@ -263,7 +267,9 @@ trait CallHandler
         }
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
-                if ($object !== 'msgs_ack') \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                if ($object !== 'msgs_ack') {
+                    \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                }
                 $message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object), $aargs);
                 if ($object !== 'msgs_ack') {
                     $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];

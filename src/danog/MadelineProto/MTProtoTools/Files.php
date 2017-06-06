@@ -112,7 +112,7 @@ trait Files
             }
             if (isset($message_media['decrypted_message']['media']['mime_type'])) {
                 $res['mime'] = $message_media['decrypted_message']['media']['mime_type'];
-            } else if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaPhoto') {
+            } elseif ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaPhoto') {
                 $res['mime'] = 'image/jpeg';
             }
 

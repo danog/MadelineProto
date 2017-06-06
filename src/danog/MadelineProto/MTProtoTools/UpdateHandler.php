@@ -114,7 +114,7 @@ trait UpdateHandler
             $this->load_channel_state($channel)['pts'] = $data['pts'];
         }
     }
-    
+
     /*
     public function get_msg_id($peer)
     {
@@ -136,6 +136,7 @@ trait UpdateHandler
         }
         if ($this->load_channel_state($channel)['sync_loading']) {
             \danog\MadelineProto\Logger::log(['Not fetching '.$channel.' difference, I am already fetching it']);
+
             return;
         }
         $this->load_channel_state($channel)['sync_loading'] = true;
@@ -147,13 +148,15 @@ trait UpdateHandler
             $input = $input['InputChannel'];
         } catch (\danog\MadelineProto\Exception $e) {
             $this->load_channel_state($channel)['sync_loading'] = false;
+
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->load_channel_state($channel)['sync_loading'] = false;
+
             return false;
         }
         \danog\MadelineProto\Logger::log(['Fetching '.$channel.' difference...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
- 
+
         try {
             $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->load_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -226,11 +229,12 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        if ($this->updates_state["sync_loading"]) {
+        if ($this->updates_state['sync_loading']) {
             \danog\MadelineProto\Logger::log(['Not fetching normal difference, I am already fetching it']);
+
             return false;
         }
-        $this->updates_state["sync_loading"] = true;
+        $this->updates_state['sync_loading'] = true;
 
         \danog\MadelineProto\Logger::log(['Fetching normal difference...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -238,7 +242,7 @@ trait UpdateHandler
             try {
                 $difference = $this->method_call('updates.getDifference', ['pts' => $this->load_update_state()['pts'], 'date' => $this->load_update_state()['date'], 'qts' => $this->load_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
             } catch (\danog\MadelineProto\PTSException $e) {
-                $this->updates_state["sync_loading"] = false;
+                $this->updates_state['sync_loading'] = false;
                 $this->got_state = false;
             }
         }
@@ -262,14 +266,14 @@ trait UpdateHandler
                 $this->handle_update_messages($difference['new_messages']);
                 $this->set_update_state($difference['intermediate_state']);
                 unset($difference);
-                $this->updates_state["sync_loading"] = false;
+                $this->updates_state['sync_loading'] = false;
                 $this->get_updates_difference();
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
-        $this->updates_state["sync_loading"] = false;
+        $this->updates_state['sync_loading'] = false;
     }
 
     public function get_updates_state()
@@ -389,6 +393,7 @@ trait UpdateHandler
             if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
                 \danog\MadelineProto\Logger::log(['Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1'], \danog\MadelineProto\Logger::ERROR);
                 $this->get_updates_difference();
+
                 return false;
             }
 
@@ -400,9 +405,7 @@ trait UpdateHandler
             }
         }
         $this->save_update($update);
-
     }
-
 
     public function handle_multiple_update($updates, $options = [], $channel = false)
     {
@@ -568,5 +571,4 @@ trait UpdateHandler
             }
         }
     }
-
 }

@@ -509,9 +509,9 @@ trait AuthKeyHandler
 
     public function get_dh_config()
     {
-        $this->updates_state["sync_loading"] = true;
+        $this->updates_state['sync_loading'] = true;
         $dh_config = $this->method_call('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
-        $this->updates_state["sync_loading"] = false;
+        $this->updates_state['sync_loading'] = false;
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             \danog\MadelineProto\Logger::log(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
 

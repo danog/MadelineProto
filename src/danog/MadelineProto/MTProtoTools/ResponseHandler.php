@@ -351,7 +351,9 @@ trait ResponseHandler
 
     public function handle_pending_updates()
     {
-        if ($this->updates_state["sync_loading"]) return false;
+        if ($this->updates_state['sync_loading']) {
+            return false;
+        }
         if (count($this->pending_updates)) {
             \danog\MadelineProto\Logger::log(['Parsing pending updates...'], \danog\MadelineProto\Logger::VERBOSE);
             foreach ($this->pending_updates as $key => $updates) {
