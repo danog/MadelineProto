@@ -1,6 +1,8 @@
 # Changelog
 
 
+MadelineProto can now be proxied.  
+
 Added `$no_updates` parameter to the deserialize method of `\danog\MadelineProto\Serialization`.
 
 

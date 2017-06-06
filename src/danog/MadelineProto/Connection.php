@@ -39,6 +39,8 @@ class Connection extends \Volatile
     public $new_outgoing = [];
     public $max_incoming_id;
     public $max_outgoing_id;
+    public $proxy = '\Socket';
+    public $extra = [];
 
     public $call_queue = [];
 
@@ -51,7 +53,7 @@ var_dump(is_null($this->{$name}));
         return $this->{$name};
     }*/
 
-    public function ___construct($ip, $port, $protocol, $timeout, $ipv6)
+    public function ___construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
 
         // Can use:
@@ -68,9 +70,18 @@ var_dump(is_null($this->{$name}));
         $this->ipv6 = $ipv6;
         $this->ip = $ip;
         $this->port = $port;
+        $this->proxy = $proxy;
+        $this->extra = $extra;
+
+        if (($has_proxy = $proxy !== '\Socket') && !isset(class_implements($proxy)['\danog\MadelineProto\Proxy'])) {
+            throw new \danog\MadelineProto\Exception('Invalid proxy class provided!');
+        }
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                if ($has_proxy && $this->extra !== []) {
+                    $this->sock->setExtra($this->extra);
+                }
                 if (!\danog\MadelineProto\Logger::$has_thread) {
                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                     $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
@@ -82,7 +93,10 @@ var_dump(is_null($this->{$name}));
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                if ($has_proxy && $this->extra !== []) {
+                    $this->sock->setExtra($this->extra);
+                }
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
@@ -97,7 +111,10 @@ var_dump(is_null($this->{$name}));
                 break;
             case 'tcp_full':
 
-                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                if ($has_proxy && $this->extra !== []) {
+                    $this->sock->setExtra($this->extra);
+                }
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -113,7 +130,10 @@ var_dump(is_null($this->{$name}));
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                $this->sock = new \Socket($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                if ($has_proxy && $this->extra !== []) {
+                    $this->sock->setExtra($this->extra);
+                }
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception("Connection: couldn't connect to socket.");
                 }
@@ -158,12 +178,12 @@ var_dump(is_null($this->{$name}));
     public function close_and_reopen()
     {
         $this->__destruct();
-        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+        $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
     public function __sleep()
     {
-        return ['protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'sock'];
     }
 
     public function __wakeup()

@@ -123,7 +123,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L232) for the default values for the settings arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L405) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
@@ -274,6 +274,106 @@ array(3) {
 ```
 
 To specify a custom callback change the correct value in the settings. The specified callable must accept one parameter for the update.
+
+
+### Using a proxy
+
+You can use a proxy with MadelineProto.
+
+To do that, simply create a class that implements the `\danog\MadelineProto\Proxy` interface, and enter its name in the settings.
+
+Your proxy class MUST use the `\Socket` class for all TCP/UDP communications.
+
+Your proxy class can also have a setExtra method that accepts an array as the first parameter, to pass the values provided in the proxy_extra setting.
+
+The `\Socket` class has the following methods (all of the following methods must also be implemented by your proxy class):
+
+
+```public function __construct(int $domain, int $type, int $protocol);```
+
+Works exactly like the [socket_connect](http://php.net/manual/en/function.socket-connect.php) function.
+
+
+
+```public function setOption(int $level, int $name, $value);```
+
+Works exactly like the [socket_set_option](http://php.net/manual/en/function.socket-set-option.php) function.
+
+
+
+```public function getOption(int $name, $value);```
+
+Works exactly like the [socket_get_option](http://php.net/manual/en/function.socket-get-option.php) function.
+
+
+
+```public function setBlocking(bool $blocking);```
+
+Works like the [socket_block](http://php.net/manual/en/function.socket-set-block.php) or [socket_nonblock](http://php.net/manual/en/function.socket-set-nonblock.php) functions.
+
+
+
+```public function bind(string $address, [ int $port = 0 ]);```
+
+Works exactly like the [socket_bind](http://php.net/manual/en/function.socket-bind.php) function.
+
+
+
+```public function listen([ int $backlog = 0 ]);```
+
+Works exactly like the [socket_listen](http://php.net/manual/en/function.socket-listen.php) function.
+
+
+
+```public function accept();```
+
+Works exactly like the [socket_accept](http://php.net/manual/en/function.socket-accept.php) function.
+
+
+
+```public function connect(string $address, [ int $port = 0 ]);```
+
+Works exactly like the [socket_accept](http://php.net/manual/en/function.socket-connect.php) function.
+
+
+
+```public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);```
+
+Works exactly like the [socket_select](http://php.net/manual/en/function.socket-select.php) function.
+
+
+
+```public function read(int $length, [ int $flags = 0 ]);```
+
+Works exactly like the [socket_read](http://php.net/manual/en/function.socket-read.php) function.
+
+
+
+```public function write(string $buffer, [ int $length ]);```
+
+Works exactly like the [socket_read](http://php.net/manual/en/function.socket-write.php) function.
+
+
+
+```public function send(string $data, int $length, int $flags);```
+
+Works exactly like the [socket_send](http://php.net/manual/en/function.socket-send.php) function.
+
+
+
+```public function close();```
+
+Works exactly like the [socket_close](http://php.net/manual/en/function.socket-close.php) function.
+
+
+```public function getPeerName(bool $port = true);```
+
+Works like [socket_getpeername](http://php.net/manual/en/function.socket-getpeername.php): the difference is that it returns an array with the `host` and the `port`.
+
+
+```public function getSockName(bool $port = true);```
+
+Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsockname.php): the difference is that it returns an array with the `host` and the `port`.
 
 
 ### Uploading and downloading files
