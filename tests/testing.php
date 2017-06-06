@@ -94,7 +94,7 @@ var_dump($MadelineProto->get_call($call));
     $InputEncryptedChat = $MadelineProto->get_secret_chat($secret)['InputEncryptedChat'];
     $sentMessage = $MadelineProto->messages->sendEncrypted(['peer' => $InputEncryptedChat, 'message' => ['_' => 'decryptedMessage', 'media' => ['_' => 'decryptedMessageMediaEmpty'], 'ttl' => 10, 'message' => $message, 'entities' => [['_' => 'messageEntityCode', 'offset' => 0, 'length' => mb_strlen($message)]]]]); // should work with all layers
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
-
+    /*
     while (true) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         //\danog\MadelineProto\Logger::log([$updates]);
@@ -106,7 +106,7 @@ var_dump($MadelineProto->get_call($call));
            }
            echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
         }
-    }
+    }*/
 
     $secret_media = [];
 

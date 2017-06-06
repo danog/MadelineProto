@@ -24,6 +24,8 @@ Features:
 
 * It allows you to do everything official clients can do, programmatically!
 
+* It can be proxied!
+
 * It is very fast!
 
 * It can be easily serialized!

@@ -22,8 +22,7 @@ trait AuthKeyHandler
     protected $temp_requested_secret_chats = [];
     protected $secret_chats = [];
 
-    public function accept_secret_chat($params)
-    {
+    public function accept_secret_chat($params) {
         //var_dump($params['id'],$this->secret_chat_status($params['id']));
         if ($this->secret_chat_status($params['id']) !== 0) {
             //var_dump($this->secret_chat_status($params['id']));

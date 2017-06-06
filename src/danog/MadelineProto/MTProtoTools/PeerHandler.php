@@ -26,9 +26,9 @@ trait PeerHandler
             switch ($user['_']) {
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
-                        foreach (str_split(pack('q', $user['access_hash'])) as $char) {
+                        /*foreach (str_split(pack('q', $user['access_hash'])) as $char) {
                             var_dump(ord($char));
-                        }
+                        }*/
                         $this->chats[$user['id']] = $user;
                         try {
                             $this->get_pwr_chat($user['id'], false, true);

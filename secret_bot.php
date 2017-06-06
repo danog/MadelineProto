@@ -80,6 +80,7 @@ while (true) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         //\danog\MadelineProto\Logger::log([$updates]);
         foreach ($updates as $update) {
+            echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 /*case 'updateNewChannelMessage':
@@ -88,9 +89,9 @@ while (true) {
                     break;*/
                 case 'updateNewMessage':
                     if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') continue;
-var_dump($update);
                     break;
                 case 'updateNewEncryptedMessage':
+                    var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
                     if (isset($sent[$update['update']['message']['chat_id']])) continue;
                     $i = 0;
                     while ($i < $argv[1]) {

@@ -95,6 +95,9 @@ trait Files
         $res = [];
         switch ($message_media['_']) {
             case 'encryptedMessage':
+            if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
+                return $this->get_download_info($message_media['decrypted_message']['media']);
+            }
             $res['InputFileLocation'] = ['_' => 'inputEncryptedFileLocation', 'id' => $message_media['file']['id'], 'access_hash' => $message_media['file']['access_hash'], 'dc_id' => $message_media['file']['dc_id']];
             $res['size'] = $message_media['decrypted_message']['media']['size'];
             $res['key_fingerprint'] = $message_media['file']['key_fingerprint'];
@@ -109,7 +112,10 @@ trait Files
             }
             if (isset($message_media['decrypted_message']['media']['mime_type'])) {
                 $res['mime'] = $message_media['decrypted_message']['media']['mime_type'];
+            } else if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaPhoto') {
+                $res['mime'] = 'image/jpeg';
             }
+
             if (isset($message_media['decrypted_message']['media']['attributes'])) {
                 foreach ($message_media['decrypted_message']['media']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
