@@ -372,7 +372,10 @@ trait UpdateHandler
             if ($update['pts'] > $computed_pts) {
                 \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$computed_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
-                    $this->get_channel_difference($channel_id);
+                    try {
+                        $this->get_channel_difference($channel_id);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
                 } else {
                     $this->get_updates_difference();
                 }
