@@ -383,7 +383,7 @@ trait UpdateHandler
             }
 //            if ($cur_state['pts'] < $update['pts']) {
                 \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].', new pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
-                $cur_state['pts'] = $update['pts'];
+            $cur_state['pts'] = $update['pts'];
 //            }
 
             if ($channel_id === false && isset($options['date']) && $cur_state['date'] < $options['date']) {
