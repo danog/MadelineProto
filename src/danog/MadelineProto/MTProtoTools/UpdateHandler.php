@@ -366,14 +366,13 @@ trait UpdateHandler
         }
 
         if (isset($update['pts'])) {
-            $computed_pts = $cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0);
-            if ($update['pts'] < $computed_pts) {
-                \danog\MadelineProto\Logger::log(['Duplicate update. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$computed_pts.'. update pts: '.$update['pts'].' < new pts '.$computed_pts.', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
+            if ($update['pts'] <= $cur_state['pts']) {
+                \danog\MadelineProto\Logger::log(['Duplicate update, channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
 
                 return false;
             }
-            if ($update['pts'] > $computed_pts) {
-                \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', new pts: '.$computed_pts.' < update pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
+            if ($cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0) !== $update['pts']) {
+                \danog\MadelineProto\Logger::log(['Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                     $this->get_channel_difference($channel_id);
                 } else {
@@ -382,10 +381,11 @@ trait UpdateHandler
 
                 return false;
             }
-            if ($update['pts'] > $cur_state['pts']) {
-                \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].' + pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).' = new pts: '.$computed_pts.', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
+//            if ($cur_state['pts'] < $update['pts']) {
+                \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].', new pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
                 $cur_state['pts'] = $update['pts'];
-            }
+//            }
+
             if ($channel_id === false && isset($options['date']) && $cur_state['date'] < $options['date']) {
                 $cur_state['date'] = $options['date'];
             }
