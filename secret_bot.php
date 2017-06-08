@@ -92,7 +92,7 @@ while (true) {
                     }
                     break;
                 case 'updateNewEncryptedMessage':
-                    var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
+                    //var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
                     if (isset($sent[$update['update']['message']['chat_id']])) {
                         continue;
                     }

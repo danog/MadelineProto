@@ -285,7 +285,6 @@ class MTProto extends \Volatile
             }
             unset($this->data);
         }
-        $this->secret_chats = [];
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
