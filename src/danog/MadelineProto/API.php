@@ -71,6 +71,13 @@ class API extends APIFactory
 
         return $this->storage[$name] = $value;
     }
+    public function __isset($name) {
+        return isset($this->storage[$name]);
+    }
+
+    public function __unset($name) {
+        unset($this->storage[$name]);
+    }
 
     public function APIFactory()
     {

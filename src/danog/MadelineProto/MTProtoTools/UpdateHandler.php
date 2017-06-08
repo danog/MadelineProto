@@ -218,7 +218,8 @@ trait UpdateHandler
             $this->updates_state['qts'] = 0;
         }
         if (!$this->got_state) {
-            $this->get_updates_state();
+            $this->got_state = true;
+            $this->set_update_state($this->get_updates_state());
         }
 
         return $this->updates_state;
@@ -280,8 +281,9 @@ trait UpdateHandler
     {
         $last = $this->updates_state['sync_loading'];
         $this->updates_state['sync_loading'] = true;
-        $this->set_update_state($this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]));
+        $data = $this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]);
         $this->updates_state['sync_loading'] = $last;
+        return $data;
     }
 
     public function handle_update($update, $options = [])
