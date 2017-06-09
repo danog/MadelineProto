@@ -684,7 +684,9 @@ class MTProto extends \Volatile
         $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
         $this->parse_config();
     }
-    public function get_cdn_config($datacenter) {
+
+    public function get_cdn_config($datacenter)
+    {
         /*
          * ***********************************************************************
          * Fetch RSA keys for CDN datacenters
