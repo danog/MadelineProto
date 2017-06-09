@@ -384,14 +384,14 @@ class MTProto extends \Volatile
         // Detect device model
         try {
             $device_model = php_uname('s');
-        } catch (Exception $e) {
+        } catch (\danog\MadelineProto\Exception $e) {
             $device_model = 'Web server';
         }
 
         // Detect system version
         try {
             $system_version = php_uname('r');
-        } catch (Exception $e) {
+        } catch (\danog\MadelineProto\Exception $e) {
             $system_version = phpversion();
         }
 
@@ -536,7 +536,7 @@ class MTProto extends \Volatile
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (!isset($settings['app_info']['api_id'])) {
-            throw new Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
+            throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
