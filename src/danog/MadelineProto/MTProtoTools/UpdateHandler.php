@@ -282,6 +282,7 @@ trait UpdateHandler
         $last = $this->updates_state['sync_loading'];
         $this->updates_state['sync_loading'] = true;
         $data = $this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]);
+        $this->get_cdn_config($this->datacenter->curdc);
         $this->updates_state['sync_loading'] = $last;
 
         return $data;

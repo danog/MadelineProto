@@ -316,6 +316,7 @@ class MTProto extends \Volatile
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         if ($this->authorized === self::LOGGED_IN) {
             $this->get_self();
+            $this->get_cdn_config($this->datacenter->curdc);
         }
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs();
@@ -590,7 +591,6 @@ class MTProto extends \Volatile
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();
         }
-        $this->get_cdn_config($this->datacenter->curdc);
     }
 
     private $initing_authorization = false;
