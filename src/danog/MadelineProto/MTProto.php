@@ -603,20 +603,24 @@ class MTProto extends \Volatile
             if (strpos($id, 'media')) {
                 continue;
             }
+            $cdn = strpos($id, 'cdn');
             if ($socket->session_id === null) {
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
             }
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
-                if ($socket->auth_key === null) {
+                if ($socket->auth_key === null && !$cdn) {
                     \danog\MadelineProto\Logger::log(['Generating permanent authorization key for DC '.$id.'...'], Logger::NOTICE);
                     $socket->auth_key = $this->create_auth_key(-1, $id);
                 }
                 \danog\MadelineProto\Logger::log(['Generating temporary authorization key for DC '.$id.'...'], Logger::NOTICE);
                 $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
+                if (!$cdn) {
+                    $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                    $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
+                    $this->get_cdn_config($id);
+                }
                 if (in_array($socket->protocol, ['http', 'https'])) {
                     $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
                 }
@@ -637,7 +641,7 @@ class MTProto extends \Volatile
                 continue;
             }
             \danog\MadelineProto\Logger::log([$int_dc, $new_dc]);
-            if (preg_match('|_|', $new_dc)) {
+            if (strpos($new_dc, '_') !== false) {
                 continue;
             }
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
@@ -680,6 +684,16 @@ class MTProto extends \Volatile
         $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
         $this->parse_config();
     }
+    public function get_cdn_config($datacenter) {
+        /*
+         * ***********************************************************************
+         * Fetch RSA keys for CDN datacenters
+         */
+        foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
+            $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
+            $this->rsa_keys[$tempkey->fp] = $tempkey;
+        }
+    }
 
     public function parse_config()
     {
@@ -702,6 +716,10 @@ class MTProto extends \Volatile
             if (is_numeric($id)) {
                 $id = (int) $id;
             }
+            unset($dc['cdn']);
+            unset($dc['media_only']);
+            unset($dc['id']);
+            unset($dc['ipv6']);
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
@@ -709,7 +727,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 42;
+        return 44;
     }
 
     public function get_self()

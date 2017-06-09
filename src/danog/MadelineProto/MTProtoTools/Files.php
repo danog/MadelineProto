@@ -294,32 +294,34 @@ trait Files
                     throw $e;
                 }
             }
-            if ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+            if ($res['_'] === 'upload.fileCdnRedirect') {
+                $cdn = true;
+                $message_media['file_token'] = $res['file_token'];
+                $message_media['cdn_key'] = $res['encryption_key'];
+                $message_media['cdn_iv'] = $res['encryption_iv'];
+                $old_dc = $datacenter;
+                $datacenter = $res['dc_id'].'_cdn';
+                \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
+                continue;
+            }
+            if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
+                \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
+                $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]);
+                continue;
+            }
+            if ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 1;
             }
-            while ($res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
+            while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
                 $datacenter++;
                 if (!isset($this->datacenter->sockets[$datacenter])) {
                     break;
                 }
             }
-            if ($res['_'] === 'upload.fileCdnRedirect') {
-                $cdn = true;
-                $message_media['file_token'] = $res['file_token'];
-                $message_media['cdn_key'] = $res['key'];
-                $message_media['cdn_iv'] = $res['iv'];
-                $datacenter = $res['dc_id'].'_cdn';
-                \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
-                continue;
-            }
-            if ($res['type']['_'] === 'upload.cdnFileReuploadNeeded') {
-                \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
-                $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $datacenter]);
-                continue;
-            }
             if (isset($message_media['cdn_key'])) {
-                $res['bytes'] = $this->encrypt_ctr($res['bytes'], $message_media['cdn_key'], $message_media['cdn_iv'], $offset);
+                $ivec = substr($message_media['cdn_iv'], 0, 12).pack('N', $offset >> 4);
+                $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
@@ -341,7 +343,6 @@ trait Files
             if ($theend) {
                 break;
             }
-            //\danog\MadelineProto\Logger::log([$offset, $size, ftell($stream)], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             if ($end !== -1) {
                 $cb($percent = $downloaded_size * 100 / $size);
             }

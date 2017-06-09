@@ -61,17 +61,6 @@ trait AuthKeyHandler
 
                 /*
                 * ***********************************************************************
-                * Fetch RSA keys for CDN datacenters
-                */
-                if (strpos($datacenter, 'cdn') !== false) {
-                    foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
-                        $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
-                        $this->rsa_keys[$tempkey->fp] = $tempkey;
-                    }
-                }
-
-                /*
-                * ***********************************************************************
                 * Find our key in the server_public_key_fingerprints vector
                 */
 
