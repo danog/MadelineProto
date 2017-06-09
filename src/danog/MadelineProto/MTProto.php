@@ -590,6 +590,7 @@ class MTProto extends \Volatile
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();
         }
+        $this->get_cdn_config($this->datacenter->curdc);
     }
 
     private $initing_authorization = false;
@@ -619,7 +620,6 @@ class MTProto extends \Volatile
                 if (!$cdn) {
                     $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                     $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
-                    $this->get_cdn_config($id);
                 }
                 if (in_array($socket->protocol, ['http', 'https'])) {
                     $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
