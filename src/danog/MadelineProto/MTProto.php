@@ -289,8 +289,8 @@ class MTProto extends \Volatile
             $this->authorized = self::LOGGED_IN;
         }
         $this->updates_state['sync_loading'] = false;
-        foreach ($this->channels_state as &$state) {
-            $state['sync_loading'] = false;
+        foreach ($this->channels_state as $key => $state) {
+            $this->channels_state[$key]['sync_loading'] = false;
         }
         foreach (debug_backtrace(0) as $trace) {
             if (isset($trace['function']) && isset($trace['class']) && $trace['function'] === 'deserialize' && $trace['class'] === 'danog\MadelineProto\Serialization') {

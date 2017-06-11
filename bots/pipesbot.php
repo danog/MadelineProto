@@ -195,26 +195,34 @@ while (true) {
                         $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        var_dump($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
+                        var_dump($e->getMessage());
                     }
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        var_dump($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
+                        var_dump($e->getMessage());
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
                     try {
                         $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        var_dump($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
+                        var_dump($e->getMessage());
                     }
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        var_dump($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
+                        var_dump($e->getMessage());
                     }
                 }
         }

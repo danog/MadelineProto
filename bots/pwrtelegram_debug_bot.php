@@ -11,7 +11,7 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 require '../vendor/autoload.php';
-$settings = [];
+$settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 include_once 'token.php';
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('b.madeline');
@@ -93,7 +93,15 @@ function getfiles($token, &$params)
         }
     }
 }
-
+function recurse($array, $prefix = '') {
+    $res = [];
+    foreach ($array as $k => $v) {
+        if (is_array($v)) {
+            $res = array_merge(recurse($v, $prefix.$k.'->'), $res);
+        } else if (is_integer($v)) $res[$prefix.$k] = $v;
+    }
+    return $res;
+}
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
@@ -111,6 +119,10 @@ while (true) {
                         $bot_api_id = $message = $res['files'][$update['update']['message']['id']];
                         $bot_api_id_b256 = base64url_decode($bot_api_id);
                         $bot_api_id_rledecoded = rle_decode($bot_api_id_b256);
+                        $message .= PHP_EOL.PHP_EOL;
+                        for ($x = 0; $x < strlen($bot_api_id_rledecoded)-3; $x++) {
+                            $message .= 'Bytes '.$x.'-'.($x+4).': '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, $x, 4))[0].PHP_EOL;
+                        }
                         $message .= PHP_EOL.PHP_EOL.
                             'First 4 bytes: '.ord($bot_api_id_rledecoded[0]).' '.ord($bot_api_id_rledecoded[1]).' '.ord($bot_api_id_rledecoded[2]).' '.ord($bot_api_id_rledecoded[3]).PHP_EOL.
                             'First 4 bytes (single integer): '.(\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 0, 4))[0]).PHP_EOL.
@@ -119,17 +131,20 @@ while (true) {
                             'Last byte: '.ord(substr($bot_api_id_rledecoded, -1)).PHP_EOL.
                             'Total length: '.strlen($bot_api_id_b256).PHP_EOL.
                             'Total length (rledecoded): '.strlen($bot_api_id_rledecoded).PHP_EOL.
-                             PHP_EOL.'<b>param (value): start-end (length)</b><br>'.PHP_EOL;
+                             PHP_EOL.'<b>param (value): start-end (length)</b>'.PHP_EOL.PHP_EOL;
                         $bot_api = foreach_offset_length($bot_api_id_rledecoded);
-                        $mtproto = $MadelineProto->get_download_info($update['update']['message']['media'])['InputFileLocation'];
+                        //$mtproto = $MadelineProto->get_download_info($update['update']['message']['media'])['InputFileLocation'];
+                        //unset($mtproto['_']);
                         $m = [];
-                        unset($mtproto['_']);
+                        $mtproto = recurse($update['update']['message']);
+                        /*
                         if (isset($mtproto['version'])) {
                             unset($mtproto['version']);
                         }
                         if (isset($update['update']['message']['media']['photo'])) {
                             $mtproto['id'] = $update['update']['message']['media']['photo']['id'];
                         }
+                        $mtproto['sender_id'] = $update['update']['message']['from_id'];
                         if (isset($update['update']['message']['media']['photo'])) {
                             $mtproto['access_hash'] = $update['update']['message']['media']['photo']['access_hash'];
                         }
@@ -138,11 +153,11 @@ while (true) {
                         }
                         if (isset($update['update']['message']['media']['document'])) {
                             $mtproto['access_hash'] = $update['update']['message']['media']['document']['access_hash'];
-                        }
+                        }*/
                         foreach ($mtproto as $key => $n) {
                             foreach ($bot_api as $bn) {
                                 if ($bn['number'] === $n) {
-                                    $m[$bn['offset'] + $bn['length']] = $key.' ('.$n.'): '.$bn['offset'].'-'.($bn['offset'] + $bn['length']).' ('.$bn['length'].')'.PHP_EOL;
+                                    $m[$bn['offset'] + $bn['length']] = $key.' ('.$n.'): '.$bn['offset'].'-'.($bn['offset'] + $bn['length']).' ('.$bn['length'].') <b>FOUND</b>'.PHP_EOL;
                                     unset($mtproto[$key]);
                                 }
                             }
@@ -154,6 +169,8 @@ while (true) {
                         foreach ($mtproto as $key => $n) {
                             $message .= $key.' ('.$n.'): not found'.PHP_EOL;
                         }
+                        $message .= PHP_EOL.PHP_EOL.'File number: '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
+                        if ($update['update']['message']['from_id'] === 101374607) $message = \danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown']);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
