@@ -93,13 +93,17 @@ function getfiles($token, &$params)
         }
     }
 }
-function recurse($array, $prefix = '') {
+function recurse($array, $prefix = '')
+{
     $res = [];
     foreach ($array as $k => $v) {
         if (is_array($v)) {
             $res = array_merge(recurse($v, $prefix.$k.'->'), $res);
-        } else if (is_integer($v)) $res[$prefix.$k] = $v;
+        } elseif (is_int($v)) {
+            $res[$prefix.$k] = $v;
+        }
     }
+
     return $res;
 }
 $offset = 0;
@@ -120,8 +124,8 @@ while (true) {
                         $bot_api_id_b256 = base64url_decode($bot_api_id);
                         $bot_api_id_rledecoded = rle_decode($bot_api_id_b256);
                         $message .= PHP_EOL.PHP_EOL;
-                        for ($x = 0; $x < strlen($bot_api_id_rledecoded)-3; $x++) {
-                            $message .= 'Bytes '.$x.'-'.($x+4).': '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, $x, 4))[0].PHP_EOL;
+                        for ($x = 0; $x < strlen($bot_api_id_rledecoded) - 3; $x++) {
+                            $message .= 'Bytes '.$x.'-'.($x + 4).': '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, $x, 4))[0].PHP_EOL;
                         }
                         $message .= PHP_EOL.PHP_EOL.
                             'First 4 bytes: '.ord($bot_api_id_rledecoded[0]).' '.ord($bot_api_id_rledecoded[1]).' '.ord($bot_api_id_rledecoded[2]).' '.ord($bot_api_id_rledecoded[3]).PHP_EOL.
@@ -170,7 +174,9 @@ while (true) {
                             $message .= $key.' ('.$n.'): not found'.PHP_EOL;
                         }
                         $message .= PHP_EOL.PHP_EOL.'File number: '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
-                        if ($update['update']['message']['from_id'] === 101374607) $message = \danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
+                        if ($update['update']['message']['from_id'] === 101374607) {
+                            $message = \danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
+                        }
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown']);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
