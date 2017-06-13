@@ -25,9 +25,7 @@ class Lua
             throw new Exception('Provided script does not exist');
         }
         $this->MadelineProto = $MadelineProto;
-        $settings = $this->MadelineProto->get_settings();
-        $settings['updates']['handle_updates'] = true;
-        $this->MadelineProto->parse_settings($settings);
+        $this->MadelineProto->settings['updates']['handle_updates'] = true;
         $this->script = $script;
         $this->__wakeup();
     }
