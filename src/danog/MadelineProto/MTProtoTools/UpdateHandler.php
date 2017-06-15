@@ -48,6 +48,10 @@ trait UpdateHandler
         }
         */
         if (isset($this->settings['pwr']['update_handler'])) {
+            if (is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) $this->settings['pwr']['update_handler'] = $this->settings['pwr']['update_handler'][1];
+            if (is_string($this->settings['pwr']['update_handler'])) {
+                return $this->{$this->settings['pwr']['update_handler']}($update);
+            }
             in_array($this->settings['pwr']['update_handler'], [['danog\MadelineProto\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['pwr']['update_handler']($update);
         }
     }
