@@ -523,11 +523,11 @@ class MTProto extends \Volatile
                 'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
             ],
             'calls' => [
-                'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
-                'allow_p2p'         => false, // Should I accept p2p calls?
-                'incoming_callback' => 'default_incoming_call_callback',
-                'network_type'      => 7,
-                'log_file_path'     => '/dev/stdout',
+                'accept_calls'             => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
+                'allow_p2p'                => false, // Should I accept p2p calls?
+                'incoming_callback'        => 'default_incoming_call_callback',
+                'network_type'             => 7,
+                'log_file_path'            => '/dev/stdout',
                 'stats_dump_file_path'     => '/dev/stdout',
             ],
             'threading' => [
