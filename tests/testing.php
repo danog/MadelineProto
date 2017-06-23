@@ -31,6 +31,7 @@ if (file_exists('.env')) {
 
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
+
 var_dump($settings);
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
@@ -69,8 +70,45 @@ if ($MadelineProto === false) {
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
-echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+
+echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
+'.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+
+var_dump($id = $MadelineProto->request_call('@danogentili', [
+    'set_state' => function ($call, $state) {
+        var_dump("SET STATE $state");
+    },
+    'incoming' => [
+        'start' => function ($call) {
+            var_dump("PLEASE START RECEIVING DATA");
+        },
+        'stop' => function ($call) {
+            var_dump("PLEASE STOP RECEIVING DATA");
+        },
+        'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
+            var_dump("incoming sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+        },
+    ],
+    'outgoing' => [
+        'start' => function ($call) {
+            var_dump("PLEASE START SENDING DATA");
+        },
+        'stop' => function ($call) {
+            var_dump("PLEASE STOP SENDING DATA");
+        },
+        'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
+            var_dump("outgoing sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+        },
+        'get_level' => function ($call) {
+            return 1;
+        }
+
+    ],
+]));
+
+while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
+    $MadelineProto->get_updates();
+}
 
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
 
@@ -149,16 +187,18 @@ $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an arra
 $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];
 
-// Photo uploaded as document
-$inputFile = $MadelineProto->upload('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
-$media['document_photo'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]];
+foreach (glob('gifs/*') as $gif) {
+    // GIF
+    $inputFile = $MadelineProto->upload($gif);
+    $media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type($gif), 'caption' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]];
+}
 
-// Photo
-$media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This photo was uploaded using MadelineProto'];
-
-// GIF
-$inputFile = $MadelineProto->upload('tests/pony.mp4');
-$media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeAnimated']]];
+foreach (glob('vids/*') as $vid) {
+    // GIF
+    $inputFile = $MadelineProto->upload($vid);
+$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
+    $media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type($gif), 'caption' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]];
+}
 
 // Sticker
 $inputFile = $MadelineProto->upload('tests/lel.webp');

@@ -41,6 +41,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\Tools;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
+    use \danog\MadelineProto\VoIP\CallbackHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
@@ -524,6 +525,10 @@ class MTProto extends \Volatile
             'calls' => [
                 'accept_calls'      => true, // Should I accept calls? Can be true, false or on array of user ids from which to accept calls
                 'allow_p2p'         => false, // Should I accept p2p calls?
+                'incoming_callback' => 'default_incoming_call_callback',
+                'network_type'      => 7,
+                'log_file_path'     => '/dev/stdout',
+                'stats_dump_file_path'     => '/dev/stdout',
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?

@@ -22,7 +22,7 @@ trait AuthKeyHandler
 {
     private $calls = [];
 
-    public function request_call($user)
+    public function request_call($user, $callbacks)
     {
         $user = $this->get_info($user);
         if (!isset($user['InputUser'])) {
@@ -38,7 +38,7 @@ trait AuthKeyHandler
         $this->check_G($g_a, $dh_config['p']);
 
         $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
-        $this->calls[$res['phone_call']['id']] = ['status' => self::REQUESTED, 'a' => $a, 'g_a' => $g_a];
+        $this->calls[$res['phone_call']['id']] = ['status' => self::REQUESTED, 'a' => $a, 'g_a' => $g_a, 'callbacks' => $callbacks];
         $this->handle_pending_updates();
         $this->get_updates_difference();
 
@@ -61,8 +61,8 @@ trait AuthKeyHandler
         $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
+        $res = $this->method_call('phone.acceptCall', ['peer' => ['_' => 'inputPhoneCall', 'id' => $params['id'], 'access_hash' => $params['access_hash']], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
         $this->calls[$res['phone_call']['id']] = ['status' => self::ACCEPTED, 'b' => $b, 'g_a_hash' => $params['g_a_hash']];
-        $res = $this->method_call('phone.acceptCall', ['user_id' => $user, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
         $this->get_updates_difference();
     }
@@ -79,14 +79,28 @@ trait AuthKeyHandler
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_b']->powMod($this->calls[$params['id']]['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
-        $res = $this->method_call('phone.confirmCall', ['user_id' => $user, 'g_a' => $this->calls[$params['id']]['g_a']->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc]);
+        $res = $this->method_call('phone.confirmCall', ['key_fingerprint' => $key['fingerprint'], 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]['g_a']->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => $this->settings['tl_schema']['layer'], 'max_layer' => $this->settings['tl_schema']['layer']]], ['datacenter' => $this->datacenter->curdc])['phone_call'];
         $key['visualization'] = '';
         $length = new \phpseclib\Math\BigInteger(count(self::EMOJIS));
         foreach (str_split(strrev(substr(hash('sha256', $this->calls[$params['id']]['g_a']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
             $key['visualization'] .= self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
-        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => $this->settings['tl_schema']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'callbacks' => $this->calls[$params['id']]['callbacks']];
+        $this->calls[$params['id']]['controller'] = new \danog\MadelineProto\VoIP($this->calls[$params['id']]['callbacks']['set_state'], $this->calls[$params['id']]['callbacks']['incoming'], $this->calls[$params['id']]['callbacks']['outgoing'], $this, $this->calls[$params['id']]['InputPhoneCall']);
+var_dump("key");
+        $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], true);
+var_dump("network");
+        $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);
+var_dump("config");
+        $this->calls[$params['id']]['controller']->setConfig($this->config['call_receive_timeout_ms']/1000, $this->config['call_connect_timeout_ms']/1000, true, true, true, $this->settings['calls']['log_file_path'], $this->settings['calls']['stats_dump_file_path']);
+var_dump("shared config");
+        $this->calls[$params['id']]['controller']->setSharedConfig($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+var_dump("endpoints");
+        $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$res['connection']], $res['alternative_connections']), $this->settings['calls']['allow_p2p']);
+var_dump("start");
+        $this->calls[$params['id']]['controller']->start();
+        
         $this->handle_pending_updates();
     }
 
@@ -114,7 +128,15 @@ trait AuthKeyHandler
             $key['visualization'] .= $self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
-        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => $this->settings['tl_scheme']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol']];
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => $this->settings['tl_schema']['layer'],  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'callbacks' => $this->get_incoming_call_callbacks()];
+        $this->calls[$params['id']]['controller'] = new \danog\MadelineProto\VoIP($this->calls[$params['id']]['callbacks']['set_state'], $this->calls[$params['id']]['callbacks']['incoming'], $this->calls[$params['id']]['callbacks']['outgoing'], $this, $this->calls[$params['id']]['InputPhoneCall']);
+        $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], false);
+        $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);
+        $this->calls[$params['id']]['controller']->setConfig($this->config['call_receive_timeout_ms']/1000, $this->config['call_connect_timeout_ms']/1000, true, true, true, $this->settings['calls']['log_file_path'], $this->settings['calls']['stats_dump_file_path']);
+        $this->calls[$params['id']]['controller']->setSharedConfig($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$params['connection']], $params['alternative_connections']), $this->settings['calls']['allow_p2p']);
+        $this->calls[$params['id']]['controller']->start();
+        
     }
 
     public function call_status($id)
