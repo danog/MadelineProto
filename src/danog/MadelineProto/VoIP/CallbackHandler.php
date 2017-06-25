@@ -14,7 +14,8 @@ namespace danog\MadelineProto\VoIP;
 
 trait CallbackHandler
 {
-    function get_incoming_call_callbacks() {
+    public function get_incoming_call_callbacks()
+    {
         $callbacks = $this->settings['calls']['incoming_callback'] === 'default_incoming_call_callback' ? [] : $this->settings['calls']['incoming_callback']();
     }
 }
