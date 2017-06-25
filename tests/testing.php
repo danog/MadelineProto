@@ -70,7 +70,6 @@ if ($MadelineProto === false) {
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 
@@ -80,10 +79,10 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
     },
     'incoming' => [
         'start' => function ($call) {
-            var_dump("PLEASE START RECEIVING DATA");
+            var_dump('PLEASE START RECEIVING DATA');
         },
         'stop' => function ($call) {
-            var_dump("PLEASE STOP RECEIVING DATA");
+            var_dump('PLEASE STOP RECEIVING DATA');
         },
         'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
             var_dump("incoming sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
@@ -91,17 +90,17 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
     ],
     'outgoing' => [
         'start' => function ($call) {
-            var_dump("PLEASE START SENDING DATA");
+            var_dump('PLEASE START SENDING DATA');
         },
         'stop' => function ($call) {
-            var_dump("PLEASE STOP SENDING DATA");
+            var_dump('PLEASE STOP SENDING DATA');
         },
         'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
             var_dump("outgoing sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
         },
         'get_level' => function ($call) {
             return 1;
-        }
+        },
 
     ],
 ]));
@@ -196,7 +195,7 @@ foreach (glob('gifs/*') as $gif) {
 foreach (glob('vids/*') as $vid) {
     // GIF
     $inputFile = $MadelineProto->upload($vid);
-$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
+    $media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
     $media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type($gif), 'caption' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]];
 }
 
