@@ -527,7 +527,7 @@ class MTProto extends \Volatile
                 'allow_p2p'                => false, // Should I accept p2p calls?
                 'incoming_callback'        => 'default_incoming_call_callback',
                 'network_type'             => 7,
-                'log_file_path'            => '/dev/stdout',
+                'log_file_path'            => '/tmp/logs,txt',
                 'stats_dump_file_path'     => '/dev/stdout',
             ],
             'threading' => [
