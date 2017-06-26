@@ -90,15 +90,21 @@ trait AuthKeyHandler
         $this->calls[$params['id']]['controller'] = new \danog\MadelineProto\VoIP($this->calls[$params['id']]['callbacks']['set_state'], $this->calls[$params['id']]['callbacks']['incoming'], $this->calls[$params['id']]['callbacks']['outgoing'], $this, $this->calls[$params['id']]['InputPhoneCall']);
         $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], true);
         $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);
-        var_dump('config');
+        var_dump($this->config['call_connect_timeout_ms'] / 1000);
+
         $this->calls[$params['id']]['controller']->setConfig($this->config['call_receive_timeout_ms'] / 1000, $this->config['call_connect_timeout_ms'] / 1000, true, true, true, $this->settings['calls']['log_file_path'], $this->settings['calls']['stats_dump_file_path']);
-        var_dump('shared config');
         $this->calls[$params['id']]['controller']->setSharedConfig($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
-        var_dump('endpoints');
-        var_dump(array_merge([$res['connection']], $res['alternative_connections']));
         $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$res['connection']], $res['alternative_connections']), $this->settings['calls']['allow_p2p']);
         var_dump('start');
         $this->calls[$params['id']]['controller']->start();
+        readline();
+        var_dump("SENDING DAT");
+        $f = fopen("output.raw", 'r');
+        while (!feof($f)) {
+            var_dump("SENDING 960 frames");
+            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960*2));
+        }
+
 
         $this->handle_pending_updates();
     }

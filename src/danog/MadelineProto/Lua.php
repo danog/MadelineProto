@@ -46,7 +46,7 @@ class Lua
             $this->Lua->registerCallback($method, [$this->MadelineProto->API, $method]);
         }
         $methods = [];
-        foreach ($this->MadelineProto->API->methods->method_namespace as $method => $namespace) {
+        foreach ($this->MadelineProto->get_methods_namespaced() as $method => $namespace) {
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
         foreach ($this->MadelineProto->get_method_namespaces() as $namespace) {

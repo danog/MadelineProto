@@ -221,6 +221,11 @@ trait TL
         return array_unique($this->array_values($this->methods->method_namespace));
     }
 
+    public function get_methods_namespaced()
+    {
+        return $this->methods->method_namespace;
+    }
+
     public function serialize_bool($bool)
     {
         return $this->constructors->find_by_predicate($bool ? 'boolTrue' : 'boolFalse')['id'];
