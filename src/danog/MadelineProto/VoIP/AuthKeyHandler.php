@@ -97,27 +97,27 @@ trait AuthKeyHandler
         $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$res['connection']], $res['alternative_connections']), $this->settings['calls']['allow_p2p']);
         var_dump('start');
         $this->calls[$params['id']]['controller']->start();
-        
+
         $samplerate = 48000;
-        $period = 1/$samplerate;
-        $writePeriod = $period*960;
+        $period = 1 / $samplerate;
+        $writePeriod = $period * 960;
         var_dump($writePeriod);
         var_dump('SENDING DAT');
         $f = fopen('output.raw', 'r');
         $time = microtime(true);
         while (!feof($f)) {
             usleep(
-                ($writePeriod - 
+                ($writePeriod -
                 ($time - microtime(true)) // Time it took me to write frames
-                )*1000000
+                ) * 1000000
             );
-            var_dump(($writePeriod - 
+            var_dump(($writePeriod -
                 ($time - microtime(true)) // Time it took me to write frames
-                )*1000000);
+                ) * 1000000);
             $time = microtime(true);
             $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960));
         }
-        
+
         $this->handle_pending_updates();
     }
 
