@@ -98,13 +98,12 @@ trait AuthKeyHandler
         var_dump('start');
         $this->calls[$params['id']]['controller']->start();
         readline();
-        var_dump("SENDING DAT");
-        $f = fopen("output.raw", 'r');
+        var_dump('SENDING DAT');
+        $f = fopen('output.raw', 'r');
         while (!feof($f)) {
-            var_dump("SENDING 960 frames");
-            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960*2));
+            var_dump('SENDING 960 frames');
+            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960 * 2));
         }
-
 
         $this->handle_pending_updates();
     }
