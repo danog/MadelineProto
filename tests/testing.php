@@ -72,33 +72,51 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-
+$id = 0;
 var_dump($id = $MadelineProto->request_call('@danogentili', [
-    'set_state' => function ($call, $state) {
+    'set_state' => function ($state) {
         var_dump("SET STATE $state");
     },
     'incoming' => [
-        'start' => function ($call) {
+        'start' => function () {
             var_dump('PLEASE START RECEIVING DATA');
         },
-        'stop' => function ($call) {
+        'stop' => function () {
             var_dump('PLEASE STOP RECEIVING DATA');
         },
-        'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
+        'configure' => function ($sampleRate, $bitsPerSample, $channels) {
             var_dump("incoming sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
         },
     ],
     'outgoing' => [
-        'start' => function ($call) {
+        'start' => function () use ($MadelineProto, &$id) {
             var_dump('PLEASE START SENDING DATA');
+            $controller = $MadelineProto->get_call($id)['controller'];
+            $samplerate = 48000;
+            $period = 1 / $samplerate;
+            $writePeriod = $period * 960;
+            var_dump($writePeriod);
+            var_dump('SENDING DATA');
+            $f = fopen('output.raw', 'r');
+            $time = microtime(true);
+            while (!feof($f)) {
+                usleep(
+                    (int) (($writePeriod -
+                    (microtime(true) - $time) // Time it took me to write frames
+                    ) * 1000000)
+                );
+                $time = microtime(true);
+                $controller->writeFrames(stream_get_contents($f, 960 * 2));
+                var_dump("sent 960 frames");
+            }
         },
-        'stop' => function ($call) {
+        'stop' => function () {
             var_dump('PLEASE STOP SENDING DATA');
         },
-        'configure' => function ($call, $sampleRate, $bitsPerSample, $channels) {
+        'configure' => function ($sampleRate, $bitsPerSample, $channels) {
             var_dump("outgoing sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
         },
-        'get_level' => function ($call) {
+        'get_level' => function () {
             return 1;
         },
 
