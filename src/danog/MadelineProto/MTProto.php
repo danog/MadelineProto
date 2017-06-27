@@ -527,8 +527,8 @@ class MTProto extends \Volatile
                 'allow_p2p'                => false, // Should I accept p2p calls?
                 'incoming_callback'        => 'default_incoming_call_callback',
                 'network_type'             => 7,
-                'log_file_path'            => '/tmp/logs,txt',
-                'stats_dump_file_path'     => '/dev/stdout',
+                'log_file_path'            => '/tmp/logs.txt',
+                'stats_dump_file_path'     => '/tmp/stats.txt',
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?
@@ -735,7 +735,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 47;
+        return 48;
     }
 
     public function get_self()
