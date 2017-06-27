@@ -106,7 +106,7 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
                     ) * 1000000)
                 );
                 $time = microtime(true);
-                $controller->writeFrames(stream_get_contents($f, 960 * 2));
+                var_dump($controller->writeFrames(stream_get_contents($f, 960 * 2)));
                 var_dump("sent 960 frames");
             }
         },
