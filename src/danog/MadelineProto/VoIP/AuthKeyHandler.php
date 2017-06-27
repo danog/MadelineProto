@@ -143,7 +143,7 @@ trait AuthKeyHandler
         }
 
         $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'layer' => 65,  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'callbacks' => $this->get_incoming_call_callbacks()];
-        var_dump("CREATING");
+        var_dump('CREATING');
         $this->calls[$params['id']]['controller'] = new \danog\MadelineProto\VoIP($this->calls[$params['id']]['callbacks']['set_state'], $this->calls[$params['id']]['callbacks']['incoming'], $this->calls[$params['id']]['callbacks']['outgoing'], $this, $this->calls[$params['id']]['InputPhoneCall']);
         $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], false);
         $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);
