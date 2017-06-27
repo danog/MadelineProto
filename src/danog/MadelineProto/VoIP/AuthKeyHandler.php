@@ -112,7 +112,7 @@ trait AuthKeyHandler
                 ) * 1000000
             );
             $time = microtime(true);
-            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960*2));
+            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960 * 2));
         }
 
         $this->handle_pending_updates();
