@@ -107,9 +107,9 @@ trait AuthKeyHandler
         $time = microtime(true);
         while (!feof($f)) {
             usleep(
-                ($writePeriod -
-                ($time - microtime(true)) // Time it took me to write frames
-                ) * 1000000
+                (int)(($writePeriod -
+                (microtime(true) - $time) // Time it took me to write frames
+                ) * 1000000)
             );
             $time = microtime(true);
             $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960 * 2));
