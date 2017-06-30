@@ -73,8 +73,8 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
-$start = false;
-var_dump($id = $MadelineProto->request_call('@danogentili', [
+    $start = false;
+    var_dump($id = $MadelineProto->request_call('@danogentili', [
     'set_state' => function ($state) {
         var_dump("SET STATE $state");
     },
@@ -106,31 +106,32 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
 
     ],
 ]));
-while (!$start) $MadelineProto->get_updates();
-            $controller = $MadelineProto->get_call($id)['controller'];
-            $samplerate = 48000;
-            $period = 1 / $samplerate;
-            $writePeriod = $period * 960;
-            var_dump($writePeriod);
-            var_dump('SENDING DATA');
-            $f = fopen('output.raw', 'r');
-            $time = microtime(true);
-            while (!feof($f)) {
-                var_dump($t = (int) (($writePeriod -
+    while (!$start) {
+        $MadelineProto->get_updates();
+    }
+    $controller = $MadelineProto->get_call($id)['controller'];
+    $samplerate = 48000;
+    $period = 1 / $samplerate;
+    $writePeriod = $period * 960;
+    var_dump($writePeriod);
+    var_dump('SENDING DATA');
+    $f = fopen('output.raw', 'r');
+    $time = microtime(true);
+    while (!feof($f)) {
+        var_dump($t = (int) (($writePeriod -
                     (microtime(true) - $time) // Time it took me to write frames
                     ) * 1000000));
-                usleep(
+        usleep(
                     $t
                 );
-                $time = microtime(true);
-                var_dump($controller->writeFrames(stream_get_contents($f, 960 * 2)));
-                var_dump('sent 960 frames');
-            }
+        $time = microtime(true);
+        var_dump($controller->writeFrames(stream_get_contents($f, 960 * 2)));
+        var_dump('sent 960 frames');
+    }
 
-
-while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
-    $MadelineProto->get_updates();
-}
+    while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
+        $MadelineProto->get_updates();
+    }
 
     var_dump(getenv('TEST_SECRET_CHAT'));
     $secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
@@ -198,7 +199,6 @@ while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY)
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];
-
 
 // Sticker
 $inputFile = $MadelineProto->upload('tests/lel.webp');
