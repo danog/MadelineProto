@@ -312,6 +312,7 @@ class MTProto extends \Volatile
                 unset($settings['authorization']['rsa_key']);
             }
             $this->reset_session(true, true);
+            $this->config = ['expires' => -1];
             $this->__construct($settings);
         }
         $this->setup_threads();
@@ -474,10 +475,10 @@ class MTProto extends \Volatile
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
-                'layer'         => 66, // layer version
+                'layer'         => 68, // layer version
                 'src'           => [
                     'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram'     => __DIR__.'/TL_telegram_v66.tl', // telegram TL scheme
+                    'telegram'     => __DIR__.'/TL_telegram_v68.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
                     //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
@@ -673,7 +674,9 @@ class MTProto extends \Volatile
                         'device_model'   => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a',
                         'system_version' => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a',
                         'app_version'    => $this->settings['app_info']['app_version'],
+                        'system_lang_code'      => $this->settings['app_info']['lang_code'],
                         'lang_code'      => $this->settings['app_info']['lang_code'],
+                        'lang_pack'      => '',
                         'query'          => $this->serialize_method($method, $arguments),
                     ]
                 ),
@@ -735,7 +738,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 48;
+        return 50;
     }
 
     public function get_self()

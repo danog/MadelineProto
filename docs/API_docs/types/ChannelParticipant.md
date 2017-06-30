@@ -13,13 +13,11 @@ description: constructors and methods of type ChannelParticipant
 
 [channelParticipantSelf](../constructors/channelParticipantSelf.md)  
 
-[channelParticipantModerator](../constructors/channelParticipantModerator.md)  
-
-[channelParticipantEditor](../constructors/channelParticipantEditor.md)  
-
-[channelParticipantKicked](../constructors/channelParticipantKicked.md)  
-
 [channelParticipantCreator](../constructors/channelParticipantCreator.md)  
+
+[channelParticipantAdmin](../constructors/channelParticipantAdmin.md)  
+
+[channelParticipantBanned](../constructors/channelParticipantBanned.md)  
 
 
 

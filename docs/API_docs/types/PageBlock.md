@@ -53,6 +53,8 @@ description: constructors and methods of type PageBlock
 
 [pageBlockChannel](../constructors/pageBlockChannel.md)  
 
+[pageBlockAudio](../constructors/pageBlockAudio.md)  
+
 
 
 ### Methods that return an object of this type (methods):

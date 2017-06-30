@@ -13,6 +13,7 @@ description: contacts.getTopPeers parameters, return type and example
 |correspondents|[Bool](../types/Bool.md) | Optional|
 |bots\_pm|[Bool](../types/Bool.md) | Optional|
 |bots\_inline|[Bool](../types/Bool.md) | Optional|
+|phone\_calls|[Bool](../types/Bool.md) | Optional|
 |groups|[Bool](../types/Bool.md) | Optional|
 |channels|[Bool](../types/Bool.md) | Optional|
 |offset|[int](../types/int.md) | Yes|
@@ -40,12 +41,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
+$contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'phone_calls' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-contacts_TopPeers = contacts.getTopPeers({correspondents=Bool, bots_pm=Bool, bots_inline=Bool, groups=Bool, channels=Bool, offset=int, limit=int, hash=int, })
+contacts_TopPeers = contacts.getTopPeers({correspondents=Bool, bots_pm=Bool, bots_inline=Bool, phone_calls=Bool, groups=Bool, channels=Bool, offset=int, limit=int, hash=int, })
 ```
 

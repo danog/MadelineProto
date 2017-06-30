@@ -12,6 +12,7 @@ description: messages.search parameters, return type and example
 |----------|:-------------:|---------:|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |q|[string](../types/string.md) | Yes|
+|from\_id|[InputUser](../types/InputUser.md) | Optional|
 |filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
 |min\_date|[int](../types/int.md) | Yes|
 |max\_date|[int](../types/int.md) | Yes|
@@ -40,12 +41,12 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => string, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
+$messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => string, 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
 
 Or, if you're into Lua:
 
 ```
-messages_Messages = messages.search({peer=InputPeer, q=string, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
+messages_Messages = messages.search({peer=InputPeer, q=string, from_id=InputUser, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
 ```
 

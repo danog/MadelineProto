@@ -26,11 +26,19 @@ description: List of types
 
 [CdnPublicKey](CdnPublicKey.md)<a name="CdnPublicKey"></a>  
 
+[ChannelAdminLogEvent](ChannelAdminLogEvent.md)<a name="ChannelAdminLogEvent"></a>  
+
+[ChannelAdminLogEventAction](ChannelAdminLogEventAction.md)<a name="ChannelAdminLogEventAction"></a>  
+
+[ChannelAdminLogEventsFilter](ChannelAdminLogEventsFilter.md)<a name="ChannelAdminLogEventsFilter"></a>  
+
+[ChannelAdminRights](ChannelAdminRights.md)<a name="ChannelAdminRights"></a>  
+
+[ChannelBannedRights](ChannelBannedRights.md)<a name="ChannelBannedRights"></a>  
+
 [ChannelMessagesFilter](ChannelMessagesFilter.md)<a name="ChannelMessagesFilter"></a>  
 
 [ChannelParticipant](ChannelParticipant.md)<a name="ChannelParticipant"></a>  
-
-[ChannelParticipantRole](ChannelParticipantRole.md)<a name="ChannelParticipantRole"></a>  
 
 [ChannelParticipantsFilter](ChannelParticipantsFilter.md)<a name="ChannelParticipantsFilter"></a>  
 
@@ -168,6 +176,8 @@ description: List of types
 
 [InputStickerSet](InputStickerSet.md)<a name="InputStickerSet"></a>  
 
+[InputStickerSetItem](InputStickerSetItem.md)<a name="InputStickerSetItem"></a>  
+
 [InputStickeredMedia](InputStickeredMedia.md)<a name="InputStickeredMedia"></a>  
 
 [InputUser](InputUser.md)<a name="InputUser"></a>  
@@ -178,11 +188,19 @@ description: List of types
 
 [Invoice](Invoice.md)<a name="Invoice"></a>  
 
+[IpPort](IpPort.md)<a name="IpPort"></a>  
+
 [KeyboardButton](KeyboardButton.md)<a name="KeyboardButton"></a>  
 
 [KeyboardButtonRow](KeyboardButtonRow.md)<a name="KeyboardButtonRow"></a>  
 
 [LabeledPrice](LabeledPrice.md)<a name="LabeledPrice"></a>  
+
+[LangPackDifference](LangPackDifference.md)<a name="LangPackDifference"></a>  
+
+[LangPackLanguage](LangPackLanguage.md)<a name="LangPackLanguage"></a>  
+
+[LangPackString](LangPackString.md)<a name="LangPackString"></a>  
 
 [MaskCoords](MaskCoords.md)<a name="MaskCoords"></a>  
 
@@ -344,6 +362,8 @@ description: List of types
 
 [auth\_SentCodeType](auth_SentCodeType.md)<a name="auth_SentCodeType"></a>  
 
+[channels\_AdminLogResults](channels_AdminLogResults.md)<a name="channels_AdminLogResults"></a>  
+
 [channels\_ChannelParticipant](channels_ChannelParticipant.md)<a name="channels_ChannelParticipant"></a>  
 
 [channels\_ChannelParticipants](channels_ChannelParticipants.md)<a name="channels_ChannelParticipants"></a>  
@@ -363,6 +383,8 @@ description: List of types
 [contacts\_TopPeers](contacts_TopPeers.md)<a name="contacts_TopPeers"></a>  
 
 [help\_AppUpdate](help_AppUpdate.md)<a name="help_AppUpdate"></a>  
+
+[help\_ConfigSimple](help_ConfigSimple.md)<a name="help_ConfigSimple"></a>  
 
 [help\_InviteText](help_InviteText.md)<a name="help_InviteText"></a>  
 

@@ -72,7 +72,8 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-$id = 0;
+if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+$start = false;
 var_dump($id = $MadelineProto->request_call('@danogentili', [
     'set_state' => function ($state) {
         var_dump("SET STATE $state");
@@ -89,26 +90,9 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
         },
     ],
     'outgoing' => [
-        'start' => function () use ($MadelineProto, &$id) {
+        'start' => function () use (&$start) {
             var_dump('PLEASE START SENDING DATA');
-            $controller = $MadelineProto->get_call($id)['controller'];
-            $samplerate = 48000;
-            $period = 1 / $samplerate;
-            $writePeriod = $period * 960;
-            var_dump($writePeriod);
-            var_dump('SENDING DATA');
-            $f = fopen('output.raw', 'r');
-            $time = microtime(true);
-            while (!feof($f)) {
-                usleep(
-                    (int) (($writePeriod -
-                    (microtime(true) - $time) // Time it took me to write frames
-                    ) * 1000000)
-                );
-                $time = microtime(true);
-                $controller->writeFrames(stream_get_contents($f, 960 * 2));
-                var_dump('sent 960 frames');
-            }
+            $start = true;
         },
         'stop' => function () {
             var_dump('PLEASE STOP SENDING DATA');
@@ -122,22 +106,32 @@ var_dump($id = $MadelineProto->request_call('@danogentili', [
 
     ],
 ]));
+while (!$start) $MadelineProto->get_updates();
+            $controller = $MadelineProto->get_call($id)['controller'];
+            $samplerate = 48000;
+            $period = 1 / $samplerate;
+            $writePeriod = $period * 960;
+            var_dump($writePeriod);
+            var_dump('SENDING DATA');
+            $f = fopen('output.raw', 'r');
+            $time = microtime(true);
+            while (!feof($f)) {
+                var_dump($t = (int) (($writePeriod -
+                    (microtime(true) - $time) // Time it took me to write frames
+                    ) * 1000000));
+                usleep(
+                    $t
+                );
+                $time = microtime(true);
+                var_dump($controller->writeFrames(stream_get_contents($f, 960 * 2)));
+                var_dump('sent 960 frames');
+            }
+
 
 while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
     $MadelineProto->get_updates();
 }
 
-if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
-
-/*
-$call = $MadelineProto->API->request_call(getenv('TEST_SECRET_CHAT'));
-
-echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' to accept the call...'.PHP_EOL;
-while ($MadelineProto->call_status($call) !== $MadelineProto->API->READY) {
-    $MadelineProto->get_updates();
-}
-var_dump($MadelineProto->get_call($call));
-*/
     var_dump(getenv('TEST_SECRET_CHAT'));
     $secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
     echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret.') to accept the secret chat...'.PHP_EOL;
@@ -200,22 +194,11 @@ var_dump($MadelineProto->get_call($call));
         $type = $MadelineProto->messages->sendEncryptedFile($smessage);
     }
 }
+
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];
 
-foreach (glob('gifs/*') as $gif) {
-    // GIF
-    $inputFile = $MadelineProto->upload($gif);
-    $media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type($gif), 'caption' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]];
-}
-
-foreach (glob('vids/*') as $vid) {
-    // GIF
-    $inputFile = $MadelineProto->upload($vid);
-    $media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]];
-    $media['gif'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type($gif), 'caption' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]];
-}
 
 // Sticker
 $inputFile = $MadelineProto->upload('tests/lel.webp');
@@ -237,7 +220,6 @@ $time = time();
 $inputFile = $MadelineProto->upload('tests/60', 'magic'); // This gets an inputFile object with file name magic
 var_dump(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
-
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);

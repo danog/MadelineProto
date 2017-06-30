@@ -12,10 +12,7 @@ description: channel attributes, type and example
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
 |creator|[Bool](../types/Bool.md) | Optional|
-|kicked|[Bool](../types/Bool.md) | Optional|
 |left|[Bool](../types/Bool.md) | Optional|
-|editor|[Bool](../types/Bool.md) | Optional|
-|moderator|[Bool](../types/Bool.md) | Optional|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |verified|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
@@ -31,6 +28,8 @@ description: channel attributes, type and example
 |date|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|
 |restriction\_reason|[string](../types/string.md) | Optional|
+|admin\_rights|[ChannelAdminRights](../types/ChannelAdminRights.md) | Optional|
+|banned\_rights|[ChannelBannedRights](../types/ChannelBannedRights.md) | Optional|
 
 
 
@@ -40,14 +39,14 @@ description: channel attributes, type and example
 ### Example:
 
 ```
-$channel = ['_' => 'channel', 'creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'editor' => Bool, 'moderator' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
+$channel = ['_' => 'channel', 'creator' => Bool, 'left' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, 'admin_rights' => ChannelAdminRights, 'banned_rights' => ChannelBannedRights, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channel={_='channel', creator=Bool, kicked=Bool, left=Bool, editor=Bool, moderator=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, democracy=Bool, signatures=Bool, min=Bool, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, restriction_reason=string, }
+channel={_='channel', creator=Bool, left=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, democracy=Bool, signatures=Bool, min=Bool, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, restriction_reason=string, admin_rights=ChannelAdminRights, banned_rights=ChannelBannedRights, }
 
 ```
 

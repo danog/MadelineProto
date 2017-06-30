@@ -16,7 +16,7 @@ trait BotAPI
 {
     public function html_entity_decode($stuff)
     {
-        return html_entity_decode(str_replace('<br />', "\n", $stuff));
+        return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
 
     public function parse_buttons($rows)

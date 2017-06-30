@@ -77,8 +77,6 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->channels->inviteToChannel](../methods/channels_inviteToChannel.md)  
 
-[$MadelineProto->channels->kickFromChannel](../methods/channels_kickFromChannel.md)  
-
 [$MadelineProto->channels->deleteChannel](../methods/channels_deleteChannel.md)  
 
 [$MadelineProto->channels->toggleInvites](../methods/channels_toggleInvites.md)  
@@ -86,6 +84,8 @@ description: constructors and methods of type Updates
 [$MadelineProto->channels->toggleSignatures](../methods/channels_toggleSignatures.md)  
 
 [$MadelineProto->channels->updatePinnedMessage](../methods/channels_updatePinnedMessage.md)  
+
+[$MadelineProto->channels->editBanned](../methods/channels_editBanned.md)  
 
 [$MadelineProto->phone->discardCall](../methods/phone_discardCall.md)  
 

@@ -19,6 +19,8 @@ description: constructors and methods of type TopPeerCategory
 
 [topPeerCategoryChannels](../constructors/topPeerCategoryChannels.md)  
 
+[topPeerCategoryPhoneCalls](../constructors/topPeerCategoryPhoneCalls.md)  
+
 
 
 ### Methods that return an object of this type (methods):

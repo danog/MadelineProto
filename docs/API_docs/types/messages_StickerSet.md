@@ -17,5 +17,9 @@ description: constructors and methods of type messages_StickerSet
 
 [$MadelineProto->messages->getStickerSet](../methods/messages_getStickerSet.md)  
 
+[$MadelineProto->stickers->createStickerSet](../methods/stickers_createStickerSet.md)  
+
+[$MadelineProto->stickers->addStickerToSet](../methods/stickers_addStickerToSet.md)  
+
 
 

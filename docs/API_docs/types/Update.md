@@ -131,6 +131,10 @@ Contains notifications about data changes
 
 [updatePhoneCall](../constructors/updatePhoneCall.md)  
 
+[updateLangPackTooLong](../constructors/updateLangPackTooLong.md)  
+
+[updateLangPack](../constructors/updateLangPack.md)  
+
 
 
 ### Methods that return an object of this type (methods):

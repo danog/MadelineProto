@@ -16,6 +16,7 @@ description: channelForbidden attributes, type and example
 |id|[int](../types/int.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
 |title|[string](../types/string.md) | Yes|
+|until\_date|[int](../types/int.md) | Optional|
 
 
 
@@ -25,14 +26,14 @@ description: channelForbidden attributes, type and example
 ### Example:
 
 ```
-$channelForbidden = ['_' => 'channelForbidden', 'broadcast' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, ];
+$channelForbidden = ['_' => 'channelForbidden', 'broadcast' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'until_date' => int, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channelForbidden={_='channelForbidden', broadcast=Bool, megagroup=Bool, id=int, access_hash=long, title=string, }
+channelForbidden={_='channelForbidden', broadcast=Bool, megagroup=Bool, id=int, access_hash=long, title=string, until_date=int, }
 
 ```
 

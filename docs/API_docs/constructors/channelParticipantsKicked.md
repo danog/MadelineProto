@@ -7,6 +7,11 @@ description: channelParticipantsKicked attributes, type and example
 
 
 
+### Attributes:
+
+| Name     |    Type       | Required |
+|----------|:-------------:|---------:|
+|q|[string](../types/string.md) | Yes|
 
 
 
@@ -16,14 +21,14 @@ description: channelParticipantsKicked attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsKicked = ['_' => 'channelParticipantsKicked', ];
+$channelParticipantsKicked = ['_' => 'channelParticipantsKicked', 'q' => string, ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-channelParticipantsKicked={_='channelParticipantsKicked', }
+channelParticipantsKicked={_='channelParticipantsKicked', q=string, }
 
 ```
 

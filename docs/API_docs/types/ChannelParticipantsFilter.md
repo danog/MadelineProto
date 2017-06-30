@@ -17,6 +17,10 @@ description: constructors and methods of type ChannelParticipantsFilter
 
 [channelParticipantsBots](../constructors/channelParticipantsBots.md)  
 
+[channelParticipantsBanned](../constructors/channelParticipantsBanned.md)  
+
+[channelParticipantsSearch](../constructors/channelParticipantsSearch.md)  
+
 
 
 ### Methods that return an object of this type (methods):

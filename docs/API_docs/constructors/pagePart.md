@@ -13,7 +13,7 @@ description: pagePart attributes, type and example
 |----------|:-------------:|---------:|
 |blocks|Array of [PageBlock](../types/PageBlock.md) | Yes|
 |photos|Array of [Photo](../types/Photo.md) | Yes|
-|videos|Array of [Document](../types/Document.md) | Yes|
+|documents|Array of [Document](../types/Document.md) | Yes|
 
 
 
@@ -23,14 +23,14 @@ description: pagePart attributes, type and example
 ### Example:
 
 ```
-$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'videos' => [Document], ];
+$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document], ];
 ```  
 
 Or, if you're into Lua:  
 
 
 ```
-pagePart={_='pagePart', blocks={PageBlock}, photos={Photo}, videos={Document}, }
+pagePart={_='pagePart', blocks={PageBlock}, photos={Photo}, documents={Document}, }
 
 ```
 

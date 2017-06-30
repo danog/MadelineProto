@@ -35,5 +35,7 @@ description: constructors and methods of type MessageMedia
 
 [$MadelineProto->messages->getWebPagePreview](../methods/messages_getWebPagePreview.md)  
 
+[$MadelineProto->messages->uploadMedia](../methods/messages_uploadMedia.md)  
+
 
 
