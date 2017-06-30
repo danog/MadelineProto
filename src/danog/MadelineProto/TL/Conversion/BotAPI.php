@@ -514,7 +514,7 @@ trait BotAPI
 
     public function html_fixtags($text)
     {
-        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
+        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
         if ($matches) {
             $last = count($matches) - 1;
             foreach ($matches as $val) {
