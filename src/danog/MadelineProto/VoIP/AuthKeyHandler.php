@@ -22,7 +22,7 @@ trait AuthKeyHandler
 {
     private $calls = [];
 
-    public function request_call($user, $callbacks)
+    public function request_call($user, $class)
     {
         $user = $this->get_info($user);
         if (!isset($user['InputUser'])) {
@@ -38,7 +38,7 @@ trait AuthKeyHandler
         $this->check_G($g_a, $dh_config['p']);
 
         $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
-        $this->calls[$res['phone_call']['id']] = ['status' => self::REQUESTED, 'a' => $a, 'g_a' => $g_a, 'callbacks' => $callbacks];
+        $this->calls[$res['phone_call']['id']] = ['status' => self::REQUESTED, 'a' => $a, 'g_a' => $g_a, 'class' => $class];
         $this->handle_pending_updates();
         $this->get_updates_difference();
 
@@ -85,9 +85,8 @@ trait AuthKeyHandler
         foreach (str_split(strrev(substr(hash('sha256', $this->calls[$params['id']]['g_a']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
             $key['visualization'] .= self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
-
-        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 65,  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'callbacks' => $this->calls[$params['id']]['callbacks']];
-        $this->calls[$params['id']]['controller'] = new \danog\MadelineProto\VoIP($this->calls[$params['id']]['callbacks']['set_state'], $this->calls[$params['id']]['callbacks']['incoming'], $this->calls[$params['id']]['callbacks']['outgoing'], $this, $this->calls[$params['id']]['InputPhoneCall']);
+        var_dump($this->calls[$params['id']]['class']);
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 65,  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'controller' => new $this->calls[$params['id']]['class']($this, $params['id'])];
         $this->calls[$params['id']]['controller']->setConfig($this->config['call_receive_timeout_ms'] / 1000, $this->config['call_connect_timeout_ms'] / 1000, \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, true, true, true, $this->settings['calls']['log_file_path'], $this->settings['calls']['stats_dump_file_path']);
         $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], true);
         $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);

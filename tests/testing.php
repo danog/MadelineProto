@@ -69,43 +69,40 @@ if ($MadelineProto === false) {
     }
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
+class pony extends \danog\MadelineProto\VoIP
+{
+    public function setState(int $state) {
+        var_dump("SET STATE $state");
+    }
+    public function startOutput() {
+        var_dump("START READING DATA");
+    }
+    public function startInput() {
+        var_dump("START WRITING DATA");
+    }
+    public function stopOutput() {
+        var_dump("STOP READING DATA");
+    }
+    public function stopInput() {
+        var_dump("STOP WRITING DATA");
+    }
+    public function configureAudioOutput(int $sampleRate, int $bitsPerSample, int $channels) {
+        var_dump("CONFIGURE AUDIO OUTPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+    }
+    public function configureAudioInput(int $sampleRate, int $bitsPerSample, int $channels) {
+        var_dump("CONFIGURE AUDIO INPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+    }
+    public function getOutputLevel() {
+        return 0;
+    }
+
+}
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $start = false;
-    var_dump($id = $MadelineProto->request_call('@danogentili', [
-    'set_state' => function ($state) {
-        var_dump("SET STATE $state");
-    },
-    'incoming' => [
-        'start' => function () {
-            var_dump('PLEASE START RECEIVING DATA');
-        },
-        'stop' => function () {
-            var_dump('PLEASE STOP RECEIVING DATA');
-        },
-        'configure' => function ($sampleRate, $bitsPerSample, $channels) {
-            var_dump("incoming sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-        },
-    ],
-    'outgoing' => [
-        'start' => function () use (&$start) {
-            var_dump('PLEASE START SENDING DATA');
-            $start = true;
-        },
-        'stop' => function () {
-            var_dump('PLEASE STOP SENDING DATA');
-        },
-        'configure' => function ($sampleRate, $bitsPerSample, $channels) {
-            var_dump("outgoing sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-        },
-        'get_level' => function () {
-            return 1;
-        },
-
-    ],
-]));
+    var_dump($id = $MadelineProto->request_call('@magnaluna', '\pony'));
     while (!$start) {
         $MadelineProto->get_updates();
     }
