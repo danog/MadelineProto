@@ -53,6 +53,9 @@ class Lua
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
         foreach ($this->MadelineProto->get_method_namespaces() as $namespace) {
+            if ($namespace === 'upload') {
+                continue;
+            }
             $this->{$namespace} = $methods[$namespace];
         }
     }
