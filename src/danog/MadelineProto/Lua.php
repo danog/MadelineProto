@@ -115,7 +115,13 @@ class Lua
 
     public function __call($name, $params)
     {
-        return $this->Lua->{$name}(...$params);
+        try {
+            return $this->Lua->{$name}(...$params);
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\Exception $e){
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        }
     }
 
     public function __set($name, $value)
