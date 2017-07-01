@@ -119,7 +119,7 @@ class Lua
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
-        } catch (\danog\MadelineProto\Exception $e){
+        } catch (\danog\MadelineProto\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
