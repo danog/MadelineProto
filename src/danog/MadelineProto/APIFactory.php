@@ -114,6 +114,7 @@ class APIFactory
 
     public $namespace = '';
     public $API;
+    public $lua = false;
 
     public function __construct($namespace, $API)
     {
@@ -126,7 +127,15 @@ class APIFactory
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
         $aargs = isset($arguments[1]) && $this->is_array($arguments[1]) ? $arguments[1] : [];
         $aargs['datacenter'] = $this->API->datacenter->curdc;
-
-        return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+        if ($this->lua === false) {
+            return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+        }
+        try {
+            return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+        } catch (\danog\MadelineProto\Exception $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        }
     }
 }
