@@ -71,31 +71,45 @@ if ($MadelineProto === false) {
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 class pony extends \danog\MadelineProto\VoIP
 {
-    public function setState(int $state) {
+    public function setState(int $state)
+    {
         var_dump("SET STATE $state");
     }
-    public function startOutput() {
-        var_dump("START READING DATA");
-    }
-    public function startInput() {
-        var_dump("START WRITING DATA");
-    }
-    public function stopOutput() {
-        var_dump("STOP READING DATA");
-    }
-    public function stopInput() {
-        var_dump("STOP WRITING DATA");
-    }
-    public function configureAudioOutput(int $sampleRate, int $bitsPerSample, int $channels) {
-        var_dump("CONFIGURE AUDIO OUTPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-    }
-    public function configureAudioInput(int $sampleRate, int $bitsPerSample, int $channels) {
-        var_dump("CONFIGURE AUDIO INPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-    }
-    public function getOutputLevel() {
-        return 0;
+
+    public function startOutput()
+    {
+        var_dump('START READING DATA');
     }
 
+    public function startInput()
+    {
+        var_dump('START WRITING DATA');
+    }
+
+    public function stopOutput()
+    {
+        var_dump('STOP READING DATA');
+    }
+
+    public function stopInput()
+    {
+        var_dump('STOP WRITING DATA');
+    }
+
+    public function configureAudioOutput(int $sampleRate, int $bitsPerSample, int $channels)
+    {
+        var_dump("CONFIGURE AUDIO OUTPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+    }
+
+    public function configureAudioInput(int $sampleRate, int $bitsPerSample, int $channels)
+    {
+        var_dump("CONFIGURE AUDIO INPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
+    }
+
+    public function getOutputLevel()
+    {
+        return 0;
+    }
 }
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
