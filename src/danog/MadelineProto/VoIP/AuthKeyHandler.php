@@ -170,7 +170,6 @@ trait AuthKeyHandler
         \danog\MadelineProto\Logger::log(['Discarding call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
         //var_dump(debug_backtrace(0)[0]);
 
-
         if (isset($this->calls[$call])) {
             if (isset($this->calls[$call]['InputPhoneCall'])) {
                 try {

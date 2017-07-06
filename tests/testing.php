@@ -100,10 +100,11 @@ class pony extends \danog\MadelineProto\VoIP
     {
         return 0;
     }
-    public function debug($state) {
-        var_dump("DEBUG $state"); flush();
-        
-        
+
+    public function debug($state)
+    {
+        var_dump("DEBUG $state");
+        flush();
     }
 }
 
