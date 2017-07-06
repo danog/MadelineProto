@@ -96,19 +96,14 @@ class pony extends \danog\MadelineProto\VoIP
         var_dump('STOP WRITING DATA');
     }
 
-    public function configureAudioOutput(int $sampleRate, int $bitsPerSample, int $channels)
-    {
-        var_dump("CONFIGURE AUDIO OUTPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-    }
-
-    public function configureAudioInput(int $sampleRate, int $bitsPerSample, int $channels)
-    {
-        var_dump("CONFIGURE AUDIO INPUT: sampleRate: $sampleRate, bitsPerSample: $bitsPerSample, channels: $channels");
-    }
-
     public function getOutputLevel()
     {
         return 0;
+    }
+    public function debug($state) {
+        var_dump("DEBUG $state"); flush();
+        
+        
     }
 }
 
@@ -116,7 +111,7 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $start = false;
-    var_dump($id = $MadelineProto->request_call('@magnaluna', '\pony'));
+    var_dump($id = $MadelineProto->request_call('@danogentili', '\pony'));
     while (!$start) {
         $MadelineProto->get_updates();
     }

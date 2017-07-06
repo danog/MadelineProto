@@ -85,12 +85,10 @@ trait AuthKeyHandler
         foreach (str_split(strrev(substr(hash('sha256', $this->calls[$params['id']]['g_a']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
             $key['visualization'] .= self::EMOJIS[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
-        var_dump($this->calls[$params['id']]['class']);
-        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 65,  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'controller' => new $this->calls[$params['id']]['class']($this, $params['id'])];
+        $this->calls[$params['id']] = ['status' => self::READY, 'key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'layer' => 65,  'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'protocol' => $params['protocol'], 'controller' => new $this->calls[$params['id']]['class']()];
         $this->calls[$params['id']]['controller']->setConfig($this->config['call_receive_timeout_ms'] / 1000, $this->config['call_connect_timeout_ms'] / 1000, \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, true, true, true, $this->settings['calls']['log_file_path'], $this->settings['calls']['stats_dump_file_path']);
         $this->calls[$params['id']]['controller']->setEncryptionKey($key['auth_key'], true);
         $this->calls[$params['id']]['controller']->setNetworkType($this->settings['calls']['network_type']);
-
         $this->calls[$params['id']]['controller']->setSharedConfig($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
         $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$res['connection']], $res['alternative_connections']), $params['protocol']['udp_p2p']);
         $this->calls[$params['id']]['controller']->start();
@@ -162,8 +160,28 @@ trait AuthKeyHandler
         return -1;
     }
 
-    public function get_call($chat)
+    public function get_call($call)
     {
-        return $this->calls[$chat];
+        return $this->calls[$call];
+    }
+
+    public function discard_call($call)
+    {
+        \danog\MadelineProto\Logger::log(['Discarding call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        //var_dump(debug_backtrace(0)[0]);
+
+
+        if (isset($this->calls[$call])) {
+            if (isset($this->calls[$call]['InputPhoneCall'])) {
+                try {
+                    $this->method_call('calls.discardCall', ['peer' => $this->calls[$call]['InputPhoneCall']], ['datacenter' => $this->datacenter->curdc]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    if ($e->rpc !== 'CALL_ALREADY_DECLINED') {
+                        throw $e;
+                    }
+                }
+            }
+            unset($this->calls[$call]);
+        }
     }
 }

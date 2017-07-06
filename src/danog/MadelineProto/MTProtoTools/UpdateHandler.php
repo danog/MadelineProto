@@ -452,6 +452,7 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
+            \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::WARNING);
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
                 return $this->accept_call($update['phone_call']);
@@ -463,10 +464,7 @@ trait UpdateHandler
                 $this->complete_call($update['phone_call']);
                 break;
                 case 'phoneCallDiscarded':
-                \danog\MadelineProto\Logger::log(['Revoking call '.$update['phone_call']['id']], \danog\MadelineProto\Logger::NOTICE);
-                if (isset($this->secret_chats[$update['phone_call']['id']])) {
-                    unset($this->secret_chats[$update['phone_call']['id']]);
-                }
+                $this->discard_call($update['phone_call']['id']);
                 break;
             }
         }
@@ -505,7 +503,9 @@ trait UpdateHandler
                 }
                 \danog\MadelineProto\Logger::log(['Accepting secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
 
-                return $this->accept_secret_chat($update['chat']);
+                $this->accept_secret_chat($update['chat']);
+                break;
+
                 case 'encryptedChatDiscarded':
                 \danog\MadelineProto\Logger::log(['Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user'], \danog\MadelineProto\Logger::NOTICE);
                 if (isset($this->secret_chats[$update['chat']['id']])) {
@@ -514,14 +514,13 @@ trait UpdateHandler
                 if (isset($this->temp_requested_secret_chats[$update['chat']['id']])) {
                     unset($this->temp_requested_secret_chats[$update['chat']['id']]);
                 }
-
                 break;
+
                 case 'encryptedChat':
                 \danog\MadelineProto\Logger::log(['Completing creation of secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
-
                 $this->complete_secret_chat($update['chat']);
 
-                return;
+                break;
             }
             //\danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::NOTICE);
         }

@@ -65,12 +65,12 @@ class MTProto extends \Volatile
         'messages.acceptEncryption'  => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
         'messages.discardEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
         'messages.requestEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
-/*
+
         'phone.requestCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
         'phone.acceptCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
         'phone.confirmCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
         'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
-*/
+
         'updates.getChannelDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
         'updates.getDifference'        => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
         'updates.getState'             => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',

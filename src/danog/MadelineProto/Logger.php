@@ -39,6 +39,8 @@ class Logger
         self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
         self::$BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         self::$bigint = PHP_INT_SIZE < 8;
+        if (class_exists('\danog\MadelineProto\VoIP')) \Threaded::extend('\danog\MadelineProto\VoIP');
+        
     }
 
     /*
