@@ -43,7 +43,7 @@ trait CallHandler
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
             $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
         }
-        if (isset($args['chat_id']) && !isset($args['peer']) && $method !== 'messages.discardEncryption' && (is_object($args['chat_id']) || $args['chat_id'] < 0 || !is_numeric($args['chat_id']))) {
+        if (isset($args['chat_id']) && in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateCbat']) && (!is_numeric($args['chat_id']) || $args['chat_id'] < 0)) {
             $res = $this->get_info($args['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new \danog\MadelineProto\Exception('chat_id is not a chat id!');
