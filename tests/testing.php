@@ -23,6 +23,13 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
+
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
