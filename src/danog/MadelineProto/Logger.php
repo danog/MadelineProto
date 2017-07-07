@@ -90,6 +90,7 @@ class Logger
     public static $BIG_ENDIAN = false;
     public static $bigint = true;
     public static $colors = [];
+    public static $isatty = false;
 
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
@@ -112,6 +113,7 @@ class Logger
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+        self::$isatty = posix_isatty(STDOUT);
     }
 
     /*
@@ -163,7 +165,7 @@ class Logger
                     error_log($param.PHP_EOL, 3, self::$optional);
                     break;
                 case 3:
-                    echo "\033[".self::$colors[$level].'m'.$param."\033[0m".PHP_EOL;
+                    echo self::$isatty ? "\033[".self::$colors[$level].'m'.$param."\033[0m".PHP_EOL : $param.PHP_EOL;
                     break;
                 default:
                     break;
