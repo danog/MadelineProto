@@ -109,7 +109,7 @@ class Logger
         }
         self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
         self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
-        self::$colors[self::NOTICE] = implode(';', [self::foreground['yellow']]);
+        self::$colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
