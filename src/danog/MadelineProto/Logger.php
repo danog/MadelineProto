@@ -17,70 +17,69 @@ namespace danog\MadelineProto;
 
 class Logger
 {
-    const foreground = array(
+    const foreground = [
         'default' => 39,
 
-        'black' => 30,
-        'red' => 31,
-        'green' => 32,
-        'yellow' => 33,
-        'blue' => 34,
-        'magenta' => 35,
-        'cyan' => 36,
+        'black'      => 30,
+        'red'        => 31,
+        'green'      => 32,
+        'yellow'     => 33,
+        'blue'       => 34,
+        'magenta'    => 35,
+        'cyan'       => 36,
         'light_gray' => 37,
 
-        'dark_gray' => 90,
-        'light_red' => 91,
-        'light_green' => 92,
-        'light_yellow' => 93,
-        'light_blue' => 94,
+        'dark_gray'     => 90,
+        'light_red'     => 91,
+        'light_green'   => 92,
+        'light_yellow'  => 93,
+        'light_blue'    => 94,
         'light_magenta' => 95,
-        'light_cyan' => 96,
-        'white' => 97,
-    );
+        'light_cyan'    => 96,
+        'white'         => 97,
+    ];
 
-    const background = array(
+    const background = [
         'default' => 49,
 
-        'black' => 40,
-        'red' => 41,
-        'magenta' => 45,
-        'yellow' => 43,
-        'green' => 42,
-        'blue' => 44,
-        'cyan' => 46,
+        'black'      => 40,
+        'red'        => 41,
+        'magenta'    => 45,
+        'yellow'     => 43,
+        'green'      => 42,
+        'blue'       => 44,
+        'cyan'       => 46,
         'light_gray' => 47,
 
-
-        'dark_gray' => 100,
-        'light_red' => 101,
-        'light_green' => 102,
-        'light_yellow' => 103,
-        'light_blue' => 104,
+        'dark_gray'     => 100,
+        'light_red'     => 101,
+        'light_green'   => 102,
+        'light_yellow'  => 103,
+        'light_blue'    => 104,
         'light_magenta' => 105,
-        'light_cyan' => 106,
-        'white' => 107,
-    );
+        'light_cyan'    => 106,
+        'white'         => 107,
+    ];
 
     const set = [
-        'bold' => 1,
-        'dim' => 2,
+        'bold'       => 1,
+        'dim'        => 2,
         'underlined' => 3,
-        'blink' => 4,
-        'reverse' => 5,
-        'hidden' => 6,
+        'blink'      => 4,
+        'reverse'    => 5,
+        'hidden'     => 6,
     ];
 
     const reset = [
-        'all'  => 0,
-        'bold' => 21,
-        'dim' => 22,
+        'all'        => 0,
+        'bold'       => 21,
+        'dim'        => 22,
         'underlined' => 24,
-        'blink' => 25,
-        'reverse' => 26,
-        'hidden' => 28,
+        'blink'      => 25,
+        'reverse'    => 26,
+        'hidden'     => 28,
     ];
-    
+
     public static $storage = [];
     public static $mode = null;
     public static $optional = null;
@@ -164,7 +163,7 @@ class Logger
                     error_log($param.PHP_EOL, 3, self::$optional);
                     break;
                 case 3:
-                    echo "\033[" . self::$colors[$level] . "m" . $param . "\033[0m".PHP_EOL;
+                    echo "\033[".self::$colors[$level].'m'.$param."\033[0m".PHP_EOL;
                     break;
                 default:
                     break;
