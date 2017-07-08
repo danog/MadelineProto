@@ -548,7 +548,7 @@ class MTProto extends \Volatile
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
-        
+
         if ($settings['app_info']['api_id'] < 20) {
             $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
         }
