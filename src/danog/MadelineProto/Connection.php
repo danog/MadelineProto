@@ -409,14 +409,14 @@ var_dump(is_null($this->{$name}));
                 $this->write($step1);
                 break;
             case 'obfuscated2':
-                $message = "\0\0\0\0\0\0\0\0".$message."\0\0\0\0";
+                $message = $this->obfuscated['encryption']->encrypt("\0\0\0\0\0\0\0\0".$message."\0\0\0\0");
                 $len = strlen($message) / 4;
                 if ($len < 127) {
                     $step1 = chr($len).$message;
                 } else {
                     $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
-                $this->write($this->obfuscated['encryption']->encrypt($step1));
+                $this->write($step1);
                 break;
             case 'http':
             case 'https':
