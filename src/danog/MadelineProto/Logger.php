@@ -123,6 +123,8 @@ class Logger
      * 1 - Log to the default logger destination
      * 2 - Log to file defined in second parameter
      * 3 - Echo logs
+     * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
+     *     $message is an array containing the messages the log, $level, is the logging level
      */
     public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
     {
