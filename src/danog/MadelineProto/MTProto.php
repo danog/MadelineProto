@@ -457,7 +457,7 @@ class MTProto extends \Volatile
             ],
             'connection_settings' => [ // connection settings
                 'all' => [ // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, udp (unsupported)
+                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                     'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
                     'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                     'timeout'      => 2, // timeout for sockets
@@ -548,10 +548,10 @@ class MTProto extends \Volatile
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
-        /*
+        
         if ($settings['app_info']['api_id'] < 20) {
             $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
-        }*/
+        }
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
             case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;

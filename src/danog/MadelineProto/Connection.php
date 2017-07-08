@@ -143,7 +143,8 @@ var_dump(is_null($this->{$name}));
                 $this->sock->setBlocking(true);
                 do {
                     $random = $this->random(64);
-                } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(239) || substr($random, 4, 4) === "\0\0\0\0");
+                } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
+                $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
                 $reversed = strrev(substr($random, 8, 48));
 
                 $this->obfuscated = ['encryption' => new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR), 'decryption' => new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR)];
@@ -159,9 +160,7 @@ var_dump(is_null($this->{$name}));
                 $random = substr_replace(
                     $random,
                     substr(
-                        $this->obfuscated['encryption']->encrypt(
-                            substr_replace($random, str_repeat(chr(239), 4), 56, 4)
-                        ),
+                        $this->obfuscated['encryption']->encrypt($random),
                         56,
                         8
                     ),
@@ -339,16 +338,17 @@ var_dump(is_null($this->{$name}));
                 return $this->read($packet_length);
 
             case 'obfuscated2':
-                $packet_length_data = $this->read(1);
+                $packet_length_data = $this->obfuscated['decryption']->encrypt($this->read(1));
                 $packet_length = ord($packet_length_data);
+
                 if ($packet_length < 127) {
                     $packet_length <<= 2;
                 } else {
-                    $packet_length_data = $this->read(3);
+                    $packet_length_data = $this->obfuscated['decryption']->encrypt($this->read(3));
                     $packet_length = unpack('V', $packet_length_data."\0")[1] << 2;
                 }
 
-                return substr($this->obfuscation['decryption']->encrypt($this->read($packet_length)), 8, -4);
+                return $this->obfuscated['decryption']->encrypt($this->read($packet_length));
             case 'http':
             case 'https':
                 $headers = [];
@@ -409,14 +409,14 @@ var_dump(is_null($this->{$name}));
                 $this->write($step1);
                 break;
             case 'obfuscated2':
-                $message = $this->obfuscated['encryption']->encrypt("\0\0\0\0\0\0\0\0".$message."\0\0\0\0");
                 $len = strlen($message) / 4;
                 if ($len < 127) {
-                    $step1 = chr($len).$message;
+                    $message = chr($len).$message;
                 } else {
-                    $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
+                    $message = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
-                $this->write($step1);
+                $message = $this->obfuscated['encryption']->encrypt($message);
+                $this->write($message);
                 break;
             case 'http':
             case 'https':
