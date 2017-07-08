@@ -41,6 +41,7 @@ class Connection extends \Volatile
     public $max_outgoing_id;
     public $proxy = '\Socket';
     public $extra = [];
+    public $obfuscated = [];
 
     public $call_queue = [];
 
@@ -109,8 +110,8 @@ var_dump(is_null($this->{$name}));
                 $this->sock->setBlocking(true);
                 $this->write(str_repeat(chr(238), 4));
                 break;
-            case 'tcp_full':
 
+            case 'tcp_full':
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
@@ -127,6 +128,49 @@ var_dump(is_null($this->{$name}));
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
                 break;
+            case 'obfuscated2':
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                if ($has_proxy && $this->extra !== []) {
+                    $this->sock->setExtra($this->extra);
+                }
+                if (!$this->sock->connect($ip, $port)) {
+                    throw new Exception("Connection: couldn't connect to socket.");
+                }
+                if (!\danog\MadelineProto\Logger::$has_thread) {
+                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                }
+                $this->sock->setBlocking(true);
+                do {
+                    $random = $this->random(64);
+                } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(239) || substr($random, 4, 4) === "\0\0\0\0");
+                $reversed = strrev(substr($random, 8, 48));
+
+                $this->obfuscated = ['encryption' => new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR), 'decryption' => new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR)];
+                $this->obfuscated['encryption']->enableContinuousBuffer();
+                $this->obfuscated['decryption']->enableContinuousBuffer();
+
+                $this->obfuscated['encryption']->setKey(substr($random, 8, 32));
+                $this->obfuscated['encryption']->setIV(substr($random, 40, 16));
+
+                $this->obfuscated['decryption']->setKey(substr($reversed, 0, 32));
+                $this->obfuscated['decryption']->setIV(substr($reversed, 32, 16));
+
+                $random = substr_replace(
+                    $random,
+                    substr(
+                        $this->obfuscated['encryption']->encrypt(
+                            substr_replace($random, str_repeat(chr(239), 4), 56, 4)
+                        ),
+                        56,
+                        8
+                    ),
+                    56,
+                    8
+                );
+                $this->write($random);
+                break;
+
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
@@ -162,6 +206,7 @@ var_dump(is_null($this->{$name}));
             case 'tcp_full':
             case 'http':
             case 'https':
+            case 'obfuscated2':
                 try {
                     unset($this->sock);
                 } catch (\danog\MadelineProto\Exception $e) {
@@ -183,7 +228,7 @@ var_dump(is_null($this->{$name}));
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated'];
     }
 
     public function __wakeup()
@@ -208,6 +253,7 @@ var_dump(is_null($this->{$name}));
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
+            case 'obfuscated2':
             case 'http':
             case 'https':
                 $wrote = 0;
@@ -233,6 +279,7 @@ var_dump(is_null($this->{$name}));
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
+            case 'obfuscated2':
             case 'http':
             case 'https':
                 $packet = '';
@@ -290,6 +337,18 @@ var_dump(is_null($this->{$name}));
                 }
 
                 return $this->read($packet_length);
+
+            case 'obfuscated2':
+                $packet_length_data = $this->read(1);
+                $packet_length = ord($packet_length_data);
+                if ($packet_length < 127) {
+                    $packet_length <<= 2;
+                } else {
+                    $packet_length_data = $this->read(3);
+                    $packet_length = unpack('V', $packet_length_data."\0")[1] << 2;
+                }
+
+                return substr($this->obfuscation['decryption']->encrypt($this->read($packet_length)), 8, -4);
             case 'http':
             case 'https':
                 $headers = [];
@@ -348,6 +407,16 @@ var_dump(is_null($this->{$name}));
                     $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
                 $this->write($step1);
+                break;
+            case 'obfuscated2':
+                $message = "\0\0\0\0\0\0\0\0".$message."\0\0\0\0";
+                $len = strlen($message) / 4;
+                if ($len < 127) {
+                    $step1 = chr($len).$message;
+                } else {
+                    $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
+                }
+                $this->write($this->obfuscated['encryption']->encrypt($step1));
                 break;
             case 'http':
             case 'https':

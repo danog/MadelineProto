@@ -548,6 +548,10 @@ class MTProto extends \Volatile
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
         }
+        /*
+        if ($settings['app_info']['api_id'] < 20) {
+            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
+        }*/
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
             case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;
@@ -591,9 +595,7 @@ class MTProto extends \Volatile
     public function connect_to_all_dcs()
     {
         foreach ($old = $this->datacenter->get_dcs() as $new_dc) {
-            if (!isset($this->datacenter->sockets[$new_dc])) {
-                $this->datacenter->dc_connect($new_dc);
-            }
+            $this->datacenter->dc_connect($new_dc);
         }
         $this->setup_threads();
         $this->init_authorization();
@@ -740,7 +742,7 @@ class MTProto extends \Volatile
 
     public function getV()
     {
-        return 50;
+        return 52;
     }
 
     public function get_self()

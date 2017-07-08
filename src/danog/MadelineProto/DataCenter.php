@@ -46,6 +46,7 @@ var_dump(is_null($this->{$name}));
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof Connection) {
+                $socket->old = true;
                 $socket->close_and_reopen();
             } else {
                 unset($this->sockets[$key]);
@@ -67,7 +68,7 @@ var_dump(is_null($this->{$name}));
     public function dc_connect($dc_number)
     {
         $this->curdc = $dc_number;
-        if (isset($this->sockets[$dc_number])) {
+        if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
             return false;
         }
         $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
