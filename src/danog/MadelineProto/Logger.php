@@ -113,7 +113,7 @@ class Logger
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
-        self::$isatty = posix_isatty(STDOUT);
+        try { self::$isatty = posix_isatty(STDOUT); } catch (\danog\MadelineProto\Exception $e) { ; }
     }
 
     /*
