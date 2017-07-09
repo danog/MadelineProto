@@ -250,7 +250,9 @@ var_dump(is_null($this->{$name}));
     {
         if ($length !== null) {
             $what = substr($what, 0, $length);
-        } else $length = strlen($what);
+        } else {
+            $length = strlen($what);
+        }
 
         switch ($this->protocol) {
             case 'obfuscated2':
@@ -344,6 +346,7 @@ var_dump(is_null($this->{$name}));
             case 'obfuscated2':
             case 'tcp_abridged':
                 $packet_length = ord($this->read(1));
+
                 return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3)."\0")[1] << 2);
 
             case 'http':
