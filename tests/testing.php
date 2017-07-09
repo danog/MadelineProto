@@ -23,12 +23,6 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
 
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
@@ -75,6 +69,13 @@ if ($MadelineProto === false) {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
+\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
+
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 class pony extends \danog\MadelineProto\VoIP
 {

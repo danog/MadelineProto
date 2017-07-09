@@ -167,7 +167,10 @@ var_dump(is_null($this->{$name}));
                     56,
                     8
                 );
-                $this->write($random);
+                $wrote = 0;
+                if (($wrote += $this->sock->write($random)) !== 64) {
+                    while (($wrote += $this->sock->write(substr($what, $wrote))) !== 64);
+                }
                 break;
 
             case 'http':
@@ -247,18 +250,19 @@ var_dump(is_null($this->{$name}));
     {
         if ($length !== null) {
             $what = substr($what, 0, $length);
-        }
+        } else $length = strlen($what);
+
         switch ($this->protocol) {
+            case 'obfuscated2':
+                $what = $this->obfuscated['encryption']->encrypt($what);
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
-            case 'obfuscated2':
             case 'http':
             case 'https':
                 $wrote = 0;
-                $len = strlen($what);
-                if (($wrote += $this->sock->write($what)) !== $len) {
-                    while (($wrote += $this->sock->write(substr($what, $wrote))) !== $len);
+                if (($wrote += $this->sock->write($what)) !== $length) {
+                    while (($wrote += $this->sock->write(substr($what, $wrote))) !== $length);
                 }
 
                 return $wrote;
@@ -275,10 +279,24 @@ var_dump(is_null($this->{$name}));
     public function read($length)
     {
         switch ($this->protocol) {
+            case 'obfuscated2':
+                $packet = '';
+                while (strlen($packet) < $length) {
+                    $packet .= $this->sock->read($length - strlen($packet));
+                    if ($packet === false || strlen($packet) === 0) {
+                        throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
+                    }
+                }
+                if (strlen($packet) !== $length) {
+                    $this->close_and_reopen();
+                    throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
+                }
+
+                return $this->obfuscated['decryption']->encrypt($packet);
+
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
-            case 'obfuscated2':
             case 'http':
             case 'https':
                 $packet = '';
@@ -321,34 +339,13 @@ var_dump(is_null($this->{$name}));
 
                 return substr($packet, 4, $packet_length - 12);
             case 'tcp_intermediate':
-                $packet_length_data = $this->read(4);
-                $packet_length = unpack('V', $packet_length_data)[1];
-
-                return $this->read($packet_length);
-            case 'tcp_abridged':
-                $packet_length_data = $this->read(1);
-                $packet_length = ord($packet_length_data);
-                if ($packet_length < 127) {
-                    $packet_length <<= 2;
-                } else {
-                    $packet_length_data = $this->read(3);
-                    $packet_length = unpack('V', $packet_length_data."\0")[1] << 2;
-                }
-
-                return $this->read($packet_length);
+                return $this->read(unpack('V', $this->read(4))[1]);
 
             case 'obfuscated2':
-                $packet_length_data = $this->obfuscated['decryption']->encrypt($this->read(1));
-                $packet_length = ord($packet_length_data);
+            case 'tcp_abridged':
+                $packet_length = ord($this->read(1));
+                return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3)."\0")[1] << 2);
 
-                if ($packet_length < 127) {
-                    $packet_length <<= 2;
-                } else {
-                    $packet_length_data = $this->obfuscated['decryption']->encrypt($this->read(3));
-                    $packet_length = unpack('V', $packet_length_data."\0")[1] << 2;
-                }
-
-                return $this->obfuscated['decryption']->encrypt($this->read($packet_length));
             case 'http':
             case 'https':
                 $headers = [];
@@ -399,23 +396,14 @@ var_dump(is_null($this->{$name}));
             case 'tcp_intermediate':
                 $this->write(pack('V', strlen($message)).$message);
                 break;
-            case 'tcp_abridged':
-                $len = strlen($message) / 4;
-                if ($len < 127) {
-                    $step1 = chr($len).$message;
-                } else {
-                    $step1 = chr(127).substr(pack('V', $len), 0, 3).$message;
-                }
-                $this->write($step1);
-                break;
             case 'obfuscated2':
+            case 'tcp_abridged':
                 $len = strlen($message) / 4;
                 if ($len < 127) {
                     $message = chr($len).$message;
                 } else {
                     $message = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
-                $message = $this->obfuscated['encryption']->encrypt($message);
                 $this->write($message);
                 break;
             case 'http':
