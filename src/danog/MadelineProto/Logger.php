@@ -105,7 +105,11 @@ class Logger
         self::$BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
         self::$bigint = PHP_INT_SIZE < 8;
         if (class_exists('\danog\MadelineProto\VoIP')) {
-            \Threaded::extend('\danog\MadelineProto\VoIP');
+            try {
+                \Threaded::extend('\danog\MadelineProto\VoIP');
+            } catch (\RuntimeException $e) {
+                
+            }
         }
         self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
         self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);

@@ -93,24 +93,26 @@ trait AuthKeyHandler
         $this->calls[$params['id']]['controller']->setRemoteEndpoints(array_merge([$res['connection']], $res['alternative_connections']), $params['protocol']['udp_p2p']);
         $this->calls[$params['id']]['controller']->start();
         $this->calls[$params['id']]['controller']->connect();
-        /*
-        $samplerate = 48000;
-        $period = 1 / $samplerate;
-        $writePeriod = $period * 960;
-        var_dump($writePeriod);
+        var_dump($this->calls[$params['id']]['controller']);
+        while ($this->calls[$params['id']]['controller']->getState() !== \danog\MadelineProto\VoIP::STATE_ESTABLISHED);
+        while ($this->calls[$params['id']]['controller']->getOutputState() !== \danog\MadelineProto\VoIP::AUDIO_STATE_RUNNING);
+
+        $writePeriod = $this->calls[$params['id']]['controller']->getInputParams()["writePeriod"];
+        $samplesSize = $this->calls[$params['id']]['controller']->getInputParams()["samplesSize"];
+
         var_dump('SENDING DAT');
         $f = fopen('output.raw', 'r');
         $time = microtime(true);
         while (!feof($f)) {
-            usleep(
-                (int) (($writePeriod -
-                (microtime(true) - $time) // Time it took me to write frames
-                ) * 1000000)
+            usleep((int)
+                ($writePeriod -
+                    (microtime(true) - $time) // Time it took me to write frames
+                ) 
             );
             $time = microtime(true);
-            $this->calls[$params['id']]['controller']->writeFrames(stream_get_contents($f, 960 * 2));
+            $this->calls[$params['id']]['controller']->writeSamples(stream_get_contents($f, $samplesSize));
         }
-        */
+        
 
         $this->handle_pending_updates();
     }

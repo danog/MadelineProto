@@ -156,7 +156,6 @@ var_dump(is_null($this->{$name}));
 
                 $this->obfuscated['decryption']->setKey(substr($reversed, 0, 32));
                 $this->obfuscated['decryption']->setIV(substr($reversed, 32, 16));
-
                 $random = substr_replace(
                     $random,
                     substr(
