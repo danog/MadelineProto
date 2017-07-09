@@ -108,7 +108,6 @@ class Logger
             try {
                 \Threaded::extend('\danog\MadelineProto\VoIP');
             } catch (\RuntimeException $e) {
-                
             }
         }
         self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);

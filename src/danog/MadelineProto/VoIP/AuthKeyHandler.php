@@ -97,8 +97,8 @@ trait AuthKeyHandler
         while ($this->calls[$params['id']]['controller']->getState() !== \danog\MadelineProto\VoIP::STATE_ESTABLISHED);
         while ($this->calls[$params['id']]['controller']->getOutputState() !== \danog\MadelineProto\VoIP::AUDIO_STATE_RUNNING);
 
-        $writePeriod = $this->calls[$params['id']]['controller']->getInputParams()["writePeriod"];
-        $samplesSize = $this->calls[$params['id']]['controller']->getInputParams()["samplesSize"];
+        $writePeriod = $this->calls[$params['id']]['controller']->getInputParams()['writePeriod'];
+        $samplesSize = $this->calls[$params['id']]['controller']->getInputParams()['samplesSize'];
 
         var_dump('SENDING DAT');
         $f = fopen('output.raw', 'r');
@@ -107,12 +107,11 @@ trait AuthKeyHandler
             usleep((int)
                 ($writePeriod -
                     (microtime(true) - $time) // Time it took me to write frames
-                ) 
+                )
             );
             $time = microtime(true);
             $this->calls[$params['id']]['controller']->writeSamples(stream_get_contents($f, $samplesSize));
         }
-        
 
         $this->handle_pending_updates();
     }
