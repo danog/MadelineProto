@@ -58,6 +58,7 @@ class API extends APIFactory
     {
         if ($name === 'settings') {
             $this->API->setdem = true;
+
             return $this->API->settings;
         }
 
