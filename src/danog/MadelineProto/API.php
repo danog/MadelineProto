@@ -57,6 +57,7 @@ class API extends APIFactory
     public function &__get($name)
     {
         if ($name === 'settings') {
+            $this->API->setdem = true;
             return $this->API->settings;
         }
 

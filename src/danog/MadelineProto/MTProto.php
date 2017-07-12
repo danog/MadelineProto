@@ -183,7 +183,7 @@ class MTProto extends \Volatile
     private $ipv6 = false;
     public $run_workers = false;
     public $threads = false;
-
+    public $setdem = false;
     public function ___construct($settings = [])
     {
         \danog\MadelineProto\Logger::class_exists();

@@ -124,6 +124,10 @@ class APIFactory
 
     public function __call($name, $arguments)
     {
+        if ($this->API->setdem) {
+            $this->API->setdem = false;
+            $this->API->__construct($this->API->settings);
+        }
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
         $aargs = isset($arguments[1]) && $this->is_array($arguments[1]) ? $arguments[1] : [];
         $aargs['datacenter'] = $this->API->datacenter->curdc;
