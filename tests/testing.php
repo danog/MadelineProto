@@ -122,7 +122,7 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $start = false;
     var_dump($id = $MadelineProto->request_call('@danogentili', '\pony'));
-    while (!$start) {
+    while (true) {
         $MadelineProto->get_updates();
     }
     $controller = $MadelineProto->get_call($id)['controller'];
