@@ -46,7 +46,7 @@ trait AuthKeyHandler
 
     public function accept_call($params)
     {
-/*
+        /*
         if ($this->settings['calls']['accept_calls'] === false) {
             return false;
         }
@@ -118,7 +118,7 @@ trait AuthKeyHandler
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
 //var_dump($params['key_fingerprint'], $key['fingerprint']);
         if ($key['fingerprint'] != $params['key_fingerprint']) {
-//            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
+            //            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $key['visualization'] = '';
         $length = new \phpseclib\Math\BigInteger(count(self::EMOJIS));
