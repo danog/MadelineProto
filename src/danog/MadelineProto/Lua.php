@@ -80,7 +80,7 @@ class Lua
         if (is_callable($cb)) {
             $cb($result, $cb_extra);
         }
-
+        array_walk_recursive($result, function (&$value, $key) { if ($value instanceof \danog\MadelineProto\TL\Types\Button) $value = $value->jsonSerialize(); });
         return $result;
     }
 
