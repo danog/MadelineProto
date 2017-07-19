@@ -269,15 +269,8 @@ class MTProto extends \Volatile
         }
         foreach ($this->calls as $id => $controller) {
             if (is_array($controller) || $controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-<<<<<<< HEAD
                 $controller->discard();
-            } else var_dump($controller->getCallState());
-=======
-                unset($this->calls[$id]);
-            } else {
-                var_dump($controller->getCallState());
             }
->>>>>>> d2ce6c06842a023a088ca7ac2b6d3967641a868d
         }
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;

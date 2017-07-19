@@ -121,7 +121,7 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote
 
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $start = false;
-    $MadelineProto->request_call('@danogentili', '\pony');
+    $MadelineProto->request_call('@vagent', '\pony');
     while (1) {
         $MadelineProto->get_updates();
     }
