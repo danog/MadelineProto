@@ -26,7 +26,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
 
@@ -55,7 +55,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         $dh_config = $this->get_dh_config();
@@ -73,7 +73,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         if ($this->calls[$params['id']]->getCallState() !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
@@ -90,11 +90,9 @@ trait AuthKeyHandler
         $key['visualization'] = '';
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
         foreach (str_split(hash('sha256', $key['auth_key'].$this->calls[$params['id']]->storage['g_a'], true), 8) as $number) {
-            var_dump((new \phpseclib\Math\BigInteger($number, -256))->toString());
-            var_dump($this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())]);
             $key['visualization'] .= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
-        readline();
+
         $this->calls[$params['id']]->setCallState(\danog\MadelineProto\VoIP::CALL_STATE_READY);
         $this->calls[$params['id']]->storage = ['InputPhoneCall' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'protocol' => $params['protocol']];
         $this->calls[$params['id']]->setVisualization($key['visualization']);
@@ -129,7 +127,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
@@ -141,16 +139,17 @@ trait AuthKeyHandler
         if (hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException('Invalid g_a!');
         }
+        $g_a = str_pad($params['g_a_or_b'], 256, chr(0), \STR_PAD_LEFT);
         $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->calls[$params['id']]['b'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         if ($key['fingerprint'] != $params['key_fingerprint']) {
-            //            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
+            throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $key['visualization'] = '';
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
-        foreach (str_split(strrev(substr(hash('sha256', $params['g_a_or_b']->toBytes().$key['auth_key'], true), 20)), 8) as $number) {
+        foreach (str_split(hash('sha256', $key['auth_key'].$g_a, true), 8) as $number) {
             $key['visualization'] .= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
@@ -174,7 +173,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         if (isset($this->calls[$id])) {
@@ -188,7 +187,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         return $this->calls[$call];
@@ -198,7 +197,7 @@ trait AuthKeyHandler
     {
         foreach ($this->calls as $id => $controller) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                unset($this->calls[$id]);
+                $controller->discard();
             }
         }
         \danog\MadelineProto\Logger::log(['Discarding call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
