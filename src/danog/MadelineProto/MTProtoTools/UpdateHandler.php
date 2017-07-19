@@ -456,7 +456,7 @@ trait UpdateHandler
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
                 return $this->accept_call($update['phone_call']);
-                
+
                 case 'phoneCallAccepted':
                 $this->confirm_call($update['phone_call']);
 
