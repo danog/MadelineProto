@@ -48,6 +48,7 @@ trait AuthKeyHandler
 
         $this->handle_pending_updates();
         $this->get_updates_difference();
+
         return $controller;
     }
 
@@ -101,19 +102,19 @@ trait AuthKeyHandler
 
         $this->calls[$params['id']]->configuration = array_merge([
             'config' => [
-                'recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000,
-                'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000,
-                'data_saving'     => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, 
-                'enable_NS'       => true,
-                'enable_AEC'      => true,
-                'enable_AGC'      => true,
-                'log_file_path'   => $this->settings['calls']['log_file_path'],
-                'stats_dump_file_path' => $this->settings['calls']['stats_dump_file_path']
+                'recv_timeout'         => $this->config['call_receive_timeout_ms'] / 1000,
+                'init_timeout'         => $this->config['call_connect_timeout_ms'] / 1000,
+                'data_saving'          => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER,
+                'enable_NS'            => true,
+                'enable_AEC'           => true,
+                'enable_AGC'           => true,
+                'log_file_path'        => $this->settings['calls']['log_file_path'],
+                'stats_dump_file_path' => $this->settings['calls']['stats_dump_file_path'],
             ],
-            'auth_key' => $key['auth_key'],
-            'network_type' => $this->settings['calls']['network_type'],
+            'auth_key'      => $key['auth_key'],
+            'network_type'  => $this->settings['calls']['network_type'],
             'shared_config' => $this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]),
-            'endpoints' => array_merge([$res['connection']], $res['alternative_connections']),
+            'endpoints'     => array_merge([$res['connection']], $res['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
         $this->calls[$params['id']]->startTheMagic();
@@ -191,6 +192,7 @@ trait AuthKeyHandler
                 unset($this->calls[$id]);
             }
         }
+
         return $this->calls[$call];
     }
 
