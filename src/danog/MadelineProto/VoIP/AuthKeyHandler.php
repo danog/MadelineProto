@@ -25,9 +25,13 @@ trait AuthKeyHandler
     public function request_call($user)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
 
         $user = $this->get_info($user);
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
@@ -56,10 +60,14 @@ trait AuthKeyHandler
     public function accept_call($params)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
 
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
         \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
@@ -78,10 +86,14 @@ trait AuthKeyHandler
     public function confirm_call($params)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
 
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
             \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
 
@@ -98,7 +110,7 @@ trait AuthKeyHandler
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
         foreach (str_split(hash('sha256', $key.$this->calls[$params['id']]->storage['g_a'], true), 8) as $number) {
-            $visualization []= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
 
@@ -124,18 +136,22 @@ trait AuthKeyHandler
         while ($this->calls[$params['id']]->getState() !== \danog\MadelineProto\VoIP::STATE_ESTABLISHED);
         while ($this->calls[$params['id']]->getOutputState() < \danog\MadelineProto\VoIP::AUDIO_STATE_CONFIGURED);
 
-
         $this->handle_pending_updates();
+
         return true;
     }
 
     public function complete_call($params)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
 
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
 
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
             \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
@@ -158,7 +174,7 @@ trait AuthKeyHandler
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
         foreach (str_split(hash('sha256', $key.str_pad($params['g_a_or_b'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
-            $visualization []= $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
         }
 
         $this->calls[$params['id']]->setVisualization($visualization);
@@ -187,16 +203,21 @@ trait AuthKeyHandler
         while ($this->calls[$params['id']]->getInputState() === \danog\MadelineProto\VoIP::AUDIO_STATE_NONE);
 
         $this->calls[$params['id']]->play('../Little Swing.raw')->then('output.raw');
+
         return true;
     }
 
     public function call_status($id)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
 
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
 
         if (isset($this->calls[$id])) {
             return $this->calls[$id]->getCallState();
@@ -208,11 +229,14 @@ trait AuthKeyHandler
     public function get_call($call)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
 
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
-
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
 
         return $this->calls[$call];
     }
@@ -220,10 +244,11 @@ trait AuthKeyHandler
     public function discard_call($call, $reason, $rating = [], $need_debug = true)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
-            throw new \danog\MadelineProto\Exception("The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.");
+            throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
         if (!isset($this->calls[$call])) {
             \danog\MadelineProto\Logger::log(['Could not find and discard call '.$call.'...'], \danog\MadelineProto\Logger::ERROR);
+
             return false;
         }
         \danog\MadelineProto\Logger::log(['Discarding call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -243,6 +268,10 @@ trait AuthKeyHandler
             $this->method_call('phone.saveCallDebug', ['peer' => $this->calls[$call]->getCallID(), 'debug' => $this->calls[$call]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
         unset($this->calls[$call]);
-        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+        array_walk($this->calls, function ($controller, $id) {
+            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->discard();
+            }
+        });
     }
 }
