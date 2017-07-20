@@ -72,6 +72,8 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
+        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
+
         $time = microtime(true);
         $this->get_updates_difference();
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
@@ -445,6 +447,7 @@ trait UpdateHandler
 
     public function save_update($update)
     {
+        array_walk($this->calls, function ($controller, $id) { if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) $controller->discard(); });
         if ($update['_'] === 'updateDcOptions') {
             \danog\MadelineProto\Logger::log(['Got new dc options'], \danog\MadelineProto\Logger::VERBOSE);
             $this->parse_dc_options($update['dc_options']);
@@ -452,20 +455,29 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
+            if (!class_exists('\danog\MadelineProto\VoIP')) {
+                \danog\MadelineProto\Logger::log(['The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.'], \danog\MadelineProto\Logger::WARNING);
+                return;
+            }
             \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::WARNING);
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
-                return $this->accept_call($update['phone_call']);
+                $this->calls[$update['phone_call']['id']] = $update['phone_call'] = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], ['_' => 'inputPhoneCall', 'id' => $update['phone_call']['id'], 'access_hash' => $update['phone_call']['access_hash']], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING, $update['phone_call']['protocol']);
+                $update['phone_call']->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
+                break;
 
                 case 'phoneCallAccepted':
-                $this->confirm_call($update['phone_call']);
-
-                return;
-                case 'phoneCall':
-                $this->complete_call($update['phone_call']);
+                if (!$this->confirm_call($update['phone_call'])) return;
+                $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                 break;
+
+                case 'phoneCall':
+                if (!$this->complete_call($update['phone_call'])) return;
+                $update['phone_call'] = $this->calls[$update['phone_call']['id']];
+                break;
+
                 case 'phoneCallDiscarded':
-                $this->discard_call($update['phone_call']['id']);
+                $this->discard_call($update['phone_call']['id'], ['_' => "phoneCallDiscardReasonHangup"], [], $update['phone_call']['need_debug']);
                 break;
             }
         }

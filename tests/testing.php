@@ -118,33 +118,16 @@ class pony extends \danog\MadelineProto\VoIP
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-
+/*
+if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+    $controller = $MadelineProto->request_call('@danogentili');
+}*/
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $start = false;
-    $MadelineProto->request_call('@vagent', '\pony');
+    $MadelineProto->request_call('@danogentili');
     while (1) {
         $MadelineProto->get_updates();
     }
-    $controller = $MadelineProto->get_call($id)['controller'];
-    $samplerate = 48000;
-    $period = 1 / $samplerate;
-    $writePeriod = $period * 960;
-    var_dump($writePeriod);
-    var_dump('SENDING DATA');
-    $f = fopen('output.raw', 'r');
-    $time = microtime(true);
-    while (!feof($f)) {
-        var_dump($t = (int) (($writePeriod -
-                    (microtime(true) - $time) // Time it took me to write frames
-                    ) * 1000000));
-        usleep(
-                    $t
-                );
-        $time = microtime(true);
-        var_dump($controller->writeFrames(stream_get_contents($f, 960 * 2)));
-        var_dump('sent 960 frames');
-    }
-
     while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
         $MadelineProto->get_updates();
     }

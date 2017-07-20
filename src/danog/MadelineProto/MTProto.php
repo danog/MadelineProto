@@ -729,7 +729,9 @@ class MTProto extends \Volatile
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
-            $id .= $dc['cdn'] ? '_cdn' : '';
+            if (isset($dc['cdn'])) {
+                $id .= $dc['cdn'] ? '_cdn' : '';
+            }
             $id .= $dc['media_only'] ? '_media' : '';
             $ipv6 = ($dc['ipv6'] ? 'ipv6' : 'ipv4');
             $id .= (isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address']) ? '_bk' : '';
