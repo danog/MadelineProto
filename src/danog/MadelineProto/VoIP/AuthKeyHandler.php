@@ -68,6 +68,11 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
+        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+            throw new \danog\MadelineProto\Exception('I cannot accept call '.$params['id']);
+
+            return false;
+        }
         \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
@@ -96,7 +101,6 @@ trait AuthKeyHandler
         });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
             \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
-
             return false;
         }
         \danog\MadelineProto\Logger::log(['Confirming call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -223,7 +227,7 @@ trait AuthKeyHandler
             return $this->calls[$id]->getCallState();
         }
 
-        return -1;
+        return \danog\MadelineProto\VoIP::CALL_STATE_NONE;
     }
 
     public function get_call($call)
