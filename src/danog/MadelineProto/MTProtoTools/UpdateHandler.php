@@ -490,7 +490,9 @@ trait UpdateHandler
                 break;
 
                 case 'phoneCallDiscarded':
-                if (!isset($this->calls[$update['phone_call']['id']])) return;
+                if (!isset($this->calls[$update['phone_call']['id']])) {
+                    return;
+                }
                 ($update['phone_call'] = $this->calls[$update['phone_call']['id']])->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
                 break;
             }
