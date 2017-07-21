@@ -77,62 +77,33 @@ if ($MadelineProto === false) {
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
-class pony extends \danog\MadelineProto\VoIP
-{
-    public function setState(int $state)
-    {
-        var_dump("SET STATE $state");
-    }
-
-    public function startOutput()
-    {
-        var_dump('START READING DATA');
-    }
-
-    public function startInput()
-    {
-        var_dump('START WRITING DATA');
-    }
-
-    public function stopOutput()
-    {
-        var_dump('STOP READING DATA');
-    }
-
-    public function stopInput()
-    {
-        var_dump('STOP WRITING DATA');
-    }
-
-    public function getOutputLevel()
-    {
-        return 0;
-    }
-
-    public function debug($state)
-    {
-        var_dump("DEBUG $state");
-        flush();
-    }
-}
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote 
 '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
-/*
-if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
-    $controller = $MadelineProto->request_call('@danogentili');
-}*/
-if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
-    $start = false;
-    $MadelineProto->request_call('@danogentili');
-    while (1) {
-        $MadelineProto->get_updates();
-    }
-    while ($MadelineProto->call_status($id) !== \danog\MadelineProto\MTProto::READY) {
-        $MadelineProto->get_updates();
-    }
 
-    var_dump(getenv('TEST_SECRET_CHAT'));
+if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+    $controller = $MadelineProto->request_call(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+}
+if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
+    $howmany = readline('How many calls would you like me to handle? ');
+    $offset = 0;
+    while ($howmany > 0) {
+        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        foreach ($updates as $update) {
+            \danog\MadelineProto\Logger::log([$update]);
+            $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
+            switch ($update['update']['_']) {
+                case 'updatePhoneCall':
+                if ($update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+                    $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+                    $howmany--;
+                }
+           }
+        }
+        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+    }
+}
+if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     $secret = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
     echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret.') to accept the secret chat...'.PHP_EOL;
     while ($MadelineProto->secret_chat_status($secret) !== 2) {

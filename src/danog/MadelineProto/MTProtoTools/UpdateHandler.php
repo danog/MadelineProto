@@ -471,8 +471,9 @@ trait UpdateHandler
             \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::WARNING);
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
-                $this->calls[$update['phone_call']['id']] = $update['phone_call'] = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], ['_' => 'inputPhoneCall', 'id' => $update['phone_call']['id'], 'access_hash' => $update['phone_call']['access_hash']], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING, $update['phone_call']['protocol']);
-                $update['phone_call']->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
+                $controller = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], ['_' => 'inputPhoneCall', 'id' => $update['phone_call']['id'], 'access_hash' => $update['phone_call']['access_hash']], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING, $update['phone_call']['protocol']);
+                $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
+                $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                 break;
 
                 case 'phoneCallAccepted':
@@ -493,8 +494,7 @@ trait UpdateHandler
                 if (!isset($this->calls[$update['phone_call']['id']])) {
                     return;
                 }
-                ($update['phone_call'] = $this->calls[$update['phone_call']['id']])->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
-                break;
+                return $this->calls[$update['phone_call']['id']]->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {

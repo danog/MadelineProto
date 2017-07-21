@@ -57,7 +57,7 @@ trait AuthKeyHandler
         return $controller;
     }
 
-    public function accept_call($params)
+    public function accept_call($call)
     {
         if (!class_exists('\danog\MadelineProto\VoIP')) {
             throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
@@ -68,19 +68,18 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-            throw new \danog\MadelineProto\Exception('I cannot accept call '.$params['id']);
+        if ($this->call_status($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+            throw new \danog\MadelineProto\Exception('I cannot accept call '.$call['id']);
             return false;
         }
-        \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$call['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
         \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
         $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
-        $res = $this->method_call('phone.acceptCall', ['peer' => $params, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
-        $this->calls[$res['phone_call']['id']]->setCallState(\danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED);
+        $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
 
         $this->handle_pending_updates();
@@ -250,28 +249,31 @@ trait AuthKeyHandler
         if (!class_exists('\danog\MadelineProto\VoIP')) {
             throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
-        if (!isset($this->calls[$call])) {
-            \danog\MadelineProto\Logger::log(['Could not find and discard call '.$call.'...'], \danog\MadelineProto\Logger::ERROR);
 
-            return false;
-        }
-        \danog\MadelineProto\Logger::log(['Discarding call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Discarding call '.$call['id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
         try {
-            $res = $this->method_call('phone.discardCall', ['peer' => $this->calls[$call]->getCallID(), 'duration' => time() - $this->calls[$call]->whenCreated(), 'connection_id' => $this->calls[$call]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
+            $res = $this->method_call('phone.discardCall', ['peer' => $call, 'duration' => time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc !== 'CALL_ALREADY_DECLINED') {
                 throw $e;
             }
         }
         if (!empty($rating)) {
-            \danog\MadelineProto\Logger::log(['Setting rating for call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
-            $this->method_call('phone.setCallRating', ['peer' => $this->calls[$call]->getCallID(), 'rating' => $rating['rating'], 'comment' => $rating['comment']], ['datacenter' => $this->datacenter->curdc]);
+            \danog\MadelineProto\Logger::log(['Setting rating for call '.$call['id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
+            $this->method_call('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']], ['datacenter' => $this->datacenter->curdc]);
         }
         if ($need_debug) {
-            \danog\MadelineProto\Logger::log(['Saving debug data for call '.$call.'...'], \danog\MadelineProto\Logger::VERBOSE);
-            $this->method_call('phone.saveCallDebug', ['peer' => $this->calls[$call]->getCallID(), 'debug' => $this->calls[$call]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
+            \danog\MadelineProto\Logger::log(['Saving debug data for call '.$call['id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
+            $this->method_call('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
-        unset($this->calls[$call]);
+        $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];
+        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
+            $this->pwr_update_handler($update);
+        } else {
+            in_array($this->settings['updates']['callback'], [['danog\MadelineProto\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
+        }
+
+        unset($this->calls[$call['id']]);
         array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $controller->discard();
