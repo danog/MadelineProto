@@ -48,8 +48,6 @@ trait AuthKeyHandler
         $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         $this->calls[$res['phone_call']['id']] = $controller = new \danog\MadelineProto\VoIP(true, $user['user_id'], ['_' => 'inputPhoneCall', 'id' => $res['phone_call']['id'], 'access_hash' => $res['phone_call']['access_hash']], $this, \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED, $res['phone_call']['protocol']);
         $controller->storage = ['a' => $a, 'g_a' => str_pad($g_a->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
-        $controller->play('../Little Swing.raw')->then('output.raw');
-        $controller->setOutputFile('ou.raw');
 
         $this->handle_pending_updates();
         $this->get_updates_difference();
@@ -155,13 +153,12 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
-            \danog\MadelineProto\Logger::log(['Could not find and confirm call '.$params['id']]);
+            \danog\MadelineProto\Logger::log(['Could not find and complete call '.$params['id']]);
 
             return false;
         }
-        \danog\MadelineProto\Logger::log(['Confirming call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(['Completing call from '.$this->calls[$params['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
         if (hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
@@ -196,16 +193,10 @@ trait AuthKeyHandler
             'auth_key'      => $key,
             'network_type'  => $this->settings['calls']['network_type'],
             'shared_config' => $this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]),
-            'endpoints'     => array_merge([$res['connection']], $res['alternative_connections']),
+            'endpoints'     => array_merge([$params['connection']], $params['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
         $this->calls[$params['id']]->startTheMagic();
-
-        while ($this->calls[$params['id']]->getState() !== \danog\MadelineProto\VoIP::STATE_ESTABLISHED);
-        while ($this->calls[$params['id']]->getOutputState() === \danog\MadelineProto\VoIP::AUDIO_STATE_NONE);
-        while ($this->calls[$params['id']]->getInputState() === \danog\MadelineProto\VoIP::AUDIO_STATE_NONE);
-
-        $this->calls[$params['id']]->play('../Little Swing.raw')->then('output.raw');
 
         return true;
     }

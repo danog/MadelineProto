@@ -711,9 +711,13 @@ class MTProto extends \Volatile
          * ***********************************************************************
          * Fetch RSA keys for CDN datacenters
          */
-        foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
-            $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
-            $this->rsa_keys[$tempkey->fp] = $tempkey;
+        try {
+            foreach ($this->method_call('help.getCdnConfig', [], ['datacenter' => $datacenter])['public_keys'] as $curkey) {
+                $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
+                $this->rsa_keys[$tempkey->fp] = $tempkey;
+            }
+        } catch (\danog\MadelineProto\TL\Exception $e) {
+            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
     }
 

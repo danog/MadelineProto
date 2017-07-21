@@ -468,9 +468,10 @@ trait UpdateHandler
 
                 return;
             }
-            \danog\MadelineProto\Logger::log([$update], \danog\MadelineProto\Logger::WARNING);
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
+                if (isset($this->calls[$update['phone_call']['id']])) return;
+
                 $controller = new \danog\MadelineProto\VoIP(false, $update['phone_call']['admin_id'], ['_' => 'inputPhoneCall', 'id' => $update['phone_call']['id'], 'access_hash' => $update['phone_call']['access_hash']], $this, \danog\MadelineProto\VoIP::CALL_STATE_INCOMING, $update['phone_call']['protocol']);
                 $controller->storage = ['g_a_hash' => $update['phone_call']['g_a_hash']];
                 $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
