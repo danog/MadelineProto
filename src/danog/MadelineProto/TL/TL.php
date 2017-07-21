@@ -631,6 +631,9 @@ trait TL
             if ($this->in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
+            if ($this->in_array($arg['name'], ['peer_tag'])) {
+                $arg['type'] = 'string';
+            }
 
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']) && stripos($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type'], '<') !== false) {
                 $arg['subtype'] = preg_replace(['|Vector[<]|', '|[>]|'], '', $this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']);
