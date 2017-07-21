@@ -494,6 +494,7 @@ trait UpdateHandler
                 if (!isset($this->calls[$update['phone_call']['id']])) {
                     return;
                 }
+
                 return $this->calls[$update['phone_call']['id']]->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
             }
         }
