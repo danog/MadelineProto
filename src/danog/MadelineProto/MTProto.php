@@ -322,9 +322,15 @@ class MTProto extends \Volatile
                 unset($settings['authorization']['rsa_key']);
             }
             foreach ($settings['connection_settings'] as $key => &$connection) {
-                if (!is_array($connection)) continue;
-                if (!isset($connection['proxy'])) $connection['proxy'] = '\Socket';
-                if (!isset($connection['proxy_extra'])) $connection['proxy_extra'] = [];
+                if (!is_array($connection)) {
+                    continue;
+                }
+                if (!isset($connection['proxy'])) {
+                    $connection['proxy'] = '\Socket';
+                }
+                if (!isset($connection['proxy_extra'])) {
+                    $connection['proxy_extra'] = [];
+                }
             }
             if (!isset($settings['authorization']['rsa_key'])) {
                 unset($settings['authorization']['rsa_key']);
