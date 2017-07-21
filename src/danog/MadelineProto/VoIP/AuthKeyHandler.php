@@ -66,10 +66,6 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-        if ($this->call_status($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-            throw new \danog\MadelineProto\Exception('I cannot accept call '.$call['id']);
-            return false;
-        }
         \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$call['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
@@ -240,7 +236,7 @@ trait AuthKeyHandler
         if (!class_exists('\danog\MadelineProto\VoIP')) {
             throw new \danog\MadelineProto\Exception('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.');
         }
-
+        if (!isset($this->calls[$call['id']])) return;
         \danog\MadelineProto\Logger::log(['Discarding call '.$call['id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
         try {
             $res = $this->method_call('phone.discardCall', ['peer' => $call, 'duration' => time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
