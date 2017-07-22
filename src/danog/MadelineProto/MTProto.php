@@ -549,11 +549,6 @@ class MTProto extends \Volatile
             'secret_chats' => [
                 'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
             ],
-            'calls' => [
-                'network_type'             => 7,
-                'log_file_path'            => '/tmp/logs.txt',
-                'stats_dump_file_path'     => '/tmp/stats.txt',
-            ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?
                 'handler_workers' => 10, // How many workers should every message handler pool of each socket reader have
