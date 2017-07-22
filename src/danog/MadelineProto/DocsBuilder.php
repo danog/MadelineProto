@@ -654,7 +654,7 @@ VoIPController states (these constants are incrementing integers, thus can be co
 VoIPController errors:
 
 * `TGVOIP_ERROR_UNKNOWN` - An unknown error occurred
-* `TGVOIP_ERROR_INCOMPATIBLE` - The other side is using an unsupported c√lient/protocol
+* `TGVOIP_ERROR_INCOMPATIBLE` - The other side is using an unsupported client/protocol
 * `TGVOIP_ERROR_TIMEOUT` - A timeout occurred
 * `TGVOIP_ERROR_AUDIO_IO` - An I/O error occurred
 
