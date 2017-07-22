@@ -674,9 +674,11 @@ class MTProto extends \Volatile
             \danog\MadelineProto\Logger::log(['Copying authorization from dc '.$authorized_dc.' to dc '.$new_dc.'...'], Logger::VERBOSE);
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
-            $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
+            $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
         $this->updates_state['sync_loading'] = false;
+
+        return $authorization;
     }
 
     public function write_client_info($method, $arguments = [], $options = [])
