@@ -37,7 +37,7 @@ trait Login
 
     public function bot_login($token)
     {
-        if ($this->authorized) {
+        if ($this->authorized === self::LOGGED_IN) {
             \danog\MadelineProto\Logger::log(['This instance of MadelineProto is already logged in. Logging out first...'], \danog\MadelineProto\Logger::NOTICE);
             $this->logout();
         }
@@ -64,7 +64,7 @@ trait Login
 
     public function phone_login($number, $sms_type = 5)
     {
-        if ($this->authorized) {
+        if ($this->authorized === self::LOGGED_IN) {
             \danog\MadelineProto\Logger::log(['This instance of MadelineProto is already logged in. Logging out first...'], \danog\MadelineProto\Logger::NOTICE);
             $this->logout();
         }
@@ -132,6 +132,36 @@ trait Login
 
         return $this->authorization;
     }
+    public function import_authorization($authorization)
+    {
+        if ($this->authorized === self::LOGGED_IN) {
+            \danog\MadelineProto\Logger::log(['This instance of MadelineProto is already logged in. Logging out first...'], \danog\MadelineProto\Logger::NOTICE);
+            $this->logout();
+        }
+        \danog\MadelineProto\Logger::log(['Logging in using auth key...'], \danog\MadelineProto\Logger::NOTICE);
+        list($dc_id, $auth_key) = $authorization;
+        $this->datacenter->sockets[$dc_id]->session_id = $this->random(8);
+        $this->datacenter->sockets[$dc_id]->session_in_seq_no = 0;
+        $this->datacenter->sockets[$dc_id]->session_out_seq_no = 0;
+        $this->datacenter->sockets[$dc_id]->auth_key = $auth_key;
+        $this->datacenter->sockets[$dc_id]->temp_auth_key = null;
+        $this->datacenter->sockets[$dc_id]->incoming_messages = [];
+        $this->datacenter->sockets[$dc_id]->outgoing_messages = [];
+        $this->datacenter->sockets[$dc_id]->new_outgoing = [];
+        $this->datacenter->sockets[$dc_id]->new_incoming = [];
+
+        $this->authorized = self::LOGGED_IN;
+        $this->init_authorization();
+        return $this->authorization = $this->sync_authorization($dc_id);
+    }
+
+    public function export_authorization()
+    {
+        if ($this->authorized !== self::LOGGED_IN) {
+            throw new \danog\MadelineProto\Exception("I'm not logged in!");
+        }
+        return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key];
+    }
 
     public function complete_signup($first_name, $last_name)
     {
@@ -151,7 +181,6 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;
-        $this->authorized = true;
         $this->sync_authorization($this->datacenter->curdc);
 
         \danog\MadelineProto\Logger::log(['Signed up in successfully!'], \danog\MadelineProto\Logger::NOTICE);
