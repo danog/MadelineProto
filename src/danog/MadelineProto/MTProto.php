@@ -682,6 +682,7 @@ class MTProto extends \Volatile
             $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
         $this->updates_state['sync_loading'] = false;
+
         return $authorization;
     }
 

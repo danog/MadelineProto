@@ -132,6 +132,7 @@ trait Login
 
         return $this->authorization;
     }
+
     public function import_authorization($authorization)
     {
         if ($this->authorized === self::LOGGED_IN) {
@@ -152,6 +153,7 @@ trait Login
 
         $this->authorized = self::LOGGED_IN;
         $this->init_authorization();
+
         return $this->authorization = $this->sync_authorization($dc_id);
     }
 
@@ -160,6 +162,7 @@ trait Login
         if ($this->authorized !== self::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception("I'm not logged in!");
         }
+
         return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key];
     }
 
