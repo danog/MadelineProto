@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.receivedQueue`
 
 Parameters:
 
+```
 max_qts - Json encoded int
-
 
 ```
 

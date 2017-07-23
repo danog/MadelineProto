@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getCdnFile`
 
 Parameters:
 
+```
 file_token - Json encoded bytes
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

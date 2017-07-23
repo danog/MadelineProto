@@ -257,8 +257,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$rmethod.'`
 
 Parameters:
 
+```
 '.$pwr_params.'
-
 ```
 
 Or, if you\'re into Lua:

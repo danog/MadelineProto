@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.clearSavedInfo`
 
 Parameters:
 
+```
 credentials - Json encoded Bool
 info - Json encoded Bool
-
 
 ```
 

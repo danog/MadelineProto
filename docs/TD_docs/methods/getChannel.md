@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChannel`
 
 Parameters:
 
+```
 channel_id - Json encoded int
-
 
 ```
 

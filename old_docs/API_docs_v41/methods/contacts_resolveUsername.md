@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.resolveUsername`
 
 Parameters:
 
+```
 username - Json encoded string
-
 
 ```
 

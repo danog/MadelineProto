@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getGameHighScores`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
 user_id - Json encoded int
-
 
 ```
 

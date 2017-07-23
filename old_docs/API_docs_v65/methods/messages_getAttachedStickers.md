@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAttachedStickers`
 
 Parameters:
 
+```
 media - Json encoded InputStickeredMedia
-
 
 ```
 

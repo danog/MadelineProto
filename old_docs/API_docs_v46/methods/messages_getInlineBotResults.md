@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineBotResults`
 
 Parameters:
 
+```
 bot - Json encoded InputUser
 query - Json encoded string
 offset - Json encoded string
-
 
 ```
 

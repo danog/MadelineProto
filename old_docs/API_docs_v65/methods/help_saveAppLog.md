@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.saveAppLog`
 
 Parameters:
 
+```
 events - Json encoded  array of InputAppEvent
-
 
 ```
 

@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeAccountTtl`
 
 Parameters:
 
+```
 ttl - Json encoded accountTtl
-
 
 ```
 

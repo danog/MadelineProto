@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.checkin`
 
 Parameters:
 
+```
 peer - Json encoded InputGeoChat
-
 
 ```
 

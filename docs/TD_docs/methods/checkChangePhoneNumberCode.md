@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/checkChangePhoneNumberCode`
 
 Parameters:
 
+```
 code - Json encoded string
-
 
 ```
 

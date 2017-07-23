@@ -61,6 +61,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getAdminLog`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 q - Json encoded string
 events_filter - Json encoded ChannelAdminLogEventsFilter
@@ -68,7 +69,6 @@ admins - Json encoded  array of InputUser
 max_id - Json encoded long
 min_id - Json encoded long
 limit - Json encoded int
-
 
 ```
 

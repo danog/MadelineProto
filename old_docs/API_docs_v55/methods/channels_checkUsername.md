@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.checkUsername`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 username - Json encoded string
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.unblock`
 
 Parameters:
 
+```
 id - Json encoded InputUser
-
 
 ```
 

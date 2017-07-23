@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createNewChannelChat`
 
 Parameters:
 
+```
 title - Json encoded string
 is_supergroup - Json encoded Bool
 about - Json encoded string
-
 
 ```
 

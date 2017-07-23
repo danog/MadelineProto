@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getFilePersistent`
 
 Parameters:
 
+```
 persistent_file_id - Json encoded string
-
 
 ```
 

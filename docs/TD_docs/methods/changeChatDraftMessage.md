@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatDraftMessage`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 draft_message - Json encoded draftMessage
-
 
 ```
 

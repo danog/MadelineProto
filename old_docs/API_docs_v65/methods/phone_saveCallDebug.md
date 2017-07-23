@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.saveCallDebug`
 
 Parameters:
 
+```
 peer - Json encoded InputPhoneCall
 debug - Json encoded DataJSON
-
 
 ```
 

@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.sendMedia`
 
 Parameters:
 
+```
 peer - Json encoded InputGeoChat
 media - Json encoded InputMedia
-
 
 ```
 

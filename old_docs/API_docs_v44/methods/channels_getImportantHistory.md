@@ -60,13 +60,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getImportantHistory`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 offset_id - Json encoded int
 add_offset - Json encoded int
 limit - Json encoded int
 max_id - Json encoded int
 min_id - Json encoded int
-
 
 ```
 

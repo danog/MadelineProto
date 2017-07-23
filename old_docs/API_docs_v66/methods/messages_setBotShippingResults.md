@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotShippingResult
 
 Parameters:
 
+```
 query_id - Json encoded long
 error - Json encoded string
 shipping_options - Json encoded  array of ShippingOption
-
 
 ```
 

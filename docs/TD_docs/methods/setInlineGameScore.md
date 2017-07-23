@@ -64,12 +64,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setInlineGameScore`
 
 Parameters:
 
+```
 inline_message_id - Json encoded string
 edit_message - Json encoded Bool
 user_id - Json encoded int
 score - Json encoded int
 force - Json encoded Bool
-
 
 ```
 

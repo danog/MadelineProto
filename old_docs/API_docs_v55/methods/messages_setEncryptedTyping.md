@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setEncryptedTyping`
 
 Parameters:
 
+```
 peer - Json encoded InputEncryptedChat
 typing - Json encoded Bool
-
 
 ```
 

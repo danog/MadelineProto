@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.importBotAuthorization`
 
 Parameters:
 
+```
 api_id - Json encoded int
 api_hash - Json encoded string
 bot_auth_token - Json encoded string
-
 
 ```
 

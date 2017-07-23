@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/rpc_drop_answer`
 
 Parameters:
 
+```
 req_msg_id - Json encoded long
-
 
 ```
 

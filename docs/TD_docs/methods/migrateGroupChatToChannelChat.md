@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/migrateGroupChatToChannelChat
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
-
 
 ```
 

@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addRecentSticker`
 
 Parameters:
 
+```
 is_attached - Json encoded Bool
 sticker - Json encoded InputFile
-
 
 ```
 

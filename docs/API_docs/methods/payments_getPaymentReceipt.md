@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.getPaymentReceipt`
 
 Parameters:
 
+```
 msg_id - Json encoded int
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getPeerDialogs`
 
 Parameters:
 
+```
 peers - Json encoded  array of InputPeer
-
 
 ```
 

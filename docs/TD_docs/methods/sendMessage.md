@@ -65,13 +65,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/sendMessage`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 reply_to_message_id - Json encoded long
 disable_notification - Json encoded Bool
 from_background - Json encoded Bool
 reply_markup - Json encoded ReplyMarkup
 input_message_content - Json encoded InputMessageContent
-
 
 ```
 

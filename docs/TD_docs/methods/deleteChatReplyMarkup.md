@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteChatReplyMarkup`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
-
 
 ```
 

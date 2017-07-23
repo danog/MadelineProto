@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerSets`
 
 Parameters:
 
+```
 is_masks - Json encoded Bool
-
 
 ```
 

@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.sendCode`
 
 Parameters:
 
+```
 phone_number - Json encoded string
 sms_type - Json encoded int
 api_id - Json encoded int
 api_hash - Json encoded string
 lang_code - Json encoded string
-
 
 ```
 

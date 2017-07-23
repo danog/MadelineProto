@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.dropTempAuthKeys`
 
 Parameters:
 
+```
 except_auth_keys - Json encoded  array of long
-
 
 ```
 

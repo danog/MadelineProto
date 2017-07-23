@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.confirmPhone`
 
 Parameters:
 
+```
 phone_code_hash - Json encoded string
 phone_code - Json encoded string
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.recoverPassword`
 
 Parameters:
 
+```
 code - Json encoded string
-
 
 ```
 

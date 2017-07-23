@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getCallbackQueryAnswer`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
 payload - Json encoded CallbackQueryPayload
-
 
 ```
 

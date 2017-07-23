@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getNotificationSettings`
 
 Parameters:
 
+```
 scope - Json encoded NotificationSettingsScope
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getChats`
 
 Parameters:
 
+```
 id - Json encoded  array of int
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.discardEncryption`
 
 Parameters:
 
+```
 chat_id - Json encoded int
-
 
 ```
 

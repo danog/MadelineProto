@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.exportInvite`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
-
 
 ```
 

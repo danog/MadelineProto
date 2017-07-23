@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.testNet`
 
 Parameters:
 
-
+```
 
 ```
 

@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendEncrypted`
 
 Parameters:
 
+```
 peer - Json encoded InputEncryptedChat
 message - Json encoded DecryptedMessage
-
 
 ```
 

@@ -64,12 +64,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/forwardMessages`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 from_chat_id - Json encoded long
 message_ids - Json encoded  array of long
 disable_notification - Json encoded Bool
 from_background - Json encoded Bool
-
 
 ```
 

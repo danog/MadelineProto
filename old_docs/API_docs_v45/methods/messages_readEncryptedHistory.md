@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readEncryptedHistory
 
 Parameters:
 
+```
 peer - Json encoded InputEncryptedChat
 max_date - Json encoded int
-
 
 ```
 

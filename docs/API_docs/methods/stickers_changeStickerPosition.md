@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.changeStickerPositio
 
 Parameters:
 
+```
 sticker - Json encoded InputDocument
 position - Json encoded int
-
 
 ```
 

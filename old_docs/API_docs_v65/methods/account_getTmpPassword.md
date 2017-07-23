@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getTmpPassword`
 
 Parameters:
 
+```
 password_hash - Json encoded bytes
 period - Json encoded int
-
 
 ```
 

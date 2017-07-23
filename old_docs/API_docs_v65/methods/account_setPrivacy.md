@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.setPrivacy`
 
 Parameters:
 
+```
 key - Json encoded InputPrivacyKey
 rules - Json encoded  array of InputPrivacyRule
-
 
 ```
 

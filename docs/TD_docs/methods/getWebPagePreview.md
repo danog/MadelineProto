@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getWebPagePreview`
 
 Parameters:
 
+```
 message_text - Json encoded string
-
 
 ```
 

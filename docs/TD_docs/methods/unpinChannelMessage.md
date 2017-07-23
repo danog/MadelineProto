@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/unpinChannelMessage`
 
 Parameters:
 
+```
 channel_id - Json encoded int
-
 
 ```
 

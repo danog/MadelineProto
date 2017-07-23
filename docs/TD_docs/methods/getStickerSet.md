@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerSet`
 
 Parameters:
 
+```
 set_id - Json encoded long
-
 
 ```
 

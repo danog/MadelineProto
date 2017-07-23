@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/destroy_session`
 
 Parameters:
 
+```
 session_id - Json encoded long
-
 
 ```
 

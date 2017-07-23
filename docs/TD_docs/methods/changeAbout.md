@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeAbout`
 
 Parameters:
 
+```
 about - Json encoded string
-
 
 ```
 

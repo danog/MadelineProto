@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/bots.sendCustomRequest`
 
 Parameters:
 
+```
 custom_method - Json encoded string
 params - Json encoded DataJSON
-
 
 ```
 

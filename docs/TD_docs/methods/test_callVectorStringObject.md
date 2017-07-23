@@ -58,8 +58,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callVectorStringObject`
 
 Parameters:
 
+```
 x - Json encoded  array of test_String
-
 
 ```
 

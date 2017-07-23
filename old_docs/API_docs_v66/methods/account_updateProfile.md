@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateProfile`
 
 Parameters:
 
+```
 first_name - Json encoded string
 last_name - Json encoded string
 about - Json encoded string
-
 
 ```
 

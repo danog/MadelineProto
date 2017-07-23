@@ -58,8 +58,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.squareInt`
 
 Parameters:
 
+```
 x - Json encoded int
-
 
 ```
 

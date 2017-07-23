@@ -60,13 +60,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.forwardMessages`
 
 Parameters:
 
+```
 broadcast - Json encoded Bool
 silent - Json encoded Bool
 background - Json encoded Bool
 from_peer - Json encoded InputPeer
 id - Json encoded  array of int
 to_peer - Json encoded InputPeer
-
 
 ```
 

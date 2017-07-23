@@ -63,11 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChannelMembers`
 
 Parameters:
 
+```
 channel_id - Json encoded int
 filter - Json encoded ChannelMembersFilter
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

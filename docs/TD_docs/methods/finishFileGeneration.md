@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/finishFileGeneration`
 
 Parameters:
 
+```
 generation_id - Json encoded long
-
 
 ```
 

@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/bots.answerWebhookJSONQuery`
 
 Parameters:
 
+```
 query_id - Json encoded long
 data - Json encoded DataJSON
-
 
 ```
 

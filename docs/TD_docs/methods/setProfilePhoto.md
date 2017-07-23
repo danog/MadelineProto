@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setProfilePhoto`
 
 Parameters:
 
+```
 photo_path - Json encoded string
-
 
 ```
 

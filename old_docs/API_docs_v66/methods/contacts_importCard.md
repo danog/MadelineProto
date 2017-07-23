@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.importCard`
 
 Parameters:
 
+```
 export_card - Json encoded  array of int
-
 
 ```
 

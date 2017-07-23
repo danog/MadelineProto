@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setAlarm`
 
 Parameters:
 
+```
 seconds - Json encoded double
-
 
 ```
 

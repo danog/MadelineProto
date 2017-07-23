@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/viewMessages`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 message_ids - Json encoded  array of long
-
 
 ```
 

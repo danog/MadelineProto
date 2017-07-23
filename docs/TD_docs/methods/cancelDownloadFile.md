@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/cancelDownloadFile`
 
 Parameters:
 
+```
 file_id - Json encoded int
-
 
 ```
 

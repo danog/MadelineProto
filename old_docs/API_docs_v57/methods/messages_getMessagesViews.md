@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getMessagesViews`
 
 Parameters:
 
+```
 peer - Json encoded InputPeer
 id - Json encoded  array of int
 increment - Json encoded Bool
-
 
 ```
 

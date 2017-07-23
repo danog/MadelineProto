@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotCallbackAnswer
 
 Parameters:
 
+```
 alert - Json encoded Bool
 query_id - Json encoded long
 message - Json encoded string
 url - Json encoded string
 cache_time - Json encoded int
-
 
 ```
 

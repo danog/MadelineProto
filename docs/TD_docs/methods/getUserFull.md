@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getUserFull`
 
 Parameters:
 
+```
 user_id - Json encoded int
-
 
 ```
 

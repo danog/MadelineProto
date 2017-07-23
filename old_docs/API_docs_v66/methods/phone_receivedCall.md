@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.receivedCall`
 
 Parameters:
 
+```
 peer - Json encoded InputPhoneCall
-
 
 ```
 

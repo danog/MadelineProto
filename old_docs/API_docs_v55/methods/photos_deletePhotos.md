@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.deletePhotos`
 
 Parameters:
 
+```
 id - Json encoded  array of InputPhoto
-
 
 ```
 

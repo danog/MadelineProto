@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getChannelDifference`
 
 Parameters:
 
+```
 force - Json encoded Bool
 channel - Json encoded InputChannel
 filter - Json encoded ChannelMessagesFilter
 pts - Json encoded int
 limit - Json encoded int
-
 
 ```
 

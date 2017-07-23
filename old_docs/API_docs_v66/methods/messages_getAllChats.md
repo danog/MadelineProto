@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAllChats`
 
 Parameters:
 
+```
 except_ids - Json encoded  array of int
-
 
 ```
 

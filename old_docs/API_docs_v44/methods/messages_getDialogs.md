@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDialogs`
 
 Parameters:
 
+```
 offset_date - Json encoded int
 offset_id - Json encoded int
 offset_peer - Json encoded InputPeer
 limit - Json encoded int
-
 
 ```
 

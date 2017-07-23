@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.exportMessageLink`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 id - Json encoded int
-
 
 ```
 

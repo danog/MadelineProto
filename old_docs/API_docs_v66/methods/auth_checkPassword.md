@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.checkPassword`
 
 Parameters:
 
+```
 password_hash - Json encoded bytes
-
 
 ```
 

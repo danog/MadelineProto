@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.sendInvites`
 
 Parameters:
 
+```
 phone_numbers - Json encoded  array of string
 message - Json encoded string
-
 
 ```
 

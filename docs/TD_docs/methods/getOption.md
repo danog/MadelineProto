@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getOption`
 
 Parameters:
 
+```
 name - Json encoded string
-
 
 ```
 

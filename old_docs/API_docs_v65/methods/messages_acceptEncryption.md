@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.acceptEncryption`
 
 Parameters:
 
+```
 peer - Json encoded InputEncryptedChat
 g_b - Json encoded bytes
 key_fingerprint - Json encoded long
-
 
 ```
 

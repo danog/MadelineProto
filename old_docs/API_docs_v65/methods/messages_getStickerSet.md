@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getStickerSet`
 
 Parameters:
 
+```
 stickerset - Json encoded InputStickerSet
-
 
 ```
 

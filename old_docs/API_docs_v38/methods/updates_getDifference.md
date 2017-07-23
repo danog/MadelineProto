@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getDifference`
 
 Parameters:
 
+```
 pts - Json encoded int
 date - Json encoded int
 qts - Json encoded int
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/get_future_salts`
 
 Parameters:
 
+```
 num - Json encoded int
-
 
 ```
 

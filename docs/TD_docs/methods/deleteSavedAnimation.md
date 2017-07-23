@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteSavedAnimation`
 
 Parameters:
 
+```
 animation - Json encoded InputFile
-
 
 ```
 

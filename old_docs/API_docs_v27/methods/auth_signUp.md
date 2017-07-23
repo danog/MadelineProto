@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.signUp`
 
 Parameters:
 
+```
 phone_number - Json encoded string
 phone_code_hash - Json encoded string
 phone_code - Json encoded string
 first_name - Json encoded string
 last_name - Json encoded string
-
 
 ```
 

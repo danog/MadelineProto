@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createNewSecretChat`
 
 Parameters:
 
+```
 user_id - Json encoded int
-
 
 ```
 

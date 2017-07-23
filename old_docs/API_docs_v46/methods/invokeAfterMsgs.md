@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeAfterMsgs`
 
 Parameters:
 
+```
 msg_ids - Json encoded  array of long
 query - Json encoded !X
-
 
 ```
 

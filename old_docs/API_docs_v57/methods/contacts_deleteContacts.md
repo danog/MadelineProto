@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.deleteContacts`
 
 Parameters:
 
+```
 id - Json encoded  array of InputUser
-
 
 ```
 

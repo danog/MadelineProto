@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getParticipants`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 filter - Json encoded ChannelParticipantsFilter
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

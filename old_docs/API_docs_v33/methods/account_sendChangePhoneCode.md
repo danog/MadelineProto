@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.sendChangePhoneCode`
 
 Parameters:
 
+```
 phone_number - Json encoded string
-
 
 ```
 

@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.saveBigFilePart`
 
 Parameters:
 
+```
 file_id - Json encoded long
 file_part - Json encoded int
 file_total_parts - Json encoded int
 bytes - Json encoded bytes
-
 
 ```
 

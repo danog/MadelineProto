@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.confirmCall`
 
 Parameters:
 
+```
 peer - Json encoded InputPhoneCall
 g_a - Json encoded bytes
 key_fingerprint - Json encoded long
 protocol - Json encoded PhoneCallProtocol
-
 
 ```
 

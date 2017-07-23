@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.toggleInvites`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 enabled - Json encoded Bool
-
 
 ```
 

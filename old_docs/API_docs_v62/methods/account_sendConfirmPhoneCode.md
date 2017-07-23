@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.sendConfirmPhoneCode`
 
 Parameters:
 
+```
 allow_flashcall - Json encoded Bool
 hash - Json encoded string
 current_number - Json encoded Bool
-
 
 ```
 

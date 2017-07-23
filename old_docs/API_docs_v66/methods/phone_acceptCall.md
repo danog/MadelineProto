@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.acceptCall`
 
 Parameters:
 
+```
 peer - Json encoded InputPhoneCall
 g_b - Json encoded bytes
 protocol - Json encoded PhoneCallProtocol
-
 
 ```
 

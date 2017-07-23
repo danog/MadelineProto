@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchPublicChats`
 
 Parameters:
 
+```
 username_prefix - Json encoded string
-
 
 ```
 

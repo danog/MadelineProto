@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.removeStickerFromSet
 
 Parameters:
 
+```
 sticker - Json encoded InputDocument
-
 
 ```
 

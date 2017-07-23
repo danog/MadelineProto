@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatMemberStatus`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 user_id - Json encoded int
 status - Json encoded ChatMemberStatus
-
 
 ```
 

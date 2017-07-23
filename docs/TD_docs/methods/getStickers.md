@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickers`
 
 Parameters:
 
+```
 emoji - Json encoded string
-
 
 ```
 

@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.bindTempAuthKey`
 
 Parameters:
 
+```
 perm_auth_key_id - Json encoded long
 nonce - Json encoded long
 expires_at - Json encoded int
 encrypted_message - Json encoded bytes
-
 
 ```
 

@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getInlineGameHighScores`
 
 Parameters:
 
+```
 inline_message_id - Json encoded string
 user_id - Json encoded int
-
 
 ```
 

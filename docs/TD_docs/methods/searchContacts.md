@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchContacts`
 
 Parameters:
 
+```
 query - Json encoded string
 limit - Json encoded int
-
 
 ```
 

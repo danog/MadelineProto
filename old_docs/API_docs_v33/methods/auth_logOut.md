@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.logOut`
 
 Parameters:
 
-
+```
 
 ```
 

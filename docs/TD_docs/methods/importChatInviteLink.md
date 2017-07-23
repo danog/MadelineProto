@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/importChatInviteLink`
 
 Parameters:
 
+```
 invite_link - Json encoded string
-
 
 ```
 

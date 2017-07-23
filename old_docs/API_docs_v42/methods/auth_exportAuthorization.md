@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.exportAuthorization`
 
 Parameters:
 
+```
 dc_id - Json encoded int
-
 
 ```
 

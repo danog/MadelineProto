@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleDialogPin`
 
 Parameters:
 
+```
 pinned - Json encoded Bool
 peer - Json encoded InputPeer
-
 
 ```
 

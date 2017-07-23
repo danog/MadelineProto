@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/ping_delay_disconnect`
 
 Parameters:
 
+```
 ping_id - Json encoded long
 disconnect_delay - Json encoded int
-
 
 ```
 

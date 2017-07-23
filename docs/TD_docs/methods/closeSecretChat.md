@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/closeSecretChat`
 
 Parameters:
 
+```
 secret_chat_id - Json encoded int
-
 
 ```
 

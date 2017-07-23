@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatPhoto`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 photo - Json encoded InputFile
-
 
 ```
 

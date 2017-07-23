@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getSavedGifs`
 
 Parameters:
 
+```
 hash - Json encoded int
-
 
 ```
 

@@ -61,6 +61,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendInlineBotResult`
 
 Parameters:
 
+```
 silent - Json encoded Bool
 background - Json encoded Bool
 clear_draft - Json encoded Bool
@@ -68,7 +69,6 @@ peer - Json encoded InputPeer
 reply_to_msg_id - Json encoded int
 query_id - Json encoded long
 id - Json encoded string
-
 
 ```
 

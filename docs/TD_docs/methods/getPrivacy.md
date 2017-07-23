@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getPrivacy`
 
 Parameters:
 
+```
 key - Json encoded PrivacyKey
-
 
 ```
 

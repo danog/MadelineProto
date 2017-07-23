@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/importContacts`
 
 Parameters:
 
+```
 contacts - Json encoded  array of contact
-
 
 ```
 

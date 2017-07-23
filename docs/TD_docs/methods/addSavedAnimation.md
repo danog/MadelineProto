@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addSavedAnimation`
 
 Parameters:
 
+```
 animation - Json encoded InputFile
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.migrateChat`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
-
 
 ```
 

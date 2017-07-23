@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/ping`
 
 Parameters:
 
+```
 ping_id - Json encoded long
-
 
 ```
 

@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setTyping`
 
 Parameters:
 
+```
 peer - Json encoded InputPeer
 action - Json encoded SendMessageAction
-
 
 ```
 

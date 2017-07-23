@@ -66,6 +66,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/answerInlineQuery`
 
 Parameters:
 
+```
 inline_query_id - Json encoded long
 is_personal - Json encoded Bool
 results - Json encoded  array of InputInlineQueryResult
@@ -73,7 +74,6 @@ cache_time - Json encoded int
 next_offset - Json encoded string
 switch_pm_text - Json encoded string
 switch_pm_parameter - Json encoded string
-
 
 ```
 

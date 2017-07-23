@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.discardCall`
 
 Parameters:
 
+```
 peer - Json encoded InputPhoneCall
 duration - Json encoded int
 reason - Json encoded PhoneCallDiscardReason
 connection_id - Json encoded long
-
 
 ```
 

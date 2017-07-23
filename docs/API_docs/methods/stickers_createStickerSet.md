@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.createStickerSet`
 
 Parameters:
 
+```
 masks - Json encoded Bool
 user_id - Json encoded InputUser
 title - Json encoded string
 short_name - Json encoded string
 stickers - Json encoded  array of InputStickerSetItem
-
 
 ```
 

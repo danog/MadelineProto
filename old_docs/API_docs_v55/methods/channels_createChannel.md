@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.createChannel`
 
 Parameters:
 
+```
 broadcast - Json encoded Bool
 megagroup - Json encoded Bool
 title - Json encoded string
 about - Json encoded string
-
 
 ```
 

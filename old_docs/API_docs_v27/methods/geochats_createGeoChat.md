@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.createGeoChat`
 
 Parameters:
 
+```
 title - Json encoded string
 geo_point - Json encoded InputGeoPoint
 address - Json encoded string
 venue - Json encoded string
-
 
 ```
 

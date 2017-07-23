@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createGroupChat`
 
 Parameters:
 
+```
 group_id - Json encoded int
-
 
 ```
 

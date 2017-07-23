@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editInlineBotMessage
 
 Parameters:
 
+```
 parse_mode - string
-
 
 ```
 

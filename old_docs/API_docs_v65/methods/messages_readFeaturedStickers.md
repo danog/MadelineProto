@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readFeaturedStickers
 
 Parameters:
 
+```
 id - Json encoded  array of long
-
 
 ```
 

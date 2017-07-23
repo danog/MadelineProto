@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getAppChangelog`
 
 Parameters:
 
+```
 prev_app_version - Json encoded string
-
 
 ```
 

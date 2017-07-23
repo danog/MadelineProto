@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getFullChannel`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
-
 
 ```
 

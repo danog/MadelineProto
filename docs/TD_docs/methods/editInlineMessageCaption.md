@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editInlineMessageCaption`
 
 Parameters:
 
+```
 inline_message_id - Json encoded string
 reply_markup - Json encoded ReplyMarkup
 caption - Json encoded string
-
 
 ```
 

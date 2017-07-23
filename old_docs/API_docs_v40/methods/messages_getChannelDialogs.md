@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getChannelDialogs`
 
 Parameters:
 
+```
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

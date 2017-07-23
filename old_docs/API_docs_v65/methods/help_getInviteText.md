@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getInviteText`
 
 Parameters:
 
-
+```
 
 ```
 

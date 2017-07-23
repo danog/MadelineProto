@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editMessageReplyMarkup`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
 reply_markup - Json encoded ReplyMarkup
-
 
 ```
 

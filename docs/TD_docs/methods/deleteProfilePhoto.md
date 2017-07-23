@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteProfilePhoto`
 
 Parameters:
 
+```
 profile_photo_id - Json encoded long
-
 
 ```
 

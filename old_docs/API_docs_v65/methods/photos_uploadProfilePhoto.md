@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.uploadProfilePhoto`
 
 Parameters:
 
+```
 file - Json encoded InputFile
-
 
 ```
 

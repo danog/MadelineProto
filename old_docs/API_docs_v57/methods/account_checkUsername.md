@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.checkUsername`
 
 Parameters:
 
+```
 username - Json encoded string
-
 
 ```
 

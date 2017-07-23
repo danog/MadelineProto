@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getHistory`
 
 Parameters:
 
+```
 peer - Json encoded InputPeer
 offset - Json encoded int
 max_id - Json encoded int
 min_id - Json encoded int
 limit - Json encoded int
-
 
 ```
 

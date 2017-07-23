@@ -64,8 +64,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMessage`
 
 Parameters:
 
+```
 parse_mode - string
-
 
 ```
 

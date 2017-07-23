@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setOption`
 
 Parameters:
 
+```
 name - Json encoded string
 value - Json encoded OptionValue
-
 
 ```
 

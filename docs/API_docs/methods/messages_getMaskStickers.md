@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getMaskStickers`
 
 Parameters:
 
+```
 hash - Json encoded int
-
 
 ```
 

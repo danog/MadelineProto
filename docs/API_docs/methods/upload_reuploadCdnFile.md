@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.reuploadCdnFile`
 
 Parameters:
 
+```
 file_token - Json encoded bytes
 request_token - Json encoded bytes
-
 
 ```
 

@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editChatAdmin`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 user_id - Json encoded InputUser
 is_admin - Json encoded Bool
-
 
 ```
 

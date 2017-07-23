@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getFile`
 
 Parameters:
 
+```
 location - Json encoded InputFileLocation
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

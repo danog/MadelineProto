@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.reportPeer`
 
 Parameters:
 
+```
 peer - Json encoded InputPeer
 reason - Json encoded ReportReason
-
 
 ```
 

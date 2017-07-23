@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.receivedMessages`
 
 Parameters:
 
+```
 max_id - Json encoded int
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readMessageContents`
 
 Parameters:
 
+```
 id - Json encoded  array of int
-
 
 ```
 

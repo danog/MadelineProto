@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.saveDraft`
 
 Parameters:
 
+```
 parse_mode - string
-
 
 ```
 

@@ -58,8 +58,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callString`
 
 Parameters:
 
+```
 x - Json encoded string
-
 
 ```
 

@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.registerDevice`
 
 Parameters:
 
+```
 token_type - Json encoded int
 token - Json encoded string
-
 
 ```
 

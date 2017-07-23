@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.leaveChannel`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
-
 
 ```
 

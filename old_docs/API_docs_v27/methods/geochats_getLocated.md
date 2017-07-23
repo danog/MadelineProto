@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getLocated`
 
 Parameters:
 
+```
 geo_point - Json encoded InputGeoPoint
 radius - Json encoded int
 limit - Json encoded int
-
 
 ```
 

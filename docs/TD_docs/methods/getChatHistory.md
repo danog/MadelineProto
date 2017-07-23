@@ -63,11 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChatHistory`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 from_message_id - Json encoded long
 offset - Json encoded int
 limit - Json encoded int
-
 
 ```
 

@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatReportSpamState`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 is_spam_chat - Json encoded Bool
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.deleteAccount`
 
 Parameters:
 
+```
 reason - Json encoded string
-
 
 ```
 

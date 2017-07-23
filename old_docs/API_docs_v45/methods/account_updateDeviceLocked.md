@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateDeviceLocked`
 
 Parameters:
 
+```
 period - Json encoded int
-
 
 ```
 

@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getTermsOfService`
 
 Parameters:
 
+```
 lang_code - Json encoded string
-
 
 ```
 

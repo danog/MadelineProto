@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.reportSpam`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
 user_id - Json encoded InputUser
 id - Json encoded  array of int
-
 
 ```
 

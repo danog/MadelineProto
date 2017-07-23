@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.joinChannel`
 
 Parameters:
 
+```
 channel - Json encoded InputChannel
-
 
 ```
 

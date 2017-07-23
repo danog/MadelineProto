@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reorderStickerSets`
 
 Parameters:
 
+```
 order - Json encoded  array of long
-
 
 ```
 

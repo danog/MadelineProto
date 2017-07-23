@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getRecentStickers`
 
 Parameters:
 
+```
 attached - Json encoded Bool
 hash - Json encoded int
-
 
 ```
 

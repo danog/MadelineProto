@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/pinChannelMessage`
 
 Parameters:
 
+```
 channel_id - Json encoded int
 message_id - Json encoded long
 disable_notification - Json encoded Bool
-
 
 ```
 

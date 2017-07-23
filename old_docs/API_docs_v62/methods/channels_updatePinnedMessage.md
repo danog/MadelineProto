@@ -57,10 +57,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.updatePinnedMessage`
 
 Parameters:
 
+```
 silent - Json encoded Bool
 channel - Json encoded InputChannel
 id - Json encoded int
-
 
 ```
 

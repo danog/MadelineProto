@@ -58,11 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.setPassword`
 
 Parameters:
 
+```
 current_password_hash - Json encoded bytes
 new_salt - Json encoded bytes
 new_password_hash - Json encoded bytes
 hint - Json encoded string
-
 
 ```
 

@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getFile`
 
 Parameters:
 
+```
 file_id - Json encoded int
-
 
 ```
 

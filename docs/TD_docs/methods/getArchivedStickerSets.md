@@ -62,10 +62,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getArchivedStickerSets`
 
 Parameters:
 
+```
 is_masks - Json encoded Bool
 offset_sticker_set_id - Json encoded long
 limit - Json encoded int
-
 
 ```
 

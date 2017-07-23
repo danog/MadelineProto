@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/terminateSession`
 
 Parameters:
 
+```
 session_id - Json encoded long
-
 
 ```
 

@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getRecentStickers`
 
 Parameters:
 
+```
 is_attached - Json encoded Bool
-
 
 ```
 

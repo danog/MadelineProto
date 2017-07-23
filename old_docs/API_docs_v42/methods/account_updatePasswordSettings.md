@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updatePasswordSetting
 
 Parameters:
 
+```
 current_password_hash - Json encoded bytes
 new_settings - Json encoded account_PasswordInputSettings
-
 
 ```
 

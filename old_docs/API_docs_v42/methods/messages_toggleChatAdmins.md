@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleChatAdmins`
 
 Parameters:
 
+```
 chat_id - Json encoded InputPeer
 enabled - Json encoded Bool
-
 
 ```
 

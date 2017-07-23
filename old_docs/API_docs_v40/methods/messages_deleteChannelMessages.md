@@ -56,9 +56,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteChannelMessage
 
 Parameters:
 
+```
 peer - Json encoded InputPeer
 id - Json encoded  array of int
-
 
 ```
 

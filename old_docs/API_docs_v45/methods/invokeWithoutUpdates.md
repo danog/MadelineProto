@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeWithoutUpdates`
 
 Parameters:
 
+```
 query - Json encoded !X
-
 
 ```
 

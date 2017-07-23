@@ -59,12 +59,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMedia`
 
 Parameters:
 
+```
 broadcast - Json encoded Bool
 peer - Json encoded InputPeer
 reply_to_msg_id - Json encoded int
 media - Json encoded InputMedia
 reply_markup - Json encoded ReplyMarkup
-
 
 ```
 

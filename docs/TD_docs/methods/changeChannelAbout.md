@@ -61,9 +61,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChannelAbout`
 
 Parameters:
 
+```
 channel_id - Json encoded int
 about - Json encoded string
-
 
 ```
 

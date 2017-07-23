@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.resetAuthorization`
 
 Parameters:
 
+```
 hash - Json encoded long
-
 
 ```
 

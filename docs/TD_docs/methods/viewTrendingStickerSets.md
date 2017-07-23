@@ -60,8 +60,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/viewTrendingStickerSets`
 
 Parameters:
 
+```
 sticker_set_ids - Json encoded  array of long
-
 
 ```
 

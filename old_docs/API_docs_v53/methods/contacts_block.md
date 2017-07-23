@@ -55,8 +55,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.block`
 
 Parameters:
 
+```
 id - Json encoded InputUser
-
 
 ```
 
