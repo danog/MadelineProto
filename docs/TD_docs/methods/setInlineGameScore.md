@@ -45,7 +45,7 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->setInlineGameScore(['inline_message_id' => 'string', 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

@@ -41,7 +41,7 @@ if (isset($number)) { // Login as a user
 $WebPage = $MadelineProto->getWebPagePreview(['message_text' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

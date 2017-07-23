@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
 $messages_StatedMessage = $MadelineProto->messages->sendMedia(['peer' => InputPeer, 'reply_to_msg_id' => int, 'media' => InputMedia, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

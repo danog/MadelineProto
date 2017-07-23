@@ -43,7 +43,7 @@ if (isset($number)) { // Login as a user
 $contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

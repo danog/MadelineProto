@@ -13,7 +13,7 @@ description: stickers.removeStickerFromSet parameters, return type and example
 |sticker|[InputDocument](../types/InputDocument.md) | Yes|
 
 
-### Return type: [Bool](../types/Bool.md)
+### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Example:
 
@@ -33,10 +33,10 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->stickers->removeStickerFromSet(['sticker' => InputDocument, ]);
+$messages_StickerSet = $MadelineProto->stickers->removeStickerFromSet(['sticker' => InputDocument, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 
@@ -62,6 +62,6 @@ sticker - Json encoded InputDocument
 Or, if you're into Lua:
 
 ```
-Bool = stickers.removeStickerFromSet({sticker=InputDocument, })
+messages_StickerSet = stickers.removeStickerFromSet({sticker=InputDocument, })
 ```
 

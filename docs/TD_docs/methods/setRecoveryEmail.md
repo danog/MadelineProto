@@ -42,7 +42,7 @@ if (isset($number)) { // Login as a user
 $PasswordState = $MadelineProto->setRecoveryEmail(['password' => 'string', 'new_recovery_email' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

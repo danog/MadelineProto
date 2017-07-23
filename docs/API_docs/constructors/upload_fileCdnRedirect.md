@@ -15,6 +15,7 @@ description: upload_fileCdnRedirect attributes, type and example
 |file\_token|[bytes](../types/bytes.md) | Yes|
 |encryption\_key|[bytes](../types/bytes.md) | Yes|
 |encryption\_iv|[bytes](../types/bytes.md) | Yes|
+|cdn\_file\_hashes|Array of [CdnFileHash](../types/CdnFileHash.md) | Yes|
 
 
 
@@ -24,13 +25,13 @@ description: upload_fileCdnRedirect attributes, type and example
 ### Example:
 
 ```
-$upload_fileCdnRedirect = ['_' => 'upload.fileCdnRedirect', 'dc_id' => int, 'file_token' => 'bytes', 'encryption_key' => 'bytes', 'encryption_iv' => 'bytes'];
+$upload_fileCdnRedirect = ['_' => 'upload.fileCdnRedirect', 'dc_id' => int, 'file_token' => 'bytes', 'encryption_key' => 'bytes', 'encryption_iv' => 'bytes', 'cdn_file_hashes' => [CdnFileHash]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "upload.fileCdnRedirect", "dc_id": int, "file_token": "bytes", "encryption_key": "bytes", "encryption_iv": "bytes"}
+{"_": "upload.fileCdnRedirect", "dc_id": int, "file_token": "bytes", "encryption_key": "bytes", "encryption_iv": "bytes", "cdn_file_hashes": [CdnFileHash]}
 ```
 
 
@@ -38,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-upload_fileCdnRedirect={_='upload.fileCdnRedirect', dc_id=int, file_token='bytes', encryption_key='bytes', encryption_iv='bytes'}
+upload_fileCdnRedirect={_='upload.fileCdnRedirect', dc_id=int, file_token='bytes', encryption_key='bytes', encryption_iv='bytes', cdn_file_hashes={CdnFileHash}}
 
 ```
 

@@ -11,8 +11,9 @@ description: messageMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|photo|[Photo](../types/Photo.md) | Yes|
-|caption|[string](../types/string.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Optional|
+|caption|[string](../types/string.md) | Optional|
+|ttl\_seconds|[int](../types/int.md) | Optional|
 
 
 
@@ -22,13 +23,13 @@ description: messageMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo, 'caption' => 'string'];
+$messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo, 'caption' => 'string', 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "messageMediaPhoto", "photo": Photo, "caption": "string"}
+{"_": "messageMediaPhoto", "photo": Photo, "caption": "string", "ttl_seconds": int}
 ```
 
 
@@ -36,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaPhoto={_='messageMediaPhoto', photo=Photo, caption='string'}
+messageMediaPhoto={_='messageMediaPhoto', photo=Photo, caption='string', ttl_seconds=int}
 
 ```
 

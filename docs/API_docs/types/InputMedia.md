@@ -21,8 +21,6 @@ description: constructors and methods of type InputMedia
 
 [inputMediaUploadedDocument](../constructors/inputMediaUploadedDocument.md)  
 
-[inputMediaUploadedThumbDocument](../constructors/inputMediaUploadedThumbDocument.md)  
-
 [inputMediaDocument](../constructors/inputMediaDocument.md)  
 
 [inputMediaVenue](../constructors/inputMediaVenue.md)  

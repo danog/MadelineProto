@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
 $test_VectorStringObject = $MadelineProto->test->callVectorStringObject(['x' => [test_String], ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

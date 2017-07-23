@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
 $contacts_Contacts = $MadelineProto->contacts->getContacts(['hash' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

@@ -1489,6 +1489,16 @@ interface messages
      * @return MessageMedia
      */
     public function uploadMedia(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int reply_to_msg_id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function sendScreenshotNotification(array $params);
 }
 
 interface updates
@@ -1630,9 +1640,19 @@ interface upload
      *               bytes request_token,
      *              ]
      *
-     * @return bool
+     * @return Vector_of_CdnFileHash
      */
     public function reuploadCdnFile(array $params);
+
+    /**
+     * @param array params [
+     *               bytes file_token,
+     *               int offset,
+     *              ]
+     *
+     * @return Vector_of_CdnFileHash
+     */
+    public function getCdnFileHashes(array $params);
 }
 
 interface help
@@ -2088,7 +2108,7 @@ interface stickers
      *               InputDocument sticker,
      *              ]
      *
-     * @return bool
+     * @return messages_StickerSet
      */
     public function removeStickerFromSet(array $params);
 
@@ -2098,7 +2118,7 @@ interface stickers
      *               int position,
      *              ]
      *
-     * @return bool
+     * @return messages_StickerSet
      */
     public function changeStickerPosition(array $params);
 

@@ -14,7 +14,7 @@ description: stickers.changeStickerPosition parameters, return type and example
 |position|[int](../types/int.md) | Yes|
 
 
-### Return type: [Bool](../types/Bool.md)
+### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Example:
 
@@ -34,10 +34,10 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->stickers->changeStickerPosition(['sticker' => InputDocument, 'position' => int, ]);
+$messages_StickerSet = $MadelineProto->stickers->changeStickerPosition(['sticker' => InputDocument, 'position' => int, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 
@@ -64,6 +64,6 @@ position - Json encoded int
 Or, if you're into Lua:
 
 ```
-Bool = stickers.changeStickerPosition({sticker=InputDocument, position=int, })
+messages_StickerSet = stickers.changeStickerPosition({sticker=InputDocument, position=int, })
 ```
 

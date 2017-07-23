@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
 $auth_Authorization = $MadelineProto->auth->importBotAuthorization(['api_id' => int, 'api_hash' => 'string', 'bot_auth_token' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

@@ -17,14 +17,18 @@ class Exception extends \Exception
     public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
     {
         parent::__construct($message, $code, $previous);
-        if (\danog\MadelineProto\Logger::$constructed && $this->file !== __FILE__) {
-            \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
+        if ($file !== null) {
+            if (basename($file) === 'Threaded.php') {
+                $line = debug_backtrace(0)[2]['line'];
+                $file = debug_backtrace(0)[2]['file'];
+            }
+            $this->file = $file;
         }
         if ($line !== null) {
             $this->line = $line;
         }
-        if ($file !== null) {
-            $this->file = $file;
+        if (\danog\MadelineProto\Logger::$constructed) {
+            \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
         if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden'])) {
             return;
@@ -45,9 +49,6 @@ class Exception extends \Exception
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
-        }
-        if (\danog\MadelineProto\Logger::$constructed) {
-            \danog\MadelineProto\Logger::log([$errstr.' in '.basename($errfile).':'.$errline], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
         $e = new self($errstr, $errno, null, $errfile, $errline);
         throw $e;

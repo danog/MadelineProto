@@ -24,6 +24,8 @@ description: List of types
 
 [CdnConfig](CdnConfig.md)<a name="CdnConfig"></a>  
 
+[CdnFileHash](CdnFileHash.md)<a name="CdnFileHash"></a>  
+
 [CdnPublicKey](CdnPublicKey.md)<a name="CdnPublicKey"></a>  
 
 [ChannelAdminLogEvent](ChannelAdminLogEvent.md)<a name="ChannelAdminLogEvent"></a>  
@@ -271,6 +273,8 @@ description: List of types
 [PhotoSize](PhotoSize.md)<a name="PhotoSize"></a>  
 
 [Pong](Pong.md)<a name="Pong"></a>  
+
+[PopularContact](PopularContact.md)<a name="PopularContact"></a>  
 
 [PostAddress](PostAddress.md)<a name="PostAddress"></a>  
 

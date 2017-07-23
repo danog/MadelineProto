@@ -42,7 +42,7 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeChatReportSpamState(['chat_id' => InputPeer, 'is_spam_chat' => Bool, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

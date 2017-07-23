@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
 $help_TermsOfService = $MadelineProto->help->getTermsOfService(['lang_code' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

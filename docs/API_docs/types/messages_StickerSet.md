@@ -19,6 +19,10 @@ description: constructors and methods of type messages_StickerSet
 
 [$MadelineProto->stickers->createStickerSet](../methods/stickers_createStickerSet.md)  
 
+[$MadelineProto->stickers->removeStickerFromSet](../methods/stickers_removeStickerFromSet.md)  
+
+[$MadelineProto->stickers->changeStickerPosition](../methods/stickers_changeStickerPosition.md)  
+
 [$MadelineProto->stickers->addStickerToSet](../methods/stickers_addStickerToSet.md)  
 
 

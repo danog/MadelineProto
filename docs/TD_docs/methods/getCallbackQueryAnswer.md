@@ -43,7 +43,7 @@ if (isset($number)) { // Login as a user
 $CallbackQueryAnswer = $MadelineProto->getCallbackQueryAnswer(['chat_id' => InputPeer, 'message_id' => long, 'payload' => CallbackQueryPayload, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

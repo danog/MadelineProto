@@ -31,7 +31,7 @@ if (isset($number)) { // Login as a user
 $updates_State = $MadelineProto->updates->getState();
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

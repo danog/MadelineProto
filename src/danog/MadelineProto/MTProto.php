@@ -26,7 +26,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\ResponseHandler;
-    //use \danog\MadelineProto\MTProtoTools\SaltHandler;
+    use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 56;
+    const V = 57;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;

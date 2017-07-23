@@ -44,7 +44,7 @@ if (isset($number)) { // Login as a user
 $Messages = $MadelineProto->getChatHistory(['chat_id' => InputPeer, 'from_message_id' => long, 'offset' => int, 'limit' => int, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

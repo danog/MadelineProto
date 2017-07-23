@@ -11,8 +11,9 @@ description: messageMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|:-------------:|---------:|
-|document|[Document](../types/Document.md) | Yes|
-|caption|[string](../types/string.md) | Yes|
+|document|[Document](../types/Document.md) | Optional|
+|caption|[string](../types/string.md) | Optional|
+|ttl\_seconds|[int](../types/int.md) | Optional|
 
 
 
@@ -22,13 +23,13 @@ description: messageMediaDocument attributes, type and example
 ### Example:
 
 ```
-$messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document, 'caption' => 'string'];
+$messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document, 'caption' => 'string', 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "messageMediaDocument", "document": Document, "caption": "string"}
+{"_": "messageMediaDocument", "document": Document, "caption": "string", "ttl_seconds": int}
 ```
 
 
@@ -36,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaDocument={_='messageMediaDocument', document=Document, caption='string'}
+messageMediaDocument={_='messageMediaDocument', document=Document, caption='string', ttl_seconds=int}
 
 ```
 

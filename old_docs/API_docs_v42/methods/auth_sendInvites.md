@@ -37,7 +37,7 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => ['string'], 'message' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

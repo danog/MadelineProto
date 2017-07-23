@@ -47,7 +47,7 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->answerInlineQuery(['inline_query_id' => long, 'is_personal' => Bool, 'results' => [InputInlineQueryResult], 'cache_time' => int, 'next_offset' => 'string', 'switch_pm_text' => 'string', 'switch_pm_parameter' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

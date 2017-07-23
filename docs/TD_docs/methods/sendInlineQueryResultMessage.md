@@ -46,7 +46,7 @@ if (isset($number)) { // Login as a user
 $Message = $MadelineProto->sendInlineQueryResultMessage(['chat_id' => InputPeer, 'reply_to_message_id' => long, 'disable_notification' => Bool, 'from_background' => Bool, 'query_id' => long, 'result_id' => 'string', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

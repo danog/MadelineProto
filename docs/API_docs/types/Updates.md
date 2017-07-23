@@ -61,6 +61,8 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->messages->setGameScore](../methods/messages_setGameScore.md)  
 
+[$MadelineProto->messages->sendScreenshotNotification](../methods/messages_sendScreenshotNotification.md)  
+
 [$MadelineProto->help->getAppChangelog](../methods/help_getAppChangelog.md)  
 
 [$MadelineProto->channels->createChannel](../methods/channels_createChannel.md)  

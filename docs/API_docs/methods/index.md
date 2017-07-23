@@ -391,6 +391,8 @@ $MadelineProto->[messages->sendMedia](messages_sendMedia.md)(\['silent' => [Bool
 
 $MadelineProto->[messages->sendMessage](messages_sendMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'silent' => [Bool](../types/Bool.md), 'background' => [Bool](../types/Bool.md), 'clear_draft' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'reply_to_msg_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Updates](../types/Updates.md)<a name="messages_sendMessage"></a>  
 
+$MadelineProto->[messages->sendScreenshotNotification](messages_sendScreenshotNotification.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'reply_to_msg_id' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_sendScreenshotNotification"></a>  
+
 $MadelineProto->[messages->setBotCallbackAnswer](messages_setBotCallbackAnswer.md)(\['alert' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'message' => [string](../types/string.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setBotCallbackAnswer"></a>  
 
 $MadelineProto->[messages->setBotPrecheckoutResults](messages_setBotPrecheckoutResults.md)(\['success' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'error' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setBotPrecheckoutResults"></a>  
@@ -475,11 +477,11 @@ $MadelineProto->[req_pq](req_pq.md)(\['nonce' => [int128](../types/int128.md), \
 ***
 <br><br>$MadelineProto->[stickers->addStickerToSet](stickers_addStickerToSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'sticker' => [InputStickerSetItem](../types/InputStickerSetItem.md), \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="stickers_addStickerToSet"></a>  
 
-$MadelineProto->[stickers->changeStickerPosition](stickers_changeStickerPosition.md)(\['sticker' => [InputDocument](../types/InputDocument.md), 'position' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="stickers_changeStickerPosition"></a>  
+$MadelineProto->[stickers->changeStickerPosition](stickers_changeStickerPosition.md)(\['sticker' => [InputDocument](../types/InputDocument.md), 'position' => [int](../types/int.md), \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="stickers_changeStickerPosition"></a>  
 
 $MadelineProto->[stickers->createStickerSet](stickers_createStickerSet.md)(\['masks' => [Bool](../types/Bool.md), 'user_id' => [InputUser](../types/InputUser.md), 'title' => [string](../types/string.md), 'short_name' => [string](../types/string.md), 'stickers' => \[[InputStickerSetItem](../types/InputStickerSetItem.md)\], \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="stickers_createStickerSet"></a>  
 
-$MadelineProto->[stickers->removeStickerFromSet](stickers_removeStickerFromSet.md)(\['sticker' => [InputDocument](../types/InputDocument.md), \]) === [$Bool](../types/Bool.md)<a name="stickers_removeStickerFromSet"></a>  
+$MadelineProto->[stickers->removeStickerFromSet](stickers_removeStickerFromSet.md)(\['sticker' => [InputDocument](../types/InputDocument.md), \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="stickers_removeStickerFromSet"></a>  
 
 ***
 <br><br>$MadelineProto->[updates->getChannelDifference](updates_getChannelDifference.md)(\['force' => [Bool](../types/Bool.md), 'channel' => [InputChannel](../types/InputChannel.md), 'filter' => [ChannelMessagesFilter](../types/ChannelMessagesFilter.md), 'pts' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$updates\_ChannelDifference](../types/updates_ChannelDifference.md)<a name="updates_getChannelDifference"></a>  
@@ -491,11 +493,13 @@ $MadelineProto->[updates->getState](updates_getState.md)(\[\]) === [$updates\_St
 ***
 <br><br>$MadelineProto->[upload->getCdnFile](upload_getCdnFile.md)(\['file_token' => [bytes](../types/bytes.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_CdnFile](../types/upload_CdnFile.md)<a name="upload_getCdnFile"></a>  
 
+$MadelineProto->[upload->getCdnFileHashes](upload_getCdnFileHashes.md)(\['file_token' => [bytes](../types/bytes.md), 'offset' => [int](../types/int.md), \]) === [$Vector\_of\_CdnFileHash](../types/CdnFileHash.md)<a name="upload_getCdnFileHashes"></a>  
+
 $MadelineProto->[upload->getFile](upload_getFile.md)(\['location' => [InputFileLocation](../types/InputFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_File](../types/upload_File.md)<a name="upload_getFile"></a>  
 
 $MadelineProto->[upload->getWebFile](upload_getWebFile.md)(\['location' => [InputWebFileLocation](../types/InputWebFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_WebFile](../types/upload_WebFile.md)<a name="upload_getWebFile"></a>  
 
-$MadelineProto->[upload->reuploadCdnFile](upload_reuploadCdnFile.md)(\['file_token' => [bytes](../types/bytes.md), 'request_token' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_reuploadCdnFile"></a>  
+$MadelineProto->[upload->reuploadCdnFile](upload_reuploadCdnFile.md)(\['file_token' => [bytes](../types/bytes.md), 'request_token' => [bytes](../types/bytes.md), \]) === [$Vector\_of\_CdnFileHash](../types/CdnFileHash.md)<a name="upload_reuploadCdnFile"></a>  
 
 $MadelineProto->[upload->saveBigFilePart](upload_saveBigFilePart.md)(\['file_id' => [long](../types/long.md), 'file_part' => [int](../types/int.md), 'file_total_parts' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_saveBigFilePart"></a>  
 

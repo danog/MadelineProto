@@ -43,7 +43,7 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->reportChannelSpam(['channel_id' => int, 'user_id' => int, 'message_ids' => [long], ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

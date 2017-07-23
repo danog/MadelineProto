@@ -43,6 +43,8 @@ description: constructors and methods of type MessageAction
 
 [messageActionPhoneCall](../constructors/messageActionPhoneCall.md)  
 
+[messageActionScreenshotTaken](../constructors/messageActionScreenshotTaken.md)  
+
 
 
 ### Methods that return an object of this type (methods):

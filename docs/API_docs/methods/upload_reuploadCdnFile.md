@@ -14,7 +14,7 @@ description: upload.reuploadCdnFile parameters, return type and example
 |request\_token|[bytes](../types/bytes.md) | Yes|
 
 
-### Return type: [Bool](../types/Bool.md)
+### Return type: [Vector\_of\_CdnFileHash](../types/CdnFileHash.md)
 
 ### Example:
 
@@ -34,10 +34,10 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->upload->reuploadCdnFile(['file_token' => 'bytes', 'request_token' => 'bytes', ]);
+$Vector_of_CdnFileHash = $MadelineProto->upload->reuploadCdnFile(['file_token' => 'bytes', 'request_token' => 'bytes', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 
@@ -64,6 +64,6 @@ request_token - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-Bool = upload.reuploadCdnFile({file_token='bytes', request_token='bytes', })
+Vector_of_CdnFileHash = upload.reuploadCdnFile({file_token='bytes', request_token='bytes', })
 ```
 

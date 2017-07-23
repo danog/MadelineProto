@@ -45,7 +45,7 @@ if (isset($number)) { // Login as a user
 $Messages = $MadelineProto->searchChatMessages(['chat_id' => InputPeer, 'query' => 'string', 'from_message_id' => long, 'limit' => int, 'filter' => SearchMessagesFilter, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

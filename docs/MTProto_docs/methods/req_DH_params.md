@@ -41,7 +41,7 @@ if (isset($number)) { // Login as a user
 $Server_DH_Params = $MadelineProto->req_DH_params(['nonce' => int128, 'server_nonce' => int128, 'p' => 'bytes', 'q' => 'bytes', 'public_key_fingerprint' => long, 'encrypted_data' => 'bytes', ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 

@@ -45,7 +45,7 @@ if (isset($number)) { // Login as a user
 $Messages = $MadelineProto->forwardMessages(['chat_id' => InputPeer, 'from_chat_id' => long, 'message_ids' => [long], 'disable_notification' => Bool, 'from_background' => Bool, ]);
 ```
 
-Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
 ### As a bot:
 
