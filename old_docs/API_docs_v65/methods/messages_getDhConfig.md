@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getDhConfig
 * params - {"version": int, "random_length": int, }
 
-```
+
 
 ### As a user:
 

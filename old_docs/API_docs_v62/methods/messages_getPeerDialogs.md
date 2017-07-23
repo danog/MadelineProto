@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getPeerDialogs
 * params - {"peers": [InputPeer], }
 
-```
+
 
 ### As a user:
 

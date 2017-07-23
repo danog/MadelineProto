@@ -47,7 +47,7 @@ Parameters:
 * method - req_pq
 * params - {"nonce": int128, }
 
-```
+
 
 ### As a user:
 

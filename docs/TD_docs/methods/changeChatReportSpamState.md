@@ -53,7 +53,7 @@ Parameters:
 * method - changeChatReportSpamState
 * params - {"chat_id": InputPeer, "is_spam_chat": Bool, }
 
-```
+
 
 ### As a user:
 

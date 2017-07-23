@@ -50,7 +50,7 @@ Parameters:
 * method - test.squareInt
 * params - {"x": int, }
 
-```
+
 
 ### As a user:
 

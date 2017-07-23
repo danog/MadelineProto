@@ -52,7 +52,7 @@ Parameters:
 * method - deleteAccount
 * params - {"reason": "string", }
 
-```
+
 
 ### As a user:
 

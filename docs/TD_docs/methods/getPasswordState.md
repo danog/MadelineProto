@@ -51,7 +51,7 @@ Parameters:
 * method - getPasswordState
 * params - {}
 
-```
+
 
 ### As a user:
 

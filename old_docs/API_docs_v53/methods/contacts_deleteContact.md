@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.deleteContact
 * params - {"id": InputUser, }
 
-```
+
 
 ### As a user:
 

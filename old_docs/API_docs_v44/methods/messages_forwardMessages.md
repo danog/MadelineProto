@@ -50,7 +50,7 @@ Parameters:
 * method - messages.forwardMessages
 * params - {"broadcast": Bool, "from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

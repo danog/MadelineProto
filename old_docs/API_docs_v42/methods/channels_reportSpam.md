@@ -49,7 +49,7 @@ Parameters:
 * method - channels.reportSpam
 * params - {"channel": InputChannel, "user_id": InputUser, "id": [int], }
 
-```
+
 
 ### As a user:
 

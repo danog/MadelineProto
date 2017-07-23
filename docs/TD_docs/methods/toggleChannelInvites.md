@@ -53,7 +53,7 @@ Parameters:
 * method - toggleChannelInvites
 * params - {"channel_id": int, "anyone_can_invite": Bool, }
 
-```
+
 
 ### As a user:
 

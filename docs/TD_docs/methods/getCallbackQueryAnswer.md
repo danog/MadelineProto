@@ -54,7 +54,7 @@ Parameters:
 * method - getCallbackQueryAnswer
 * params - {"chat_id": InputPeer, "message_id": long, "payload": CallbackQueryPayload, }
 
-```
+
 
 ### As a user:
 

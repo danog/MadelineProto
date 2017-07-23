@@ -49,7 +49,7 @@ Parameters:
 * method - upload.getFile
 * params - {"location": InputFileLocation, "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

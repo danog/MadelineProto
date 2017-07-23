@@ -47,7 +47,7 @@ Parameters:
 * method - geochats.getFullChat
 * params - {"peer": InputGeoChat, }
 
-```
+
 
 ### As a user:
 

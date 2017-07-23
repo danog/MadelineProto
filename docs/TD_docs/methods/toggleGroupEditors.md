@@ -53,7 +53,7 @@ Parameters:
 * method - toggleGroupEditors
 * params - {"group_id": int, "anyone_can_edit": Bool, }
 
-```
+
 
 ### As a user:
 

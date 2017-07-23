@@ -53,7 +53,7 @@ Parameters:
 * method - addRecentSticker
 * params - {"is_attached": Bool, "sticker": InputFile, }
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getCommonChats
 * params - {"user_id": InputUser, "max_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

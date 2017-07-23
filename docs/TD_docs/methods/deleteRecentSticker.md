@@ -53,7 +53,7 @@ Parameters:
 * method - deleteRecentSticker
 * params - {"is_attached": Bool, "sticker": InputFile, }
 
-```
+
 
 ### As a user:
 

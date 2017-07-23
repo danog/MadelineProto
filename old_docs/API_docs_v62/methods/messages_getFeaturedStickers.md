@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getFeaturedStickers
 * params - {"hash": int, }
 
-```
+
 
 ### As a user:
 

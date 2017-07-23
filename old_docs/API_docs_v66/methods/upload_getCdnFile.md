@@ -49,7 +49,7 @@ Parameters:
 * method - upload.getCdnFile
 * params - {"file_token": "bytes", "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - getWebPagePreview
 * params - {"message_text": "string", }
 
-```
+
 
 ### As a user:
 

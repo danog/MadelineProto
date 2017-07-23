@@ -50,7 +50,7 @@ Parameters:
 * method - test.callString
 * params - {"x": "string", }
 
-```
+
 
 ### As a user:
 

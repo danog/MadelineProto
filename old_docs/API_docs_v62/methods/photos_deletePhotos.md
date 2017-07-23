@@ -47,7 +47,7 @@ Parameters:
 * method - photos.deletePhotos
 * params - {"id": [InputPhoto], }
 
-```
+
 
 ### As a user:
 

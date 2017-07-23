@@ -53,7 +53,7 @@ Parameters:
 * method - createNewGroupChat
 * params - {"user_ids": [int], "title": "string", }
 
-```
+
 
 ### As a user:
 

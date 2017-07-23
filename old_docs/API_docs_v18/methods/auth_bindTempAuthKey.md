@@ -50,7 +50,7 @@ Parameters:
 * method - auth.bindTempAuthKey
 * params - {"perm_auth_key_id": long, "nonce": long, "expires_at": int, "encrypted_message": "bytes", }
 
-```
+
 
 ### As a user:
 

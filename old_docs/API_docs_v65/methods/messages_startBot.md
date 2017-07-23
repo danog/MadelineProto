@@ -49,7 +49,7 @@ Parameters:
 * method - messages.startBot
 * params - {"bot": InputUser, "peer": InputPeer, "start_param": "string", }
 
-```
+
 
 ### As a user:
 

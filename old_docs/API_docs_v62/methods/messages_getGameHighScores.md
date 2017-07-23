@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getGameHighScores
 * params - {"peer": InputPeer, "id": int, "user_id": InputUser, }
 
-```
+
 
 ### As a user:
 

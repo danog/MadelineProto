@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getDialogs
 * params - {"offset": int, "max_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

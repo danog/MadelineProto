@@ -53,7 +53,7 @@ Parameters:
 * method - getBlockedUsers
 * params - {"offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

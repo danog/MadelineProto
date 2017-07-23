@@ -42,7 +42,7 @@ Parameters:
 * method - updates.getState
 * params - {}
 
-```
+
 
 ### As a user:
 

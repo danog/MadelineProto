@@ -48,7 +48,7 @@ Parameters:
 * method - geochats.sendMessage
 * params - {"peer": InputGeoChat, "message": "string", }
 
-```
+
 
 ### As a user:
 

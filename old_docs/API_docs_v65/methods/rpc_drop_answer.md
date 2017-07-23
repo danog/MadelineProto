@@ -47,7 +47,7 @@ Parameters:
 * method - rpc_drop_answer
 * params - {"req_msg_id": long, }
 
-```
+
 
 ### As a user:
 

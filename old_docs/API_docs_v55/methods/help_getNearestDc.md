@@ -42,7 +42,7 @@ Parameters:
 * method - help.getNearestDc
 * params - {}
 
-```
+
 
 ### As a user:
 

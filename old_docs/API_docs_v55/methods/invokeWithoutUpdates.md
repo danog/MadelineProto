@@ -47,7 +47,7 @@ Parameters:
 * method - invokeWithoutUpdates
 * params - {"query": !X, }
 
-```
+
 
 ### As a user:
 

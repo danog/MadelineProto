@@ -56,7 +56,7 @@ Parameters:
 * method - setPassword
 * params - {"old_password": "string", "new_password": "string", "new_hint": "string", "set_recovery_email": Bool, "new_recovery_email": "string", }
 
-```
+
 
 ### As a user:
 

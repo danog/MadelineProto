@@ -48,7 +48,7 @@ Parameters:
 * method - messages.readEncryptedHistory
 * params - {"peer": InputEncryptedChat, "max_date": int, }
 
-```
+
 
 ### As a user:
 

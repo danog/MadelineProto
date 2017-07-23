@@ -52,7 +52,7 @@ Parameters:
 * method - checkChangePhoneNumberCode
 * params - {"code": "string", }
 
-```
+
 
 ### As a user:
 

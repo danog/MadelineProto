@@ -52,7 +52,7 @@ Parameters:
 * method - getFilePersistent
 * params - {"persistent_file_id": "string", }
 
-```
+
 
 ### As a user:
 

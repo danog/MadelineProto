@@ -52,7 +52,7 @@ Parameters:
 * method - setProfilePhoto
 * params - {"photo_path": "string", }
 
-```
+
 
 ### As a user:
 

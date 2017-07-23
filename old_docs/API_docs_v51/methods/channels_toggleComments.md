@@ -48,7 +48,7 @@ Parameters:
 * method - channels.toggleComments
 * params - {"channel": InputChannel, "enabled": Bool, }
 
-```
+
 
 ### As a user:
 

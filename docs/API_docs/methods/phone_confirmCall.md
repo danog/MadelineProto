@@ -50,7 +50,7 @@ Parameters:
 * method - phone.confirmCall
 * params - {"peer": InputPhoneCall, "g_a": "bytes", "key_fingerprint": long, "protocol": PhoneCallProtocol, }
 
-```
+
 
 ### As a user:
 

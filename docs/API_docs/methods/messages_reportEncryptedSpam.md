@@ -47,7 +47,7 @@ Parameters:
 * method - messages.reportEncryptedSpam
 * params - {"peer": InputEncryptedChat, }
 
-```
+
 
 ### As a user:
 

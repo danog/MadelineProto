@@ -53,7 +53,7 @@ Parameters:
 * method - setOption
 * params - {"name": "string", "value": OptionValue, }
 
-```
+
 
 ### As a user:
 

@@ -50,7 +50,7 @@ Parameters:
 * method - help.getAppChangelog
 * params - {"device_model": "string", "system_version": "string", "app_version": "string", "lang_code": "string", }
 
-```
+
 
 ### As a user:
 

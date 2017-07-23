@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getAllChats
 * params - {"except_ids": [int], }
 
-```
+
 
 ### As a user:
 

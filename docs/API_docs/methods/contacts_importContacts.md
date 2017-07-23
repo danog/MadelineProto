@@ -48,7 +48,7 @@ Parameters:
 * method - contacts.importContacts
 * params - {"contacts": [InputContact], "replace": Bool, }
 
-```
+
 
 ### As a user:
 

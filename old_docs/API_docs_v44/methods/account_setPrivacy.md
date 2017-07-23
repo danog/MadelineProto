@@ -48,7 +48,7 @@ Parameters:
 * method - account.setPrivacy
 * params - {"key": InputPrivacyKey, "rules": [InputPrivacyRule], }
 
-```
+
 
 ### As a user:
 

@@ -42,7 +42,7 @@ Parameters:
 * method - auth.resetAuthorizations
 * params - {}
 
-```
+
 
 ### As a user:
 

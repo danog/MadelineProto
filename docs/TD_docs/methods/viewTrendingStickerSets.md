@@ -52,7 +52,7 @@ Parameters:
 * method - viewTrendingStickerSets
 * params - {"sticker_set_ids": [long], }
 
-```
+
 
 ### As a user:
 

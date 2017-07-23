@@ -51,7 +51,7 @@ Parameters:
 * method - requestPasswordRecovery
 * params - {}
 
-```
+
 
 ### As a user:
 

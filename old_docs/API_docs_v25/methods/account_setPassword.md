@@ -50,7 +50,7 @@ Parameters:
 * method - account.setPassword
 * params - {"current_password_hash": "bytes", "new_salt": "bytes", "new_password_hash": "bytes", "hint": "string", }
 
-```
+
 
 ### As a user:
 

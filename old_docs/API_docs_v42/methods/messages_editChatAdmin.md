@@ -49,7 +49,7 @@ Parameters:
 * method - messages.editChatAdmin
 * params - {"chat_id": InputPeer, "user_id": InputUser, "is_admin": Bool, }
 
-```
+
 
 ### As a user:
 

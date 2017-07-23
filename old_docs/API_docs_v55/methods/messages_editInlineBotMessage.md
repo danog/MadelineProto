@@ -52,7 +52,7 @@ Parameters:
 * method - messages.editInlineBotMessage
 * params - {"no_webpage": Bool, "id": InputBotInlineMessageID, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}
 
-```
+
 
 ### As a user:
 

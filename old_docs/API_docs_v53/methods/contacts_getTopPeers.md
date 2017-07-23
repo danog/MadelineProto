@@ -54,7 +54,7 @@ Parameters:
 * method - contacts.getTopPeers
 * params - {"correspondents": Bool, "bots_pm": Bool, "bots_inline": Bool, "groups": Bool, "channels": Bool, "offset": int, "limit": int, "hash": int, }
 
-```
+
 
 ### As a user:
 

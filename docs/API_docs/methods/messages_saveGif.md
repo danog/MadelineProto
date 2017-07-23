@@ -48,7 +48,7 @@ Parameters:
 * method - messages.saveGif
 * params - {"id": InputDocument, "unsave": Bool, }
 
-```
+
 
 ### As a user:
 

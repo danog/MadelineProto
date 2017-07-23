@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.resolveUsername
 * params - {"username": "string", }
 
-```
+
 
 ### As a user:
 

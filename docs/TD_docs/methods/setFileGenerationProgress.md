@@ -53,7 +53,7 @@ Parameters:
 * method - setFileGenerationProgress
 * params - {"generation_id": long, "ready": int, }
 
-```
+
 
 ### As a user:
 

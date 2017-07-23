@@ -48,7 +48,7 @@ Parameters:
 * method - channels.toggleSignatures
 * params - {"channel": InputChannel, "enabled": Bool, }
 
-```
+
 
 ### As a user:
 

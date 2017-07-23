@@ -51,7 +51,7 @@ Parameters:
 * method - auth.signUp
 * params - {"phone_number": "string", "phone_code_hash": "string", "phone_code": "string", "first_name": "string", "last_name": "string", }
 
-```
+
 
 ### As a user:
 

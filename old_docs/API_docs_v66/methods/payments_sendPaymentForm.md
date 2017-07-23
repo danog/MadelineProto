@@ -50,7 +50,7 @@ Parameters:
 * method - payments.sendPaymentForm
 * params - {"msg_id": int, "requested_info_id": "string", "shipping_option_id": "string", "credentials": InputPaymentCredentials, }
 
-```
+
 
 ### As a user:
 

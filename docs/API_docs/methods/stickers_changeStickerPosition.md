@@ -48,7 +48,7 @@ Parameters:
 * method - stickers.changeStickerPosition
 * params - {"sticker": InputDocument, "position": int, }
 
-```
+
 
 ### As a user:
 

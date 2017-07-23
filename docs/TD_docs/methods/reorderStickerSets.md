@@ -53,7 +53,7 @@ Parameters:
 * method - reorderStickerSets
 * params - {"is_masks": Bool, "sticker_set_ids": [long], }
 
-```
+
 
 ### As a user:
 

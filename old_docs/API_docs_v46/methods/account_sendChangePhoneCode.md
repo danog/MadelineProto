@@ -47,7 +47,7 @@ Parameters:
 * method - account.sendChangePhoneCode
 * params - {"phone_number": "string", }
 
-```
+
 
 ### As a user:
 

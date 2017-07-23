@@ -52,7 +52,7 @@ Parameters:
 * method - getChatReportSpamState
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

@@ -48,7 +48,7 @@ Parameters:
 * method - messages.editChatPhoto
 * params - {"chat_id": InputPeer, "photo": InputChatPhoto, }
 
-```
+
 
 ### As a user:
 

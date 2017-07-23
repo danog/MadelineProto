@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.block
 * params - {"id": InputUser, }
 
-```
+
 
 ### As a user:
 

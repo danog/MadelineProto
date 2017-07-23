@@ -42,7 +42,7 @@ Parameters:
 * method - help.getTermsOfService
 * params - {}
 
-```
+
 
 ### As a user:
 

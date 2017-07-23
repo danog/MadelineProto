@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.unblock
 * params - {"id": InputUser, }
 
-```
+
 
 ### As a user:
 

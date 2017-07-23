@@ -49,7 +49,7 @@ Parameters:
 * method - channels.kickFromChannel
 * params - {"channel": InputChannel, "user_id": InputUser, "kicked": Bool, }
 
-```
+
 
 ### As a user:
 

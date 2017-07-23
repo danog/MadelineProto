@@ -47,7 +47,7 @@ Parameters:
 * method - help.getInviteText
 * params - {"lang_code": "string", }
 
-```
+
 
 ### As a user:
 

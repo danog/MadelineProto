@@ -50,7 +50,7 @@ Parameters:
 * method - photos.uploadProfilePhoto
 * params - {"file": InputFile, "caption": "string", "geo_point": InputGeoPoint, "crop": InputPhotoCrop, }
 
-```
+
 
 ### As a user:
 

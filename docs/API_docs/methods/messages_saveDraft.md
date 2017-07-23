@@ -52,7 +52,7 @@ Parameters:
 * method - messages.saveDraft
 * params - {"no_webpage": Bool, "reply_to_msg_id": int, "peer": InputPeer, "message": "string", "entities": [MessageEntity], "parse_mode": "string"}
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getSavedGifs
 * params - {"hash": int, }
 
-```
+
 
 ### As a user:
 

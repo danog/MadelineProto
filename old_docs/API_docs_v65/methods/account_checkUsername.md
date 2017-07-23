@@ -47,7 +47,7 @@ Parameters:
 * method - account.checkUsername
 * params - {"username": "string", }
 
-```
+
 
 ### As a user:
 

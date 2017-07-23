@@ -53,7 +53,7 @@ Parameters:
 * method - viewMessages
 * params - {"chat_id": InputPeer, "message_ids": [long], }
 
-```
+
 
 ### As a user:
 

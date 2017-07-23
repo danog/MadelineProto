@@ -52,7 +52,7 @@ Parameters:
 * method - getGroup
 * params - {"group_id": int, }
 
-```
+
 
 ### As a user:
 

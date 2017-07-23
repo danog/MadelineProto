@@ -48,7 +48,7 @@ Parameters:
 * method - messages.setTyping
 * params - {"peer": InputPeer, "action": SendMessageAction, }
 
-```
+
 
 ### As a user:
 

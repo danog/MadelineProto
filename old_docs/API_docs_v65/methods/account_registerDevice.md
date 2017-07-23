@@ -48,7 +48,7 @@ Parameters:
 * method - account.registerDevice
 * params - {"token_type": int, "token": "string", }
 
-```
+
 
 ### As a user:
 

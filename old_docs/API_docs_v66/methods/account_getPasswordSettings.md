@@ -47,7 +47,7 @@ Parameters:
 * method - account.getPasswordSettings
 * params - {"current_password_hash": "bytes", }
 
-```
+
 
 ### As a user:
 

@@ -53,7 +53,7 @@ Parameters:
 * method - toggleChannelSignMessages
 * params - {"channel_id": int, "sign_messages": Bool, }
 
-```
+
 
 ### As a user:
 

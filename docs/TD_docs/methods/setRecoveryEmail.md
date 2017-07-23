@@ -53,7 +53,7 @@ Parameters:
 * method - setRecoveryEmail
 * params - {"password": "string", "new_recovery_email": "string", }
 
-```
+
 
 ### As a user:
 

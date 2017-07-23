@@ -50,7 +50,7 @@ Parameters:
 * method - channels.getParticipants
 * params - {"channel": InputChannel, "filter": ChannelParticipantsFilter, "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

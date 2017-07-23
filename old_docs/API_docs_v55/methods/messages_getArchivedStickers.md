@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getArchivedStickers
 * params - {"offset_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - help.saveAppLog
 * params - {"events": [InputAppEvent], }
 
-```
+
 
 ### As a user:
 

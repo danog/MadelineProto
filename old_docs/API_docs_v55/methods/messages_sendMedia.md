@@ -53,7 +53,7 @@ Parameters:
 * method - messages.sendMedia
 * params - {"silent": Bool, "background": Bool, "clear_draft": Bool, "peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, "reply_markup": ReplyMarkup, }
 
-```
+
 
 ### As a user:
 

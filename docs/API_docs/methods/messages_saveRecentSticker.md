@@ -49,7 +49,7 @@ Parameters:
 * method - messages.saveRecentSticker
 * params - {"attached": Bool, "id": InputDocument, "unsave": Bool, }
 
-```
+
 
 ### As a user:
 

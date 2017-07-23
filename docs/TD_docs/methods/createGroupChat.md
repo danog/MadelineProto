@@ -52,7 +52,7 @@ Parameters:
 * method - createGroupChat
 * params - {"group_id": int, }
 
-```
+
 
 ### As a user:
 

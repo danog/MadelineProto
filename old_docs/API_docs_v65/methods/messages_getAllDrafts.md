@@ -42,7 +42,7 @@ Parameters:
 * method - messages.getAllDrafts
 * params - {}
 
-```
+
 
 ### As a user:
 

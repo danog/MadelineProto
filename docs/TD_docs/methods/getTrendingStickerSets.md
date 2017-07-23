@@ -51,7 +51,7 @@ Parameters:
 * method - getTrendingStickerSets
 * params - {}
 
-```
+
 
 ### As a user:
 

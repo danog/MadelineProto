@@ -48,7 +48,7 @@ Parameters:
 * method - messages.searchGifs
 * params - {"q": "string", "offset": int, }
 
-```
+
 
 ### As a user:
 

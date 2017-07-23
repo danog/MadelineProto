@@ -48,7 +48,7 @@ Parameters:
 * method - channels.readHistory
 * params - {"channel": InputChannel, "max_id": int, }
 
-```
+
 
 ### As a user:
 

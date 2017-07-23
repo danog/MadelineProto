@@ -53,7 +53,7 @@ Parameters:
 * method - deleteMessagesFromUser
 * params - {"chat_id": InputPeer, "user_id": int, }
 
-```
+
 
 ### As a user:
 

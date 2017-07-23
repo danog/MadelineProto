@@ -45,7 +45,7 @@ Parameters:
 * method - test.callEmpty
 * params - {}
 
-```
+
 
 ### As a user:
 

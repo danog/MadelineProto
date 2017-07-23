@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getMaskStickers
 * params - {"hash": int, }
 
-```
+
 
 ### As a user:
 

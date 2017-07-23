@@ -54,7 +54,7 @@ Parameters:
 * method - editInlineMessageText
 * params - {"inline_message_id": "string", "reply_markup": ReplyMarkup, "input_message_content": InputMessageContent, }
 
-```
+
 
 ### As a user:
 

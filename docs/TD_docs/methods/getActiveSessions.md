@@ -51,7 +51,7 @@ Parameters:
 * method - getActiveSessions
 * params - {}
 
-```
+
 
 ### As a user:
 

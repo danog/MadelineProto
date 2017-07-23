@@ -47,7 +47,7 @@ Parameters:
 * method - users.getFullUser
 * params - {"id": InputUser, }
 
-```
+
 
 ### As a user:
 

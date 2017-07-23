@@ -50,7 +50,7 @@ Parameters:
 * method - messages.readHistory
 * params - {"peer": InputPeer, "max_id": int, "offset": int, "read_contents": Bool, }
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - help.getAppChangelog
 * params - {"prev_app_version": "string", }
 
-```
+
 
 ### As a user:
 

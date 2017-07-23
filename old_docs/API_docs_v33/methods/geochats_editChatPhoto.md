@@ -48,7 +48,7 @@ Parameters:
 * method - geochats.editChatPhoto
 * params - {"peer": InputGeoChat, "photo": InputChatPhoto, }
 
-```
+
 
 ### As a user:
 

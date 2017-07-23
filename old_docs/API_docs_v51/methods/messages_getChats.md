@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getChats
 * params - {"id": [int], }
 
-```
+
 
 ### As a user:
 

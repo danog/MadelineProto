@@ -47,7 +47,7 @@ Parameters:
 * method - payments.getPaymentForm
 * params - {"msg_id": int, }
 
-```
+
 
 ### As a user:
 

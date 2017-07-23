@@ -49,7 +49,7 @@ Parameters:
 * method - account.sendChangePhoneCode
 * params - {"allow_flashcall": Bool, "phone_number": "string", "current_number": Bool, }
 
-```
+
 
 ### As a user:
 

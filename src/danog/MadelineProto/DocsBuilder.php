@@ -249,7 +249,7 @@ Parameters:
 * method - '.$rmethod.'
 * params - {'.$json_params.'}
 
-```
+
 
 ### As a user:
 

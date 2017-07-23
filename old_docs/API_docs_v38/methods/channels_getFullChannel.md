@@ -47,7 +47,7 @@ Parameters:
 * method - channels.getFullChannel
 * params - {"channel": InputChannel, }
 
-```
+
 
 ### As a user:
 

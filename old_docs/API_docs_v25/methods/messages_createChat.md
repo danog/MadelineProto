@@ -48,7 +48,7 @@ Parameters:
 * method - messages.createChat
 * params - {"users": [InputUser], "title": "string", }
 
-```
+
 
 ### As a user:
 

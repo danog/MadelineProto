@@ -47,7 +47,7 @@ Parameters:
 * method - messages.receivedQueue
 * params - {"max_qts": int, }
 
-```
+
 
 ### As a user:
 

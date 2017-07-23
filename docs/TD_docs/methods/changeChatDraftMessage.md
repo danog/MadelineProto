@@ -53,7 +53,7 @@ Parameters:
 * method - changeChatDraftMessage
 * params - {"chat_id": InputPeer, "draft_message": draftMessage, }
 
-```
+
 
 ### As a user:
 

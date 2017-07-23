@@ -42,7 +42,7 @@ Parameters:
 * method - destroy_auth_key
 * params - {}
 
-```
+
 
 ### As a user:
 

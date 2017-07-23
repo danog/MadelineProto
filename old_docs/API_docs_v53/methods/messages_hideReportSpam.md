@@ -47,7 +47,7 @@ Parameters:
 * method - messages.hideReportSpam
 * params - {"peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

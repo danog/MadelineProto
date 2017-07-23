@@ -48,7 +48,7 @@ Parameters:
 * method - messages.reorderStickerSets
 * params - {"masks": Bool, "order": [long], }
 
-```
+
 
 ### As a user:
 

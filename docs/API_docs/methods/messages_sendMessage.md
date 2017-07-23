@@ -56,7 +56,7 @@ Parameters:
 * method - messages.sendMessage
 * params - {"no_webpage": Bool, "silent": Bool, "background": Bool, "clear_draft": Bool, "peer": InputPeer, "reply_to_msg_id": int, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - account.updateStatus
 * params - {"offline": Bool, }
 
-```
+
 
 ### As a user:
 

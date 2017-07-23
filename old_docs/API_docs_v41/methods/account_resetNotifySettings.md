@@ -42,7 +42,7 @@ Parameters:
 * method - account.resetNotifySettings
 * params - {}
 
-```
+
 
 ### As a user:
 

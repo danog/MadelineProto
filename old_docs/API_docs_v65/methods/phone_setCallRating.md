@@ -49,7 +49,7 @@ Parameters:
 * method - phone.setCallRating
 * params - {"peer": InputPhoneCall, "rating": int, "comment": "string", }
 
-```
+
 
 ### As a user:
 

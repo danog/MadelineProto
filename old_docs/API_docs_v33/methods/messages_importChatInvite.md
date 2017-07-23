@@ -47,7 +47,7 @@ Parameters:
 * method - messages.importChatInvite
 * params - {"hash": "string", }
 
-```
+
 
 ### As a user:
 

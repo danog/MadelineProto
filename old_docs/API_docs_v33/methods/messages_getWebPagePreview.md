@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getWebPagePreview
 * params - {"message": "string", }
 
-```
+
 
 ### As a user:
 

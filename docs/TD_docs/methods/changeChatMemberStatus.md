@@ -54,7 +54,7 @@ Parameters:
 * method - changeChatMemberStatus
 * params - {"chat_id": InputPeer, "user_id": int, "status": ChatMemberStatus, }
 
-```
+
 
 ### As a user:
 

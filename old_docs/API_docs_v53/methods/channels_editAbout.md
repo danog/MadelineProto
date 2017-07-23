@@ -48,7 +48,7 @@ Parameters:
 * method - channels.editAbout
 * params - {"channel": InputChannel, "about": "string", }
 
-```
+
 
 ### As a user:
 

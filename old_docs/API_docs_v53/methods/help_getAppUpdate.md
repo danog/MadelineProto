@@ -42,7 +42,7 @@ Parameters:
 * method - help.getAppUpdate
 * params - {}
 
-```
+
 
 ### As a user:
 

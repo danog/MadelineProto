@@ -52,7 +52,7 @@ Parameters:
 * method - changeAccountTtl
 * params - {"ttl": accountTtl, }
 
-```
+
 
 ### As a user:
 

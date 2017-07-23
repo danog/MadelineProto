@@ -53,7 +53,7 @@ Parameters:
 * method - changeChannelAbout
 * params - {"channel_id": int, "about": "string", }
 
-```
+
 
 ### As a user:
 

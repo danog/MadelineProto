@@ -48,7 +48,7 @@ Parameters:
 * method - messages.sendMedia
 * params - {"peer": InputPeer, "media": InputMedia, }
 
-```
+
 
 ### As a user:
 

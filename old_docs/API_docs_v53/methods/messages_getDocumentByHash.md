@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getDocumentByHash
 * params - {"sha256": "bytes", "size": int, "mime_type": "string", }
 
-```
+
 
 ### As a user:
 

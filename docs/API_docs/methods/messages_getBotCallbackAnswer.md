@@ -50,7 +50,7 @@ Parameters:
 * method - messages.getBotCallbackAnswer
 * params - {"game": Bool, "peer": InputPeer, "msg_id": int, "data": "bytes", }
 
-```
+
 
 ### As a user:
 

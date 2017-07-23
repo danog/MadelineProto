@@ -56,7 +56,7 @@ Parameters:
 * method - answerCallbackQuery
 * params - {"callback_query_id": long, "text": "string", "show_alert": Bool, "url": "string", "cache_time": int, }
 
-```
+
 
 ### As a user:
 

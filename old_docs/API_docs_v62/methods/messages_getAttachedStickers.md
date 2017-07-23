@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getAttachedStickers
 * params - {"media": InputStickeredMedia, }
 
-```
+
 
 ### As a user:
 

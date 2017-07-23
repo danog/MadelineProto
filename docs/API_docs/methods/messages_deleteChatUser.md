@@ -48,7 +48,7 @@ Parameters:
 * method - messages.deleteChatUser
 * params - {"chat_id": InputPeer, "user_id": InputUser, }
 
-```
+
 
 ### As a user:
 

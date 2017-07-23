@@ -56,7 +56,7 @@ Parameters:
 * method - searchMessages
 * params - {"query": "string", "offset_date": int, "offset_chat_id": long, "offset_message_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -54,7 +54,7 @@ Parameters:
 * method - getUserProfilePhotos
 * params - {"user_id": int, "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

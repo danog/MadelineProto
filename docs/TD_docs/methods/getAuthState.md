@@ -51,7 +51,7 @@ Parameters:
 * method - getAuthState
 * params - {}
 
-```
+
 
 ### As a user:
 

@@ -42,7 +42,7 @@ Parameters:
 * method - help.getConfig
 * params - {}
 
-```
+
 
 ### As a user:
 

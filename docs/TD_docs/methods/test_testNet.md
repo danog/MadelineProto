@@ -45,7 +45,7 @@ Parameters:
 * method - test.testNet
 * params - {}
 
-```
+
 
 ### As a user:
 

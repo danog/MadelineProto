@@ -50,7 +50,7 @@ Parameters:
 * method - test.callBytes
 * params - {"x": "bytes", }
 
-```
+
 
 ### As a user:
 

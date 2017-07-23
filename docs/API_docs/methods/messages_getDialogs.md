@@ -51,7 +51,7 @@ Parameters:
 * method - messages.getDialogs
 * params - {"exclude_pinned": Bool, "offset_date": int, "offset_id": int, "offset_peer": InputPeer, "limit": int, }
 
-```
+
 
 ### As a user:
 

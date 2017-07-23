@@ -52,7 +52,7 @@ Parameters:
 * method - deleteRecentlyFoundChat
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

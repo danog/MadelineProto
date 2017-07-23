@@ -53,7 +53,7 @@ Parameters:
 * method - deleteChatHistory
 * params - {"chat_id": InputPeer, "remove_from_chat_list": Bool, }
 
-```
+
 
 ### As a user:
 

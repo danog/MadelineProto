@@ -49,7 +49,7 @@ Parameters:
 * method - set_client_DH_params
 * params - {"nonce": int128, "server_nonce": int128, "encrypted_data": "string", }
 
-```
+
 
 ### As a user:
 

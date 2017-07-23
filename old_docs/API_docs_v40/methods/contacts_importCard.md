@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.importCard
 * params - {"export_card": [int], }
 
-```
+
 
 ### As a user:
 

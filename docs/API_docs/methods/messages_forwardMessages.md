@@ -52,7 +52,7 @@ Parameters:
 * method - messages.forwardMessages
 * params - {"silent": Bool, "background": Bool, "with_my_score": Bool, "from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

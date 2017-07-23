@@ -48,7 +48,7 @@ Parameters:
 * method - messages.deleteMessages
 * params - {"revoke": Bool, "id": [int], }
 
-```
+
 
 ### As a user:
 

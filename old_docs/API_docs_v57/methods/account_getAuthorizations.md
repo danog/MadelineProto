@@ -42,7 +42,7 @@ Parameters:
 * method - account.getAuthorizations
 * params - {}
 
-```
+
 
 ### As a user:
 

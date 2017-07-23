@@ -54,7 +54,7 @@ Parameters:
 * method - addChatMember
 * params - {"chat_id": InputPeer, "user_id": int, "forward_limit": int, }
 
-```
+
 
 ### As a user:
 

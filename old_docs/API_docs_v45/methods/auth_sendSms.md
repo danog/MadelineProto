@@ -48,7 +48,7 @@ Parameters:
 * method - auth.sendSms
 * params - {"phone_number": "string", "phone_code_hash": "string", }
 
-```
+
 
 ### As a user:
 

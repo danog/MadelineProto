@@ -53,7 +53,7 @@ Parameters:
 * method - addChatMembers
 * params - {"chat_id": InputPeer, "user_ids": [int], }
 
-```
+
 
 ### As a user:
 

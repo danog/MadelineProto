@@ -48,7 +48,7 @@ Parameters:
 * method - geochats.setTyping
 * params - {"peer": InputGeoChat, "typing": Bool, }
 
-```
+
 
 ### As a user:
 

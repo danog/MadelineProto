@@ -48,7 +48,7 @@ Parameters:
 * method - auth.sendInvites
 * params - {"phone_numbers": ["string"], "message": "string", }
 
-```
+
 
 ### As a user:
 

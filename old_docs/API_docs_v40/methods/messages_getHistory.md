@@ -51,7 +51,7 @@ Parameters:
 * method - messages.getHistory
 * params - {"peer": InputPeer, "offset": int, "max_id": int, "min_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

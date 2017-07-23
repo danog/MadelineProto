@@ -42,7 +42,7 @@ Parameters:
 * method - account.getWallPapers
 * params - {}
 
-```
+
 
 ### As a user:
 

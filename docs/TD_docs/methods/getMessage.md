@@ -53,7 +53,7 @@ Parameters:
 * method - getMessage
 * params - {"chat_id": InputPeer, "message_id": long, }
 
-```
+
 
 ### As a user:
 

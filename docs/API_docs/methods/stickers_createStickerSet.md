@@ -51,7 +51,7 @@ Parameters:
 * method - stickers.createStickerSet
 * params - {"masks": Bool, "user_id": InputUser, "title": "string", "short_name": "string", "stickers": [InputStickerSetItem], }
 
-```
+
 
 ### As a user:
 

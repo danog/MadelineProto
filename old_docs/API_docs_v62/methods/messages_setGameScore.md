@@ -52,7 +52,7 @@ Parameters:
 * method - messages.setGameScore
 * params - {"edit_message": Bool, "force": Bool, "peer": InputPeer, "id": int, "user_id": InputUser, "score": int, }
 
-```
+
 
 ### As a user:
 

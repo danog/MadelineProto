@@ -42,7 +42,7 @@ Parameters:
 * method - help.getCdnConfig
 * params - {}
 
-```
+
 
 ### As a user:
 

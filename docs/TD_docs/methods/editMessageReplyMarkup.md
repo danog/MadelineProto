@@ -54,7 +54,7 @@ Parameters:
 * method - editMessageReplyMarkup
 * params - {"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, }
 
-```
+
 
 ### As a user:
 

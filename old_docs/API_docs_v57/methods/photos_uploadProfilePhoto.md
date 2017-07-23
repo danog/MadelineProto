@@ -47,7 +47,7 @@ Parameters:
 * method - photos.uploadProfilePhoto
 * params - {"file": InputFile, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - blockUser
 * params - {"user_id": int, }
 
-```
+
 
 ### As a user:
 

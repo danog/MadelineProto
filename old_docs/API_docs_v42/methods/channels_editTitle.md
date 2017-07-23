@@ -48,7 +48,7 @@ Parameters:
 * method - channels.editTitle
 * params - {"channel": InputChannel, "title": "string", }
 
-```
+
 
 ### As a user:
 

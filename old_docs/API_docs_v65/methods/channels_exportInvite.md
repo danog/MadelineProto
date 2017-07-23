@@ -47,7 +47,7 @@ Parameters:
 * method - channels.exportInvite
 * params - {"channel": InputChannel, }
 
-```
+
 
 ### As a user:
 

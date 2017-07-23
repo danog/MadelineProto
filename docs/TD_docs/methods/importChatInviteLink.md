@@ -52,7 +52,7 @@ Parameters:
 * method - importChatInviteLink
 * params - {"invite_link": "string", }
 
-```
+
 
 ### As a user:
 

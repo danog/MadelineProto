@@ -48,7 +48,7 @@ Parameters:
 * method - account.getTmpPassword
 * params - {"password_hash": "bytes", "period": int, }
 
-```
+
 
 ### As a user:
 

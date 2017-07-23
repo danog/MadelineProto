@@ -50,7 +50,7 @@ Parameters:
 * method - phone.acceptCall
 * params - {"peer": InputPhoneCall, "g_b": "bytes", "key_fingerprint": long, "protocol": PhoneCallProtocol, }
 
-```
+
 
 ### As a user:
 

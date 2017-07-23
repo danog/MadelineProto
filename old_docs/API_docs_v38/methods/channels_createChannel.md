@@ -49,7 +49,7 @@ Parameters:
 * method - channels.createChannel
 * params - {"title": "string", "about": "string", "users": [InputUser], }
 
-```
+
 
 ### As a user:
 

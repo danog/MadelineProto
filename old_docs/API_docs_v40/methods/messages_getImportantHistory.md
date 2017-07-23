@@ -50,7 +50,7 @@ Parameters:
 * method - messages.getImportantHistory
 * params - {"peer": InputPeer, "max_id": int, "min_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

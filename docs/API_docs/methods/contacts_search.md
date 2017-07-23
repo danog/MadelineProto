@@ -48,7 +48,7 @@ Parameters:
 * method - contacts.search
 * params - {"q": "string", "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - changeAbout
 * params - {"about": "string", }
 
-```
+
 
 ### As a user:
 

@@ -48,7 +48,7 @@ Parameters:
 * method - messages.saveRecentSticker
 * params - {"id": InputDocument, "unsave": Bool, }
 
-```
+
 
 ### As a user:
 

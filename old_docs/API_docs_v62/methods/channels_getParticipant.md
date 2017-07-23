@@ -48,7 +48,7 @@ Parameters:
 * method - channels.getParticipant
 * params - {"channel": InputChannel, "user_id": InputUser, }
 
-```
+
 
 ### As a user:
 

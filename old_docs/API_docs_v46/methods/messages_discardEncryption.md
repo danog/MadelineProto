@@ -47,7 +47,7 @@ Parameters:
 * method - messages.discardEncryption
 * params - {"chat_id": int, }
 
-```
+
 
 ### As a user:
 

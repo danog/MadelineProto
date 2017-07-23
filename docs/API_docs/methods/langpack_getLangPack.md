@@ -47,7 +47,7 @@ Parameters:
 * method - langpack.getLangPack
 * params - {"lang_code": "string", }
 
-```
+
 
 ### As a user:
 

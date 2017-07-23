@@ -49,7 +49,7 @@ Parameters:
 * method - upload.saveFilePart
 * params - {"file_id": long, "file_part": int, "bytes": "bytes", }
 
-```
+
 
 ### As a user:
 

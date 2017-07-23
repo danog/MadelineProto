@@ -51,7 +51,7 @@ Parameters:
 * method - contest.saveDeveloperInfo
 * params - {"vk_id": int, "name": "string", "phone_number": "string", "age": int, "city": "string", }
 
-```
+
 
 ### As a user:
 

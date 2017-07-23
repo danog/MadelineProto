@@ -47,7 +47,7 @@ Parameters:
 * method - help.getTermsOfService
 * params - {"lang_code": "string", }
 
-```
+
 
 ### As a user:
 

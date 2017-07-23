@@ -47,7 +47,7 @@ Parameters:
 * method - messages.clearRecentStickers
 * params - {"attached": Bool, }
 
-```
+
 
 ### As a user:
 

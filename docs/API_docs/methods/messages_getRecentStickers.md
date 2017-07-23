@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getRecentStickers
 * params - {"attached": Bool, "hash": int, }
 
-```
+
 
 ### As a user:
 

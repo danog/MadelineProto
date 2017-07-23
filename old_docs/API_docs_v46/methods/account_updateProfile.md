@@ -48,7 +48,7 @@ Parameters:
 * method - account.updateProfile
 * params - {"first_name": "string", "last_name": "string", }
 
-```
+
 
 ### As a user:
 

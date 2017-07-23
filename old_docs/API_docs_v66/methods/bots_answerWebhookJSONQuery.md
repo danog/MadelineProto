@@ -48,7 +48,7 @@ Parameters:
 * method - bots.answerWebhookJSONQuery
 * params - {"query_id": long, "data": DataJSON, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - getChannelFull
 * params - {"channel_id": int, }
 
-```
+
 
 ### As a user:
 

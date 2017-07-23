@@ -47,7 +47,7 @@ Parameters:
 * method - payments.getPaymentReceipt
 * params - {"msg_id": int, }
 
-```
+
 
 ### As a user:
 

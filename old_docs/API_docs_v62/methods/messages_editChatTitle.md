@@ -48,7 +48,7 @@ Parameters:
 * method - messages.editChatTitle
 * params - {"chat_id": InputPeer, "title": "string", }
 
-```
+
 
 ### As a user:
 

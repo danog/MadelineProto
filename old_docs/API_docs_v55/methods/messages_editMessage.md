@@ -53,7 +53,7 @@ Parameters:
 * method - messages.editMessage
 * params - {"no_webpage": Bool, "peer": InputPeer, "id": int, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}
 
-```
+
 
 ### As a user:
 

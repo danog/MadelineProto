@@ -51,7 +51,7 @@ Parameters:
 * method - getRecentInlineBots
 * params - {}
 
-```
+
 
 ### As a user:
 

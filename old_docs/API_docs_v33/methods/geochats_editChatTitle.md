@@ -49,7 +49,7 @@ Parameters:
 * method - geochats.editChatTitle
 * params - {"peer": InputGeoChat, "title": "string", "address": "string", }
 
-```
+
 
 ### As a user:
 

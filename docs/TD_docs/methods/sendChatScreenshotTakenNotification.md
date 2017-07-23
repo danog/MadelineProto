@@ -52,7 +52,7 @@ Parameters:
 * method - sendChatScreenshotTakenNotification
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

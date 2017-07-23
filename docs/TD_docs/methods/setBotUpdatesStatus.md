@@ -53,7 +53,7 @@ Parameters:
 * method - setBotUpdatesStatus
 * params - {"pending_update_count": int, "error_message": "string", }
 
-```
+
 
 ### As a user:
 

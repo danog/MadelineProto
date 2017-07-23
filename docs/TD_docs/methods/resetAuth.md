@@ -52,7 +52,7 @@ Parameters:
 * method - resetAuth
 * params - {"force": Bool, }
 
-```
+
 
 ### As a user:
 

@@ -53,7 +53,7 @@ Parameters:
 * method - messages.sendInlineBotResult
 * params - {"broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "query_id": long, "id": "string", }
 
-```
+
 
 ### As a user:
 

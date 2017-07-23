@@ -47,7 +47,7 @@ Parameters:
 * method - messages.readFeaturedStickers
 * params - {"id": [long], }
 
-```
+
 
 ### As a user:
 

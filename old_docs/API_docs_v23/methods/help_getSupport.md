@@ -42,7 +42,7 @@ Parameters:
 * method - help.getSupport
 * params - {}
 
-```
+
 
 ### As a user:
 

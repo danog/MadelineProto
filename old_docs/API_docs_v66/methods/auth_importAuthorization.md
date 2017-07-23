@@ -48,7 +48,7 @@ Parameters:
 * method - auth.importAuthorization
 * params - {"id": int, "bytes": "bytes", }
 
-```
+
 
 ### As a user:
 

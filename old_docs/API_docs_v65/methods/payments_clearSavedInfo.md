@@ -48,7 +48,7 @@ Parameters:
 * method - payments.clearSavedInfo
 * params - {"credentials": Bool, "info": Bool, }
 
-```
+
 
 ### As a user:
 

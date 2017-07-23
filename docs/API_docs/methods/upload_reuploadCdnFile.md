@@ -48,7 +48,7 @@ Parameters:
 * method - upload.reuploadCdnFile
 * params - {"file_token": "bytes", "request_token": "bytes", }
 
-```
+
 
 ### As a user:
 

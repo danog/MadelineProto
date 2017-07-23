@@ -48,7 +48,7 @@ Parameters:
 * method - photos.updateProfilePhoto
 * params - {"id": InputPhoto, "crop": InputPhotoCrop, }
 
-```
+
 
 ### As a user:
 

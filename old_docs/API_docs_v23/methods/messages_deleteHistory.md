@@ -48,7 +48,7 @@ Parameters:
 * method - messages.deleteHistory
 * params - {"peer": InputPeer, "offset": int, }
 
-```
+
 
 ### As a user:
 

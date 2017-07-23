@@ -48,7 +48,7 @@ Parameters:
 * method - messages.forwardMessages
 * params - {"peer": InputPeer, "id": [int], }
 
-```
+
 
 ### As a user:
 

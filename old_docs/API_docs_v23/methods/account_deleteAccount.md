@@ -47,7 +47,7 @@ Parameters:
 * method - account.deleteAccount
 * params - {"reason": "string", }
 
-```
+
 
 ### As a user:
 

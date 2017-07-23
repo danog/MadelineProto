@@ -42,7 +42,7 @@ Parameters:
 * method - contacts.getStatuses
 * params - {}
 
-```
+
 
 ### As a user:
 

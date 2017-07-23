@@ -47,7 +47,7 @@ Parameters:
 * method - channels.getChannels
 * params - {"id": [InputChannel], }
 
-```
+
 
 ### As a user:
 

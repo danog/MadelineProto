@@ -52,7 +52,7 @@ Parameters:
 * method - getPrivacy
 * params - {"key": PrivacyKey, }
 
-```
+
 
 ### As a user:
 

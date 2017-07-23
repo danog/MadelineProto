@@ -42,7 +42,7 @@ Parameters:
 * method - langpack.getLanguages
 * params - {}
 
-```
+
 
 ### As a user:
 

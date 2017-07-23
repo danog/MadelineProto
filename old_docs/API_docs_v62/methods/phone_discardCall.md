@@ -50,7 +50,7 @@ Parameters:
 * method - phone.discardCall
 * params - {"peer": InputPhoneCall, "duration": int, "reason": PhoneCallDiscardReason, "connection_id": long, }
 
-```
+
 
 ### As a user:
 

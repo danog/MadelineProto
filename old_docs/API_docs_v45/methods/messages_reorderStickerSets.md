@@ -47,7 +47,7 @@ Parameters:
 * method - messages.reorderStickerSets
 * params - {"order": [long], }
 
-```
+
 
 ### As a user:
 

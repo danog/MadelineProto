@@ -50,7 +50,7 @@ Parameters:
 * method - channels.createChannel
 * params - {"broadcast": Bool, "megagroup": Bool, "title": "string", "about": "string", }
 
-```
+
 
 ### As a user:
 

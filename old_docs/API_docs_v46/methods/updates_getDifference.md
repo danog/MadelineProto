@@ -49,7 +49,7 @@ Parameters:
 * method - updates.getDifference
 * params - {"pts": int, "date": int, "qts": int, }
 
-```
+
 
 ### As a user:
 

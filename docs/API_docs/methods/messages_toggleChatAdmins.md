@@ -48,7 +48,7 @@ Parameters:
 * method - messages.toggleChatAdmins
 * params - {"chat_id": InputPeer, "enabled": Bool, }
 
-```
+
 
 ### As a user:
 

@@ -50,7 +50,7 @@ Parameters:
 * method - geochats.createGeoChat
 * params - {"title": "string", "geo_point": InputGeoPoint, "address": "string", "venue": "string", }
 
-```
+
 
 ### As a user:
 

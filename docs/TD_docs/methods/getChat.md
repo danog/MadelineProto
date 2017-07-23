@@ -52,7 +52,7 @@ Parameters:
 * method - getChat
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - searchPublicChat
 * params - {"username": "string", }
 
-```
+
 
 ### As a user:
 

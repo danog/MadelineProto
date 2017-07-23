@@ -52,7 +52,7 @@ Parameters:
 * method - getRecoveryEmail
 * params - {"password": "string", }
 
-```
+
 
 ### As a user:
 

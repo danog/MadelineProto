@@ -56,7 +56,7 @@ Parameters:
 * method - setInlineGameScore
 * params - {"inline_message_id": "string", "edit_message": Bool, "user_id": int, "score": int, "force": Bool, }
 
-```
+
 
 ### As a user:
 

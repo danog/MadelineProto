@@ -42,7 +42,7 @@ Parameters:
 * method - account.getAccountTTL
 * params - {}
 
-```
+
 
 ### As a user:
 

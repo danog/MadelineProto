@@ -47,7 +47,7 @@ Parameters:
 * method - get_future_salts
 * params - {"num": int, }
 
-```
+
 
 ### As a user:
 

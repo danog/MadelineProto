@@ -58,7 +58,7 @@ Parameters:
 * method - answerInlineQuery
 * params - {"inline_query_id": long, "is_personal": Bool, "results": [InputInlineQueryResult], "cache_time": int, "next_offset": "string", "switch_pm_text": "string", "switch_pm_parameter": "string", }
 
-```
+
 
 ### As a user:
 

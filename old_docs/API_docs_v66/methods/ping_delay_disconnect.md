@@ -48,7 +48,7 @@ Parameters:
 * method - ping_delay_disconnect
 * params - {"ping_id": long, "disconnect_delay": int, }
 
-```
+
 
 ### As a user:
 

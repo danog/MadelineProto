@@ -47,7 +47,7 @@ Parameters:
 * method - destroy_session
 * params - {"session_id": long, }
 
-```
+
 
 ### As a user:
 

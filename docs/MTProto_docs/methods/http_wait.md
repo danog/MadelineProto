@@ -49,7 +49,7 @@ Parameters:
 * method - http_wait
 * params - {"max_delay": int, "wait_after": int, "max_wait": int, }
 
-```
+
 
 ### As a user:
 

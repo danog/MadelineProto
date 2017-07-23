@@ -49,7 +49,7 @@ Parameters:
 * method - messages.readHistory
 * params - {"peer": InputPeer, "max_id": int, "offset": int, }
 
-```
+
 
 ### As a user:
 

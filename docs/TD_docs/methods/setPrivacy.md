@@ -53,7 +53,7 @@ Parameters:
 * method - setPrivacy
 * params - {"key": PrivacyKey, "rules": privacyRules, }
 
-```
+
 
 ### As a user:
 

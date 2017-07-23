@@ -54,7 +54,7 @@ Parameters:
 * method - checkAuthCode
 * params - {"code": "string", "first_name": "string", "last_name": "string", }
 
-```
+
 
 ### As a user:
 

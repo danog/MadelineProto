@@ -48,7 +48,7 @@ Parameters:
 * method - messages.sendEncrypted
 * params - {"peer": InputEncryptedChat, "message": DecryptedMessage, }
 
-```
+
 
 ### As a user:
 

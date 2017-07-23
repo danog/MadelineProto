@@ -48,7 +48,7 @@ Parameters:
 * method - channels.editPhoto
 * params - {"channel": InputChannel, "photo": InputChatPhoto, }
 
-```
+
 
 ### As a user:
 

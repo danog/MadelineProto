@@ -47,7 +47,7 @@ Parameters:
 * method - auth.checkPhone
 * params - {"phone_number": "string", }
 
-```
+
 
 ### As a user:
 

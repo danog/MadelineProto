@@ -52,7 +52,7 @@ Parameters:
 * method - getAttachedStickerSets
 * params - {"file_id": int, }
 
-```
+
 
 ### As a user:
 

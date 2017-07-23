@@ -47,7 +47,7 @@ Parameters:
 * method - auth.checkPassword
 * params - {"password_hash": "bytes", }
 
-```
+
 
 ### As a user:
 

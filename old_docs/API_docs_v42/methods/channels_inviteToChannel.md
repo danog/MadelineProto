@@ -48,7 +48,7 @@ Parameters:
 * method - channels.inviteToChannel
 * params - {"channel": InputChannel, "users": [InputUser], }
 
-```
+
 
 ### As a user:
 

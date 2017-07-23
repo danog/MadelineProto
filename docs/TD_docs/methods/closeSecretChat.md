@@ -52,7 +52,7 @@ Parameters:
 * method - closeSecretChat
 * params - {"secret_chat_id": int, }
 
-```
+
 
 ### As a user:
 

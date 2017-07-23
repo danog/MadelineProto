@@ -53,7 +53,7 @@ Parameters:
 * method - channels.getAdminLog
 * params - {"channel": InputChannel, "q": "string", "events_filter": ChannelAdminLogEventsFilter, "admins": [InputUser], "max_id": long, "min_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -54,7 +54,7 @@ Parameters:
 * method - getGameHighScores
 * params - {"chat_id": InputPeer, "message_id": long, "user_id": int, }
 
-```
+
 
 ### As a user:
 

@@ -51,7 +51,7 @@ Parameters:
 * method - resetAllNotificationSettings
 * params - {}
 
-```
+
 
 ### As a user:
 

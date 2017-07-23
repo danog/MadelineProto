@@ -52,7 +52,7 @@ Parameters:
 * method - createNewSecretChat
 * params - {"user_id": int, }
 
-```
+
 
 ### As a user:
 

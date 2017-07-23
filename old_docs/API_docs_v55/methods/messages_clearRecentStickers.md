@@ -42,7 +42,7 @@ Parameters:
 * method - messages.clearRecentStickers
 * params - {}
 
-```
+
 
 ### As a user:
 

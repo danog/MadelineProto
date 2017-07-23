@@ -49,7 +49,7 @@ Parameters:
 * method - channels.editAdmin
 * params - {"channel": InputChannel, "user_id": InputUser, "admin_rights": ChannelAdminRights, }
 
-```
+
 
 ### As a user:
 

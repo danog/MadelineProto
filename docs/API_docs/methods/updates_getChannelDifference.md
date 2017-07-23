@@ -51,7 +51,7 @@ Parameters:
 * method - updates.getChannelDifference
 * params - {"force": Bool, "channel": InputChannel, "filter": ChannelMessagesFilter, "pts": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

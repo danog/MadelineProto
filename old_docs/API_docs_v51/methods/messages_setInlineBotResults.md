@@ -53,7 +53,7 @@ Parameters:
 * method - messages.setInlineBotResults
 * params - {"gallery": Bool, "private": Bool, "query_id": long, "results": [InputBotInlineResult], "cache_time": int, "next_offset": "string", "switch_pm": InlineBotSwitchPM, }
 
-```
+
 
 ### As a user:
 

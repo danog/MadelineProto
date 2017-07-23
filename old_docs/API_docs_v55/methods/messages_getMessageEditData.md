@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getMessageEditData
 * params - {"peer": InputPeer, "id": int, }
 
-```
+
 
 ### As a user:
 

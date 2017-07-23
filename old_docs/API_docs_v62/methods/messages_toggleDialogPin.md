@@ -48,7 +48,7 @@ Parameters:
 * method - messages.toggleDialogPin
 * params - {"pinned": Bool, "peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

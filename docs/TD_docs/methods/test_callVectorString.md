@@ -50,7 +50,7 @@ Parameters:
 * method - test.callVectorString
 * params - {"x": ["string"], }
 
-```
+
 
 ### As a user:
 

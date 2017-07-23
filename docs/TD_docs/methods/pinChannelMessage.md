@@ -54,7 +54,7 @@ Parameters:
 * method - pinChannelMessage
 * params - {"channel_id": int, "message_id": long, "disable_notification": Bool, }
 
-```
+
 
 ### As a user:
 

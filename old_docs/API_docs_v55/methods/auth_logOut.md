@@ -42,7 +42,7 @@ Parameters:
 * method - auth.logOut
 * params - {}
 
-```
+
 
 ### As a user:
 

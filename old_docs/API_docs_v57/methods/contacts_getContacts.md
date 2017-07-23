@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.getContacts
 * params - {"hash": "string", }
 
-```
+
 
 ### As a user:
 

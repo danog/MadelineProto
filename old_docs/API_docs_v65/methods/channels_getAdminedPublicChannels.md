@@ -42,7 +42,7 @@ Parameters:
 * method - channels.getAdminedPublicChannels
 * params - {}
 
-```
+
 
 ### As a user:
 

@@ -54,7 +54,7 @@ Parameters:
 * method - createNewChannelChat
 * params - {"title": "string", "is_supergroup": Bool, "about": "string", }
 
-```
+
 
 ### As a user:
 

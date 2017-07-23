@@ -57,7 +57,7 @@ Parameters:
 * method - sendInlineQueryResultMessage
 * params - {"chat_id": InputPeer, "reply_to_message_id": long, "disable_notification": Bool, "from_background": Bool, "query_id": long, "result_id": "string", }
 
-```
+
 
 ### As a user:
 

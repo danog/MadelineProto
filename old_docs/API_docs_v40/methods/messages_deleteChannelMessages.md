@@ -48,7 +48,7 @@ Parameters:
 * method - messages.deleteChannelMessages
 * params - {"peer": InputPeer, "id": [int], }
 
-```
+
 
 ### As a user:
 

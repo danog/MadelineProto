@@ -51,7 +51,7 @@ Parameters:
 * method - deleteRecentlyFoundChats
 * params - {}
 
-```
+
 
 ### As a user:
 

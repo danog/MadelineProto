@@ -51,7 +51,7 @@ Parameters:
 * method - resendChangePhoneNumberCode
 * params - {}
 
-```
+
 
 ### As a user:
 

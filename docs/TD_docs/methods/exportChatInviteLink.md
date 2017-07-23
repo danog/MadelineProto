@@ -52,7 +52,7 @@ Parameters:
 * method - exportChatInviteLink
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

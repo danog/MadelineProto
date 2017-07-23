@@ -48,7 +48,7 @@ Parameters:
 * method - channels.exportMessageLink
 * params - {"channel": InputChannel, "id": int, }
 
-```
+
 
 ### As a user:
 

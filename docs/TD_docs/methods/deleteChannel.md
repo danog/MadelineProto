@@ -52,7 +52,7 @@ Parameters:
 * method - deleteChannel
 * params - {"channel_id": int, }
 
-```
+
 
 ### As a user:
 

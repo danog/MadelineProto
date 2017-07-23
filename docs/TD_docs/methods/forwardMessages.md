@@ -56,7 +56,7 @@ Parameters:
 * method - forwardMessages
 * params - {"chat_id": InputPeer, "from_chat_id": long, "message_ids": [long], "disable_notification": Bool, "from_background": Bool, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - getStickers
 * params - {"emoji": "string", }
 
-```
+
 
 ### As a user:
 

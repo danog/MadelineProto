@@ -48,7 +48,7 @@ Parameters:
 * method - phone.saveCallDebug
 * params - {"peer": InputPhoneCall, "debug": DataJSON, }
 
-```
+
 
 ### As a user:
 

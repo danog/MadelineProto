@@ -49,7 +49,7 @@ Parameters:
 * method - messages.sendMessage
 * params - {"peer": InputPeer, "reply_to_msg_id": int, "message": "string", }
 
-```
+
 
 ### As a user:
 

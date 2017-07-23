@@ -42,7 +42,7 @@ Parameters:
 * method - help.getAppChangelog
 * params - {}
 
-```
+
 
 ### As a user:
 

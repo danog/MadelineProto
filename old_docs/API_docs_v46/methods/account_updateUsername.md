@@ -47,7 +47,7 @@ Parameters:
 * method - account.updateUsername
 * params - {"username": "string", }
 
-```
+
 
 ### As a user:
 

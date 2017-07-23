@@ -47,7 +47,7 @@ Parameters:
 * method - channels.joinChannel
 * params - {"channel": InputChannel, }
 
-```
+
 
 ### As a user:
 

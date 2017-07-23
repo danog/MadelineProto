@@ -53,7 +53,7 @@ Parameters:
 * method - searchContacts
 * params - {"query": "string", "limit": int, }
 
-```
+
 
 ### As a user:
 

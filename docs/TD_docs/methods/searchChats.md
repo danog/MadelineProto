@@ -53,7 +53,7 @@ Parameters:
 * method - searchChats
 * params - {"query": "string", "limit": int, }
 
-```
+
 
 ### As a user:
 

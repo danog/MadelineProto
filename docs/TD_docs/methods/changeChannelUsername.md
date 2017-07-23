@@ -53,7 +53,7 @@ Parameters:
 * method - changeChannelUsername
 * params - {"channel_id": int, "username": "string", }
 
-```
+
 
 ### As a user:
 

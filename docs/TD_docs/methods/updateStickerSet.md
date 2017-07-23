@@ -54,7 +54,7 @@ Parameters:
 * method - updateStickerSet
 * params - {"set_id": long, "is_installed": Bool, "is_archived": Bool, }
 
-```
+
 
 ### As a user:
 

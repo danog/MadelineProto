@@ -51,7 +51,7 @@ Parameters:
 * method - terminateAllOtherSessions
 * params - {}
 
-```
+
 
 ### As a user:
 

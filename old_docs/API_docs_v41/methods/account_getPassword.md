@@ -42,7 +42,7 @@ Parameters:
 * method - account.getPassword
 * params - {}
 
-```
+
 
 ### As a user:
 

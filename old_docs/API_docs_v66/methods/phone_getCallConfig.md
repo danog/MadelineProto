@@ -42,7 +42,7 @@ Parameters:
 * method - phone.getCallConfig
 * params - {}
 
-```
+
 
 ### As a user:
 

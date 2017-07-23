@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getWebPage
 * params - {"url": "string", "hash": int, }
 
-```
+
 
 ### As a user:
 

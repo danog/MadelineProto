@@ -49,7 +49,7 @@ Parameters:
 * method - messages.setBotCallbackAnswer
 * params - {"alert": Bool, "query_id": long, "message": "string", }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - getStickerSets
 * params - {"is_masks": Bool, }
 
-```
+
 
 ### As a user:
 

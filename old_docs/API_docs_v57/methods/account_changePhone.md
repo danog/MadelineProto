@@ -49,7 +49,7 @@ Parameters:
 * method - account.changePhone
 * params - {"phone_number": "string", "phone_code_hash": "string", "phone_code": "string", }
 
-```
+
 
 ### As a user:
 

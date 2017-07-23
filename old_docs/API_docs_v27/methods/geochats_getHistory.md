@@ -50,7 +50,7 @@ Parameters:
 * method - geochats.getHistory
 * params - {"peer": InputGeoChat, "offset": int, "max_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

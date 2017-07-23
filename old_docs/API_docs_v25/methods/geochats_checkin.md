@@ -47,7 +47,7 @@ Parameters:
 * method - geochats.checkin
 * params - {"peer": InputGeoChat, }
 
-```
+
 
 ### As a user:
 

@@ -56,7 +56,7 @@ Parameters:
 * method - searchChatMessages
 * params - {"chat_id": InputPeer, "query": "string", "from_message_id": long, "limit": int, "filter": SearchMessagesFilter, }
 
-```
+
 
 ### As a user:
 

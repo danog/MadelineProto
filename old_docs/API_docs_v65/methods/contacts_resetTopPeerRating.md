@@ -48,7 +48,7 @@ Parameters:
 * method - contacts.resetTopPeerRating
 * params - {"category": TopPeerCategory, "peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

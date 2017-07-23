@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getInlineBotResults
 * params - {"bot": InputUser, "query": "string", "offset": "string", }
 
-```
+
 
 ### As a user:
 

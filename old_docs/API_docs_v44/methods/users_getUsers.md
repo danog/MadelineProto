@@ -47,7 +47,7 @@ Parameters:
 * method - users.getUsers
 * params - {"id": [InputUser], }
 
-```
+
 
 ### As a user:
 

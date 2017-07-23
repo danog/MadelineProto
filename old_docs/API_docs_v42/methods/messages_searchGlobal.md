@@ -51,7 +51,7 @@ Parameters:
 * method - messages.searchGlobal
 * params - {"q": "string", "offset_date": int, "offset_peer": InputPeer, "offset_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - messages.acceptEncryption
 * params - {"peer": InputEncryptedChat, "g_b": "bytes", "key_fingerprint": long, }
 
-```
+
 
 ### As a user:
 

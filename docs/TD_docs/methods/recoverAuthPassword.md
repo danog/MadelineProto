@@ -52,7 +52,7 @@ Parameters:
 * method - recoverAuthPassword
 * params - {"recovery_code": "string", }
 
-```
+
 
 ### As a user:
 

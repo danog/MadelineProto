@@ -48,7 +48,7 @@ Parameters:
 * method - geochats.getRecents
 * params - {"offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

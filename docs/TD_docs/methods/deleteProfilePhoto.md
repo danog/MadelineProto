@@ -52,7 +52,7 @@ Parameters:
 * method - deleteProfilePhoto
 * params - {"profile_photo_id": long, }
 
-```
+
 
 ### As a user:
 

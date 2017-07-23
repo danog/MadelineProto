@@ -48,7 +48,7 @@ Parameters:
 * method - account.updateNotifySettings
 * params - {"peer": InputNotifyPeer, "settings": InputPeerNotifySettings, }
 
-```
+
 
 ### As a user:
 

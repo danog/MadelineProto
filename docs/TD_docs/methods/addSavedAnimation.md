@@ -52,7 +52,7 @@ Parameters:
 * method - addSavedAnimation
 * params - {"animation": InputFile, }
 
-```
+
 
 ### As a user:
 

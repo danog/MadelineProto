@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getBotCallbackAnswer
 * params - {"peer": InputPeer, "msg_id": int, "data": "bytes", }
 
-```
+
 
 ### As a user:
 

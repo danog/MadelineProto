@@ -48,7 +48,7 @@ Parameters:
 * method - messages.setEncryptedTyping
 * params - {"peer": InputEncryptedChat, "typing": Bool, }
 
-```
+
 
 ### As a user:
 

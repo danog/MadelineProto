@@ -42,7 +42,7 @@ Parameters:
 * method - messages.readFeaturedStickers
 * params - {}
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - channels.editBanned
 * params - {"channel": InputChannel, "user_id": InputUser, "banned_rights": ChannelBannedRights, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - clearRecentStickers
 * params - {"is_attached": Bool, }
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - account.sendConfirmPhoneCode
 * params - {"allow_flashcall": Bool, "hash": "string", "current_number": Bool, }
 
-```
+
 
 ### As a user:
 

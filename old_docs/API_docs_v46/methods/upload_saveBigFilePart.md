@@ -50,7 +50,7 @@ Parameters:
 * method - upload.saveBigFilePart
 * params - {"file_id": long, "file_part": int, "file_total_parts": int, "bytes": "bytes", }
 
-```
+
 
 ### As a user:
 

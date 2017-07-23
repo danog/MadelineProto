@@ -52,7 +52,7 @@ Parameters:
 * method - auth.sendCode
 * params - {"allow_flashcall": Bool, "phone_number": "string", "current_number": Bool, "api_id": int, "api_hash": "string", "lang_code": "string", }
 
-```
+
 
 ### As a user:
 

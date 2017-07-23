@@ -45,7 +45,7 @@ Parameters:
 * method - test.forceGetDifference
 * params - {}
 
-```
+
 
 ### As a user:
 

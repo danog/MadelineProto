@@ -53,7 +53,7 @@ Parameters:
 * method - editInlineMessageReplyMarkup
 * params - {"inline_message_id": "string", "reply_markup": ReplyMarkup, }
 
-```
+
 
 ### As a user:
 

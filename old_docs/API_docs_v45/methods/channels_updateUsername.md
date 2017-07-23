@@ -48,7 +48,7 @@ Parameters:
 * method - channels.updateUsername
 * params - {"channel": InputChannel, "username": "string", }
 
-```
+
 
 ### As a user:
 

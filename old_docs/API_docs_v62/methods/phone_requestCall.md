@@ -49,7 +49,7 @@ Parameters:
 * method - phone.requestCall
 * params - {"user_id": InputUser, "g_a": "bytes", "protocol": PhoneCallProtocol, }
 
-```
+
 
 ### As a user:
 

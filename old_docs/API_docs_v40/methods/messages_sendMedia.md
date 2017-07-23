@@ -50,7 +50,7 @@ Parameters:
 * method - messages.sendMedia
 * params - {"peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, "reply_markup": ReplyMarkup, }
 
-```
+
 
 ### As a user:
 

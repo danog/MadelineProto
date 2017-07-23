@@ -55,7 +55,7 @@ Parameters:
 * method - getChannelMembers
 * params - {"channel_id": int, "filter": ChannelMembersFilter, "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

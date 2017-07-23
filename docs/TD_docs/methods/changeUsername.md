@@ -52,7 +52,7 @@ Parameters:
 * method - changeUsername
 * params - {"username": "string", }
 
-```
+
 
 ### As a user:
 

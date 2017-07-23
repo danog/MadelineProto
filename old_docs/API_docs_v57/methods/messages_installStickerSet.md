@@ -48,7 +48,7 @@ Parameters:
 * method - messages.installStickerSet
 * params - {"stickerset": InputStickerSet, "archived": Bool, }
 
-```
+
 
 ### As a user:
 

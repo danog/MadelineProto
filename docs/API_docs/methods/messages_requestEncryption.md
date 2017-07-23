@@ -48,7 +48,7 @@ Parameters:
 * method - messages.requestEncryption
 * params - {"user_id": InputUser, "g_a": "bytes", }
 
-```
+
 
 ### As a user:
 

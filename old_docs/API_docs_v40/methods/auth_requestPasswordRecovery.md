@@ -42,7 +42,7 @@ Parameters:
 * method - auth.requestPasswordRecovery
 * params - {}
 
-```
+
 
 ### As a user:
 

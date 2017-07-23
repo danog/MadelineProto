@@ -51,7 +51,7 @@ Parameters:
 * method - getAccountTtl
 * params - {}
 
-```
+
 
 ### As a user:
 

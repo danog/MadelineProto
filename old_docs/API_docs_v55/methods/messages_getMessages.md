@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getMessages
 * params - {"id": [int], }
 
-```
+
 
 ### As a user:
 

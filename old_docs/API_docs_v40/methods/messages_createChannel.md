@@ -47,7 +47,7 @@ Parameters:
 * method - messages.createChannel
 * params - {"title": "string", }
 
-```
+
 
 ### As a user:
 

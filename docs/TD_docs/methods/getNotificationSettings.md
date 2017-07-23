@@ -52,7 +52,7 @@ Parameters:
 * method - getNotificationSettings
 * params - {"scope": NotificationSettingsScope, }
 
-```
+
 
 ### As a user:
 

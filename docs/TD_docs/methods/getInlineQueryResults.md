@@ -56,7 +56,7 @@ Parameters:
 * method - getInlineQueryResults
 * params - {"bot_user_id": int, "chat_id": InputPeer, "user_location": location, "query": "string", "offset": "string", }
 
-```
+
 
 ### As a user:
 

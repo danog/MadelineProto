@@ -48,7 +48,7 @@ Parameters:
 * method - account.unregisterDevice
 * params - {"token_type": int, "token": "string", }
 
-```
+
 
 ### As a user:
 

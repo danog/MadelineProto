@@ -47,7 +47,7 @@ Parameters:
 * method - contacts.getSuggested
 * params - {"limit": int, }
 
-```
+
 
 ### As a user:
 

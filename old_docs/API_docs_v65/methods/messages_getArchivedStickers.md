@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getArchivedStickers
 * params - {"masks": Bool, "offset_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

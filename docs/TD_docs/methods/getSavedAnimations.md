@@ -51,7 +51,7 @@ Parameters:
 * method - getSavedAnimations
 * params - {}
 
-```
+
 
 ### As a user:
 

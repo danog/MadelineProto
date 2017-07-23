@@ -47,7 +47,7 @@ Parameters:
 * method - phone.receivedCall
 * params - {"peer": InputPhoneCall, }
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - stickers.removeStickerFromSet
 * params - {"sticker": InputDocument, }
 
-```
+
 
 ### As a user:
 

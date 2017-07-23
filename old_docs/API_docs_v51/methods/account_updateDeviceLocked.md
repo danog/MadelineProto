@@ -47,7 +47,7 @@ Parameters:
 * method - account.updateDeviceLocked
 * params - {"period": int, }
 
-```
+
 
 ### As a user:
 

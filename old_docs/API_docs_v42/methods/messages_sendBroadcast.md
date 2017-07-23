@@ -49,7 +49,7 @@ Parameters:
 * method - messages.sendBroadcast
 * params - {"contacts": [InputUser], "message": "string", "media": InputMedia, }
 
-```
+
 
 ### As a user:
 

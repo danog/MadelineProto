@@ -52,7 +52,7 @@ Parameters:
 * method - checkAuthBotToken
 * params - {"token": "string", }
 
-```
+
 
 ### As a user:
 

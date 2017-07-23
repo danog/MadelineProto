@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getAllStickers
 * params - {"hash": int, }
 
-```
+
 
 ### As a user:
 

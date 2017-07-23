@@ -52,7 +52,7 @@ Parameters:
 * method - getStickerEmojis
 * params - {"sticker": InputFile, }
 
-```
+
 
 ### As a user:
 

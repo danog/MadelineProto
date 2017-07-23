@@ -51,7 +51,7 @@ Parameters:
 * method - getWallpapers
 * params - {}
 
-```
+
 
 ### As a user:
 

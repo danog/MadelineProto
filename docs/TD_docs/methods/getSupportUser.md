@@ -51,7 +51,7 @@ Parameters:
 * method - getSupportUser
 * params - {}
 
-```
+
 
 ### As a user:
 

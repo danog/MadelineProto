@@ -48,7 +48,7 @@ Parameters:
 * method - messages.reorderPinnedDialogs
 * params - {"force": Bool, "order": [InputPeer], }
 
-```
+
 
 ### As a user:
 

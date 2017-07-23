@@ -47,7 +47,7 @@ Parameters:
 * method - channels.leaveChannel
 * params - {"channel": InputChannel, }
 
-```
+
 
 ### As a user:
 

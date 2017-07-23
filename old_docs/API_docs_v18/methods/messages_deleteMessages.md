@@ -47,7 +47,7 @@ Parameters:
 * method - messages.deleteMessages
 * params - {"id": [int], }
 
-```
+
 
 ### As a user:
 

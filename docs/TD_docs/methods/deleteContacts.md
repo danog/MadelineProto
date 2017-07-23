@@ -52,7 +52,7 @@ Parameters:
 * method - deleteContacts
 * params - {"user_ids": [int], }
 
-```
+
 
 ### As a user:
 

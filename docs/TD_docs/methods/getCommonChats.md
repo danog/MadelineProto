@@ -54,7 +54,7 @@ Parameters:
 * method - getCommonChats
 * params - {"user_id": int, "offset_chat_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

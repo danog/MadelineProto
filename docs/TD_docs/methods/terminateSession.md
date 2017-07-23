@@ -52,7 +52,7 @@ Parameters:
 * method - terminateSession
 * params - {"session_id": long, }
 
-```
+
 
 ### As a user:
 

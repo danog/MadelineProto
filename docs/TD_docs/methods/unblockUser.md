@@ -52,7 +52,7 @@ Parameters:
 * method - unblockUser
 * params - {"user_id": int, }
 
-```
+
 
 ### As a user:
 

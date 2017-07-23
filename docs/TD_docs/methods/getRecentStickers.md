@@ -52,7 +52,7 @@ Parameters:
 * method - getRecentStickers
 * params - {"is_attached": Bool, }
 
-```
+
 
 ### As a user:
 

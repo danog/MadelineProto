@@ -47,7 +47,7 @@ Parameters:
 * method - auth.dropTempAuthKeys
 * params - {"except_auth_keys": [long], }
 
-```
+
 
 ### As a user:
 

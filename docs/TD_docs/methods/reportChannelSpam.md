@@ -54,7 +54,7 @@ Parameters:
 * method - reportChannelSpam
 * params - {"channel_id": int, "user_id": int, "message_ids": [long], }
 
-```
+
 
 ### As a user:
 

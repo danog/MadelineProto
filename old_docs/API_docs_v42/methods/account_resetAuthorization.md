@@ -47,7 +47,7 @@ Parameters:
 * method - account.resetAuthorization
 * params - {"hash": long, }
 
-```
+
 
 ### As a user:
 

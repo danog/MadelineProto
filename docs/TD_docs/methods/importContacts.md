@@ -52,7 +52,7 @@ Parameters:
 * method - importContacts
 * params - {"contacts": [contact], }
 
-```
+
 
 ### As a user:
 

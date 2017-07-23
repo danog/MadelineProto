@@ -48,7 +48,7 @@ Parameters:
 * method - bots.sendCustomRequest
 * params - {"custom_method": "string", "params": DataJSON, }
 
-```
+
 
 ### As a user:
 

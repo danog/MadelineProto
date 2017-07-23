@@ -47,7 +47,7 @@ Parameters:
 * method - invokeWithLayer18
 * params - {"query": !X, }
 
-```
+
 
 ### As a user:
 

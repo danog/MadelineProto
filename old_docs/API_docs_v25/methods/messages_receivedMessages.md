@@ -47,7 +47,7 @@ Parameters:
 * method - messages.receivedMessages
 * params - {"max_id": int, }
 
-```
+
 
 ### As a user:
 

@@ -48,7 +48,7 @@ Parameters:
 * method - channels.getDialogs
 * params - {"offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - geochats.getLocated
 * params - {"geo_point": InputGeoPoint, "radius": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

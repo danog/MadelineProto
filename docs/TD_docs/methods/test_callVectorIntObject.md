@@ -50,7 +50,7 @@ Parameters:
 * method - test.callVectorIntObject
 * params - {"x": [test_Int], }
 
-```
+
 
 ### As a user:
 

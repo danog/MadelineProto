@@ -47,7 +47,7 @@ Parameters:
 * method - channels.deleteChannel
 * params - {"channel": InputChannel, }
 
-```
+
 
 ### As a user:
 

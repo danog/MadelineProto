@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getUnusedStickers
 * params - {"limit": int, }
 
-```
+
 
 ### As a user:
 

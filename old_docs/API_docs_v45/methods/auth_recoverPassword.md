@@ -47,7 +47,7 @@ Parameters:
 * method - auth.recoverPassword
 * params - {"code": "string", }
 
-```
+
 
 ### As a user:
 

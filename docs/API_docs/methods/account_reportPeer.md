@@ -48,7 +48,7 @@ Parameters:
 * method - account.reportPeer
 * params - {"peer": InputPeer, "reason": ReportReason, }
 
-```
+
 
 ### As a user:
 

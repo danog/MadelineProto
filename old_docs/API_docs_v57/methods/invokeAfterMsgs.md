@@ -48,7 +48,7 @@ Parameters:
 * method - invokeAfterMsgs
 * params - {"msg_ids": [long], "query": !X, }
 
-```
+
 
 ### As a user:
 

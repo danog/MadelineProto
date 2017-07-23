@@ -52,7 +52,7 @@ Parameters:
 * method - initConnection
 * params - {"api_id": int, "device_model": "string", "system_version": "string", "app_version": "string", "lang_code": "string", "query": !X, }
 
-```
+
 
 ### As a user:
 

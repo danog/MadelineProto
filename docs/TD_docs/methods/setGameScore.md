@@ -57,7 +57,7 @@ Parameters:
 * method - setGameScore
 * params - {"chat_id": InputPeer, "message_id": long, "edit_message": Bool, "user_id": int, "score": int, "force": Bool, }
 
-```
+
 
 ### As a user:
 

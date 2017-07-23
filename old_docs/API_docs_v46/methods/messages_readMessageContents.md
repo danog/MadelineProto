@@ -47,7 +47,7 @@ Parameters:
 * method - messages.readMessageContents
 * params - {"id": [int], }
 
-```
+
 
 ### As a user:
 

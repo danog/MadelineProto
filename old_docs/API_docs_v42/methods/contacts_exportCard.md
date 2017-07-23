@@ -42,7 +42,7 @@ Parameters:
 * method - contacts.exportCard
 * params - {}
 
-```
+
 
 ### As a user:
 

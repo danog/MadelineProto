@@ -49,7 +49,7 @@ Parameters:
 * method - channels.updatePinnedMessage
 * params - {"silent": Bool, "channel": InputChannel, "id": int, }
 
-```
+
 
 ### As a user:
 

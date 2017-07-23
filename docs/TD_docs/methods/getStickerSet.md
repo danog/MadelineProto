@@ -52,7 +52,7 @@ Parameters:
 * method - getStickerSet
 * params - {"set_id": long, }
 
-```
+
 
 ### As a user:
 

@@ -52,7 +52,7 @@ Parameters:
 * method - checkAuthPassword
 * params - {"password": "string", }
 
-```
+
 
 ### As a user:
 

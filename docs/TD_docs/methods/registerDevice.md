@@ -52,7 +52,7 @@ Parameters:
 * method - registerDevice
 * params - {"device_token": DeviceToken, }
 
-```
+
 
 ### As a user:
 

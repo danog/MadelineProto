@@ -53,7 +53,7 @@ Parameters:
 * method - auth.importBotAuthorization
 * params - {"a": Bool, "b": Bool, "c": Bool, "d": Bool, "api_id": int, "api_hash": "string", "bot_auth_token": "string", }
 
-```
+
 
 ### As a user:
 

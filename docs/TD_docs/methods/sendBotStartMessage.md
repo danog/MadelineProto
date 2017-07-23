@@ -54,7 +54,7 @@ Parameters:
 * method - sendBotStartMessage
 * params - {"bot_user_id": int, "chat_id": InputPeer, "parameter": "string", }
 
-```
+
 
 ### As a user:
 

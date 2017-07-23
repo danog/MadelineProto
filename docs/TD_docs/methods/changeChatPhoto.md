@@ -53,7 +53,7 @@ Parameters:
 * method - changeChatPhoto
 * params - {"chat_id": InputPeer, "photo": InputFile, }
 
-```
+
 
 ### As a user:
 

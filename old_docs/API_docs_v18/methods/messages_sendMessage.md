@@ -48,7 +48,7 @@ Parameters:
 * method - messages.sendMessage
 * params - {"peer": InputPeer, "message": "string", }
 
-```
+
 
 ### As a user:
 

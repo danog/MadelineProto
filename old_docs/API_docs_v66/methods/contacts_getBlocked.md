@@ -48,7 +48,7 @@ Parameters:
 * method - contacts.getBlocked
 * params - {"offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

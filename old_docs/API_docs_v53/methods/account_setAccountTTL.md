@@ -47,7 +47,7 @@ Parameters:
 * method - account.setAccountTTL
 * params - {"ttl": AccountDaysTTL, }
 
-```
+
 
 ### As a user:
 

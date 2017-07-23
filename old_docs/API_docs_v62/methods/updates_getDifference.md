@@ -50,7 +50,7 @@ Parameters:
 * method - updates.getDifference
 * params - {"pts": int, "pts_total_limit": int, "date": int, "qts": int, }
 
-```
+
 
 ### As a user:
 

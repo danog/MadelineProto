@@ -48,7 +48,7 @@ Parameters:
 * method - geochats.sendMedia
 * params - {"peer": InputGeoChat, "media": InputMedia, }
 
-```
+
 
 ### As a user:
 

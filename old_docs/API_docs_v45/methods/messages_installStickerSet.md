@@ -48,7 +48,7 @@ Parameters:
 * method - messages.installStickerSet
 * params - {"stickerset": InputStickerSet, "disabled": Bool, }
 
-```
+
 
 ### As a user:
 

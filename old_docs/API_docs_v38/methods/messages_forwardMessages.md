@@ -49,7 +49,7 @@ Parameters:
 * method - messages.forwardMessages
 * params - {"from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }
 
-```
+
 
 ### As a user:
 

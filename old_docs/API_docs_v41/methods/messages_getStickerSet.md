@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getStickerSet
 * params - {"stickerset": InputStickerSet, }
 
-```
+
 
 ### As a user:
 

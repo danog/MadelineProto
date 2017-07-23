@@ -52,7 +52,7 @@ Parameters:
 * method - createChannelChat
 * params - {"channel_id": int, }
 
-```
+
 
 ### As a user:
 

@@ -54,7 +54,7 @@ Parameters:
 * method - messages.search
 * params - {"peer": InputPeer, "q": "string", "filter": MessagesFilter, "min_date": int, "max_date": int, "offset": int, "max_id": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -55,7 +55,7 @@ Parameters:
 * method - editMessageCaption
 * params - {"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, "caption": "string", }
 
-```
+
 
 ### As a user:
 

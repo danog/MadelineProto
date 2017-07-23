@@ -51,7 +51,7 @@ Parameters:
 * method - getCreatedPublicChannels
 * params - {}
 
-```
+
 
 ### As a user:
 

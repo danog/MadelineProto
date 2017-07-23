@@ -51,7 +51,7 @@ Parameters:
 * method - getMe
 * params - {}
 
-```
+
 
 ### As a user:
 

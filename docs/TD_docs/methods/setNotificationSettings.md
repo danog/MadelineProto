@@ -53,7 +53,7 @@ Parameters:
 * method - setNotificationSettings
 * params - {"scope": NotificationSettingsScope, "notification_settings": notificationSettings, }
 
-```
+
 
 ### As a user:
 

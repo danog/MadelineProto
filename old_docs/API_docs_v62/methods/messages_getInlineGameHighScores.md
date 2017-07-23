@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getInlineGameHighScores
 * params - {"id": InputBotInlineMessageID, "user_id": InputUser, }
 
-```
+
 
 ### As a user:
 

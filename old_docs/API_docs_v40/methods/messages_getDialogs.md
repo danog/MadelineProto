@@ -48,7 +48,7 @@ Parameters:
 * method - messages.getDialogs
 * params - {"offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - messages.uninstallStickerSet
 * params - {"stickerset": InputStickerSet, }
 
-```
+
 
 ### As a user:
 

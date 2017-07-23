@@ -52,7 +52,7 @@ Parameters:
 * method - getOption
 * params - {"name": "string", }
 
-```
+
 
 ### As a user:
 

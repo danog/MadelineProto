@@ -49,7 +49,7 @@ Parameters:
 * method - messages.setBotPrecheckoutResults
 * params - {"success": Bool, "query_id": long, "error": "string", }
 
-```
+
 
 ### As a user:
 

@@ -54,7 +54,7 @@ Parameters:
 * method - getArchivedStickerSets
 * params - {"is_masks": Bool, "offset_sticker_set_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

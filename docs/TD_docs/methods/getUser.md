@@ -52,7 +52,7 @@ Parameters:
 * method - getUser
 * params - {"user_id": int, }
 
-```
+
 
 ### As a user:
 

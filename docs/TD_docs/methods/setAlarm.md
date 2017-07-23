@@ -52,7 +52,7 @@ Parameters:
 * method - setAlarm
 * params - {"seconds": double, }
 
-```
+
 
 ### As a user:
 

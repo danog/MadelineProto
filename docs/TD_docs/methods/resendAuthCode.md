@@ -51,7 +51,7 @@ Parameters:
 * method - resendAuthCode
 * params - {}
 
-```
+
 
 ### As a user:
 

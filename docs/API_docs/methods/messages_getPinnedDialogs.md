@@ -42,7 +42,7 @@ Parameters:
 * method - messages.getPinnedDialogs
 * params - {}
 
-```
+
 
 ### As a user:
 

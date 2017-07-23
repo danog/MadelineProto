@@ -50,7 +50,7 @@ Parameters:
 * method - photos.getUserPhotos
 * params - {"user_id": InputUser, "offset": int, "max_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

@@ -42,7 +42,7 @@ Parameters:
 * method - help.getInviteText
 * params - {}
 
-```
+
 
 ### As a user:
 

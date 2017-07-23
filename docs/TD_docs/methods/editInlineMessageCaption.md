@@ -54,7 +54,7 @@ Parameters:
 * method - editInlineMessageCaption
 * params - {"inline_message_id": "string", "reply_markup": ReplyMarkup, "caption": "string", }
 
-```
+
 
 ### As a user:
 

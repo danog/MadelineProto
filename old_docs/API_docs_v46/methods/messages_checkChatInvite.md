@@ -47,7 +47,7 @@ Parameters:
 * method - messages.checkChatInvite
 * params - {"hash": "string", }
 
-```
+
 
 ### As a user:
 

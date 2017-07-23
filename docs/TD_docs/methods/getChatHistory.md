@@ -55,7 +55,7 @@ Parameters:
 * method - getChatHistory
 * params - {"chat_id": InputPeer, "from_message_id": long, "offset": int, "limit": int, }
 
-```
+
 
 ### As a user:
 

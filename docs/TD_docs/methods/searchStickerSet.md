@@ -52,7 +52,7 @@ Parameters:
 * method - searchStickerSet
 * params - {"name": "string", }
 
-```
+
 
 ### As a user:
 

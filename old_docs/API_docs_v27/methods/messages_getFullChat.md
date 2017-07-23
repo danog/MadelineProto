@@ -47,7 +47,7 @@ Parameters:
 * method - messages.getFullChat
 * params - {"chat_id": InputPeer, }
 
-```
+
 
 ### As a user:
 

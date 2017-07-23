@@ -53,7 +53,7 @@ Parameters:
 * method - sendChatSetTtlMessage
 * params - {"chat_id": InputPeer, "ttl": int, }
 
-```
+
 
 ### As a user:
 

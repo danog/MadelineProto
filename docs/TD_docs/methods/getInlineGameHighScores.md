@@ -53,7 +53,7 @@ Parameters:
 * method - getInlineGameHighScores
 * params - {"inline_message_id": "string", "user_id": int, }
 
-```
+
 
 ### As a user:
 

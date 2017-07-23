@@ -49,7 +49,7 @@ Parameters:
 * method - messages.setBotShippingResults
 * params - {"query_id": long, "error": "string", "shipping_options": [ShippingOption], }
 
-```
+
 
 ### As a user:
 

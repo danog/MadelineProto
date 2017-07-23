@@ -48,7 +48,7 @@ Parameters:
 * method - account.confirmPhone
 * params - {"phone_code_hash": "string", "phone_code": "string", }
 
-```
+
 
 ### As a user:
 

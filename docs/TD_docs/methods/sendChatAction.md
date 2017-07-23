@@ -53,7 +53,7 @@ Parameters:
 * method - sendChatAction
 * params - {"chat_id": InputPeer, "action": SendMessageAction, }
 
-```
+
 
 ### As a user:
 

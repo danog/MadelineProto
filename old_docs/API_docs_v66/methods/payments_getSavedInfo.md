@@ -42,7 +42,7 @@ Parameters:
 * method - payments.getSavedInfo
 * params - {}
 
-```
+
 
 ### As a user:
 

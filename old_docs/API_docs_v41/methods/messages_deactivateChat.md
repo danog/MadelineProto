@@ -48,7 +48,7 @@ Parameters:
 * method - messages.deactivateChat
 * params - {"chat_id": InputPeer, "enabled": Bool, }
 
-```
+
 
 ### As a user:
 

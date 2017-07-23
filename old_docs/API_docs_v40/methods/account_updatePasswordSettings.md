@@ -48,7 +48,7 @@ Parameters:
 * method - account.updatePasswordSettings
 * params - {"current_password_hash": "bytes", "new_settings": account_PasswordInputSettings, }
 
-```
+
 
 ### As a user:
 

@@ -47,7 +47,7 @@ Parameters:
 * method - auth.exportAuthorization
 * params - {"dc_id": int, }
 
-```
+
 
 ### As a user:
 

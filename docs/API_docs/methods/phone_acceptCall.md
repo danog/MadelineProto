@@ -49,7 +49,7 @@ Parameters:
 * method - phone.acceptCall
 * params - {"peer": InputPhoneCall, "g_b": "bytes", "protocol": PhoneCallProtocol, }
 
-```
+
 
 ### As a user:
 

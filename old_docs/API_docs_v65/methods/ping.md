@@ -47,7 +47,7 @@ Parameters:
 * method - ping
 * params - {"ping_id": long, }
 
-```
+
 
 ### As a user:
 

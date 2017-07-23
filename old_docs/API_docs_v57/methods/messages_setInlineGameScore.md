@@ -50,7 +50,7 @@ Parameters:
 * method - messages.setInlineGameScore
 * params - {"edit_message": Bool, "id": InputBotInlineMessageID, "user_id": InputUser, "score": int, }
 
-```
+
 
 ### As a user:
 

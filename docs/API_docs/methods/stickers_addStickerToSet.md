@@ -48,7 +48,7 @@ Parameters:
 * method - stickers.addStickerToSet
 * params - {"stickerset": InputStickerSet, "sticker": InputStickerSetItem, }
 
-```
+
 
 ### As a user:
 

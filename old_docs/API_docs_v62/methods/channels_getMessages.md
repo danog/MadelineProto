@@ -48,7 +48,7 @@ Parameters:
 * method - channels.getMessages
 * params - {"channel": InputChannel, "id": [int], }
 
-```
+
 
 ### As a user:
 

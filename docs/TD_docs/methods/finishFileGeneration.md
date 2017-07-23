@@ -52,7 +52,7 @@ Parameters:
 * method - finishFileGeneration
 * params - {"generation_id": long, }
 
-```
+
 
 ### As a user:
 

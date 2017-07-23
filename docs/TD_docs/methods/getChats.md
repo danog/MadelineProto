@@ -54,7 +54,7 @@ Parameters:
 * method - getChats
 * params - {"offset_order": long, "offset_chat_id": long, "limit": int, }
 
-```
+
 
 ### As a user:
 

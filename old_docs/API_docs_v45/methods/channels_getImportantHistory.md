@@ -52,7 +52,7 @@ Parameters:
 * method - channels.getImportantHistory
 * params - {"channel": InputChannel, "offset_id": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }
 
-```
+
 
 ### As a user:
 

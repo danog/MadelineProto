@@ -49,7 +49,7 @@ Parameters:
 * method - messages.getMessagesViews
 * params - {"peer": InputPeer, "id": [int], "increment": Bool, }
 
-```
+
 
 ### As a user:
 

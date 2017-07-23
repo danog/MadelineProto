@@ -47,7 +47,7 @@ Parameters:
 * method - langpack.getDifference
 * params - {"from_version": int, }
 
-```
+
 
 ### As a user:
 

@@ -49,7 +49,7 @@ Parameters:
 * method - payments.validateRequestedInfo
 * params - {"save": Bool, "msg_id": int, "info": PaymentRequestedInfo, }
 
-```
+
 
 ### As a user:
 

@@ -48,7 +48,7 @@ Parameters:
 * method - help.setBotUpdatesStatus
 * params - {"pending_updates_count": int, "message": "string", }
 
-```
+
 
 ### As a user:
 

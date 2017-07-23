@@ -54,7 +54,7 @@ Parameters:
 * method - setAuthPhoneNumber
 * params - {"phone_number": "string", "allow_flash_call": Bool, "is_current_phone_number": Bool, }
 
-```
+
 
 ### As a user:
 

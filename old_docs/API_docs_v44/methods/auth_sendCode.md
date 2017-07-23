@@ -51,7 +51,7 @@ Parameters:
 * method - auth.sendCode
 * params - {"phone_number": "string", "sms_type": int, "api_id": int, "api_hash": "string", "lang_code": "string", }
 
-```
+
 
 ### As a user:
 

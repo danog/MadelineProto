@@ -53,7 +53,7 @@ Parameters:
 * method - account.registerDevice
 * params - {"token_type": int, "token": "string", "device_model": "string", "system_version": "string", "app_version": "string", "app_sandbox": Bool, "lang_code": "string", }
 
-```
+
 
 ### As a user:
 

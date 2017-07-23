@@ -49,7 +49,7 @@ Parameters:
 * method - messages.sendEncryptedFile
 * params - {"peer": InputEncryptedChat, "message": DecryptedMessage, "file": InputEncryptedFile, }
 
-```
+
 
 ### As a user:
 

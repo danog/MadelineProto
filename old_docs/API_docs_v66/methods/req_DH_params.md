@@ -52,7 +52,7 @@ Parameters:
 * method - req_DH_params
 * params - {"nonce": int128, "server_nonce": int128, "p": "string", "q": "string", "public_key_fingerprint": long, "encrypted_data": "string", }
 
-```
+
 
 ### As a user:
 
