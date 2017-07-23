@@ -24,6 +24,13 @@ description: inputChatPhoto attributes, type and example
 $inputChatPhoto = ['_' => 'inputChatPhoto', 'id' => InputPhoto, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputChatPhoto","id":"InputPhoto"}
+```
+
+
 Or, if you're into Lua:  
 
 

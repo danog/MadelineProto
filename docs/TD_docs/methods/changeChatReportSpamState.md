@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeChatReportSpamState(['chat_id' => InputPeer, 'is_spam_chat' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - changeChatReportSpamState
+* params - {"chat_id":"InputPeer","is_spam_chat":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatReportSpamState`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+is_spam_chat - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

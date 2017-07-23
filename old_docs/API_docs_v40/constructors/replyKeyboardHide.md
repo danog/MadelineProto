@@ -23,6 +23,13 @@ description: replyKeyboardHide attributes, type and example
 $replyKeyboardHide = ['_' => 'replyKeyboardHide', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyKeyboardHide"}
+```
+
+
 Or, if you're into Lua:  
 
 

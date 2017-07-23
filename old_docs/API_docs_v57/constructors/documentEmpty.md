@@ -24,6 +24,13 @@ description: documentEmpty attributes, type and example
 $documentEmpty = ['_' => 'documentEmpty', 'id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentEmpty","id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

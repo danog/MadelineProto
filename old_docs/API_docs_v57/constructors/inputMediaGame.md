@@ -24,6 +24,13 @@ description: inputMediaGame attributes, type and example
 $inputMediaGame = ['_' => 'inputMediaGame', 'id' => InputGame, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaGame","id":"InputGame"}
+```
+
+
 Or, if you're into Lua:  
 
 

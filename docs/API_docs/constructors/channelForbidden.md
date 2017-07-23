@@ -29,6 +29,13 @@ description: channelForbidden attributes, type and example
 $channelForbidden = ['_' => 'channelForbidden', 'broadcast' => Bool, 'megagroup' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'until_date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelForbidden","broadcast":"Bool","megagroup":"Bool","id":"int","access_hash":"long","title":"string","until_date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

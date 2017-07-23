@@ -34,6 +34,13 @@ description: payments_paymentForm attributes, type and example
 $payments_paymentForm = ['_' => 'payments.paymentForm', 'can_save_credentials' => Bool, 'password_missing' => Bool, 'bot_id' => int, 'invoice' => Invoice, 'provider_id' => int, 'url' => string, 'native_provider' => string, 'native_params' => DataJSON, 'saved_info' => PaymentRequestedInfo, 'saved_credentials' => PaymentSavedCredentials, 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"payments.paymentForm","can_save_credentials":"Bool","password_missing":"Bool","bot_id":"int","invoice":"Invoice","provider_id":"int","url":"string","native_provider":"string","native_params":"DataJSON","saved_info":"PaymentRequestedInfo","saved_credentials":"PaymentSavedCredentials","users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

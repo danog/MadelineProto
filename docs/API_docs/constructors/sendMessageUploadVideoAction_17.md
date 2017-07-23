@@ -25,6 +25,13 @@ User uploads a video
 $sendMessageUploadVideoAction_17 = ['_' => 'sendMessageUploadVideoAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageUploadVideoAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

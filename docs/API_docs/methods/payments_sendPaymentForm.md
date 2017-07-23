@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $payments_PaymentResult = $MadelineProto->payments->sendPaymentForm(['msg_id' => int, 'requested_info_id' => string, 'shipping_option_id' => string, 'credentials' => InputPaymentCredentials, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - payments.sendPaymentForm
+* params - {"msg_id":"int","requested_info_id":"string","shipping_option_id":"string","credentials":"InputPaymentCredentials"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.sendPaymentForm`
+
+Parameters:
+
+msg_id - Json encoded int
+requested_info_id - Json encoded string
+shipping_option_id - Json encoded string
+credentials - Json encoded InputPaymentCredentials
+
+
+```
+
 Or, if you're into Lua:
 
 ```

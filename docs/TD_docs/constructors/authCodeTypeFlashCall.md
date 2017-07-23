@@ -26,6 +26,13 @@ Code is delivered by the immediately cancelled call to the specified phone numbe
 $authCodeTypeFlashCall = ['_' => 'authCodeTypeFlashCall', 'pattern' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"authCodeTypeFlashCall","pattern":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: contacts_myLinkEmpty attributes, type and example
 $contacts_myLinkEmpty = ['_' => 'contacts.myLinkEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.myLinkEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -27,6 +27,13 @@ Contains information about one wallpaper
 $wallpaper = ['_' => 'wallpaper', 'sizes' => [photoSize], 'color' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"wallpaper","sizes":["photoSize"],"color":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

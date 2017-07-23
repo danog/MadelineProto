@@ -27,6 +27,13 @@ description: wallPaper attributes, type and example
 $wallPaper = ['_' => 'wallPaper', 'id' => int, 'title' => string, 'sizes' => [PhotoSize], 'color' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"wallPaper","id":"int","title":"string","sizes":["PhotoSize"],"color":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

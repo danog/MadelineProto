@@ -24,7 +24,7 @@ Features:
 
 * It allows you to do everything official clients can do, programmatically!
 
-* *It can make phone calls!*
+* *It can make phone calls!* [See here for instructions](#calls)
 
 * It can be proxied!
 
@@ -410,6 +410,58 @@ $stream = fopen('php://output', 'w'); // Stream to browser like with echo
 $MadelineProto->download_to_stream($message_media, $stream, $cb, $offset, $endoffset); // offset and endoffset are optional parameters that specify the byte from which to start downloading and the byte where to stop downloading (the latter non-inclusive), if not specified default to 0 and the size of the file
 ```
 
+
+### Calls
+
+MadelineProto provides an easy wrapper to work with phone calls.
+
+The wrapper consists in the `\danog\MadelineProto\VoIP` class, that can be installed by compiling the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension.
+
+Please read the whole [VoIP API documentation](https://daniil.it/MadelineProto/API_docs/types/PhoneCall.html) before proceeding.
+
+You can also run [this script](https://daniil.it/php.sh), that will compile the latest version of ZTS PHP, PrimeModule, pthreads, and php-libtgvoip.
+
+It accepts one parameter with the ID of the person to call, and returns a VoIP object that can be used to play audio files, set the hold files, change the configuration and set the output file.
+
+Input/output audio can be converted from/to any audio/video file using ffmpeg (just don't forget to provide the correct number of channels, sample rate and bit depth, `fmpeg -i anyaudioorvideo -f s"$bitnumber"le -ac $channelNumber -ar $bitRate -acodec pcm_s"$bitnumber"le output.raw`).
+
+You can also stream the audio track of video streams (even from youtube), or audio streams. Just stream the data to a FIFO, and use ffmpeg to output the converted audio to another FIFO that will be used as input file.
+
+MadelineProto works using raw signed PCM audio with the sample rate and the bit depth specified in the configuration (see [here](https://daniil.it/MadelineProto/API_docs/types/PhoneCall.html) for info on how to fetch it).
+
+
+Requesting calls is easy, just run the `request_call` method.
+
+```
+$controller = $MadelineProto->request_call('@danogentili')->play('input.raw')->then('inputb.raw')->setHoldFiles(['hold.raw'])->setOutputFile('output.raw');
+$controller->configuration['log_file_path'] = $controller->getOtherID().'.log';
+
+// We need to receive updates in order to know that the other use accepted the call
+while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
+    $MadelineProto->get_updates();
+}
+
+```
+
+
+Accepting calls is just as easy: you will receive an [updatePhoneCall](https://daniil.it/MadelineProto/API_docs/constructors/updatePhoneCall.html) object from your update source (see [update handling](#update-handling)).
+
+This array will contain a VoIP object under the `phone_call` key.
+
+```
+
+$updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+foreach ($updates as $update) {
+    \danog\MadelineProto\Logger::log([$update]);
+    $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
+    switch ($update['update']['_']) {
+        case 'updatePhoneCall':
+        if (is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+            $update['update']['phone_call']->accept()->play('input.raw')->then('inputb.raw')->playOnHold(['hold.raw'])->setOutputFile('output.raw');
+        }
+    }
+}
+```
 
 ### Secret chats
 

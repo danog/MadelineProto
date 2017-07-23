@@ -30,6 +30,13 @@ description: userFull attributes, type and example
 $userFull = ['_' => 'userFull', 'blocked' => Bool, 'user' => User, 'about' => string, 'link' => contacts_Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userFull","blocked":"Bool","user":"User","about":"string","link":"contacts_Link","profile_photo":"Photo","notify_settings":"PeerNotifySettings","bot_info":"BotInfo"}
+```
+
+
 Or, if you're into Lua:  
 
 

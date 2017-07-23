@@ -32,6 +32,13 @@ description: config attributes, type and example
 $config = ['_' => 'config', 'date' => int, 'expires' => int, 'test_mode' => Bool, 'this_dc' => int, 'dc_options' => [DcOption], 'chat_big_size' => int, 'chat_size_max' => int, 'broadcast_size_max' => int, 'disabled_features' => [DisabledFeature], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"config","date":"int","expires":"int","test_mode":"Bool","this_dc":"int","dc_options":["DcOption"],"chat_big_size":"int","chat_size_max":"int","broadcast_size_max":"int","disabled_features":["DisabledFeature"]}
+```
+
+
 Or, if you're into Lua:  
 
 

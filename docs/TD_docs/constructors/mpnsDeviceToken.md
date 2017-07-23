@@ -26,6 +26,13 @@ Token for MPNS
 $mpnsDeviceToken = ['_' => 'mpnsDeviceToken', 'token' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"mpnsDeviceToken","token":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

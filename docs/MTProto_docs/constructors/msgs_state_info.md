@@ -25,6 +25,13 @@ description: msgs_state_info attributes, type and example
 $msgs_state_info = ['_' => 'msgs_state_info', 'req_msg_id' => long, 'info' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"msgs_state_info","req_msg_id":"long","info":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

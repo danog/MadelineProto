@@ -28,6 +28,13 @@ Describes photo
 $photo = ['_' => 'photo', 'id' => long, 'has_stickers' => Bool, 'sizes' => [photoSize], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photo","id":"long","has_stickers":"Bool","sizes":["photoSize"]}
+```
+
+
 Or, if you're into Lua:  
 
 

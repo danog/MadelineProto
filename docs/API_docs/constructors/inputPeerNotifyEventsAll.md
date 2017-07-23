@@ -19,6 +19,13 @@ description: inputPeerNotifyEventsAll attributes, type and example
 $inputPeerNotifyEventsAll = ['_' => 'inputPeerNotifyEventsAll', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPeerNotifyEventsAll"}
+```
+
+
 Or, if you're into Lua:  
 
 

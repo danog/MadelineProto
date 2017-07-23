@@ -26,6 +26,13 @@ Message with information about venue
 $messageVenue = ['_' => 'messageVenue', 'venue' => venue, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageVenue","venue":"venue"}
+```
+
+
 Or, if you're into Lua:  
 
 

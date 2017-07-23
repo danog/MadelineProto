@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - users.getUsers
+* params - {"id":["InputUser"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/users.getUsers`
+
+Parameters:
+
+id - Json encoded  array of InputUser
+
+
+```
+
 Or, if you're into Lua:
 
 ```

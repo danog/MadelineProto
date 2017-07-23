@@ -40,6 +40,34 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.sendInlineBotResult
+* params - {"broadcast":"Bool","peer":"InputPeer","reply_to_msg_id":"int","query_id":"long","id":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendInlineBotResult`
+
+Parameters:
+
+broadcast - Json encoded Bool
+peer - Json encoded InputPeer
+reply_to_msg_id - Json encoded int
+query_id - Json encoded long
+id - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

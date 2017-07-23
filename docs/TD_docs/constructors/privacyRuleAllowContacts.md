@@ -25,6 +25,13 @@ Rule to allow all user contacts
 $privacyRuleAllowContacts = ['_' => 'privacyRuleAllowContacts', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyRuleAllowContacts"}
+```
+
+
 Or, if you're into Lua:  
 
 

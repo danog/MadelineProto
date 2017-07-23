@@ -26,6 +26,13 @@ description: channelParticipantKicked attributes, type and example
 $channelParticipantKicked = ['_' => 'channelParticipantKicked', 'user_id' => int, 'kicked_by' => int, 'date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantKicked","user_id":"int","kicked_by":"int","date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

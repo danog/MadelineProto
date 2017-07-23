@@ -25,6 +25,13 @@ Message is incoming
 $messageIsIncoming = ['_' => 'messageIsIncoming', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageIsIncoming"}
+```
+
+
 Or, if you're into Lua:  
 
 

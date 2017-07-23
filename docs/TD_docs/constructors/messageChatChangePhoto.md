@@ -26,6 +26,13 @@ Chat photo changed
 $messageChatChangePhoto = ['_' => 'messageChatChangePhoto', 'photo' => photo, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageChatChangePhoto","photo":"photo"}
+```
+
+
 Or, if you're into Lua:  
 
 

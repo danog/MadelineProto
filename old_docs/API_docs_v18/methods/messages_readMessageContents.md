@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Vector_of_int = $MadelineProto->messages->readMessageContents(['id' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.readMessageContents
+* params - {"id":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readMessageContents`
+
+Parameters:
+
+id - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

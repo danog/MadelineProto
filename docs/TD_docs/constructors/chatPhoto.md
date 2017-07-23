@@ -27,6 +27,13 @@ Describes chat photo
 $chatPhoto = ['_' => 'chatPhoto', 'small' => file, 'big' => file, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatPhoto","small":"file","big":"file"}
+```
+
+
 Or, if you're into Lua:  
 
 

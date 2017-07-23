@@ -25,6 +25,13 @@ Return only video messages
 $searchMessagesFilterVideo = ['_' => 'searchMessagesFilterVideo', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"searchMessagesFilterVideo"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -45,6 +45,34 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->setInlineGameScore(['inline_message_id' => string, 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - setInlineGameScore
+* params - {"inline_message_id":"string","edit_message":"Bool","user_id":"int","score":"int","force":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setInlineGameScore`
+
+Parameters:
+
+inline_message_id - Json encoded string
+edit_message - Json encoded Bool
+user_id - Json encoded int
+score - Json encoded int
+force - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

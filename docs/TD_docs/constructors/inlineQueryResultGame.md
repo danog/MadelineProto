@@ -27,6 +27,13 @@ Represents information about a game
 $inlineQueryResultGame = ['_' => 'inlineQueryResultGame', 'id' => string, 'game' => game, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineQueryResultGame","id":"string","game":"game"}
+```
+
+
 Or, if you're into Lua:  
 
 

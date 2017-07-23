@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $messages_AllStickers = $MadelineProto->messages->getAllStickers(['hash' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getAllStickers
+* params - {"hash":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAllStickers`
+
+Parameters:
+
+hash - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -30,6 +30,13 @@ Bots only. User has chosen a result of the inline query
 $updateNewChosenInlineResult = ['_' => 'updateNewChosenInlineResult', 'sender_user_id' => int, 'user_location' => location, 'query' => string, 'result_id' => string, 'inline_message_id' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewChosenInlineResult","sender_user_id":"int","user_location":"location","query":"string","result_id":"string","inline_message_id":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

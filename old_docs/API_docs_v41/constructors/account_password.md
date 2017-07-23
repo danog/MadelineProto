@@ -28,6 +28,13 @@ description: account_password attributes, type and example
 $account_password = ['_' => 'account.password', 'current_salt' => bytes, 'new_salt' => bytes, 'hint' => string, 'has_recovery' => Bool, 'email_unconfirmed_pattern' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"account.password","current_salt":"bytes","new_salt":"bytes","hint":"string","has_recovery":"Bool","email_unconfirmed_pattern":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

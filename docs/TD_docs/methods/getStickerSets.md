@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $StickerSets = $MadelineProto->getStickerSets(['is_masks' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getStickerSets
+* params - {"is_masks":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerSets`
+
+Parameters:
+
+is_masks - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

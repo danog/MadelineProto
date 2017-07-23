@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Chats = $MadelineProto->searchPublicChats(['username_prefix' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - searchPublicChats
+* params - {"username_prefix":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchPublicChats`
+
+Parameters:
+
+username_prefix - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

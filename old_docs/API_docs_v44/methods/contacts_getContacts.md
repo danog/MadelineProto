@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $contacts_Contacts = $MadelineProto->contacts->getContacts(['hash' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - contacts.getContacts
+* params - {"hash":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getContacts`
+
+Parameters:
+
+hash - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

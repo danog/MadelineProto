@@ -39,6 +39,30 @@ if (isset($number)) { // Login as a user
 $test_VectorInt = $MadelineProto->test->callVectorInt(['x' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.callVectorInt
+* params - {"x":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callVectorInt`
+
+Parameters:
+
+x - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

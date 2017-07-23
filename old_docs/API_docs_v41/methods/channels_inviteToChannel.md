@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->channels->inviteToChannel(['channel' => InputChannel, 'users' => [InputUser], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.inviteToChannel
+* params - {"channel":"InputChannel","users":["InputUser"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.inviteToChannel`
+
+Parameters:
+
+channel - Json encoded InputChannel
+users - Json encoded  array of InputUser
+
+
+```
+
 Or, if you're into Lua:
 
 ```

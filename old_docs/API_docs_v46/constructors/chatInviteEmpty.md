@@ -19,6 +19,13 @@ description: chatInviteEmpty attributes, type and example
 $chatInviteEmpty = ['_' => 'chatInviteEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatInviteEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

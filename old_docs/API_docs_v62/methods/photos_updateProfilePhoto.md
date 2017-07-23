@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $UserProfilePhoto = $MadelineProto->photos->updateProfilePhoto(['id' => InputPhoto, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - photos.updateProfilePhoto
+* params - {"id":"InputPhoto"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.updateProfilePhoto`
+
+Parameters:
+
+id - Json encoded InputPhoto
+
+
+```
+
 Or, if you're into Lua:
 
 ```

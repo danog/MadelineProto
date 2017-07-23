@@ -25,6 +25,13 @@ description: paymentSavedCredentialsCard attributes, type and example
 $paymentSavedCredentialsCard = ['_' => 'paymentSavedCredentialsCard', 'id' => string, 'title' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"paymentSavedCredentialsCard","id":"string","title":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

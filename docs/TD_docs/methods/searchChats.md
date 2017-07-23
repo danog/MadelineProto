@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Chats = $MadelineProto->searchChats(['query' => string, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - searchChats
+* params - {"query":"string","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchChats`
+
+Parameters:
+
+query - Json encoded string
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

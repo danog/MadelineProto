@@ -25,6 +25,13 @@ User sends geolocation
 $sendMessageGeoLocationAction_17 = ['_' => 'sendMessageGeoLocationAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageGeoLocationAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->auth->bindTempAuthKey(['perm_auth_key_id' => long, 'nonce' => long, 'expires_at' => int, 'encrypted_message' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.bindTempAuthKey
+* params - {"perm_auth_key_id":"long","nonce":"long","expires_at":"int","encrypted_message":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.bindTempAuthKey`
+
+Parameters:
+
+perm_auth_key_id - Json encoded long
+nonce - Json encoded long
+expires_at - Json encoded int
+encrypted_message - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

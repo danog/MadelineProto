@@ -25,6 +25,13 @@ description: stickerPack attributes, type and example
 $stickerPack = ['_' => 'stickerPack', 'emoticon' => string, 'documents' => [long], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickerPack","emoticon":"string","documents":["long"]}
+```
+
+
 Or, if you're into Lua:  
 
 

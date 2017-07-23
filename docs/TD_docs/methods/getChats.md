@@ -43,6 +43,32 @@ if (isset($number)) { // Login as a user
 $Chats = $MadelineProto->getChats(['offset_order' => long, 'offset_chat_id' => long, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getChats
+* params - {"offset_order":"long","offset_chat_id":"long","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChats`
+
+Parameters:
+
+offset_order - Json encoded long
+offset_chat_id - Json encoded long
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

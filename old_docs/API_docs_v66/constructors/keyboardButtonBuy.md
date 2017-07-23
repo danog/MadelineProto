@@ -24,6 +24,13 @@ description: keyboardButtonBuy attributes, type and example
 $keyboardButtonBuy = ['_' => 'keyboardButtonBuy', 'text' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonBuy","text":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

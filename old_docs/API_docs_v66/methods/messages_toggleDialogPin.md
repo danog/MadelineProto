@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->toggleDialogPin(['pinned' => Bool, 'peer' => InputPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.toggleDialogPin
+* params - {"pinned":"Bool","peer":"InputPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleDialogPin`
+
+Parameters:
+
+pinned - Json encoded Bool
+peer - Json encoded InputPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

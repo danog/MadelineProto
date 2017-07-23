@@ -26,6 +26,13 @@ description: inputMediaUploadedAudio attributes, type and example
 $inputMediaUploadedAudio = ['_' => 'inputMediaUploadedAudio', 'file' => InputFile, 'duration' => int, 'mime_type' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedAudio","file":"InputFile","duration":"int","mime_type":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -27,6 +27,13 @@ Message is successfully sent
 $updateMessageSendSucceeded = ['_' => 'updateMessageSendSucceeded', 'message' => message, 'old_message_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateMessageSendSucceeded","message":"message","old_message_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

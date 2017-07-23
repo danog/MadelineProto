@@ -25,6 +25,13 @@ Notification settings applied to all private chats
 $notificationSettingsForPrivateChats = ['_' => 'notificationSettingsForPrivateChats', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"notificationSettingsForPrivateChats"}
+```
+
+
 Or, if you're into Lua:  
 
 

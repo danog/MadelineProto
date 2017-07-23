@@ -19,6 +19,13 @@ description: contactLinkHasPhone attributes, type and example
 $contactLinkHasPhone = ['_' => 'contactLinkHasPhone', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contactLinkHasPhone"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: channelAdminLogEventActionDeleteMessage attributes, type and exampl
 $channelAdminLogEventActionDeleteMessage = ['_' => 'channelAdminLogEventActionDeleteMessage', 'message' => Message, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelAdminLogEventActionDeleteMessage","message":"Message"}
+```
+
+
 Or, if you're into Lua:  
 
 

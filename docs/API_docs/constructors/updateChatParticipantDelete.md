@@ -26,6 +26,13 @@ description: updateChatParticipantDelete attributes, type and example
 $updateChatParticipantDelete = ['_' => 'updateChatParticipantDelete', 'chat_id' => int, 'user_id' => int, 'version' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChatParticipantDelete","chat_id":"int","user_id":"int","version":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

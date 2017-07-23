@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->account->resetNotifySettings();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.resetNotifySettings
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.resetNotifySettings`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

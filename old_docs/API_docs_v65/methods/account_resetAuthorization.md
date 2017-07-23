@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->account->resetAuthorization(['hash' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.resetAuthorization
+* params - {"hash":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.resetAuthorization`
+
+Parameters:
+
+hash - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ description: messageEntityHashtag attributes, type and example
 $messageEntityHashtag = ['_' => 'messageEntityHashtag', 'offset' => int, 'length' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageEntityHashtag","offset":"int","length":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

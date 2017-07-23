@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $AccountDaysTTL = $MadelineProto->account->getAccountTTL();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.getAccountTTL
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getAccountTTL`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

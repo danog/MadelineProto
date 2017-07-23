@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $phone_PhoneCall = $MadelineProto->phone->acceptCall(['peer' => InputPhoneCall, 'g_b' => bytes, 'protocol' => PhoneCallProtocol, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - phone.acceptCall
+* params - {"peer":"InputPhoneCall","g_b":"bytes","protocol":"PhoneCallProtocol"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.acceptCall`
+
+Parameters:
+
+peer - Json encoded InputPhoneCall
+g_b - Json encoded bytes
+protocol - Json encoded PhoneCallProtocol
+
+
+```
+
 Or, if you're into Lua:
 
 ```

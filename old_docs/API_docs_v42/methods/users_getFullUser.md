@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $UserFull = $MadelineProto->users->getFullUser(['id' => InputUser, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - users.getFullUser
+* params - {"id":"InputUser"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/users.getFullUser`
+
+Parameters:
+
+id - Json encoded InputUser
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -26,6 +26,13 @@ Contains list of wallpapers
 $wallpapers = ['_' => 'wallpapers', 'wallpapers' => [wallpaper], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"wallpapers","wallpapers":["wallpaper"]}
+```
+
+
 Or, if you're into Lua:  
 
 

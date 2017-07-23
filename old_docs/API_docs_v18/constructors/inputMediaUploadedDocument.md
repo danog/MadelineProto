@@ -26,6 +26,13 @@ description: inputMediaUploadedDocument attributes, type and example
 $inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'file_name' => string, 'mime_type' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedDocument","file":"InputFile","file_name":"string","mime_type":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $User = $MadelineProto->contacts->importCard(['export_card' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - contacts.importCard
+* params - {"export_card":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.importCard`
+
+Parameters:
+
+export_card - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

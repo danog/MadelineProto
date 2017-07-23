@@ -25,6 +25,13 @@ description: account_tmpPassword attributes, type and example
 $account_tmpPassword = ['_' => 'account.tmpPassword', 'tmp_password' => bytes, 'valid_until' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"account.tmpPassword","tmp_password":"bytes","valid_until":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

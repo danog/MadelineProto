@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->uninstallStickerSet(['stickerset' => InputStickerSet, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.uninstallStickerSet
+* params - {"stickerset":"InputStickerSet"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.uninstallStickerSet`
+
+Parameters:
+
+stickerset - Json encoded InputStickerSet
+
+
+```
+
 Or, if you're into Lua:
 
 ```

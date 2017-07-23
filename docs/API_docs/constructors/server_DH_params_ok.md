@@ -26,6 +26,13 @@ description: server_DH_params_ok attributes, type and example
 $server_DH_params_ok = ['_' => 'server_DH_params_ok', 'nonce' => int128, 'server_nonce' => int128, 'encrypted_answer' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"server_DH_params_ok","nonce":"int128","server_nonce":"int128","encrypted_answer":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

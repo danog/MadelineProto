@@ -24,6 +24,13 @@ description: replyKeyboardMarkup attributes, type and example
 $replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'rows' => [KeyboardButtonRow], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyKeyboardMarkup","rows":["KeyboardButtonRow"]}
+```
+
+
 Or, if you're into Lua:  
 
 

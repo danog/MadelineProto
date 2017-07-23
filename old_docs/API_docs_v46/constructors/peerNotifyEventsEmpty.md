@@ -19,6 +19,13 @@ description: peerNotifyEventsEmpty attributes, type and example
 $peerNotifyEventsEmpty = ['_' => 'peerNotifyEventsEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"peerNotifyEventsEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

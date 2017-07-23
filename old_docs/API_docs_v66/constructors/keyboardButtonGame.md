@@ -24,6 +24,13 @@ description: keyboardButtonGame attributes, type and example
 $keyboardButtonGame = ['_' => 'keyboardButtonGame', 'text' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonGame","text":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

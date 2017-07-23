@@ -24,6 +24,13 @@ description: updatePinnedDialogs attributes, type and example
 $updatePinnedDialogs = ['_' => 'updatePinnedDialogs', 'order' => [Peer], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updatePinnedDialogs","order":["Peer"]}
+```
+
+
 Or, if you're into Lua:  
 
 

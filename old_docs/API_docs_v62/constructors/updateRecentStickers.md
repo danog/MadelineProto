@@ -19,6 +19,13 @@ description: updateRecentStickers attributes, type and example
 $updateRecentStickers = ['_' => 'updateRecentStickers', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateRecentStickers"}
+```
+
+
 Or, if you're into Lua:  
 
 

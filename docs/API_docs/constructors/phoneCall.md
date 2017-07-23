@@ -34,6 +34,13 @@ description: phoneCall attributes, type and example
 $phoneCall = ['_' => 'phoneCall', 'id' => long, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a_or_b' => bytes, 'key_fingerprint' => long, 'protocol' => PhoneCallProtocol, 'connection' => PhoneConnection, 'alternative_connections' => [PhoneConnection], 'start_date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"phoneCall","id":"long","access_hash":"long","date":"int","admin_id":"int","participant_id":"int","g_a_or_b":"bytes","key_fingerprint":"long","protocol":"PhoneCallProtocol","connection":"PhoneConnection","alternative_connections":["PhoneConnection"],"start_date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: messageActionChannelCreate attributes, type and example
 $messageActionChannelCreate = ['_' => 'messageActionChannelCreate', 'title' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionChannelCreate","title":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

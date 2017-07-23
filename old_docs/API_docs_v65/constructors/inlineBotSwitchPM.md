@@ -25,6 +25,13 @@ description: inlineBotSwitchPM attributes, type and example
 $inlineBotSwitchPM = ['_' => 'inlineBotSwitchPM', 'text' => string, 'start_param' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineBotSwitchPM","text":"string","start_param":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

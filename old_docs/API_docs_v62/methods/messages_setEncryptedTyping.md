@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->setEncryptedTyping(['peer' => InputEncryptedChat, 'typing' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.setEncryptedTyping
+* params - {"peer":"InputEncryptedChat","typing":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setEncryptedTyping`
+
+Parameters:
+
+peer - Json encoded InputEncryptedChat
+typing - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

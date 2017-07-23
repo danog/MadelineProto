@@ -24,6 +24,13 @@ description: peerChannel attributes, type and example
 $peerChannel = ['_' => 'peerChannel', 'channel_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"peerChannel","channel_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->toggleChannelSignMessages(['channel_id' => int, 'sign_messages' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - toggleChannelSignMessages
+* params - {"channel_id":"int","sign_messages":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelSignMessages`
+
+Parameters:
+
+channel_id - Json encoded int
+sign_messages - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -24,6 +24,13 @@ description: textConcat attributes, type and example
 $textConcat = ['_' => 'textConcat', 'texts' => [RichText], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textConcat","texts":["RichText"]}
+```
+
+
 Or, if you're into Lua:  
 
 

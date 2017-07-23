@@ -39,6 +39,30 @@ if (isset($number)) { // Login as a user
 $test_Bytes = $MadelineProto->test->callBytes(['x' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.callBytes
+* params - {"x":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callBytes`
+
+Parameters:
+
+x - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

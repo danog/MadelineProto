@@ -25,6 +25,13 @@ description: inputMediaGifExternal attributes, type and example
 $inputMediaGifExternal = ['_' => 'inputMediaGifExternal', 'url' => string, 'q' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaGifExternal","url":"string","q":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

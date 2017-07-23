@@ -45,6 +45,34 @@ if (isset($number)) { // Login as a user
 $InlineQueryResults = $MadelineProto->getInlineQueryResults(['bot_user_id' => int, 'chat_id' => InputPeer, 'user_location' => location, 'query' => string, 'offset' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getInlineQueryResults
+* params - {"bot_user_id":"int","chat_id":"InputPeer","user_location":"location","query":"string","offset":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getInlineQueryResults`
+
+Parameters:
+
+bot_user_id - Json encoded int
+chat_id - Json encoded InputPeer
+user_location - Json encoded location
+query - Json encoded string
+offset - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

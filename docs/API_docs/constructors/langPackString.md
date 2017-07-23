@@ -25,6 +25,13 @@ description: langPackString attributes, type and example
 $langPackString = ['_' => 'langPackString', 'key' => string, 'value' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"langPackString","key":"string","value":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

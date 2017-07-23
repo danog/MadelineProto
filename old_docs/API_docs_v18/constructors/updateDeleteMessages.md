@@ -25,6 +25,13 @@ description: updateDeleteMessages attributes, type and example
 $updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int], 'pts' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateDeleteMessages","messages":["int"],"pts":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

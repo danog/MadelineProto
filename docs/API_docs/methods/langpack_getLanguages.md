@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $Vector_of_LangPackLanguage = $MadelineProto->langpack->getLanguages();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - langpack.getLanguages
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/langpack.getLanguages`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

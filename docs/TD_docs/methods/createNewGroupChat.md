@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Chat = $MadelineProto->createNewGroupChat(['user_ids' => [int], 'title' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - createNewGroupChat
+* params - {"user_ids":["int"],"title":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createNewGroupChat`
+
+Parameters:
+
+user_ids - Json encoded  array of int
+title - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

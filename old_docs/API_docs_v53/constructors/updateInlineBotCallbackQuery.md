@@ -27,6 +27,13 @@ description: updateInlineBotCallbackQuery attributes, type and example
 $updateInlineBotCallbackQuery = ['_' => 'updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'data' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateInlineBotCallbackQuery","query_id":"long","user_id":"int","msg_id":"InputBotInlineMessageID","data":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

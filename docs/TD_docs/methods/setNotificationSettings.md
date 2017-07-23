@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->setNotificationSettings(['scope' => NotificationSettingsScope, 'notification_settings' => notificationSettings, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - setNotificationSettings
+* params - {"scope":"NotificationSettingsScope","notification_settings":"notificationSettings"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setNotificationSettings`
+
+Parameters:
+
+scope - Json encoded NotificationSettingsScope
+notification_settings - Json encoded notificationSettings
+
+
+```
+
 Or, if you're into Lua:
 
 ```

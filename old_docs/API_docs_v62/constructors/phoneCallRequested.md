@@ -30,6 +30,13 @@ description: phoneCallRequested attributes, type and example
 $phoneCallRequested = ['_' => 'phoneCallRequested', 'id' => long, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, 'protocol' => PhoneCallProtocol, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"phoneCallRequested","id":"long","access_hash":"long","date":"int","admin_id":"int","participant_id":"int","g_a":"bytes","protocol":"PhoneCallProtocol"}
+```
+
+
 Or, if you're into Lua:  
 
 

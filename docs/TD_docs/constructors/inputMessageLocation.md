@@ -26,6 +26,13 @@ Message with location
 $inputMessageLocation = ['_' => 'inputMessageLocation', 'location' => location, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessageLocation","location":"location"}
+```
+
+
 Or, if you're into Lua:  
 
 

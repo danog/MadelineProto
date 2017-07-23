@@ -25,6 +25,13 @@ description: botInlineMessageMediaAuto attributes, type and example
 $botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'caption' => string, 'reply_markup' => ReplyMarkup, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"botInlineMessageMediaAuto","caption":"string","reply_markup":"ReplyMarkup"}
+```
+
+
 Or, if you're into Lua:  
 
 

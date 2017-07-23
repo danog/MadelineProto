@@ -24,6 +24,13 @@ description: messageActionChatEditPhoto attributes, type and example
 $messageActionChatEditPhoto = ['_' => 'messageActionChatEditPhoto', 'photo' => Photo, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionChatEditPhoto","photo":"Photo"}
+```
+
+
 Or, if you're into Lua:  
 
 

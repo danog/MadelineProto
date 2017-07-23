@@ -25,6 +25,13 @@ description: inputEncryptedFile attributes, type and example
 $inputEncryptedFile = ['_' => 'inputEncryptedFile', 'id' => long, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputEncryptedFile","id":"long","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

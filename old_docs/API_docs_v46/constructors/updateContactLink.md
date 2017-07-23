@@ -26,6 +26,13 @@ description: updateContactLink attributes, type and example
 $updateContactLink = ['_' => 'updateContactLink', 'user_id' => int, 'my_link' => ContactLink, 'foreign_link' => ContactLink, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateContactLink","user_id":"int","my_link":"ContactLink","foreign_link":"ContactLink"}
+```
+
+
 Or, if you're into Lua:  
 
 

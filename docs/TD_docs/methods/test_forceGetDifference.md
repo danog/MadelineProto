@@ -34,6 +34,29 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->test->forceGetDifference();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.forceGetDifference
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.forceGetDifference`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

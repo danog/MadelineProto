@@ -25,6 +25,13 @@ Object of this type returns on successful function call for some functions
 $ok = ['_' => 'ok', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"ok"}
+```
+
+
 Or, if you're into Lua:  
 
 

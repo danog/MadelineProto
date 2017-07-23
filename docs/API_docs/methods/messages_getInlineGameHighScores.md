@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $messages_HighScores = $MadelineProto->messages->getInlineGameHighScores(['id' => InputBotInlineMessageID, 'user_id' => InputUser, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getInlineGameHighScores
+* params - {"id":"InputBotInlineMessageID","user_id":"InputUser"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineGameHighScores`
+
+Parameters:
+
+id - Json encoded InputBotInlineMessageID
+user_id - Json encoded InputUser
+
+
+```
+
 Or, if you're into Lua:
 
 ```

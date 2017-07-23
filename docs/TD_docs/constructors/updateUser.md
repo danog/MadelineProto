@@ -26,6 +26,13 @@ Some data about a user has been changed
 $updateUser = ['_' => 'updateUser', 'user' => user, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateUser","user":"user"}
+```
+
+
 Or, if you're into Lua:  
 
 

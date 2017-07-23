@@ -23,6 +23,13 @@ description: replyKeyboardForceReply attributes, type and example
 $replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyKeyboardForceReply"}
+```
+
+
 Or, if you're into Lua:  
 
 

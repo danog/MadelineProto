@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - photos.uploadProfilePhoto
+* params - {"file":"InputFile"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.uploadProfilePhoto`
+
+Parameters:
+
+file - Json encoded InputFile
+
+
+```
+
 Or, if you're into Lua:
 
 ```

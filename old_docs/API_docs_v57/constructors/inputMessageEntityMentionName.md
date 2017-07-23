@@ -26,6 +26,13 @@ description: inputMessageEntityMentionName attributes, type and example
 $inputMessageEntityMentionName = ['_' => 'inputMessageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => InputUser, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessageEntityMentionName","offset":"int","length":"int","user_id":"InputUser"}
+```
+
+
 Or, if you're into Lua:  
 
 

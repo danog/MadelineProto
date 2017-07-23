@@ -24,6 +24,13 @@ description: upload_cdnFileReuploadNeeded attributes, type and example
 $upload_cdnFileReuploadNeeded = ['_' => 'upload.cdnFileReuploadNeeded', 'request_token' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"upload.cdnFileReuploadNeeded","request_token":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ TDLib needs user's phone number to authorize
 $authStateWaitPhoneNumber = ['_' => 'authStateWaitPhoneNumber', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"authStateWaitPhoneNumber"}
+```
+
+
 Or, if you're into Lua:  
 
 

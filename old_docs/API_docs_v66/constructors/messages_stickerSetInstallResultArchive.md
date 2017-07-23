@@ -24,6 +24,13 @@ description: messages_stickerSetInstallResultArchive attributes, type and exampl
 $messages_stickerSetInstallResultArchive = ['_' => 'messages.stickerSetInstallResultArchive', 'sets' => [StickerSetCovered], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.stickerSetInstallResultArchive","sets":["StickerSetCovered"]}
+```
+
+
 Or, if you're into Lua:  
 
 

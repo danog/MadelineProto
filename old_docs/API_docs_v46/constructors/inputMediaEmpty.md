@@ -19,6 +19,13 @@ description: inputMediaEmpty attributes, type and example
 $inputMediaEmpty = ['_' => 'inputMediaEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

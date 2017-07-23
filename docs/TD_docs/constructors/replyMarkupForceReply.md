@@ -26,6 +26,13 @@ Instruct clients to force reply to this message
 $replyMarkupForceReply = ['_' => 'replyMarkupForceReply', 'personal' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyMarkupForceReply","personal":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

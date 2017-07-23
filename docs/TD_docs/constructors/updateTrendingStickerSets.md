@@ -26,6 +26,13 @@ List of trending sticker sets was updated or some of them was viewed
 $updateTrendingStickerSets = ['_' => 'updateTrendingStickerSets', 'sticker_sets' => stickerSets, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateTrendingStickerSets","sticker_sets":"stickerSets"}
+```
+
+
 Or, if you're into Lua:  
 
 

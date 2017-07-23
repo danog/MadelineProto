@@ -24,6 +24,13 @@ description: inputMediaUploadedPhoto attributes, type and example
 $inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedPhoto","file":"InputFile"}
+```
+
+
 Or, if you're into Lua:  
 
 

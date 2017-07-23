@@ -28,6 +28,13 @@ Audio message
 $messageAudio = ['_' => 'messageAudio', 'audio' => audio, 'caption' => string, 'is_listened' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageAudio","audio":"audio","caption":"string","is_listened":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: topPeerCategoryBotsPM attributes, type and example
 $topPeerCategoryBotsPM = ['_' => 'topPeerCategoryBotsPM', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"topPeerCategoryBotsPM"}
+```
+
+
 Or, if you're into Lua:  
 
 

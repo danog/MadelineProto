@@ -27,6 +27,13 @@ description: photo attributes, type and example
 $photo = ['_' => 'photo', 'id' => long, 'access_hash' => long, 'date' => int, 'sizes' => [PhotoSize], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photo","id":"long","access_hash":"long","date":"int","sizes":["PhotoSize"]}
+```
+
+
 Or, if you're into Lua:  
 
 

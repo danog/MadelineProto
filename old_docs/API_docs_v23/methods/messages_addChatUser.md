@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $messages_StatedMessage = $MadelineProto->messages->addChatUser(['chat_id' => InputPeer, 'user_id' => InputUser, 'fwd_limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.addChatUser
+* params - {"chat_id":"InputPeer","user_id":"InputUser","fwd_limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.addChatUser`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+user_id - Json encoded InputUser
+fwd_limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

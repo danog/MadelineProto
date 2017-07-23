@@ -19,6 +19,13 @@ description: messageMediaEmpty attributes, type and example
 $messageMediaEmpty = ['_' => 'messageMediaEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageMediaEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

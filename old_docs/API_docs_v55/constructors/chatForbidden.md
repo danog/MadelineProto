@@ -25,6 +25,13 @@ description: chatForbidden attributes, type and example
 $chatForbidden = ['_' => 'chatForbidden', 'id' => int, 'title' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatForbidden","id":"int","title":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: phoneCallDiscardReasonMissed attributes, type and example
 $phoneCallDiscardReasonMissed = ['_' => 'phoneCallDiscardReasonMissed', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"phoneCallDiscardReasonMissed"}
+```
+
+
 Or, if you're into Lua:  
 
 

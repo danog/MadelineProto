@@ -27,6 +27,13 @@ description: updateBotShippingQuery attributes, type and example
 $updateBotShippingQuery = ['_' => 'updateBotShippingQuery', 'query_id' => long, 'user_id' => int, 'payload' => bytes, 'shipping_address' => PostAddress, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateBotShippingQuery","query_id":"long","user_id":"int","payload":"bytes","shipping_address":"PostAddress"}
+```
+
+
 Or, if you're into Lua:  
 
 

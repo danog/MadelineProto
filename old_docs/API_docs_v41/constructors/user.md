@@ -40,6 +40,13 @@ description: user attributes, type and example
 $user = ['_' => 'user', 'self' => Bool, 'contact' => Bool, 'mutual_contact' => Bool, 'deleted' => Bool, 'bot' => Bool, 'bot_chat_history' => Bool, 'bot_nochats' => Bool, 'verified' => Bool, 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"user","self":"Bool","contact":"Bool","mutual_contact":"Bool","deleted":"Bool","bot":"Bool","bot_chat_history":"Bool","bot_nochats":"Bool","verified":"Bool","id":"int","access_hash":"long","first_name":"string","last_name":"string","username":"string","phone":"string","photo":"UserProfilePhoto","status":"UserStatus","bot_info_version":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

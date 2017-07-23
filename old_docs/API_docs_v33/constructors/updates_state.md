@@ -28,6 +28,13 @@ description: updates_state attributes, type and example
 $updates_state = ['_' => 'updates.state', 'pts' => int, 'qts' => int, 'date' => int, 'seq' => int, 'unread_count' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates.state","pts":"int","qts":"int","date":"int","seq":"int","unread_count":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

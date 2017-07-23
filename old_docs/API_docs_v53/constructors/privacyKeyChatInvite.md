@@ -19,6 +19,13 @@ description: privacyKeyChatInvite attributes, type and example
 $privacyKeyChatInvite = ['_' => 'privacyKeyChatInvite', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyKeyChatInvite"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: channelMessagesFilter attributes, type and example
 $channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelMessagesFilter","ranges":["MessageRange"]}
+```
+
+
 Or, if you're into Lua:  
 
 

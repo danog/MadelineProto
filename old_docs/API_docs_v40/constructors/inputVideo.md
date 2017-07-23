@@ -25,6 +25,13 @@ description: inputVideo attributes, type and example
 $inputVideo = ['_' => 'inputVideo', 'id' => long, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputVideo","id":"long","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

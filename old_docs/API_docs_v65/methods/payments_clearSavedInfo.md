@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->payments->clearSavedInfo(['credentials' => Bool, 'info' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - payments.clearSavedInfo
+* params - {"credentials":"Bool","info":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.clearSavedInfo`
+
+Parameters:
+
+credentials - Json encoded Bool
+info - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

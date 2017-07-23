@@ -27,6 +27,13 @@ Video message
 $messageVideo = ['_' => 'messageVideo', 'video' => video, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageVideo","video":"video","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

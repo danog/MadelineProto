@@ -24,6 +24,13 @@ description: decryptedMessageActionAbortKey attributes, type and example
 $decryptedMessageActionAbortKey_20 = ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageActionAbortKey","exchange_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

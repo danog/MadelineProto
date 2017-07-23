@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->messages->toggleChatAdmins(['chat_id' => InputPeer, 'enabled' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.toggleChatAdmins
+* params - {"chat_id":"InputPeer","enabled":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleChatAdmins`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+enabled - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

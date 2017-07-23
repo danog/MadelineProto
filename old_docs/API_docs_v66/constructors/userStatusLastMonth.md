@@ -19,6 +19,13 @@ description: userStatusLastMonth attributes, type and example
 $userStatusLastMonth = ['_' => 'userStatusLastMonth', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userStatusLastMonth"}
+```
+
+
 Or, if you're into Lua:  
 
 

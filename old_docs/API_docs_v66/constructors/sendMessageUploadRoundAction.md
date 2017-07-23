@@ -24,6 +24,13 @@ description: sendMessageUploadRoundAction attributes, type and example
 $sendMessageUploadRoundAction = ['_' => 'sendMessageUploadRoundAction', 'progress' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageUploadRoundAction","progress":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ User is offline, but was online last month
 $userStatusLastMonth = ['_' => 'userStatusLastMonth', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userStatusLastMonth"}
+```
+
+
 Or, if you're into Lua:  
 
 

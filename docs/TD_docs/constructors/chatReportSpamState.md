@@ -26,6 +26,13 @@ Contains information about chat report spam state
 $chatReportSpamState = ['_' => 'chatReportSpamState', 'can_report_spam' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatReportSpamState","can_report_spam":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

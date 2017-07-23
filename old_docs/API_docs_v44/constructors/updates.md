@@ -28,6 +28,13 @@ description: updates attributes, type and example
 $updates = ['_' => 'updates', 'updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates","updates":["Update"],"users":["User"],"chats":["Chat"],"date":"int","seq":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

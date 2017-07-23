@@ -19,6 +19,13 @@ description: inputMessagesFilterPhotoVideo attributes, type and example
 $inputMessagesFilterPhotoVideo = ['_' => 'inputMessagesFilterPhotoVideo', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessagesFilterPhotoVideo"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -29,6 +29,13 @@ description: inputMediaUploadedThumbVideo attributes, type and example
 $inputMediaUploadedThumbVideo = ['_' => 'inputMediaUploadedThumbVideo', 'file' => InputFile, 'thumb' => InputFile, 'duration' => int, 'w' => int, 'h' => int, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedThumbVideo","file":"InputFile","thumb":"InputFile","duration":"int","w":"int","h":"int","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

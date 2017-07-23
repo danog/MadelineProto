@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Vector_of_long = $MadelineProto->photos->deletePhotos(['id' => [InputPhoto], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - photos.deletePhotos
+* params - {"id":["InputPhoto"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.deletePhotos`
+
+Parameters:
+
+id - Json encoded  array of InputPhoto
+
+
+```
+
 Or, if you're into Lua:
 
 ```

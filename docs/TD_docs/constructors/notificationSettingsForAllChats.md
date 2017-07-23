@@ -25,6 +25,13 @@ Notification settings applied to all chats
 $notificationSettingsForAllChats = ['_' => 'notificationSettingsForAllChats', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"notificationSettingsForAllChats"}
+```
+
+
 Or, if you're into Lua:  
 
 

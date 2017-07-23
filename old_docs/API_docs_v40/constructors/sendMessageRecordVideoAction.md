@@ -19,6 +19,13 @@ description: sendMessageRecordVideoAction attributes, type and example
 $sendMessageRecordVideoAction = ['_' => 'sendMessageRecordVideoAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageRecordVideoAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

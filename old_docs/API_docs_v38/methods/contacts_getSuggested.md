@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $contacts_Suggested = $MadelineProto->contacts->getSuggested(['limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - contacts.getSuggested
+* params - {"limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getSuggested`
+
+Parameters:
+
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

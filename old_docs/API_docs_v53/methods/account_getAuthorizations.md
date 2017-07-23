@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $account_Authorizations = $MadelineProto->account->getAuthorizations();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.getAuthorizations
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getAuthorizations`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

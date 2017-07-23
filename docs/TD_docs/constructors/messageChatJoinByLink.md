@@ -25,6 +25,13 @@ Chat member joined by invite link
 $messageChatJoinByLink = ['_' => 'messageChatJoinByLink', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageChatJoinByLink"}
+```
+
+
 Or, if you're into Lua:  
 
 

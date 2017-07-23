@@ -19,6 +19,13 @@ description: inputChatPhotoEmpty attributes, type and example
 $inputChatPhotoEmpty = ['_' => 'inputChatPhotoEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputChatPhotoEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

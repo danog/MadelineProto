@@ -25,6 +25,13 @@ User records voice message
 $sendMessageRecordVoiceAction = ['_' => 'sendMessageRecordVoiceAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageRecordVoiceAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

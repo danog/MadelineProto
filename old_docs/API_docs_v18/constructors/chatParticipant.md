@@ -26,6 +26,13 @@ description: chatParticipant attributes, type and example
 $chatParticipant = ['_' => 'chatParticipant', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatParticipant","user_id":"int","inviter_id":"int","date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

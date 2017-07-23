@@ -27,6 +27,13 @@ Service notification from the server. Upon receiving client should show popup wi
 $updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'content' => MessageContent, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateServiceNotification","type":"string","content":"MessageContent"}
+```
+
+
 Or, if you're into Lua:  
 
 

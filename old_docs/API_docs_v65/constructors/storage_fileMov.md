@@ -19,6 +19,13 @@ description: storage_fileMov attributes, type and example
 $storage_fileMov = ['_' => 'storage.fileMov', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"storage.fileMov"}
+```
+
+
 Or, if you're into Lua:  
 
 

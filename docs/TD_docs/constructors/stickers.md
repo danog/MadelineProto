@@ -26,6 +26,13 @@ Represents list of stickers
 $stickers = ['_' => 'stickers', 'stickers' => [sticker], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickers","stickers":["sticker"]}
+```
+
+
 Or, if you're into Lua:  
 
 

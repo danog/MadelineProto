@@ -26,6 +26,13 @@ Contains infotmation about period of inactivity, after which the account of curr
 $accountTtl = ['_' => 'accountTtl', 'days' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"accountTtl","days":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

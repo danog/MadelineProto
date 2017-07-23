@@ -26,6 +26,13 @@ description: pagePart attributes, type and example
 $pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'videos' => [Document], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pagePart","blocks":["PageBlock"],"photos":["Photo"],"videos":["Document"]}
+```
+
+
 Or, if you're into Lua:  
 
 

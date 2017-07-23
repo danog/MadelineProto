@@ -24,6 +24,13 @@ description: keyboardButtonRow attributes, type and example
 $keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [KeyboardButton], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonRow","buttons":["KeyboardButton"]}
+```
+
+
 Or, if you're into Lua:  
 
 

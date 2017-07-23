@@ -19,6 +19,13 @@ description: inputMessagesFilterVoice attributes, type and example
 $inputMessagesFilterVoice = ['_' => 'inputMessagesFilterVoice', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessagesFilterVoice"}
+```
+
+
 Or, if you're into Lua:  
 
 

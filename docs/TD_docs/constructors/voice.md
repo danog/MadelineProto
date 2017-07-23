@@ -29,6 +29,13 @@ Describes voice record. Voice must be encoded with Opus codec and must be stored
 $voice = ['_' => 'voice', 'duration' => int, 'waveform' => bytes, 'mime_type' => string, 'voice' => file, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"voice","duration":"int","waveform":"bytes","mime_type":"string","voice":"file"}
+```
+
+
 Or, if you're into Lua:  
 
 

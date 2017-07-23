@@ -27,6 +27,13 @@ Some option changed its value
 $updateOption = ['_' => 'updateOption', 'name' => string, 'value' => OptionValue, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateOption","name":"string","value":"OptionValue"}
+```
+
+
 Or, if you're into Lua:  
 
 

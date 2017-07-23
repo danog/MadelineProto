@@ -24,6 +24,13 @@ description: updateBotWebhookJSON attributes, type and example
 $updateBotWebhookJSON = ['_' => 'updateBotWebhookJSON', 'data' => DataJSON, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateBotWebhookJSON","data":"DataJSON"}
+```
+
+
 Or, if you're into Lua:  
 
 

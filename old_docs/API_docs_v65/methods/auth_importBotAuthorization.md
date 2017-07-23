@@ -42,6 +42,36 @@ if (isset($number)) { // Login as a user
 $auth_Authorization = $MadelineProto->auth->importBotAuthorization(['a' => Bool, 'b' => Bool, 'c' => Bool, 'd' => Bool, 'api_id' => int, 'api_hash' => string, 'bot_auth_token' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.importBotAuthorization
+* params - {"a":"Bool","b":"Bool","c":"Bool","d":"Bool","api_id":"int","api_hash":"string","bot_auth_token":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.importBotAuthorization`
+
+Parameters:
+
+a - Json encoded Bool
+b - Json encoded Bool
+c - Json encoded Bool
+d - Json encoded Bool
+api_id - Json encoded int
+api_hash - Json encoded string
+bot_auth_token - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

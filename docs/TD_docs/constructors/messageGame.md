@@ -26,6 +26,13 @@ Message with a game
 $messageGame = ['_' => 'messageGame', 'game' => game, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageGame","game":"game"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: geoPointEmpty attributes, type and example
 $geoPointEmpty = ['_' => 'geoPointEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"geoPointEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

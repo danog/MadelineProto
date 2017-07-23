@@ -24,6 +24,13 @@ description: msgs_ack attributes, type and example
 $msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [long], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"msgs_ack","msg_ids":["long"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: topPeerCategoryPhoneCalls attributes, type and example
 $topPeerCategoryPhoneCalls = ['_' => 'topPeerCategoryPhoneCalls', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"topPeerCategoryPhoneCalls"}
+```
+
+
 Or, if you're into Lua:  
 
 

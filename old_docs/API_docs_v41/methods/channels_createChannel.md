@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->channels->createChannel(['broadcast' => Bool, 'megagroup' => Bool, 'title' => string, 'about' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.createChannel
+* params - {"broadcast":"Bool","megagroup":"Bool","title":"string","about":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.createChannel`
+
+Parameters:
+
+broadcast - Json encoded Bool
+megagroup - Json encoded Bool
+title - Json encoded string
+about - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

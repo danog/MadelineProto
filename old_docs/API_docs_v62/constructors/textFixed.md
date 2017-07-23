@@ -24,6 +24,13 @@ description: textFixed attributes, type and example
 $textFixed = ['_' => 'textFixed', 'text' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textFixed","text":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -29,6 +29,13 @@ Voice message
 $inputMessageVoice = ['_' => 'inputMessageVoice', 'voice' => InputFile, 'duration' => int, 'waveform' => bytes, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessageVoice","voice":"InputFile","duration":"int","waveform":"bytes","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

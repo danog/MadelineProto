@@ -30,6 +30,13 @@ description: audio attributes, type and example
 $audio = ['_' => 'audio', 'id' => long, 'access_hash' => long, 'date' => int, 'duration' => int, 'mime_type' => string, 'size' => int, 'dc_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"audio","id":"long","access_hash":"long","date":"int","duration":"int","mime_type":"string","size":"int","dc_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -40,6 +40,29 @@ if (isset($number)) { // Login as a user
 $StickerSets = $MadelineProto->getTrendingStickerSets();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getTrendingStickerSets
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getTrendingStickerSets`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

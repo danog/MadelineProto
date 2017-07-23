@@ -26,6 +26,13 @@ File deifned by local path
 $inputFileLocal = ['_' => 'inputFileLocal', 'path' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputFileLocal","path":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ description: inputBotInlineMessageID attributes, type and example
 $inputBotInlineMessageID = ['_' => 'inputBotInlineMessageID', 'dc_id' => int, 'id' => long, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputBotInlineMessageID","dc_id":"int","id":"long","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

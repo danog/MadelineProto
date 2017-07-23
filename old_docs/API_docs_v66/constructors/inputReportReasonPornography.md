@@ -19,6 +19,13 @@ description: inputReportReasonPornography attributes, type and example
 $inputReportReasonPornography = ['_' => 'inputReportReasonPornography', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputReportReasonPornography"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -27,6 +27,13 @@ Message with a game, can't be used in broadcast channels and secret chats
 $inputMessageGame = ['_' => 'inputMessageGame', 'bot_user_id' => int, 'game_short_name' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessageGame","bot_user_id":"int","game_short_name":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

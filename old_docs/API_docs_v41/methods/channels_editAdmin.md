@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->channels->editAdmin(['channel' => InputChannel, 'user_id' => InputUser, 'role' => ChannelParticipantRole, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.editAdmin
+* params - {"channel":"InputChannel","user_id":"InputUser","role":"ChannelParticipantRole"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editAdmin`
+
+Parameters:
+
+channel - Json encoded InputChannel
+user_id - Json encoded InputUser
+role - Json encoded ChannelParticipantRole
+
+
+```
+
 Or, if you're into Lua:
 
 ```

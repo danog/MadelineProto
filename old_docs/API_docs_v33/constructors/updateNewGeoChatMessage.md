@@ -24,6 +24,13 @@ description: updateNewGeoChatMessage attributes, type and example
 $updateNewGeoChatMessage = ['_' => 'updateNewGeoChatMessage', 'message' => GeoChatMessage, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewGeoChatMessage","message":"GeoChatMessage"}
+```
+
+
 Or, if you're into Lua:  
 
 

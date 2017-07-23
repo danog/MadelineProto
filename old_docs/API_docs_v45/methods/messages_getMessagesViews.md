@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Vector_of_int = $MadelineProto->messages->getMessagesViews(['peer' => InputPeer, 'id' => [int], 'increment' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getMessagesViews
+* params - {"peer":"InputPeer","id":["int"],"increment":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getMessagesViews`
+
+Parameters:
+
+peer - Json encoded InputPeer
+id - Json encoded  array of int
+increment - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

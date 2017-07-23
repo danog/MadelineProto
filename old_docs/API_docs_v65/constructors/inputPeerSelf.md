@@ -19,6 +19,13 @@ description: inputPeerSelf attributes, type and example
 $inputPeerSelf = ['_' => 'inputPeerSelf', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPeerSelf"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: inputMessagesFilterEmpty attributes, type and example
 $inputMessagesFilterEmpty = ['_' => 'inputMessagesFilterEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessagesFilterEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

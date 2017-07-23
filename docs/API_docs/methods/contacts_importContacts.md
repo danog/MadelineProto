@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - contacts.importContacts
+* params - {"contacts":["InputContact"],"replace":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.importContacts`
+
+Parameters:
+
+contacts - Json encoded  array of InputContact
+replace - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

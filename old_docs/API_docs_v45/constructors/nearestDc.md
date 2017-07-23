@@ -26,6 +26,13 @@ description: nearestDc attributes, type and example
 $nearestDc = ['_' => 'nearestDc', 'country' => string, 'this_dc' => int, 'nearest_dc' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"nearestDc","country":"string","this_dc":"int","nearest_dc":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

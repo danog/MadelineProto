@@ -27,6 +27,13 @@ Represents list of sticker sets
 $stickerSets = ['_' => 'stickerSets', 'total_count' => int, 'sets' => [stickerSetInfo], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickerSets","total_count":"int","sets":["stickerSetInfo"]}
+```
+
+
 Or, if you're into Lua:  
 
 

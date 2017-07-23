@@ -25,6 +25,13 @@ description: updateReadChannelOutbox attributes, type and example
 $updateReadChannelOutbox = ['_' => 'updateReadChannelOutbox', 'channel_id' => int, 'max_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateReadChannelOutbox","channel_id":"int","max_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

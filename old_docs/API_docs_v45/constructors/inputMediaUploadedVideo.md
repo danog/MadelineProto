@@ -29,6 +29,13 @@ description: inputMediaUploadedVideo attributes, type and example
 $inputMediaUploadedVideo = ['_' => 'inputMediaUploadedVideo', 'file' => InputFile, 'duration' => int, 'w' => int, 'h' => int, 'mime_type' => string, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedVideo","file":"InputFile","duration":"int","w":"int","h":"int","mime_type":"string","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

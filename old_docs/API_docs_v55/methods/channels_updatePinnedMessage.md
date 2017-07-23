@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->channels->updatePinnedMessage(['silent' => Bool, 'channel' => InputChannel, 'id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.updatePinnedMessage
+* params - {"silent":"Bool","channel":"InputChannel","id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.updatePinnedMessage`
+
+Parameters:
+
+silent - Json encoded Bool
+channel - Json encoded InputChannel
+id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

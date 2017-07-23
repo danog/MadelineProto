@@ -25,6 +25,13 @@ Message was synchronized with the server
 $messageIsSuccessfullySent = ['_' => 'messageIsSuccessfullySent', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageIsSuccessfullySent"}
+```
+
+
 Or, if you're into Lua:  
 
 

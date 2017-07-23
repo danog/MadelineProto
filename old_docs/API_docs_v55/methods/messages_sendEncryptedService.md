@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedService(['peer' => InputEncryptedChat, 'message' => DecryptedMessage, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.sendEncryptedService
+* params - {"peer":"InputEncryptedChat","message":"DecryptedMessage"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendEncryptedService`
+
+Parameters:
+
+peer - Json encoded InputEncryptedChat
+message - Json encoded DecryptedMessage
+
+
+```
+
 Or, if you're into Lua:
 
 ```

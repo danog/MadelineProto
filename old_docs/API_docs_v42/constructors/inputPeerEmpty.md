@@ -19,6 +19,13 @@ description: inputPeerEmpty attributes, type and example
 $inputPeerEmpty = ['_' => 'inputPeerEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPeerEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

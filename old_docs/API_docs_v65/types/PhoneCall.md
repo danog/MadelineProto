@@ -9,7 +9,7 @@ description: constructors and methods of type PhoneCall
 
 This is an object of type `\danog\MadelineProto\VoIP`.
 
-It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto) for an easy installation script.
+It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
 
 You MUST know [OOP](http://php.net/manual/en/language.oop5.php) to use this class.
 
@@ -109,7 +109,7 @@ Accepts two optional parameters:
 
 * `getOutputParams()` - Returns the output audio configuration
 
-MadelineProto works using raw PCM audio, internally split in packets with `sampleNumber` samples.
+MadelineProto works using raw signed PCM audio, internally split in packets with `sampleNumber` samples.
 
 The audio configuration is an array structured in the following way:
 ```
@@ -127,7 +127,7 @@ The audio configuration is an array structured in the following way:
 
 * `getInputParams()` - Returns the input audio configuration
 
-MadelineProto works using raw PCM audio, internally split in packets with `sampleNumber` samples.
+MadelineProto works using raw signed PCM audio, internally split in packets with `sampleNumber` samples.
 
 The audio configuration is an array structured in the following way:
 ```

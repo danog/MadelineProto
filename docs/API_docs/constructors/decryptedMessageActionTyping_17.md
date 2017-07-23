@@ -24,6 +24,13 @@ description: decryptedMessageActionTyping attributes, type and example
 $decryptedMessageActionTyping_17 = ['_' => 'decryptedMessageActionTyping', 'action' => SendMessageAction, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageActionTyping","action":"SendMessageAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

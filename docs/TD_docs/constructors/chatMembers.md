@@ -27,6 +27,13 @@ Contains list of chat members
 $chatMembers = ['_' => 'chatMembers', 'total_count' => int, 'members' => [chatMember], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatMembers","total_count":"int","members":["chatMember"]}
+```
+
+
 Or, if you're into Lua:  
 
 

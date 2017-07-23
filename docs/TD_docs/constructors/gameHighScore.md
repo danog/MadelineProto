@@ -28,6 +28,13 @@ Contains one row of the game high scores table
 $gameHighScore = ['_' => 'gameHighScore', 'position' => int, 'user_id' => int, 'score' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"gameHighScore","position":"int","user_id":"int","score":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

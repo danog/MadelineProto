@@ -25,6 +25,13 @@ description: pageBlockCollage attributes, type and example
 $pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock], 'caption' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockCollage","items":["PageBlock"],"caption":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

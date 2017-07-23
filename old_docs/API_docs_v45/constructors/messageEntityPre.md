@@ -26,6 +26,13 @@ description: messageEntityPre attributes, type and example
 $messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int, 'language' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageEntityPre","offset":"int","length":"int","language":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

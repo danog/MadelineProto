@@ -25,6 +25,13 @@ Return only voice messages
 $searchMessagesFilterVoice = ['_' => 'searchMessagesFilterVoice', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"searchMessagesFilterVoice"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -33,6 +33,13 @@ Represents link to an animated gif
 $inputInlineQueryResultAnimatedGif = ['_' => 'inputInlineQueryResultAnimatedGif', 'id' => string, 'title' => string, 'thumb_url' => string, 'gif_url' => string, 'gif_width' => int, 'gif_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputInlineQueryResultAnimatedGif","id":"string","title":"string","thumb_url":"string","gif_url":"string","gif_width":"int","gif_height":"int","reply_markup":"ReplyMarkup","input_message_content":"InputMessageContent"}
+```
+
+
 Or, if you're into Lua:  
 
 

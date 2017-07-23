@@ -24,6 +24,13 @@ description: textStrike attributes, type and example
 $textStrike = ['_' => 'textStrike', 'text' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textStrike","text":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

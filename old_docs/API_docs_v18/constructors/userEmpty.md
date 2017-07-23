@@ -24,6 +24,13 @@ description: userEmpty attributes, type and example
 $userEmpty = ['_' => 'userEmpty', 'id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userEmpty","id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

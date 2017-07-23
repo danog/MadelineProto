@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $StickerSet = $MadelineProto->getStickerSet(['set_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getStickerSet
+* params - {"set_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerSet`
+
+Parameters:
+
+set_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

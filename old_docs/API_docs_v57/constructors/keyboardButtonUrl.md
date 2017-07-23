@@ -25,6 +25,13 @@ description: keyboardButtonUrl attributes, type and example
 $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => string, 'url' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonUrl","text":"string","url":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

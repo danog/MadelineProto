@@ -26,6 +26,13 @@ description: contacts_link attributes, type and example
 $contacts_link = ['_' => 'contacts.link', 'my_link' => ContactLink, 'foreign_link' => ContactLink, 'user' => User, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.link","my_link":"ContactLink","foreign_link":"ContactLink","user":"User"}
+```
+
+
 Or, if you're into Lua:  
 
 

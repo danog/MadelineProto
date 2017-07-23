@@ -25,6 +25,13 @@ Chat photo deleted
 $messageChatDeletePhoto = ['_' => 'messageChatDeletePhoto', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageChatDeletePhoto"}
+```
+
+
 Or, if you're into Lua:  
 
 

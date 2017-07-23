@@ -24,6 +24,13 @@ description: privacyValueDisallowUsers attributes, type and example
 $privacyValueDisallowUsers = ['_' => 'privacyValueDisallowUsers', 'users' => [int], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyValueDisallowUsers","users":["int"]}
+```
+
+
 Or, if you're into Lua:  
 
 

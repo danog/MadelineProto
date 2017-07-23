@@ -24,6 +24,13 @@ description: textBold attributes, type and example
 $textBold = ['_' => 'textBold', 'text' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textBold","text":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

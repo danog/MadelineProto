@@ -27,6 +27,13 @@ Represents an audio cached on the telegram server
 $inlineQueryResultAudio = ['_' => 'inlineQueryResultAudio', 'id' => string, 'audio' => audio, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineQueryResultAudio","id":"string","audio":"audio"}
+```
+
+
 Or, if you're into Lua:  
 
 

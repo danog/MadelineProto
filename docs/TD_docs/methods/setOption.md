@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->setOption(['name' => string, 'value' => OptionValue, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - setOption
+* params - {"name":"string","value":"OptionValue"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setOption`
+
+Parameters:
+
+name - Json encoded string
+value - Json encoded OptionValue
+
+
+```
+
 Or, if you're into Lua:
 
 ```

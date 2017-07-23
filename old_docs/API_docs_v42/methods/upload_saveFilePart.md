@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->upload->saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - upload.saveFilePart
+* params - {"file_id":"long","file_part":"int","bytes":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.saveFilePart`
+
+Parameters:
+
+file_id - Json encoded long
+file_part - Json encoded int
+bytes - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

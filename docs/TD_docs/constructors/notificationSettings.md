@@ -28,6 +28,13 @@ Contains information about notification settings for chat or chats
 $notificationSettings = ['_' => 'notificationSettings', 'mute_for' => int, 'sound' => string, 'show_preview' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"notificationSettings","mute_for":"int","sound":"string","show_preview":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

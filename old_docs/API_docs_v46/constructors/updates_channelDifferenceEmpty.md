@@ -26,6 +26,13 @@ description: updates_channelDifferenceEmpty attributes, type and example
 $updates_channelDifferenceEmpty = ['_' => 'updates.channelDifferenceEmpty', 'final' => Bool, 'channel_pts' => int, 'timeout' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates.channelDifferenceEmpty","final":"Bool","channel_pts":"int","timeout":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

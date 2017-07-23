@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $auth_Authorization = $MadelineProto->auth->importAuthorization(['id' => int, 'bytes' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.importAuthorization
+* params - {"id":"int","bytes":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.importAuthorization`
+
+Parameters:
+
+id - Json encoded int
+bytes - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ Other user's phone number doesn't known
 $linkStateNone = ['_' => 'linkStateNone', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"linkStateNone"}
+```
+
+
 Or, if you're into Lua:  
 
 

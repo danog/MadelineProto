@@ -25,6 +25,13 @@ description: pageBlockPullquote attributes, type and example
 $pageBlockPullquote = ['_' => 'pageBlockPullquote', 'text' => RichText, 'caption' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockPullquote","text":"RichText","caption":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

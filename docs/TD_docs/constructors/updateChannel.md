@@ -26,6 +26,13 @@ Some data about a channel has been changed
 $updateChannel = ['_' => 'updateChannel', 'channel' => channel, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChannel","channel":"channel"}
+```
+
+
 Or, if you're into Lua:  
 
 

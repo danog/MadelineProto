@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Chat = $MadelineProto->createPrivateChat(['user_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - createPrivateChat
+* params - {"user_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createPrivateChat`
+
+Parameters:
+
+user_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

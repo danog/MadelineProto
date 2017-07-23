@@ -30,6 +30,13 @@ description: updateShortChatMessage attributes, type and example
 $updateShortChatMessage = ['_' => 'updateShortChatMessage', 'id' => int, 'from_id' => int, 'chat_id' => int, 'message' => string, 'pts' => int, 'date' => int, 'seq' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateShortChatMessage","id":"int","from_id":"int","chat_id":"int","message":"string","pts":"int","date":"int","seq":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

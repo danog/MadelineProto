@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->account->deleteAccount(['reason' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.deleteAccount
+* params - {"reason":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.deleteAccount`
+
+Parameters:
+
+reason - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

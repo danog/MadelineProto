@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $NearestDc = $MadelineProto->help->getNearestDc();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.getNearestDc
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getNearestDc`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

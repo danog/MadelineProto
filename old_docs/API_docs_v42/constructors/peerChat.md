@@ -24,6 +24,13 @@ description: peerChat attributes, type and example
 $peerChat = ['_' => 'peerChat', 'chat_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"peerChat","chat_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

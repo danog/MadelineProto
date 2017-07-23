@@ -25,6 +25,13 @@ Deleted user or deleted bot. There is no any information about it except user_id
 $userTypeDeleted = ['_' => 'userTypeDeleted', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userTypeDeleted"}
+```
+
+
 Or, if you're into Lua:  
 
 

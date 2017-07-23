@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $help_Support = $MadelineProto->help->getSupport();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.getSupport
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getSupport`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -24,6 +24,13 @@ description: documentAttributeFilename attributes, type and example
 $documentAttributeFilename_23 = ['_' => 'documentAttributeFilename', 'file_name' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeFilename","file_name":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

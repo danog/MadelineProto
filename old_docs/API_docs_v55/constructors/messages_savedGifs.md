@@ -25,6 +25,13 @@ description: messages_savedGifs attributes, type and example
 $messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Document], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.savedGifs","hash":"int","gifs":["Document"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: storage_filePartial attributes, type and example
 $storage_filePartial = ['_' => 'storage.filePartial', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"storage.filePartial"}
+```
+
+
 Or, if you're into Lua:  
 
 

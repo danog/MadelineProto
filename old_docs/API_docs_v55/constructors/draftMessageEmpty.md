@@ -19,6 +19,13 @@ description: draftMessageEmpty attributes, type and example
 $draftMessageEmpty = ['_' => 'draftMessageEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"draftMessageEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

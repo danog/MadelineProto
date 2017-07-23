@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $updates_Difference = $MadelineProto->updates->getDifference(['pts' => int, 'pts_total_limit' => int, 'date' => int, 'qts' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - updates.getDifference
+* params - {"pts":"int","pts_total_limit":"int","date":"int","qts":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getDifference`
+
+Parameters:
+
+pts - Json encoded int
+pts_total_limit - Json encoded int
+date - Json encoded int
+qts - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

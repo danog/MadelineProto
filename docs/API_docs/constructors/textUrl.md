@@ -26,6 +26,13 @@ description: textUrl attributes, type and example
 $textUrl = ['_' => 'textUrl', 'text' => RichText, 'url' => string, 'webpage_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textUrl","text":"RichText","url":"string","webpage_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ description: pageBlockSlideshow attributes, type and example
 $pageBlockSlideshow = ['_' => 'pageBlockSlideshow', 'items' => [PageBlock], 'caption' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockSlideshow","items":["PageBlock"],"caption":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

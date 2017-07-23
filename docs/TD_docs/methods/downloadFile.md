@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->downloadFile(['file_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - downloadFile
+* params - {"file_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/downloadFile`
+
+Parameters:
+
+file_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

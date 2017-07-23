@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $payments_PaymentReceipt = $MadelineProto->payments->getPaymentReceipt(['msg_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - payments.getPaymentReceipt
+* params - {"msg_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.getPaymentReceipt`
+
+Parameters:
+
+msg_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

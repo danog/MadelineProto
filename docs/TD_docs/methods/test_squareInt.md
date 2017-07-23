@@ -39,6 +39,30 @@ if (isset($number)) { // Login as a user
 $test_Int = $MadelineProto->test->squareInt(['x' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.squareInt
+* params - {"x":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.squareInt`
+
+Parameters:
+
+x - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

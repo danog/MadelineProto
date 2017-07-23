@@ -24,6 +24,13 @@ description: messageActionChatAddUser attributes, type and example
 $messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [int], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionChatAddUser","users":["int"]}
+```
+
+
 Or, if you're into Lua:  
 
 

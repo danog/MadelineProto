@@ -26,6 +26,13 @@ File defined by its persistent id
 $inputFilePersistentId = ['_' => 'inputFilePersistentId', 'persistent_id' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputFilePersistentId","persistent_id":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

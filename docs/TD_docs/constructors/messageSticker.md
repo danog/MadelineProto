@@ -26,6 +26,13 @@ Sticker message
 $messageSticker = ['_' => 'messageSticker', 'sticker' => sticker, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageSticker","sticker":"sticker"}
+```
+
+
 Or, if you're into Lua:  
 
 

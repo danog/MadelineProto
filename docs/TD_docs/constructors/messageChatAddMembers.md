@@ -26,6 +26,13 @@ Chat members added
 $messageChatAddMembers = ['_' => 'messageChatAddMembers', 'members' => [user], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageChatAddMembers","members":["user"]}
+```
+
+
 Or, if you're into Lua:  
 
 

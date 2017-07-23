@@ -25,6 +25,13 @@ description: stickerSetMultiCovered attributes, type and example
 $stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Document], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickerSetMultiCovered","set":"StickerSet","covers":["Document"]}
+```
+
+
 Or, if you're into Lua:  
 
 

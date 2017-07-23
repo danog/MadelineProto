@@ -26,6 +26,13 @@ Some message was pinned
 $messagePinMessage = ['_' => 'messagePinMessage', 'message_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messagePinMessage","message_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

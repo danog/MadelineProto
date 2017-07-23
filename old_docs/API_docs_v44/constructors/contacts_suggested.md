@@ -25,6 +25,13 @@ description: contacts_suggested attributes, type and example
 $contacts_suggested = ['_' => 'contacts.suggested', 'results' => [ContactSuggested], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.suggested","results":["ContactSuggested"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

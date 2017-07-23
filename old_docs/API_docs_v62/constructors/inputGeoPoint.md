@@ -25,6 +25,13 @@ description: inputGeoPoint attributes, type and example
 $inputGeoPoint = ['_' => 'inputGeoPoint', 'lat' => double, 'long' => double, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputGeoPoint","lat":"double","long":"double"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ Payload from a general callback button
 $callbackQueryData = ['_' => 'callbackQueryData', 'data' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"callbackQueryData","data":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

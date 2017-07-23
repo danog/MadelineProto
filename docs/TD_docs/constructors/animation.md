@@ -31,6 +31,13 @@ Describes animation file. Animation should be encoded in gif or mp4 format
 $animation = ['_' => 'animation', 'width' => int, 'height' => int, 'file_name' => string, 'mime_type' => string, 'thumb' => photoSize, 'animation' => file, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"animation","width":"int","height":"int","file_name":"string","mime_type":"string","thumb":"photoSize","animation":"file"}
+```
+
+
 Or, if you're into Lua:  
 
 

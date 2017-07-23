@@ -25,6 +25,13 @@ description: decryptedMessageActionCommitKey attributes, type and example
 $decryptedMessageActionCommitKey_20 = ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => long, 'key_fingerprint' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageActionCommitKey","exchange_id":"long","key_fingerprint":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

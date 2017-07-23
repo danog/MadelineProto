@@ -27,6 +27,13 @@ description: userDeleted attributes, type and example
 $userDeleted = ['_' => 'userDeleted', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userDeleted","id":"int","first_name":"string","last_name":"string","username":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

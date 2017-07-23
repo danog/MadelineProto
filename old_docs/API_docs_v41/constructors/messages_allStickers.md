@@ -25,6 +25,13 @@ description: messages_allStickers attributes, type and example
 $messages_allStickers = ['_' => 'messages.allStickers', 'hash' => string, 'sets' => [StickerSet], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.allStickers","hash":"string","sets":["StickerSet"]}
+```
+
+
 Or, if you're into Lua:  
 
 

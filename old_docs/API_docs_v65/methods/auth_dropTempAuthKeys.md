@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->auth->dropTempAuthKeys(['except_auth_keys' => [long], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.dropTempAuthKeys
+* params - {"except_auth_keys":["long"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.dropTempAuthKeys`
+
+Parameters:
+
+except_auth_keys - Json encoded  array of long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

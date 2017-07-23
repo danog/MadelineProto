@@ -25,6 +25,13 @@ description: inputAudioFileLocation attributes, type and example
 $inputAudioFileLocation = ['_' => 'inputAudioFileLocation', 'id' => long, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputAudioFileLocation","id":"long","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

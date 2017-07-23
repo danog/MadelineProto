@@ -25,6 +25,13 @@ description: messages_recentStickers attributes, type and example
 $messages_recentStickers = ['_' => 'messages.recentStickers', 'hash' => int, 'stickers' => [Document], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.recentStickers","hash":"int","stickers":["Document"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ User uploads a document
 $sendMessageUploadDocumentAction_17 = ['_' => 'sendMessageUploadDocumentAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageUploadDocumentAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

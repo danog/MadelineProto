@@ -24,6 +24,13 @@ description: inputNotifyGeoChatPeer attributes, type and example
 $inputNotifyGeoChatPeer = ['_' => 'inputNotifyGeoChatPeer', 'peer' => InputGeoChat, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputNotifyGeoChatPeer","peer":"InputGeoChat"}
+```
+
+
 Or, if you're into Lua:  
 
 

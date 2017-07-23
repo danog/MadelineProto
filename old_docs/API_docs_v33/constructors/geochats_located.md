@@ -27,6 +27,13 @@ description: geochats_located attributes, type and example
 $geochats_located = ['_' => 'geochats.located', 'results' => [ChatLocated], 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"geochats.located","results":["ChatLocated"],"messages":["GeoChatMessage"],"chats":["Chat"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

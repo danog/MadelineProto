@@ -30,6 +30,13 @@ Represents results of the inline query. Use sendInlineQueryResultMessage to send
 $inlineQueryResults = ['_' => 'inlineQueryResults', 'inline_query_id' => long, 'next_offset' => string, 'results' => [InlineQueryResult], 'switch_pm_text' => string, 'switch_pm_parameter' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineQueryResults","inline_query_id":"long","next_offset":"string","results":["InlineQueryResult"],"switch_pm_text":"string","switch_pm_parameter":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

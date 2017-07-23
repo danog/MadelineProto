@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->toggleChannelInvites(['channel_id' => int, 'anyone_can_invite' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - toggleChannelInvites
+* params - {"channel_id":"int","anyone_can_invite":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelInvites`
+
+Parameters:
+
+channel_id - Json encoded int
+anyone_can_invite - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

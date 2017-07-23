@@ -29,6 +29,13 @@ Contains custom keyboard layout for fast reply to bot
 $replyMarkupShowKeyboard = ['_' => 'replyMarkupShowKeyboard', 'rows' => [keyboardButton>], 'resize_keyboard' => Bool, 'one_time' => Bool, 'personal' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyMarkupShowKeyboard","rows":["keyboardButton>"],"resize_keyboard":"Bool","one_time":"Bool","personal":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: messages_dhConfigNotModified attributes, type and example
 $messages_dhConfigNotModified = ['_' => 'messages.dhConfigNotModified', 'random' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.dhConfigNotModified","random":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

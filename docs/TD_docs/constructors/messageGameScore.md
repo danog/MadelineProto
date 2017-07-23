@@ -28,6 +28,13 @@ New high score was achieved in a game
 $messageGameScore = ['_' => 'messageGameScore', 'game_message_id' => long, 'game_id' => long, 'score' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageGameScore","game_message_id":"long","game_id":"long","score":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

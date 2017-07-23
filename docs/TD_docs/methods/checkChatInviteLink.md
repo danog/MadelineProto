@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $ChatInviteLinkInfo = $MadelineProto->checkChatInviteLink(['invite_link' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - checkChatInviteLink
+* params - {"invite_link":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/checkChatInviteLink`
+
+Parameters:
+
+invite_link - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

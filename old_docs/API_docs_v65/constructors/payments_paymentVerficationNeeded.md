@@ -24,6 +24,13 @@ description: payments_paymentVerficationNeeded attributes, type and example
 $payments_paymentVerficationNeeded = ['_' => 'payments.paymentVerficationNeeded', 'url' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"payments.paymentVerficationNeeded","url":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

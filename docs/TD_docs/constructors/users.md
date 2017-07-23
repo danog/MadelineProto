@@ -27,6 +27,13 @@ Contains list of users
 $users = ['_' => 'users', 'total_count' => int, 'users' => [user], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"users","total_count":"int","users":["user"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -40,6 +40,34 @@ if (isset($number)) { // Login as a user
 $messages_Dialogs = $MadelineProto->messages->getDialogs(['exclude_pinned' => Bool, 'offset_date' => int, 'offset_id' => int, 'offset_peer' => InputPeer, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getDialogs
+* params - {"exclude_pinned":"Bool","offset_date":"int","offset_id":"int","offset_peer":"InputPeer","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDialogs`
+
+Parameters:
+
+exclude_pinned - Json encoded Bool
+offset_date - Json encoded int
+offset_id - Json encoded int
+offset_peer - Json encoded InputPeer
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -36,6 +36,13 @@ Gives full information about a channel
 $channelFull = ['_' => 'channelFull', 'channel' => channel, 'about' => string, 'member_count' => int, 'administrator_count' => int, 'kicked_count' => int, 'can_get_members' => Bool, 'can_set_username' => Bool, 'invite_link' => string, 'pinned_message_id' => long, 'migrated_from_group_id' => int, 'migrated_from_max_message_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelFull","channel":"channel","about":"string","member_count":"int","administrator_count":"int","kicked_count":"int","can_get_members":"Bool","can_set_username":"Bool","invite_link":"string","pinned_message_id":"long","migrated_from_group_id":"int","migrated_from_max_message_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

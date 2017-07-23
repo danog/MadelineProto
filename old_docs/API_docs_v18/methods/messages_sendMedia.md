@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $messages_StatedMessage = $MadelineProto->messages->sendMedia(['peer' => InputPeer, 'media' => InputMedia, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.sendMedia
+* params - {"peer":"InputPeer","media":"InputMedia"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMedia`
+
+Parameters:
+
+peer - Json encoded InputPeer
+media - Json encoded InputMedia
+
+
+```
+
 Or, if you're into Lua:
 
 ```

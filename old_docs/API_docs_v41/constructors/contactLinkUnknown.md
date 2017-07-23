@@ -19,6 +19,13 @@ description: contactLinkUnknown attributes, type and example
 $contactLinkUnknown = ['_' => 'contactLinkUnknown', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contactLinkUnknown"}
+```
+
+
 Or, if you're into Lua:  
 
 

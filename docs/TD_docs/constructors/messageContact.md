@@ -26,6 +26,13 @@ User contact message
 $messageContact = ['_' => 'messageContact', 'contact' => contact, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageContact","contact":"contact"}
+```
+
+
 Or, if you're into Lua:  
 
 

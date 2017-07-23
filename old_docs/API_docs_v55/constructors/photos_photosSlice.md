@@ -26,6 +26,13 @@ description: photos_photosSlice attributes, type and example
 $photos_photosSlice = ['_' => 'photos.photosSlice', 'count' => int, 'photos' => [Photo], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photos.photosSlice","count":"int","photos":["Photo"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

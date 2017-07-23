@@ -26,6 +26,13 @@ description: documentAttributeVideo attributes, type and example
 $documentAttributeVideo_23 = ['_' => 'documentAttributeVideo', 'duration' => int, 'w' => int, 'h' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeVideo","duration":"int","w":"int","h":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

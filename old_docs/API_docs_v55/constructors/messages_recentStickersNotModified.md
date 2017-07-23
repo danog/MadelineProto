@@ -19,6 +19,13 @@ description: messages_recentStickersNotModified attributes, type and example
 $messages_recentStickersNotModified = ['_' => 'messages.recentStickersNotModified', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.recentStickersNotModified"}
+```
+
+
 Or, if you're into Lua:  
 
 

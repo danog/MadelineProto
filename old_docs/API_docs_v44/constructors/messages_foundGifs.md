@@ -25,6 +25,13 @@ description: messages_foundGifs attributes, type and example
 $messages_foundGifs = ['_' => 'messages.foundGifs', 'next_offset' => int, 'results' => [FoundGif], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.foundGifs","next_offset":"int","results":["FoundGif"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ description: ipPort attributes, type and example
 $ipPort = ['_' => 'ipPort', 'ipv4' => int, 'port' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"ipPort","ipv4":"int","port":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

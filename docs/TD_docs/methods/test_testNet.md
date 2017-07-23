@@ -34,6 +34,29 @@ if (isset($number)) { // Login as a user
 $test_Empty = $MadelineProto->test->testNet();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.testNet
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.testNet`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

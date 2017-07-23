@@ -26,6 +26,13 @@ description: foundGifCached attributes, type and example
 $foundGifCached = ['_' => 'foundGifCached', 'url' => string, 'photo' => Photo, 'document' => Document, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"foundGifCached","url":"string","photo":"Photo","document":"Document"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: inputMessagesFilterMusic attributes, type and example
 $inputMessagesFilterMusic = ['_' => 'inputMessagesFilterMusic', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessagesFilterMusic"}
+```
+
+
 Or, if you're into Lua:  
 
 

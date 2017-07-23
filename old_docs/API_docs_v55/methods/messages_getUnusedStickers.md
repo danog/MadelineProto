@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Vector_of_StickerSetCovered = $MadelineProto->messages->getUnusedStickers(['limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getUnusedStickers
+* params - {"limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getUnusedStickers`
+
+Parameters:
+
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

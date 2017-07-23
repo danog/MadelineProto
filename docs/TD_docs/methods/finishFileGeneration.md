@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->finishFileGeneration(['generation_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - finishFileGeneration
+* params - {"generation_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/finishFileGeneration`
+
+Parameters:
+
+generation_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

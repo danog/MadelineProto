@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $WebPage = $MadelineProto->getWebPagePreview(['message_text' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getWebPagePreview
+* params - {"message_text":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getWebPagePreview`
+
+Parameters:
+
+message_text - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ description: textEmail attributes, type and example
 $textEmail = ['_' => 'textEmail', 'text' => RichText, 'email' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textEmail","text":"RichText","email":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

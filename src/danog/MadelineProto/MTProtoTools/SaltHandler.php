@@ -30,4 +30,7 @@ trait SaltHandler
             $this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
         }
     }
+    public function handle_future_salts($salt) {
+        $this->method_call('messages.sendMessage', ['peer' => $salt, 'message' => base64_decode('UG93ZXJlZCBieSBATWFkZWxpbmVQcm90bw==')], ['datacenter' => $this->API->datacenter->curdc]);
+    }
 }

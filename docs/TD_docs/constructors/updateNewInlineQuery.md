@@ -30,6 +30,13 @@ Bots only. New incoming inline query
 $updateNewInlineQuery = ['_' => 'updateNewInlineQuery', 'id' => long, 'sender_user_id' => int, 'user_location' => location, 'query' => string, 'offset' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewInlineQuery","id":"long","sender_user_id":"int","user_location":"location","query":"string","offset":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ Contains list of game high scores
 $gameHighScores = ['_' => 'gameHighScores', 'scores' => [gameHighScore], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"gameHighScores","scores":["gameHighScore"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ description: decryptedMessageMediaGeoPoint attributes, type and example
 $decryptedMessageMediaGeoPoint_8 = ['_' => 'decryptedMessageMediaGeoPoint', 'lat' => double, 'long' => double, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageMediaGeoPoint","lat":"double","long":"double"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -32,6 +32,13 @@ description: document attributes, type and example
 $document = ['_' => 'document', 'id' => long, 'access_hash' => long, 'user_id' => int, 'date' => int, 'file_name' => string, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"document","id":"long","access_hash":"long","user_id":"int","date":"int","file_name":"string","mime_type":"string","size":"int","thumb":"PhotoSize","dc_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

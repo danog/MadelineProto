@@ -42,6 +42,36 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->messages->sendMedia(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'media' => InputMedia, 'reply_markup' => ReplyMarkup, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.sendMedia
+* params - {"broadcast":"Bool","silent":"Bool","background":"Bool","peer":"InputPeer","reply_to_msg_id":"int","media":"InputMedia","reply_markup":"ReplyMarkup"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMedia`
+
+Parameters:
+
+broadcast - Json encoded Bool
+silent - Json encoded Bool
+background - Json encoded Bool
+peer - Json encoded InputPeer
+reply_to_msg_id - Json encoded int
+media - Json encoded InputMedia
+reply_markup - Json encoded ReplyMarkup
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ description: pageBlockPhoto attributes, type and example
 $pageBlockPhoto = ['_' => 'pageBlockPhoto', 'photo_id' => long, 'caption' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockPhoto","photo_id":"long","caption":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

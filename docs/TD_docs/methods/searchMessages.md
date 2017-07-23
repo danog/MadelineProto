@@ -45,6 +45,34 @@ if (isset($number)) { // Login as a user
 $Messages = $MadelineProto->searchMessages(['query' => string, 'offset_date' => int, 'offset_chat_id' => long, 'offset_message_id' => long, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - searchMessages
+* params - {"query":"string","offset_date":"int","offset_chat_id":"long","offset_message_id":"long","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchMessages`
+
+Parameters:
+
+query - Json encoded string
+offset_date - Json encoded int
+offset_chat_id - Json encoded long
+offset_message_id - Json encoded long
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

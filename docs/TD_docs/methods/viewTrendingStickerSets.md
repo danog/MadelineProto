@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->viewTrendingStickerSets(['sticker_set_ids' => [long], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - viewTrendingStickerSets
+* params - {"sticker_set_ids":["long"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/viewTrendingStickerSets`
+
+Parameters:
+
+sticker_set_ids - Json encoded  array of long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

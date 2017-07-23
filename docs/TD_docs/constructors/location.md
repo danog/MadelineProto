@@ -27,6 +27,13 @@ Describes location on Earth
 $location = ['_' => 'location', 'latitude' => double, 'longitude' => double, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"location","latitude":"double","longitude":"double"}
+```
+
+
 Or, if you're into Lua:  
 
 

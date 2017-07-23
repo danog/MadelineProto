@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $LangPackDifference = $MadelineProto->langpack->getDifference(['from_version' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - langpack.getDifference
+* params - {"from_version":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/langpack.getDifference`
+
+Parameters:
+
+from_version - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

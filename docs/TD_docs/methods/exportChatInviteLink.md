@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $ChatInviteLink = $MadelineProto->exportChatInviteLink(['chat_id' => InputPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - exportChatInviteLink
+* params - {"chat_id":"InputPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/exportChatInviteLink`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

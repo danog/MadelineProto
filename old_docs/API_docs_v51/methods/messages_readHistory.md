@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $messages_AffectedMessages = $MadelineProto->messages->readHistory(['peer' => InputPeer, 'max_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.readHistory
+* params - {"peer":"InputPeer","max_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readHistory`
+
+Parameters:
+
+peer - Json encoded InputPeer
+max_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -31,6 +31,13 @@ description: userSelf attributes, type and example
 $userSelf = ['_' => 'userSelf', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'inactive' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userSelf","id":"int","first_name":"string","last_name":"string","username":"string","phone":"string","photo":"UserProfilePhoto","status":"UserStatus","inactive":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

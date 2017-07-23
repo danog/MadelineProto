@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->channels->editPhoto(['channel' => InputChannel, 'photo' => InputChatPhoto, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.editPhoto
+* params - {"channel":"InputChannel","photo":"InputChatPhoto"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editPhoto`
+
+Parameters:
+
+channel - Json encoded InputChannel
+photo - Json encoded InputChatPhoto
+
+
+```
+
 Or, if you're into Lua:
 
 ```

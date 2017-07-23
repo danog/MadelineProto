@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $PeerSettings = $MadelineProto->messages->getPeerSettings(['peer' => InputPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getPeerSettings
+* params - {"peer":"InputPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getPeerSettings`
+
+Parameters:
+
+peer - Json encoded InputPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

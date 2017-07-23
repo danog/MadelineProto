@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeChatTitle(['chat_id' => InputPeer, 'title' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - changeChatTitle
+* params - {"chat_id":"InputPeer","title":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatTitle`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+title - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

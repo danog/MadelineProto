@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->channels->editTitle(['channel' => InputChannel, 'title' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.editTitle
+* params - {"channel":"InputChannel","title":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editTitle`
+
+Parameters:
+
+channel - Json encoded InputChannel
+title - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ description: updateDraftMessage attributes, type and example
 $updateDraftMessage = ['_' => 'updateDraftMessage', 'peer' => Peer, 'draft' => DraftMessage, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateDraftMessage","peer":"Peer","draft":"DraftMessage"}
+```
+
+
 Or, if you're into Lua:  
 
 

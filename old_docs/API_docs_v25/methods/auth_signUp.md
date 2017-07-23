@@ -40,6 +40,34 @@ if (isset($number)) { // Login as a user
 $auth_Authorization = $MadelineProto->auth->signUp(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, 'first_name' => string, 'last_name' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.signUp
+* params - {"phone_number":"string","phone_code_hash":"string","phone_code":"string","first_name":"string","last_name":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.signUp`
+
+Parameters:
+
+phone_number - Json encoded string
+phone_code_hash - Json encoded string
+phone_code - Json encoded string
+first_name - Json encoded string
+last_name - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

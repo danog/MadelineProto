@@ -24,6 +24,13 @@ description: updateStickerSetsOrder attributes, type and example
 $updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'order' => [long], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateStickerSetsOrder","order":["long"]}
+```
+
+
 Or, if you're into Lua:  
 
 

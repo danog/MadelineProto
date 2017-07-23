@@ -26,6 +26,13 @@ Token for GCM
 $gcmDeviceToken = ['_' => 'gcmDeviceToken', 'token' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"gcmDeviceToken","token":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

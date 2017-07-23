@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->help->setBotUpdatesStatus(['pending_updates_count' => int, 'message' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.setBotUpdatesStatus
+* params - {"pending_updates_count":"int","message":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.setBotUpdatesStatus`
+
+Parameters:
+
+pending_updates_count - Json encoded int
+message - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $DataJSON = $MadelineProto->phone->getCallConfig();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - phone.getCallConfig
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.getCallConfig`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

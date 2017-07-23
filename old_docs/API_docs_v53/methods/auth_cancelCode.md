@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->auth->cancelCode(['phone_number' => string, 'phone_code_hash' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - auth.cancelCode
+* params - {"phone_number":"string","phone_code_hash":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.cancelCode`
+
+Parameters:
+
+phone_number - Json encoded string
+phone_code_hash - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

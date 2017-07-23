@@ -25,6 +25,13 @@ description: contacts_contacts attributes, type and example
 $contacts_contacts = ['_' => 'contacts.contacts', 'contacts' => [Contact], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.contacts","contacts":["Contact"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

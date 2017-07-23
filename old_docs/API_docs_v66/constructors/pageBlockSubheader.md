@@ -24,6 +24,13 @@ description: pageBlockSubheader attributes, type and example
 $pageBlockSubheader = ['_' => 'pageBlockSubheader', 'text' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockSubheader","text":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

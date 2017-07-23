@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->readFeaturedStickers();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.readFeaturedStickers
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readFeaturedStickers`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

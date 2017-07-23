@@ -25,6 +25,13 @@ description: auth_checkedPhone attributes, type and example
 $auth_checkedPhone = ['_' => 'auth.checkedPhone', 'phone_registered' => Bool, 'phone_invited' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"auth.checkedPhone","phone_registered":"Bool","phone_invited":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

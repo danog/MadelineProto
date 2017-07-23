@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $updates_ChannelDifference = $MadelineProto->updates->getChannelDifference(['peer' => InputPeer, 'filter' => ChannelMessagesFilter, 'pts' => int, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - updates.getChannelDifference
+* params - {"peer":"InputPeer","filter":"ChannelMessagesFilter","pts":"int","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getChannelDifference`
+
+Parameters:
+
+peer - Json encoded InputPeer
+filter - Json encoded ChannelMessagesFilter
+pts - Json encoded int
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

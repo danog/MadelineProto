@@ -27,6 +27,13 @@ description: updateBotInlineQuery attributes, type and example
 $updateBotInlineQuery = ['_' => 'updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'offset' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateBotInlineQuery","query_id":"long","user_id":"int","query":"string","offset":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

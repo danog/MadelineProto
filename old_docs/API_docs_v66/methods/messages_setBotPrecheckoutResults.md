@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->setBotPrecheckoutResults(['success' => Bool, 'query_id' => long, 'error' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.setBotPrecheckoutResults
+* params - {"success":"Bool","query_id":"long","error":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotPrecheckoutResults`
+
+Parameters:
+
+success - Json encoded Bool
+query_id - Json encoded long
+error - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

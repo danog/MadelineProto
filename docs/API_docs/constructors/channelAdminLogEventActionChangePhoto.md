@@ -25,6 +25,13 @@ description: channelAdminLogEventActionChangePhoto attributes, type and example
 $channelAdminLogEventActionChangePhoto = ['_' => 'channelAdminLogEventActionChangePhoto', 'prev_photo' => ChatPhoto, 'new_photo' => ChatPhoto, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelAdminLogEventActionChangePhoto","prev_photo":"ChatPhoto","new_photo":"ChatPhoto"}
+```
+
+
 Or, if you're into Lua:  
 
 

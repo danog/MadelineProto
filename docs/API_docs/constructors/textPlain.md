@@ -24,6 +24,13 @@ description: textPlain attributes, type and example
 $textPlain = ['_' => 'textPlain', 'text' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textPlain","text":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

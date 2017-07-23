@@ -25,6 +25,13 @@ description: inputPeerChannel attributes, type and example
 $inputPeerChannel = ['_' => 'inputPeerChannel', 'channel_id' => int, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPeerChannel","channel_id":"int","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

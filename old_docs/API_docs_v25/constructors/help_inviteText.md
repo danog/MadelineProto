@@ -24,6 +24,13 @@ description: help_inviteText attributes, type and example
 $help_inviteText = ['_' => 'help.inviteText', 'message' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"help.inviteText","message":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

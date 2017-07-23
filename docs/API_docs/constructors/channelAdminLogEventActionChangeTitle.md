@@ -25,6 +25,13 @@ description: channelAdminLogEventActionChangeTitle attributes, type and example
 $channelAdminLogEventActionChangeTitle = ['_' => 'channelAdminLogEventActionChangeTitle', 'prev_value' => string, 'new_value' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelAdminLogEventActionChangeTitle","prev_value":"string","new_value":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

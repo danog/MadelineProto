@@ -19,6 +19,13 @@ description: help_appChangelogEmpty attributes, type and example
 $help_appChangelogEmpty = ['_' => 'help.appChangelogEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"help.appChangelogEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: gzip_packed attributes, type and example
 $gzip_packed = ['_' => 'gzip_packed', 'packed_data' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"gzip_packed","packed_data":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $messages_Chats = $MadelineProto->messages->getChats(['id' => [InputChat], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getChats
+* params - {"id":["InputChat"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getChats`
+
+Parameters:
+
+id - Json encoded  array of InputChat
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -25,6 +25,13 @@ description: disabledFeature attributes, type and example
 $disabledFeature = ['_' => 'disabledFeature', 'feature' => string, 'description' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"disabledFeature","feature":"string","description":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

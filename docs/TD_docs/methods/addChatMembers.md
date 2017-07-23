@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->addChatMembers(['chat_id' => InputPeer, 'user_ids' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - addChatMembers
+* params - {"chat_id":"InputPeer","user_ids":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addChatMembers`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+user_ids - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

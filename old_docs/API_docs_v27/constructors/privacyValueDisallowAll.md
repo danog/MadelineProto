@@ -19,6 +19,13 @@ description: privacyValueDisallowAll attributes, type and example
 $privacyValueDisallowAll = ['_' => 'privacyValueDisallowAll', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyValueDisallowAll"}
+```
+
+
 Or, if you're into Lua:  
 
 

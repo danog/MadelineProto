@@ -19,6 +19,13 @@ description: inputAudioEmpty attributes, type and example
 $inputAudioEmpty = ['_' => 'inputAudioEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputAudioEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

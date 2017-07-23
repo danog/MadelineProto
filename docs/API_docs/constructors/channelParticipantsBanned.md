@@ -24,6 +24,13 @@ description: channelParticipantsBanned attributes, type and example
 $channelParticipantsBanned = ['_' => 'channelParticipantsBanned', 'q' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantsBanned","q":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ Return recently active users in reverse chronological order
 $channelMembersRecent = ['_' => 'channelMembersRecent', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelMembersRecent"}
+```
+
+
 Or, if you're into Lua:  
 
 

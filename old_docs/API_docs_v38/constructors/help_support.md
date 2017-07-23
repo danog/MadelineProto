@@ -25,6 +25,13 @@ description: help_support attributes, type and example
 $help_support = ['_' => 'help.support', 'phone_number' => string, 'user' => User, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"help.support","phone_number":"string","user":"User"}
+```
+
+
 Or, if you're into Lua:  
 
 

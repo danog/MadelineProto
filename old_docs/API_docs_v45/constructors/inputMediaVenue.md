@@ -28,6 +28,13 @@ description: inputMediaVenue attributes, type and example
 $inputMediaVenue = ['_' => 'inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaVenue","geo_point":"InputGeoPoint","title":"string","address":"string","provider":"string","venue_id":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

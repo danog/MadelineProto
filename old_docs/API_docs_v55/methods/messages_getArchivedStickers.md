@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $messages_ArchivedStickers = $MadelineProto->messages->getArchivedStickers(['offset_id' => long, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getArchivedStickers
+* params - {"offset_id":"long","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getArchivedStickers`
+
+Parameters:
+
+offset_id - Json encoded long
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

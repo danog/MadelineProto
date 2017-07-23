@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeChatDraftMessage(['chat_id' => InputPeer, 'draft_message' => draftMessage, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - changeChatDraftMessage
+* params - {"chat_id":"InputPeer","draft_message":"draftMessage"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatDraftMessage`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+draft_message - Json encoded draftMessage
+
+
+```
+
 Or, if you're into Lua:
 
 ```

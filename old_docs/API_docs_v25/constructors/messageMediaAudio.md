@@ -24,6 +24,13 @@ description: messageMediaAudio attributes, type and example
 $messageMediaAudio = ['_' => 'messageMediaAudio', 'audio' => Audio, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageMediaAudio","audio":"Audio"}
+```
+
+
 Or, if you're into Lua:  
 
 

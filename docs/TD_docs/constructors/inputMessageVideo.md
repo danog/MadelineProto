@@ -32,6 +32,13 @@ Video message
 $inputMessageVideo = ['_' => 'inputMessageVideo', 'video' => InputFile, 'thumb' => InputThumb, 'added_sticker_file_ids' => [int], 'duration' => int, 'width' => int, 'height' => int, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessageVideo","video":"InputFile","thumb":"InputThumb","added_sticker_file_ids":["int"],"duration":"int","width":"int","height":"int","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

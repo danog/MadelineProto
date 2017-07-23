@@ -19,6 +19,13 @@ description: channelParticipantsRecent attributes, type and example
 $channelParticipantsRecent = ['_' => 'channelParticipantsRecent', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantsRecent"}
+```
+
+
 Or, if you're into Lua:  
 
 

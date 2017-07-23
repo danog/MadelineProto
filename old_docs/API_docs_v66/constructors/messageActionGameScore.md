@@ -25,6 +25,13 @@ description: messageActionGameScore attributes, type and example
 $messageActionGameScore = ['_' => 'messageActionGameScore', 'game_id' => long, 'score' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionGameScore","game_id":"long","score":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

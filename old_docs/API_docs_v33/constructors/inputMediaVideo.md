@@ -25,6 +25,13 @@ description: inputMediaVideo attributes, type and example
 $inputMediaVideo = ['_' => 'inputMediaVideo', 'id' => InputVideo, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaVideo","id":"InputVideo","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

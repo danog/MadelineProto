@@ -28,6 +28,13 @@ Some incoming messages was read
 $updateChatReadInbox = ['_' => 'updateChatReadInbox', 'chat_id' => long, 'last_read_inbox_message_id' => long, 'unread_count' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChatReadInbox","chat_id":"long","last_read_inbox_message_id":"long","unread_count":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

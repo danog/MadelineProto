@@ -26,6 +26,13 @@ description: future_salts attributes, type and example
 $future_salts = ['_' => 'future_salts', 'req_msg_id' => long, 'now' => int, 'salts' => [future_salt], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"future_salts","req_msg_id":"long","now":"int","salts":["future_salt"]}
+```
+
+
 Or, if you're into Lua:  
 
 

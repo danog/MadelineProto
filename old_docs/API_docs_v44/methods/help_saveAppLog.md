@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->help->saveAppLog(['events' => [InputAppEvent], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.saveAppLog
+* params - {"events":["InputAppEvent"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.saveAppLog`
+
+Parameters:
+
+events - Json encoded  array of InputAppEvent
+
+
+```
+
 Or, if you're into Lua:
 
 ```

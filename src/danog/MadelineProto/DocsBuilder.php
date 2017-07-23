@@ -127,6 +127,8 @@ description: '.$this->settings['description'].'
 
             $params = '';
             $lua_params = '';
+            $pwr_params = '';
+            $json_params = [];
             $table = empty($this->methods->params[$key]) ? '' : '### Parameters:
 
 | Name     |    Type       | Required |
@@ -169,6 +171,8 @@ description: '.$this->settings['description'].'
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
+                $json_params[$param['name']] = isset($param['subtype']) ? [$ptype] : $ptype;
+                $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n";
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
                 if ($param['name'] === 'reply_markup') {
@@ -183,6 +187,8 @@ description: '.$this->settings['description'].'
 ';
                     $params .= "'parse_mode' => 'string', ";
                     $lua_params .= "parse_mode='string', ";
+                    $json_params['parse_mode'] = 'string';
+                    $pwr_params = "parse_mode - string\n";
                 }
             }
             $description = isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'] : ($rmethod.' parameters, return type and example');
@@ -227,6 +233,29 @@ if (isset($number)) { // Login as a user
 }
 
 $'.$type.' = $MadelineProto->'.$real_method.'(['.$params.']);
+```
+
+Or, if you\'re using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - '.$rmethod.'
+* params - '.json_encode($json_params).'
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$rmethod.'`
+
+Parameters:
+
+'.$pwr_params.'
+
 ```
 
 Or, if you\'re into Lua:
@@ -403,6 +432,7 @@ description: List of methods
 
             $params = '';
             $lua_params = '';
+            $pwr_params = ['_' => $rconstructor];
             $hasreplymarkup = false;
             foreach ($this->constructors->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
@@ -438,6 +468,7 @@ description: List of methods
                 $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
+                $pwr_params[$param['name']] = isset($param['subtype']) ? [$ptype] : $ptype;
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
@@ -472,6 +503,13 @@ description: '.$description.'
 ```
 $'.$constructor.$layer.' = '.$params.';
 ```  
+
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+'.json_encode($pwr_params).'
+```
+
 
 Or, if you\'re into Lua:  
 
@@ -636,7 +674,7 @@ $result = $'.$type.'->click();
                 $constructors = '';
                 $header .= 'This is an object of type `\danog\MadelineProto\VoIP`.
 
-It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto) for an easy installation script.
+It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
 
 You MUST know [OOP](http://php.net/manual/en/language.oop5.php) to use this class.
 
@@ -736,7 +774,7 @@ Accepts two optional parameters:
 
 * `getOutputParams()` - Returns the output audio configuration
 
-MadelineProto works using raw PCM audio, internally split in packets with `sampleNumber` samples.
+MadelineProto works using raw signed PCM audio, internally split in packets with `sampleNumber` samples.
 
 The audio configuration is an array structured in the following way:
 ```
@@ -754,7 +792,7 @@ The audio configuration is an array structured in the following way:
 
 * `getInputParams()` - Returns the input audio configuration
 
-MadelineProto works using raw PCM audio, internally split in packets with `sampleNumber` samples.
+MadelineProto works using raw signed PCM audio, internally split in packets with `sampleNumber` samples.
 
 The audio configuration is an array structured in the following way:
 ```

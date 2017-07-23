@@ -19,6 +19,13 @@ description: textEmpty attributes, type and example
 $textEmpty = ['_' => 'textEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

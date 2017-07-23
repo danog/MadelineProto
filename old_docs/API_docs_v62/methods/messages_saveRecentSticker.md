@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->saveRecentSticker(['attached' => Bool, 'id' => InputDocument, 'unsave' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.saveRecentSticker
+* params - {"attached":"Bool","id":"InputDocument","unsave":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.saveRecentSticker`
+
+Parameters:
+
+attached - Json encoded Bool
+id - Json encoded InputDocument
+unsave - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

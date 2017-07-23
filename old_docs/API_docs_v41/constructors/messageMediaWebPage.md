@@ -24,6 +24,13 @@ description: messageMediaWebPage attributes, type and example
 $messageMediaWebPage = ['_' => 'messageMediaWebPage', 'webpage' => WebPage, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageMediaWebPage","webpage":"WebPage"}
+```
+
+
 Or, if you're into Lua:  
 
 

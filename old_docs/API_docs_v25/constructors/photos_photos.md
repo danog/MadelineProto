@@ -25,6 +25,13 @@ description: photos_photos attributes, type and example
 $photos_photos = ['_' => 'photos.photos', 'photos' => [Photo], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photos.photos","photos":["Photo"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

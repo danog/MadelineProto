@@ -31,6 +31,13 @@ description: messageForwarded attributes, type and example
 $messageForwarded = ['_' => 'messageForwarded', 'id' => int, 'fwd_from_id' => int, 'fwd_date' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'message' => string, 'media' => MessageMedia, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageForwarded","id":"int","fwd_from_id":"int","fwd_date":"int","from_id":"int","to_id":"Peer","date":"int","message":"string","media":"MessageMedia"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ description: updateNewMessage attributes, type and example
 $updateNewMessage = ['_' => 'updateNewMessage', 'message' => Message, 'pts' => int, 'pts_count' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewMessage","message":"Message","pts":"int","pts_count":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

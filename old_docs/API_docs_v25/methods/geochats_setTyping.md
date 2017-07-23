@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->geochats->setTyping(['peer' => InputGeoChat, 'typing' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - geochats.setTyping
+* params - {"peer":"InputGeoChat","typing":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.setTyping`
+
+Parameters:
+
+peer - Json encoded InputGeoChat
+typing - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -32,6 +32,13 @@ description: decryptedMessageMediaPhoto attributes, type and example
 $decryptedMessageMediaPhoto_45 = ['_' => 'decryptedMessageMediaPhoto', 'thumb' => bytes, 'thumb_w' => int, 'thumb_h' => int, 'w' => int, 'h' => int, 'size' => int, 'key' => bytes, 'iv' => bytes, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageMediaPhoto","thumb":"bytes","thumb_w":"int","thumb_h":"int","w":"int","h":"int","size":"int","key":"bytes","iv":"bytes","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

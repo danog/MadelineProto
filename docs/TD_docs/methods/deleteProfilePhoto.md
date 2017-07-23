@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->deleteProfilePhoto(['profile_photo_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - deleteProfilePhoto
+* params - {"profile_photo_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteProfilePhoto`
+
+Parameters:
+
+profile_photo_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

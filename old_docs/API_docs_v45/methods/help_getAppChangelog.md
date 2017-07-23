@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $help_AppChangelog = $MadelineProto->help->getAppChangelog(['device_model' => string, 'system_version' => string, 'app_version' => string, 'lang_code' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.getAppChangelog
+* params - {"device_model":"string","system_version":"string","app_version":"string","lang_code":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getAppChangelog`
+
+Parameters:
+
+device_model - Json encoded string
+system_version - Json encoded string
+app_version - Json encoded string
+lang_code - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -45,6 +45,30 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->messages->sendMessage(['no_webpage' => Bool, 'silent' => Bool, 'background' => Bool, 'clear_draft' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.sendMessage
+* params - {"no_webpage":"Bool","silent":"Bool","background":"Bool","clear_draft":"Bool","peer":"InputPeer","reply_to_msg_id":"int","message":"string","reply_markup":"ReplyMarkup","entities":["MessageEntity"],"parse_mode":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMessage`
+
+Parameters:
+
+parse_mode - string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -24,6 +24,13 @@ description: messageActionChatJoinedByLink attributes, type and example
 $messageActionChatJoinedByLink = ['_' => 'messageActionChatJoinedByLink', 'inviter_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionChatJoinedByLink","inviter_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

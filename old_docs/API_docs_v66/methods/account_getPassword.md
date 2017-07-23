@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $account_Password = $MadelineProto->account->getPassword();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.getPassword
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getPassword`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

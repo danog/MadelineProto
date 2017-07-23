@@ -26,6 +26,13 @@ Some date about chat has been changed
 $updateChat = ['_' => 'updateChat', 'chat' => chat, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChat","chat":"chat"}
+```
+
+
 Or, if you're into Lua:  
 
 

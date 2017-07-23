@@ -27,6 +27,13 @@ A button which forces inline query to the bot to be substitued in the input fiel
 $inlineKeyboardButtonTypeSwitchInline = ['_' => 'inlineKeyboardButtonTypeSwitchInline', 'query' => string, 'in_current_chat' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineKeyboardButtonTypeSwitchInline","query":"string","in_current_chat":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

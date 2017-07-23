@@ -29,6 +29,13 @@ Gives full information about a group
 $groupFull = ['_' => 'groupFull', 'group' => group, 'creator_user_id' => int, 'members' => [chatMember], 'invite_link' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"groupFull","group":"group","creator_user_id":"int","members":["chatMember"],"invite_link":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

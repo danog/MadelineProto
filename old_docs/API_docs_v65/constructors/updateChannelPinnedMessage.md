@@ -25,6 +25,13 @@ description: updateChannelPinnedMessage attributes, type and example
 $updateChannelPinnedMessage = ['_' => 'updateChannelPinnedMessage', 'channel_id' => int, 'id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChannelPinnedMessage","channel_id":"int","id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ description: contact attributes, type and example
 $contact = ['_' => 'contact', 'user_id' => int, 'mutual' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contact","user_id":"int","mutual":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

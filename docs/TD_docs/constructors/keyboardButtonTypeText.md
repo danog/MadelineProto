@@ -25,6 +25,13 @@ Simple button with a text, which should be sent when the button is pressed
 $keyboardButtonTypeText = ['_' => 'keyboardButtonTypeText', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonTypeText"}
+```
+
+
 Or, if you're into Lua:  
 
 

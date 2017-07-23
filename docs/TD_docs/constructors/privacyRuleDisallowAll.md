@@ -25,6 +25,13 @@ Rule to disallow all users
 $privacyRuleDisallowAll = ['_' => 'privacyRuleDisallowAll', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyRuleDisallowAll"}
+```
+
+
 Or, if you're into Lua:  
 
 

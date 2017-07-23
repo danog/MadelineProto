@@ -27,6 +27,13 @@ description: botInlineMediaResultPhoto attributes, type and example
 $botInlineMediaResultPhoto = ['_' => 'botInlineMediaResultPhoto', 'id' => string, 'type' => string, 'photo' => Photo, 'send_message' => BotInlineMessage, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"botInlineMediaResultPhoto","id":"string","type":"string","photo":"Photo","send_message":"BotInlineMessage"}
+```
+
+
 Or, if you're into Lua:  
 
 

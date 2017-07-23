@@ -25,6 +25,13 @@ description: contactBlocked attributes, type and example
 $contactBlocked = ['_' => 'contactBlocked', 'user_id' => int, 'date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contactBlocked","user_id":"int","date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

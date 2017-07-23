@@ -26,6 +26,13 @@ Represents list of animations
 $animations = ['_' => 'animations', 'animations' => [animation], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"animations","animations":["animation"]}
+```
+
+
 Or, if you're into Lua:  
 
 

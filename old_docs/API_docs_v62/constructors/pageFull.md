@@ -26,6 +26,13 @@ description: pageFull attributes, type and example
 $pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock], 'photos' => [Photo], 'videos' => [Document], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageFull","blocks":["PageBlock"],"photos":["Photo"],"videos":["Document"]}
+```
+
+
 Or, if you're into Lua:  
 
 

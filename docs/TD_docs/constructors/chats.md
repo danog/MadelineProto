@@ -26,6 +26,13 @@ Contains list of chats
 $chats = ['_' => 'chats', 'chats' => [chat], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chats","chats":["chat"]}
+```
+
+
 Or, if you're into Lua:  
 
 

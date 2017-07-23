@@ -27,6 +27,13 @@ Photo message
 $messagePhoto = ['_' => 'messagePhoto', 'photo' => photo, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messagePhoto","photo":"photo","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $messages_ChatFull = $MadelineProto->channels->getFullChannel(['channel' => InputChannel, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.getFullChannel
+* params - {"channel":"InputChannel"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getFullChannel`
+
+Parameters:
+
+channel - Json encoded InputChannel
+
+
+```
+
 Or, if you're into Lua:
 
 ```

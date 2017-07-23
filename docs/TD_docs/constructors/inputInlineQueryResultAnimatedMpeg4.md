@@ -33,6 +33,13 @@ Represents link to an animated (i.e. without sound) H.264/MPEG-4 AVC video
 $inputInlineQueryResultAnimatedMpeg4 = ['_' => 'inputInlineQueryResultAnimatedMpeg4', 'id' => string, 'title' => string, 'thumb_url' => string, 'mpeg4_url' => string, 'mpeg4_width' => int, 'mpeg4_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputInlineQueryResultAnimatedMpeg4","id":"string","title":"string","thumb_url":"string","mpeg4_url":"string","mpeg4_width":"int","mpeg4_height":"int","reply_markup":"ReplyMarkup","input_message_content":"InputMessageContent"}
+```
+
+
 Or, if you're into Lua:  
 
 

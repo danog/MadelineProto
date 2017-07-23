@@ -25,6 +25,13 @@ Only for channels, member that can delete messages of unprivileged members and k
 $chatMemberStatusModerator = ['_' => 'chatMemberStatusModerator', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatMemberStatusModerator"}
+```
+
+
 Or, if you're into Lua:  
 
 

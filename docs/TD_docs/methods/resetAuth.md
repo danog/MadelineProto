@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $AuthState = $MadelineProto->resetAuth(['force' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - resetAuth
+* params - {"force":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/resetAuth`
+
+Parameters:
+
+force - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

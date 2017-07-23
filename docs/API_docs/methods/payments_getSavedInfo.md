@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $payments_SavedInfo = $MadelineProto->payments->getSavedInfo();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - payments.getSavedInfo
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.getSavedInfo`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

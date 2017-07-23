@@ -25,6 +25,13 @@ description: updateNotifySettings attributes, type and example
 $updateNotifySettings = ['_' => 'updateNotifySettings', 'peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNotifySettings","peer":"NotifyPeer","notify_settings":"PeerNotifySettings"}
+```
+
+
 Or, if you're into Lua:  
 
 

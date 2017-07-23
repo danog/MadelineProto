@@ -19,6 +19,13 @@ description: inputPrivacyValueDisallowContacts attributes, type and example
 $inputPrivacyValueDisallowContacts = ['_' => 'inputPrivacyValueDisallowContacts', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPrivacyValueDisallowContacts"}
+```
+
+
 Or, if you're into Lua:  
 
 

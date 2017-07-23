@@ -31,6 +31,13 @@ description: decryptedMessageMediaExternalDocument attributes, type and example
 $decryptedMessageMediaExternalDocument_23 = ['_' => 'decryptedMessageMediaExternalDocument', 'id' => long, 'access_hash' => long, 'date' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'attributes' => [DocumentAttribute], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageMediaExternalDocument","id":"long","access_hash":"long","date":"int","mime_type":"string","size":"int","thumb":"PhotoSize","dc_id":"int","attributes":["DocumentAttribute"]}
+```
+
+
 Or, if you're into Lua:  
 
 

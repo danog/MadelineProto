@@ -24,6 +24,13 @@ description: channelParticipantsKicked attributes, type and example
 $channelParticipantsKicked = ['_' => 'channelParticipantsKicked', 'q' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantsKicked","q":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

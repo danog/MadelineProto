@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Vector_of_long = $MadelineProto->messages->receivedQueue(['max_qts' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.receivedQueue
+* params - {"max_qts":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.receivedQueue`
+
+Parameters:
+
+max_qts - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

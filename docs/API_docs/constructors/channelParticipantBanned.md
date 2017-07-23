@@ -28,6 +28,13 @@ description: channelParticipantBanned attributes, type and example
 $channelParticipantBanned = ['_' => 'channelParticipantBanned', 'left' => Bool, 'user_id' => int, 'kicked_by' => int, 'date' => int, 'banned_rights' => ChannelBannedRights, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantBanned","left":"Bool","user_id":"int","kicked_by":"int","date":"int","banned_rights":"ChannelBannedRights"}
+```
+
+
 Or, if you're into Lua:  
 
 

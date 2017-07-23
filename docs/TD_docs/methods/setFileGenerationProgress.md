@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->setFileGenerationProgress(['generation_id' => long, 'ready' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - setFileGenerationProgress
+* params - {"generation_id":"long","ready":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setFileGenerationProgress`
+
+Parameters:
+
+generation_id - Json encoded long
+ready - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

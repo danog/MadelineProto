@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $FutureSalts = $MadelineProto->get_future_salts(['num' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - get_future_salts
+* params - {"num":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/get_future_salts`
+
+Parameters:
+
+num - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

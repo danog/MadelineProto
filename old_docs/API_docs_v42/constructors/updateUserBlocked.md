@@ -25,6 +25,13 @@ description: updateUserBlocked attributes, type and example
 $updateUserBlocked = ['_' => 'updateUserBlocked', 'user_id' => int, 'blocked' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateUserBlocked","user_id":"int","blocked":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

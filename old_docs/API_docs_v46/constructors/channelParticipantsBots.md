@@ -19,6 +19,13 @@ description: channelParticipantsBots attributes, type and example
 $channelParticipantsBots = ['_' => 'channelParticipantsBots', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantsBots"}
+```
+
+
 Or, if you're into Lua:  
 
 

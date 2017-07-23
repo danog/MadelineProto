@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->deleteChatHistory(['chat_id' => InputPeer, 'remove_from_chat_list' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - deleteChatHistory
+* params - {"chat_id":"InputPeer","remove_from_chat_list":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteChatHistory`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+remove_from_chat_list - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -19,6 +19,13 @@ description: notifyUsers attributes, type and example
 $notifyUsers = ['_' => 'notifyUsers', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"notifyUsers"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->channels->reportSpam(['channel' => InputChannel, 'user_id' => InputUser, 'id' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.reportSpam
+* params - {"channel":"InputChannel","user_id":"InputUser","id":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.reportSpam`
+
+Parameters:
+
+channel - Json encoded InputChannel
+user_id - Json encoded InputUser
+id - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -19,6 +19,13 @@ description: inputPrivacyKeyStatusTimestamp attributes, type and example
 $inputPrivacyKeyStatusTimestamp = ['_' => 'inputPrivacyKeyStatusTimestamp', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPrivacyKeyStatusTimestamp"}
+```
+
+
 Or, if you're into Lua:  
 
 

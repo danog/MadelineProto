@@ -45,6 +45,34 @@ if (isset($number)) { // Login as a user
 $Messages = $MadelineProto->forwardMessages(['chat_id' => InputPeer, 'from_chat_id' => long, 'message_ids' => [long], 'disable_notification' => Bool, 'from_background' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - forwardMessages
+* params - {"chat_id":"InputPeer","from_chat_id":"long","message_ids":["long"],"disable_notification":"Bool","from_background":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/forwardMessages`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+from_chat_id - Json encoded long
+message_ids - Json encoded  array of long
+disable_notification - Json encoded Bool
+from_background - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

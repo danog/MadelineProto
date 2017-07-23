@@ -25,6 +25,13 @@ description: updateChannelTooLong attributes, type and example
 $updateChannelTooLong = ['_' => 'updateChannelTooLong', 'channel_id' => int, 'pts' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChannelTooLong","channel_id":"int","pts":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

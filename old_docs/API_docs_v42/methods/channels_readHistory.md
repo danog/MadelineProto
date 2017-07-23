@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->channels->readHistory(['channel' => InputChannel, 'max_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - channels.readHistory
+* params - {"channel":"InputChannel","max_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.readHistory`
+
+Parameters:
+
+channel - Json encoded InputChannel
+max_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

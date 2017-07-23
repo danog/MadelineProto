@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'g_a' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.requestEncryption
+* params - {"user_id":"InputUser","g_a":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.requestEncryption`
+
+Parameters:
+
+user_id - Json encoded InputUser
+g_a - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

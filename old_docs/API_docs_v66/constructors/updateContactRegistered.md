@@ -25,6 +25,13 @@ description: updateContactRegistered attributes, type and example
 $updateContactRegistered = ['_' => 'updateContactRegistered', 'user_id' => int, 'date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateContactRegistered","user_id":"int","date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

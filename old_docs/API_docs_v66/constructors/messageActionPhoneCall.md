@@ -26,6 +26,13 @@ description: messageActionPhoneCall attributes, type and example
 $messageActionPhoneCall = ['_' => 'messageActionPhoneCall', 'call_id' => long, 'reason' => PhoneCallDiscardReason, 'duration' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionPhoneCall","call_id":"long","reason":"PhoneCallDiscardReason","duration":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

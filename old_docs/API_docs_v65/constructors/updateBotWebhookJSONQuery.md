@@ -26,6 +26,13 @@ description: updateBotWebhookJSONQuery attributes, type and example
 $updateBotWebhookJSONQuery = ['_' => 'updateBotWebhookJSONQuery', 'query_id' => long, 'data' => DataJSON, 'timeout' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateBotWebhookJSONQuery","query_id":"long","data":"DataJSON","timeout":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

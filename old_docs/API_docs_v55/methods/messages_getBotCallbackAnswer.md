@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $messages_BotCallbackAnswer = $MadelineProto->messages->getBotCallbackAnswer(['peer' => InputPeer, 'msg_id' => int, 'data' => bytes, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getBotCallbackAnswer
+* params - {"peer":"InputPeer","msg_id":"int","data":"bytes"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getBotCallbackAnswer`
+
+Parameters:
+
+peer - Json encoded InputPeer
+msg_id - Json encoded int
+data - Json encoded bytes
+
+
+```
+
 Or, if you're into Lua:
 
 ```

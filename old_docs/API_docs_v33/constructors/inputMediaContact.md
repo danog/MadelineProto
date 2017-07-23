@@ -26,6 +26,13 @@ description: inputMediaContact attributes, type and example
 $inputMediaContact = ['_' => 'inputMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaContact","phone_number":"string","first_name":"string","last_name":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

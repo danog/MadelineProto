@@ -19,6 +19,13 @@ description: documentAttributeAnimated attributes, type and example
 $documentAttributeAnimated = ['_' => 'documentAttributeAnimated', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeAnimated"}
+```
+
+
 Or, if you're into Lua:  
 
 

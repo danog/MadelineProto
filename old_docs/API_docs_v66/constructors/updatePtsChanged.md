@@ -19,6 +19,13 @@ description: updatePtsChanged attributes, type and example
 $updatePtsChanged = ['_' => 'updatePtsChanged', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updatePtsChanged"}
+```
+
+
 Or, if you're into Lua:  
 
 

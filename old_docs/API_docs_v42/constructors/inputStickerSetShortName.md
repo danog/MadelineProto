@@ -24,6 +24,13 @@ description: inputStickerSetShortName attributes, type and example
 $inputStickerSetShortName = ['_' => 'inputStickerSetShortName', 'short_name' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputStickerSetShortName","short_name":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

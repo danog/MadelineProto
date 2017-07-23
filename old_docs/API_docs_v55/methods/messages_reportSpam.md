@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->reportSpam(['peer' => InputPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.reportSpam
+* params - {"peer":"InputPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reportSpam`
+
+Parameters:
+
+peer - Json encoded InputPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

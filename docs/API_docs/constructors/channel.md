@@ -42,6 +42,13 @@ description: channel attributes, type and example
 $channel = ['_' => 'channel', 'creator' => Bool, 'left' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, 'admin_rights' => ChannelAdminRights, 'banned_rights' => ChannelBannedRights, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channel","creator":"Bool","left":"Bool","broadcast":"Bool","verified":"Bool","megagroup":"Bool","restricted":"Bool","democracy":"Bool","signatures":"Bool","min":"Bool","id":"int","access_hash":"long","title":"string","username":"string","photo":"ChatPhoto","date":"int","version":"int","restriction_reason":"string","admin_rights":"ChannelAdminRights","banned_rights":"ChannelBannedRights"}
+```
+
+
 Or, if you're into Lua:  
 
 

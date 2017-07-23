@@ -29,6 +29,13 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 $inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, 'stickers' => [InputDocument], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedThumbDocument","file":"InputFile","thumb":"InputFile","mime_type":"string","attributes":["DocumentAttribute"],"caption":"string","stickers":["InputDocument"]}
+```
+
+
 Or, if you're into Lua:  
 
 

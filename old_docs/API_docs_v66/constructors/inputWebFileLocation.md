@@ -25,6 +25,13 @@ description: inputWebFileLocation attributes, type and example
 $inputWebFileLocation = ['_' => 'inputWebFileLocation', 'url' => string, 'access_hash' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputWebFileLocation","url":"string","access_hash":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

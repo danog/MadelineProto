@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $Vector_of_ContactStatus = $MadelineProto->contacts->getStatuses();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - contacts.getStatuses
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getStatuses`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

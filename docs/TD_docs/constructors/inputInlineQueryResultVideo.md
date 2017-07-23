@@ -36,6 +36,13 @@ Represents link to a page containing an embedded video player or a video file
 $inputInlineQueryResultVideo = ['_' => 'inputInlineQueryResultVideo', 'id' => string, 'title' => string, 'description' => string, 'thumb_url' => string, 'video_url' => string, 'mime_type' => string, 'video_width' => int, 'video_height' => int, 'video_duration' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputInlineQueryResultVideo","id":"string","title":"string","description":"string","thumb_url":"string","video_url":"string","mime_type":"string","video_width":"int","video_height":"int","video_duration":"int","reply_markup":"ReplyMarkup","input_message_content":"InputMessageContent"}
+```
+
+
 Or, if you're into Lua:  
 
 

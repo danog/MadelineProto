@@ -42,6 +42,13 @@ Describes message
 $message = ['_' => 'message', 'id' => long, 'sender_user_id' => int, 'chat_id' => long, 'send_state' => MessageSendState, 'can_be_edited' => Bool, 'can_be_deleted' => Bool, 'is_post' => Bool, 'date' => int, 'edit_date' => int, 'forward_info' => MessageForwardInfo, 'reply_to_message_id' => long, 'ttl' => int, 'ttl_expires_in' => double, 'via_bot_user_id' => int, 'views' => int, 'content' => MessageContent, 'reply_markup' => ReplyMarkup, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"message","id":"long","sender_user_id":"int","chat_id":"long","send_state":"MessageSendState","can_be_edited":"Bool","can_be_deleted":"Bool","is_post":"Bool","date":"int","edit_date":"int","forward_info":"MessageForwardInfo","reply_to_message_id":"long","ttl":"int","ttl_expires_in":"double","via_bot_user_id":"int","views":"int","content":"MessageContent","reply_markup":"ReplyMarkup"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ New channel chat created
 $messageChannelChatCreate = ['_' => 'messageChannelChatCreate', 'title' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageChannelChatCreate","title":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

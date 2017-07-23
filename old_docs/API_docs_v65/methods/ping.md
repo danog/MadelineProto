@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Pong = $MadelineProto->ping(['ping_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - ping
+* params - {"ping_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/ping`
+
+Parameters:
+
+ping_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

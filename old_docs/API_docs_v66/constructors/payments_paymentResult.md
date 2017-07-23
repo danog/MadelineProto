@@ -24,6 +24,13 @@ description: payments_paymentResult attributes, type and example
 $payments_paymentResult = ['_' => 'payments.paymentResult', 'updates' => Updates, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"payments.paymentResult","updates":"Updates"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ description: updateNewEncryptedMessage attributes, type and example
 $updateNewEncryptedMessage = ['_' => 'updateNewEncryptedMessage', 'encr_message' => EncryptedMessage, 'qts' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewEncryptedMessage","encr_message":"EncryptedMessage","qts":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

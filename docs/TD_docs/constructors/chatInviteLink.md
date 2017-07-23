@@ -26,6 +26,13 @@ Contains chat invite link
 $chatInviteLink = ['_' => 'chatInviteLink', 'invite_link' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatInviteLink","invite_link":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

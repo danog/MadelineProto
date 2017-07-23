@@ -27,6 +27,13 @@ Represents one button of the inline keyboard
 $inlineKeyboardButton = ['_' => 'inlineKeyboardButton', 'text' => string, 'type' => InlineKeyboardButtonType, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineKeyboardButton","text":"string","type":"InlineKeyboardButtonType"}
+```
+
+
 Or, if you're into Lua:  
 
 

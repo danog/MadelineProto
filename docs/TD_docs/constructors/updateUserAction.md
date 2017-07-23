@@ -28,6 +28,13 @@ Some chat activity
 $updateUserAction = ['_' => 'updateUserAction', 'chat_id' => long, 'user_id' => int, 'action' => SendMessageAction, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateUserAction","chat_id":"long","user_id":"int","action":"SendMessageAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

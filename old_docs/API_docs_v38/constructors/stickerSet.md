@@ -29,6 +29,13 @@ description: stickerSet attributes, type and example
 $stickerSet = ['_' => 'stickerSet', 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickerSet","id":"long","access_hash":"long","title":"string","short_name":"string","count":"int","hash":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

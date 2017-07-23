@@ -25,6 +25,13 @@ description: botCommand attributes, type and example
 $botCommand = ['_' => 'botCommand', 'command' => string, 'description' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"botCommand","command":"string","description":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

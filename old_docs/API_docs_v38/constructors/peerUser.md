@@ -24,6 +24,13 @@ description: peerUser attributes, type and example
 $peerUser = ['_' => 'peerUser', 'user_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"peerUser","user_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

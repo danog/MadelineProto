@@ -24,6 +24,13 @@ description: cdnConfig attributes, type and example
 $cdnConfig = ['_' => 'cdnConfig', 'public_keys' => [CdnPublicKey], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"cdnConfig","public_keys":["CdnPublicKey"]}
+```
+
+
 Or, if you're into Lua:  
 
 

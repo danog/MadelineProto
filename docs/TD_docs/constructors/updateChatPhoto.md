@@ -27,6 +27,13 @@ Chat photo was changed
 $updateChatPhoto = ['_' => 'updateChatPhoto', 'chat_id' => long, 'photo' => chatPhoto, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChatPhoto","chat_id":"long","photo":"chatPhoto"}
+```
+
+
 Or, if you're into Lua:  
 
 

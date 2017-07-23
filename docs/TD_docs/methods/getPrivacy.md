@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $PrivacyRules = $MadelineProto->getPrivacy(['key' => PrivacyKey, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getPrivacy
+* params - {"key":"PrivacyKey"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getPrivacy`
+
+Parameters:
+
+key - Json encoded PrivacyKey
+
+
+```
+
 Or, if you're into Lua:
 
 ```

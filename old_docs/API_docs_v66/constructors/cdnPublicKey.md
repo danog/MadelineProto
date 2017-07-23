@@ -25,6 +25,13 @@ description: cdnPublicKey attributes, type and example
 $cdnPublicKey = ['_' => 'cdnPublicKey', 'dc_id' => int, 'public_key' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"cdnPublicKey","dc_id":"int","public_key":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->sendChatAction(['chat_id' => InputPeer, 'action' => SendMessageAction, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - sendChatAction
+* params - {"chat_id":"InputPeer","action":"SendMessageAction"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/sendChatAction`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+action - Json encoded SendMessageAction
+
+
+```
+
 Or, if you're into Lua:
 
 ```

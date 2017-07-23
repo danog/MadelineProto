@@ -25,6 +25,13 @@ description: documentAttributeImageSize attributes, type and example
 $documentAttributeImageSize = ['_' => 'documentAttributeImageSize', 'w' => int, 'h' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeImageSize","w":"int","h":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -19,6 +19,13 @@ description: inputPhotoEmpty attributes, type and example
 $inputPhotoEmpty = ['_' => 'inputPhotoEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputPhotoEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

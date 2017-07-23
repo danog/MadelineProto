@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->messages->forwardMessages(['broadcast' => Bool, 'from_peer' => InputPeer, 'id' => [int], 'to_peer' => InputPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.forwardMessages
+* params - {"broadcast":"Bool","from_peer":"InputPeer","id":["int"],"to_peer":"InputPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.forwardMessages`
+
+Parameters:
+
+broadcast - Json encoded Bool
+from_peer - Json encoded InputPeer
+id - Json encoded  array of int
+to_peer - Json encoded InputPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

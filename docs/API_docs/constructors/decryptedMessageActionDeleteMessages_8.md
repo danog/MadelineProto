@@ -24,6 +24,13 @@ description: decryptedMessageActionDeleteMessages attributes, type and example
 $decryptedMessageActionDeleteMessages_8 = ['_' => 'decryptedMessageActionDeleteMessages', 'random_ids' => [long], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageActionDeleteMessages","random_ids":["long"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ Unsupported message content
 $messageUnsupported = ['_' => 'messageUnsupported', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageUnsupported"}
+```
+
+
 Or, if you're into Lua:  
 
 

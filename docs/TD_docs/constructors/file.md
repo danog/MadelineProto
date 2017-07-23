@@ -29,6 +29,13 @@ Represents a file
 $file = ['_' => 'file', 'id' => int, 'persistent_id' => string, 'size' => int, 'path' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"file","id":"int","persistent_id":"string","size":"int","path":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

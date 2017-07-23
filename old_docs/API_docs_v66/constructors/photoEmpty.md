@@ -24,6 +24,13 @@ description: photoEmpty attributes, type and example
 $photoEmpty = ['_' => 'photoEmpty', 'id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photoEmpty","id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $messages_Chats = $MadelineProto->messages->getAllChats(['except_ids' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getAllChats
+* params - {"except_ids":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAllChats`
+
+Parameters:
+
+except_ids - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

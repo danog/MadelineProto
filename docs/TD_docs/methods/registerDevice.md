@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->registerDevice(['device_token' => DeviceToken, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - registerDevice
+* params - {"device_token":"DeviceToken"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/registerDevice`
+
+Parameters:
+
+device_token - Json encoded DeviceToken
+
+
+```
+
 Or, if you're into Lua:
 
 ```

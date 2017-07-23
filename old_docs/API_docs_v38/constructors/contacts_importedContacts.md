@@ -26,6 +26,13 @@ description: contacts_importedContacts attributes, type and example
 $contacts_importedContacts = ['_' => 'contacts.importedContacts', 'imported' => [ImportedContact], 'retry_contacts' => [long], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.importedContacts","imported":["ImportedContact"],"retry_contacts":["long"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -33,6 +33,13 @@ description: webPageExternal attributes, type and example
 $webPageExternal = ['_' => 'webPageExternal', 'url' => string, 'display_url' => string, 'type' => string, 'title' => string, 'description' => string, 'thumb_url' => string, 'content_url' => string, 'w' => int, 'h' => int, 'duration' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"webPageExternal","url":"string","display_url":"string","type":"string","title":"string","description":"string","thumb_url":"string","content_url":"string","w":"int","h":"int","duration":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

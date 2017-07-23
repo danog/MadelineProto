@@ -25,6 +25,13 @@ description: pageBlockAuthorDate attributes, type and example
 $pageBlockAuthorDate = ['_' => 'pageBlockAuthorDate', 'author' => RichText, 'published_date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockAuthorDate","author":"RichText","published_date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $upload_CdnFile = $MadelineProto->upload->getCdnFile(['file_token' => bytes, 'offset' => int, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - upload.getCdnFile
+* params - {"file_token":"bytes","offset":"int","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getCdnFile`
+
+Parameters:
+
+file_token - Json encoded bytes
+offset - Json encoded int
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

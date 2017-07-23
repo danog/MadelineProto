@@ -25,6 +25,13 @@ description: updatePrivacy attributes, type and example
 $updatePrivacy = ['_' => 'updatePrivacy', 'key' => PrivacyKey, 'rules' => [PrivacyRule], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updatePrivacy","key":"PrivacyKey","rules":["PrivacyRule"]}
+```
+
+
 Or, if you're into Lua:  
 
 

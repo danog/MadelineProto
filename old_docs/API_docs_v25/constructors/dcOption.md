@@ -27,6 +27,13 @@ description: dcOption attributes, type and example
 $dcOption = ['_' => 'dcOption', 'id' => int, 'hostname' => string, 'ip_address' => string, 'port' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"dcOption","id":"int","hostname":"string","ip_address":"string","port":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

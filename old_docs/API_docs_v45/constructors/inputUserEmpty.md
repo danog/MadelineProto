@@ -19,6 +19,13 @@ description: inputUserEmpty attributes, type and example
 $inputUserEmpty = ['_' => 'inputUserEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputUserEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

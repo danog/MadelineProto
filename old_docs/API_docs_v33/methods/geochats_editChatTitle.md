@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $geochats_StatedMessage = $MadelineProto->geochats->editChatTitle(['peer' => InputGeoChat, 'title' => string, 'address' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - geochats.editChatTitle
+* params - {"peer":"InputGeoChat","title":"string","address":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.editChatTitle`
+
+Parameters:
+
+peer - Json encoded InputGeoChat
+title - Json encoded string
+address - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

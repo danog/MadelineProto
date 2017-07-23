@@ -25,6 +25,13 @@ description: documentAttributeSticker attributes, type and example
 $documentAttributeSticker = ['_' => 'documentAttributeSticker', 'alt' => string, 'stickerset' => InputStickerSet, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeSticker","alt":"string","stickerset":"InputStickerSet"}
+```
+
+
 Or, if you're into Lua:  
 
 

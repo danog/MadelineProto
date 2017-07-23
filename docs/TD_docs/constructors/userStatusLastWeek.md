@@ -25,6 +25,13 @@ User is offline, but was online last week
 $userStatusLastWeek = ['_' => 'userStatusLastWeek', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userStatusLastWeek"}
+```
+
+
 Or, if you're into Lua:  
 
 

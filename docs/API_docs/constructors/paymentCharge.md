@@ -25,6 +25,13 @@ description: paymentCharge attributes, type and example
 $paymentCharge = ['_' => 'paymentCharge', 'id' => string, 'provider_charge_id' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"paymentCharge","id":"string","provider_charge_id":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

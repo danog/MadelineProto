@@ -25,6 +25,13 @@ description: messages_botCallbackAnswer attributes, type and example
 $messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => Bool, 'message' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.botCallbackAnswer","alert":"Bool","message":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

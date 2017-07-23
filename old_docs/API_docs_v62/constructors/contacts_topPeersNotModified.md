@@ -19,6 +19,13 @@ description: contacts_topPeersNotModified attributes, type and example
 $contacts_topPeersNotModified = ['_' => 'contacts.topPeersNotModified', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.topPeersNotModified"}
+```
+
+
 Or, if you're into Lua:  
 
 

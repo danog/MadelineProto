@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $RecoveryEmail = $MadelineProto->getRecoveryEmail(['password' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getRecoveryEmail
+* params - {"password":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getRecoveryEmail`
+
+Parameters:
+
+password - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

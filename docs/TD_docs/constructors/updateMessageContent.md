@@ -28,6 +28,13 @@ Sent message gets new content
 $updateMessageContent = ['_' => 'updateMessageContent', 'chat_id' => long, 'message_id' => long, 'new_content' => MessageContent, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateMessageContent","chat_id":"long","message_id":"long","new_content":"MessageContent"}
+```
+
+
 Or, if you're into Lua:  
 
 

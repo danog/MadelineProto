@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $payments_ValidatedRequestedInfo = $MadelineProto->payments->validateRequestedInfo(['save' => Bool, 'msg_id' => int, 'info' => PaymentRequestedInfo, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - payments.validateRequestedInfo
+* params - {"save":"Bool","msg_id":"int","info":"PaymentRequestedInfo"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.validateRequestedInfo`
+
+Parameters:
+
+save - Json encoded Bool
+msg_id - Json encoded int
+info - Json encoded PaymentRequestedInfo
+
+
+```
+
 Or, if you're into Lua:
 
 ```

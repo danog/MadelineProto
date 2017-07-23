@@ -24,6 +24,13 @@ description: test_vectorIntObject attributes, type and example
 $test_vectorIntObject = ['_' => 'test.vectorIntObject', 'value' => [test_Int], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"test.vectorIntObject","value":["test_Int"]}
+```
+
+
 Or, if you're into Lua:  
 
 

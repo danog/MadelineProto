@@ -26,6 +26,13 @@ Code is delivered by SMS to the specified phone number
 $authCodeTypeSms = ['_' => 'authCodeTypeSms', 'length' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"authCodeTypeSms","length":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

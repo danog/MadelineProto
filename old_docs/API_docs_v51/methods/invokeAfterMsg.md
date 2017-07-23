@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $X = $MadelineProto->invokeAfterMsg(['msg_id' => long, 'query' => !X, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - invokeAfterMsg
+* params - {"msg_id":"long","query":"!X"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeAfterMsg`
+
+Parameters:
+
+msg_id - Json encoded long
+query - Json encoded !X
+
+
+```
+
 Or, if you're into Lua:
 
 ```

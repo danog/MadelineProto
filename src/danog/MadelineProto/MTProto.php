@@ -44,6 +44,8 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
+    const V = 54;
+
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -250,7 +252,7 @@ class MTProto extends \Volatile
             }
         }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
-        $this->v = $this->getV();
+        $this->v = self::V;
 
         return $this->settings;
     }
@@ -276,7 +278,10 @@ class MTProto extends \Volatile
         }
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-
+        preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
+        if (isset($matches[1]) && self::V !== $matches[1]) {
+            throw new \danog\MadelineProto\Exception('Please update to the latest version of MadelineProto.', 0, null, 'MadelineProto', 1);
+        }
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
@@ -311,7 +316,7 @@ class MTProto extends \Volatile
         }
 
         $this->reset_session();
-        if (!isset($this->v) || $this->v !== $this->getV()) {
+        if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
             $settings = $this->settings;
             if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
@@ -495,7 +500,7 @@ class MTProto extends \Volatile
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // ðŸŒš
-//                'app_version'     => $this->getV(),
+//                'app_version'     => self::V,
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
@@ -562,7 +567,7 @@ class MTProto extends \Volatile
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (!isset($settings['app_info']['api_id'])) {
-            throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org');
+            throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org', 0, null, 'MadelineProto', 1);
         }
 
         if ($settings['app_info']['api_id'] < 20) {
@@ -762,11 +767,6 @@ class MTProto extends \Volatile
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
-    }
-
-    public function getV()
-    {
-        return 53;
     }
 
     public function get_self()

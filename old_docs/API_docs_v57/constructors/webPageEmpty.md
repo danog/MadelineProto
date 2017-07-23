@@ -24,6 +24,13 @@ description: webPageEmpty attributes, type and example
 $webPageEmpty = ['_' => 'webPageEmpty', 'id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"webPageEmpty","id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -25,6 +25,13 @@ Privacy key for managing visibility of the user status
 $privacyKeyUserStatus = ['_' => 'privacyKeyUserStatus', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyKeyUserStatus"}
+```
+
+
 Or, if you're into Lua:  
 
 

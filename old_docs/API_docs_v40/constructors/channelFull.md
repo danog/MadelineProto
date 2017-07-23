@@ -30,6 +30,13 @@ description: channelFull attributes, type and example
 $channelFull = ['_' => 'channelFull', 'id' => int, 'read_inbox_max_id' => int, 'unread_count' => int, 'unread_important_count' => int, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelFull","id":"int","read_inbox_max_id":"int","unread_count":"int","unread_important_count":"int","chat_photo":"Photo","notify_settings":"PeerNotifySettings","exported_invite":"ExportedChatInvite"}
+```
+
+
 Or, if you're into Lua:  
 
 

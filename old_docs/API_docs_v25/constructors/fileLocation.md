@@ -27,6 +27,13 @@ description: fileLocation attributes, type and example
 $fileLocation = ['_' => 'fileLocation', 'dc_id' => int, 'volume_id' => long, 'local_id' => int, 'secret' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"fileLocation","dc_id":"int","volume_id":"long","local_id":"int","secret":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

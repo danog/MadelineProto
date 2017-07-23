@@ -27,6 +27,13 @@ description: decryptedMessageMediaContact attributes, type and example
 $decryptedMessageMediaContact_8 = ['_' => 'decryptedMessageMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'user_id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"decryptedMessageMediaContact","phone_number":"string","first_name":"string","last_name":"string","user_id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->account->reportPeer(['peer' => InputPeer, 'reason' => ReportReason, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.reportPeer
+* params - {"peer":"InputPeer","reason":"ReportReason"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.reportPeer`
+
+Parameters:
+
+peer - Json encoded InputPeer
+reason - Json encoded ReportReason
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->addSavedAnimation(['animation' => InputFile, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - addSavedAnimation
+* params - {"animation":"InputFile"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addSavedAnimation`
+
+Parameters:
+
+animation - Json encoded InputFile
+
+
+```
+
 Or, if you're into Lua:
 
 ```

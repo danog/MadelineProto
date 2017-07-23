@@ -27,6 +27,13 @@ New group chat created
 $messageGroupChatCreate = ['_' => 'messageGroupChatCreate', 'title' => string, 'members' => [user], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageGroupChatCreate","title":"string","members":["user"]}
+```
+
+
 Or, if you're into Lua:  
 
 

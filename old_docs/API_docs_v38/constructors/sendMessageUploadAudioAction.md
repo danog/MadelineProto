@@ -24,6 +24,13 @@ description: sendMessageUploadAudioAction attributes, type and example
 $sendMessageUploadAudioAction = ['_' => 'sendMessageUploadAudioAction', 'progress' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageUploadAudioAction","progress":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

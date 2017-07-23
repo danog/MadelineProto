@@ -25,6 +25,13 @@ General user
 $userTypeGeneral = ['_' => 'userTypeGeneral', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"userTypeGeneral"}
+```
+
+
 Or, if you're into Lua:  
 
 

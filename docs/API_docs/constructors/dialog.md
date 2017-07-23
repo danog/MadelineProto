@@ -32,6 +32,13 @@ description: dialog attributes, type and example
 $dialog = ['_' => 'dialog', 'pinned' => Bool, 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings, 'pts' => int, 'draft' => DraftMessage, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"dialog","pinned":"Bool","peer":"Peer","top_message":"int","read_inbox_max_id":"int","read_outbox_max_id":"int","unread_count":"int","notify_settings":"PeerNotifySettings","pts":"int","draft":"DraftMessage"}
+```
+
+
 Or, if you're into Lua:  
 
 

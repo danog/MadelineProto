@@ -39,6 +39,30 @@ if (isset($number)) { // Login as a user
 $test_VectorIntObject = $MadelineProto->test->callVectorIntObject(['x' => [test_Int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - test.callVectorIntObject
+* params - {"x":["test_Int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callVectorIntObject`
+
+Parameters:
+
+x - Json encoded  array of test_Int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

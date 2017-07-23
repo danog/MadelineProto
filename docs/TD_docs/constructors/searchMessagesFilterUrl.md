@@ -25,6 +25,13 @@ Return only messages containing url
 $searchMessagesFilterUrl = ['_' => 'searchMessagesFilterUrl', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"searchMessagesFilterUrl"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: updates_differenceTooLong attributes, type and example
 $updates_differenceTooLong = ['_' => 'updates.differenceTooLong', 'pts' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates.differenceTooLong","pts":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

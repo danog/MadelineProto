@@ -25,6 +25,13 @@ description: messageEntityCode attributes, type and example
 $messageEntityCode = ['_' => 'messageEntityCode', 'offset' => int, 'length' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageEntityCode","offset":"int","length":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

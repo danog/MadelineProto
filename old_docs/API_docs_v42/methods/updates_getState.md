@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $updates_State = $MadelineProto->updates->getState();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - updates.getState
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getState`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

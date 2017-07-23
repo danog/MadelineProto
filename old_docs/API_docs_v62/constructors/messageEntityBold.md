@@ -25,6 +25,13 @@ description: messageEntityBold attributes, type and example
 $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => int, 'length' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageEntityBold","offset":"int","length":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

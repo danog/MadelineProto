@@ -26,6 +26,13 @@ File generation is finished
 $updateFileGenerationFinish = ['_' => 'updateFileGenerationFinish', 'file' => file, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateFileGenerationFinish","file":"file"}
+```
+
+
 Or, if you're into Lua:  
 
 

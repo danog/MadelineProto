@@ -41,6 +41,35 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->setInlineBotResults(['gallery' => Bool, 'private' => Bool, 'query_id' => long, 'results' => [InputBotInlineResult], 'cache_time' => int, 'next_offset' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.setInlineBotResults
+* params - {"gallery":"Bool","private":"Bool","query_id":"long","results":["InputBotInlineResult"],"cache_time":"int","next_offset":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setInlineBotResults`
+
+Parameters:
+
+gallery - Json encoded Bool
+private - Json encoded Bool
+query_id - Json encoded long
+results - Json encoded  array of InputBotInlineResult
+cache_time - Json encoded int
+next_offset - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

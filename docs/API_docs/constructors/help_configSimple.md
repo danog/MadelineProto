@@ -27,6 +27,13 @@ description: help_configSimple attributes, type and example
 $help_configSimple = ['_' => 'help.configSimple', 'date' => int, 'expires' => int, 'dc_id' => int, 'ip_port_list' => [ipPort], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"help.configSimple","date":"int","expires":"int","dc_id":"int","ip_port_list":["ipPort"]}
+```
+
+
 Or, if you're into Lua:  
 
 

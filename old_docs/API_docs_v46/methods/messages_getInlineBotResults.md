@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $messages_BotResults = $MadelineProto->messages->getInlineBotResults(['bot' => InputUser, 'query' => string, 'offset' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getInlineBotResults
+* params - {"bot":"InputUser","query":"string","offset":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineBotResults`
+
+Parameters:
+
+bot - Json encoded InputUser
+query - Json encoded string
+offset - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

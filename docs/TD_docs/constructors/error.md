@@ -27,6 +27,13 @@ Object of this type may be returned on every function call in case of the error
 $error = ['_' => 'error', 'code' => int, 'message' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"error","code":"int","message":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

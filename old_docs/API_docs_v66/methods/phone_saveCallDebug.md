@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->phone->saveCallDebug(['peer' => InputPhoneCall, 'debug' => DataJSON, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - phone.saveCallDebug
+* params - {"peer":"InputPhoneCall","debug":"DataJSON"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.saveCallDebug`
+
+Parameters:
+
+peer - Json encoded InputPhoneCall
+debug - Json encoded DataJSON
+
+
+```
+
 Or, if you're into Lua:
 
 ```

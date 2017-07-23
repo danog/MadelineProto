@@ -24,6 +24,13 @@ description: messageMediaDocument attributes, type and example
 $messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageMediaDocument","document":"Document"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -29,6 +29,13 @@ description: geoChatMessage attributes, type and example
 $geoChatMessage = ['_' => 'geoChatMessage', 'chat_id' => int, 'id' => int, 'from_id' => int, 'date' => int, 'message' => string, 'media' => MessageMedia, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"geoChatMessage","chat_id":"int","id":"int","from_id":"int","date":"int","message":"string","media":"MessageMedia"}
+```
+
+
 Or, if you're into Lua:  
 
 

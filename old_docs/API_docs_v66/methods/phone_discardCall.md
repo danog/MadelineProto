@@ -39,6 +39,33 @@ if (isset($number)) { // Login as a user
 $Updates = $MadelineProto->phone->discardCall(['peer' => InputPhoneCall, 'duration' => int, 'reason' => PhoneCallDiscardReason, 'connection_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - phone.discardCall
+* params - {"peer":"InputPhoneCall","duration":"int","reason":"PhoneCallDiscardReason","connection_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.discardCall`
+
+Parameters:
+
+peer - Json encoded InputPhoneCall
+duration - Json encoded int
+reason - Json encoded PhoneCallDiscardReason
+connection_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

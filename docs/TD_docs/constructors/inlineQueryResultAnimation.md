@@ -28,6 +28,13 @@ Represents an animation cached on the telegram server
 $inlineQueryResultAnimation = ['_' => 'inlineQueryResultAnimation', 'id' => string, 'animation' => animation, 'title' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineQueryResultAnimation","id":"string","animation":"animation","title":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

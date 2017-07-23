@@ -27,6 +27,13 @@ Some outcoming messages was read
 $updateChatReadOutbox = ['_' => 'updateChatReadOutbox', 'chat_id' => long, 'last_read_outbox_message_id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateChatReadOutbox","chat_id":"long","last_read_outbox_message_id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -44,6 +44,13 @@ Describes web page preview
 $webPage = ['_' => 'webPage', 'url' => string, 'display_url' => string, 'type' => string, 'site_name' => string, 'title' => string, 'description' => string, 'photo' => photo, 'embed_url' => string, 'embed_type' => string, 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => string, 'animation' => animation, 'audio' => audio, 'document' => document, 'sticker' => sticker, 'video' => video, 'voice' => voice, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"webPage","url":"string","display_url":"string","type":"string","site_name":"string","title":"string","description":"string","photo":"photo","embed_url":"string","embed_type":"string","embed_width":"int","embed_height":"int","duration":"int","author":"string","animation":"animation","audio":"audio","document":"document","sticker":"sticker","video":"video","voice":"voice"}
+```
+
+
 Or, if you're into Lua:  
 
 

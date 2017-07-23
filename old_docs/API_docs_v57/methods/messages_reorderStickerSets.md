@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->reorderStickerSets(['masks' => Bool, 'order' => [long], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.reorderStickerSets
+* params - {"masks":"Bool","order":["long"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reorderStickerSets`
+
+Parameters:
+
+masks - Json encoded Bool
+order - Json encoded  array of long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

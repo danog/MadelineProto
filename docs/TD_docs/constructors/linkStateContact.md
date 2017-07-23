@@ -25,6 +25,13 @@ Other user is in contacts list, particularly its phone number is known
 $linkStateContact = ['_' => 'linkStateContact', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"linkStateContact"}
+```
+
+
 Or, if you're into Lua:  
 
 

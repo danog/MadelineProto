@@ -26,6 +26,13 @@ Code is delievered by voice call to the specified phone number
 $authCodeTypeCall = ['_' => 'authCodeTypeCall', 'length' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"authCodeTypeCall","length":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

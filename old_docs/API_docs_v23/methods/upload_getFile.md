@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $upload_File = $MadelineProto->upload->getFile(['location' => InputFileLocation, 'offset' => int, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - upload.getFile
+* params - {"location":"InputFileLocation","offset":"int","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getFile`
+
+Parameters:
+
+location - Json encoded InputFileLocation
+offset - Json encoded int
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

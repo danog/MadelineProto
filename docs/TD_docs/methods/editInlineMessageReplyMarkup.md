@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->editInlineMessageReplyMarkup(['inline_message_id' => string, 'reply_markup' => ReplyMarkup, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - editInlineMessageReplyMarkup
+* params - {"inline_message_id":"string","reply_markup":"ReplyMarkup"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editInlineMessageReplyMarkup`
+
+Parameters:
+
+inline_message_id - Json encoded string
+reply_markup - Json encoded ReplyMarkup
+
+
+```
+
 Or, if you're into Lua:
 
 ```

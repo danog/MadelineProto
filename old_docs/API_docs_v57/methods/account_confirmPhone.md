@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->account->confirmPhone(['phone_code_hash' => string, 'phone_code' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.confirmPhone
+* params - {"phone_code_hash":"string","phone_code":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.confirmPhone`
+
+Parameters:
+
+phone_code_hash - Json encoded string
+phone_code - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

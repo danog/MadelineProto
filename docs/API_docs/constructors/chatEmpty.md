@@ -24,6 +24,13 @@ description: chatEmpty attributes, type and example
 $chatEmpty = ['_' => 'chatEmpty', 'id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatEmpty","id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

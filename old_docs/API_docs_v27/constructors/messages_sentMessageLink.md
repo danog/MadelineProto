@@ -30,6 +30,13 @@ description: messages_sentMessageLink attributes, type and example
 $messages_sentMessageLink = ['_' => 'messages.sentMessageLink', 'id' => int, 'date' => int, 'media' => MessageMedia, 'pts' => int, 'pts_count' => int, 'links' => [contacts_Link], 'seq' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages.sentMessageLink","id":"int","date":"int","media":"MessageMedia","pts":"int","pts_count":"int","links":["contacts_Link"],"seq":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

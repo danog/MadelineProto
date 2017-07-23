@@ -26,6 +26,13 @@ List of privacy rules. Rules are matched in the specified order. First matched r
 $privacyRules = ['_' => 'privacyRules', 'rules' => [PrivacyRule], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"privacyRules","rules":["PrivacyRule"]}
+```
+
+
 Or, if you're into Lua:  
 
 

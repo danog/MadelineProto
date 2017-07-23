@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Document = $MadelineProto->messages->getDocumentByHash(['sha256' => bytes, 'size' => int, 'mime_type' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getDocumentByHash
+* params - {"sha256":"bytes","size":"int","mime_type":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDocumentByHash`
+
+Parameters:
+
+sha256 - Json encoded bytes
+size - Json encoded int
+mime_type - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -26,6 +26,13 @@ A button which sends to the bot special callback query
 $inlineKeyboardButtonTypeCallback = ['_' => 'inlineKeyboardButtonTypeCallback', 'data' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineKeyboardButtonTypeCallback","data":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

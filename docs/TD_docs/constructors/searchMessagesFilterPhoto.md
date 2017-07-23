@@ -25,6 +25,13 @@ Return only photo messages
 $searchMessagesFilterPhoto = ['_' => 'searchMessagesFilterPhoto', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"searchMessagesFilterPhoto"}
+```
+
+
 Or, if you're into Lua:  
 
 

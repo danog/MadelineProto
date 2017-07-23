@@ -26,6 +26,13 @@ Some data about a group has been changed
 $updateGroup = ['_' => 'updateGroup', 'group' => group, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateGroup","group":"group"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $DestroySessionRes = $MadelineProto->destroy_session(['session_id' => long, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - destroy_session
+* params - {"session_id":"long"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/destroy_session`
+
+Parameters:
+
+session_id - Json encoded long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

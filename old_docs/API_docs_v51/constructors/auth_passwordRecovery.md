@@ -24,6 +24,13 @@ description: auth_passwordRecovery attributes, type and example
 $auth_passwordRecovery = ['_' => 'auth.passwordRecovery', 'email_pattern' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"auth.passwordRecovery","email_pattern":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

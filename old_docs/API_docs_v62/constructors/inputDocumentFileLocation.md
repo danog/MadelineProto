@@ -26,6 +26,13 @@ description: inputDocumentFileLocation attributes, type and example
 $inputDocumentFileLocation = ['_' => 'inputDocumentFileLocation', 'id' => long, 'access_hash' => long, 'version' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputDocumentFileLocation","id":"long","access_hash":"long","version":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

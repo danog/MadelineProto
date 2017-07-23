@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->stickers->removeStickerFromSet(['sticker' => InputDocument, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - stickers.removeStickerFromSet
+* params - {"sticker":"InputDocument"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.removeStickerFromSet`
+
+Parameters:
+
+sticker - Json encoded InputDocument
+
+
+```
+
 Or, if you're into Lua:
 
 ```

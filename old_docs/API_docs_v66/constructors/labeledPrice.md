@@ -25,6 +25,13 @@ description: labeledPrice attributes, type and example
 $labeledPrice = ['_' => 'labeledPrice', 'label' => string, 'amount' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"labeledPrice","label":"string","amount":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

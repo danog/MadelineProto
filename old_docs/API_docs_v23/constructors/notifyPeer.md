@@ -24,6 +24,13 @@ description: notifyPeer attributes, type and example
 $notifyPeer = ['_' => 'notifyPeer', 'peer' => Peer, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"notifyPeer","peer":"Peer"}
+```
+
+
 Or, if you're into Lua:  
 
 

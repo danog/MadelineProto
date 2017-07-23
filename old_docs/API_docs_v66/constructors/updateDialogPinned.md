@@ -25,6 +25,13 @@ description: updateDialogPinned attributes, type and example
 $updateDialogPinned = ['_' => 'updateDialogPinned', 'pinned' => Bool, 'peer' => Peer, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateDialogPinned","pinned":"Bool","peer":"Peer"}
+```
+
+
 Or, if you're into Lua:  
 
 

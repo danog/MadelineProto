@@ -19,6 +19,13 @@ description: inputEncryptedFileEmpty attributes, type and example
 $inputEncryptedFileEmpty = ['_' => 'inputEncryptedFileEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputEncryptedFileEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

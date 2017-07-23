@@ -26,6 +26,13 @@ Instruct clients to remove keyboard after receiving this message. This kind of k
 $replyMarkupRemoveKeyboard = ['_' => 'replyMarkupRemoveKeyboard', 'personal' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyMarkupRemoveKeyboard","personal":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

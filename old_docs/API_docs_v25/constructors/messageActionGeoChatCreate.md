@@ -25,6 +25,13 @@ description: messageActionGeoChatCreate attributes, type and example
 $messageActionGeoChatCreate = ['_' => 'messageActionGeoChatCreate', 'title' => string, 'address' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageActionGeoChatCreate","title":"string","address":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

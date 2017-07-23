@@ -24,6 +24,13 @@ description: test_vectorString attributes, type and example
 $test_vectorString = ['_' => 'test.vectorString', 'value' => [string], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"test.vectorString","value":["string"]}
+```
+
+
 Or, if you're into Lua:  
 
 

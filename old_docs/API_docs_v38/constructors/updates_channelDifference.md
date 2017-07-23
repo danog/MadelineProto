@@ -29,6 +29,13 @@ description: updates_channelDifference attributes, type and example
 $updates_channelDifference = ['_' => 'updates.channelDifference', 'pts' => int, 'timeout' => int, 'new_messages' => [Message], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates.channelDifference","pts":"int","timeout":"int","new_messages":["Message"],"other_updates":["Update"],"chats":["Chat"],"users":["User"]}
+```
+
+
 Or, if you're into Lua:  
 
 

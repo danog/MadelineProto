@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $phone_PhoneCall = $MadelineProto->phone->requestCall(['user_id' => InputUser, 'g_a_hash' => bytes, 'protocol' => PhoneCallProtocol, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - phone.requestCall
+* params - {"user_id":"InputUser","g_a_hash":"bytes","protocol":"PhoneCallProtocol"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.requestCall`
+
+Parameters:
+
+user_id - Json encoded InputUser
+g_a_hash - Json encoded bytes
+protocol - Json encoded PhoneCallProtocol
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -28,6 +28,13 @@ description: messageMediaVenue attributes, type and example
 $messageMediaVenue = ['_' => 'messageMediaVenue', 'geo' => GeoPoint, 'title' => string, 'address' => string, 'provider' => string, 'venue_id' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageMediaVenue","geo":"GeoPoint","title":"string","address":"string","provider":"string","venue_id":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

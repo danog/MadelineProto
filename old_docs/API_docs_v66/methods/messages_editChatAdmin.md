@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->editChatAdmin(['chat_id' => InputPeer, 'user_id' => InputUser, 'is_admin' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.editChatAdmin
+* params - {"chat_id":"InputPeer","user_id":"InputUser","is_admin":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editChatAdmin`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+user_id - Json encoded InputUser
+is_admin - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -29,6 +29,13 @@ description: chat attributes, type and example
 $chat = ['_' => 'chat', 'id' => int, 'title' => string, 'photo' => ChatPhoto, 'participants_count' => int, 'date' => int, 'version' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chat","id":"int","title":"string","photo":"ChatPhoto","participants_count":"int","date":"int","version":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

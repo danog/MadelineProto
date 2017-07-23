@@ -26,6 +26,13 @@ description: documentAttributeAudio attributes, type and example
 $documentAttributeAudio = ['_' => 'documentAttributeAudio', 'duration' => int, 'title' => string, 'performer' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"documentAttributeAudio","duration":"int","title":"string","performer":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

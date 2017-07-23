@@ -25,6 +25,13 @@ Text should be parsed in markdown-style way
 $textParseModeMarkdown = ['_' => 'textParseModeMarkdown', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"textParseModeMarkdown"}
+```
+
+
 Or, if you're into Lua:  
 
 

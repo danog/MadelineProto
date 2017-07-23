@@ -85,6 +85,9 @@ $m->import_authorization($MadelineProto->export_authorization());
 */
 if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     $controller = $MadelineProto->request_call(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+    while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
+        $MadelineProto->get_updates();
+    }
 }
 if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
     $howmany = readline('How many calls would you like me to handle? ');

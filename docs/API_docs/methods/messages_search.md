@@ -44,6 +44,38 @@ if (isset($number)) { // Login as a user
 $messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => string, 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.search
+* params - {"peer":"InputPeer","q":"string","from_id":"InputUser","filter":"MessagesFilter","min_date":"int","max_date":"int","offset":"int","max_id":"int","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.search`
+
+Parameters:
+
+peer - Json encoded InputPeer
+q - Json encoded string
+from_id - Json encoded InputUser
+filter - Json encoded MessagesFilter
+min_date - Json encoded int
+max_date - Json encoded int
+offset - Json encoded int
+max_id - Json encoded int
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

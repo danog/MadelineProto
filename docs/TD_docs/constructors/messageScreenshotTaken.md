@@ -25,6 +25,13 @@ Screenshot of messages in secret chat was taken
 $messageScreenshotTaken = ['_' => 'messageScreenshotTaken', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messageScreenshotTaken"}
+```
+
+
 Or, if you're into Lua:  
 
 

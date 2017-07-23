@@ -25,6 +25,13 @@ User is currently logging out
 $authStateLoggingOut = ['_' => 'authStateLoggingOut', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"authStateLoggingOut"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ Contains inline keyboard layout
 $replyMarkupInlineKeyboard = ['_' => 'replyMarkupInlineKeyboard', 'rows' => [inlineKeyboardButton>], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"replyMarkupInlineKeyboard","rows":["inlineKeyboardButton>"]}
+```
+
+
 Or, if you're into Lua:  
 
 

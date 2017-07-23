@@ -25,6 +25,13 @@ description: keyboardButtonCallback attributes, type and example
 $keyboardButtonCallback = ['_' => 'keyboardButtonCallback', 'text' => string, 'data' => bytes, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButtonCallback","text":"string","data":"bytes"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->viewMessages(['chat_id' => InputPeer, 'message_ids' => [long], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - viewMessages
+* params - {"chat_id":"InputPeer","message_ids":["long"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/viewMessages`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+message_ids - Json encoded  array of long
+
+
+```
+
 Or, if you're into Lua:
 
 ```

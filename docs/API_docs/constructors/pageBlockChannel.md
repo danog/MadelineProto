@@ -24,6 +24,13 @@ description: pageBlockChannel attributes, type and example
 $pageBlockChannel = ['_' => 'pageBlockChannel', 'channel' => Chat, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockChannel","channel":"Chat"}
+```
+
+
 Or, if you're into Lua:  
 
 

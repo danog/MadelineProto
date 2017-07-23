@@ -26,6 +26,13 @@ String option
 $optionString = ['_' => 'optionString', 'value' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"optionString","value":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

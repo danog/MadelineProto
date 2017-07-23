@@ -26,6 +26,13 @@ Represents list of all emojis corresponding to a sticker in a sticker set. The l
 $stickerEmojis = ['_' => 'stickerEmojis', 'emojis' => [string], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"stickerEmojis","emojis":["string"]}
+```
+
+
 Or, if you're into Lua:  
 
 

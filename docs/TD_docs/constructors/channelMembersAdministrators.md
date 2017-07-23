@@ -25,6 +25,13 @@ Return privileged members, i.e. creator, editors and moderators are returned
 $channelMembersAdministrators = ['_' => 'channelMembersAdministrators', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelMembersAdministrators"}
+```
+
+
 Or, if you're into Lua:  
 
 

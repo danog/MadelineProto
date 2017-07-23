@@ -38,6 +38,32 @@ if (isset($number)) { // Login as a user
 $messages_Dialogs = $MadelineProto->messages->getDialogs(['offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.getDialogs
+* params - {"offset":"int","max_id":"int","limit":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDialogs`
+
+Parameters:
+
+offset - Json encoded int
+max_id - Json encoded int
+limit - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

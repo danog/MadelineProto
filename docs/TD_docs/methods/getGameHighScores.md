@@ -43,6 +43,32 @@ if (isset($number)) { // Login as a user
 $GameHighScores = $MadelineProto->getGameHighScores(['chat_id' => InputPeer, 'message_id' => long, 'user_id' => int, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - getGameHighScores
+* params - {"chat_id":"InputPeer","message_id":"long","user_id":"int"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getGameHighScores`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+message_id - Json encoded long
+user_id - Json encoded int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

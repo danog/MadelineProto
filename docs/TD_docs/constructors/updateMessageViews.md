@@ -28,6 +28,13 @@ View count of the message has changed
 $updateMessageViews = ['_' => 'updateMessageViews', 'chat_id' => long, 'message_id' => long, 'views' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateMessageViews","chat_id":"long","message_id":"long","views":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

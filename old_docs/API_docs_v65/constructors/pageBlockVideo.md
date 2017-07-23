@@ -27,6 +27,13 @@ description: pageBlockVideo attributes, type and example
 $pageBlockVideo = ['_' => 'pageBlockVideo', 'autoplay' => Bool, 'loop' => Bool, 'video_id' => long, 'caption' => RichText, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"pageBlockVideo","autoplay":"Bool","loop":"Bool","video_id":"long","caption":"RichText"}
+```
+
+
 Or, if you're into Lua:  
 
 

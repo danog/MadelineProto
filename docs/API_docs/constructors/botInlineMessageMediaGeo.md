@@ -25,6 +25,13 @@ description: botInlineMessageMediaGeo attributes, type and example
 $botInlineMessageMediaGeo = ['_' => 'botInlineMessageMediaGeo', 'geo' => GeoPoint, 'reply_markup' => ReplyMarkup, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"botInlineMessageMediaGeo","geo":"GeoPoint","reply_markup":"ReplyMarkup"}
+```
+
+
 Or, if you're into Lua:  
 
 

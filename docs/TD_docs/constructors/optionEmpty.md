@@ -25,6 +25,13 @@ Unknown option or option having default value
 $optionEmpty = ['_' => 'optionEmpty', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"optionEmpty"}
+```
+
+
 Or, if you're into Lua:  
 
 

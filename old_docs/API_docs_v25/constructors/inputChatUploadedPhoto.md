@@ -25,6 +25,13 @@ description: inputChatUploadedPhoto attributes, type and example
 $inputChatUploadedPhoto = ['_' => 'inputChatUploadedPhoto', 'file' => InputFile, 'crop' => InputPhotoCrop, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputChatUploadedPhoto","file":"InputFile","crop":"InputPhotoCrop"}
+```
+
+
 Or, if you're into Lua:  
 
 

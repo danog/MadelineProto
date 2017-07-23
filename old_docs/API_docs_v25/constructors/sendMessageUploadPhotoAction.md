@@ -19,6 +19,13 @@ description: sendMessageUploadPhotoAction attributes, type and example
 $sendMessageUploadPhotoAction = ['_' => 'sendMessageUploadPhotoAction', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sendMessageUploadPhotoAction"}
+```
+
+
 Or, if you're into Lua:  
 
 

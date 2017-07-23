@@ -27,6 +27,13 @@ description: updateNewAuthorization attributes, type and example
 $updateNewAuthorization = ['_' => 'updateNewAuthorization', 'auth_key_id' => long, 'date' => int, 'device' => string, 'location' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateNewAuthorization","auth_key_id":"long","date":"int","device":"string","location":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

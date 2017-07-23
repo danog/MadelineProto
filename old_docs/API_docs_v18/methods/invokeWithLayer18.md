@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $X = $MadelineProto->invokeWithLayer18(['query' => !X, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - invokeWithLayer18
+* params - {"query":"!X"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeWithLayer18`
+
+Parameters:
+
+query - Json encoded !X
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $DestroyAuthKeyRes = $MadelineProto->destroy_auth_key();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - destroy_auth_key
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/destroy_auth_key`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

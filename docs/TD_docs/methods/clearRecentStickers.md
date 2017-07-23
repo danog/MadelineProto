@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->clearRecentStickers(['is_attached' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - clearRecentStickers
+* params - {"is_attached":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/clearRecentStickers`
+
+Parameters:
+
+is_attached - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

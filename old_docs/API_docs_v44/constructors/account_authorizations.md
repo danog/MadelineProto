@@ -24,6 +24,13 @@ description: account_authorizations attributes, type and example
 $account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Authorization], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"account.authorizations","authorizations":["Authorization"]}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -26,6 +26,13 @@ File defined by its id
 $inputFileId = ['_' => 'inputFileId', 'id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputFileId","id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

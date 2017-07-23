@@ -25,6 +25,13 @@ description: channelParticipant attributes, type and example
 $channelParticipant = ['_' => 'channelParticipant', 'user_id' => int, 'date' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipant","user_id":"int","date":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

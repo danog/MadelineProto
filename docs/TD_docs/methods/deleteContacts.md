@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->deleteContacts(['user_ids' => [int], ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - deleteContacts
+* params - {"user_ids":["int"]}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteContacts`
+
+Parameters:
+
+user_ids - Json encoded  array of int
+
+
+```
+
 Or, if you're into Lua:
 
 ```

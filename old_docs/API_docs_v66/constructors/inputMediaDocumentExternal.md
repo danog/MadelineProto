@@ -25,6 +25,13 @@ description: inputMediaDocumentExternal attributes, type and example
 $inputMediaDocumentExternal = ['_' => 'inputMediaDocumentExternal', 'url' => string, 'caption' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaDocumentExternal","url":"string","caption":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

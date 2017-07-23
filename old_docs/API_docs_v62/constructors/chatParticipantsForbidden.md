@@ -25,6 +25,13 @@ description: chatParticipantsForbidden attributes, type and example
 $chatParticipantsForbidden = ['_' => 'chatParticipantsForbidden', 'chat_id' => int, 'self_participant' => ChatParticipant, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"chatParticipantsForbidden","chat_id":"int","self_participant":"ChatParticipant"}
+```
+
+
 Or, if you're into Lua:  
 
 

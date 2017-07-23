@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeChannelAbout(['channel_id' => int, 'about' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - changeChannelAbout
+* params - {"channel_id":"int","about":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChannelAbout`
+
+Parameters:
+
+channel_id - Json encoded int
+about - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $PeerNotifySettings = $MadelineProto->account->getNotifySettings(['peer' => InputNotifyPeer, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - account.getNotifySettings
+* params - {"peer":"InputNotifyPeer"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getNotifySettings`
+
+Parameters:
+
+peer - Json encoded InputNotifyPeer
+
+
+```
+
 Or, if you're into Lua:
 
 ```

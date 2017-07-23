@@ -19,6 +19,13 @@ description: inputNotifyUsers attributes, type and example
 $inputNotifyUsers = ['_' => 'inputNotifyUsers', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputNotifyUsers"}
+```
+
+
 Or, if you're into Lua:  
 
 

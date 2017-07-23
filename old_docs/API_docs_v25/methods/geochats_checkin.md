@@ -36,6 +36,30 @@ if (isset($number)) { // Login as a user
 $geochats_StatedMessage = $MadelineProto->geochats->checkin(['peer' => InputGeoChat, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - geochats.checkin
+* params - {"peer":"InputGeoChat"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.checkin`
+
+Parameters:
+
+peer - Json encoded InputGeoChat
+
+
+```
+
 Or, if you're into Lua:
 
 ```

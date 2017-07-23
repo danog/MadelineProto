@@ -37,6 +37,31 @@ if (isset($number)) { // Login as a user
 $Bool = $MadelineProto->messages->installStickerSet(['stickerset' => InputStickerSet, 'disabled' => Bool, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - messages.installStickerSet
+* params - {"stickerset":"InputStickerSet","disabled":"Bool"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.installStickerSet`
+
+Parameters:
+
+stickerset - Json encoded InputStickerSet
+disabled - Json encoded Bool
+
+
+```
+
 Or, if you're into Lua:
 
 ```

@@ -24,6 +24,13 @@ description: channelAdminLogEventActionToggleInvites attributes, type and exampl
 $channelAdminLogEventActionToggleInvites = ['_' => 'channelAdminLogEventActionToggleInvites', 'new_value' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelAdminLogEventActionToggleInvites","new_value":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

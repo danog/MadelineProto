@@ -19,6 +19,13 @@ description: inputReportReasonSpam attributes, type and example
 $inputReportReasonSpam = ['_' => 'inputReportReasonSpam', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputReportReasonSpam"}
+```
+
+
 Or, if you're into Lua:  
 
 

@@ -24,6 +24,13 @@ description: photoSizeEmpty attributes, type and example
 $photoSizeEmpty_23 = ['_' => 'photoSizeEmpty', 'type' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"photoSizeEmpty","type":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

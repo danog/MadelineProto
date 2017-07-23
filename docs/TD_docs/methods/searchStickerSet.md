@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $StickerSet = $MadelineProto->searchStickerSet(['name' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - searchStickerSet
+* params - {"name":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchStickerSet`
+
+Parameters:
+
+name - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

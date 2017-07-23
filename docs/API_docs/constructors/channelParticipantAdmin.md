@@ -29,6 +29,13 @@ description: channelParticipantAdmin attributes, type and example
 $channelParticipantAdmin = ['_' => 'channelParticipantAdmin', 'can_edit' => Bool, 'user_id' => int, 'inviter_id' => int, 'promoted_by' => int, 'date' => int, 'admin_rights' => ChannelAdminRights, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantAdmin","can_edit":"Bool","user_id":"int","inviter_id":"int","promoted_by":"int","date":"int","admin_rights":"ChannelAdminRights"}
+```
+
+
 Or, if you're into Lua:  
 
 

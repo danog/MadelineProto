@@ -24,6 +24,13 @@ description: contacts_myLinkRequested attributes, type and example
 $contacts_myLinkRequested = ['_' => 'contacts.myLinkRequested', 'contact' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"contacts.myLinkRequested","contact":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

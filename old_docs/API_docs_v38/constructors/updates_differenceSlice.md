@@ -29,6 +29,13 @@ description: updates_differenceSlice attributes, type and example
 $updates_differenceSlice = ['_' => 'updates.differenceSlice', 'new_messages' => [Message], 'new_encrypted_messages' => [EncryptedMessage], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], 'intermediate_state' => updates_State, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updates.differenceSlice","new_messages":["Message"],"new_encrypted_messages":["EncryptedMessage"],"other_updates":["Update"],"chats":["Chat"],"users":["User"],"intermediate_state":"updates_State"}
+```
+
+
 Or, if you're into Lua:  
 
 

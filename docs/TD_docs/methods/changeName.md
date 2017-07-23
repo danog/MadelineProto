@@ -42,6 +42,31 @@ if (isset($number)) { // Login as a user
 $Ok = $MadelineProto->changeName(['first_name' => string, 'last_name' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - changeName
+* params - {"first_name":"string","last_name":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeName`
+
+Parameters:
+
+first_name - Json encoded string
+last_name - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

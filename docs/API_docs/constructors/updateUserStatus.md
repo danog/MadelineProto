@@ -27,6 +27,13 @@ User went online/offline
 $updateUserStatus = ['_' => 'updateUserStatus', 'user_id' => int, 'status' => UserStatus, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"updateUserStatus","user_id":"int","status":"UserStatus"}
+```
+
+
 Or, if you're into Lua:  
 
 

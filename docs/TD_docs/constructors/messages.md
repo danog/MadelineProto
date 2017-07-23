@@ -27,6 +27,13 @@ Contains list of messages
 $messages = ['_' => 'messages', 'total_count' => int, 'messages' => [message], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"messages","total_count":"int","messages":["message"]}
+```
+
+
 Or, if you're into Lua:  
 
 

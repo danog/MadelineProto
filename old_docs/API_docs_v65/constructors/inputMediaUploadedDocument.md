@@ -28,6 +28,13 @@ description: inputMediaUploadedDocument attributes, type and example
 $inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, 'stickers' => [InputDocument], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMediaUploadedDocument","file":"InputFile","mime_type":"string","attributes":["DocumentAttribute"],"caption":"string","stickers":["InputDocument"]}
+```
+
+
 Or, if you're into Lua:  
 
 

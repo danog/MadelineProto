@@ -19,6 +19,13 @@ description: channelParticipantsAdmins attributes, type and example
 $channelParticipantsAdmins = ['_' => 'channelParticipantsAdmins', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelParticipantsAdmins"}
+```
+
+
 Or, if you're into Lua:  
 
 

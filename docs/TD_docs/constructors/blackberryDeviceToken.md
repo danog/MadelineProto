@@ -26,6 +26,13 @@ Token for Blackberry Push Service
 $blackberryDeviceToken = ['_' => 'blackberryDeviceToken', 'token' => string, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"blackberryDeviceToken","token":"string"}
+```
+
+
 Or, if you're into Lua:  
 
 

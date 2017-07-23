@@ -26,6 +26,13 @@ Chat with zero or more other users
 $groupChatInfo = ['_' => 'groupChatInfo', 'group' => group, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"groupChatInfo","group":"group"}
+```
+
+
 Or, if you're into Lua:  
 
 

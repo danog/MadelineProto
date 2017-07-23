@@ -24,6 +24,13 @@ description: channelAdminLogEventActionToggleSignatures attributes, type and exa
 $channelAdminLogEventActionToggleSignatures = ['_' => 'channelAdminLogEventActionToggleSignatures', 'new_value' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"channelAdminLogEventActionToggleSignatures","new_value":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

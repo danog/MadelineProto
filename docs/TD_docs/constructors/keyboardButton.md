@@ -27,6 +27,13 @@ Represents one button of the bot keyboard
 $keyboardButton = ['_' => 'keyboardButton', 'text' => string, 'type' => KeyboardButtonType, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"keyboardButton","text":"string","type":"KeyboardButtonType"}
+```
+
+
 Or, if you're into Lua:  
 
 

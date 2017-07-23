@@ -24,6 +24,13 @@ description: audioEmpty attributes, type and example
 $audioEmpty = ['_' => 'audioEmpty', 'id' => long, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"audioEmpty","id":"long"}
+```
+
+
 Or, if you're into Lua:  
 
 

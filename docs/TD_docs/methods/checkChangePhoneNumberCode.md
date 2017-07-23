@@ -41,6 +41,30 @@ if (isset($number)) { // Login as a user
 $AuthState = $MadelineProto->checkChangePhoneNumberCode(['code' => string, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - checkChangePhoneNumberCode
+* params - {"code":"string"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/checkChangePhoneNumberCode`
+
+Parameters:
+
+code - Json encoded string
+
+
+```
+
 Or, if you're into Lua:
 
 ```

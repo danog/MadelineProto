@@ -44,6 +44,33 @@ if (isset($number)) { // Login as a user
 $Message = $MadelineProto->editMessageText(['chat_id' => InputPeer, 'message_id' => long, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ]);
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - editMessageText
+* params - {"chat_id":"InputPeer","message_id":"long","reply_markup":"ReplyMarkup","input_message_content":"InputMessageContent"}
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editMessageText`
+
+Parameters:
+
+chat_id - Json encoded InputPeer
+message_id - Json encoded long
+reply_markup - Json encoded ReplyMarkup
+input_message_content - Json encoded InputMessageContent
+
+
+```
+
 Or, if you're into Lua:
 
 ```

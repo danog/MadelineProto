@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $help_TermsOfService = $MadelineProto->help->getTermsOfService();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.getTermsOfService
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getTermsOfService`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

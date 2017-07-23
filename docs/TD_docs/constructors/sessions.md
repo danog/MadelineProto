@@ -26,6 +26,13 @@ Contains list of sessions
 $sessions = ['_' => 'sessions', 'sessions' => [session], ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"sessions","sessions":["session"]}
+```
+
+
 Or, if you're into Lua:  
 
 

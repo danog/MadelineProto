@@ -24,6 +24,13 @@ description: encryptedChatDiscarded attributes, type and example
 $encryptedChatDiscarded = ['_' => 'encryptedChatDiscarded', 'id' => int, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"encryptedChatDiscarded","id":"int"}
+```
+
+
 Or, if you're into Lua:  
 
 

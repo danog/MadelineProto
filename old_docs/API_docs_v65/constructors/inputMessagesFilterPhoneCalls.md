@@ -24,6 +24,13 @@ description: inputMessagesFilterPhoneCalls attributes, type and example
 $inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => Bool, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inputMessagesFilterPhoneCalls","missed":"Bool"}
+```
+
+
 Or, if you're into Lua:  
 
 

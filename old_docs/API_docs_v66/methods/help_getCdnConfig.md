@@ -31,6 +31,29 @@ if (isset($number)) { // Login as a user
 $CdnConfig = $MadelineProto->help->getCdnConfig();
 ```
 
+Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
+
+Parameters:
+
+* method - help.getCdnConfig
+* params - 
+
+```
+
+### As a user:
+
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getCdnConfig`
+
+Parameters:
+
+
+
+```
+
 Or, if you're into Lua:
 
 ```

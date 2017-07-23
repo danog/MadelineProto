@@ -27,6 +27,13 @@ Represents a sticker cached on the telegram server
 $inlineQueryResultSticker = ['_' => 'inlineQueryResultSticker', 'id' => string, 'sticker' => sticker, ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"inlineQueryResultSticker","id":"string","sticker":"sticker"}
+```
+
+
 Or, if you're into Lua:  
 
 

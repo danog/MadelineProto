@@ -19,6 +19,13 @@ description: topPeerCategoryGroups attributes, type and example
 $topPeerCategoryGroups = ['_' => 'topPeerCategoryGroups', ];
 ```  
 
+[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
+
+```
+{"_":"topPeerCategoryGroups"}
+```
+
+
 Or, if you're into Lua:  
 
 
