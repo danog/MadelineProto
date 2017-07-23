@@ -23,13 +23,13 @@ File generation is finished
 ### Example:
 
 ```
-$updateFileGenerationFinish = ['_' => 'updateFileGenerationFinish', 'file' => file, ];
+$updateFileGenerationFinish = ['_' => 'updateFileGenerationFinish', 'file' => file];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateFileGenerationFinish","file":"file"}
+{"_": "updateFileGenerationFinish", "file": file}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateFileGenerationFinish={_='updateFileGenerationFinish', file=file, }
+updateFileGenerationFinish={_='updateFileGenerationFinish', file=file}
 
 ```
 

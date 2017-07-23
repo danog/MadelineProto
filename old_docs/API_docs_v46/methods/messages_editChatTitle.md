@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->editChatTitle(['chat_id' => InputPeer, 'title' => string, ]);
+$Updates = $MadelineProto->messages->editChatTitle(['chat_id' => InputPeer, 'title' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editChatTitle
-* params - {"chat_id":"InputPeer","title":"string"}
+* params - {"chat_id": InputPeer, "title": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ title - Json encoded string
 Or, if you're into Lua:
 
 ```
-Updates = messages.editChatTitle({chat_id=InputPeer, title=string, })
+Updates = messages.editChatTitle({chat_id=InputPeer, title='string', })
 ```
 

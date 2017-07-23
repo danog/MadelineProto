@@ -24,13 +24,13 @@ Text needs to be formatted as inside of pre HTML tag
 ### Example:
 
 ```
-$messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int, ];
+$messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityPre","offset":"int","length":"int"}
+{"_": "messageEntityPre", "offset": int, "length": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityPre={_='messageEntityPre', offset=int, length=int, }
+messageEntityPre={_='messageEntityPre', offset=int, length=int}
 
 ```
 

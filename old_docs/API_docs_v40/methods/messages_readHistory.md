@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.readHistory
-* params - {"peer":"InputPeer","max_id":"int","offset":"int"}
+* params - {"peer": InputPeer, "max_id": int, "offset": int, }
 
 ```
 

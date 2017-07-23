@@ -22,13 +22,13 @@ description: messageActionGeoChatCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionGeoChatCreate = ['_' => 'messageActionGeoChatCreate', 'title' => string, 'address' => string, ];
+$messageActionGeoChatCreate = ['_' => 'messageActionGeoChatCreate', 'title' => 'string', 'address' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageActionGeoChatCreate","title":"string","address":"string"}
+{"_": "messageActionGeoChatCreate", "title": "string", "address": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageActionGeoChatCreate={_='messageActionGeoChatCreate', title=string, address=string, }
+messageActionGeoChatCreate={_='messageActionGeoChatCreate', title='string', address='string'}
 
 ```
 

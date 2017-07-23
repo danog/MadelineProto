@@ -26,13 +26,13 @@ Represents a document cached on the telegram server
 ### Example:
 
 ```
-$inlineQueryResultDocument = ['_' => 'inlineQueryResultDocument', 'id' => string, 'document' => document, 'title' => string, 'description' => string, ];
+$inlineQueryResultDocument = ['_' => 'inlineQueryResultDocument', 'id' => 'string', 'document' => document, 'title' => 'string', 'description' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultDocument","id":"string","document":"document","title":"string","description":"string"}
+{"_": "inlineQueryResultDocument", "id": "string", "document": document, "title": "string", "description": "string"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultDocument={_='inlineQueryResultDocument', id=string, document=document, title=string, description=string, }
+inlineQueryResultDocument={_='inlineQueryResultDocument', id='string', document=document, title='string', description='string'}
 
 ```
 

@@ -21,13 +21,13 @@ description: keyboardButton attributes, type and example
 ### Example:
 
 ```
-$keyboardButton = ['_' => 'keyboardButton', 'text' => string, ];
+$keyboardButton = ['_' => 'keyboardButton', 'text' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"keyboardButton","text":"string"}
+{"_": "keyboardButton", "text": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-keyboardButton={_='keyboardButton', text=string, }
+keyboardButton={_='keyboardButton', text='string'}
 
 ```
 

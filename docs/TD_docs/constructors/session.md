@@ -36,13 +36,13 @@ Contains information about one session in some application used by the user
 ### Example:
 
 ```
-$session = ['_' => 'session', 'id' => long, 'is_current' => Bool, 'app_id' => int, 'app_name' => string, 'app_version' => string, 'is_official_app' => Bool, 'device_model' => string, 'platform' => string, 'system_version' => string, 'date_created' => int, 'date_active' => int, 'ip' => string, 'country' => string, 'region' => string, ];
+$session = ['_' => 'session', 'id' => long, 'is_current' => Bool, 'app_id' => int, 'app_name' => 'string', 'app_version' => 'string', 'is_official_app' => Bool, 'device_model' => 'string', 'platform' => 'string', 'system_version' => 'string', 'date_created' => int, 'date_active' => int, 'ip' => 'string', 'country' => 'string', 'region' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"session","id":"long","is_current":"Bool","app_id":"int","app_name":"string","app_version":"string","is_official_app":"Bool","device_model":"string","platform":"string","system_version":"string","date_created":"int","date_active":"int","ip":"string","country":"string","region":"string"}
+{"_": "session", "id": long, "is_current": Bool, "app_id": int, "app_name": "string", "app_version": "string", "is_official_app": Bool, "device_model": "string", "platform": "string", "system_version": "string", "date_created": int, "date_active": int, "ip": "string", "country": "string", "region": "string"}
 ```
 
 
@@ -50,7 +50,7 @@ Or, if you're into Lua:
 
 
 ```
-session={_='session', id=long, is_current=Bool, app_id=int, app_name=string, app_version=string, is_official_app=Bool, device_model=string, platform=string, system_version=string, date_created=int, date_active=int, ip=string, country=string, region=string, }
+session={_='session', id=long, is_current=Bool, app_id=int, app_name='string', app_version='string', is_official_app=Bool, device_model='string', platform='string', system_version='string', date_created=int, date_active=int, ip='string', country='string', region='string'}
 
 ```
 

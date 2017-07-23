@@ -16,13 +16,13 @@ description: rpc_answer_unknown attributes, type and example
 ### Example:
 
 ```
-$rpc_answer_unknown = ['_' => 'rpc_answer_unknown', ];
+$rpc_answer_unknown = ['_' => 'rpc_answer_unknown'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"rpc_answer_unknown"}
+{"_": "rpc_answer_unknown"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-rpc_answer_unknown={_='rpc_answer_unknown', }
+rpc_answer_unknown={_='rpc_answer_unknown'}
 
 ```
 

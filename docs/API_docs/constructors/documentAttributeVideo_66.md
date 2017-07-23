@@ -24,13 +24,13 @@ description: documentAttributeVideo attributes, type and example
 ### Example:
 
 ```
-$documentAttributeVideo_66 = ['_' => 'documentAttributeVideo', 'round_message' => Bool, 'duration' => int, 'w' => int, 'h' => int, ];
+$documentAttributeVideo_66 = ['_' => 'documentAttributeVideo', 'round_message' => Bool, 'duration' => int, 'w' => int, 'h' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"documentAttributeVideo","round_message":"Bool","duration":"int","w":"int","h":"int"}
+{"_": "documentAttributeVideo", "round_message": Bool, "duration": int, "w": int, "h": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-documentAttributeVideo_66={_='documentAttributeVideo', round_message=Bool, duration=int, w=int, h=int, }
+documentAttributeVideo_66={_='documentAttributeVideo', round_message=Bool, duration=int, w=int, h=int}
 
 ```
 

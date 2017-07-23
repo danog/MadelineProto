@@ -23,13 +23,13 @@ Contains list of channel identifiers
 ### Example:
 
 ```
-$channels = ['_' => 'channels', 'channel_ids' => [int], ];
+$channels = ['_' => 'channels', 'channel_ids' => [int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channels","channel_ids":["int"]}
+{"_": "channels", "channel_ids": [int]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-channels={_='channels', channel_ids={int}, }
+channels={_='channels', channel_ids={int}}
 
 ```
 

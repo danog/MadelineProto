@@ -21,13 +21,13 @@ description: help_termsOfService attributes, type and example
 ### Example:
 
 ```
-$help_termsOfService = ['_' => 'help.termsOfService', 'text' => string, ];
+$help_termsOfService = ['_' => 'help.termsOfService', 'text' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.termsOfService","text":"string"}
+{"_": "help.termsOfService", "text": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-help_termsOfService={_='help.termsOfService', text=string, }
+help_termsOfService={_='help.termsOfService', text='string'}
 
 ```
 

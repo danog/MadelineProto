@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - invokeAfterMsgs
-* params - {"msg_ids":["long"],"query":"!X"}
+* params - {"msg_ids": [long], "query": !X, }
 
 ```
 

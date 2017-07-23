@@ -22,13 +22,13 @@ description: account_sentChangePhoneCode attributes, type and example
 ### Example:
 
 ```
-$account_sentChangePhoneCode = ['_' => 'account.sentChangePhoneCode', 'phone_code_hash' => string, 'send_call_timeout' => int, ];
+$account_sentChangePhoneCode = ['_' => 'account.sentChangePhoneCode', 'phone_code_hash' => 'string', 'send_call_timeout' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"account.sentChangePhoneCode","phone_code_hash":"string","send_call_timeout":"int"}
+{"_": "account.sentChangePhoneCode", "phone_code_hash": "string", "send_call_timeout": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-account_sentChangePhoneCode={_='account.sentChangePhoneCode', phone_code_hash=string, send_call_timeout=int, }
+account_sentChangePhoneCode={_='account.sentChangePhoneCode', phone_code_hash='string', send_call_timeout=int}
 
 ```
 

@@ -22,13 +22,13 @@ User records a video
 ### Example:
 
 ```
-$sendMessageRecordVideoAction_17 = ['_' => 'sendMessageRecordVideoAction', ];
+$sendMessageRecordVideoAction_17 = ['_' => 'sendMessageRecordVideoAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageRecordVideoAction"}
+{"_": "sendMessageRecordVideoAction"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageRecordVideoAction_17={_='sendMessageRecordVideoAction', }
+sendMessageRecordVideoAction_17={_='sendMessageRecordVideoAction'}
 
 ```
 

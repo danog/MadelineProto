@@ -40,7 +40,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$AuthState = $MadelineProto->setAuthPhoneNumber(['phone_number' => string, 'allow_flash_call' => Bool, 'is_current_phone_number' => Bool, ]);
+$AuthState = $MadelineProto->setAuthPhoneNumber(['phone_number' => 'string', 'allow_flash_call' => Bool, 'is_current_phone_number' => Bool, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setAuthPhoneNumber
-* params - {"phone_number":"string","allow_flash_call":"Bool","is_current_phone_number":"Bool"}
+* params - {"phone_number": "string", "allow_flash_call": Bool, "is_current_phone_number": Bool, }
 
 ```
 
@@ -72,6 +72,6 @@ is_current_phone_number - Json encoded Bool
 Or, if you're into Lua:
 
 ```
-AuthState = setAuthPhoneNumber({phone_number=string, allow_flash_call=Bool, is_current_phone_number=Bool, })
+AuthState = setAuthPhoneNumber({phone_number='string', allow_flash_call=Bool, is_current_phone_number=Bool, })
 ```
 

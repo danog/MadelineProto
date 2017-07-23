@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$payments_PaymentResult = $MadelineProto->payments->sendPaymentForm(['msg_id' => int, 'requested_info_id' => string, 'shipping_option_id' => string, 'credentials' => InputPaymentCredentials, ]);
+$payments_PaymentResult = $MadelineProto->payments->sendPaymentForm(['msg_id' => int, 'requested_info_id' => 'string', 'shipping_option_id' => 'string', 'credentials' => InputPaymentCredentials, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - payments.sendPaymentForm
-* params - {"msg_id":"int","requested_info_id":"string","shipping_option_id":"string","credentials":"InputPaymentCredentials"}
+* params - {"msg_id": int, "requested_info_id": "string", "shipping_option_id": "string", "credentials": InputPaymentCredentials, }
 
 ```
 
@@ -69,6 +69,6 @@ credentials - Json encoded InputPaymentCredentials
 Or, if you're into Lua:
 
 ```
-payments_PaymentResult = payments.sendPaymentForm({msg_id=int, requested_info_id=string, shipping_option_id=string, credentials=InputPaymentCredentials, })
+payments_PaymentResult = payments.sendPaymentForm({msg_id=int, requested_info_id='string', shipping_option_id='string', credentials=InputPaymentCredentials, })
 ```
 

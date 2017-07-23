@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateDeviceLocked
-* params - {"period":"int"}
+* params - {"period": int, }
 
 ```
 

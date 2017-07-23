@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_SentMessage = $MadelineProto->messages->sendMessage(['peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => string, 'reply_markup' => ReplyMarkup, ]);
+$messages_SentMessage = $MadelineProto->messages->sendMessage(['peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => 'string', 'reply_markup' => ReplyMarkup, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendMessage
-* params - {"peer":"InputPeer","reply_to_msg_id":"int","message":"string","reply_markup":"ReplyMarkup"}
+* params - {"peer": InputPeer, "reply_to_msg_id": int, "message": "string", "reply_markup": ReplyMarkup, }
 
 ```
 
@@ -69,7 +69,7 @@ reply_markup - Json encoded ReplyMarkup
 Or, if you're into Lua:
 
 ```
-messages_SentMessage = messages.sendMessage({peer=InputPeer, reply_to_msg_id=int, message=string, reply_markup=ReplyMarkup, })
+messages_SentMessage = messages.sendMessage({peer=InputPeer, reply_to_msg_id=int, message='string', reply_markup=ReplyMarkup, })
 ```
 
 

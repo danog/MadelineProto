@@ -21,13 +21,13 @@ description: pageBlockChannel attributes, type and example
 ### Example:
 
 ```
-$pageBlockChannel = ['_' => 'pageBlockChannel', 'channel' => Chat, ];
+$pageBlockChannel = ['_' => 'pageBlockChannel', 'channel' => Chat];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockChannel","channel":"Chat"}
+{"_": "pageBlockChannel", "channel": Chat}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockChannel={_='pageBlockChannel', channel=Chat, }
+pageBlockChannel={_='pageBlockChannel', channel=Chat}
 
 ```
 

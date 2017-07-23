@@ -43,7 +43,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callEmpty
-* params - 
+* params - {}
 
 ```
 

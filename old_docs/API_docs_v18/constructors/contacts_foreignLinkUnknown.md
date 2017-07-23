@@ -16,13 +16,13 @@ description: contacts_foreignLinkUnknown attributes, type and example
 ### Example:
 
 ```
-$contacts_foreignLinkUnknown = ['_' => 'contacts.foreignLinkUnknown', ];
+$contacts_foreignLinkUnknown = ['_' => 'contacts.foreignLinkUnknown'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.foreignLinkUnknown"}
+{"_": "contacts.foreignLinkUnknown"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_foreignLinkUnknown={_='contacts.foreignLinkUnknown', }
+contacts_foreignLinkUnknown={_='contacts.foreignLinkUnknown'}
 
 ```
 

@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_FoundGifs = $MadelineProto->messages->searchGifs(['q' => string, 'offset' => int, ]);
+$messages_FoundGifs = $MadelineProto->messages->searchGifs(['q' => 'string', 'offset' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.searchGifs
-* params - {"q":"string","offset":"int"}
+* params - {"q": "string", "offset": int, }
 
 ```
 
@@ -65,6 +65,6 @@ offset - Json encoded int
 Or, if you're into Lua:
 
 ```
-messages_FoundGifs = messages.searchGifs({q=string, offset=int, })
+messages_FoundGifs = messages.searchGifs({q='string', offset=int, })
 ```
 

@@ -21,13 +21,13 @@ description: auth_sentCodeTypeCall attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeCall = ['_' => 'auth.sentCodeTypeCall', 'length' => int, ];
+$auth_sentCodeTypeCall = ['_' => 'auth.sentCodeTypeCall', 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"auth.sentCodeTypeCall","length":"int"}
+{"_": "auth.sentCodeTypeCall", "length": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-auth_sentCodeTypeCall={_='auth.sentCodeTypeCall', length=int, }
+auth_sentCodeTypeCall={_='auth.sentCodeTypeCall', length=int}
 
 ```
 

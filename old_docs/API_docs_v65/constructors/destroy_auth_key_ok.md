@@ -16,13 +16,13 @@ description: destroy_auth_key_ok attributes, type and example
 ### Example:
 
 ```
-$destroy_auth_key_ok = ['_' => 'destroy_auth_key_ok', ];
+$destroy_auth_key_ok = ['_' => 'destroy_auth_key_ok'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"destroy_auth_key_ok"}
+{"_": "destroy_auth_key_ok"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-destroy_auth_key_ok={_='destroy_auth_key_ok', }
+destroy_auth_key_ok={_='destroy_auth_key_ok'}
 
 ```
 

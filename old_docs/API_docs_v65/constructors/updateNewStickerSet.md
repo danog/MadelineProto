@@ -21,13 +21,13 @@ description: updateNewStickerSet attributes, type and example
 ### Example:
 
 ```
-$updateNewStickerSet = ['_' => 'updateNewStickerSet', 'stickerset' => messages_StickerSet, ];
+$updateNewStickerSet = ['_' => 'updateNewStickerSet', 'stickerset' => messages_StickerSet];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewStickerSet","stickerset":"messages_StickerSet"}
+{"_": "updateNewStickerSet", "stickerset": messages_StickerSet}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewStickerSet={_='updateNewStickerSet', stickerset=messages_StickerSet, }
+updateNewStickerSet={_='updateNewStickerSet', stickerset=messages_StickerSet}
 
 ```
 

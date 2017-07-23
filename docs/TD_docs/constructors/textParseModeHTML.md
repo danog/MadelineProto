@@ -22,13 +22,13 @@ Text should be parsed in the HTML-style way
 ### Example:
 
 ```
-$textParseModeHTML = ['_' => 'textParseModeHTML', ];
+$textParseModeHTML = ['_' => 'textParseModeHTML'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"textParseModeHTML"}
+{"_": "textParseModeHTML"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-textParseModeHTML={_='textParseModeHTML', }
+textParseModeHTML={_='textParseModeHTML'}
 
 ```
 

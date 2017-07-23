@@ -24,13 +24,13 @@ Represents list of sticker sets
 ### Example:
 
 ```
-$stickerSets = ['_' => 'stickerSets', 'total_count' => int, 'sets' => [stickerSetInfo], ];
+$stickerSets = ['_' => 'stickerSets', 'total_count' => int, 'sets' => [stickerSetInfo]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerSets","total_count":"int","sets":["stickerSetInfo"]}
+{"_": "stickerSets", "total_count": int, "sets": [stickerSetInfo]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerSets={_='stickerSets', total_count=int, sets={stickerSetInfo}, }
+stickerSets={_='stickerSets', total_count=int, sets={stickerSetInfo}}
 
 ```
 

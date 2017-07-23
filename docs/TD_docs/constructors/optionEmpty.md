@@ -22,13 +22,13 @@ Unknown option or option having default value
 ### Example:
 
 ```
-$optionEmpty = ['_' => 'optionEmpty', ];
+$optionEmpty = ['_' => 'optionEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"optionEmpty"}
+{"_": "optionEmpty"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-optionEmpty={_='optionEmpty', }
+optionEmpty={_='optionEmpty'}
 
 ```
 

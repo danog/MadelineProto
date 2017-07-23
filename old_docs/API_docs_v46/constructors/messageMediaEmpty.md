@@ -16,13 +16,13 @@ description: messageMediaEmpty attributes, type and example
 ### Example:
 
 ```
-$messageMediaEmpty = ['_' => 'messageMediaEmpty', ];
+$messageMediaEmpty = ['_' => 'messageMediaEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaEmpty"}
+{"_": "messageMediaEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaEmpty={_='messageMediaEmpty', }
+messageMediaEmpty={_='messageMediaEmpty'}
 
 ```
 

@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account->deleteAccount(['reason' => string, ]);
+$Bool = $MadelineProto->account->deleteAccount(['reason' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.deleteAccount
-* params - {"reason":"string"}
+* params - {"reason": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ reason - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = account.deleteAccount({reason=string, })
+Bool = account.deleteAccount({reason='string', })
 ```
 

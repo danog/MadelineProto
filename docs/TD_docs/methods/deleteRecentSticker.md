@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteRecentSticker
-* params - {"is_attached":"Bool","sticker":"InputFile"}
+* params - {"is_attached": Bool, "sticker": InputFile, }
 
 ```
 

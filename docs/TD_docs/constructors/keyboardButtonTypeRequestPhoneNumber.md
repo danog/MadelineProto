@@ -22,13 +22,13 @@ A button which sends user's phone number when pressed, available only in private
 ### Example:
 
 ```
-$keyboardButtonTypeRequestPhoneNumber = ['_' => 'keyboardButtonTypeRequestPhoneNumber', ];
+$keyboardButtonTypeRequestPhoneNumber = ['_' => 'keyboardButtonTypeRequestPhoneNumber'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"keyboardButtonTypeRequestPhoneNumber"}
+{"_": "keyboardButtonTypeRequestPhoneNumber"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-keyboardButtonTypeRequestPhoneNumber={_='keyboardButtonTypeRequestPhoneNumber', }
+keyboardButtonTypeRequestPhoneNumber={_='keyboardButtonTypeRequestPhoneNumber'}
 
 ```
 

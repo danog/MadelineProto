@@ -26,13 +26,13 @@ description: encryptedChatRequested attributes, type and example
 ### Example:
 
 ```
-$encryptedChatRequested = ['_' => 'encryptedChatRequested', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => bytes, ];
+$encryptedChatRequested = ['_' => 'encryptedChatRequested', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"encryptedChatRequested","id":"int","access_hash":"long","date":"int","admin_id":"int","participant_id":"int","g_a":"bytes"}
+{"_": "encryptedChatRequested", "id": int, "access_hash": long, "date": int, "admin_id": int, "participant_id": int, "g_a": "bytes"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-encryptedChatRequested={_='encryptedChatRequested', id=int, access_hash=long, date=int, admin_id=int, participant_id=int, g_a=bytes, }
+encryptedChatRequested={_='encryptedChatRequested', id=int, access_hash=long, date=int, admin_id=int, participant_id=int, g_a='bytes'}
 
 ```
 

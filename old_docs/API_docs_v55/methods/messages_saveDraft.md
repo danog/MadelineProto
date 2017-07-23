@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->saveDraft(['no_webpage' => Bool, 'reply_to_msg_id' => int, 'peer' => InputPeer, 'message' => string, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
+$Bool = $MadelineProto->messages->saveDraft(['no_webpage' => Bool, 'reply_to_msg_id' => int, 'peer' => InputPeer, 'message' => 'string', 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.saveDraft
-* params - {"no_webpage":"Bool","reply_to_msg_id":"int","peer":"InputPeer","message":"string","entities":["MessageEntity"],"parse_mode":"string"}
+* params - {"no_webpage": Bool, "reply_to_msg_id": int, "peer": InputPeer, "message": "string", "entities": [MessageEntity], "parse_mode": "string"}
 
 ```
 
@@ -68,7 +68,7 @@ parse_mode - string
 Or, if you're into Lua:
 
 ```
-Bool = messages.saveDraft({no_webpage=Bool, reply_to_msg_id=int, peer=InputPeer, message=string, entities={MessageEntity}, parse_mode='string', })
+Bool = messages.saveDraft({no_webpage=Bool, reply_to_msg_id=int, peer=InputPeer, message='string', entities={MessageEntity}, parse_mode='string', })
 ```
 
 

@@ -22,13 +22,13 @@ Only for channels, member that can delete messages of unprivileged members and k
 ### Example:
 
 ```
-$chatMemberStatusModerator = ['_' => 'chatMemberStatusModerator', ];
+$chatMemberStatusModerator = ['_' => 'chatMemberStatusModerator'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatMemberStatusModerator"}
+{"_": "chatMemberStatusModerator"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-chatMemberStatusModerator={_='chatMemberStatusModerator', }
+chatMemberStatusModerator={_='chatMemberStatusModerator'}
 
 ```
 

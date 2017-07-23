@@ -25,13 +25,13 @@ description: messages_statedMessages attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessages = ['_' => 'messages.statedMessages', 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'pts' => int, 'pts_count' => int, ];
+$messages_statedMessages = ['_' => 'messages.statedMessages', 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'pts' => int, 'pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.statedMessages","messages":["Message"],"chats":["Chat"],"users":["User"],"pts":"int","pts_count":"int"}
+{"_": "messages.statedMessages", "messages": [Message], "chats": [Chat], "users": [User], "pts": int, "pts_count": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_statedMessages={_='messages.statedMessages', messages={Message}, chats={Chat}, users={User}, pts=int, pts_count=int, }
+messages_statedMessages={_='messages.statedMessages', messages={Message}, chats={Chat}, users={User}, pts=int, pts_count=int}
 
 ```
 

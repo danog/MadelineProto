@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteProfilePhoto
-* params - {"profile_photo_id":"long"}
+* params - {"profile_photo_id": long, }
 
 ```
 

@@ -22,13 +22,13 @@ description: decryptedMessage attributes, type and example
 ### Example:
 
 ```
-$decryptedMessage_8 = ['_' => 'decryptedMessage', 'message' => string, 'media' => DecryptedMessageMedia, ];
+$decryptedMessage_8 = ['_' => 'decryptedMessage', 'message' => 'string', 'media' => DecryptedMessageMedia];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessage","message":"string","media":"DecryptedMessageMedia"}
+{"_": "decryptedMessage", "message": "string", "media": DecryptedMessageMedia}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessage_8={_='decryptedMessage', message=string, media=DecryptedMessageMedia, }
+decryptedMessage_8={_='decryptedMessage', message='string', media=DecryptedMessageMedia}
 
 ```
 

@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteChannel
-* params - {"channel_id":"int"}
+* params - {"channel_id": int, }
 
 ```
 

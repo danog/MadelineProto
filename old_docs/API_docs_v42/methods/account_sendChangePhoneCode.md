@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_SentChangePhoneCode = $MadelineProto->account->sendChangePhoneCode(['phone_number' => string, ]);
+$account_SentChangePhoneCode = $MadelineProto->account->sendChangePhoneCode(['phone_number' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.sendChangePhoneCode
-* params - {"phone_number":"string"}
+* params - {"phone_number": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ phone_number - Json encoded string
 Or, if you're into Lua:
 
 ```
-account_SentChangePhoneCode = account.sendChangePhoneCode({phone_number=string, })
+account_SentChangePhoneCode = account.sendChangePhoneCode({phone_number='string', })
 ```
 

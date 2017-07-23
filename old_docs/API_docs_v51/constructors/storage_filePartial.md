@@ -16,13 +16,13 @@ description: storage_filePartial attributes, type and example
 ### Example:
 
 ```
-$storage_filePartial = ['_' => 'storage.filePartial', ];
+$storage_filePartial = ['_' => 'storage.filePartial'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"storage.filePartial"}
+{"_": "storage.filePartial"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-storage_filePartial={_='storage.filePartial', }
+storage_filePartial={_='storage.filePartial'}
 
 ```
 

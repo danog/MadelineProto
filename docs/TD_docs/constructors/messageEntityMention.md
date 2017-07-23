@@ -24,13 +24,13 @@ Mention of the user by his username
 ### Example:
 
 ```
-$messageEntityMention = ['_' => 'messageEntityMention', 'offset' => int, 'length' => int, ];
+$messageEntityMention = ['_' => 'messageEntityMention', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityMention","offset":"int","length":"int"}
+{"_": "messageEntityMention", "offset": int, "length": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityMention={_='messageEntityMention', offset=int, length=int, }
+messageEntityMention={_='messageEntityMention', offset=int, length=int}
 
 ```
 

@@ -16,13 +16,13 @@ description: inputMessagesFilterRoundVideo attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterRoundVideo = ['_' => 'inputMessagesFilterRoundVideo', ];
+$inputMessagesFilterRoundVideo = ['_' => 'inputMessagesFilterRoundVideo'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterRoundVideo"}
+{"_": "inputMessagesFilterRoundVideo"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterRoundVideo={_='inputMessagesFilterRoundVideo', }
+inputMessagesFilterRoundVideo={_='inputMessagesFilterRoundVideo'}
 
 ```
 

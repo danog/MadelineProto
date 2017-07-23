@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - http_wait
-* params - {"max_delay":"int","wait_after":"int","max_wait":"int"}
+* params - {"max_delay": int, "wait_after": int, "max_wait": int, }
 
 ```
 

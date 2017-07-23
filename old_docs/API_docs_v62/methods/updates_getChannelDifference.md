@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updates.getChannelDifference
-* params - {"force":"Bool","channel":"InputChannel","filter":"ChannelMessagesFilter","pts":"int","limit":"int"}
+* params - {"force": Bool, "channel": InputChannel, "filter": ChannelMessagesFilter, "pts": int, "limit": int, }
 
 ```
 

@@ -23,13 +23,13 @@ description: botInfo attributes, type and example
 ### Example:
 
 ```
-$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => string, 'commands' => [BotCommand], ];
+$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => 'string', 'commands' => [BotCommand]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInfo","user_id":"int","description":"string","commands":["BotCommand"]}
+{"_": "botInfo", "user_id": int, "description": "string", "commands": [BotCommand]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-botInfo={_='botInfo', user_id=int, description=string, commands={BotCommand}, }
+botInfo={_='botInfo', user_id=int, description='string', commands={BotCommand}}
 
 ```
 

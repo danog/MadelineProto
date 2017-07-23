@@ -21,13 +21,13 @@ description: msgs_ack attributes, type and example
 ### Example:
 
 ```
-$msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [long], ];
+$msgs_ack = ['_' => 'msgs_ack', 'msg_ids' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"msgs_ack","msg_ids":["long"]}
+{"_": "msgs_ack", "msg_ids": [long]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-msgs_ack={_='msgs_ack', msg_ids={long}, }
+msgs_ack={_='msgs_ack', msg_ids={long}}
 
 ```
 

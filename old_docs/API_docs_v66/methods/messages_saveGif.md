@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.saveGif
-* params - {"id":"InputDocument","unsave":"Bool"}
+* params - {"id": InputDocument, "unsave": Bool, }
 
 ```
 

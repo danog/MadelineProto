@@ -16,13 +16,13 @@ description: topPeerCategoryPhoneCalls attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryPhoneCalls = ['_' => 'topPeerCategoryPhoneCalls', ];
+$topPeerCategoryPhoneCalls = ['_' => 'topPeerCategoryPhoneCalls'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"topPeerCategoryPhoneCalls"}
+{"_": "topPeerCategoryPhoneCalls"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-topPeerCategoryPhoneCalls={_='topPeerCategoryPhoneCalls', }
+topPeerCategoryPhoneCalls={_='topPeerCategoryPhoneCalls'}
 
 ```
 

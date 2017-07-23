@@ -23,13 +23,13 @@ description: topPeerCategoryPeers attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer], ];
+$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"topPeerCategoryPeers","category":"TopPeerCategory","count":"int","peers":["TopPeer"]}
+{"_": "topPeerCategoryPeers", "category": TopPeerCategory, "count": int, "peers": [TopPeer]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-topPeerCategoryPeers={_='topPeerCategoryPeers', category=TopPeerCategory, count=int, peers={TopPeer}, }
+topPeerCategoryPeers={_='topPeerCategoryPeers', category=TopPeerCategory, count=int, peers={TopPeer}}
 
 ```
 

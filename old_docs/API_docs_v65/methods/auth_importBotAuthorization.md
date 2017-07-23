@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth->importBotAuthorization(['a' => Bool, 'b' => Bool, 'c' => Bool, 'd' => Bool, 'api_id' => int, 'api_hash' => string, 'bot_auth_token' => string, ]);
+$auth_Authorization = $MadelineProto->auth->importBotAuthorization(['a' => Bool, 'b' => Bool, 'c' => Bool, 'd' => Bool, 'api_id' => int, 'api_hash' => 'string', 'bot_auth_token' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.importBotAuthorization
-* params - {"a":"Bool","b":"Bool","c":"Bool","d":"Bool","api_id":"int","api_hash":"string","bot_auth_token":"string"}
+* params - {"a": Bool, "b": Bool, "c": Bool, "d": Bool, "api_id": int, "api_hash": "string", "bot_auth_token": "string", }
 
 ```
 
@@ -75,6 +75,6 @@ bot_auth_token - Json encoded string
 Or, if you're into Lua:
 
 ```
-auth_Authorization = auth.importBotAuthorization({a=Bool, b=Bool, c=Bool, d=Bool, api_id=int, api_hash=string, bot_auth_token=string, })
+auth_Authorization = auth.importBotAuthorization({a=Bool, b=Bool, c=Bool, d=Bool, api_id=int, api_hash='string', bot_auth_token='string', })
 ```
 

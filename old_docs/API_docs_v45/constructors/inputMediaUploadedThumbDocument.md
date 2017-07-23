@@ -25,13 +25,13 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], 'caption' => string, ];
+$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute], 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaUploadedThumbDocument","file":"InputFile","thumb":"InputFile","mime_type":"string","attributes":["DocumentAttribute"],"caption":"string"}
+{"_": "inputMediaUploadedThumbDocument", "file": InputFile, "thumb": InputFile, "mime_type": "string", "attributes": [DocumentAttribute], "caption": "string"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaUploadedThumbDocument={_='inputMediaUploadedThumbDocument', file=InputFile, thumb=InputFile, mime_type=string, attributes={DocumentAttribute}, caption=string, }
+inputMediaUploadedThumbDocument={_='inputMediaUploadedThumbDocument', file=InputFile, thumb=InputFile, mime_type='string', attributes={DocumentAttribute}, caption='string'}
 
 ```
 

@@ -22,13 +22,13 @@ Unsupported message content
 ### Example:
 
 ```
-$messageUnsupported = ['_' => 'messageUnsupported', ];
+$messageUnsupported = ['_' => 'messageUnsupported'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageUnsupported"}
+{"_": "messageUnsupported"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageUnsupported={_='messageUnsupported', }
+messageUnsupported={_='messageUnsupported'}
 
 ```
 

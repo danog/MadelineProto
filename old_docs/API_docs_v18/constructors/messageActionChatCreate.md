@@ -22,13 +22,13 @@ description: messageActionChatCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => string, 'users' => [int], ];
+$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => 'string', 'users' => [int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageActionChatCreate","title":"string","users":["int"]}
+{"_": "messageActionChatCreate", "title": "string", "users": [int]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageActionChatCreate={_='messageActionChatCreate', title=string, users={int}, }
+messageActionChatCreate={_='messageActionChatCreate', title='string', users={int}}
 
 ```
 

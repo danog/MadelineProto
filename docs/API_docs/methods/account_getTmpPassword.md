@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$account_TmpPassword = $MadelineProto->account->getTmpPassword(['password_hash' => bytes, 'period' => int, ]);
+$account_TmpPassword = $MadelineProto->account->getTmpPassword(['password_hash' => 'bytes', 'period' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.getTmpPassword
-* params - {"password_hash":"bytes","period":"int"}
+* params - {"password_hash": "bytes", "period": int, }
 
 ```
 
@@ -65,6 +65,6 @@ period - Json encoded int
 Or, if you're into Lua:
 
 ```
-account_TmpPassword = account.getTmpPassword({password_hash=bytes, period=int, })
+account_TmpPassword = account.getTmpPassword({password_hash='bytes', period=int, })
 ```
 

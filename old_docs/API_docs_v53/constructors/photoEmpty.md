@@ -21,13 +21,13 @@ description: photoEmpty attributes, type and example
 ### Example:
 
 ```
-$photoEmpty = ['_' => 'photoEmpty', 'id' => long, ];
+$photoEmpty = ['_' => 'photoEmpty', 'id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photoEmpty","id":"long"}
+{"_": "photoEmpty", "id": long}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-photoEmpty={_='photoEmpty', id=long, }
+photoEmpty={_='photoEmpty', id=long}
 
 ```
 

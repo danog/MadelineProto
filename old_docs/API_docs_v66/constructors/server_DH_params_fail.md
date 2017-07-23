@@ -23,13 +23,13 @@ description: server_DH_params_fail attributes, type and example
 ### Example:
 
 ```
-$server_DH_params_fail = ['_' => 'server_DH_params_fail', 'nonce' => int128, 'server_nonce' => int128, 'new_nonce_hash' => int128, ];
+$server_DH_params_fail = ['_' => 'server_DH_params_fail', 'nonce' => int128, 'server_nonce' => int128, 'new_nonce_hash' => int128];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"server_DH_params_fail","nonce":"int128","server_nonce":"int128","new_nonce_hash":"int128"}
+{"_": "server_DH_params_fail", "nonce": int128, "server_nonce": int128, "new_nonce_hash": int128}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-server_DH_params_fail={_='server_DH_params_fail', nonce=int128, server_nonce=int128, new_nonce_hash=int128, }
+server_DH_params_fail={_='server_DH_params_fail', nonce=int128, server_nonce=int128, new_nonce_hash=int128}
 
 ```
 

@@ -23,13 +23,13 @@ Token for Blackberry Push Service
 ### Example:
 
 ```
-$blackberryDeviceToken = ['_' => 'blackberryDeviceToken', 'token' => string, ];
+$blackberryDeviceToken = ['_' => 'blackberryDeviceToken', 'token' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"blackberryDeviceToken","token":"string"}
+{"_": "blackberryDeviceToken", "token": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-blackberryDeviceToken={_='blackberryDeviceToken', token=string, }
+blackberryDeviceToken={_='blackberryDeviceToken', token='string'}
 
 ```
 

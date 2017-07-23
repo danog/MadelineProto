@@ -24,13 +24,13 @@ Contains list of messages
 ### Example:
 
 ```
-$messages = ['_' => 'messages', 'total_count' => int, 'messages' => [message], ];
+$messages = ['_' => 'messages', 'total_count' => int, 'messages' => [message]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages","total_count":"int","messages":["message"]}
+{"_": "messages", "total_count": int, "messages": [message]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messages={_='messages', total_count=int, messages={message}, }
+messages={_='messages', total_count=int, messages={message}}
 
 ```
 

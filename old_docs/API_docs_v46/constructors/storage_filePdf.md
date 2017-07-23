@@ -16,13 +16,13 @@ description: storage_filePdf attributes, type and example
 ### Example:
 
 ```
-$storage_filePdf = ['_' => 'storage.filePdf', ];
+$storage_filePdf = ['_' => 'storage.filePdf'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"storage.filePdf"}
+{"_": "storage.filePdf"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-storage_filePdf={_='storage.filePdf', }
+storage_filePdf={_='storage.filePdf'}
 
 ```
 

@@ -26,13 +26,13 @@ Position on a photo where a mask should be placed
 ### Example:
 
 ```
-$maskPosition = ['_' => 'maskPosition', 'point' => int, 'x_shift' => double, 'y_shift' => double, 'zoom' => double, ];
+$maskPosition = ['_' => 'maskPosition', 'point' => int, 'x_shift' => double, 'y_shift' => double, 'zoom' => double];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"maskPosition","point":"int","x_shift":"double","y_shift":"double","zoom":"double"}
+{"_": "maskPosition", "point": int, "x_shift": double, "y_shift": double, "zoom": double}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-maskPosition={_='maskPosition', point=int, x_shift=double, y_shift=double, zoom=double, }
+maskPosition={_='maskPosition', point=int, x_shift=double, y_shift=double, zoom=double}
 
 ```
 

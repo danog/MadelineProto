@@ -22,13 +22,13 @@ Notification settings applied to all group and broadcast channel chats (supergro
 ### Example:
 
 ```
-$notificationSettingsForGroupChats = ['_' => 'notificationSettingsForGroupChats', ];
+$notificationSettingsForGroupChats = ['_' => 'notificationSettingsForGroupChats'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"notificationSettingsForGroupChats"}
+{"_": "notificationSettingsForGroupChats"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-notificationSettingsForGroupChats={_='notificationSettingsForGroupChats', }
+notificationSettingsForGroupChats={_='notificationSettingsForGroupChats'}
 
 ```
 

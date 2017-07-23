@@ -22,13 +22,13 @@ description: help_support attributes, type and example
 ### Example:
 
 ```
-$help_support = ['_' => 'help.support', 'phone_number' => string, 'user' => User, ];
+$help_support = ['_' => 'help.support', 'phone_number' => 'string', 'user' => User];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.support","phone_number":"string","user":"User"}
+{"_": "help.support", "phone_number": "string", "user": User}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-help_support={_='help.support', phone_number=string, user=User, }
+help_support={_='help.support', phone_number='string', user=User}
 
 ```
 

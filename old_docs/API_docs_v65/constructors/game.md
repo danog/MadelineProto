@@ -27,13 +27,13 @@ description: game attributes, type and example
 ### Example:
 
 ```
-$game = ['_' => 'game', 'id' => long, 'access_hash' => long, 'short_name' => string, 'title' => string, 'description' => string, 'photo' => Photo, 'document' => Document, ];
+$game = ['_' => 'game', 'id' => long, 'access_hash' => long, 'short_name' => 'string', 'title' => 'string', 'description' => 'string', 'photo' => Photo, 'document' => Document];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"game","id":"long","access_hash":"long","short_name":"string","title":"string","description":"string","photo":"Photo","document":"Document"}
+{"_": "game", "id": long, "access_hash": long, "short_name": "string", "title": "string", "description": "string", "photo": Photo, "document": Document}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-game={_='game', id=long, access_hash=long, short_name=string, title=string, description=string, photo=Photo, document=Document, }
+game={_='game', id=long, access_hash=long, short_name='string', title='string', description='string', photo=Photo, document=Document}
 
 ```
 

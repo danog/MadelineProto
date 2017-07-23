@@ -21,13 +21,13 @@ description: updatePhoneCall attributes, type and example
 ### Example:
 
 ```
-$updatePhoneCall = ['_' => 'updatePhoneCall', 'phone_call' => PhoneCall, ];
+$updatePhoneCall = ['_' => 'updatePhoneCall', 'phone_call' => PhoneCall];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updatePhoneCall","phone_call":"PhoneCall"}
+{"_": "updatePhoneCall", "phone_call": PhoneCall}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-updatePhoneCall={_='updatePhoneCall', phone_call=PhoneCall, }
+updatePhoneCall={_='updatePhoneCall', phone_call=PhoneCall}
 
 ```
 

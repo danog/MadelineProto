@@ -44,7 +44,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->answerInlineQuery(['inline_query_id' => long, 'is_personal' => Bool, 'results' => [InputInlineQueryResult], 'cache_time' => int, 'next_offset' => string, 'switch_pm_text' => string, 'switch_pm_parameter' => string, ]);
+$Ok = $MadelineProto->answerInlineQuery(['inline_query_id' => long, 'is_personal' => Bool, 'results' => [InputInlineQueryResult], 'cache_time' => int, 'next_offset' => 'string', 'switch_pm_text' => 'string', 'switch_pm_parameter' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -56,7 +56,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - answerInlineQuery
-* params - {"inline_query_id":"long","is_personal":"Bool","results":["InputInlineQueryResult"],"cache_time":"int","next_offset":"string","switch_pm_text":"string","switch_pm_parameter":"string"}
+* params - {"inline_query_id": long, "is_personal": Bool, "results": [InputInlineQueryResult], "cache_time": int, "next_offset": "string", "switch_pm_text": "string", "switch_pm_parameter": "string", }
 
 ```
 
@@ -80,6 +80,6 @@ switch_pm_parameter - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = answerInlineQuery({inline_query_id=long, is_personal=Bool, results={InputInlineQueryResult}, cache_time=int, next_offset=string, switch_pm_text=string, switch_pm_parameter=string, })
+Ok = answerInlineQuery({inline_query_id=long, is_personal=Bool, results={InputInlineQueryResult}, cache_time=int, next_offset='string', switch_pm_text='string', switch_pm_parameter='string', })
 ```
 

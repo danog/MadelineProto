@@ -25,13 +25,13 @@ description: photoCachedSize attributes, type and example
 ### Example:
 
 ```
-$photoCachedSize = ['_' => 'photoCachedSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'bytes' => bytes, ];
+$photoCachedSize = ['_' => 'photoCachedSize', 'type' => 'string', 'location' => FileLocation, 'w' => int, 'h' => int, 'bytes' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photoCachedSize","type":"string","location":"FileLocation","w":"int","h":"int","bytes":"bytes"}
+{"_": "photoCachedSize", "type": "string", "location": FileLocation, "w": int, "h": int, "bytes": "bytes"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-photoCachedSize={_='photoCachedSize', type=string, location=FileLocation, w=int, h=int, bytes=bytes, }
+photoCachedSize={_='photoCachedSize', type='string', location=FileLocation, w=int, h=int, bytes='bytes'}
 
 ```
 

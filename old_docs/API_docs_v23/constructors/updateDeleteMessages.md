@@ -22,13 +22,13 @@ description: updateDeleteMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int], 'pts' => int, ];
+$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int], 'pts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateDeleteMessages","messages":["int"],"pts":"int"}
+{"_": "updateDeleteMessages", "messages": [int], "pts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateDeleteMessages={_='updateDeleteMessages', messages={int}, pts=int, }
+updateDeleteMessages={_='updateDeleteMessages', messages={int}, pts=int}
 
 ```
 

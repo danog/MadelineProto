@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.installStickerSet
-* params - {"stickerset":"InputStickerSet","disabled":"Bool"}
+* params - {"stickerset": InputStickerSet, "disabled": Bool, }
 
 ```
 

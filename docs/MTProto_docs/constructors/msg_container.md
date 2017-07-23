@@ -21,13 +21,13 @@ description: msg_container attributes, type and example
 ### Example:
 
 ```
-$msg_container = ['_' => 'msg_container', 'messages' => [MTmessage], ];
+$msg_container = ['_' => 'msg_container', 'messages' => [MTmessage]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"msg_container","messages":["MTmessage"]}
+{"_": "msg_container", "messages": [MTmessage]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-msg_container={_='msg_container', messages={MTmessage}, }
+msg_container={_='msg_container', messages={MTmessage}}
 
 ```
 

@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getChatHistory
-* params - {"chat_id":"InputPeer","from_message_id":"long","offset":"int","limit":"int"}
+* params - {"chat_id": InputPeer, "from_message_id": long, "offset": int, "limit": int, }
 
 ```
 

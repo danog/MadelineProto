@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.checkin
-* params - {"peer":"InputGeoChat"}
+* params - {"peer": InputGeoChat, }
 
 ```
 

@@ -22,13 +22,13 @@ description: pageBlockCollage attributes, type and example
 ### Example:
 
 ```
-$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock], 'caption' => RichText, ];
+$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock], 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockCollage","items":["PageBlock"],"caption":"RichText"}
+{"_": "pageBlockCollage", "items": [PageBlock], "caption": RichText}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockCollage={_='pageBlockCollage', items={PageBlock}, caption=RichText, }
+pageBlockCollage={_='pageBlockCollage', items={PageBlock}, caption=RichText}
 
 ```
 

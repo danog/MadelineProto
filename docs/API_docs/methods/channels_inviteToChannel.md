@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.inviteToChannel
-* params - {"channel":"InputChannel","users":["InputUser"]}
+* params - {"channel": InputChannel, "users": [InputUser], }
 
 ```
 

@@ -22,13 +22,13 @@ Currently there is no any information about the user except user_id. It can happ
 ### Example:
 
 ```
-$userTypeUnknown = ['_' => 'userTypeUnknown', ];
+$userTypeUnknown = ['_' => 'userTypeUnknown'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userTypeUnknown"}
+{"_": "userTypeUnknown"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-userTypeUnknown={_='userTypeUnknown', }
+userTypeUnknown={_='userTypeUnknown'}
 
 ```
 

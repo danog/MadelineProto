@@ -23,13 +23,13 @@ description: bad_msg_notification attributes, type and example
 ### Example:
 
 ```
-$bad_msg_notification = ['_' => 'bad_msg_notification', 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int, ];
+$bad_msg_notification = ['_' => 'bad_msg_notification', 'bad_msg_id' => long, 'bad_msg_seqno' => int, 'error_code' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"bad_msg_notification","bad_msg_id":"long","bad_msg_seqno":"int","error_code":"int"}
+{"_": "bad_msg_notification", "bad_msg_id": long, "bad_msg_seqno": int, "error_code": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-bad_msg_notification={_='bad_msg_notification', bad_msg_id=long, bad_msg_seqno=int, error_code=int, }
+bad_msg_notification={_='bad_msg_notification', bad_msg_id=long, bad_msg_seqno=int, error_code=int}
 
 ```
 

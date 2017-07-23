@@ -23,13 +23,13 @@ Represents list of all emojis corresponding to a sticker in a sticker set. The l
 ### Example:
 
 ```
-$stickerEmojis = ['_' => 'stickerEmojis', 'emojis' => [string], ];
+$stickerEmojis = ['_' => 'stickerEmojis', 'emojis' => ['string']];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerEmojis","emojis":["string"]}
+{"_": "stickerEmojis", "emojis": ["string"]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerEmojis={_='stickerEmojis', emojis={string}, }
+stickerEmojis={_='stickerEmojis', emojis={'string'}}
 
 ```
 

@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getDialogs
-* params - {"offset_date":"int","offset_id":"int","offset_peer":"InputPeer","limit":"int"}
+* params - {"offset_date": int, "offset_id": int, "offset_peer": InputPeer, "limit": int, }
 
 ```
 

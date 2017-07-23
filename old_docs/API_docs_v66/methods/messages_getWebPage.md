@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$WebPage = $MadelineProto->messages->getWebPage(['url' => string, 'hash' => int, ]);
+$WebPage = $MadelineProto->messages->getWebPage(['url' => 'string', 'hash' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getWebPage
-* params - {"url":"string","hash":"int"}
+* params - {"url": "string", "hash": int, }
 
 ```
 
@@ -65,6 +65,6 @@ hash - Json encoded int
 Or, if you're into Lua:
 
 ```
-WebPage = messages.getWebPage({url=string, hash=int, })
+WebPage = messages.getWebPage({url='string', hash=int, })
 ```
 

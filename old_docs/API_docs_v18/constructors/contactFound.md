@@ -21,13 +21,13 @@ description: contactFound attributes, type and example
 ### Example:
 
 ```
-$contactFound = ['_' => 'contactFound', 'user_id' => int, ];
+$contactFound = ['_' => 'contactFound', 'user_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contactFound","user_id":"int"}
+{"_": "contactFound", "user_id": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-contactFound={_='contactFound', user_id=int, }
+contactFound={_='contactFound', user_id=int}
 
 ```
 

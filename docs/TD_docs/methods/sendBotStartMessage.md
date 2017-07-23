@@ -40,7 +40,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->sendBotStartMessage(['bot_user_id' => int, 'chat_id' => InputPeer, 'parameter' => string, ]);
+$Message = $MadelineProto->sendBotStartMessage(['bot_user_id' => int, 'chat_id' => InputPeer, 'parameter' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - sendBotStartMessage
-* params - {"bot_user_id":"int","chat_id":"InputPeer","parameter":"string"}
+* params - {"bot_user_id": int, "chat_id": InputPeer, "parameter": "string", }
 
 ```
 
@@ -72,6 +72,6 @@ parameter - Json encoded string
 Or, if you're into Lua:
 
 ```
-Message = sendBotStartMessage({bot_user_id=int, chat_id=InputPeer, parameter=string, })
+Message = sendBotStartMessage({bot_user_id=int, chat_id=InputPeer, parameter='string', })
 ```
 

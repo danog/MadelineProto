@@ -22,13 +22,13 @@ description: messages_chatsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_chatsSlice = ['_' => 'messages.chatsSlice', 'count' => int, 'chats' => [Chat], ];
+$messages_chatsSlice = ['_' => 'messages.chatsSlice', 'count' => int, 'chats' => [Chat]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.chatsSlice","count":"int","chats":["Chat"]}
+{"_": "messages.chatsSlice", "count": int, "chats": [Chat]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_chatsSlice={_='messages.chatsSlice', count=int, chats={Chat}, }
+messages_chatsSlice={_='messages.chatsSlice', count=int, chats={Chat}}
 
 ```
 

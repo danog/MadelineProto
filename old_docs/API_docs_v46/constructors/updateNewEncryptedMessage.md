@@ -22,13 +22,13 @@ description: updateNewEncryptedMessage attributes, type and example
 ### Example:
 
 ```
-$updateNewEncryptedMessage = ['_' => 'updateNewEncryptedMessage', 'encr_message' => EncryptedMessage, 'qts' => int, ];
+$updateNewEncryptedMessage = ['_' => 'updateNewEncryptedMessage', 'encr_message' => EncryptedMessage, 'qts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewEncryptedMessage","encr_message":"EncryptedMessage","qts":"int"}
+{"_": "updateNewEncryptedMessage", "encr_message": EncryptedMessage, "qts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewEncryptedMessage={_='updateNewEncryptedMessage', encr_message=EncryptedMessage, qts=int, }
+updateNewEncryptedMessage={_='updateNewEncryptedMessage', encr_message=EncryptedMessage, qts=int}
 
 ```
 

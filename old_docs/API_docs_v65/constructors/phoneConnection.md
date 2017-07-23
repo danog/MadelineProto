@@ -25,13 +25,13 @@ description: phoneConnection attributes, type and example
 ### Example:
 
 ```
-$phoneConnection = ['_' => 'phoneConnection', 'id' => long, 'ip' => string, 'ipv6' => string, 'port' => int, 'peer_tag' => bytes, ];
+$phoneConnection = ['_' => 'phoneConnection', 'id' => long, 'ip' => 'string', 'ipv6' => 'string', 'port' => int, 'peer_tag' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"phoneConnection","id":"long","ip":"string","ipv6":"string","port":"int","peer_tag":"bytes"}
+{"_": "phoneConnection", "id": long, "ip": "string", "ipv6": "string", "port": int, "peer_tag": "bytes"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-phoneConnection={_='phoneConnection', id=long, ip=string, ipv6=string, port=int, peer_tag=bytes, }
+phoneConnection={_='phoneConnection', id=long, ip='string', ipv6='string', port=int, peer_tag='bytes'}
 
 ```
 

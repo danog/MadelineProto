@@ -37,7 +37,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->contest->saveDeveloperInfo(['vk_id' => int, 'name' => string, 'phone_number' => string, 'age' => int, 'city' => string, ]);
+$Bool = $MadelineProto->contest->saveDeveloperInfo(['vk_id' => int, 'name' => 'string', 'phone_number' => 'string', 'age' => int, 'city' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contest.saveDeveloperInfo
-* params - {"vk_id":"int","name":"string","phone_number":"string","age":"int","city":"string"}
+* params - {"vk_id": int, "name": "string", "phone_number": "string", "age": int, "city": "string", }
 
 ```
 
@@ -71,6 +71,6 @@ city - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = contest.saveDeveloperInfo({vk_id=int, name=string, phone_number=string, age=int, city=string, })
+Bool = contest.saveDeveloperInfo({vk_id=int, name='string', phone_number='string', age=int, city='string', })
 ```
 

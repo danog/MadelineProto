@@ -21,13 +21,13 @@ description: messageMediaGeo attributes, type and example
 ### Example:
 
 ```
-$messageMediaGeo = ['_' => 'messageMediaGeo', 'geo' => GeoPoint, ];
+$messageMediaGeo = ['_' => 'messageMediaGeo', 'geo' => GeoPoint];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaGeo","geo":"GeoPoint"}
+{"_": "messageMediaGeo", "geo": GeoPoint}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaGeo={_='messageMediaGeo', geo=GeoPoint, }
+messageMediaGeo={_='messageMediaGeo', geo=GeoPoint}
 
 ```
 

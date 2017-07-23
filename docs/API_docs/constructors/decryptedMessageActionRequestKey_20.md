@@ -22,13 +22,13 @@ description: decryptedMessageActionRequestKey attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionRequestKey_20 = ['_' => 'decryptedMessageActionRequestKey', 'exchange_id' => long, 'g_a' => bytes, ];
+$decryptedMessageActionRequestKey_20 = ['_' => 'decryptedMessageActionRequestKey', 'exchange_id' => long, 'g_a' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionRequestKey","exchange_id":"long","g_a":"bytes"}
+{"_": "decryptedMessageActionRequestKey", "exchange_id": long, "g_a": "bytes"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionRequestKey_20={_='decryptedMessageActionRequestKey', exchange_id=long, g_a=bytes, }
+decryptedMessageActionRequestKey_20={_='decryptedMessageActionRequestKey', exchange_id=long, g_a='bytes'}
 
 ```
 

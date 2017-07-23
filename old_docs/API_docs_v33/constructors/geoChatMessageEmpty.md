@@ -22,13 +22,13 @@ description: geoChatMessageEmpty attributes, type and example
 ### Example:
 
 ```
-$geoChatMessageEmpty = ['_' => 'geoChatMessageEmpty', 'chat_id' => int, 'id' => int, ];
+$geoChatMessageEmpty = ['_' => 'geoChatMessageEmpty', 'chat_id' => int, 'id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geoChatMessageEmpty","chat_id":"int","id":"int"}
+{"_": "geoChatMessageEmpty", "chat_id": int, "id": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-geoChatMessageEmpty={_='geoChatMessageEmpty', chat_id=int, id=int, }
+geoChatMessageEmpty={_='geoChatMessageEmpty', chat_id=int, id=int}
 
 ```
 

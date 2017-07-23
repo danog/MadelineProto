@@ -23,13 +23,13 @@ description: pagePart attributes, type and example
 ### Example:
 
 ```
-$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document], ];
+$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pagePart","blocks":["PageBlock"],"photos":["Photo"],"documents":["Document"]}
+{"_": "pagePart", "blocks": [PageBlock], "photos": [Photo], "documents": [Document]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-pagePart={_='pagePart', blocks={PageBlock}, photos={Photo}, documents={Document}, }
+pagePart={_='pagePart', blocks={PageBlock}, photos={Photo}, documents={Document}}
 
 ```
 

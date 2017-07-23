@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.uploadProfilePhoto
-* params - {"file":"InputFile"}
+* params - {"file": InputFile, }
 
 ```
 

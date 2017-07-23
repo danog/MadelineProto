@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getDifference
-* params - {"from_version":"int"}
+* params - {"from_version": int, }
 
 ```
 

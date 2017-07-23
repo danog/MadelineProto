@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - clearRecentStickers
-* params - {"is_attached":"Bool"}
+* params - {"is_attached": Bool, }
 
 ```
 

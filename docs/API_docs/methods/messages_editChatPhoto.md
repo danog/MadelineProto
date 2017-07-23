@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editChatPhoto
-* params - {"chat_id":"InputPeer","photo":"InputChatPhoto"}
+* params - {"chat_id": InputPeer, "photo": InputChatPhoto, }
 
 ```
 

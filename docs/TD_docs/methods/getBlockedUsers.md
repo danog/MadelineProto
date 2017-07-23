@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getBlockedUsers
-* params - {"offset":"int","limit":"int"}
+* params - {"offset": int, "limit": int, }
 
 ```
 

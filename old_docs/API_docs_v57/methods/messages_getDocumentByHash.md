@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Document = $MadelineProto->messages->getDocumentByHash(['sha256' => bytes, 'size' => int, 'mime_type' => string, ]);
+$Document = $MadelineProto->messages->getDocumentByHash(['sha256' => 'bytes', 'size' => int, 'mime_type' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getDocumentByHash
-* params - {"sha256":"bytes","size":"int","mime_type":"string"}
+* params - {"sha256": "bytes", "size": int, "mime_type": "string", }
 
 ```
 
@@ -67,6 +67,6 @@ mime_type - Json encoded string
 Or, if you're into Lua:
 
 ```
-Document = messages.getDocumentByHash({sha256=bytes, size=int, mime_type=string, })
+Document = messages.getDocumentByHash({sha256='bytes', size=int, mime_type='string', })
 ```
 

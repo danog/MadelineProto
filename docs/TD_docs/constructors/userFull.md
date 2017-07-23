@@ -27,13 +27,13 @@ Gives full information about a user (except full list of profile photos)
 ### Example:
 
 ```
-$userFull = ['_' => 'userFull', 'user' => user, 'is_blocked' => Bool, 'about' => string, 'common_chat_count' => int, 'bot_info' => botInfo, ];
+$userFull = ['_' => 'userFull', 'user' => user, 'is_blocked' => Bool, 'about' => 'string', 'common_chat_count' => int, 'bot_info' => botInfo];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userFull","user":"user","is_blocked":"Bool","about":"string","common_chat_count":"int","bot_info":"botInfo"}
+{"_": "userFull", "user": user, "is_blocked": Bool, "about": "string", "common_chat_count": int, "bot_info": botInfo}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-userFull={_='userFull', user=user, is_blocked=Bool, about=string, common_chat_count=int, bot_info=botInfo, }
+userFull={_='userFull', user=user, is_blocked=Bool, about='string', common_chat_count=int, bot_info=botInfo}
 
 ```
 

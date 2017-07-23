@@ -21,13 +21,13 @@ description: inputStickerSetShortName attributes, type and example
 ### Example:
 
 ```
-$inputStickerSetShortName = ['_' => 'inputStickerSetShortName', 'short_name' => string, ];
+$inputStickerSetShortName = ['_' => 'inputStickerSetShortName', 'short_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputStickerSetShortName","short_name":"string"}
+{"_": "inputStickerSetShortName", "short_name": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputStickerSetShortName={_='inputStickerSetShortName', short_name=string, }
+inputStickerSetShortName={_='inputStickerSetShortName', short_name='string'}
 
 ```
 

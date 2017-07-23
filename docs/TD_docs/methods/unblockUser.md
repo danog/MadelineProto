@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - unblockUser
-* params - {"user_id":"int"}
+* params - {"user_id": int, }
 
 ```
 

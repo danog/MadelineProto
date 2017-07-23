@@ -23,13 +23,13 @@ description: updateWebPage attributes, type and example
 ### Example:
 
 ```
-$updateWebPage = ['_' => 'updateWebPage', 'webpage' => WebPage, 'pts' => int, 'pts_count' => int, ];
+$updateWebPage = ['_' => 'updateWebPage', 'webpage' => WebPage, 'pts' => int, 'pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateWebPage","webpage":"WebPage","pts":"int","pts_count":"int"}
+{"_": "updateWebPage", "webpage": WebPage, "pts": int, "pts_count": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateWebPage={_='updateWebPage', webpage=WebPage, pts=int, pts_count=int, }
+updateWebPage={_='updateWebPage', webpage=WebPage, pts=int, pts_count=int}
 
 ```
 

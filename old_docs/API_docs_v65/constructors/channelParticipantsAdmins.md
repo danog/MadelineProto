@@ -16,13 +16,13 @@ description: channelParticipantsAdmins attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsAdmins = ['_' => 'channelParticipantsAdmins', ];
+$channelParticipantsAdmins = ['_' => 'channelParticipantsAdmins'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelParticipantsAdmins"}
+{"_": "channelParticipantsAdmins"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-channelParticipantsAdmins={_='channelParticipantsAdmins', }
+channelParticipantsAdmins={_='channelParticipantsAdmins'}
 
 ```
 

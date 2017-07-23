@@ -21,13 +21,13 @@ description: pageBlockSubheader attributes, type and example
 ### Example:
 
 ```
-$pageBlockSubheader = ['_' => 'pageBlockSubheader', 'text' => RichText, ];
+$pageBlockSubheader = ['_' => 'pageBlockSubheader', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockSubheader","text":"RichText"}
+{"_": "pageBlockSubheader", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockSubheader={_='pageBlockSubheader', text=RichText, }
+pageBlockSubheader={_='pageBlockSubheader', text=RichText}
 
 ```
 

@@ -16,13 +16,13 @@ description: help_appChangelogEmpty attributes, type and example
 ### Example:
 
 ```
-$help_appChangelogEmpty = ['_' => 'help.appChangelogEmpty', ];
+$help_appChangelogEmpty = ['_' => 'help.appChangelogEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.appChangelogEmpty"}
+{"_": "help.appChangelogEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-help_appChangelogEmpty={_='help.appChangelogEmpty', }
+help_appChangelogEmpty={_='help.appChangelogEmpty'}
 
 ```
 

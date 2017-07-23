@@ -24,13 +24,13 @@ Contains information about draft of a message
 ### Example:
 
 ```
-$draftMessage = ['_' => 'draftMessage', 'reply_to_message_id' => long, 'input_message_text' => InputMessageContent, ];
+$draftMessage = ['_' => 'draftMessage', 'reply_to_message_id' => long, 'input_message_text' => InputMessageContent];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"draftMessage","reply_to_message_id":"long","input_message_text":"InputMessageContent"}
+{"_": "draftMessage", "reply_to_message_id": long, "input_message_text": InputMessageContent}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-draftMessage={_='draftMessage', reply_to_message_id=long, input_message_text=InputMessageContent, }
+draftMessage={_='draftMessage', reply_to_message_id=long, input_message_text=InputMessageContent}
 
 ```
 

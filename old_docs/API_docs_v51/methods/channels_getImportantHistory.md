@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.getImportantHistory
-* params - {"channel":"InputChannel","offset_id":"int","offset_date":"int","add_offset":"int","limit":"int","max_id":"int","min_id":"int"}
+* params - {"channel": InputChannel, "offset_id": int, "offset_date": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }
 
 ```
 

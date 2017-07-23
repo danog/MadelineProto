@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.toggleInvites
-* params - {"channel":"InputChannel","enabled":"Bool"}
+* params - {"channel": InputChannel, "enabled": Bool, }
 
 ```
 

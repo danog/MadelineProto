@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - ping_delay_disconnect
-* params - {"ping_id":"long","disconnect_delay":"int"}
+* params - {"ping_id": long, "disconnect_delay": int, }
 
 ```
 

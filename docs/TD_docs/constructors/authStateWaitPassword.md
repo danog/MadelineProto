@@ -25,13 +25,13 @@ User is authorized but he needs to enter its password to begin to use applicatio
 ### Example:
 
 ```
-$authStateWaitPassword = ['_' => 'authStateWaitPassword', 'password_hint' => string, 'has_recovery_email' => Bool, 'recovery_email_pattern' => string, ];
+$authStateWaitPassword = ['_' => 'authStateWaitPassword', 'password_hint' => 'string', 'has_recovery_email' => Bool, 'recovery_email_pattern' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"authStateWaitPassword","password_hint":"string","has_recovery_email":"Bool","recovery_email_pattern":"string"}
+{"_": "authStateWaitPassword", "password_hint": "string", "has_recovery_email": Bool, "recovery_email_pattern": "string"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-authStateWaitPassword={_='authStateWaitPassword', password_hint=string, has_recovery_email=Bool, recovery_email_pattern=string, }
+authStateWaitPassword={_='authStateWaitPassword', password_hint='string', has_recovery_email=Bool, recovery_email_pattern='string'}
 
 ```
 

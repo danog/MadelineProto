@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_SentCode = $MadelineProto->account->sendChangePhoneCode(['allow_flashcall' => Bool, 'phone_number' => string, 'current_number' => Bool, ]);
+$auth_SentCode = $MadelineProto->account->sendChangePhoneCode(['allow_flashcall' => Bool, 'phone_number' => 'string', 'current_number' => Bool, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.sendChangePhoneCode
-* params - {"allow_flashcall":"Bool","phone_number":"string","current_number":"Bool"}
+* params - {"allow_flashcall": Bool, "phone_number": "string", "current_number": Bool, }
 
 ```
 
@@ -67,6 +67,6 @@ current_number - Json encoded Bool
 Or, if you're into Lua:
 
 ```
-auth_SentCode = account.sendChangePhoneCode({allow_flashcall=Bool, phone_number=string, current_number=Bool, })
+auth_SentCode = account.sendChangePhoneCode({allow_flashcall=Bool, phone_number='string', current_number=Bool, })
 ```
 

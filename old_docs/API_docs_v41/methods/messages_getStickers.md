@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Stickers = $MadelineProto->messages->getStickers(['emoticon' => string, 'hash' => string, ]);
+$messages_Stickers = $MadelineProto->messages->getStickers(['emoticon' => 'string', 'hash' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getStickers
-* params - {"emoticon":"string","hash":"string"}
+* params - {"emoticon": "string", "hash": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ hash - Json encoded string
 Or, if you're into Lua:
 
 ```
-messages_Stickers = messages.getStickers({emoticon=string, hash=string, })
+messages_Stickers = messages.getStickers({emoticon='string', hash='string', })
 ```
 

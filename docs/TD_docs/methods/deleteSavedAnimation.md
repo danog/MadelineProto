@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteSavedAnimation
-* params - {"animation":"InputFile"}
+* params - {"animation": InputFile, }
 
 ```
 

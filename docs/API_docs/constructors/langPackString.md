@@ -22,13 +22,13 @@ description: langPackString attributes, type and example
 ### Example:
 
 ```
-$langPackString = ['_' => 'langPackString', 'key' => string, 'value' => string, ];
+$langPackString = ['_' => 'langPackString', 'key' => 'string', 'value' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"langPackString","key":"string","value":"string"}
+{"_": "langPackString", "key": "string", "value": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-langPackString={_='langPackString', key=string, value=string, }
+langPackString={_='langPackString', key='string', value='string'}
 
 ```
 

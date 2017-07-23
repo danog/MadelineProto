@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->phone->setCallRating(['peer' => InputPhoneCall, 'rating' => int, 'comment' => string, ]);
+$Updates = $MadelineProto->phone->setCallRating(['peer' => InputPhoneCall, 'rating' => int, 'comment' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.setCallRating
-* params - {"peer":"InputPhoneCall","rating":"int","comment":"string"}
+* params - {"peer": InputPhoneCall, "rating": int, "comment": "string", }
 
 ```
 
@@ -67,6 +67,6 @@ comment - Json encoded string
 Or, if you're into Lua:
 
 ```
-Updates = phone.setCallRating({peer=InputPhoneCall, rating=int, comment=string, })
+Updates = phone.setCallRating({peer=InputPhoneCall, rating=int, comment='string', })
 ```
 

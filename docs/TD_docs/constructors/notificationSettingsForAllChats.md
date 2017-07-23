@@ -22,13 +22,13 @@ Notification settings applied to all chats
 ### Example:
 
 ```
-$notificationSettingsForAllChats = ['_' => 'notificationSettingsForAllChats', ];
+$notificationSettingsForAllChats = ['_' => 'notificationSettingsForAllChats'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"notificationSettingsForAllChats"}
+{"_": "notificationSettingsForAllChats"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-notificationSettingsForAllChats={_='notificationSettingsForAllChats', }
+notificationSettingsForAllChats={_='notificationSettingsForAllChats'}
 
 ```
 

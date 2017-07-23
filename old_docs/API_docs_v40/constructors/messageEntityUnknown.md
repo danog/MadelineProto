@@ -22,13 +22,13 @@ description: messageEntityUnknown attributes, type and example
 ### Example:
 
 ```
-$messageEntityUnknown = ['_' => 'messageEntityUnknown', 'offset' => int, 'length' => int, ];
+$messageEntityUnknown = ['_' => 'messageEntityUnknown', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityUnknown","offset":"int","length":"int"}
+{"_": "messageEntityUnknown", "offset": int, "length": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityUnknown={_='messageEntityUnknown', offset=int, length=int, }
+messageEntityUnknown={_='messageEntityUnknown', offset=int, length=int}
 
 ```
 

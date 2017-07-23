@@ -22,13 +22,13 @@ description: inputChatUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputChatUploadedPhoto = ['_' => 'inputChatUploadedPhoto', 'file' => InputFile, 'crop' => InputPhotoCrop, ];
+$inputChatUploadedPhoto = ['_' => 'inputChatUploadedPhoto', 'file' => InputFile, 'crop' => InputPhotoCrop];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputChatUploadedPhoto","file":"InputFile","crop":"InputPhotoCrop"}
+{"_": "inputChatUploadedPhoto", "file": InputFile, "crop": InputPhotoCrop}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputChatUploadedPhoto={_='inputChatUploadedPhoto', file=InputFile, crop=InputPhotoCrop, }
+inputChatUploadedPhoto={_='inputChatUploadedPhoto', file=InputFile, crop=InputPhotoCrop}
 
 ```
 

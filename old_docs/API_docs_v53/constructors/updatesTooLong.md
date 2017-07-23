@@ -16,13 +16,13 @@ description: updatesTooLong attributes, type and example
 ### Example:
 
 ```
-$updatesTooLong = ['_' => 'updatesTooLong', ];
+$updatesTooLong = ['_' => 'updatesTooLong'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updatesTooLong"}
+{"_": "updatesTooLong"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-updatesTooLong={_='updatesTooLong', }
+updatesTooLong={_='updatesTooLong'}
 
 ```
 

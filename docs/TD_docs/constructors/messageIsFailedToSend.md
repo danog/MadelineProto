@@ -22,13 +22,13 @@ Message is failed to send
 ### Example:
 
 ```
-$messageIsFailedToSend = ['_' => 'messageIsFailedToSend', ];
+$messageIsFailedToSend = ['_' => 'messageIsFailedToSend'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageIsFailedToSend"}
+{"_": "messageIsFailedToSend"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageIsFailedToSend={_='messageIsFailedToSend', }
+messageIsFailedToSend={_='messageIsFailedToSend'}
 
 ```
 

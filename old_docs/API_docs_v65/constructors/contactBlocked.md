@@ -22,13 +22,13 @@ description: contactBlocked attributes, type and example
 ### Example:
 
 ```
-$contactBlocked = ['_' => 'contactBlocked', 'user_id' => int, 'date' => int, ];
+$contactBlocked = ['_' => 'contactBlocked', 'user_id' => int, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contactBlocked","user_id":"int","date":"int"}
+{"_": "contactBlocked", "user_id": int, "date": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-contactBlocked={_='contactBlocked', user_id=int, date=int, }
+contactBlocked={_='contactBlocked', user_id=int, date=int}
 
 ```
 

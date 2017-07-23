@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - createGroupChat
-* params - {"group_id":"int"}
+* params - {"group_id": int, }
 
 ```
 

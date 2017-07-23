@@ -22,13 +22,13 @@ description: pageBlockBlockquote attributes, type and example
 ### Example:
 
 ```
-$pageBlockBlockquote = ['_' => 'pageBlockBlockquote', 'text' => RichText, 'caption' => RichText, ];
+$pageBlockBlockquote = ['_' => 'pageBlockBlockquote', 'text' => RichText, 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockBlockquote","text":"RichText","caption":"RichText"}
+{"_": "pageBlockBlockquote", "text": RichText, "caption": RichText}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockBlockquote={_='pageBlockBlockquote', text=RichText, caption=RichText, }
+pageBlockBlockquote={_='pageBlockBlockquote', text=RichText, caption=RichText}
 
 ```
 

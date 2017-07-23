@@ -24,13 +24,13 @@ Some option changed its value
 ### Example:
 
 ```
-$updateOption = ['_' => 'updateOption', 'name' => string, 'value' => OptionValue, ];
+$updateOption = ['_' => 'updateOption', 'name' => 'string', 'value' => OptionValue];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateOption","name":"string","value":"OptionValue"}
+{"_": "updateOption", "name": "string", "value": OptionValue}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateOption={_='updateOption', name=string, value=OptionValue, }
+updateOption={_='updateOption', name='string', value=OptionValue}
 
 ```
 

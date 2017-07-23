@@ -22,13 +22,13 @@ Other user's phone number doesn't known
 ### Example:
 
 ```
-$linkStateNone = ['_' => 'linkStateNone', ];
+$linkStateNone = ['_' => 'linkStateNone'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"linkStateNone"}
+{"_": "linkStateNone"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-linkStateNone={_='linkStateNone', }
+linkStateNone={_='linkStateNone'}
 
 ```
 

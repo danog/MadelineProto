@@ -26,13 +26,13 @@ Represents a photo cached on the telegram server
 ### Example:
 
 ```
-$inlineQueryResultPhoto = ['_' => 'inlineQueryResultPhoto', 'id' => string, 'photo' => photo, 'title' => string, 'description' => string, ];
+$inlineQueryResultPhoto = ['_' => 'inlineQueryResultPhoto', 'id' => 'string', 'photo' => photo, 'title' => 'string', 'description' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultPhoto","id":"string","photo":"photo","title":"string","description":"string"}
+{"_": "inlineQueryResultPhoto", "id": "string", "photo": photo, "title": "string", "description": "string"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultPhoto={_='inlineQueryResultPhoto', id=string, photo=photo, title=string, description=string, }
+inlineQueryResultPhoto={_='inlineQueryResultPhoto', id='string', photo=photo, title='string', description='string'}
 
 ```
 

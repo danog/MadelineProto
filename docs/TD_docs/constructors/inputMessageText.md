@@ -27,13 +27,13 @@ Text message
 ### Example:
 
 ```
-$inputMessageText = ['_' => 'inputMessageText', 'text' => string, 'disable_web_page_preview' => Bool, 'clear_draft' => Bool, 'entities' => [MessageEntity], 'parse_mode' => TextParseMode, ];
+$inputMessageText = ['_' => 'inputMessageText', 'text' => 'string', 'disable_web_page_preview' => Bool, 'clear_draft' => Bool, 'entities' => [MessageEntity], 'parse_mode' => TextParseMode];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessageText","text":"string","disable_web_page_preview":"Bool","clear_draft":"Bool","entities":["MessageEntity"],"parse_mode":"TextParseMode"}
+{"_": "inputMessageText", "text": "string", "disable_web_page_preview": Bool, "clear_draft": Bool, "entities": [MessageEntity], "parse_mode": TextParseMode}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessageText={_='inputMessageText', text=string, disable_web_page_preview=Bool, clear_draft=Bool, entities={MessageEntity}, parse_mode=TextParseMode, }
+inputMessageText={_='inputMessageText', text='string', disable_web_page_preview=Bool, clear_draft=Bool, entities={MessageEntity}, parse_mode=TextParseMode}
 
 ```
 

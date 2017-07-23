@@ -21,13 +21,13 @@ description: pageBlockCover attributes, type and example
 ### Example:
 
 ```
-$pageBlockCover = ['_' => 'pageBlockCover', 'cover' => PageBlock, ];
+$pageBlockCover = ['_' => 'pageBlockCover', 'cover' => PageBlock];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockCover","cover":"PageBlock"}
+{"_": "pageBlockCover", "cover": PageBlock}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockCover={_='pageBlockCover', cover=PageBlock, }
+pageBlockCover={_='pageBlockCover', cover=PageBlock}
 
 ```
 

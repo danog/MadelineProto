@@ -24,13 +24,13 @@ Contains information about one wallpaper
 ### Example:
 
 ```
-$wallpaper = ['_' => 'wallpaper', 'sizes' => [photoSize], 'color' => int, ];
+$wallpaper = ['_' => 'wallpaper', 'sizes' => [photoSize], 'color' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"wallpaper","sizes":["photoSize"],"color":"int"}
+{"_": "wallpaper", "sizes": [photoSize], "color": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-wallpaper={_='wallpaper', sizes={photoSize}, color=int, }
+wallpaper={_='wallpaper', sizes={photoSize}, color=int}
 
 ```
 

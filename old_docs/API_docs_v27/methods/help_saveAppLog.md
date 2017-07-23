@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.saveAppLog
-* params - {"events":["InputAppEvent"]}
+* params - {"events": [InputAppEvent], }
 
 ```
 

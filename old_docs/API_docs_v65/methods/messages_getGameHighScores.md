@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getGameHighScores
-* params - {"peer":"InputPeer","id":"int","user_id":"InputUser"}
+* params - {"peer": InputPeer, "id": int, "user_id": InputUser, }
 
 ```
 

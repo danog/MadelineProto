@@ -24,13 +24,13 @@ A button which forces inline query to the bot to be substitued in the input fiel
 ### Example:
 
 ```
-$inlineKeyboardButtonTypeSwitchInline = ['_' => 'inlineKeyboardButtonTypeSwitchInline', 'query' => string, 'in_current_chat' => Bool, ];
+$inlineKeyboardButtonTypeSwitchInline = ['_' => 'inlineKeyboardButtonTypeSwitchInline', 'query' => 'string', 'in_current_chat' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineKeyboardButtonTypeSwitchInline","query":"string","in_current_chat":"Bool"}
+{"_": "inlineKeyboardButtonTypeSwitchInline", "query": "string", "in_current_chat": Bool}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineKeyboardButtonTypeSwitchInline={_='inlineKeyboardButtonTypeSwitchInline', query=string, in_current_chat=Bool, }
+inlineKeyboardButtonTypeSwitchInline={_='inlineKeyboardButtonTypeSwitchInline', query='string', in_current_chat=Bool}
 
 ```
 

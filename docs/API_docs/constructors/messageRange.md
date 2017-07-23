@@ -22,13 +22,13 @@ description: messageRange attributes, type and example
 ### Example:
 
 ```
-$messageRange = ['_' => 'messageRange', 'min_id' => int, 'max_id' => int, ];
+$messageRange = ['_' => 'messageRange', 'min_id' => int, 'max_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageRange","min_id":"int","max_id":"int"}
+{"_": "messageRange", "min_id": int, "max_id": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageRange={_='messageRange', min_id=int, max_id=int, }
+messageRange={_='messageRange', min_id=int, max_id=int}
 
 ```
 

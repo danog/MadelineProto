@@ -23,13 +23,13 @@ File is downloaded/uploaded
 ### Example:
 
 ```
-$updateFile = ['_' => 'updateFile', 'file' => file, ];
+$updateFile = ['_' => 'updateFile', 'file' => file];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateFile","file":"file"}
+{"_": "updateFile", "file": file}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateFile={_='updateFile', file=file, }
+updateFile={_='updateFile', file=file}
 
 ```
 

@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->setInlineBotResults(['gallery' => Bool, 'private' => Bool, 'query_id' => long, 'results' => [InputBotInlineResult], 'cache_time' => int, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, ]);
+$Bool = $MadelineProto->messages->setInlineBotResults(['gallery' => Bool, 'private' => Bool, 'query_id' => long, 'results' => [InputBotInlineResult], 'cache_time' => int, 'next_offset' => 'string', 'switch_pm' => InlineBotSwitchPM, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setInlineBotResults
-* params - {"gallery":"Bool","private":"Bool","query_id":"long","results":["InputBotInlineResult"],"cache_time":"int","next_offset":"string","switch_pm":"InlineBotSwitchPM"}
+* params - {"gallery": Bool, "private": Bool, "query_id": long, "results": [InputBotInlineResult], "cache_time": int, "next_offset": "string", "switch_pm": InlineBotSwitchPM, }
 
 ```
 
@@ -75,6 +75,6 @@ switch_pm - Json encoded InlineBotSwitchPM
 Or, if you're into Lua:
 
 ```
-Bool = messages.setInlineBotResults({gallery=Bool, private=Bool, query_id=long, results={InputBotInlineResult}, cache_time=int, next_offset=string, switch_pm=InlineBotSwitchPM, })
+Bool = messages.setInlineBotResults({gallery=Bool, private=Bool, query_id=long, results={InputBotInlineResult}, cache_time=int, next_offset='string', switch_pm=InlineBotSwitchPM, })
 ```
 

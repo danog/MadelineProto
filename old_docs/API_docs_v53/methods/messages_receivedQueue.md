@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.receivedQueue
-* params - {"max_qts":"int"}
+* params - {"max_qts": int, }
 
 ```
 

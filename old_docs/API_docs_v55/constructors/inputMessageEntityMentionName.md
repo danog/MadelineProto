@@ -23,13 +23,13 @@ description: inputMessageEntityMentionName attributes, type and example
 ### Example:
 
 ```
-$inputMessageEntityMentionName = ['_' => 'inputMessageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => InputUser, ];
+$inputMessageEntityMentionName = ['_' => 'inputMessageEntityMentionName', 'offset' => int, 'length' => int, 'user_id' => InputUser];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessageEntityMentionName","offset":"int","length":"int","user_id":"InputUser"}
+{"_": "inputMessageEntityMentionName", "offset": int, "length": int, "user_id": InputUser}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessageEntityMentionName={_='inputMessageEntityMentionName', offset=int, length=int, user_id=InputUser, }
+inputMessageEntityMentionName={_='inputMessageEntityMentionName', offset=int, length=int, user_id=InputUser}
 
 ```
 

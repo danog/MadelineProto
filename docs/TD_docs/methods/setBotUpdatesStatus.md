@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->setBotUpdatesStatus(['pending_update_count' => int, 'error_message' => string, ]);
+$Ok = $MadelineProto->setBotUpdatesStatus(['pending_update_count' => int, 'error_message' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setBotUpdatesStatus
-* params - {"pending_update_count":"int","error_message":"string"}
+* params - {"pending_update_count": int, "error_message": "string", }
 
 ```
 
@@ -70,6 +70,6 @@ error_message - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = setBotUpdatesStatus({pending_update_count=int, error_message=string, })
+Ok = setBotUpdatesStatus({pending_update_count=int, error_message='string', })
 ```
 

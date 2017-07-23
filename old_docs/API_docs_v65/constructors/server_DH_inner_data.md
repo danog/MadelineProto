@@ -26,13 +26,13 @@ description: server_DH_inner_data attributes, type and example
 ### Example:
 
 ```
-$server_DH_inner_data = ['_' => 'server_DH_inner_data', 'nonce' => int128, 'server_nonce' => int128, 'g' => int, 'dh_prime' => string, 'g_a' => string, 'server_time' => int, ];
+$server_DH_inner_data = ['_' => 'server_DH_inner_data', 'nonce' => int128, 'server_nonce' => int128, 'g' => int, 'dh_prime' => 'string', 'g_a' => 'string', 'server_time' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"server_DH_inner_data","nonce":"int128","server_nonce":"int128","g":"int","dh_prime":"string","g_a":"string","server_time":"int"}
+{"_": "server_DH_inner_data", "nonce": int128, "server_nonce": int128, "g": int, "dh_prime": "string", "g_a": "string", "server_time": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-server_DH_inner_data={_='server_DH_inner_data', nonce=int128, server_nonce=int128, g=int, dh_prime=string, g_a=string, server_time=int, }
+server_DH_inner_data={_='server_DH_inner_data', nonce=int128, server_nonce=int128, g=int, dh_prime='string', g_a='string', server_time=int}
 
 ```
 

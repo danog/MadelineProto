@@ -21,13 +21,13 @@ description: inputNotifyGeoChatPeer attributes, type and example
 ### Example:
 
 ```
-$inputNotifyGeoChatPeer = ['_' => 'inputNotifyGeoChatPeer', 'peer' => InputGeoChat, ];
+$inputNotifyGeoChatPeer = ['_' => 'inputNotifyGeoChatPeer', 'peer' => InputGeoChat];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputNotifyGeoChatPeer","peer":"InputGeoChat"}
+{"_": "inputNotifyGeoChatPeer", "peer": InputGeoChat}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputNotifyGeoChatPeer={_='inputNotifyGeoChatPeer', peer=InputGeoChat, }
+inputNotifyGeoChatPeer={_='inputNotifyGeoChatPeer', peer=InputGeoChat}
 
 ```
 

@@ -16,13 +16,13 @@ description: updateConfig attributes, type and example
 ### Example:
 
 ```
-$updateConfig = ['_' => 'updateConfig', ];
+$updateConfig = ['_' => 'updateConfig'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateConfig"}
+{"_": "updateConfig"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-updateConfig={_='updateConfig', }
+updateConfig={_='updateConfig'}
 
 ```
 

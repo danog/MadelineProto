@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - toggleGroupEditors
-* params - {"group_id":"int","anyone_can_edit":"Bool"}
+* params - {"group_id": int, "anyone_can_edit": Bool, }
 
 ```
 

@@ -23,13 +23,13 @@ Chat photo changed
 ### Example:
 
 ```
-$messageChatChangePhoto = ['_' => 'messageChatChangePhoto', 'photo' => photo, ];
+$messageChatChangePhoto = ['_' => 'messageChatChangePhoto', 'photo' => photo];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageChatChangePhoto","photo":"photo"}
+{"_": "messageChatChangePhoto", "photo": photo}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageChatChangePhoto={_='messageChatChangePhoto', photo=photo, }
+messageChatChangePhoto={_='messageChatChangePhoto', photo=photo}
 
 ```
 

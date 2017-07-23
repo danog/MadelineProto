@@ -24,13 +24,13 @@ Describes chat photo
 ### Example:
 
 ```
-$chatPhoto = ['_' => 'chatPhoto', 'small' => file, 'big' => file, ];
+$chatPhoto = ['_' => 'chatPhoto', 'small' => file, 'big' => file];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatPhoto","small":"file","big":"file"}
+{"_": "chatPhoto", "small": file, "big": file}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-chatPhoto={_='chatPhoto', small=file, big=file, }
+chatPhoto={_='chatPhoto', small=file, big=file}
 
 ```
 

@@ -23,13 +23,13 @@ Represents list of animations
 ### Example:
 
 ```
-$animations = ['_' => 'animations', 'animations' => [animation], ];
+$animations = ['_' => 'animations', 'animations' => [animation]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"animations","animations":["animation"]}
+{"_": "animations", "animations": [animation]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-animations={_='animations', animations={animation}, }
+animations={_='animations', animations={animation}}
 
 ```
 

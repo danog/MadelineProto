@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_Found = $MadelineProto->contacts->search(['q' => string, 'limit' => int, ]);
+$contacts_Found = $MadelineProto->contacts->search(['q' => 'string', 'limit' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.search
-* params - {"q":"string","limit":"int"}
+* params - {"q": "string", "limit": int, }
 
 ```
 
@@ -65,6 +65,6 @@ limit - Json encoded int
 Or, if you're into Lua:
 
 ```
-contacts_Found = contacts.search({q=string, limit=int, })
+contacts_Found = contacts.search({q='string', limit=int, })
 ```
 

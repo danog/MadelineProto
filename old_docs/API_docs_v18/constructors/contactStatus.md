@@ -22,13 +22,13 @@ description: contactStatus attributes, type and example
 ### Example:
 
 ```
-$contactStatus = ['_' => 'contactStatus', 'user_id' => int, 'expires' => int, ];
+$contactStatus = ['_' => 'contactStatus', 'user_id' => int, 'expires' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contactStatus","user_id":"int","expires":"int"}
+{"_": "contactStatus", "user_id": int, "expires": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-contactStatus={_='contactStatus', user_id=int, expires=int, }
+contactStatus={_='contactStatus', user_id=int, expires=int}
 
 ```
 

@@ -23,13 +23,13 @@ description: channels_adminLogResults attributes, type and example
 ### Example:
 
 ```
-$channels_adminLogResults = ['_' => 'channels.adminLogResults', 'events' => [ChannelAdminLogEvent], 'chats' => [Chat], 'users' => [User], ];
+$channels_adminLogResults = ['_' => 'channels.adminLogResults', 'events' => [ChannelAdminLogEvent], 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channels.adminLogResults","events":["ChannelAdminLogEvent"],"chats":["Chat"],"users":["User"]}
+{"_": "channels.adminLogResults", "events": [ChannelAdminLogEvent], "chats": [Chat], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-channels_adminLogResults={_='channels.adminLogResults', events={ChannelAdminLogEvent}, chats={Chat}, users={User}, }
+channels_adminLogResults={_='channels.adminLogResults', events={ChannelAdminLogEvent}, chats={Chat}, users={User}}
 
 ```
 

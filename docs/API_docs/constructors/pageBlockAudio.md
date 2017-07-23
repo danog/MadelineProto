@@ -22,13 +22,13 @@ description: pageBlockAudio attributes, type and example
 ### Example:
 
 ```
-$pageBlockAudio = ['_' => 'pageBlockAudio', 'audio_id' => long, 'caption' => RichText, ];
+$pageBlockAudio = ['_' => 'pageBlockAudio', 'audio_id' => long, 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockAudio","audio_id":"long","caption":"RichText"}
+{"_": "pageBlockAudio", "audio_id": long, "caption": RichText}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockAudio={_='pageBlockAudio', audio_id=long, caption=RichText, }
+pageBlockAudio={_='pageBlockAudio', audio_id=long, caption=RichText}
 
 ```
 

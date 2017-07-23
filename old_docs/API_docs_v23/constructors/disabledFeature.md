@@ -22,13 +22,13 @@ description: disabledFeature attributes, type and example
 ### Example:
 
 ```
-$disabledFeature = ['_' => 'disabledFeature', 'feature' => string, 'description' => string, ];
+$disabledFeature = ['_' => 'disabledFeature', 'feature' => 'string', 'description' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"disabledFeature","feature":"string","description":"string"}
+{"_": "disabledFeature", "feature": "string", "description": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-disabledFeature={_='disabledFeature', feature=string, description=string, }
+disabledFeature={_='disabledFeature', feature='string', description='string'}
 
 ```
 

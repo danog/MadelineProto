@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.removeStickerFromSet
-* params - {"sticker":"InputDocument"}
+* params - {"sticker": InputDocument, }
 
 ```
 

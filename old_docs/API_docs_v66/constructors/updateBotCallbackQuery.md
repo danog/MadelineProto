@@ -27,13 +27,13 @@ description: updateBotCallbackQuery attributes, type and example
 ### Example:
 
 ```
-$updateBotCallbackQuery = ['_' => 'updateBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'peer' => Peer, 'msg_id' => int, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];
+$updateBotCallbackQuery = ['_' => 'updateBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'peer' => Peer, 'msg_id' => int, 'chat_instance' => long, 'data' => 'bytes', 'game_short_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateBotCallbackQuery","query_id":"long","user_id":"int","peer":"Peer","msg_id":"int","chat_instance":"long","data":"bytes","game_short_name":"string"}
+{"_": "updateBotCallbackQuery", "query_id": long, "user_id": int, "peer": Peer, "msg_id": int, "chat_instance": long, "data": "bytes", "game_short_name": "string"}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-updateBotCallbackQuery={_='updateBotCallbackQuery', query_id=long, user_id=int, peer=Peer, msg_id=int, chat_instance=long, data=bytes, game_short_name=string, }
+updateBotCallbackQuery={_='updateBotCallbackQuery', query_id=long, user_id=int, peer=Peer, msg_id=int, chat_instance=long, data='bytes', game_short_name='string'}
 
 ```
 

@@ -25,13 +25,13 @@ Represents a voice cached on the telegram server
 ### Example:
 
 ```
-$inlineQueryResultVoice = ['_' => 'inlineQueryResultVoice', 'id' => string, 'voice' => voice, 'title' => string, ];
+$inlineQueryResultVoice = ['_' => 'inlineQueryResultVoice', 'id' => 'string', 'voice' => voice, 'title' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultVoice","id":"string","voice":"voice","title":"string"}
+{"_": "inlineQueryResultVoice", "id": "string", "voice": voice, "title": "string"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultVoice={_='inlineQueryResultVoice', id=string, voice=voice, title=string, }
+inlineQueryResultVoice={_='inlineQueryResultVoice', id='string', voice=voice, title='string'}
 
 ```
 

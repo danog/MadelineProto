@@ -22,13 +22,13 @@ Other user's phone number is known but user not in contacts list
 ### Example:
 
 ```
-$linkStateKnowsPhoneNumber = ['_' => 'linkStateKnowsPhoneNumber', ];
+$linkStateKnowsPhoneNumber = ['_' => 'linkStateKnowsPhoneNumber'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"linkStateKnowsPhoneNumber"}
+{"_": "linkStateKnowsPhoneNumber"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-linkStateKnowsPhoneNumber={_='linkStateKnowsPhoneNumber', }
+linkStateKnowsPhoneNumber={_='linkStateKnowsPhoneNumber'}
 
 ```
 

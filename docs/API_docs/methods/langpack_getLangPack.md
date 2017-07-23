@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$LangPackDifference = $MadelineProto->langpack->getLangPack(['lang_code' => string, ]);
+$LangPackDifference = $MadelineProto->langpack->getLangPack(['lang_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getLangPack
-* params - {"lang_code":"string"}
+* params - {"lang_code": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ lang_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-LangPackDifference = langpack.getLangPack({lang_code=string, })
+LangPackDifference = langpack.getLangPack({lang_code='string', })
 ```
 

@@ -16,13 +16,13 @@ description: updateLangPackTooLong attributes, type and example
 ### Example:
 
 ```
-$updateLangPackTooLong = ['_' => 'updateLangPackTooLong', ];
+$updateLangPackTooLong = ['_' => 'updateLangPackTooLong'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateLangPackTooLong"}
+{"_": "updateLangPackTooLong"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-updateLangPackTooLong={_='updateLangPackTooLong', }
+updateLangPackTooLong={_='updateLangPackTooLong'}
 
 ```
 

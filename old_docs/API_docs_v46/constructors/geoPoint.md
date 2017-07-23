@@ -22,13 +22,13 @@ description: geoPoint attributes, type and example
 ### Example:
 
 ```
-$geoPoint = ['_' => 'geoPoint', 'longitude' => double, 'latitude' => double, ];
+$geoPoint = ['_' => 'geoPoint', 'longitude' => double, 'latitude' => double];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geoPoint","longitude":"double","latitude":"double"}
+{"_": "geoPoint", "longitude": double, "latitude": double}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-geoPoint={_='geoPoint', longitude=double, latitude=double, }
+geoPoint={_='geoPoint', longitude=double, latitude=double}
 
 ```
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.getRecents
-* params - {"offset":"int","limit":"int"}
+* params - {"offset": int, "limit": int, }
 
 ```
 

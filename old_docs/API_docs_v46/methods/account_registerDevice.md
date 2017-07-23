@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account->registerDevice(['token_type' => int, 'token' => string, 'device_model' => string, 'system_version' => string, 'app_version' => string, 'app_sandbox' => Bool, 'lang_code' => string, ]);
+$Bool = $MadelineProto->account->registerDevice(['token_type' => int, 'token' => 'string', 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'app_sandbox' => Bool, 'lang_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.registerDevice
-* params - {"token_type":"int","token":"string","device_model":"string","system_version":"string","app_version":"string","app_sandbox":"Bool","lang_code":"string"}
+* params - {"token_type": int, "token": "string", "device_model": "string", "system_version": "string", "app_version": "string", "app_sandbox": Bool, "lang_code": "string", }
 
 ```
 
@@ -75,6 +75,6 @@ lang_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = account.registerDevice({token_type=int, token=string, device_model=string, system_version=string, app_version=string, app_sandbox=Bool, lang_code=string, })
+Bool = account.registerDevice({token_type=int, token='string', device_model='string', system_version='string', app_version='string', app_sandbox=Bool, lang_code='string', })
 ```
 

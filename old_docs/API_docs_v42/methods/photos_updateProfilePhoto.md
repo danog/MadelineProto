@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.updateProfilePhoto
-* params - {"id":"InputPhoto","crop":"InputPhotoCrop"}
+* params - {"id": InputPhoto, "crop": InputPhotoCrop, }
 
 ```
 

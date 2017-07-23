@@ -24,13 +24,13 @@ description: auth_sentAppCode attributes, type and example
 ### Example:
 
 ```
-$auth_sentAppCode = ['_' => 'auth.sentAppCode', 'phone_registered' => Bool, 'phone_code_hash' => string, 'send_call_timeout' => int, 'is_password' => Bool, ];
+$auth_sentAppCode = ['_' => 'auth.sentAppCode', 'phone_registered' => Bool, 'phone_code_hash' => 'string', 'send_call_timeout' => int, 'is_password' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"auth.sentAppCode","phone_registered":"Bool","phone_code_hash":"string","send_call_timeout":"int","is_password":"Bool"}
+{"_": "auth.sentAppCode", "phone_registered": Bool, "phone_code_hash": "string", "send_call_timeout": int, "is_password": Bool}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-auth_sentAppCode={_='auth.sentAppCode', phone_registered=Bool, phone_code_hash=string, send_call_timeout=int, is_password=Bool, }
+auth_sentAppCode={_='auth.sentAppCode', phone_registered=Bool, phone_code_hash='string', send_call_timeout=int, is_password=Bool}
 
 ```
 

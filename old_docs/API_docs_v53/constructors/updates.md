@@ -25,13 +25,13 @@ description: updates attributes, type and example
 ### Example:
 
 ```
-$updates = ['_' => 'updates', 'updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq' => int, ];
+$updates = ['_' => 'updates', 'updates' => [Update], 'users' => [User], 'chats' => [Chat], 'date' => int, 'seq' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updates","updates":["Update"],"users":["User"],"chats":["Chat"],"date":"int","seq":"int"}
+{"_": "updates", "updates": [Update], "users": [User], "chats": [Chat], "date": int, "seq": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updates={_='updates', updates={Update}, users={User}, chats={Chat}, date=int, seq=int, }
+updates={_='updates', updates={Update}, users={User}, chats={Chat}, date=int, seq=int}
 
 ```
 

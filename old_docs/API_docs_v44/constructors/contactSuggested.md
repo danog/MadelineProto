@@ -22,13 +22,13 @@ description: contactSuggested attributes, type and example
 ### Example:
 
 ```
-$contactSuggested = ['_' => 'contactSuggested', 'user_id' => int, 'mutual_contacts' => int, ];
+$contactSuggested = ['_' => 'contactSuggested', 'user_id' => int, 'mutual_contacts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contactSuggested","user_id":"int","mutual_contacts":"int"}
+{"_": "contactSuggested", "user_id": int, "mutual_contacts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-contactSuggested={_='contactSuggested', user_id=int, mutual_contacts=int, }
+contactSuggested={_='contactSuggested', user_id=int, mutual_contacts=int}
 
 ```
 

@@ -26,13 +26,13 @@ Describes user contact
 ### Example:
 
 ```
-$contact = ['_' => 'contact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'user_id' => int, ];
+$contact = ['_' => 'contact', 'phone_number' => 'string', 'first_name' => 'string', 'last_name' => 'string', 'user_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contact","phone_number":"string","first_name":"string","last_name":"string","user_id":"int"}
+{"_": "contact", "phone_number": "string", "first_name": "string", "last_name": "string", "user_id": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-contact={_='contact', phone_number=string, first_name=string, last_name=string, user_id=int, }
+contact={_='contact', phone_number='string', first_name='string', last_name='string', user_id=int}
 
 ```
 

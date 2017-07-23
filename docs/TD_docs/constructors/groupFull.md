@@ -26,13 +26,13 @@ Gives full information about a group
 ### Example:
 
 ```
-$groupFull = ['_' => 'groupFull', 'group' => group, 'creator_user_id' => int, 'members' => [chatMember], 'invite_link' => string, ];
+$groupFull = ['_' => 'groupFull', 'group' => group, 'creator_user_id' => int, 'members' => [chatMember], 'invite_link' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"groupFull","group":"group","creator_user_id":"int","members":["chatMember"],"invite_link":"string"}
+{"_": "groupFull", "group": group, "creator_user_id": int, "members": [chatMember], "invite_link": "string"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-groupFull={_='groupFull', group=group, creator_user_id=int, members={chatMember}, invite_link=string, }
+groupFull={_='groupFull', group=group, creator_user_id=int, members={chatMember}, invite_link='string'}
 
 ```
 

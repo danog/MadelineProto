@@ -23,13 +23,13 @@ Integer option
 ### Example:
 
 ```
-$optionInteger = ['_' => 'optionInteger', 'value' => int, ];
+$optionInteger = ['_' => 'optionInteger', 'value' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"optionInteger","value":"int"}
+{"_": "optionInteger", "value": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-optionInteger={_='optionInteger', value=int, }
+optionInteger={_='optionInteger', value=int}
 
 ```
 

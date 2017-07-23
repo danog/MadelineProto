@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.saveCallDebug
-* params - {"peer":"InputPhoneCall","debug":"DataJSON"}
+* params - {"peer": InputPhoneCall, "debug": DataJSON, }
 
 ```
 

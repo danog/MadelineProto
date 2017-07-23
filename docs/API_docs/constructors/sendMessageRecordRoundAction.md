@@ -16,13 +16,13 @@ description: sendMessageRecordRoundAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageRecordRoundAction = ['_' => 'sendMessageRecordRoundAction', ];
+$sendMessageRecordRoundAction = ['_' => 'sendMessageRecordRoundAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageRecordRoundAction"}
+{"_": "sendMessageRecordRoundAction"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageRecordRoundAction={_='sendMessageRecordRoundAction', }
+sendMessageRecordRoundAction={_='sendMessageRecordRoundAction'}
 
 ```
 

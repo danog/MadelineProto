@@ -21,13 +21,13 @@ description: inputChat attributes, type and example
 ### Example:
 
 ```
-$inputChat = ['_' => 'inputChat', 'chat_id' => int, ];
+$inputChat = ['_' => 'inputChat', 'chat_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputChat","chat_id":"int"}
+{"_": "inputChat", "chat_id": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputChat={_='inputChat', chat_id=int, }
+inputChat={_='inputChat', chat_id=int}
 
 ```
 

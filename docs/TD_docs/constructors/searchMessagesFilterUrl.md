@@ -22,13 +22,13 @@ Return only messages containing url
 ### Example:
 
 ```
-$searchMessagesFilterUrl = ['_' => 'searchMessagesFilterUrl', ];
+$searchMessagesFilterUrl = ['_' => 'searchMessagesFilterUrl'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"searchMessagesFilterUrl"}
+{"_": "searchMessagesFilterUrl"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-searchMessagesFilterUrl={_='searchMessagesFilterUrl', }
+searchMessagesFilterUrl={_='searchMessagesFilterUrl'}
 
 ```
 

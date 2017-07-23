@@ -21,13 +21,13 @@ description: decryptedMessageActionReadMessages attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionReadMessages_8 = ['_' => 'decryptedMessageActionReadMessages', 'random_ids' => [long], ];
+$decryptedMessageActionReadMessages_8 = ['_' => 'decryptedMessageActionReadMessages', 'random_ids' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionReadMessages","random_ids":["long"]}
+{"_": "decryptedMessageActionReadMessages", "random_ids": [long]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionReadMessages_8={_='decryptedMessageActionReadMessages', random_ids={long}, }
+decryptedMessageActionReadMessages_8={_='decryptedMessageActionReadMessages', random_ids={long}}
 
 ```
 

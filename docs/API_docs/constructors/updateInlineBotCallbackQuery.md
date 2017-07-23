@@ -26,13 +26,13 @@ description: updateInlineBotCallbackQuery attributes, type and example
 ### Example:
 
 ```
-$updateInlineBotCallbackQuery = ['_' => 'updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'chat_instance' => long, 'data' => bytes, 'game_short_name' => string, ];
+$updateInlineBotCallbackQuery = ['_' => 'updateInlineBotCallbackQuery', 'query_id' => long, 'user_id' => int, 'msg_id' => InputBotInlineMessageID, 'chat_instance' => long, 'data' => 'bytes', 'game_short_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateInlineBotCallbackQuery","query_id":"long","user_id":"int","msg_id":"InputBotInlineMessageID","chat_instance":"long","data":"bytes","game_short_name":"string"}
+{"_": "updateInlineBotCallbackQuery", "query_id": long, "user_id": int, "msg_id": InputBotInlineMessageID, "chat_instance": long, "data": "bytes", "game_short_name": "string"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-updateInlineBotCallbackQuery={_='updateInlineBotCallbackQuery', query_id=long, user_id=int, msg_id=InputBotInlineMessageID, chat_instance=long, data=bytes, game_short_name=string, }
+updateInlineBotCallbackQuery={_='updateInlineBotCallbackQuery', query_id=long, user_id=int, msg_id=InputBotInlineMessageID, chat_instance=long, data='bytes', game_short_name='string'}
 
 ```
 

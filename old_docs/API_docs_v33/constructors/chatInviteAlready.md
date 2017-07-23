@@ -21,13 +21,13 @@ description: chatInviteAlready attributes, type and example
 ### Example:
 
 ```
-$chatInviteAlready = ['_' => 'chatInviteAlready', 'chat' => Chat, ];
+$chatInviteAlready = ['_' => 'chatInviteAlready', 'chat' => Chat];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatInviteAlready","chat":"Chat"}
+{"_": "chatInviteAlready", "chat": Chat}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-chatInviteAlready={_='chatInviteAlready', chat=Chat, }
+chatInviteAlready={_='chatInviteAlready', chat=Chat}
 
 ```
 

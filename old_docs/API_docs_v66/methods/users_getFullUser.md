@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - users.getFullUser
-* params - {"id":"InputUser"}
+* params - {"id": InputUser, }
 
 ```
 

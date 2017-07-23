@@ -35,13 +35,13 @@ Represents user
 ### Example:
 
 ```
-$user = ['_' => 'user', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone_number' => string, 'status' => UserStatus, 'profile_photo' => profilePhoto, 'my_link' => LinkState, 'foreign_link' => LinkState, 'is_verified' => Bool, 'restriction_reason' => string, 'have_access' => Bool, 'type' => UserType, ];
+$user = ['_' => 'user', 'id' => int, 'first_name' => 'string', 'last_name' => 'string', 'username' => 'string', 'phone_number' => 'string', 'status' => UserStatus, 'profile_photo' => profilePhoto, 'my_link' => LinkState, 'foreign_link' => LinkState, 'is_verified' => Bool, 'restriction_reason' => 'string', 'have_access' => Bool, 'type' => UserType];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"user","id":"int","first_name":"string","last_name":"string","username":"string","phone_number":"string","status":"UserStatus","profile_photo":"profilePhoto","my_link":"LinkState","foreign_link":"LinkState","is_verified":"Bool","restriction_reason":"string","have_access":"Bool","type":"UserType"}
+{"_": "user", "id": int, "first_name": "string", "last_name": "string", "username": "string", "phone_number": "string", "status": UserStatus, "profile_photo": profilePhoto, "my_link": LinkState, "foreign_link": LinkState, "is_verified": Bool, "restriction_reason": "string", "have_access": Bool, "type": UserType}
 ```
 
 
@@ -49,7 +49,7 @@ Or, if you're into Lua:
 
 
 ```
-user={_='user', id=int, first_name=string, last_name=string, username=string, phone_number=string, status=UserStatus, profile_photo=profilePhoto, my_link=LinkState, foreign_link=LinkState, is_verified=Bool, restriction_reason=string, have_access=Bool, type=UserType, }
+user={_='user', id=int, first_name='string', last_name='string', username='string', phone_number='string', status=UserStatus, profile_photo=profilePhoto, my_link=LinkState, foreign_link=LinkState, is_verified=Bool, restriction_reason='string', have_access=Bool, type=UserType}
 
 ```
 

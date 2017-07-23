@@ -24,13 +24,13 @@ description: inputWebDocument attributes, type and example
 ### Example:
 
 ```
-$inputWebDocument = ['_' => 'inputWebDocument', 'url' => string, 'size' => int, 'mime_type' => string, 'attributes' => [DocumentAttribute], ];
+$inputWebDocument = ['_' => 'inputWebDocument', 'url' => 'string', 'size' => int, 'mime_type' => 'string', 'attributes' => [DocumentAttribute]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputWebDocument","url":"string","size":"int","mime_type":"string","attributes":["DocumentAttribute"]}
+{"_": "inputWebDocument", "url": "string", "size": int, "mime_type": "string", "attributes": [DocumentAttribute]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inputWebDocument={_='inputWebDocument', url=string, size=int, mime_type=string, attributes={DocumentAttribute}, }
+inputWebDocument={_='inputWebDocument', url='string', size=int, mime_type='string', attributes={DocumentAttribute}}
 
 ```
 

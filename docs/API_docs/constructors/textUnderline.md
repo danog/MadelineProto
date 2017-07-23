@@ -21,13 +21,13 @@ description: textUnderline attributes, type and example
 ### Example:
 
 ```
-$textUnderline = ['_' => 'textUnderline', 'text' => RichText, ];
+$textUnderline = ['_' => 'textUnderline', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"textUnderline","text":"RichText"}
+{"_": "textUnderline", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-textUnderline={_='textUnderline', text=RichText, }
+textUnderline={_='textUnderline', text=RichText}
 
 ```
 

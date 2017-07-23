@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.readHistory
-* params - {"channel":"InputChannel","max_id":"int"}
+* params - {"channel": InputChannel, "max_id": int, }
 
 ```
 

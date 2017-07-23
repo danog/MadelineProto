@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getCommonChats
-* params - {"user_id":"InputUser","max_id":"int","limit":"int"}
+* params - {"user_id": InputUser, "max_id": int, "limit": int, }
 
 ```
 

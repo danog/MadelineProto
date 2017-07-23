@@ -26,13 +26,13 @@ Message was edited. Changes in the message content will come in a separate updat
 ### Example:
 
 ```
-$updateMessageEdited = ['_' => 'updateMessageEdited', 'chat_id' => long, 'message_id' => long, 'edit_date' => int, 'reply_markup' => ReplyMarkup, ];
+$updateMessageEdited = ['_' => 'updateMessageEdited', 'chat_id' => long, 'message_id' => long, 'edit_date' => int, 'reply_markup' => ReplyMarkup];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateMessageEdited","chat_id":"long","message_id":"long","edit_date":"int","reply_markup":"ReplyMarkup"}
+{"_": "updateMessageEdited", "chat_id": long, "message_id": long, "edit_date": int, "reply_markup": ReplyMarkup}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-updateMessageEdited={_='updateMessageEdited', chat_id=long, message_id=long, edit_date=int, reply_markup=ReplyMarkup, }
+updateMessageEdited={_='updateMessageEdited', chat_id=long, message_id=long, edit_date=int, reply_markup=ReplyMarkup}
 
 ```
 

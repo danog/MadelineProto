@@ -24,13 +24,13 @@ description: botInlineMessageMediaContact attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageMediaContact = ['_' => 'botInlineMessageMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, 'reply_markup' => ReplyMarkup, ];
+$botInlineMessageMediaContact = ['_' => 'botInlineMessageMediaContact', 'phone_number' => 'string', 'first_name' => 'string', 'last_name' => 'string', 'reply_markup' => ReplyMarkup];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInlineMessageMediaContact","phone_number":"string","first_name":"string","last_name":"string","reply_markup":"ReplyMarkup"}
+{"_": "botInlineMessageMediaContact", "phone_number": "string", "first_name": "string", "last_name": "string", "reply_markup": ReplyMarkup}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMessageMediaContact={_='botInlineMessageMediaContact', phone_number=string, first_name=string, last_name=string, reply_markup=ReplyMarkup, }
+botInlineMessageMediaContact={_='botInlineMessageMediaContact', phone_number='string', first_name='string', last_name='string', reply_markup=ReplyMarkup}
 
 ```
 

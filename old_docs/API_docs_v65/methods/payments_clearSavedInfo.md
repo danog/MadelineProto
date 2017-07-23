@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - payments.clearSavedInfo
-* params - {"credentials":"Bool","info":"Bool"}
+* params - {"credentials": Bool, "info": Bool, }
 
 ```
 

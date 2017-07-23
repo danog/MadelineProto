@@ -37,7 +37,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_SentCode = $MadelineProto->auth->sendCode(['phone_number' => string, 'sms_type' => int, 'api_id' => int, 'api_hash' => string, 'lang_code' => string, ]);
+$auth_SentCode = $MadelineProto->auth->sendCode(['phone_number' => 'string', 'sms_type' => int, 'api_id' => int, 'api_hash' => 'string', 'lang_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.sendCode
-* params - {"phone_number":"string","sms_type":"int","api_id":"int","api_hash":"string","lang_code":"string"}
+* params - {"phone_number": "string", "sms_type": int, "api_id": int, "api_hash": "string", "lang_code": "string", }
 
 ```
 
@@ -71,6 +71,6 @@ lang_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-auth_SentCode = auth.sendCode({phone_number=string, sms_type=int, api_id=int, api_hash=string, lang_code=string, })
+auth_SentCode = auth.sendCode({phone_number='string', sms_type=int, api_id=int, api_hash='string', lang_code='string', })
 ```
 

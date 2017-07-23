@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChannelUsername(['channel_id' => int, 'username' => string, ]);
+$Ok = $MadelineProto->changeChannelUsername(['channel_id' => int, 'username' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChannelUsername
-* params - {"channel_id":"int","username":"string"}
+* params - {"channel_id": int, "username": "string", }
 
 ```
 
@@ -70,6 +70,6 @@ username - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = changeChannelUsername({channel_id=int, username=string, })
+Ok = changeChannelUsername({channel_id=int, username='string', })
 ```
 

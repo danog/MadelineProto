@@ -27,13 +27,13 @@ Represents information about a venue
 ### Example:
 
 ```
-$inlineQueryResultVenue = ['_' => 'inlineQueryResultVenue', 'id' => string, 'venue' => venue, 'thumb_url' => string, 'thumb_width' => int, 'thumb_height' => int, ];
+$inlineQueryResultVenue = ['_' => 'inlineQueryResultVenue', 'id' => 'string', 'venue' => venue, 'thumb_url' => 'string', 'thumb_width' => int, 'thumb_height' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultVenue","id":"string","venue":"venue","thumb_url":"string","thumb_width":"int","thumb_height":"int"}
+{"_": "inlineQueryResultVenue", "id": "string", "venue": venue, "thumb_url": "string", "thumb_width": int, "thumb_height": int}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultVenue={_='inlineQueryResultVenue', id=string, venue=venue, thumb_url=string, thumb_width=int, thumb_height=int, }
+inlineQueryResultVenue={_='inlineQueryResultVenue', id='string', venue=venue, thumb_url='string', thumb_width=int, thumb_height=int}
 
 ```
 

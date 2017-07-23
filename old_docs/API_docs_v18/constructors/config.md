@@ -26,13 +26,13 @@ description: config attributes, type and example
 ### Example:
 
 ```
-$config = ['_' => 'config', 'date' => int, 'test_mode' => Bool, 'this_dc' => int, 'dc_options' => [DcOption], 'chat_size_max' => int, 'broadcast_size_max' => int, ];
+$config = ['_' => 'config', 'date' => int, 'test_mode' => Bool, 'this_dc' => int, 'dc_options' => [DcOption], 'chat_size_max' => int, 'broadcast_size_max' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"config","date":"int","test_mode":"Bool","this_dc":"int","dc_options":["DcOption"],"chat_size_max":"int","broadcast_size_max":"int"}
+{"_": "config", "date": int, "test_mode": Bool, "this_dc": int, "dc_options": [DcOption], "chat_size_max": int, "broadcast_size_max": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-config={_='config', date=int, test_mode=Bool, this_dc=int, dc_options={DcOption}, chat_size_max=int, broadcast_size_max=int, }
+config={_='config', date=int, test_mode=Bool, this_dc=int, dc_options={DcOption}, chat_size_max=int, broadcast_size_max=int}
 
 ```
 

@@ -16,13 +16,13 @@ description: updateStickerSets attributes, type and example
 ### Example:
 
 ```
-$updateStickerSets = ['_' => 'updateStickerSets', ];
+$updateStickerSets = ['_' => 'updateStickerSets'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateStickerSets"}
+{"_": "updateStickerSets"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-updateStickerSets={_='updateStickerSets', }
+updateStickerSets={_='updateStickerSets'}
 
 ```
 

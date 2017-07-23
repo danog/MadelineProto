@@ -23,13 +23,13 @@ description: inputMediaContact attributes, type and example
 ### Example:
 
 ```
-$inputMediaContact = ['_' => 'inputMediaContact', 'phone_number' => string, 'first_name' => string, 'last_name' => string, ];
+$inputMediaContact = ['_' => 'inputMediaContact', 'phone_number' => 'string', 'first_name' => 'string', 'last_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaContact","phone_number":"string","first_name":"string","last_name":"string"}
+{"_": "inputMediaContact", "phone_number": "string", "first_name": "string", "last_name": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaContact={_='inputMediaContact', phone_number=string, first_name=string, last_name=string, }
+inputMediaContact={_='inputMediaContact', phone_number='string', first_name='string', last_name='string'}
 
 ```
 

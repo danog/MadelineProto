@@ -23,13 +23,13 @@ User contact message
 ### Example:
 
 ```
-$messageContact = ['_' => 'messageContact', 'contact' => contact, ];
+$messageContact = ['_' => 'messageContact', 'contact' => contact];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageContact","contact":"contact"}
+{"_": "messageContact", "contact": contact}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageContact={_='messageContact', contact=contact, }
+messageContact={_='messageContact', contact=contact}
 
 ```
 

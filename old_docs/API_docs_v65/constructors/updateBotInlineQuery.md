@@ -25,13 +25,13 @@ description: updateBotInlineQuery attributes, type and example
 ### Example:
 
 ```
-$updateBotInlineQuery = ['_' => 'updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => string, 'geo' => GeoPoint, 'offset' => string, ];
+$updateBotInlineQuery = ['_' => 'updateBotInlineQuery', 'query_id' => long, 'user_id' => int, 'query' => 'string', 'geo' => GeoPoint, 'offset' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateBotInlineQuery","query_id":"long","user_id":"int","query":"string","geo":"GeoPoint","offset":"string"}
+{"_": "updateBotInlineQuery", "query_id": long, "user_id": int, "query": "string", "geo": GeoPoint, "offset": "string"}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updateBotInlineQuery={_='updateBotInlineQuery', query_id=long, user_id=int, query=string, geo=GeoPoint, offset=string, }
+updateBotInlineQuery={_='updateBotInlineQuery', query_id=long, user_id=int, query='string', geo=GeoPoint, offset='string'}
 
 ```
 

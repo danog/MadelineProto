@@ -24,13 +24,13 @@ description: wallPaperSolid attributes, type and example
 ### Example:
 
 ```
-$wallPaperSolid = ['_' => 'wallPaperSolid', 'id' => int, 'title' => string, 'bg_color' => int, 'color' => int, ];
+$wallPaperSolid = ['_' => 'wallPaperSolid', 'id' => int, 'title' => 'string', 'bg_color' => int, 'color' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"wallPaperSolid","id":"int","title":"string","bg_color":"int","color":"int"}
+{"_": "wallPaperSolid", "id": int, "title": "string", "bg_color": int, "color": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-wallPaperSolid={_='wallPaperSolid', id=int, title=string, bg_color=int, color=int, }
+wallPaperSolid={_='wallPaperSolid', id=int, title='string', bg_color=int, color=int}
 
 ```
 

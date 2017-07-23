@@ -26,13 +26,13 @@ TDLib needs user authentication code to finish authorization
 ### Example:
 
 ```
-$authStateWaitCode = ['_' => 'authStateWaitCode', 'is_registered' => Bool, 'code_type' => AuthCodeType, 'next_code_type' => AuthCodeType, 'timeout' => int, ];
+$authStateWaitCode = ['_' => 'authStateWaitCode', 'is_registered' => Bool, 'code_type' => AuthCodeType, 'next_code_type' => AuthCodeType, 'timeout' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"authStateWaitCode","is_registered":"Bool","code_type":"AuthCodeType","next_code_type":"AuthCodeType","timeout":"int"}
+{"_": "authStateWaitCode", "is_registered": Bool, "code_type": AuthCodeType, "next_code_type": AuthCodeType, "timeout": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-authStateWaitCode={_='authStateWaitCode', is_registered=Bool, code_type=AuthCodeType, next_code_type=AuthCodeType, timeout=int, }
+authStateWaitCode={_='authStateWaitCode', is_registered=Bool, code_type=AuthCodeType, next_code_type=AuthCodeType, timeout=int}
 
 ```
 

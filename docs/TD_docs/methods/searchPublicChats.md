@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Chats = $MadelineProto->searchPublicChats(['username_prefix' => string, ]);
+$Chats = $MadelineProto->searchPublicChats(['username_prefix' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - searchPublicChats
-* params - {"username_prefix":"string"}
+* params - {"username_prefix": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ username_prefix - Json encoded string
 Or, if you're into Lua:
 
 ```
-Chats = searchPublicChats({username_prefix=string, })
+Chats = searchPublicChats({username_prefix='string', })
 ```
 

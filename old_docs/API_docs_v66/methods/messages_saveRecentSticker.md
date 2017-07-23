@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.saveRecentSticker
-* params - {"attached":"Bool","id":"InputDocument","unsave":"Bool"}
+* params - {"attached": Bool, "id": InputDocument, "unsave": Bool, }
 
 ```
 

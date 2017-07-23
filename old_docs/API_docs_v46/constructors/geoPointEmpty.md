@@ -16,13 +16,13 @@ description: geoPointEmpty attributes, type and example
 ### Example:
 
 ```
-$geoPointEmpty = ['_' => 'geoPointEmpty', ];
+$geoPointEmpty = ['_' => 'geoPointEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geoPointEmpty"}
+{"_": "geoPointEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-geoPointEmpty={_='geoPointEmpty', }
+geoPointEmpty={_='geoPointEmpty'}
 
 ```
 

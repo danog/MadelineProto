@@ -23,13 +23,13 @@ description: keyboardButtonSwitchInline attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonSwitchInline = ['_' => 'keyboardButtonSwitchInline', 'same_peer' => Bool, 'text' => string, 'query' => string, ];
+$keyboardButtonSwitchInline = ['_' => 'keyboardButtonSwitchInline', 'same_peer' => Bool, 'text' => 'string', 'query' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"keyboardButtonSwitchInline","same_peer":"Bool","text":"string","query":"string"}
+{"_": "keyboardButtonSwitchInline", "same_peer": Bool, "text": "string", "query": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-keyboardButtonSwitchInline={_='keyboardButtonSwitchInline', same_peer=Bool, text=string, query=string, }
+keyboardButtonSwitchInline={_='keyboardButtonSwitchInline', same_peer=Bool, text='string', query='string'}
 
 ```
 

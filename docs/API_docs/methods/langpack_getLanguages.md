@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getLanguages
-* params - 
+* params - {}
 
 ```
 

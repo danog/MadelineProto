@@ -20,13 +20,13 @@ description: replyKeyboardForceReply attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply', ];
+$replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"replyKeyboardForceReply"}
+{"_": "replyKeyboardForceReply"}
 ```
 
 
@@ -34,7 +34,7 @@ Or, if you're into Lua:
 
 
 ```
-replyKeyboardForceReply={_='replyKeyboardForceReply', }
+replyKeyboardForceReply={_='replyKeyboardForceReply'}
 
 ```
 

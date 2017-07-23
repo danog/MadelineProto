@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->upload->reuploadCdnFile(['file_token' => bytes, 'request_token' => bytes, ]);
+$Bool = $MadelineProto->upload->reuploadCdnFile(['file_token' => 'bytes', 'request_token' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - upload.reuploadCdnFile
-* params - {"file_token":"bytes","request_token":"bytes"}
+* params - {"file_token": "bytes", "request_token": "bytes", }
 
 ```
 
@@ -65,6 +65,6 @@ request_token - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-Bool = upload.reuploadCdnFile({file_token=bytes, request_token=bytes, })
+Bool = upload.reuploadCdnFile({file_token='bytes', request_token='bytes', })
 ```
 

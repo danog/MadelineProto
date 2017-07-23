@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - rpc_drop_answer
-* params - {"req_msg_id":"long"}
+* params - {"req_msg_id": long, }
 
 ```
 

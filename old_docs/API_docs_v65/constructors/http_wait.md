@@ -23,13 +23,13 @@ description: http_wait attributes, type and example
 ### Example:
 
 ```
-$http_wait = ['_' => 'http_wait', 'max_delay' => int, 'wait_after' => int, 'max_wait' => int, ];
+$http_wait = ['_' => 'http_wait', 'max_delay' => int, 'wait_after' => int, 'max_wait' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"http_wait","max_delay":"int","wait_after":"int","max_wait":"int"}
+{"_": "http_wait", "max_delay": int, "wait_after": int, "max_wait": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-http_wait={_='http_wait', max_delay=int, wait_after=int, max_wait=int, }
+http_wait={_='http_wait', max_delay=int, wait_after=int, max_wait=int}
 
 ```
 

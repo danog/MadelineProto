@@ -23,13 +23,13 @@ description: channels_channelParticipants attributes, type and example
 ### Example:
 
 ```
-$channels_channelParticipants = ['_' => 'channels.channelParticipants', 'count' => int, 'participants' => [ChannelParticipant], 'users' => [User], ];
+$channels_channelParticipants = ['_' => 'channels.channelParticipants', 'count' => int, 'participants' => [ChannelParticipant], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channels.channelParticipants","count":"int","participants":["ChannelParticipant"],"users":["User"]}
+{"_": "channels.channelParticipants", "count": int, "participants": [ChannelParticipant], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-channels_channelParticipants={_='channels.channelParticipants', count=int, participants={ChannelParticipant}, users={User}, }
+channels_channelParticipants={_='channels.channelParticipants', count=int, participants={ChannelParticipant}, users={User}}
 
 ```
 

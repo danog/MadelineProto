@@ -24,13 +24,13 @@ description: replyKeyboardMarkup attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'resize' => Bool, 'single_use' => Bool, 'selective' => Bool, 'rows' => [KeyboardButtonRow], ];
+$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'resize' => Bool, 'single_use' => Bool, 'selective' => Bool, 'rows' => [KeyboardButtonRow]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"replyKeyboardMarkup","resize":"Bool","single_use":"Bool","selective":"Bool","rows":["KeyboardButtonRow"]}
+{"_": "replyKeyboardMarkup", "resize": Bool, "single_use": Bool, "selective": Bool, "rows": [KeyboardButtonRow]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-replyKeyboardMarkup={_='replyKeyboardMarkup', resize=Bool, single_use=Bool, selective=Bool, rows={KeyboardButtonRow}, }
+replyKeyboardMarkup={_='replyKeyboardMarkup', resize=Bool, single_use=Bool, selective=Bool, rows={KeyboardButtonRow}}
 
 ```
 

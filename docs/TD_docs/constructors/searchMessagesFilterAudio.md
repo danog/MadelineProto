@@ -22,13 +22,13 @@ Return only audio messages
 ### Example:
 
 ```
-$searchMessagesFilterAudio = ['_' => 'searchMessagesFilterAudio', ];
+$searchMessagesFilterAudio = ['_' => 'searchMessagesFilterAudio'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"searchMessagesFilterAudio"}
+{"_": "searchMessagesFilterAudio"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-searchMessagesFilterAudio={_='searchMessagesFilterAudio', }
+searchMessagesFilterAudio={_='searchMessagesFilterAudio'}
 
 ```
 

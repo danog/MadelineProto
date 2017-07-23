@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getChats
-* params - {"id":["int"]}
+* params - {"id": [int], }
 
 ```
 

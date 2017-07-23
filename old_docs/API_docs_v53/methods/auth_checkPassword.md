@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth->checkPassword(['password_hash' => bytes, ]);
+$auth_Authorization = $MadelineProto->auth->checkPassword(['password_hash' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.checkPassword
-* params - {"password_hash":"bytes"}
+* params - {"password_hash": "bytes", }
 
 ```
 
@@ -63,6 +63,6 @@ password_hash - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-auth_Authorization = auth.checkPassword({password_hash=bytes, })
+auth_Authorization = auth.checkPassword({password_hash='bytes', })
 ```
 

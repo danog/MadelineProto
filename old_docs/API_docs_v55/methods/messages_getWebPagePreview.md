@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$MessageMedia = $MadelineProto->messages->getWebPagePreview(['message' => string, ]);
+$MessageMedia = $MadelineProto->messages->getWebPagePreview(['message' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getWebPagePreview
-* params - {"message":"string"}
+* params - {"message": "string", }
 
 ```
 
@@ -63,7 +63,7 @@ message - Json encoded string
 Or, if you're into Lua:
 
 ```
-MessageMedia = messages.getWebPagePreview({message=string, })
+MessageMedia = messages.getWebPagePreview({message='string', })
 ```
 
 

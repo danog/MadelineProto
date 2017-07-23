@@ -23,13 +23,13 @@ description: updateEncryptedMessagesRead attributes, type and example
 ### Example:
 
 ```
-$updateEncryptedMessagesRead = ['_' => 'updateEncryptedMessagesRead', 'chat_id' => int, 'max_date' => int, 'date' => int, ];
+$updateEncryptedMessagesRead = ['_' => 'updateEncryptedMessagesRead', 'chat_id' => int, 'max_date' => int, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateEncryptedMessagesRead","chat_id":"int","max_date":"int","date":"int"}
+{"_": "updateEncryptedMessagesRead", "chat_id": int, "max_date": int, "date": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateEncryptedMessagesRead={_='updateEncryptedMessagesRead', chat_id=int, max_date=int, date=int, }
+updateEncryptedMessagesRead={_='updateEncryptedMessagesRead', chat_id=int, max_date=int, date=int}
 
 ```
 

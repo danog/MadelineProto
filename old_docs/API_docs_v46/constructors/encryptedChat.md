@@ -27,13 +27,13 @@ description: encryptedChat attributes, type and example
 ### Example:
 
 ```
-$encryptedChat = ['_' => 'encryptedChat', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a_or_b' => bytes, 'key_fingerprint' => long, ];
+$encryptedChat = ['_' => 'encryptedChat', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, 'g_a_or_b' => 'bytes', 'key_fingerprint' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"encryptedChat","id":"int","access_hash":"long","date":"int","admin_id":"int","participant_id":"int","g_a_or_b":"bytes","key_fingerprint":"long"}
+{"_": "encryptedChat", "id": int, "access_hash": long, "date": int, "admin_id": int, "participant_id": int, "g_a_or_b": "bytes", "key_fingerprint": long}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-encryptedChat={_='encryptedChat', id=int, access_hash=long, date=int, admin_id=int, participant_id=int, g_a_or_b=bytes, key_fingerprint=long, }
+encryptedChat={_='encryptedChat', id=int, access_hash=long, date=int, admin_id=int, participant_id=int, g_a_or_b='bytes', key_fingerprint=long}
 
 ```
 

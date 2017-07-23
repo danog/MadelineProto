@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - exportChatInviteLink
-* params - {"chat_id":"InputPeer"}
+* params - {"chat_id": InputPeer, }
 
 ```
 

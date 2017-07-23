@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setNotificationSettings
-* params - {"scope":"NotificationSettingsScope","notification_settings":"notificationSettings"}
+* params - {"scope": NotificationSettingsScope, "notification_settings": notificationSettings, }
 
 ```
 

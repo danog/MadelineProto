@@ -16,13 +16,13 @@ description: auth_codeTypeFlashCall attributes, type and example
 ### Example:
 
 ```
-$auth_codeTypeFlashCall = ['_' => 'auth.codeTypeFlashCall', ];
+$auth_codeTypeFlashCall = ['_' => 'auth.codeTypeFlashCall'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"auth.codeTypeFlashCall"}
+{"_": "auth.codeTypeFlashCall"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-auth_codeTypeFlashCall={_='auth.codeTypeFlashCall', }
+auth_codeTypeFlashCall={_='auth.codeTypeFlashCall'}
 
 ```
 

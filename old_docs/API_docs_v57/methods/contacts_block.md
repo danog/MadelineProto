@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.block
-* params - {"id":"InputUser"}
+* params - {"id": InputUser, }
 
 ```
 

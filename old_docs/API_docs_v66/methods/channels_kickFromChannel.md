@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.kickFromChannel
-* params - {"channel":"InputChannel","user_id":"InputUser","kicked":"Bool"}
+* params - {"channel": InputChannel, "user_id": InputUser, "kicked": Bool, }
 
 ```
 

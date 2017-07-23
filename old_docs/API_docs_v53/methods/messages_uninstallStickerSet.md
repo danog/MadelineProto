@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.uninstallStickerSet
-* params - {"stickerset":"InputStickerSet"}
+* params - {"stickerset": InputStickerSet, }
 
 ```
 

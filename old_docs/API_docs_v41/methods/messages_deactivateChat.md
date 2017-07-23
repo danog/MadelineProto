@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deactivateChat
-* params - {"chat_id":"InputPeer","enabled":"Bool"}
+* params - {"chat_id": InputPeer, "enabled": Bool, }
 
 ```
 

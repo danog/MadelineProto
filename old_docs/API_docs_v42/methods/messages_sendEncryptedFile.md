@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendEncryptedFile
-* params - {"peer":"InputEncryptedChat","message":"DecryptedMessage","file":"InputEncryptedFile"}
+* params - {"peer": InputEncryptedChat, "message": DecryptedMessage, "file": InputEncryptedFile, }
 
 ```
 

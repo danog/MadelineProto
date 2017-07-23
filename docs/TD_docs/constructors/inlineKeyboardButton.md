@@ -24,13 +24,13 @@ Represents one button of the inline keyboard
 ### Example:
 
 ```
-$inlineKeyboardButton = ['_' => 'inlineKeyboardButton', 'text' => string, 'type' => InlineKeyboardButtonType, ];
+$inlineKeyboardButton = ['_' => 'inlineKeyboardButton', 'text' => 'string', 'type' => InlineKeyboardButtonType];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineKeyboardButton","text":"string","type":"InlineKeyboardButtonType"}
+{"_": "inlineKeyboardButton", "text": "string", "type": InlineKeyboardButtonType}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineKeyboardButton={_='inlineKeyboardButton', text=string, type=InlineKeyboardButtonType, }
+inlineKeyboardButton={_='inlineKeyboardButton', text='string', type=InlineKeyboardButtonType}
 
 ```
 

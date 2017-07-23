@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteHistory
-* params - {"peer":"InputPeer","max_id":"int"}
+* params - {"peer": InputPeer, "max_id": int, }
 
 ```
 

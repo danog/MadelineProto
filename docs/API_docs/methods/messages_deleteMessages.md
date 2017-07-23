@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteMessages
-* params - {"revoke":"Bool","id":["int"]}
+* params - {"revoke": Bool, "id": [int], }
 
 ```
 

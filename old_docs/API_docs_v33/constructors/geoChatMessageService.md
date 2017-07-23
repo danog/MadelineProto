@@ -25,13 +25,13 @@ description: geoChatMessageService attributes, type and example
 ### Example:
 
 ```
-$geoChatMessageService = ['_' => 'geoChatMessageService', 'chat_id' => int, 'id' => int, 'from_id' => int, 'date' => int, 'action' => MessageAction, ];
+$geoChatMessageService = ['_' => 'geoChatMessageService', 'chat_id' => int, 'id' => int, 'from_id' => int, 'date' => int, 'action' => MessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geoChatMessageService","chat_id":"int","id":"int","from_id":"int","date":"int","action":"MessageAction"}
+{"_": "geoChatMessageService", "chat_id": int, "id": int, "from_id": int, "date": int, "action": MessageAction}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-geoChatMessageService={_='geoChatMessageService', chat_id=int, id=int, from_id=int, date=int, action=MessageAction, }
+geoChatMessageService={_='geoChatMessageService', chat_id=int, id=int, from_id=int, date=int, action=MessageAction}
 
 ```
 

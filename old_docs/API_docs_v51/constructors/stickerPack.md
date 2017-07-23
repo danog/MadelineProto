@@ -22,13 +22,13 @@ description: stickerPack attributes, type and example
 ### Example:
 
 ```
-$stickerPack = ['_' => 'stickerPack', 'emoticon' => string, 'documents' => [long], ];
+$stickerPack = ['_' => 'stickerPack', 'emoticon' => 'string', 'documents' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerPack","emoticon":"string","documents":["long"]}
+{"_": "stickerPack", "emoticon": "string", "documents": [long]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerPack={_='stickerPack', emoticon=string, documents={long}, }
+stickerPack={_='stickerPack', emoticon='string', documents={long}}
 
 ```
 

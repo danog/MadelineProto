@@ -22,13 +22,13 @@ Privacy key for managing visibility of the user status
 ### Example:
 
 ```
-$privacyKeyUserStatus = ['_' => 'privacyKeyUserStatus', ];
+$privacyKeyUserStatus = ['_' => 'privacyKeyUserStatus'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"privacyKeyUserStatus"}
+{"_": "privacyKeyUserStatus"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-privacyKeyUserStatus={_='privacyKeyUserStatus', }
+privacyKeyUserStatus={_='privacyKeyUserStatus'}
 
 ```
 

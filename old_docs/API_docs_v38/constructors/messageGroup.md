@@ -24,13 +24,13 @@ description: messageGroup attributes, type and example
 ### Example:
 
 ```
-$messageGroup = ['_' => 'messageGroup', 'min_id' => int, 'max_id' => int, 'count' => int, 'date' => int, ];
+$messageGroup = ['_' => 'messageGroup', 'min_id' => int, 'max_id' => int, 'count' => int, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageGroup","min_id":"int","max_id":"int","count":"int","date":"int"}
+{"_": "messageGroup", "min_id": int, "max_id": int, "count": int, "date": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messageGroup={_='messageGroup', min_id=int, max_id=int, count=int, date=int, }
+messageGroup={_='messageGroup', min_id=int, max_id=int, count=int, date=int}
 
 ```
 

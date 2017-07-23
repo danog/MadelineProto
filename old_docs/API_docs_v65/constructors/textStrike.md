@@ -21,13 +21,13 @@ description: textStrike attributes, type and example
 ### Example:
 
 ```
-$textStrike = ['_' => 'textStrike', 'text' => RichText, ];
+$textStrike = ['_' => 'textStrike', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"textStrike","text":"RichText"}
+{"_": "textStrike", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-textStrike={_='textStrike', text=RichText, }
+textStrike={_='textStrike', text=RichText}
 
 ```
 

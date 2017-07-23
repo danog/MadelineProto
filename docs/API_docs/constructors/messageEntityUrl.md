@@ -24,13 +24,13 @@ Url beginning with http
 ### Example:
 
 ```
-$messageEntityUrl = ['_' => 'messageEntityUrl', 'offset' => int, 'length' => int, ];
+$messageEntityUrl = ['_' => 'messageEntityUrl', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityUrl","offset":"int","length":"int"}
+{"_": "messageEntityUrl", "offset": int, "length": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityUrl={_='messageEntityUrl', offset=int, length=int, }
+messageEntityUrl={_='messageEntityUrl', offset=int, length=int}
 
 ```
 

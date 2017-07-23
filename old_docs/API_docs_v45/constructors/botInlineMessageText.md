@@ -23,13 +23,13 @@ description: botInlineMessageText attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => Bool, 'message' => string, 'entities' => [MessageEntity], ];
+$botInlineMessageText = ['_' => 'botInlineMessageText', 'no_webpage' => Bool, 'message' => 'string', 'entities' => [MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInlineMessageText","no_webpage":"Bool","message":"string","entities":["MessageEntity"]}
+{"_": "botInlineMessageText", "no_webpage": Bool, "message": "string", "entities": [MessageEntity]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMessageText={_='botInlineMessageText', no_webpage=Bool, message=string, entities={MessageEntity}, }
+botInlineMessageText={_='botInlineMessageText', no_webpage=Bool, message='string', entities={MessageEntity}}
 
 ```
 

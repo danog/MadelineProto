@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.discardCall
-* params - {"peer":"InputPhoneCall","duration":"int","reason":"PhoneCallDiscardReason","connection_id":"long"}
+* params - {"peer": InputPhoneCall, "duration": int, "reason": PhoneCallDiscardReason, "connection_id": long, }
 
 ```
 

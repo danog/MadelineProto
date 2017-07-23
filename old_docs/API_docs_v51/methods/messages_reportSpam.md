@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reportSpam
-* params - {"peer":"InputPeer"}
+* params - {"peer": InputPeer, }
 
 ```
 

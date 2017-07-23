@@ -25,13 +25,13 @@ description: photoSize attributes, type and example
 ### Example:
 
 ```
-$photoSize_23 = ['_' => 'photoSize', 'type' => string, 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int, ];
+$photoSize_23 = ['_' => 'photoSize', 'type' => 'string', 'location' => FileLocation, 'w' => int, 'h' => int, 'size' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photoSize","type":"string","location":"FileLocation","w":"int","h":"int","size":"int"}
+{"_": "photoSize", "type": "string", "location": FileLocation, "w": int, "h": int, "size": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-photoSize_23={_='photoSize', type=string, location=FileLocation, w=int, h=int, size=int, }
+photoSize_23={_='photoSize', type='string', location=FileLocation, w=int, h=int, size=int}
 
 ```
 

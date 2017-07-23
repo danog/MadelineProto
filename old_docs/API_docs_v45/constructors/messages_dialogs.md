@@ -24,13 +24,13 @@ description: messages_dialogs attributes, type and example
 ### Example:
 
 ```
-$messages_dialogs = ['_' => 'messages.dialogs', 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$messages_dialogs = ['_' => 'messages.dialogs', 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.dialogs","dialogs":["Dialog"],"messages":["Message"],"chats":["Chat"],"users":["User"]}
+{"_": "messages.dialogs", "dialogs": [Dialog], "messages": [Message], "chats": [Chat], "users": [User]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_dialogs={_='messages.dialogs', dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}, }
+messages_dialogs={_='messages.dialogs', dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}}
 
 ```
 

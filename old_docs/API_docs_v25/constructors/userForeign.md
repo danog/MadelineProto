@@ -27,13 +27,13 @@ description: userForeign attributes, type and example
 ### Example:
 
 ```
-$userForeign = ['_' => 'userForeign', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'access_hash' => long, 'photo' => UserProfilePhoto, 'status' => UserStatus, ];
+$userForeign = ['_' => 'userForeign', 'id' => int, 'first_name' => 'string', 'last_name' => 'string', 'username' => 'string', 'access_hash' => long, 'photo' => UserProfilePhoto, 'status' => UserStatus];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userForeign","id":"int","first_name":"string","last_name":"string","username":"string","access_hash":"long","photo":"UserProfilePhoto","status":"UserStatus"}
+{"_": "userForeign", "id": int, "first_name": "string", "last_name": "string", "username": "string", "access_hash": long, "photo": UserProfilePhoto, "status": UserStatus}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-userForeign={_='userForeign', id=int, first_name=string, last_name=string, username=string, access_hash=long, photo=UserProfilePhoto, status=UserStatus, }
+userForeign={_='userForeign', id=int, first_name='string', last_name='string', username='string', access_hash=long, photo=UserProfilePhoto, status=UserStatus}
 
 ```
 

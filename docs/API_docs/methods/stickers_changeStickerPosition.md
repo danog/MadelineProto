@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.changeStickerPosition
-* params - {"sticker":"InputDocument","position":"int"}
+* params - {"sticker": InputDocument, "position": int, }
 
 ```
 

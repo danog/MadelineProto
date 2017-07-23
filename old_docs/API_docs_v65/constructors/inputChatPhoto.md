@@ -21,13 +21,13 @@ description: inputChatPhoto attributes, type and example
 ### Example:
 
 ```
-$inputChatPhoto = ['_' => 'inputChatPhoto', 'id' => InputPhoto, ];
+$inputChatPhoto = ['_' => 'inputChatPhoto', 'id' => InputPhoto];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputChatPhoto","id":"InputPhoto"}
+{"_": "inputChatPhoto", "id": InputPhoto}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputChatPhoto={_='inputChatPhoto', id=InputPhoto, }
+inputChatPhoto={_='inputChatPhoto', id=InputPhoto}
 
 ```
 

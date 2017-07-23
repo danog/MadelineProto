@@ -21,13 +21,13 @@ description: channelAdminLogEventActionToggleInvites attributes, type and exampl
 ### Example:
 
 ```
-$channelAdminLogEventActionToggleInvites = ['_' => 'channelAdminLogEventActionToggleInvites', 'new_value' => Bool, ];
+$channelAdminLogEventActionToggleInvites = ['_' => 'channelAdminLogEventActionToggleInvites', 'new_value' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionToggleInvites","new_value":"Bool"}
+{"_": "channelAdminLogEventActionToggleInvites", "new_value": Bool}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionToggleInvites={_='channelAdminLogEventActionToggleInvites', new_value=Bool, }
+channelAdminLogEventActionToggleInvites={_='channelAdminLogEventActionToggleInvites', new_value=Bool}
 
 ```
 

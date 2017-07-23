@@ -24,13 +24,13 @@ description: help_appUpdate attributes, type and example
 ### Example:
 
 ```
-$help_appUpdate = ['_' => 'help.appUpdate', 'id' => int, 'critical' => Bool, 'url' => string, 'text' => string, ];
+$help_appUpdate = ['_' => 'help.appUpdate', 'id' => int, 'critical' => Bool, 'url' => 'string', 'text' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.appUpdate","id":"int","critical":"Bool","url":"string","text":"string"}
+{"_": "help.appUpdate", "id": int, "critical": Bool, "url": "string", "text": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-help_appUpdate={_='help.appUpdate', id=int, critical=Bool, url=string, text=string, }
+help_appUpdate={_='help.appUpdate', id=int, critical=Bool, url='string', text='string'}
 
 ```
 

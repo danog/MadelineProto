@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callVectorIntObject
-* params - {"x":["test_Int"]}
+* params - {"x": [test_Int], }
 
 ```
 

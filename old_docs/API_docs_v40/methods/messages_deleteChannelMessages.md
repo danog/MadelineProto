@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteChannelMessages
-* params - {"peer":"InputPeer","id":["int"]}
+* params - {"peer": InputPeer, "id": [int], }
 
 ```
 

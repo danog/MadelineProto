@@ -16,13 +16,13 @@ description: destroy_auth_key_fail attributes, type and example
 ### Example:
 
 ```
-$destroy_auth_key_fail = ['_' => 'destroy_auth_key_fail', ];
+$destroy_auth_key_fail = ['_' => 'destroy_auth_key_fail'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"destroy_auth_key_fail"}
+{"_": "destroy_auth_key_fail"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-destroy_auth_key_fail={_='destroy_auth_key_fail', }
+destroy_auth_key_fail={_='destroy_auth_key_fail'}
 
 ```
 

@@ -22,13 +22,13 @@ description: error attributes, type and example
 ### Example:
 
 ```
-$error = ['_' => 'error', 'code' => int, 'text' => string, ];
+$error = ['_' => 'error', 'code' => int, 'text' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"error","code":"int","text":"string"}
+{"_": "error", "code": int, "text": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-error={_='error', code=int, text=string, }
+error={_='error', code=int, text='string'}
 
 ```
 

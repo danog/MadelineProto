@@ -16,13 +16,13 @@ description: inputUserSelf attributes, type and example
 ### Example:
 
 ```
-$inputUserSelf = ['_' => 'inputUserSelf', ];
+$inputUserSelf = ['_' => 'inputUserSelf'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputUserSelf"}
+{"_": "inputUserSelf"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputUserSelf={_='inputUserSelf', }
+inputUserSelf={_='inputUserSelf'}
 
 ```
 

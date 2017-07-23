@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.toggleDialogPin
-* params - {"pinned":"Bool","peer":"InputPeer"}
+* params - {"pinned": Bool, "peer": InputPeer, }
 
 ```
 

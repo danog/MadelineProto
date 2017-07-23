@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setEncryptedTyping
-* params - {"peer":"InputEncryptedChat","typing":"Bool"}
+* params - {"peer": InputEncryptedChat, "typing": Bool, }
 
 ```
 

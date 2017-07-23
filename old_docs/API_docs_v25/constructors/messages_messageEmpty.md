@@ -16,13 +16,13 @@ description: messages_messageEmpty attributes, type and example
 ### Example:
 
 ```
-$messages_messageEmpty = ['_' => 'messages.messageEmpty', ];
+$messages_messageEmpty = ['_' => 'messages.messageEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.messageEmpty"}
+{"_": "messages.messageEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_messageEmpty={_='messages.messageEmpty', }
+messages_messageEmpty={_='messages.messageEmpty'}
 
 ```
 

@@ -22,13 +22,13 @@ description: updateNewMessage attributes, type and example
 ### Example:
 
 ```
-$updateNewMessage = ['_' => 'updateNewMessage', 'message' => Message, 'pts' => int, ];
+$updateNewMessage = ['_' => 'updateNewMessage', 'message' => Message, 'pts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewMessage","message":"Message","pts":"int"}
+{"_": "updateNewMessage", "message": Message, "pts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewMessage={_='updateNewMessage', message=Message, pts=int, }
+updateNewMessage={_='updateNewMessage', message=Message, pts=int}
 
 ```
 

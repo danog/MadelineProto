@@ -21,13 +21,13 @@ description: decryptedMessageActionTyping attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionTyping_17 = ['_' => 'decryptedMessageActionTyping', 'action' => SendMessageAction, ];
+$decryptedMessageActionTyping_17 = ['_' => 'decryptedMessageActionTyping', 'action' => SendMessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionTyping","action":"SendMessageAction"}
+{"_": "decryptedMessageActionTyping", "action": SendMessageAction}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionTyping_17={_='decryptedMessageActionTyping', action=SendMessageAction, }
+decryptedMessageActionTyping_17={_='decryptedMessageActionTyping', action=SendMessageAction}
 
 ```
 

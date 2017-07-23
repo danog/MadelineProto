@@ -22,13 +22,13 @@ description: replyKeyboardForceReply attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply', 'single_use' => Bool, 'selective' => Bool, ];
+$replyKeyboardForceReply = ['_' => 'replyKeyboardForceReply', 'single_use' => Bool, 'selective' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"replyKeyboardForceReply","single_use":"Bool","selective":"Bool"}
+{"_": "replyKeyboardForceReply", "single_use": Bool, "selective": Bool}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-replyKeyboardForceReply={_='replyKeyboardForceReply', single_use=Bool, selective=Bool, }
+replyKeyboardForceReply={_='replyKeyboardForceReply', single_use=Bool, selective=Bool}
 
 ```
 

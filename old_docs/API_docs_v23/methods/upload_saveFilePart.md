@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->upload->saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => bytes, ]);
+$Bool = $MadelineProto->upload->saveFilePart(['file_id' => long, 'file_part' => int, 'bytes' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - upload.saveFilePart
-* params - {"file_id":"long","file_part":"int","bytes":"bytes"}
+* params - {"file_id": long, "file_part": int, "bytes": "bytes", }
 
 ```
 
@@ -67,6 +67,6 @@ bytes - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-Bool = upload.saveFilePart({file_id=long, file_part=int, bytes=bytes, })
+Bool = upload.saveFilePart({file_id=long, file_part=int, bytes='bytes', })
 ```
 

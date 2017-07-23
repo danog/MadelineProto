@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->editInlineMessageReplyMarkup(['inline_message_id' => string, 'reply_markup' => ReplyMarkup, ]);
+$Ok = $MadelineProto->editInlineMessageReplyMarkup(['inline_message_id' => 'string', 'reply_markup' => ReplyMarkup, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - editInlineMessageReplyMarkup
-* params - {"inline_message_id":"string","reply_markup":"ReplyMarkup"}
+* params - {"inline_message_id": "string", "reply_markup": ReplyMarkup, }
 
 ```
 
@@ -70,7 +70,7 @@ reply_markup - Json encoded ReplyMarkup
 Or, if you're into Lua:
 
 ```
-Ok = editInlineMessageReplyMarkup({inline_message_id=string, reply_markup=ReplyMarkup, })
+Ok = editInlineMessageReplyMarkup({inline_message_id='string', reply_markup=ReplyMarkup, })
 ```
 
 

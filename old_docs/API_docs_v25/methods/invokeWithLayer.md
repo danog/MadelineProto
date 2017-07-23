@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - invokeWithLayer
-* params - {"layer":"int","query":"!X"}
+* params - {"layer": int, "query": !X, }
 
 ```
 

@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendMedia
-* params - {"peer":"InputPeer","reply_to_msg_id":"int","media":"InputMedia"}
+* params - {"peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, }
 
 ```
 

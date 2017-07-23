@@ -22,13 +22,13 @@ User typing message
 ### Example:
 
 ```
-$sendMessageTypingAction_17 = ['_' => 'sendMessageTypingAction', ];
+$sendMessageTypingAction_17 = ['_' => 'sendMessageTypingAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageTypingAction"}
+{"_": "sendMessageTypingAction"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageTypingAction_17={_='sendMessageTypingAction', }
+sendMessageTypingAction_17={_='sendMessageTypingAction'}
 
 ```
 

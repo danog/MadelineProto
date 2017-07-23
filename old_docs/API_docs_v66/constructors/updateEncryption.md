@@ -22,13 +22,13 @@ description: updateEncryption attributes, type and example
 ### Example:
 
 ```
-$updateEncryption = ['_' => 'updateEncryption', 'chat' => EncryptedChat, 'date' => int, ];
+$updateEncryption = ['_' => 'updateEncryption', 'chat' => EncryptedChat, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateEncryption","chat":"EncryptedChat","date":"int"}
+{"_": "updateEncryption", "chat": EncryptedChat, "date": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateEncryption={_='updateEncryption', chat=EncryptedChat, date=int, }
+updateEncryption={_='updateEncryption', chat=EncryptedChat, date=int}
 
 ```
 

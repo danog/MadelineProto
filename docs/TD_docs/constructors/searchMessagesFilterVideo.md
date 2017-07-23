@@ -22,13 +22,13 @@ Return only video messages
 ### Example:
 
 ```
-$searchMessagesFilterVideo = ['_' => 'searchMessagesFilterVideo', ];
+$searchMessagesFilterVideo = ['_' => 'searchMessagesFilterVideo'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"searchMessagesFilterVideo"}
+{"_": "searchMessagesFilterVideo"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-searchMessagesFilterVideo={_='searchMessagesFilterVideo', }
+searchMessagesFilterVideo={_='searchMessagesFilterVideo'}
 
 ```
 

@@ -16,13 +16,13 @@ description: privacyKeyStatusTimestamp attributes, type and example
 ### Example:
 
 ```
-$privacyKeyStatusTimestamp = ['_' => 'privacyKeyStatusTimestamp', ];
+$privacyKeyStatusTimestamp = ['_' => 'privacyKeyStatusTimestamp'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"privacyKeyStatusTimestamp"}
+{"_": "privacyKeyStatusTimestamp"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-privacyKeyStatusTimestamp={_='privacyKeyStatusTimestamp', }
+privacyKeyStatusTimestamp={_='privacyKeyStatusTimestamp'}
 
 ```
 

@@ -23,13 +23,13 @@ description: contacts_resolvedPeer attributes, type and example
 ### Example:
 
 ```
-$contacts_resolvedPeer = ['_' => 'contacts.resolvedPeer', 'peer' => Peer, 'chats' => [Chat], 'users' => [User], ];
+$contacts_resolvedPeer = ['_' => 'contacts.resolvedPeer', 'peer' => Peer, 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.resolvedPeer","peer":"Peer","chats":["Chat"],"users":["User"]}
+{"_": "contacts.resolvedPeer", "peer": Peer, "chats": [Chat], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_resolvedPeer={_='contacts.resolvedPeer', peer=Peer, chats={Chat}, users={User}, }
+contacts_resolvedPeer={_='contacts.resolvedPeer', peer=Peer, chats={Chat}, users={User}}
 
 ```
 

@@ -37,7 +37,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->messages->searchGlobal(['q' => string, 'offset_date' => int, 'offset_peer' => InputPeer, 'offset_id' => int, 'limit' => int, ]);
+$messages_Messages = $MadelineProto->messages->searchGlobal(['q' => 'string', 'offset_date' => int, 'offset_peer' => InputPeer, 'offset_id' => int, 'limit' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.searchGlobal
-* params - {"q":"string","offset_date":"int","offset_peer":"InputPeer","offset_id":"int","limit":"int"}
+* params - {"q": "string", "offset_date": int, "offset_peer": InputPeer, "offset_id": int, "limit": int, }
 
 ```
 
@@ -71,6 +71,6 @@ limit - Json encoded int
 Or, if you're into Lua:
 
 ```
-messages_Messages = messages.searchGlobal({q=string, offset_date=int, offset_peer=InputPeer, offset_id=int, limit=int, })
+messages_Messages = messages.searchGlobal({q='string', offset_date=int, offset_peer=InputPeer, offset_id=int, limit=int, })
 ```
 

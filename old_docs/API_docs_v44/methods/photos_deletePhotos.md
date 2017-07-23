@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.deletePhotos
-* params - {"id":["InputPhoto"]}
+* params - {"id": [InputPhoto], }
 
 ```
 

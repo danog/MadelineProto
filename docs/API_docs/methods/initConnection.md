@@ -40,7 +40,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$X = $MadelineProto->initConnection(['api_id' => int, 'device_model' => string, 'system_version' => string, 'app_version' => string, 'system_lang_code' => string, 'lang_pack' => string, 'lang_code' => string, 'query' => !X, ]);
+$X = $MadelineProto->initConnection(['api_id' => int, 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'system_lang_code' => 'string', 'lang_pack' => 'string', 'lang_code' => 'string', 'query' => !X, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - initConnection
-* params - {"api_id":"int","device_model":"string","system_version":"string","app_version":"string","system_lang_code":"string","lang_pack":"string","lang_code":"string","query":"!X"}
+* params - {"api_id": int, "device_model": "string", "system_version": "string", "app_version": "string", "system_lang_code": "string", "lang_pack": "string", "lang_code": "string", "query": !X, }
 
 ```
 
@@ -77,6 +77,6 @@ query - Json encoded !X
 Or, if you're into Lua:
 
 ```
-X = initConnection({api_id=int, device_model=string, system_version=string, app_version=string, system_lang_code=string, lang_pack=string, lang_code=string, query=!X, })
+X = initConnection({api_id=int, device_model='string', system_version='string', app_version='string', system_lang_code='string', lang_pack='string', lang_code='string', query=!X, })
 ```
 

@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getArchivedStickerSets
-* params - {"is_masks":"Bool","offset_sticker_set_id":"long","limit":"int"}
+* params - {"is_masks": Bool, "offset_sticker_set_id": long, "limit": int, }
 
 ```
 

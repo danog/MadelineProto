@@ -25,13 +25,13 @@ description: messages_dialogsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_dialogsSlice = ['_' => 'messages.dialogsSlice', 'count' => int, 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], ];
+$messages_dialogsSlice = ['_' => 'messages.dialogsSlice', 'count' => int, 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.dialogsSlice","count":"int","dialogs":["Dialog"],"messages":["Message"],"chats":["Chat"],"users":["User"]}
+{"_": "messages.dialogsSlice", "count": int, "dialogs": [Dialog], "messages": [Message], "chats": [Chat], "users": [User]}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_dialogsSlice={_='messages.dialogsSlice', count=int, dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}, }
+messages_dialogsSlice={_='messages.dialogsSlice', count=int, dialogs={Dialog}, messages={Message}, chats={Chat}, users={User}}
 
 ```
 

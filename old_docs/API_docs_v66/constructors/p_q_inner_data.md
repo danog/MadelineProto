@@ -26,13 +26,13 @@ description: p_q_inner_data attributes, type and example
 ### Example:
 
 ```
-$p_q_inner_data = ['_' => 'p_q_inner_data', 'pq' => string, 'p' => string, 'q' => string, 'nonce' => int128, 'server_nonce' => int128, 'new_nonce' => int256, ];
+$p_q_inner_data = ['_' => 'p_q_inner_data', 'pq' => 'string', 'p' => 'string', 'q' => 'string', 'nonce' => int128, 'server_nonce' => int128, 'new_nonce' => int256];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"p_q_inner_data","pq":"string","p":"string","q":"string","nonce":"int128","server_nonce":"int128","new_nonce":"int256"}
+{"_": "p_q_inner_data", "pq": "string", "p": "string", "q": "string", "nonce": int128, "server_nonce": int128, "new_nonce": int256}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-p_q_inner_data={_='p_q_inner_data', pq=string, p=string, q=string, nonce=int128, server_nonce=int128, new_nonce=int256, }
+p_q_inner_data={_='p_q_inner_data', pq='string', p='string', q='string', nonce=int128, server_nonce=int128, new_nonce=int256}
 
 ```
 

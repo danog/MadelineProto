@@ -41,7 +41,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => string, 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
+$messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => 'string', 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.search
-* params - {"peer":"InputPeer","q":"string","from_id":"InputUser","filter":"MessagesFilter","min_date":"int","max_date":"int","offset":"int","max_id":"int","limit":"int"}
+* params - {"peer": InputPeer, "q": "string", "from_id": InputUser, "filter": MessagesFilter, "min_date": int, "max_date": int, "offset": int, "max_id": int, "limit": int, }
 
 ```
 
@@ -79,6 +79,6 @@ limit - Json encoded int
 Or, if you're into Lua:
 
 ```
-messages_Messages = messages.search({peer=InputPeer, q=string, from_id=InputUser, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
+messages_Messages = messages.search({peer=InputPeer, q='string', from_id=InputUser, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
 ```
 

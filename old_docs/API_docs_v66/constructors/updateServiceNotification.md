@@ -26,13 +26,13 @@ description: updateServiceNotification attributes, type and example
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => 'updateServiceNotification', 'popup' => Bool, 'inbox_date' => int, 'type' => string, 'message' => string, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'popup' => Bool, 'inbox_date' => int, 'type' => 'string', 'message' => 'string', 'media' => MessageMedia, 'entities' => [MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateServiceNotification","popup":"Bool","inbox_date":"int","type":"string","message":"string","media":"MessageMedia","entities":["MessageEntity"]}
+{"_": "updateServiceNotification", "popup": Bool, "inbox_date": int, "type": "string", "message": "string", "media": MessageMedia, "entities": [MessageEntity]}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-updateServiceNotification={_='updateServiceNotification', popup=Bool, inbox_date=int, type=string, message=string, media=MessageMedia, entities={MessageEntity}, }
+updateServiceNotification={_='updateServiceNotification', popup=Bool, inbox_date=int, type='string', message='string', media=MessageMedia, entities={MessageEntity}}
 
 ```
 

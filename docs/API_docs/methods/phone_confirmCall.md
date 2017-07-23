@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$phone_PhoneCall = $MadelineProto->phone->confirmCall(['peer' => InputPhoneCall, 'g_a' => bytes, 'key_fingerprint' => long, 'protocol' => PhoneCallProtocol, ]);
+$phone_PhoneCall = $MadelineProto->phone->confirmCall(['peer' => InputPhoneCall, 'g_a' => 'bytes', 'key_fingerprint' => long, 'protocol' => PhoneCallProtocol, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.confirmCall
-* params - {"peer":"InputPhoneCall","g_a":"bytes","key_fingerprint":"long","protocol":"PhoneCallProtocol"}
+* params - {"peer": InputPhoneCall, "g_a": "bytes", "key_fingerprint": long, "protocol": PhoneCallProtocol, }
 
 ```
 
@@ -69,6 +69,6 @@ protocol - Json encoded PhoneCallProtocol
 Or, if you're into Lua:
 
 ```
-phone_PhoneCall = phone.confirmCall({peer=InputPhoneCall, g_a=bytes, key_fingerprint=long, protocol=PhoneCallProtocol, })
+phone_PhoneCall = phone.confirmCall({peer=InputPhoneCall, g_a='bytes', key_fingerprint=long, protocol=PhoneCallProtocol, })
 ```
 

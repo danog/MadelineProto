@@ -24,13 +24,13 @@ description: channelAdminLogEvent attributes, type and example
 ### Example:
 
 ```
-$channelAdminLogEvent = ['_' => 'channelAdminLogEvent', 'id' => long, 'date' => int, 'user_id' => int, 'action' => ChannelAdminLogEventAction, ];
+$channelAdminLogEvent = ['_' => 'channelAdminLogEvent', 'id' => long, 'date' => int, 'user_id' => int, 'action' => ChannelAdminLogEventAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEvent","id":"long","date":"int","user_id":"int","action":"ChannelAdminLogEventAction"}
+{"_": "channelAdminLogEvent", "id": long, "date": int, "user_id": int, "action": ChannelAdminLogEventAction}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEvent={_='channelAdminLogEvent', id=long, date=int, user_id=int, action=ChannelAdminLogEventAction, }
+channelAdminLogEvent={_='channelAdminLogEvent', id=long, date=int, user_id=int, action=ChannelAdminLogEventAction}
 
 ```
 

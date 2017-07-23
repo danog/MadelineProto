@@ -23,13 +23,13 @@ Token for APNS
 ### Example:
 
 ```
-$apnsDeviceToken = ['_' => 'apnsDeviceToken', 'token' => string, ];
+$apnsDeviceToken = ['_' => 'apnsDeviceToken', 'token' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"apnsDeviceToken","token":"string"}
+{"_": "apnsDeviceToken", "token": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-apnsDeviceToken={_='apnsDeviceToken', token=string, }
+apnsDeviceToken={_='apnsDeviceToken', token='string'}
 
 ```
 

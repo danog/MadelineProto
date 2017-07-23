@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.logOut
-* params - 
+* params - {}
 
 ```
 

@@ -23,13 +23,13 @@ Some data from channelFull has been changed
 ### Example:
 
 ```
-$updateChannelFull = ['_' => 'updateChannelFull', 'channel_full' => channelFull, ];
+$updateChannelFull = ['_' => 'updateChannelFull', 'channel_full' => channelFull];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChannelFull","channel_full":"channelFull"}
+{"_": "updateChannelFull", "channel_full": channelFull}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChannelFull={_='updateChannelFull', channel_full=channelFull, }
+updateChannelFull={_='updateChannelFull', channel_full=channelFull}
 
 ```
 

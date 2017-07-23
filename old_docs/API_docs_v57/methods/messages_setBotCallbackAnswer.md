@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => string, 'url' => string, ]);
+$Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => 'string', 'url' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setBotCallbackAnswer
-* params - {"alert":"Bool","query_id":"long","message":"string","url":"string"}
+* params - {"alert": Bool, "query_id": long, "message": "string", "url": "string", }
 
 ```
 
@@ -69,7 +69,7 @@ url - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = messages.setBotCallbackAnswer({alert=Bool, query_id=long, message=string, url=string, })
+Bool = messages.setBotCallbackAnswer({alert=Bool, query_id=long, message='string', url='string', })
 ```
 
 

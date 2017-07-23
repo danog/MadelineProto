@@ -25,13 +25,13 @@ Contains information about notification settings for chat or chats
 ### Example:
 
 ```
-$notificationSettings = ['_' => 'notificationSettings', 'mute_for' => int, 'sound' => string, 'show_preview' => Bool, ];
+$notificationSettings = ['_' => 'notificationSettings', 'mute_for' => int, 'sound' => 'string', 'show_preview' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"notificationSettings","mute_for":"int","sound":"string","show_preview":"Bool"}
+{"_": "notificationSettings", "mute_for": int, "sound": "string", "show_preview": Bool}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-notificationSettings={_='notificationSettings', mute_for=int, sound=string, show_preview=Bool, }
+notificationSettings={_='notificationSettings', mute_for=int, sound='string', show_preview=Bool}
 
 ```
 

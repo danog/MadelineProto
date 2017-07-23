@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.addStickerToSet
-* params - {"stickerset":"InputStickerSet","sticker":"InputStickerSetItem"}
+* params - {"stickerset": InputStickerSet, "sticker": InputStickerSetItem, }
 
 ```
 

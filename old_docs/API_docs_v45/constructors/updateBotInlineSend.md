@@ -23,13 +23,13 @@ description: updateBotInlineSend attributes, type and example
 ### Example:
 
 ```
-$updateBotInlineSend = ['_' => 'updateBotInlineSend', 'user_id' => int, 'query' => string, 'id' => string, ];
+$updateBotInlineSend = ['_' => 'updateBotInlineSend', 'user_id' => int, 'query' => 'string', 'id' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateBotInlineSend","user_id":"int","query":"string","id":"string"}
+{"_": "updateBotInlineSend", "user_id": int, "query": "string", "id": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateBotInlineSend={_='updateBotInlineSend', user_id=int, query=string, id=string, }
+updateBotInlineSend={_='updateBotInlineSend', user_id=int, query='string', id='string'}
 
 ```
 

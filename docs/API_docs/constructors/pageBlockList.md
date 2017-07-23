@@ -22,13 +22,13 @@ description: pageBlockList attributes, type and example
 ### Example:
 
 ```
-$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [RichText], ];
+$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [RichText]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockList","ordered":"Bool","items":["RichText"]}
+{"_": "pageBlockList", "ordered": Bool, "items": [RichText]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockList={_='pageBlockList', ordered=Bool, items={RichText}, }
+pageBlockList={_='pageBlockList', ordered=Bool, items={RichText}}
 
 ```
 

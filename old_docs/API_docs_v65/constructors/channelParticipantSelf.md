@@ -23,13 +23,13 @@ description: channelParticipantSelf attributes, type and example
 ### Example:
 
 ```
-$channelParticipantSelf = ['_' => 'channelParticipantSelf', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$channelParticipantSelf = ['_' => 'channelParticipantSelf', 'user_id' => int, 'inviter_id' => int, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelParticipantSelf","user_id":"int","inviter_id":"int","date":"int"}
+{"_": "channelParticipantSelf", "user_id": int, "inviter_id": int, "date": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-channelParticipantSelf={_='channelParticipantSelf', user_id=int, inviter_id=int, date=int, }
+channelParticipantSelf={_='channelParticipantSelf', user_id=int, inviter_id=int, date=int}
 
 ```
 

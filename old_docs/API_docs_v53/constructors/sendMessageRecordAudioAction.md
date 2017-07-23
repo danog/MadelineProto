@@ -16,13 +16,13 @@ description: sendMessageRecordAudioAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageRecordAudioAction = ['_' => 'sendMessageRecordAudioAction', ];
+$sendMessageRecordAudioAction = ['_' => 'sendMessageRecordAudioAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageRecordAudioAction"}
+{"_": "sendMessageRecordAudioAction"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageRecordAudioAction={_='sendMessageRecordAudioAction', }
+sendMessageRecordAudioAction={_='sendMessageRecordAudioAction'}
 
 ```
 

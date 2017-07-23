@@ -29,13 +29,13 @@ description: stickerSet attributes, type and example
 ### Example:
 
 ```
-$stickerSet = ['_' => 'stickerSet', 'installed' => Bool, 'disabled' => Bool, 'official' => Bool, 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
+$stickerSet = ['_' => 'stickerSet', 'installed' => Bool, 'disabled' => Bool, 'official' => Bool, 'id' => long, 'access_hash' => long, 'title' => 'string', 'short_name' => 'string', 'count' => int, 'hash' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerSet","installed":"Bool","disabled":"Bool","official":"Bool","id":"long","access_hash":"long","title":"string","short_name":"string","count":"int","hash":"int"}
+{"_": "stickerSet", "installed": Bool, "disabled": Bool, "official": Bool, "id": long, "access_hash": long, "title": "string", "short_name": "string", "count": int, "hash": int}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerSet={_='stickerSet', installed=Bool, disabled=Bool, official=Bool, id=long, access_hash=long, title=string, short_name=string, count=int, hash=int, }
+stickerSet={_='stickerSet', installed=Bool, disabled=Bool, official=Bool, id=long, access_hash=long, title='string', short_name='string', count=int, hash=int}
 
 ```
 

@@ -37,13 +37,13 @@ description: channel attributes, type and example
 ### Example:
 
 ```
-$channel = ['_' => 'channel', 'creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'editor' => Bool, 'moderator' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'id' => int, 'access_hash' => long, 'title' => string, 'username' => string, 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => string, ];
+$channel = ['_' => 'channel', 'creator' => Bool, 'kicked' => Bool, 'left' => Bool, 'editor' => Bool, 'moderator' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'id' => int, 'access_hash' => long, 'title' => 'string', 'username' => 'string', 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channel","creator":"Bool","kicked":"Bool","left":"Bool","editor":"Bool","moderator":"Bool","broadcast":"Bool","verified":"Bool","megagroup":"Bool","restricted":"Bool","id":"int","access_hash":"long","title":"string","username":"string","photo":"ChatPhoto","date":"int","version":"int","restriction_reason":"string"}
+{"_": "channel", "creator": Bool, "kicked": Bool, "left": Bool, "editor": Bool, "moderator": Bool, "broadcast": Bool, "verified": Bool, "megagroup": Bool, "restricted": Bool, "id": int, "access_hash": long, "title": "string", "username": "string", "photo": ChatPhoto, "date": int, "version": int, "restriction_reason": "string"}
 ```
 
 
@@ -51,7 +51,7 @@ Or, if you're into Lua:
 
 
 ```
-channel={_='channel', creator=Bool, kicked=Bool, left=Bool, editor=Bool, moderator=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, id=int, access_hash=long, title=string, username=string, photo=ChatPhoto, date=int, version=int, restriction_reason=string, }
+channel={_='channel', creator=Bool, kicked=Bool, left=Bool, editor=Bool, moderator=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, id=int, access_hash=long, title='string', username='string', photo=ChatPhoto, date=int, version=int, restriction_reason='string'}
 
 ```
 

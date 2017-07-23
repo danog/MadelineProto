@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getAttachedStickerSets
-* params - {"file_id":"int"}
+* params - {"file_id": int, }
 
 ```
 

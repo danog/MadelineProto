@@ -30,13 +30,13 @@ Describes video file
 ### Example:
 
 ```
-$video = ['_' => 'video', 'duration' => int, 'width' => int, 'height' => int, 'file_name' => string, 'mime_type' => string, 'has_stickers' => Bool, 'thumb' => photoSize, 'video' => file, ];
+$video = ['_' => 'video', 'duration' => int, 'width' => int, 'height' => int, 'file_name' => 'string', 'mime_type' => 'string', 'has_stickers' => Bool, 'thumb' => photoSize, 'video' => file];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"video","duration":"int","width":"int","height":"int","file_name":"string","mime_type":"string","has_stickers":"Bool","thumb":"photoSize","video":"file"}
+{"_": "video", "duration": int, "width": int, "height": int, "file_name": "string", "mime_type": "string", "has_stickers": Bool, "thumb": photoSize, "video": file}
 ```
 
 
@@ -44,7 +44,7 @@ Or, if you're into Lua:
 
 
 ```
-video={_='video', duration=int, width=int, height=int, file_name=string, mime_type=string, has_stickers=Bool, thumb=photoSize, video=file, }
+video={_='video', duration=int, width=int, height=int, file_name='string', mime_type='string', has_stickers=Bool, thumb=photoSize, video=file}
 
 ```
 

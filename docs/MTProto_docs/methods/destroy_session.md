@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - destroy_session
-* params - {"session_id":"long"}
+* params - {"session_id": long, }
 
 ```
 

@@ -21,13 +21,13 @@ description: pageBlockTitle attributes, type and example
 ### Example:
 
 ```
-$pageBlockTitle = ['_' => 'pageBlockTitle', 'text' => RichText, ];
+$pageBlockTitle = ['_' => 'pageBlockTitle', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockTitle","text":"RichText"}
+{"_": "pageBlockTitle", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockTitle={_='pageBlockTitle', text=RichText, }
+pageBlockTitle={_='pageBlockTitle', text=RichText}
 
 ```
 

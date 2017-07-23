@@ -21,13 +21,13 @@ description: botInlineMessageMediaAuto attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'caption' => string, ];
+$botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInlineMessageMediaAuto","caption":"string"}
+{"_": "botInlineMessageMediaAuto", "caption": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMessageMediaAuto={_='botInlineMessageMediaAuto', caption=string, }
+botInlineMessageMediaAuto={_='botInlineMessageMediaAuto', caption='string'}
 
 ```
 

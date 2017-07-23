@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updateStickerSet
-* params - {"set_id":"long","is_installed":"Bool","is_archived":"Bool"}
+* params - {"set_id": long, "is_installed": Bool, "is_archived": Bool, }
 
 ```
 

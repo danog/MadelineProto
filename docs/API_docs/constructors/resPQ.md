@@ -24,13 +24,13 @@ description: resPQ attributes, type and example
 ### Example:
 
 ```
-$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => string, 'server_public_key_fingerprints' => [long], ];
+$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => 'string', 'server_public_key_fingerprints' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"resPQ","nonce":"int128","server_nonce":"int128","pq":"string","server_public_key_fingerprints":["long"]}
+{"_": "resPQ", "nonce": int128, "server_nonce": int128, "pq": "string", "server_public_key_fingerprints": [long]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-resPQ={_='resPQ', nonce=int128, server_nonce=int128, pq=string, server_public_key_fingerprints={long}, }
+resPQ={_='resPQ', nonce=int128, server_nonce=int128, pq='string', server_public_key_fingerprints={long}}
 
 ```
 

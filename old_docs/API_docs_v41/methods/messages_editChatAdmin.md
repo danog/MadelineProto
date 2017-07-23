@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editChatAdmin
-* params - {"chat_id":"InputPeer","user_id":"InputUser","is_admin":"Bool"}
+* params - {"chat_id": InputPeer, "user_id": InputUser, "is_admin": Bool, }
 
 ```
 

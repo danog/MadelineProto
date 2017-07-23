@@ -24,13 +24,13 @@ description: geochats_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$geochats_messagesSlice = ['_' => 'geochats.messagesSlice', 'count' => int, 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User], ];
+$geochats_messagesSlice = ['_' => 'geochats.messagesSlice', 'count' => int, 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geochats.messagesSlice","count":"int","messages":["GeoChatMessage"],"chats":["Chat"],"users":["User"]}
+{"_": "geochats.messagesSlice", "count": int, "messages": [GeoChatMessage], "chats": [Chat], "users": [User]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-geochats_messagesSlice={_='geochats.messagesSlice', count=int, messages={GeoChatMessage}, chats={Chat}, users={User}, }
+geochats_messagesSlice={_='geochats.messagesSlice', count=int, messages={GeoChatMessage}, chats={Chat}, users={User}}
 
 ```
 

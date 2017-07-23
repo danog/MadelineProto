@@ -16,13 +16,13 @@ description: inputPeerNotifyEventsAll attributes, type and example
 ### Example:
 
 ```
-$inputPeerNotifyEventsAll = ['_' => 'inputPeerNotifyEventsAll', ];
+$inputPeerNotifyEventsAll = ['_' => 'inputPeerNotifyEventsAll'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPeerNotifyEventsAll"}
+{"_": "inputPeerNotifyEventsAll"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPeerNotifyEventsAll={_='inputPeerNotifyEventsAll', }
+inputPeerNotifyEventsAll={_='inputPeerNotifyEventsAll'}
 
 ```
 

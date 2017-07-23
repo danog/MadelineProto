@@ -23,13 +23,13 @@ Chat member deleted
 ### Example:
 
 ```
-$messageChatDeleteMember = ['_' => 'messageChatDeleteMember', 'user' => user, ];
+$messageChatDeleteMember = ['_' => 'messageChatDeleteMember', 'user' => user];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageChatDeleteMember","user":"user"}
+{"_": "messageChatDeleteMember", "user": user}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageChatDeleteMember={_='messageChatDeleteMember', user=user, }
+messageChatDeleteMember={_='messageChatDeleteMember', user=user}
 
 ```
 

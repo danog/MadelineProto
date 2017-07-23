@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.setPrivacy
-* params - {"key":"InputPrivacyKey","rules":["InputPrivacyRule"]}
+* params - {"key": InputPrivacyKey, "rules": [InputPrivacyRule], }
 
 ```
 

@@ -22,13 +22,13 @@ description: updates_differenceEmpty attributes, type and example
 ### Example:
 
 ```
-$updates_differenceEmpty = ['_' => 'updates.differenceEmpty', 'date' => int, 'seq' => int, ];
+$updates_differenceEmpty = ['_' => 'updates.differenceEmpty', 'date' => int, 'seq' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updates.differenceEmpty","date":"int","seq":"int"}
+{"_": "updates.differenceEmpty", "date": int, "seq": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updates_differenceEmpty={_='updates.differenceEmpty', date=int, seq=int, }
+updates_differenceEmpty={_='updates.differenceEmpty', date=int, seq=int}
 
 ```
 

@@ -22,13 +22,13 @@ description: messages_stickers attributes, type and example
 ### Example:
 
 ```
-$messages_stickers = ['_' => 'messages.stickers', 'hash' => string, 'stickers' => [Document], ];
+$messages_stickers = ['_' => 'messages.stickers', 'hash' => 'string', 'stickers' => [Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.stickers","hash":"string","stickers":["Document"]}
+{"_": "messages.stickers", "hash": "string", "stickers": [Document]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_stickers={_='messages.stickers', hash=string, stickers={Document}, }
+messages_stickers={_='messages.stickers', hash='string', stickers={Document}}
 
 ```
 

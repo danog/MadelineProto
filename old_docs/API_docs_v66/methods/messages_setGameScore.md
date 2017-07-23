@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setGameScore
-* params - {"edit_message":"Bool","force":"Bool","peer":"InputPeer","id":"int","user_id":"InputUser","score":"int"}
+* params - {"edit_message": Bool, "force": Bool, "peer": InputPeer, "id": int, "user_id": InputUser, "score": int, }
 
 ```
 

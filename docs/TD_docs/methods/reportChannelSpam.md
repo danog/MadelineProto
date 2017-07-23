@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - reportChannelSpam
-* params - {"channel_id":"int","user_id":"int","message_ids":["long"]}
+* params - {"channel_id": int, "user_id": int, "message_ids": [long], }
 
 ```
 

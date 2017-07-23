@@ -21,13 +21,13 @@ description: foundGif attributes, type and example
 ### Example:
 
 ```
-$foundGif = ['_' => 'foundGif', 'webpage' => WebPage, ];
+$foundGif = ['_' => 'foundGif', 'webpage' => WebPage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"foundGif","webpage":"WebPage"}
+{"_": "foundGif", "webpage": WebPage}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-foundGif={_='foundGif', webpage=WebPage, }
+foundGif={_='foundGif', webpage=WebPage}
 
 ```
 

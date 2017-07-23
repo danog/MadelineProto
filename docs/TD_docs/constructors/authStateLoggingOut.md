@@ -22,13 +22,13 @@ User is currently logging out
 ### Example:
 
 ```
-$authStateLoggingOut = ['_' => 'authStateLoggingOut', ];
+$authStateLoggingOut = ['_' => 'authStateLoggingOut'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"authStateLoggingOut"}
+{"_": "authStateLoggingOut"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-authStateLoggingOut={_='authStateLoggingOut', }
+authStateLoggingOut={_='authStateLoggingOut'}
 
 ```
 

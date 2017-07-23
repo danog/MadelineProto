@@ -23,13 +23,13 @@ Chat members added
 ### Example:
 
 ```
-$messageChatAddMembers = ['_' => 'messageChatAddMembers', 'members' => [user], ];
+$messageChatAddMembers = ['_' => 'messageChatAddMembers', 'members' => [user]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageChatAddMembers","members":["user"]}
+{"_": "messageChatAddMembers", "members": [user]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageChatAddMembers={_='messageChatAddMembers', members={user}, }
+messageChatAddMembers={_='messageChatAddMembers', members={user}}
 
 ```
 

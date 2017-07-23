@@ -26,13 +26,13 @@ description: messageActionPaymentSentMe attributes, type and example
 ### Example:
 
 ```
-$messageActionPaymentSentMe = ['_' => 'messageActionPaymentSentMe', 'currency' => string, 'total_amount' => long, 'payload' => bytes, 'info' => PaymentRequestedInfo, 'shipping_option_id' => string, 'charge' => PaymentCharge, ];
+$messageActionPaymentSentMe = ['_' => 'messageActionPaymentSentMe', 'currency' => 'string', 'total_amount' => long, 'payload' => 'bytes', 'info' => PaymentRequestedInfo, 'shipping_option_id' => 'string', 'charge' => PaymentCharge];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageActionPaymentSentMe","currency":"string","total_amount":"long","payload":"bytes","info":"PaymentRequestedInfo","shipping_option_id":"string","charge":"PaymentCharge"}
+{"_": "messageActionPaymentSentMe", "currency": "string", "total_amount": long, "payload": "bytes", "info": PaymentRequestedInfo, "shipping_option_id": "string", "charge": PaymentCharge}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-messageActionPaymentSentMe={_='messageActionPaymentSentMe', currency=string, total_amount=long, payload=bytes, info=PaymentRequestedInfo, shipping_option_id=string, charge=PaymentCharge, }
+messageActionPaymentSentMe={_='messageActionPaymentSentMe', currency='string', total_amount=long, payload='bytes', info=PaymentRequestedInfo, shipping_option_id='string', charge=PaymentCharge}
 
 ```
 

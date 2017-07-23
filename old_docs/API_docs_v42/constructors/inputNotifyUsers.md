@@ -16,13 +16,13 @@ description: inputNotifyUsers attributes, type and example
 ### Example:
 
 ```
-$inputNotifyUsers = ['_' => 'inputNotifyUsers', ];
+$inputNotifyUsers = ['_' => 'inputNotifyUsers'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputNotifyUsers"}
+{"_": "inputNotifyUsers"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputNotifyUsers={_='inputNotifyUsers', }
+inputNotifyUsers={_='inputNotifyUsers'}
 
 ```
 

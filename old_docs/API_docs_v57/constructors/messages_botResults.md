@@ -25,13 +25,13 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => string, 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult], ];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => 'string', 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.botResults","gallery":"Bool","query_id":"long","next_offset":"string","switch_pm":"InlineBotSwitchPM","results":["BotInlineResult"]}
+{"_": "messages.botResults", "gallery": Bool, "query_id": long, "next_offset": "string", "switch_pm": InlineBotSwitchPM, "results": [BotInlineResult]}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_botResults={_='messages.botResults', gallery=Bool, query_id=long, next_offset=string, switch_pm=InlineBotSwitchPM, results={BotInlineResult}, }
+messages_botResults={_='messages.botResults', gallery=Bool, query_id=long, next_offset='string', switch_pm=InlineBotSwitchPM, results={BotInlineResult}}
 
 ```
 

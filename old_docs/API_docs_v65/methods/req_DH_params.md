@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Server_DH_Params = $MadelineProto->req_DH_params(['nonce' => int128, 'server_nonce' => int128, 'p' => string, 'q' => string, 'public_key_fingerprint' => long, 'encrypted_data' => string, ]);
+$Server_DH_Params = $MadelineProto->req_DH_params(['nonce' => int128, 'server_nonce' => int128, 'p' => 'string', 'q' => 'string', 'public_key_fingerprint' => long, 'encrypted_data' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - req_DH_params
-* params - {"nonce":"int128","server_nonce":"int128","p":"string","q":"string","public_key_fingerprint":"long","encrypted_data":"string"}
+* params - {"nonce": int128, "server_nonce": int128, "p": "string", "q": "string", "public_key_fingerprint": long, "encrypted_data": "string", }
 
 ```
 
@@ -73,6 +73,6 @@ encrypted_data - Json encoded string
 Or, if you're into Lua:
 
 ```
-Server_DH_Params = req_DH_params({nonce=int128, server_nonce=int128, p=string, q=string, public_key_fingerprint=long, encrypted_data=string, })
+Server_DH_Params = req_DH_params({nonce=int128, server_nonce=int128, p='string', q='string', public_key_fingerprint=long, encrypted_data='string', })
 ```
 

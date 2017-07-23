@@ -28,13 +28,13 @@ description: userRequest attributes, type and example
 ### Example:
 
 ```
-$userRequest = ['_' => 'userRequest', 'id' => int, 'first_name' => string, 'last_name' => string, 'username' => string, 'access_hash' => long, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, ];
+$userRequest = ['_' => 'userRequest', 'id' => int, 'first_name' => 'string', 'last_name' => 'string', 'username' => 'string', 'access_hash' => long, 'phone' => 'string', 'photo' => UserProfilePhoto, 'status' => UserStatus];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userRequest","id":"int","first_name":"string","last_name":"string","username":"string","access_hash":"long","phone":"string","photo":"UserProfilePhoto","status":"UserStatus"}
+{"_": "userRequest", "id": int, "first_name": "string", "last_name": "string", "username": "string", "access_hash": long, "phone": "string", "photo": UserProfilePhoto, "status": UserStatus}
 ```
 
 
@@ -42,7 +42,7 @@ Or, if you're into Lua:
 
 
 ```
-userRequest={_='userRequest', id=int, first_name=string, last_name=string, username=string, access_hash=long, phone=string, photo=UserProfilePhoto, status=UserStatus, }
+userRequest={_='userRequest', id=int, first_name='string', last_name='string', username='string', access_hash=long, phone='string', photo=UserProfilePhoto, status=UserStatus}
 
 ```
 

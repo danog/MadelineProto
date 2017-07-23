@@ -28,13 +28,13 @@ description: dialog attributes, type and example
 ### Example:
 
 ```
-$dialog = ['_' => 'dialog', 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings, 'pts' => int, 'draft' => DraftMessage, ];
+$dialog = ['_' => 'dialog', 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings, 'pts' => int, 'draft' => DraftMessage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"dialog","peer":"Peer","top_message":"int","read_inbox_max_id":"int","read_outbox_max_id":"int","unread_count":"int","notify_settings":"PeerNotifySettings","pts":"int","draft":"DraftMessage"}
+{"_": "dialog", "peer": Peer, "top_message": int, "read_inbox_max_id": int, "read_outbox_max_id": int, "unread_count": int, "notify_settings": PeerNotifySettings, "pts": int, "draft": DraftMessage}
 ```
 
 
@@ -42,7 +42,7 @@ Or, if you're into Lua:
 
 
 ```
-dialog={_='dialog', peer=Peer, top_message=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, notify_settings=PeerNotifySettings, pts=int, draft=DraftMessage, }
+dialog={_='dialog', peer=Peer, top_message=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, notify_settings=PeerNotifySettings, pts=int, draft=DraftMessage}
 
 ```
 

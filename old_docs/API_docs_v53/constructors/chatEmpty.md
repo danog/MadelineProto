@@ -21,13 +21,13 @@ description: chatEmpty attributes, type and example
 ### Example:
 
 ```
-$chatEmpty = ['_' => 'chatEmpty', 'id' => int, ];
+$chatEmpty = ['_' => 'chatEmpty', 'id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatEmpty","id":"int"}
+{"_": "chatEmpty", "id": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-chatEmpty={_='chatEmpty', id=int, }
+chatEmpty={_='chatEmpty', id=int}
 
 ```
 

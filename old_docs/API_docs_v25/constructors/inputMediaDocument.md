@@ -21,13 +21,13 @@ description: inputMediaDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument, ];
+$inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaDocument","id":"InputDocument"}
+{"_": "inputMediaDocument", "id": InputDocument}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaDocument={_='inputMediaDocument', id=InputDocument, }
+inputMediaDocument={_='inputMediaDocument', id=InputDocument}
 
 ```
 

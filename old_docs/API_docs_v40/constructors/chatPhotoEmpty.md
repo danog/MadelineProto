@@ -16,13 +16,13 @@ description: chatPhotoEmpty attributes, type and example
 ### Example:
 
 ```
-$chatPhotoEmpty = ['_' => 'chatPhotoEmpty', ];
+$chatPhotoEmpty = ['_' => 'chatPhotoEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatPhotoEmpty"}
+{"_": "chatPhotoEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-chatPhotoEmpty={_='chatPhotoEmpty', }
+chatPhotoEmpty={_='chatPhotoEmpty'}
 
 ```
 

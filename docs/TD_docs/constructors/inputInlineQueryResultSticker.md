@@ -29,13 +29,13 @@ Represents link to a webp sticker
 ### Example:
 
 ```
-$inputInlineQueryResultSticker = ['_' => 'inputInlineQueryResultSticker', 'id' => string, 'thumb_url' => string, 'sticker_url' => string, 'sticker_width' => int, 'sticker_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent, ];
+$inputInlineQueryResultSticker = ['_' => 'inputInlineQueryResultSticker', 'id' => 'string', 'thumb_url' => 'string', 'sticker_url' => 'string', 'sticker_width' => int, 'sticker_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputInlineQueryResultSticker","id":"string","thumb_url":"string","sticker_url":"string","sticker_width":"int","sticker_height":"int","reply_markup":"ReplyMarkup","input_message_content":"InputMessageContent"}
+{"_": "inputInlineQueryResultSticker", "id": "string", "thumb_url": "string", "sticker_url": "string", "sticker_width": int, "sticker_height": int, "reply_markup": ReplyMarkup, "input_message_content": InputMessageContent}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-inputInlineQueryResultSticker={_='inputInlineQueryResultSticker', id=string, thumb_url=string, sticker_url=string, sticker_width=int, sticker_height=int, reply_markup=ReplyMarkup, input_message_content=InputMessageContent, }
+inputInlineQueryResultSticker={_='inputInlineQueryResultSticker', id='string', thumb_url='string', sticker_url='string', sticker_width=int, sticker_height=int, reply_markup=ReplyMarkup, input_message_content=InputMessageContent}
 
 ```
 

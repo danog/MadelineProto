@@ -21,13 +21,13 @@ description: updateChannel attributes, type and example
 ### Example:
 
 ```
-$updateChannel = ['_' => 'updateChannel', 'channel_id' => int, ];
+$updateChannel = ['_' => 'updateChannel', 'channel_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChannel","channel_id":"int"}
+{"_": "updateChannel", "channel_id": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChannel={_='updateChannel', channel_id=int, }
+updateChannel={_='updateChannel', channel_id=int}
 
 ```
 

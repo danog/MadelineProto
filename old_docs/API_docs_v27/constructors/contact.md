@@ -22,13 +22,13 @@ description: contact attributes, type and example
 ### Example:
 
 ```
-$contact = ['_' => 'contact', 'user_id' => int, 'mutual' => Bool, ];
+$contact = ['_' => 'contact', 'user_id' => int, 'mutual' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contact","user_id":"int","mutual":"Bool"}
+{"_": "contact", "user_id": int, "mutual": Bool}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-contact={_='contact', user_id=int, mutual=Bool, }
+contact={_='contact', user_id=int, mutual=Bool}
 
 ```
 

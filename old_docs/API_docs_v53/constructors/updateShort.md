@@ -22,13 +22,13 @@ description: updateShort attributes, type and example
 ### Example:
 
 ```
-$updateShort = ['_' => 'updateShort', 'update' => Update, 'date' => int, ];
+$updateShort = ['_' => 'updateShort', 'update' => Update, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateShort","update":"Update","date":"int"}
+{"_": "updateShort", "update": Update, "date": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateShort={_='updateShort', update=Update, date=int, }
+updateShort={_='updateShort', update=Update, date=int}
 
 ```
 

@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$AuthState = $MadelineProto->checkChangePhoneNumberCode(['code' => string, ]);
+$AuthState = $MadelineProto->checkChangePhoneNumberCode(['code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - checkChangePhoneNumberCode
-* params - {"code":"string"}
+* params - {"code": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ code - Json encoded string
 Or, if you're into Lua:
 
 ```
-AuthState = checkChangePhoneNumberCode({code=string, })
+AuthState = checkChangePhoneNumberCode({code='string', })
 ```
 

@@ -25,13 +25,13 @@ description: dialog attributes, type and example
 ### Example:
 
 ```
-$dialog = ['_' => 'dialog', 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings, ];
+$dialog = ['_' => 'dialog', 'peer' => Peer, 'top_message' => int, 'read_inbox_max_id' => int, 'unread_count' => int, 'notify_settings' => PeerNotifySettings];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"dialog","peer":"Peer","top_message":"int","read_inbox_max_id":"int","unread_count":"int","notify_settings":"PeerNotifySettings"}
+{"_": "dialog", "peer": Peer, "top_message": int, "read_inbox_max_id": int, "unread_count": int, "notify_settings": PeerNotifySettings}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-dialog={_='dialog', peer=Peer, top_message=int, read_inbox_max_id=int, unread_count=int, notify_settings=PeerNotifySettings, }
+dialog={_='dialog', peer=Peer, top_message=int, read_inbox_max_id=int, unread_count=int, notify_settings=PeerNotifySettings}
 
 ```
 

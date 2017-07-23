@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => string, ]);
+$auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.checkPhone
-* params - {"phone_number":"string"}
+* params - {"phone_number": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ phone_number - Json encoded string
 Or, if you're into Lua:
 
 ```
-auth_CheckedPhone = auth.checkPhone({phone_number=string, })
+auth_CheckedPhone = auth.checkPhone({phone_number='string', })
 ```
 

@@ -22,13 +22,13 @@ description: messageEntityHashtag attributes, type and example
 ### Example:
 
 ```
-$messageEntityHashtag = ['_' => 'messageEntityHashtag', 'offset' => int, 'length' => int, ];
+$messageEntityHashtag = ['_' => 'messageEntityHashtag', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityHashtag","offset":"int","length":"int"}
+{"_": "messageEntityHashtag", "offset": int, "length": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityHashtag={_='messageEntityHashtag', offset=int, length=int, }
+messageEntityHashtag={_='messageEntityHashtag', offset=int, length=int}
 
 ```
 

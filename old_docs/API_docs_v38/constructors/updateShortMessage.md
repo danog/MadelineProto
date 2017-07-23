@@ -30,13 +30,13 @@ description: updateShortMessage attributes, type and example
 ### Example:
 
 ```
-$updateShortMessage = ['_' => 'updateShortMessage', 'id' => int, 'user_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => Peer, 'fwd_date' => int, 'reply_to_msg_id' => int, 'entities' => [MessageEntity], ];
+$updateShortMessage = ['_' => 'updateShortMessage', 'id' => int, 'user_id' => int, 'message' => 'string', 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => Peer, 'fwd_date' => int, 'reply_to_msg_id' => int, 'entities' => [MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateShortMessage","id":"int","user_id":"int","message":"string","pts":"int","pts_count":"int","date":"int","fwd_from_id":"Peer","fwd_date":"int","reply_to_msg_id":"int","entities":["MessageEntity"]}
+{"_": "updateShortMessage", "id": int, "user_id": int, "message": "string", "pts": int, "pts_count": int, "date": int, "fwd_from_id": Peer, "fwd_date": int, "reply_to_msg_id": int, "entities": [MessageEntity]}
 ```
 
 
@@ -44,7 +44,7 @@ Or, if you're into Lua:
 
 
 ```
-updateShortMessage={_='updateShortMessage', id=int, user_id=int, message=string, pts=int, pts_count=int, date=int, fwd_from_id=Peer, fwd_date=int, reply_to_msg_id=int, entities={MessageEntity}, }
+updateShortMessage={_='updateShortMessage', id=int, user_id=int, message='string', pts=int, pts_count=int, date=int, fwd_from_id=Peer, fwd_date=int, reply_to_msg_id=int, entities={MessageEntity}}
 
 ```
 

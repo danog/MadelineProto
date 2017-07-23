@@ -22,13 +22,13 @@ description: pageBlockPhoto attributes, type and example
 ### Example:
 
 ```
-$pageBlockPhoto = ['_' => 'pageBlockPhoto', 'photo_id' => long, 'caption' => RichText, ];
+$pageBlockPhoto = ['_' => 'pageBlockPhoto', 'photo_id' => long, 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockPhoto","photo_id":"long","caption":"RichText"}
+{"_": "pageBlockPhoto", "photo_id": long, "caption": RichText}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockPhoto={_='pageBlockPhoto', photo_id=long, caption=RichText, }
+pageBlockPhoto={_='pageBlockPhoto', photo_id=long, caption=RichText}
 
 ```
 

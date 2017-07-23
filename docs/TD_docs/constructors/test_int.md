@@ -21,13 +21,13 @@ description: test_int attributes, type and example
 ### Example:
 
 ```
-$test_int = ['_' => 'test.int', 'value' => int, ];
+$test_int = ['_' => 'test.int', 'value' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"test.int","value":"int"}
+{"_": "test.int", "value": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-test_int={_='test.int', value=int, }
+test_int={_='test.int', value=int}
 
 ```
 

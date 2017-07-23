@@ -16,13 +16,13 @@ description: contacts_myLinkEmpty attributes, type and example
 ### Example:
 
 ```
-$contacts_myLinkEmpty = ['_' => 'contacts.myLinkEmpty', ];
+$contacts_myLinkEmpty = ['_' => 'contacts.myLinkEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.myLinkEmpty"}
+{"_": "contacts.myLinkEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_myLinkEmpty={_='contacts.myLinkEmpty', }
+contacts_myLinkEmpty={_='contacts.myLinkEmpty'}
 
 ```
 

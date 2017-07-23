@@ -23,13 +23,13 @@ Represents list of stickers
 ### Example:
 
 ```
-$stickers = ['_' => 'stickers', 'stickers' => [sticker], ];
+$stickers = ['_' => 'stickers', 'stickers' => [sticker]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickers","stickers":["sticker"]}
+{"_": "stickers", "stickers": [sticker]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-stickers={_='stickers', stickers={sticker}, }
+stickers={_='stickers', stickers={sticker}}
 
 ```
 

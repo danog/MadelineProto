@@ -22,13 +22,13 @@ description: auth_exportedAuthorization attributes, type and example
 ### Example:
 
 ```
-$auth_exportedAuthorization = ['_' => 'auth.exportedAuthorization', 'id' => int, 'bytes' => bytes, ];
+$auth_exportedAuthorization = ['_' => 'auth.exportedAuthorization', 'id' => int, 'bytes' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"auth.exportedAuthorization","id":"int","bytes":"bytes"}
+{"_": "auth.exportedAuthorization", "id": int, "bytes": "bytes"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-auth_exportedAuthorization={_='auth.exportedAuthorization', id=int, bytes=bytes, }
+auth_exportedAuthorization={_='auth.exportedAuthorization', id=int, bytes='bytes'}
 
 ```
 

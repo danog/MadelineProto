@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.getSuggested
-* params - {"limit":"int"}
+* params - {"limit": int, }
 
 ```
 

@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Stickers = $MadelineProto->getStickers(['emoji' => string, ]);
+$Stickers = $MadelineProto->getStickers(['emoji' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getStickers
-* params - {"emoji":"string"}
+* params - {"emoji": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ emoji - Json encoded string
 Or, if you're into Lua:
 
 ```
-Stickers = getStickers({emoji=string, })
+Stickers = getStickers({emoji='string', })
 ```
 

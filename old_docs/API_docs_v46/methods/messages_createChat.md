@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->createChat(['users' => [InputUser], 'title' => string, ]);
+$Updates = $MadelineProto->messages->createChat(['users' => [InputUser], 'title' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.createChat
-* params - {"users":["InputUser"],"title":"string"}
+* params - {"users": [InputUser], "title": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ title - Json encoded string
 Or, if you're into Lua:
 
 ```
-Updates = messages.createChat({users={InputUser}, title=string, })
+Updates = messages.createChat({users={InputUser}, title='string', })
 ```
 

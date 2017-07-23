@@ -16,13 +16,13 @@ description: inputReportReasonPornography attributes, type and example
 ### Example:
 
 ```
-$inputReportReasonPornography = ['_' => 'inputReportReasonPornography', ];
+$inputReportReasonPornography = ['_' => 'inputReportReasonPornography'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputReportReasonPornography"}
+{"_": "inputReportReasonPornography"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputReportReasonPornography={_='inputReportReasonPornography', }
+inputReportReasonPornography={_='inputReportReasonPornography'}
 
 ```
 

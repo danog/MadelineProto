@@ -22,13 +22,13 @@ description: decryptedMessageActionResend attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionResend_17 = ['_' => 'decryptedMessageActionResend', 'start_seq_no' => int, 'end_seq_no' => int, ];
+$decryptedMessageActionResend_17 = ['_' => 'decryptedMessageActionResend', 'start_seq_no' => int, 'end_seq_no' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionResend","start_seq_no":"int","end_seq_no":"int"}
+{"_": "decryptedMessageActionResend", "start_seq_no": int, "end_seq_no": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionResend_17={_='decryptedMessageActionResend', start_seq_no=int, end_seq_no=int, }
+decryptedMessageActionResend_17={_='decryptedMessageActionResend', start_seq_no=int, end_seq_no=int}
 
 ```
 

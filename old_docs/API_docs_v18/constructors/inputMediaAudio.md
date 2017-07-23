@@ -21,13 +21,13 @@ description: inputMediaAudio attributes, type and example
 ### Example:
 
 ```
-$inputMediaAudio = ['_' => 'inputMediaAudio', 'id' => InputAudio, ];
+$inputMediaAudio = ['_' => 'inputMediaAudio', 'id' => InputAudio];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaAudio","id":"InputAudio"}
+{"_": "inputMediaAudio", "id": InputAudio}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaAudio={_='inputMediaAudio', id=InputAudio, }
+inputMediaAudio={_='inputMediaAudio', id=InputAudio}
 
 ```
 

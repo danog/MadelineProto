@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - registerDevice
-* params - {"device_token":"DeviceToken"}
+* params - {"device_token": DeviceToken, }
 
 ```
 

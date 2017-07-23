@@ -21,13 +21,13 @@ description: contacts_myLinkRequested attributes, type and example
 ### Example:
 
 ```
-$contacts_myLinkRequested = ['_' => 'contacts.myLinkRequested', 'contact' => Bool, ];
+$contacts_myLinkRequested = ['_' => 'contacts.myLinkRequested', 'contact' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.myLinkRequested","contact":"Bool"}
+{"_": "contacts.myLinkRequested", "contact": Bool}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_myLinkRequested={_='contacts.myLinkRequested', contact=Bool, }
+contacts_myLinkRequested={_='contacts.myLinkRequested', contact=Bool}
 
 ```
 

@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->channels->checkUsername(['channel' => InputChannel, 'username' => string, ]);
+$Bool = $MadelineProto->channels->checkUsername(['channel' => InputChannel, 'username' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.checkUsername
-* params - {"channel":"InputChannel","username":"string"}
+* params - {"channel": InputChannel, "username": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ username - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = channels.checkUsername({channel=InputChannel, username=string, })
+Bool = channels.checkUsername({channel=InputChannel, username='string', })
 ```
 

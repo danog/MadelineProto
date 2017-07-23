@@ -25,13 +25,13 @@ description: encryptedChatWaiting attributes, type and example
 ### Example:
 
 ```
-$encryptedChatWaiting = ['_' => 'encryptedChatWaiting', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int, ];
+$encryptedChatWaiting = ['_' => 'encryptedChatWaiting', 'id' => int, 'access_hash' => long, 'date' => int, 'admin_id' => int, 'participant_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"encryptedChatWaiting","id":"int","access_hash":"long","date":"int","admin_id":"int","participant_id":"int"}
+{"_": "encryptedChatWaiting", "id": int, "access_hash": long, "date": int, "admin_id": int, "participant_id": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-encryptedChatWaiting={_='encryptedChatWaiting', id=int, access_hash=long, date=int, admin_id=int, participant_id=int, }
+encryptedChatWaiting={_='encryptedChatWaiting', id=int, access_hash=long, date=int, admin_id=int, participant_id=int}
 
 ```
 

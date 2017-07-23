@@ -27,13 +27,13 @@ Bots only. New incoming callback query from message sent via bot
 ### Example:
 
 ```
-$updateNewInlineCallbackQuery = ['_' => 'updateNewInlineCallbackQuery', 'id' => long, 'sender_user_id' => int, 'inline_message_id' => string, 'chat_instance' => long, 'payload' => CallbackQueryPayload, ];
+$updateNewInlineCallbackQuery = ['_' => 'updateNewInlineCallbackQuery', 'id' => long, 'sender_user_id' => int, 'inline_message_id' => 'string', 'chat_instance' => long, 'payload' => CallbackQueryPayload];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewInlineCallbackQuery","id":"long","sender_user_id":"int","inline_message_id":"string","chat_instance":"long","payload":"CallbackQueryPayload"}
+{"_": "updateNewInlineCallbackQuery", "id": long, "sender_user_id": int, "inline_message_id": "string", "chat_instance": long, "payload": CallbackQueryPayload}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewInlineCallbackQuery={_='updateNewInlineCallbackQuery', id=long, sender_user_id=int, inline_message_id=string, chat_instance=long, payload=CallbackQueryPayload, }
+updateNewInlineCallbackQuery={_='updateNewInlineCallbackQuery', id=long, sender_user_id=int, inline_message_id='string', chat_instance=long, payload=CallbackQueryPayload}
 
 ```
 

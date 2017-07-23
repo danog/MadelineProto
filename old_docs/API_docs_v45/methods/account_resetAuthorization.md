@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.resetAuthorization
-* params - {"hash":"long"}
+* params - {"hash": long, }
 
 ```
 

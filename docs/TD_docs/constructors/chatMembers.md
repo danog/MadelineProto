@@ -24,13 +24,13 @@ Contains list of chat members
 ### Example:
 
 ```
-$chatMembers = ['_' => 'chatMembers', 'total_count' => int, 'members' => [chatMember], ];
+$chatMembers = ['_' => 'chatMembers', 'total_count' => int, 'members' => [chatMember]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatMembers","total_count":"int","members":["chatMember"]}
+{"_": "chatMembers", "total_count": int, "members": [chatMember]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-chatMembers={_='chatMembers', total_count=int, members={chatMember}, }
+chatMembers={_='chatMembers', total_count=int, members={chatMember}}
 
 ```
 

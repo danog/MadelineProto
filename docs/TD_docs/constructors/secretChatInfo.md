@@ -23,13 +23,13 @@ Secret chat with one user
 ### Example:
 
 ```
-$secretChatInfo = ['_' => 'secretChatInfo', 'secret_chat' => secretChat, ];
+$secretChatInfo = ['_' => 'secretChatInfo', 'secret_chat' => secretChat];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"secretChatInfo","secret_chat":"secretChat"}
+{"_": "secretChatInfo", "secret_chat": secretChat}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-secretChatInfo={_='secretChatInfo', secret_chat=secretChat, }
+secretChatInfo={_='secretChatInfo', secret_chat=secretChat}
 
 ```
 

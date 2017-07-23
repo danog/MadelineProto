@@ -21,13 +21,13 @@ description: messageActionChannelCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChannelCreate = ['_' => 'messageActionChannelCreate', 'title' => string, ];
+$messageActionChannelCreate = ['_' => 'messageActionChannelCreate', 'title' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageActionChannelCreate","title":"string"}
+{"_": "messageActionChannelCreate", "title": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messageActionChannelCreate={_='messageActionChannelCreate', title=string, }
+messageActionChannelCreate={_='messageActionChannelCreate', title='string'}
 
 ```
 

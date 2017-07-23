@@ -24,13 +24,13 @@ description: geochats_statedMessage attributes, type and example
 ### Example:
 
 ```
-$geochats_statedMessage = ['_' => 'geochats.statedMessage', 'message' => GeoChatMessage, 'chats' => [Chat], 'users' => [User], 'seq' => int, ];
+$geochats_statedMessage = ['_' => 'geochats.statedMessage', 'message' => GeoChatMessage, 'chats' => [Chat], 'users' => [User], 'seq' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"geochats.statedMessage","message":"GeoChatMessage","chats":["Chat"],"users":["User"],"seq":"int"}
+{"_": "geochats.statedMessage", "message": GeoChatMessage, "chats": [Chat], "users": [User], "seq": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-geochats_statedMessage={_='geochats.statedMessage', message=GeoChatMessage, chats={Chat}, users={User}, seq=int, }
+geochats_statedMessage={_='geochats.statedMessage', message=GeoChatMessage, chats={Chat}, users={User}, seq=int}
 
 ```
 

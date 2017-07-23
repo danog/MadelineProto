@@ -22,13 +22,13 @@ description: updateStickerSetsOrder attributes, type and example
 ### Example:
 
 ```
-$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => Bool, 'order' => [long], ];
+$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'masks' => Bool, 'order' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateStickerSetsOrder","masks":"Bool","order":["long"]}
+{"_": "updateStickerSetsOrder", "masks": Bool, "order": [long]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateStickerSetsOrder={_='updateStickerSetsOrder', masks=Bool, order={long}, }
+updateStickerSetsOrder={_='updateStickerSetsOrder', masks=Bool, order={long}}
 
 ```
 

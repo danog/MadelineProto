@@ -16,13 +16,13 @@ description: inputPrivacyValueDisallowAll attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueDisallowAll = ['_' => 'inputPrivacyValueDisallowAll', ];
+$inputPrivacyValueDisallowAll = ['_' => 'inputPrivacyValueDisallowAll'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPrivacyValueDisallowAll"}
+{"_": "inputPrivacyValueDisallowAll"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPrivacyValueDisallowAll={_='inputPrivacyValueDisallowAll', }
+inputPrivacyValueDisallowAll={_='inputPrivacyValueDisallowAll'}
 
 ```
 

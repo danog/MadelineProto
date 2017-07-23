@@ -16,13 +16,13 @@ description: storage_fileJpeg attributes, type and example
 ### Example:
 
 ```
-$storage_fileJpeg = ['_' => 'storage.fileJpeg', ];
+$storage_fileJpeg = ['_' => 'storage.fileJpeg'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"storage.fileJpeg"}
+{"_": "storage.fileJpeg"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-storage_fileJpeg={_='storage.fileJpeg', }
+storage_fileJpeg={_='storage.fileJpeg'}
 
 ```
 

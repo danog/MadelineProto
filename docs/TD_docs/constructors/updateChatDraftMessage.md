@@ -24,13 +24,13 @@ Chat draft has changed. Be aware that the update may come in the currently open 
 ### Example:
 
 ```
-$updateChatDraftMessage = ['_' => 'updateChatDraftMessage', 'chat_id' => long, 'draft_message' => draftMessage, ];
+$updateChatDraftMessage = ['_' => 'updateChatDraftMessage', 'chat_id' => long, 'draft_message' => draftMessage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChatDraftMessage","chat_id":"long","draft_message":"draftMessage"}
+{"_": "updateChatDraftMessage", "chat_id": long, "draft_message": draftMessage}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChatDraftMessage={_='updateChatDraftMessage', chat_id=long, draft_message=draftMessage, }
+updateChatDraftMessage={_='updateChatDraftMessage', chat_id=long, draft_message=draftMessage}
 
 ```
 

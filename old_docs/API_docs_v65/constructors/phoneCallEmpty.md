@@ -21,13 +21,13 @@ description: phoneCallEmpty attributes, type and example
 ### Example:
 
 ```
-$phoneCallEmpty = ['_' => 'phoneCallEmpty', 'id' => long, ];
+$phoneCallEmpty = ['_' => 'phoneCallEmpty', 'id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"phoneCallEmpty","id":"long"}
+{"_": "phoneCallEmpty", "id": long}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-phoneCallEmpty={_='phoneCallEmpty', id=long, }
+phoneCallEmpty={_='phoneCallEmpty', id=long}
 
 ```
 

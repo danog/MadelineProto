@@ -22,13 +22,13 @@ Rule to allow all user contacts
 ### Example:
 
 ```
-$privacyRuleAllowContacts = ['_' => 'privacyRuleAllowContacts', ];
+$privacyRuleAllowContacts = ['_' => 'privacyRuleAllowContacts'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"privacyRuleAllowContacts"}
+{"_": "privacyRuleAllowContacts"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-privacyRuleAllowContacts={_='privacyRuleAllowContacts', }
+privacyRuleAllowContacts={_='privacyRuleAllowContacts'}
 
 ```
 

@@ -26,13 +26,13 @@ Photo description
 ### Example:
 
 ```
-$photoSize = ['_' => 'photoSize', 'type' => string, 'photo' => file, 'width' => int, 'height' => int, ];
+$photoSize = ['_' => 'photoSize', 'type' => 'string', 'photo' => file, 'width' => int, 'height' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photoSize","type":"string","photo":"file","width":"int","height":"int"}
+{"_": "photoSize", "type": "string", "photo": file, "width": int, "height": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-photoSize={_='photoSize', type=string, photo=file, width=int, height=int, }
+photoSize={_='photoSize', type='string', photo=file, width=int, height=int}
 
 ```
 

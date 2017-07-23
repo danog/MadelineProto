@@ -21,13 +21,13 @@ description: documentAttributeSticker attributes, type and example
 ### Example:
 
 ```
-$documentAttributeSticker = ['_' => 'documentAttributeSticker', 'alt' => string, ];
+$documentAttributeSticker = ['_' => 'documentAttributeSticker', 'alt' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"documentAttributeSticker","alt":"string"}
+{"_": "documentAttributeSticker", "alt": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-documentAttributeSticker={_='documentAttributeSticker', alt=string, }
+documentAttributeSticker={_='documentAttributeSticker', alt='string'}
 
 ```
 

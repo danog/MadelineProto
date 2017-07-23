@@ -23,13 +23,13 @@ description: chatForbidden attributes, type and example
 ### Example:
 
 ```
-$chatForbidden = ['_' => 'chatForbidden', 'id' => int, 'title' => string, 'date' => int, ];
+$chatForbidden = ['_' => 'chatForbidden', 'id' => int, 'title' => 'string', 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatForbidden","id":"int","title":"string","date":"int"}
+{"_": "chatForbidden", "id": int, "title": "string", "date": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-chatForbidden={_='chatForbidden', id=int, title=string, date=int, }
+chatForbidden={_='chatForbidden', id=int, title='string', date=int}
 
 ```
 

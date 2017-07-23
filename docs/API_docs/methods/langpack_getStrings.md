@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Vector_of_LangPackString = $MadelineProto->langpack->getStrings(['lang_code' => string, 'keys' => [string], ]);
+$Vector_of_LangPackString = $MadelineProto->langpack->getStrings(['lang_code' => 'string', 'keys' => ['string'], ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getStrings
-* params - {"lang_code":"string","keys":["string"]}
+* params - {"lang_code": "string", "keys": ["string"], }
 
 ```
 
@@ -65,6 +65,6 @@ keys - Json encoded  array of string
 Or, if you're into Lua:
 
 ```
-Vector_of_LangPackString = langpack.getStrings({lang_code=string, keys={string}, })
+Vector_of_LangPackString = langpack.getStrings({lang_code='string', keys={'string'}, })
 ```
 

@@ -23,13 +23,13 @@ Instruct clients to force reply to this message
 ### Example:
 
 ```
-$replyMarkupForceReply = ['_' => 'replyMarkupForceReply', 'personal' => Bool, ];
+$replyMarkupForceReply = ['_' => 'replyMarkupForceReply', 'personal' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"replyMarkupForceReply","personal":"Bool"}
+{"_": "replyMarkupForceReply", "personal": Bool}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-replyMarkupForceReply={_='replyMarkupForceReply', personal=Bool, }
+replyMarkupForceReply={_='replyMarkupForceReply', personal=Bool}
 
 ```
 

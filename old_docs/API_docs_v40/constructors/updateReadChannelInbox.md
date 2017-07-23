@@ -22,13 +22,13 @@ description: updateReadChannelInbox attributes, type and example
 ### Example:
 
 ```
-$updateReadChannelInbox = ['_' => 'updateReadChannelInbox', 'peer' => Peer, 'max_id' => int, ];
+$updateReadChannelInbox = ['_' => 'updateReadChannelInbox', 'peer' => Peer, 'max_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateReadChannelInbox","peer":"Peer","max_id":"int"}
+{"_": "updateReadChannelInbox", "peer": Peer, "max_id": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateReadChannelInbox={_='updateReadChannelInbox', peer=Peer, max_id=int, }
+updateReadChannelInbox={_='updateReadChannelInbox', peer=Peer, max_id=int}
 
 ```
 

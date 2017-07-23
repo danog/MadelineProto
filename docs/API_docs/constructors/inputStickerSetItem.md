@@ -23,13 +23,13 @@ description: inputStickerSetItem attributes, type and example
 ### Example:
 
 ```
-$inputStickerSetItem = ['_' => 'inputStickerSetItem', 'document' => InputDocument, 'emoji' => string, 'mask_coords' => MaskCoords, ];
+$inputStickerSetItem = ['_' => 'inputStickerSetItem', 'document' => InputDocument, 'emoji' => 'string', 'mask_coords' => MaskCoords];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputStickerSetItem","document":"InputDocument","emoji":"string","mask_coords":"MaskCoords"}
+{"_": "inputStickerSetItem", "document": InputDocument, "emoji": "string", "mask_coords": MaskCoords}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputStickerSetItem={_='inputStickerSetItem', document=InputDocument, emoji=string, mask_coords=MaskCoords, }
+inputStickerSetItem={_='inputStickerSetItem', document=InputDocument, emoji='string', mask_coords=MaskCoords}
 
 ```
 

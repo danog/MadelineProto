@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - unpinChannelMessage
-* params - {"channel_id":"int"}
+* params - {"channel_id": int, }
 
 ```
 

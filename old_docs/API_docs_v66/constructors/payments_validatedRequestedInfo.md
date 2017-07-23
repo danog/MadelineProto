@@ -22,13 +22,13 @@ description: payments_validatedRequestedInfo attributes, type and example
 ### Example:
 
 ```
-$payments_validatedRequestedInfo = ['_' => 'payments.validatedRequestedInfo', 'id' => string, 'shipping_options' => [ShippingOption], ];
+$payments_validatedRequestedInfo = ['_' => 'payments.validatedRequestedInfo', 'id' => 'string', 'shipping_options' => [ShippingOption]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"payments.validatedRequestedInfo","id":"string","shipping_options":["ShippingOption"]}
+{"_": "payments.validatedRequestedInfo", "id": "string", "shipping_options": [ShippingOption]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-payments_validatedRequestedInfo={_='payments.validatedRequestedInfo', id=string, shipping_options={ShippingOption}, }
+payments_validatedRequestedInfo={_='payments.validatedRequestedInfo', id='string', shipping_options={ShippingOption}}
 
 ```
 

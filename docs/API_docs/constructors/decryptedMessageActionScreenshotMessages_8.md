@@ -21,13 +21,13 @@ description: decryptedMessageActionScreenshotMessages attributes, type and examp
 ### Example:
 
 ```
-$decryptedMessageActionScreenshotMessages_8 = ['_' => 'decryptedMessageActionScreenshotMessages', 'random_ids' => [long], ];
+$decryptedMessageActionScreenshotMessages_8 = ['_' => 'decryptedMessageActionScreenshotMessages', 'random_ids' => [long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionScreenshotMessages","random_ids":["long"]}
+{"_": "decryptedMessageActionScreenshotMessages", "random_ids": [long]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionScreenshotMessages_8={_='decryptedMessageActionScreenshotMessages', random_ids={long}, }
+decryptedMessageActionScreenshotMessages_8={_='decryptedMessageActionScreenshotMessages', random_ids={long}}
 
 ```
 

@@ -23,13 +23,13 @@ description: help_appChangelog attributes, type and example
 ### Example:
 
 ```
-$help_appChangelog = ['_' => 'help.appChangelog', 'message' => string, 'media' => MessageMedia, 'entities' => [MessageEntity], ];
+$help_appChangelog = ['_' => 'help.appChangelog', 'message' => 'string', 'media' => MessageMedia, 'entities' => [MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.appChangelog","message":"string","media":"MessageMedia","entities":["MessageEntity"]}
+{"_": "help.appChangelog", "message": "string", "media": MessageMedia, "entities": [MessageEntity]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-help_appChangelog={_='help.appChangelog', message=string, media=MessageMedia, entities={MessageEntity}, }
+help_appChangelog={_='help.appChangelog', message='string', media=MessageMedia, entities={MessageEntity}}
 
 ```
 

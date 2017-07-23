@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.receivedCall
-* params - {"peer":"InputPhoneCall"}
+* params - {"peer": InputPhoneCall, }
 
 ```
 

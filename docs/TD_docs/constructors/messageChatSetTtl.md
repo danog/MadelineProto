@@ -23,13 +23,13 @@ Messages ttl setting in secret chat has changed
 ### Example:
 
 ```
-$messageChatSetTtl = ['_' => 'messageChatSetTtl', 'ttl' => int, ];
+$messageChatSetTtl = ['_' => 'messageChatSetTtl', 'ttl' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageChatSetTtl","ttl":"int"}
+{"_": "messageChatSetTtl", "ttl": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageChatSetTtl={_='messageChatSetTtl', ttl=int, }
+messageChatSetTtl={_='messageChatSetTtl', ttl=int}
 
 ```
 

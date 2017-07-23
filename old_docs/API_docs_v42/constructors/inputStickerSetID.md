@@ -22,13 +22,13 @@ description: inputStickerSetID attributes, type and example
 ### Example:
 
 ```
-$inputStickerSetID = ['_' => 'inputStickerSetID', 'id' => long, 'access_hash' => long, ];
+$inputStickerSetID = ['_' => 'inputStickerSetID', 'id' => long, 'access_hash' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputStickerSetID","id":"long","access_hash":"long"}
+{"_": "inputStickerSetID", "id": long, "access_hash": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputStickerSetID={_='inputStickerSetID', id=long, access_hash=long, }
+inputStickerSetID={_='inputStickerSetID', id=long, access_hash=long}
 
 ```
 

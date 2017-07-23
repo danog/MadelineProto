@@ -25,13 +25,13 @@ File is partly downloaded/uploaded
 ### Example:
 
 ```
-$updateFileProgress = ['_' => 'updateFileProgress', 'file_id' => int, 'size' => int, 'ready' => int, ];
+$updateFileProgress = ['_' => 'updateFileProgress', 'file_id' => int, 'size' => int, 'ready' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateFileProgress","file_id":"int","size":"int","ready":"int"}
+{"_": "updateFileProgress", "file_id": int, "size": int, "ready": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updateFileProgress={_='updateFileProgress', file_id=int, size=int, ready=int, }
+updateFileProgress={_='updateFileProgress', file_id=int, size=int, ready=int}
 
 ```
 

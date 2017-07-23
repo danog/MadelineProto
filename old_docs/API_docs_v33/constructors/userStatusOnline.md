@@ -21,13 +21,13 @@ description: userStatusOnline attributes, type and example
 ### Example:
 
 ```
-$userStatusOnline = ['_' => 'userStatusOnline', 'expires' => int, ];
+$userStatusOnline = ['_' => 'userStatusOnline', 'expires' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userStatusOnline","expires":"int"}
+{"_": "userStatusOnline", "expires": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-userStatusOnline={_='userStatusOnline', expires=int, }
+userStatusOnline={_='userStatusOnline', expires=int}
 
 ```
 

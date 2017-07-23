@@ -23,13 +23,13 @@ description: chatParticipantAdmin attributes, type and example
 ### Example:
 
 ```
-$chatParticipantAdmin = ['_' => 'chatParticipantAdmin', 'user_id' => int, 'inviter_id' => int, 'date' => int, ];
+$chatParticipantAdmin = ['_' => 'chatParticipantAdmin', 'user_id' => int, 'inviter_id' => int, 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatParticipantAdmin","user_id":"int","inviter_id":"int","date":"int"}
+{"_": "chatParticipantAdmin", "user_id": int, "inviter_id": int, "date": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-chatParticipantAdmin={_='chatParticipantAdmin', user_id=int, inviter_id=int, date=int, }
+chatParticipantAdmin={_='chatParticipantAdmin', user_id=int, inviter_id=int, date=int}
 
 ```
 

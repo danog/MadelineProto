@@ -21,13 +21,13 @@ description: updateBotWebhookJSON attributes, type and example
 ### Example:
 
 ```
-$updateBotWebhookJSON = ['_' => 'updateBotWebhookJSON', 'data' => DataJSON, ];
+$updateBotWebhookJSON = ['_' => 'updateBotWebhookJSON', 'data' => DataJSON];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateBotWebhookJSON","data":"DataJSON"}
+{"_": "updateBotWebhookJSON", "data": DataJSON}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-updateBotWebhookJSON={_='updateBotWebhookJSON', data=DataJSON, }
+updateBotWebhookJSON={_='updateBotWebhookJSON', data=DataJSON}
 
 ```
 

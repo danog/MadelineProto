@@ -21,13 +21,13 @@ description: decryptedMessageMediaWebPage attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageMediaWebPage_46 = ['_' => 'decryptedMessageMediaWebPage', 'url' => string, ];
+$decryptedMessageMediaWebPage_46 = ['_' => 'decryptedMessageMediaWebPage', 'url' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageMediaWebPage","url":"string"}
+{"_": "decryptedMessageMediaWebPage", "url": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageMediaWebPage_46={_='decryptedMessageMediaWebPage', url=string, }
+decryptedMessageMediaWebPage_46={_='decryptedMessageMediaWebPage', url='string'}
 
 ```
 

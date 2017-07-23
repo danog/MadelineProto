@@ -23,13 +23,13 @@ Payload from a general callback button
 ### Example:
 
 ```
-$callbackQueryData = ['_' => 'callbackQueryData', 'data' => bytes, ];
+$callbackQueryData = ['_' => 'callbackQueryData', 'data' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"callbackQueryData","data":"bytes"}
+{"_": "callbackQueryData", "data": "bytes"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-callbackQueryData={_='callbackQueryData', data=bytes, }
+callbackQueryData={_='callbackQueryData', data='bytes'}
 
 ```
 

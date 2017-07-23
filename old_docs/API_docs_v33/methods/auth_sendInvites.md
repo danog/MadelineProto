@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => [string], 'message' => string, ]);
+$Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => ['string'], 'message' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.sendInvites
-* params - {"phone_numbers":["string"],"message":"string"}
+* params - {"phone_numbers": ["string"], "message": "string", }
 
 ```
 
@@ -65,7 +65,7 @@ message - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = auth.sendInvites({phone_numbers={string}, message=string, })
+Bool = auth.sendInvites({phone_numbers={'string'}, message='string', })
 ```
 
 

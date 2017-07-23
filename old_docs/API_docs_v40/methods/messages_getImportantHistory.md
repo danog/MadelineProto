@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getImportantHistory
-* params - {"peer":"InputPeer","max_id":"int","min_id":"int","limit":"int"}
+* params - {"peer": InputPeer, "max_id": int, "min_id": int, "limit": int, }
 
 ```
 

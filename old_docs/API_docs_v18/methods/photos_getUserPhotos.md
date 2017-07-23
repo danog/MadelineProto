@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.getUserPhotos
-* params - {"user_id":"InputUser","offset":"int","max_id":"int","limit":"int"}
+* params - {"user_id": InputUser, "offset": int, "max_id": int, "limit": int, }
 
 ```
 

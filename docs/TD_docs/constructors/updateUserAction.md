@@ -25,13 +25,13 @@ Some chat activity
 ### Example:
 
 ```
-$updateUserAction = ['_' => 'updateUserAction', 'chat_id' => long, 'user_id' => int, 'action' => SendMessageAction, ];
+$updateUserAction = ['_' => 'updateUserAction', 'chat_id' => long, 'user_id' => int, 'action' => SendMessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateUserAction","chat_id":"long","user_id":"int","action":"SendMessageAction"}
+{"_": "updateUserAction", "chat_id": long, "user_id": int, "action": SendMessageAction}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updateUserAction={_='updateUserAction', chat_id=long, user_id=int, action=SendMessageAction, }
+updateUserAction={_='updateUserAction', chat_id=long, user_id=int, action=SendMessageAction}
 
 ```
 

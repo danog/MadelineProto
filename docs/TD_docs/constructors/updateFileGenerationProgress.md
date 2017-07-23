@@ -25,13 +25,13 @@ Informs that a file is being generated
 ### Example:
 
 ```
-$updateFileGenerationProgress = ['_' => 'updateFileGenerationProgress', 'file_id' => int, 'size' => int, 'ready' => int, ];
+$updateFileGenerationProgress = ['_' => 'updateFileGenerationProgress', 'file_id' => int, 'size' => int, 'ready' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateFileGenerationProgress","file_id":"int","size":"int","ready":"int"}
+{"_": "updateFileGenerationProgress", "file_id": int, "size": int, "ready": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updateFileGenerationProgress={_='updateFileGenerationProgress', file_id=int, size=int, ready=int, }
+updateFileGenerationProgress={_='updateFileGenerationProgress', file_id=int, size=int, ready=int}
 
 ```
 

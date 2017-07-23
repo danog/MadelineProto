@@ -24,13 +24,13 @@ description: botInlineMediaResultDocument attributes, type and example
 ### Example:
 
 ```
-$botInlineMediaResultDocument = ['_' => 'botInlineMediaResultDocument', 'id' => string, 'type' => string, 'document' => Document, 'send_message' => BotInlineMessage, ];
+$botInlineMediaResultDocument = ['_' => 'botInlineMediaResultDocument', 'id' => 'string', 'type' => 'string', 'document' => Document, 'send_message' => BotInlineMessage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInlineMediaResultDocument","id":"string","type":"string","document":"Document","send_message":"BotInlineMessage"}
+{"_": "botInlineMediaResultDocument", "id": "string", "type": "string", "document": Document, "send_message": BotInlineMessage}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMediaResultDocument={_='botInlineMediaResultDocument', id=string, type=string, document=Document, send_message=BotInlineMessage, }
+botInlineMediaResultDocument={_='botInlineMediaResultDocument', id='string', type='string', document=Document, send_message=BotInlineMessage}
 
 ```
 

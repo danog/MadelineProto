@@ -22,13 +22,13 @@ Chat member joined by invite link
 ### Example:
 
 ```
-$messageChatJoinByLink = ['_' => 'messageChatJoinByLink', ];
+$messageChatJoinByLink = ['_' => 'messageChatJoinByLink'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageChatJoinByLink"}
+{"_": "messageChatJoinByLink"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageChatJoinByLink={_='messageChatJoinByLink', }
+messageChatJoinByLink={_='messageChatJoinByLink'}
 
 ```
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.reportPeer
-* params - {"peer":"InputPeer","reason":"ReportReason"}
+* params - {"peer": InputPeer, "reason": ReportReason, }
 
 ```
 

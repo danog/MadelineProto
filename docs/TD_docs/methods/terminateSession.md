@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - terminateSession
-* params - {"session_id":"long"}
+* params - {"session_id": long, }
 
 ```
 

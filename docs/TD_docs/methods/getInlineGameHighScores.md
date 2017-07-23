@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$GameHighScores = $MadelineProto->getInlineGameHighScores(['inline_message_id' => string, 'user_id' => int, ]);
+$GameHighScores = $MadelineProto->getInlineGameHighScores(['inline_message_id' => 'string', 'user_id' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getInlineGameHighScores
-* params - {"inline_message_id":"string","user_id":"int"}
+* params - {"inline_message_id": "string", "user_id": int, }
 
 ```
 
@@ -70,6 +70,6 @@ user_id - Json encoded int
 Or, if you're into Lua:
 
 ```
-GameHighScores = getInlineGameHighScores({inline_message_id=string, user_id=int, })
+GameHighScores = getInlineGameHighScores({inline_message_id='string', user_id=int, })
 ```
 

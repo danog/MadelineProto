@@ -21,13 +21,13 @@ description: updateLangPack attributes, type and example
 ### Example:
 
 ```
-$updateLangPack = ['_' => 'updateLangPack', 'difference' => LangPackDifference, ];
+$updateLangPack = ['_' => 'updateLangPack', 'difference' => LangPackDifference];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateLangPack","difference":"LangPackDifference"}
+{"_": "updateLangPack", "difference": LangPackDifference}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-updateLangPack={_='updateLangPack', difference=LangPackDifference, }
+updateLangPack={_='updateLangPack', difference=LangPackDifference}
 
 ```
 

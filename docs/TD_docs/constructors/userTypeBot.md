@@ -27,13 +27,13 @@ Bot (see https: core.telegram.org/bots)
 ### Example:
 
 ```
-$userTypeBot = ['_' => 'userTypeBot', 'can_join_group_chats' => Bool, 'can_read_all_group_chat_messages' => Bool, 'is_inline' => Bool, 'inline_query_placeholder' => string, 'need_location' => Bool, ];
+$userTypeBot = ['_' => 'userTypeBot', 'can_join_group_chats' => Bool, 'can_read_all_group_chat_messages' => Bool, 'is_inline' => Bool, 'inline_query_placeholder' => 'string', 'need_location' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userTypeBot","can_join_group_chats":"Bool","can_read_all_group_chat_messages":"Bool","is_inline":"Bool","inline_query_placeholder":"string","need_location":"Bool"}
+{"_": "userTypeBot", "can_join_group_chats": Bool, "can_read_all_group_chat_messages": Bool, "is_inline": Bool, "inline_query_placeholder": "string", "need_location": Bool}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-userTypeBot={_='userTypeBot', can_join_group_chats=Bool, can_read_all_group_chat_messages=Bool, is_inline=Bool, inline_query_placeholder=string, need_location=Bool, }
+userTypeBot={_='userTypeBot', can_join_group_chats=Bool, can_read_all_group_chat_messages=Bool, is_inline=Bool, inline_query_placeholder='string', need_location=Bool}
 
 ```
 

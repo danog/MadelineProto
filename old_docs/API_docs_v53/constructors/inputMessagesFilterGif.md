@@ -16,13 +16,13 @@ description: inputMessagesFilterGif attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterGif = ['_' => 'inputMessagesFilterGif', ];
+$inputMessagesFilterGif = ['_' => 'inputMessagesFilterGif'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterGif"}
+{"_": "inputMessagesFilterGif"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterGif={_='inputMessagesFilterGif', }
+inputMessagesFilterGif={_='inputMessagesFilterGif'}
 
 ```
 

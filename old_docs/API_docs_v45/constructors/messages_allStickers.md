@@ -22,13 +22,13 @@ description: messages_allStickers attributes, type and example
 ### Example:
 
 ```
-$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => int, 'sets' => [StickerSet], ];
+$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => int, 'sets' => [StickerSet]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.allStickers","hash":"int","sets":["StickerSet"]}
+{"_": "messages.allStickers", "hash": int, "sets": [StickerSet]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_allStickers={_='messages.allStickers', hash=int, sets={StickerSet}, }
+messages_allStickers={_='messages.allStickers', hash=int, sets={StickerSet}}
 
 ```
 

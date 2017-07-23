@@ -22,13 +22,13 @@ User was online recently
 ### Example:
 
 ```
-$userStatusRecently = ['_' => 'userStatusRecently', ];
+$userStatusRecently = ['_' => 'userStatusRecently'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userStatusRecently"}
+{"_": "userStatusRecently"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-userStatusRecently={_='userStatusRecently', }
+userStatusRecently={_='userStatusRecently'}
 
 ```
 

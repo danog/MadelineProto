@@ -24,13 +24,13 @@ description: inputPhoneContact attributes, type and example
 ### Example:
 
 ```
-$inputPhoneContact = ['_' => 'inputPhoneContact', 'client_id' => long, 'phone' => string, 'first_name' => string, 'last_name' => string, ];
+$inputPhoneContact = ['_' => 'inputPhoneContact', 'client_id' => long, 'phone' => 'string', 'first_name' => 'string', 'last_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPhoneContact","client_id":"long","phone":"string","first_name":"string","last_name":"string"}
+{"_": "inputPhoneContact", "client_id": long, "phone": "string", "first_name": "string", "last_name": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPhoneContact={_='inputPhoneContact', client_id=long, phone=string, first_name=string, last_name=string, }
+inputPhoneContact={_='inputPhoneContact', client_id=long, phone='string', first_name='string', last_name='string'}
 
 ```
 

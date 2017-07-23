@@ -22,13 +22,13 @@ List of saved animations was updated. Need to drop saved animations cache if hav
 ### Example:
 
 ```
-$updateSavedAnimations = ['_' => 'updateSavedAnimations', ];
+$updateSavedAnimations = ['_' => 'updateSavedAnimations'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateSavedAnimations"}
+{"_": "updateSavedAnimations"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateSavedAnimations={_='updateSavedAnimations', }
+updateSavedAnimations={_='updateSavedAnimations'}
 
 ```
 

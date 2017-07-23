@@ -26,13 +26,13 @@ description: stickerSet attributes, type and example
 ### Example:
 
 ```
-$stickerSet = ['_' => 'stickerSet', 'id' => long, 'access_hash' => long, 'title' => string, 'short_name' => string, 'count' => int, 'hash' => int, ];
+$stickerSet = ['_' => 'stickerSet', 'id' => long, 'access_hash' => long, 'title' => 'string', 'short_name' => 'string', 'count' => int, 'hash' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerSet","id":"long","access_hash":"long","title":"string","short_name":"string","count":"int","hash":"int"}
+{"_": "stickerSet", "id": long, "access_hash": long, "title": "string", "short_name": "string", "count": int, "hash": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerSet={_='stickerSet', id=long, access_hash=long, title=string, short_name=string, count=int, hash=int, }
+stickerSet={_='stickerSet', id=long, access_hash=long, title='string', short_name='string', count=int, hash=int}
 
 ```
 

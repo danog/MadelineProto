@@ -24,13 +24,13 @@ Message is successfully sent
 ### Example:
 
 ```
-$updateMessageSendSucceeded = ['_' => 'updateMessageSendSucceeded', 'message' => message, 'old_message_id' => long, ];
+$updateMessageSendSucceeded = ['_' => 'updateMessageSendSucceeded', 'message' => message, 'old_message_id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateMessageSendSucceeded","message":"message","old_message_id":"long"}
+{"_": "updateMessageSendSucceeded", "message": message, "old_message_id": long}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateMessageSendSucceeded={_='updateMessageSendSucceeded', message=message, old_message_id=long, }
+updateMessageSendSucceeded={_='updateMessageSendSucceeded', message=message, old_message_id=long}
 
 ```
 

@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'g_a' => bytes, ]);
+$EncryptedChat = $MadelineProto->messages->requestEncryption(['user_id' => InputUser, 'g_a' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.requestEncryption
-* params - {"user_id":"InputUser","g_a":"bytes"}
+* params - {"user_id": InputUser, "g_a": "bytes", }
 
 ```
 
@@ -65,6 +65,6 @@ g_a - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-EncryptedChat = messages.requestEncryption({user_id=InputUser, g_a=bytes, })
+EncryptedChat = messages.requestEncryption({user_id=InputUser, g_a='bytes', })
 ```
 

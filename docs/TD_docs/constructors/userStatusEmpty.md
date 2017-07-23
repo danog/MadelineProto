@@ -22,13 +22,13 @@ User status was newer changed
 ### Example:
 
 ```
-$userStatusEmpty = ['_' => 'userStatusEmpty', ];
+$userStatusEmpty = ['_' => 'userStatusEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userStatusEmpty"}
+{"_": "userStatusEmpty"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-userStatusEmpty={_='userStatusEmpty', }
+userStatusEmpty={_='userStatusEmpty'}
 
 ```
 

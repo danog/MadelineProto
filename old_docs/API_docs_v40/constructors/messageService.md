@@ -25,13 +25,13 @@ description: messageService attributes, type and example
 ### Example:
 
 ```
-$messageService = ['_' => 'messageService', 'id' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'action' => MessageAction, ];
+$messageService = ['_' => 'messageService', 'id' => int, 'from_id' => int, 'to_id' => Peer, 'date' => int, 'action' => MessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageService","id":"int","from_id":"int","to_id":"Peer","date":"int","action":"MessageAction"}
+{"_": "messageService", "id": int, "from_id": int, "to_id": Peer, "date": int, "action": MessageAction}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-messageService={_='messageService', id=int, from_id=int, to_id=Peer, date=int, action=MessageAction, }
+messageService={_='messageService', id=int, from_id=int, to_id=Peer, date=int, action=MessageAction}
 
 ```
 

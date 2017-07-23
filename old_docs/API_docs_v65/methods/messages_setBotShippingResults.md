@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->setBotShippingResults(['query_id' => long, 'error' => string, 'shipping_options' => [ShippingOption], ]);
+$Bool = $MadelineProto->messages->setBotShippingResults(['query_id' => long, 'error' => 'string', 'shipping_options' => [ShippingOption], ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setBotShippingResults
-* params - {"query_id":"long","error":"string","shipping_options":["ShippingOption"]}
+* params - {"query_id": long, "error": "string", "shipping_options": [ShippingOption], }
 
 ```
 
@@ -67,6 +67,6 @@ shipping_options - Json encoded  array of ShippingOption
 Or, if you're into Lua:
 
 ```
-Bool = messages.setBotShippingResults({query_id=long, error=string, shipping_options={ShippingOption}, })
+Bool = messages.setBotShippingResults({query_id=long, error='string', shipping_options={ShippingOption}, })
 ```
 

@@ -26,13 +26,13 @@ description: foundGif attributes, type and example
 ### Example:
 
 ```
-$foundGif = ['_' => 'foundGif', 'url' => string, 'thumb_url' => string, 'content_url' => string, 'content_type' => string, 'w' => int, 'h' => int, ];
+$foundGif = ['_' => 'foundGif', 'url' => 'string', 'thumb_url' => 'string', 'content_url' => 'string', 'content_type' => 'string', 'w' => int, 'h' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"foundGif","url":"string","thumb_url":"string","content_url":"string","content_type":"string","w":"int","h":"int"}
+{"_": "foundGif", "url": "string", "thumb_url": "string", "content_url": "string", "content_type": "string", "w": int, "h": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-foundGif={_='foundGif', url=string, thumb_url=string, content_url=string, content_type=string, w=int, h=int, }
+foundGif={_='foundGif', url='string', thumb_url='string', content_url='string', content_type='string', w=int, h=int}
 
 ```
 

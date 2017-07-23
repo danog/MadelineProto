@@ -16,13 +16,13 @@ description: inputDocumentEmpty attributes, type and example
 ### Example:
 
 ```
-$inputDocumentEmpty = ['_' => 'inputDocumentEmpty', ];
+$inputDocumentEmpty = ['_' => 'inputDocumentEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputDocumentEmpty"}
+{"_": "inputDocumentEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputDocumentEmpty={_='inputDocumentEmpty', }
+inputDocumentEmpty={_='inputDocumentEmpty'}
 
 ```
 

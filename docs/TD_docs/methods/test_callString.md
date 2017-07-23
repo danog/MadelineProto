@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$test_String = $MadelineProto->test->callString(['x' => string, ]);
+$test_String = $MadelineProto->test->callString(['x' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callString
-* params - {"x":"string"}
+* params - {"x": "string", }
 
 ```
 
@@ -66,6 +66,6 @@ x - Json encoded string
 Or, if you're into Lua:
 
 ```
-test_String = test.callString({x=string, })
+test_String = test.callString({x='string', })
 ```
 

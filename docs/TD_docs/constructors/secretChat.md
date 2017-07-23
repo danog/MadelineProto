@@ -28,13 +28,13 @@ Represents a secret chat
 ### Example:
 
 ```
-$secretChat = ['_' => 'secretChat', 'id' => int, 'user_id' => int, 'state' => int, 'is_outbound' => Bool, 'ttl' => int, 'key_hash' => bytes, ];
+$secretChat = ['_' => 'secretChat', 'id' => int, 'user_id' => int, 'state' => int, 'is_outbound' => Bool, 'ttl' => int, 'key_hash' => 'bytes'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"secretChat","id":"int","user_id":"int","state":"int","is_outbound":"Bool","ttl":"int","key_hash":"bytes"}
+{"_": "secretChat", "id": int, "user_id": int, "state": int, "is_outbound": Bool, "ttl": int, "key_hash": "bytes"}
 ```
 
 
@@ -42,7 +42,7 @@ Or, if you're into Lua:
 
 
 ```
-secretChat={_='secretChat', id=int, user_id=int, state=int, is_outbound=Bool, ttl=int, key_hash=bytes, }
+secretChat={_='secretChat', id=int, user_id=int, state=int, is_outbound=Bool, ttl=int, key_hash='bytes'}
 
 ```
 

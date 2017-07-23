@@ -24,13 +24,13 @@ description: updateServiceNotification attributes, type and example
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'message' => string, 'media' => MessageMedia, 'popup' => Bool, ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => 'string', 'message' => 'string', 'media' => MessageMedia, 'popup' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateServiceNotification","type":"string","message":"string","media":"MessageMedia","popup":"Bool"}
+{"_": "updateServiceNotification", "type": "string", "message": "string", "media": MessageMedia, "popup": Bool}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateServiceNotification={_='updateServiceNotification', type=string, message=string, media=MessageMedia, popup=Bool, }
+updateServiceNotification={_='updateServiceNotification', type='string', message='string', media=MessageMedia, popup=Bool}
 
 ```
 

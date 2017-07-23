@@ -22,13 +22,13 @@ description: inputPhoneCall attributes, type and example
 ### Example:
 
 ```
-$inputPhoneCall = ['_' => 'inputPhoneCall', 'id' => long, 'access_hash' => long, ];
+$inputPhoneCall = ['_' => 'inputPhoneCall', 'id' => long, 'access_hash' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPhoneCall","id":"long","access_hash":"long"}
+{"_": "inputPhoneCall", "id": long, "access_hash": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPhoneCall={_='inputPhoneCall', id=long, access_hash=long, }
+inputPhoneCall={_='inputPhoneCall', id=long, access_hash=long}
 
 ```
 

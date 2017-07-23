@@ -24,13 +24,13 @@ description: updateChannelWebPage attributes, type and example
 ### Example:
 
 ```
-$updateChannelWebPage = ['_' => 'updateChannelWebPage', 'channel_id' => int, 'webpage' => WebPage, 'pts' => int, 'pts_count' => int, ];
+$updateChannelWebPage = ['_' => 'updateChannelWebPage', 'channel_id' => int, 'webpage' => WebPage, 'pts' => int, 'pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChannelWebPage","channel_id":"int","webpage":"WebPage","pts":"int","pts_count":"int"}
+{"_": "updateChannelWebPage", "channel_id": int, "webpage": WebPage, "pts": int, "pts_count": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChannelWebPage={_='updateChannelWebPage', channel_id=int, webpage=WebPage, pts=int, pts_count=int, }
+updateChannelWebPage={_='updateChannelWebPage', channel_id=int, webpage=WebPage, pts=int, pts_count=int}
 
 ```
 

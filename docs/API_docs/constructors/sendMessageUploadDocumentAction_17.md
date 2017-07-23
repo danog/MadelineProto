@@ -22,13 +22,13 @@ User uploads a document
 ### Example:
 
 ```
-$sendMessageUploadDocumentAction_17 = ['_' => 'sendMessageUploadDocumentAction', ];
+$sendMessageUploadDocumentAction_17 = ['_' => 'sendMessageUploadDocumentAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageUploadDocumentAction"}
+{"_": "sendMessageUploadDocumentAction"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageUploadDocumentAction_17={_='sendMessageUploadDocumentAction', }
+sendMessageUploadDocumentAction_17={_='sendMessageUploadDocumentAction'}
 
 ```
 

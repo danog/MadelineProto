@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.getNotifySettings
-* params - {"peer":"InputNotifyPeer"}
+* params - {"peer": InputNotifyPeer, }
 
 ```
 

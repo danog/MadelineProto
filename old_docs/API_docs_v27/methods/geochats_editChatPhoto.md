@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.editChatPhoto
-* params - {"peer":"InputGeoChat","photo":"InputChatPhoto"}
+* params - {"peer": InputGeoChat, "photo": InputChatPhoto, }
 
 ```
 

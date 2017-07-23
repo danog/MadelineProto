@@ -21,13 +21,13 @@ description: inputMessagesFilterPhoneCalls attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => Bool, ];
+$inputMessagesFilterPhoneCalls = ['_' => 'inputMessagesFilterPhoneCalls', 'missed' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterPhoneCalls","missed":"Bool"}
+{"_": "inputMessagesFilterPhoneCalls", "missed": Bool}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterPhoneCalls={_='inputMessagesFilterPhoneCalls', missed=Bool, }
+inputMessagesFilterPhoneCalls={_='inputMessagesFilterPhoneCalls', missed=Bool}
 
 ```
 

@@ -22,13 +22,13 @@ description: inputGeoPoint attributes, type and example
 ### Example:
 
 ```
-$inputGeoPoint = ['_' => 'inputGeoPoint', 'latitude' => double, 'longitude' => double, ];
+$inputGeoPoint = ['_' => 'inputGeoPoint', 'latitude' => double, 'longitude' => double];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputGeoPoint","latitude":"double","longitude":"double"}
+{"_": "inputGeoPoint", "latitude": double, "longitude": double}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputGeoPoint={_='inputGeoPoint', latitude=double, longitude=double, }
+inputGeoPoint={_='inputGeoPoint', latitude=double, longitude=double}
 
 ```
 

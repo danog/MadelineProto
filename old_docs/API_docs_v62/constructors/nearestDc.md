@@ -23,13 +23,13 @@ description: nearestDc attributes, type and example
 ### Example:
 
 ```
-$nearestDc = ['_' => 'nearestDc', 'country' => string, 'this_dc' => int, 'nearest_dc' => int, ];
+$nearestDc = ['_' => 'nearestDc', 'country' => 'string', 'this_dc' => int, 'nearest_dc' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"nearestDc","country":"string","this_dc":"int","nearest_dc":"int"}
+{"_": "nearestDc", "country": "string", "this_dc": int, "nearest_dc": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-nearestDc={_='nearestDc', country=string, this_dc=int, nearest_dc=int, }
+nearestDc={_='nearestDc', country='string', this_dc=int, nearest_dc=int}
 
 ```
 

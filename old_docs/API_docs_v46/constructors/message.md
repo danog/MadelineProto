@@ -37,13 +37,13 @@ description: message attributes, type and example
 ### Example:
 
 ```
-$message = ['_' => 'message', 'unread' => Bool, 'out' => Bool, 'mentioned' => Bool, 'media_unread' => Bool, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'fwd_from_id' => Peer, 'fwd_date' => int, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'date' => int, 'message' => string, 'media' => MessageMedia, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'views' => int, ];
+$message = ['_' => 'message', 'unread' => Bool, 'out' => Bool, 'mentioned' => Bool, 'media_unread' => Bool, 'id' => int, 'from_id' => int, 'to_id' => Peer, 'fwd_from_id' => Peer, 'fwd_date' => int, 'via_bot_id' => int, 'reply_to_msg_id' => int, 'date' => int, 'message' => 'string', 'media' => MessageMedia, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'views' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"message","unread":"Bool","out":"Bool","mentioned":"Bool","media_unread":"Bool","id":"int","from_id":"int","to_id":"Peer","fwd_from_id":"Peer","fwd_date":"int","via_bot_id":"int","reply_to_msg_id":"int","date":"int","message":"string","media":"MessageMedia","reply_markup":"ReplyMarkup","entities":["MessageEntity"],"views":"int"}
+{"_": "message", "unread": Bool, "out": Bool, "mentioned": Bool, "media_unread": Bool, "id": int, "from_id": int, "to_id": Peer, "fwd_from_id": Peer, "fwd_date": int, "via_bot_id": int, "reply_to_msg_id": int, "date": int, "message": "string", "media": MessageMedia, "reply_markup": ReplyMarkup, "entities": [MessageEntity], "views": int}
 ```
 
 
@@ -51,7 +51,7 @@ Or, if you're into Lua:
 
 
 ```
-message={_='message', unread=Bool, out=Bool, mentioned=Bool, media_unread=Bool, id=int, from_id=int, to_id=Peer, fwd_from_id=Peer, fwd_date=int, via_bot_id=int, reply_to_msg_id=int, date=int, message=string, media=MessageMedia, reply_markup=ReplyMarkup, entities={MessageEntity}, views=int, }
+message={_='message', unread=Bool, out=Bool, mentioned=Bool, media_unread=Bool, id=int, from_id=int, to_id=Peer, fwd_from_id=Peer, fwd_date=int, via_bot_id=int, reply_to_msg_id=int, date=int, message='string', media=MessageMedia, reply_markup=ReplyMarkup, entities={MessageEntity}, views=int}
 
 ```
 

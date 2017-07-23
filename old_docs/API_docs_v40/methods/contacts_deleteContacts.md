@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.deleteContacts
-* params - {"id":["InputUser"]}
+* params - {"id": [InputUser], }
 
 ```
 

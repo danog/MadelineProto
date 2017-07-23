@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - upload.getFile
-* params - {"location":"InputFileLocation","offset":"int","limit":"int"}
+* params - {"location": InputFileLocation, "offset": int, "limit": int, }
 
 ```
 

@@ -16,13 +16,13 @@ description: channelParticipantsKicked attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsKicked = ['_' => 'channelParticipantsKicked', ];
+$channelParticipantsKicked = ['_' => 'channelParticipantsKicked'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelParticipantsKicked"}
+{"_": "channelParticipantsKicked"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-channelParticipantsKicked={_='channelParticipantsKicked', }
+channelParticipantsKicked={_='channelParticipantsKicked'}
 
 ```
 

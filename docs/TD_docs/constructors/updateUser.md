@@ -23,13 +23,13 @@ Some data about a user has been changed
 ### Example:
 
 ```
-$updateUser = ['_' => 'updateUser', 'user' => user, ];
+$updateUser = ['_' => 'updateUser', 'user' => user];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateUser","user":"user"}
+{"_": "updateUser", "user": user}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateUser={_='updateUser', user=user, }
+updateUser={_='updateUser', user=user}
 
 ```
 

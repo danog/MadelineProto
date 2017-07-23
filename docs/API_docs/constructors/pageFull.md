@@ -23,13 +23,13 @@ description: pageFull attributes, type and example
 ### Example:
 
 ```
-$pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document], ];
+$pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageFull","blocks":["PageBlock"],"photos":["Photo"],"documents":["Document"]}
+{"_": "pageFull", "blocks": [PageBlock], "photos": [Photo], "documents": [Document]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-pageFull={_='pageFull', blocks={PageBlock}, photos={Photo}, documents={Document}, }
+pageFull={_='pageFull', blocks={PageBlock}, photos={Photo}, documents={Document}}
 
 ```
 

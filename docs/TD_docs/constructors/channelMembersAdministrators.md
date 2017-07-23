@@ -22,13 +22,13 @@ Return privileged members, i.e. creator, editors and moderators are returned
 ### Example:
 
 ```
-$channelMembersAdministrators = ['_' => 'channelMembersAdministrators', ];
+$channelMembersAdministrators = ['_' => 'channelMembersAdministrators'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelMembersAdministrators"}
+{"_": "channelMembersAdministrators"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelMembersAdministrators={_='channelMembersAdministrators', }
+channelMembersAdministrators={_='channelMembersAdministrators'}
 
 ```
 

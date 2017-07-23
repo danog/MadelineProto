@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeChannelAbout(['channel_id' => int, 'about' => string, ]);
+$Ok = $MadelineProto->changeChannelAbout(['channel_id' => int, 'about' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChannelAbout
-* params - {"channel_id":"int","about":"string"}
+* params - {"channel_id": int, "about": "string", }
 
 ```
 
@@ -70,6 +70,6 @@ about - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = changeChannelAbout({channel_id=int, about=string, })
+Ok = changeChannelAbout({channel_id=int, about='string', })
 ```
 

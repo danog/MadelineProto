@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteChatHistory
-* params - {"chat_id":"InputPeer","remove_from_chat_list":"Bool"}
+* params - {"chat_id": InputPeer, "remove_from_chat_list": Bool, }
 
 ```
 

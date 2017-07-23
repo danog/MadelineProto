@@ -22,13 +22,13 @@ Return only photo messages
 ### Example:
 
 ```
-$searchMessagesFilterPhoto = ['_' => 'searchMessagesFilterPhoto', ];
+$searchMessagesFilterPhoto = ['_' => 'searchMessagesFilterPhoto'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"searchMessagesFilterPhoto"}
+{"_": "searchMessagesFilterPhoto"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-searchMessagesFilterPhoto={_='searchMessagesFilterPhoto', }
+searchMessagesFilterPhoto={_='searchMessagesFilterPhoto'}
 
 ```
 

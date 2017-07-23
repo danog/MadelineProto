@@ -21,13 +21,13 @@ description: decryptedMessageService attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageService_17 = ['_' => 'decryptedMessageService', 'action' => DecryptedMessageAction, ];
+$decryptedMessageService_17 = ['_' => 'decryptedMessageService', 'action' => DecryptedMessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageService","action":"DecryptedMessageAction"}
+{"_": "decryptedMessageService", "action": DecryptedMessageAction}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageService_17={_='decryptedMessageService', action=DecryptedMessageAction, }
+decryptedMessageService_17={_='decryptedMessageService', action=DecryptedMessageAction}
 
 ```
 

@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->importChatInviteLink(['invite_link' => string, ]);
+$Ok = $MadelineProto->importChatInviteLink(['invite_link' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - importChatInviteLink
-* params - {"invite_link":"string"}
+* params - {"invite_link": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ invite_link - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = importChatInviteLink({invite_link=string, })
+Ok = importChatInviteLink({invite_link='string', })
 ```
 

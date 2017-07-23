@@ -29,13 +29,13 @@ description: decryptedMessageMediaDocument attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageMediaDocument_45 = ['_' => 'decryptedMessageMediaDocument', 'thumb' => bytes, 'thumb_w' => int, 'thumb_h' => int, 'mime_type' => string, 'size' => int, 'key' => bytes, 'iv' => bytes, 'attributes' => [DocumentAttribute], 'caption' => string, ];
+$decryptedMessageMediaDocument_45 = ['_' => 'decryptedMessageMediaDocument', 'thumb' => 'bytes', 'thumb_w' => int, 'thumb_h' => int, 'mime_type' => 'string', 'size' => int, 'key' => 'bytes', 'iv' => 'bytes', 'attributes' => [DocumentAttribute], 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageMediaDocument","thumb":"bytes","thumb_w":"int","thumb_h":"int","mime_type":"string","size":"int","key":"bytes","iv":"bytes","attributes":["DocumentAttribute"],"caption":"string"}
+{"_": "decryptedMessageMediaDocument", "thumb": "bytes", "thumb_w": int, "thumb_h": int, "mime_type": "string", "size": int, "key": "bytes", "iv": "bytes", "attributes": [DocumentAttribute], "caption": "string"}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageMediaDocument_45={_='decryptedMessageMediaDocument', thumb=bytes, thumb_w=int, thumb_h=int, mime_type=string, size=int, key=bytes, iv=bytes, attributes={DocumentAttribute}, caption=string, }
+decryptedMessageMediaDocument_45={_='decryptedMessageMediaDocument', thumb='bytes', thumb_w=int, thumb_h=int, mime_type='string', size=int, key='bytes', iv='bytes', attributes={DocumentAttribute}, caption='string'}
 
 ```
 

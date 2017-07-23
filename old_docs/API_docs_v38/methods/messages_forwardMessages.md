@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.forwardMessages
-* params - {"from_peer":"InputPeer","id":["int"],"to_peer":"InputPeer"}
+* params - {"from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }
 
 ```
 

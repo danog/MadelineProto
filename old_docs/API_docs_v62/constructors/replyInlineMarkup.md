@@ -21,13 +21,13 @@ description: replyInlineMarkup attributes, type and example
 ### Example:
 
 ```
-$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [KeyboardButtonRow], ];
+$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [KeyboardButtonRow]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"replyInlineMarkup","rows":["KeyboardButtonRow"]}
+{"_": "replyInlineMarkup", "rows": [KeyboardButtonRow]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-replyInlineMarkup={_='replyInlineMarkup', rows={KeyboardButtonRow}, }
+replyInlineMarkup={_='replyInlineMarkup', rows={KeyboardButtonRow}}
 
 ```
 

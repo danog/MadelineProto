@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->channels->createChannel(['title' => string, 'about' => string, 'users' => [InputUser], ]);
+$Updates = $MadelineProto->channels->createChannel(['title' => 'string', 'about' => 'string', 'users' => [InputUser], ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.createChannel
-* params - {"title":"string","about":"string","users":["InputUser"]}
+* params - {"title": "string", "about": "string", "users": [InputUser], }
 
 ```
 
@@ -67,6 +67,6 @@ users - Json encoded  array of InputUser
 Or, if you're into Lua:
 
 ```
-Updates = channels.createChannel({title=string, about=string, users={InputUser}, })
+Updates = channels.createChannel({title='string', about='string', users={InputUser}, })
 ```
 

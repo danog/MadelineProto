@@ -21,13 +21,13 @@ description: photoSizeEmpty attributes, type and example
 ### Example:
 
 ```
-$photoSizeEmpty_23 = ['_' => 'photoSizeEmpty', 'type' => string, ];
+$photoSizeEmpty_23 = ['_' => 'photoSizeEmpty', 'type' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photoSizeEmpty","type":"string"}
+{"_": "photoSizeEmpty", "type": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-photoSizeEmpty_23={_='photoSizeEmpty', type=string, }
+photoSizeEmpty_23={_='photoSizeEmpty', type='string'}
 
 ```
 

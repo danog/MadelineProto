@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.exportMessageLink
-* params - {"channel":"InputChannel","id":"int"}
+* params - {"channel": InputChannel, "id": int, }
 
 ```
 

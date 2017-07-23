@@ -24,13 +24,13 @@ Service notification from the server. Upon receiving client should show popup wi
 ### Example:
 
 ```
-$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => string, 'content' => MessageContent, ];
+$updateServiceNotification = ['_' => 'updateServiceNotification', 'type' => 'string', 'content' => MessageContent];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateServiceNotification","type":"string","content":"MessageContent"}
+{"_": "updateServiceNotification", "type": "string", "content": MessageContent}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateServiceNotification={_='updateServiceNotification', type=string, content=MessageContent, }
+updateServiceNotification={_='updateServiceNotification', type='string', content=MessageContent}
 
 ```
 

@@ -37,7 +37,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_StickerSet = $MadelineProto->stickers->createStickerSet(['masks' => Bool, 'user_id' => InputUser, 'title' => string, 'short_name' => string, 'stickers' => [InputStickerSetItem], ]);
+$messages_StickerSet = $MadelineProto->stickers->createStickerSet(['masks' => Bool, 'user_id' => InputUser, 'title' => 'string', 'short_name' => 'string', 'stickers' => [InputStickerSetItem], ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.createStickerSet
-* params - {"masks":"Bool","user_id":"InputUser","title":"string","short_name":"string","stickers":["InputStickerSetItem"]}
+* params - {"masks": Bool, "user_id": InputUser, "title": "string", "short_name": "string", "stickers": [InputStickerSetItem], }
 
 ```
 
@@ -71,6 +71,6 @@ stickers - Json encoded  array of InputStickerSetItem
 Or, if you're into Lua:
 
 ```
-messages_StickerSet = stickers.createStickerSet({masks=Bool, user_id=InputUser, title=string, short_name=string, stickers={InputStickerSetItem}, })
+messages_StickerSet = stickers.createStickerSet({masks=Bool, user_id=InputUser, title='string', short_name='string', stickers={InputStickerSetItem}, })
 ```
 

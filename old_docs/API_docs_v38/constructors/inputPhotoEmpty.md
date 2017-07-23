@@ -16,13 +16,13 @@ description: inputPhotoEmpty attributes, type and example
 ### Example:
 
 ```
-$inputPhotoEmpty = ['_' => 'inputPhotoEmpty', ];
+$inputPhotoEmpty = ['_' => 'inputPhotoEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPhotoEmpty"}
+{"_": "inputPhotoEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPhotoEmpty={_='inputPhotoEmpty', }
+inputPhotoEmpty={_='inputPhotoEmpty'}
 
 ```
 

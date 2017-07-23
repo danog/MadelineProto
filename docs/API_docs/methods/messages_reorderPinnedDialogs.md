@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reorderPinnedDialogs
-* params - {"force":"Bool","order":["InputPeer"]}
+* params - {"force": Bool, "order": [InputPeer], }
 
 ```
 

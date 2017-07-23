@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getChannelDialogs
-* params - {"offset":"int","limit":"int"}
+* params - {"offset": int, "limit": int, }
 
 ```
 

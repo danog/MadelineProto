@@ -21,13 +21,13 @@ description: messageMediaAudio attributes, type and example
 ### Example:
 
 ```
-$messageMediaAudio = ['_' => 'messageMediaAudio', 'audio' => Audio, ];
+$messageMediaAudio = ['_' => 'messageMediaAudio', 'audio' => Audio];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaAudio","audio":"Audio"}
+{"_": "messageMediaAudio", "audio": Audio}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaAudio={_='messageMediaAudio', audio=Audio, }
+messageMediaAudio={_='messageMediaAudio', audio=Audio}
 
 ```
 

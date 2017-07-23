@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - resetAuth
-* params - {"force":"Bool"}
+* params - {"force": Bool, }
 
 ```
 

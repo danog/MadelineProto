@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getCallbackQueryAnswer
-* params - {"chat_id":"InputPeer","message_id":"long","payload":"CallbackQueryPayload"}
+* params - {"chat_id": InputPeer, "message_id": long, "payload": CallbackQueryPayload, }
 
 ```
 

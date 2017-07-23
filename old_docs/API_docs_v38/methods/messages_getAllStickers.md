@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_AllStickers = $MadelineProto->messages->getAllStickers(['hash' => string, ]);
+$messages_AllStickers = $MadelineProto->messages->getAllStickers(['hash' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getAllStickers
-* params - {"hash":"string"}
+* params - {"hash": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ hash - Json encoded string
 Or, if you're into Lua:
 
 ```
-messages_AllStickers = messages.getAllStickers({hash=string, })
+messages_AllStickers = messages.getAllStickers({hash='string', })
 ```
 

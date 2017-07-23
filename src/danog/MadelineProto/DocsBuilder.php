@@ -128,7 +128,7 @@ description: '.$this->settings['description'].'
             $params = '';
             $lua_params = '';
             $pwr_params = '';
-            $json_params = [];
+            $json_params = '';
             $table = empty($this->methods->params[$key]) ? '' : '### Parameters:
 
 | Name     |    Type       | Required |
@@ -169,12 +169,15 @@ description: '.$this->settings['description'].'
                 }
                 $table .= PHP_EOL;
 
+                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
+
                 $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
-                $json_params[$param['name']] = isset($param['subtype']) ? [$ptype] : $ptype;
+                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
+                $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
                 $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n";
                 $lua_params .= $param['name'].'=';
-                $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
+                $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype).', ';
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
@@ -187,7 +190,7 @@ description: '.$this->settings['description'].'
 ';
                     $params .= "'parse_mode' => 'string', ";
                     $lua_params .= "parse_mode='string', ";
-                    $json_params['parse_mode'] = 'string';
+                    $json_params .= '"parse_mode": "string"';
                     $pwr_params = "parse_mode - string\n";
                 }
             }
@@ -244,7 +247,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - '.$rmethod.'
-* params - '.json_encode($json_params).'
+* params - {'.$json_params.'}
 
 ```
 
@@ -432,7 +435,7 @@ description: List of methods
 
             $params = '';
             $lua_params = '';
-            $pwr_params = ['_' => $rconstructor];
+            $pwr_params = '';
             $hasreplymarkup = false;
             foreach ($this->constructors->params[$key] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
@@ -464,17 +467,21 @@ description: List of methods
                 }
                 $table .= PHP_EOL;
 
-                $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$ptype.']' : $ptype).', ';
-                $lua_params .= $param['name'].'=';
-                $lua_params .= (isset($param['subtype']) ? '{'.$ptype.'}' : $ptype).', ';
-                $pwr_params[$param['name']] = isset($param['subtype']) ? [$ptype] : $ptype;
+                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
+
+                $params .= ", '".$param['name']."' => ";
+                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype);
+                $lua_params .= ', '.$param['name'].'=';
+                $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype);
+                $pwr_params .= ', "'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype);
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
             }
-            $params = "['_' => '".$rconstructor."', ".$params.']';
-            $lua_params = "{_='".$rconstructor."', ".$lua_params.'}';
+            $params = "['_' => '".$rconstructor."'".$params.']';
+            $lua_params = "{_='".$rconstructor."'".$lua_params.'}';
+            $pwr_params = '{"_": "'.$rconstructor.'"'.$pwr_params.'}';
             $description = isset($this->td_descriptions['constructors'][$rconstructor]) ? $this->td_descriptions['constructors'][$rconstructor]['description'] : ($constructor.' attributes, type and example');
             $header = '---
 title: '.$rconstructor.'
@@ -507,7 +514,7 @@ $'.$constructor.$layer.' = '.$params.';
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-'.json_encode($pwr_params).'
+'.$pwr_params.'
 ```
 
 

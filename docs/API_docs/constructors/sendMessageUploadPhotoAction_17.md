@@ -22,13 +22,13 @@ User uploads a photo
 ### Example:
 
 ```
-$sendMessageUploadPhotoAction_17 = ['_' => 'sendMessageUploadPhotoAction', ];
+$sendMessageUploadPhotoAction_17 = ['_' => 'sendMessageUploadPhotoAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageUploadPhotoAction"}
+{"_": "sendMessageUploadPhotoAction"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageUploadPhotoAction_17={_='sendMessageUploadPhotoAction', }
+sendMessageUploadPhotoAction_17={_='sendMessageUploadPhotoAction'}
 
 ```
 

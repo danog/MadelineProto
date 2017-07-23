@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - importContacts
-* params - {"contacts":["contact"]}
+* params - {"contacts": [contact], }
 
 ```
 

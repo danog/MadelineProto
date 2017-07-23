@@ -22,13 +22,13 @@ description: channelAdminLogEventActionParticipantToggleAdmin attributes, type a
 ### Example:
 
 ```
-$channelAdminLogEventActionParticipantToggleAdmin = ['_' => 'channelAdminLogEventActionParticipantToggleAdmin', 'prev_participant' => ChannelParticipant, 'new_participant' => ChannelParticipant, ];
+$channelAdminLogEventActionParticipantToggleAdmin = ['_' => 'channelAdminLogEventActionParticipantToggleAdmin', 'prev_participant' => ChannelParticipant, 'new_participant' => ChannelParticipant];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionParticipantToggleAdmin","prev_participant":"ChannelParticipant","new_participant":"ChannelParticipant"}
+{"_": "channelAdminLogEventActionParticipantToggleAdmin", "prev_participant": ChannelParticipant, "new_participant": ChannelParticipant}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionParticipantToggleAdmin={_='channelAdminLogEventActionParticipantToggleAdmin', prev_participant=ChannelParticipant, new_participant=ChannelParticipant, }
+channelAdminLogEventActionParticipantToggleAdmin={_='channelAdminLogEventActionParticipantToggleAdmin', prev_participant=ChannelParticipant, new_participant=ChannelParticipant}
 
 ```
 

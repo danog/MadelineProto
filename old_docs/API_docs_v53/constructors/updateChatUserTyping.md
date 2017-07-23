@@ -23,13 +23,13 @@ description: updateChatUserTyping attributes, type and example
 ### Example:
 
 ```
-$updateChatUserTyping = ['_' => 'updateChatUserTyping', 'chat_id' => int, 'user_id' => int, 'action' => SendMessageAction, ];
+$updateChatUserTyping = ['_' => 'updateChatUserTyping', 'chat_id' => int, 'user_id' => int, 'action' => SendMessageAction];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChatUserTyping","chat_id":"int","user_id":"int","action":"SendMessageAction"}
+{"_": "updateChatUserTyping", "chat_id": int, "user_id": int, "action": SendMessageAction}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChatUserTyping={_='updateChatUserTyping', chat_id=int, user_id=int, action=SendMessageAction, }
+updateChatUserTyping={_='updateChatUserTyping', chat_id=int, user_id=int, action=SendMessageAction}
 
 ```
 

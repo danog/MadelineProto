@@ -22,13 +22,13 @@ description: inputGameID attributes, type and example
 ### Example:
 
 ```
-$inputGameID = ['_' => 'inputGameID', 'id' => long, 'access_hash' => long, ];
+$inputGameID = ['_' => 'inputGameID', 'id' => long, 'access_hash' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputGameID","id":"long","access_hash":"long"}
+{"_": "inputGameID", "id": long, "access_hash": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputGameID={_='inputGameID', id=long, access_hash=long, }
+inputGameID={_='inputGameID', id=long, access_hash=long}
 
 ```
 

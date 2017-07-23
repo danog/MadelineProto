@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updates.getDifference
-* params - {"pts":"int","date":"int","qts":"int"}
+* params - {"pts": int, "date": int, "qts": int, }
 
 ```
 

@@ -16,13 +16,13 @@ description: storage_fileMp4 attributes, type and example
 ### Example:
 
 ```
-$storage_fileMp4 = ['_' => 'storage.fileMp4', ];
+$storage_fileMp4 = ['_' => 'storage.fileMp4'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"storage.fileMp4"}
+{"_": "storage.fileMp4"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-storage_fileMp4={_='storage.fileMp4', }
+storage_fileMp4={_='storage.fileMp4'}
 
 ```
 

@@ -22,13 +22,13 @@ Message is outgoing but is yet not delivered to the server
 ### Example:
 
 ```
-$messageIsBeingSent = ['_' => 'messageIsBeingSent', ];
+$messageIsBeingSent = ['_' => 'messageIsBeingSent'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageIsBeingSent"}
+{"_": "messageIsBeingSent"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageIsBeingSent={_='messageIsBeingSent', }
+messageIsBeingSent={_='messageIsBeingSent'}
 
 ```
 

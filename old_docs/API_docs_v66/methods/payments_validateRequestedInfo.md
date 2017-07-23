@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - payments.validateRequestedInfo
-* params - {"save":"Bool","msg_id":"int","info":"PaymentRequestedInfo"}
+* params - {"save": Bool, "msg_id": int, "info": PaymentRequestedInfo, }
 
 ```
 

@@ -27,13 +27,13 @@ description: botInlineMediaResult attributes, type and example
 ### Example:
 
 ```
-$botInlineMediaResult = ['_' => 'botInlineMediaResult', 'id' => string, 'type' => string, 'photo' => Photo, 'document' => Document, 'title' => string, 'description' => string, 'send_message' => BotInlineMessage, ];
+$botInlineMediaResult = ['_' => 'botInlineMediaResult', 'id' => 'string', 'type' => 'string', 'photo' => Photo, 'document' => Document, 'title' => 'string', 'description' => 'string', 'send_message' => BotInlineMessage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"botInlineMediaResult","id":"string","type":"string","photo":"Photo","document":"Document","title":"string","description":"string","send_message":"BotInlineMessage"}
+{"_": "botInlineMediaResult", "id": "string", "type": "string", "photo": Photo, "document": Document, "title": "string", "description": "string", "send_message": BotInlineMessage}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMediaResult={_='botInlineMediaResult', id=string, type=string, photo=Photo, document=Document, title=string, description=string, send_message=BotInlineMessage, }
+botInlineMediaResult={_='botInlineMediaResult', id='string', type='string', photo=Photo, document=Document, title='string', description='string', send_message=BotInlineMessage}
 
 ```
 

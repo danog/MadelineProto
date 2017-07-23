@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => string, 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
+$Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editInlineBotMessage
-* params - {"no_webpage":"Bool","id":"InputBotInlineMessageID","message":"string","reply_markup":"ReplyMarkup","entities":["MessageEntity"],"parse_mode":"string"}
+* params - {"no_webpage": Bool, "id": InputBotInlineMessageID, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}
 
 ```
 
@@ -68,7 +68,7 @@ parse_mode - string
 Or, if you're into Lua:
 
 ```
-Bool = messages.editInlineBotMessage({no_webpage=Bool, id=InputBotInlineMessageID, message=string, reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
+Bool = messages.editInlineBotMessage({no_webpage=Bool, id=InputBotInlineMessageID, message='string', reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
 ```
 
 

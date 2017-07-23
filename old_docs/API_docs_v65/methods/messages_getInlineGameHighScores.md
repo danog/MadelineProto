@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getInlineGameHighScores
-* params - {"id":"InputBotInlineMessageID","user_id":"InputUser"}
+* params - {"id": InputBotInlineMessageID, "user_id": InputUser, }
 
 ```
 

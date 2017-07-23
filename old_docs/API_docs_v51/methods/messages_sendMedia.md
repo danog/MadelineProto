@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendMedia
-* params - {"broadcast":"Bool","silent":"Bool","background":"Bool","peer":"InputPeer","reply_to_msg_id":"int","media":"InputMedia","reply_markup":"ReplyMarkup"}
+* params - {"broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, "reply_markup": ReplyMarkup, }
 
 ```
 

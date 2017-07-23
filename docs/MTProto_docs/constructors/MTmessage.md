@@ -24,13 +24,13 @@ description: MTmessage attributes, type and example
 ### Example:
 
 ```
-$MTmessage = ['_' => 'MTmessage', 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object, ];
+$MTmessage = ['_' => 'MTmessage', 'msg_id' => long, 'seqno' => int, 'bytes' => int, 'body' => Object];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"MTmessage","msg_id":"long","seqno":"int","bytes":"int","body":"Object"}
+{"_": "MTmessage", "msg_id": long, "seqno": int, "bytes": int, "body": Object}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-MTmessage={_='MTmessage', msg_id=long, seqno=int, bytes=int, body=Object, }
+MTmessage={_='MTmessage', msg_id=long, seqno=int, bytes=int, body=Object}
 
 ```
 

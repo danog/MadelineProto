@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getAttachedStickers
-* params - {"media":"InputStickeredMedia"}
+* params - {"media": InputStickeredMedia, }
 
 ```
 

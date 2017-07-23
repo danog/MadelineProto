@@ -22,13 +22,13 @@ description: inputVideoFileLocation attributes, type and example
 ### Example:
 
 ```
-$inputVideoFileLocation = ['_' => 'inputVideoFileLocation', 'id' => long, 'access_hash' => long, ];
+$inputVideoFileLocation = ['_' => 'inputVideoFileLocation', 'id' => long, 'access_hash' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputVideoFileLocation","id":"long","access_hash":"long"}
+{"_": "inputVideoFileLocation", "id": long, "access_hash": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputVideoFileLocation={_='inputVideoFileLocation', id=long, access_hash=long, }
+inputVideoFileLocation={_='inputVideoFileLocation', id=long, access_hash=long}
 
 ```
 

@@ -23,13 +23,13 @@ Message with information about venue
 ### Example:
 
 ```
-$messageVenue = ['_' => 'messageVenue', 'venue' => venue, ];
+$messageVenue = ['_' => 'messageVenue', 'venue' => venue];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageVenue","venue":"venue"}
+{"_": "messageVenue", "venue": venue}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageVenue={_='messageVenue', venue=venue, }
+messageVenue={_='messageVenue', venue=venue}
 
 ```
 

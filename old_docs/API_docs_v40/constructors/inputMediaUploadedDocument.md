@@ -23,13 +23,13 @@ description: inputMediaUploadedDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => string, 'attributes' => [DocumentAttribute], ];
+$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'file' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaUploadedDocument","file":"InputFile","mime_type":"string","attributes":["DocumentAttribute"]}
+{"_": "inputMediaUploadedDocument", "file": InputFile, "mime_type": "string", "attributes": [DocumentAttribute]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaUploadedDocument={_='inputMediaUploadedDocument', file=InputFile, mime_type=string, attributes={DocumentAttribute}, }
+inputMediaUploadedDocument={_='inputMediaUploadedDocument', file=InputFile, mime_type='string', attributes={DocumentAttribute}}
 
 ```
 

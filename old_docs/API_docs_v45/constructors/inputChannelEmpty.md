@@ -16,13 +16,13 @@ description: inputChannelEmpty attributes, type and example
 ### Example:
 
 ```
-$inputChannelEmpty = ['_' => 'inputChannelEmpty', ];
+$inputChannelEmpty = ['_' => 'inputChannelEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputChannelEmpty"}
+{"_": "inputChannelEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputChannelEmpty={_='inputChannelEmpty', }
+inputChannelEmpty={_='inputChannelEmpty'}
 
 ```
 

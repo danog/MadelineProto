@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - bots.answerWebhookJSONQuery
-* params - {"query_id":"long","data":"DataJSON"}
+* params - {"query_id": long, "data": DataJSON, }
 
 ```
 

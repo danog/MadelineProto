@@ -29,13 +29,13 @@ description: userFull attributes, type and example
 ### Example:
 
 ```
-$userFull = ['_' => 'userFull', 'blocked' => Bool, 'phone_calls_available' => Bool, 'user' => User, 'about' => string, 'link' => contacts_Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, 'common_chats_count' => int, ];
+$userFull = ['_' => 'userFull', 'blocked' => Bool, 'phone_calls_available' => Bool, 'user' => User, 'about' => 'string', 'link' => contacts_Link, 'profile_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'bot_info' => BotInfo, 'common_chats_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"userFull","blocked":"Bool","phone_calls_available":"Bool","user":"User","about":"string","link":"contacts_Link","profile_photo":"Photo","notify_settings":"PeerNotifySettings","bot_info":"BotInfo","common_chats_count":"int"}
+{"_": "userFull", "blocked": Bool, "phone_calls_available": Bool, "user": User, "about": "string", "link": contacts_Link, "profile_photo": Photo, "notify_settings": PeerNotifySettings, "bot_info": BotInfo, "common_chats_count": int}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-userFull={_='userFull', blocked=Bool, phone_calls_available=Bool, user=User, about=string, link=contacts_Link, profile_photo=Photo, notify_settings=PeerNotifySettings, bot_info=BotInfo, common_chats_count=int, }
+userFull={_='userFull', blocked=Bool, phone_calls_available=Bool, user=User, about='string', link=contacts_Link, profile_photo=Photo, notify_settings=PeerNotifySettings, bot_info=BotInfo, common_chats_count=int}
 
 ```
 

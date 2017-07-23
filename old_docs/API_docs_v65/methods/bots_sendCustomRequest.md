@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$DataJSON = $MadelineProto->bots->sendCustomRequest(['custom_method' => string, 'params' => DataJSON, ]);
+$DataJSON = $MadelineProto->bots->sendCustomRequest(['custom_method' => 'string', 'params' => DataJSON, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - bots.sendCustomRequest
-* params - {"custom_method":"string","params":"DataJSON"}
+* params - {"custom_method": "string", "params": DataJSON, }
 
 ```
 
@@ -65,6 +65,6 @@ params - Json encoded DataJSON
 Or, if you're into Lua:
 
 ```
-DataJSON = bots.sendCustomRequest({custom_method=string, params=DataJSON, })
+DataJSON = bots.sendCustomRequest({custom_method='string', params=DataJSON, })
 ```
 

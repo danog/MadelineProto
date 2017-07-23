@@ -21,13 +21,13 @@ description: channelAdminLogEventActionUpdatePinned attributes, type and example
 ### Example:
 
 ```
-$channelAdminLogEventActionUpdatePinned = ['_' => 'channelAdminLogEventActionUpdatePinned', 'message' => Message, ];
+$channelAdminLogEventActionUpdatePinned = ['_' => 'channelAdminLogEventActionUpdatePinned', 'message' => Message];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionUpdatePinned","message":"Message"}
+{"_": "channelAdminLogEventActionUpdatePinned", "message": Message}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionUpdatePinned={_='channelAdminLogEventActionUpdatePinned', message=Message, }
+channelAdminLogEventActionUpdatePinned={_='channelAdminLogEventActionUpdatePinned', message=Message}
 
 ```
 

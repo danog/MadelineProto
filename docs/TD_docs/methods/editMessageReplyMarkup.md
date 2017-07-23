@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - editMessageReplyMarkup
-* params - {"chat_id":"InputPeer","message_id":"long","reply_markup":"ReplyMarkup"}
+* params - {"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, }
 
 ```
 

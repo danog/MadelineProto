@@ -21,13 +21,13 @@ description: channelAdminLogEventActionDeleteMessage attributes, type and exampl
 ### Example:
 
 ```
-$channelAdminLogEventActionDeleteMessage = ['_' => 'channelAdminLogEventActionDeleteMessage', 'message' => Message, ];
+$channelAdminLogEventActionDeleteMessage = ['_' => 'channelAdminLogEventActionDeleteMessage', 'message' => Message];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionDeleteMessage","message":"Message"}
+{"_": "channelAdminLogEventActionDeleteMessage", "message": Message}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionDeleteMessage={_='channelAdminLogEventActionDeleteMessage', message=Message, }
+channelAdminLogEventActionDeleteMessage={_='channelAdminLogEventActionDeleteMessage', message=Message}
 
 ```
 

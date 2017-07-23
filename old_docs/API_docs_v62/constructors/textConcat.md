@@ -21,13 +21,13 @@ description: textConcat attributes, type and example
 ### Example:
 
 ```
-$textConcat = ['_' => 'textConcat', 'texts' => [RichText], ];
+$textConcat = ['_' => 'textConcat', 'texts' => [RichText]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"textConcat","texts":["RichText"]}
+{"_": "textConcat", "texts": [RichText]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-textConcat={_='textConcat', texts={RichText}, }
+textConcat={_='textConcat', texts={RichText}}
 
 ```
 

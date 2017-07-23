@@ -24,13 +24,13 @@ Title of chat was changed
 ### Example:
 
 ```
-$updateChatTitle = ['_' => 'updateChatTitle', 'chat_id' => long, 'title' => string, ];
+$updateChatTitle = ['_' => 'updateChatTitle', 'chat_id' => long, 'title' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChatTitle","chat_id":"long","title":"string"}
+{"_": "updateChatTitle", "chat_id": long, "title": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChatTitle={_='updateChatTitle', chat_id=long, title=string, }
+updateChatTitle={_='updateChatTitle', chat_id=long, title='string'}
 
 ```
 

@@ -23,13 +23,13 @@ description: updateChatAdmins attributes, type and example
 ### Example:
 
 ```
-$updateChatAdmins = ['_' => 'updateChatAdmins', 'chat_id' => int, 'enabled' => Bool, 'version' => int, ];
+$updateChatAdmins = ['_' => 'updateChatAdmins', 'chat_id' => int, 'enabled' => Bool, 'version' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChatAdmins","chat_id":"int","enabled":"Bool","version":"int"}
+{"_": "updateChatAdmins", "chat_id": int, "enabled": Bool, "version": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChatAdmins={_='updateChatAdmins', chat_id=int, enabled=Bool, version=int, }
+updateChatAdmins={_='updateChatAdmins', chat_id=int, enabled=Bool, version=int}
 
 ```
 

@@ -27,13 +27,13 @@ description: langPackStringPluralized attributes, type and example
 ### Example:
 
 ```
-$langPackStringPluralized = ['_' => 'langPackStringPluralized', 'key' => string, 'zero_value' => string, 'one_value' => string, 'two_value' => string, 'few_value' => string, 'many_value' => string, 'other_value' => string, ];
+$langPackStringPluralized = ['_' => 'langPackStringPluralized', 'key' => 'string', 'zero_value' => 'string', 'one_value' => 'string', 'two_value' => 'string', 'few_value' => 'string', 'many_value' => 'string', 'other_value' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"langPackStringPluralized","key":"string","zero_value":"string","one_value":"string","two_value":"string","few_value":"string","many_value":"string","other_value":"string"}
+{"_": "langPackStringPluralized", "key": "string", "zero_value": "string", "one_value": "string", "two_value": "string", "few_value": "string", "many_value": "string", "other_value": "string"}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-langPackStringPluralized={_='langPackStringPluralized', key=string, zero_value=string, one_value=string, two_value=string, few_value=string, many_value=string, other_value=string, }
+langPackStringPluralized={_='langPackStringPluralized', key='string', zero_value='string', one_value='string', two_value='string', few_value='string', many_value='string', other_value='string'}
 
 ```
 

@@ -27,13 +27,13 @@ Represents user contact
 ### Example:
 
 ```
-$inlineQueryResultContact = ['_' => 'inlineQueryResultContact', 'id' => string, 'contact' => contact, 'thumb_url' => string, 'thumb_width' => int, 'thumb_height' => int, ];
+$inlineQueryResultContact = ['_' => 'inlineQueryResultContact', 'id' => 'string', 'contact' => contact, 'thumb_url' => 'string', 'thumb_width' => int, 'thumb_height' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultContact","id":"string","contact":"contact","thumb_url":"string","thumb_width":"int","thumb_height":"int"}
+{"_": "inlineQueryResultContact", "id": "string", "contact": contact, "thumb_url": "string", "thumb_width": int, "thumb_height": int}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultContact={_='inlineQueryResultContact', id=string, contact=contact, thumb_url=string, thumb_width=int, thumb_height=int, }
+inlineQueryResultContact={_='inlineQueryResultContact', id='string', contact=contact, thumb_url='string', thumb_width=int, thumb_height=int}
 
 ```
 

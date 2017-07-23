@@ -22,13 +22,13 @@ description: messageMediaVideo attributes, type and example
 ### Example:
 
 ```
-$messageMediaVideo = ['_' => 'messageMediaVideo', 'video' => Video, 'caption' => string, ];
+$messageMediaVideo = ['_' => 'messageMediaVideo', 'video' => Video, 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaVideo","video":"Video","caption":"string"}
+{"_": "messageMediaVideo", "video": Video, "caption": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaVideo={_='messageMediaVideo', video=Video, caption=string, }
+messageMediaVideo={_='messageMediaVideo', video=Video, caption='string'}
 
 ```
 

@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - toggleChannelSignMessages
-* params - {"channel_id":"int","sign_messages":"Bool"}
+* params - {"channel_id": int, "sign_messages": Bool, }
 
 ```
 

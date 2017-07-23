@@ -22,13 +22,13 @@ description: contacts_blocked attributes, type and example
 ### Example:
 
 ```
-$contacts_blocked = ['_' => 'contacts.blocked', 'blocked' => [ContactBlocked], 'users' => [User], ];
+$contacts_blocked = ['_' => 'contacts.blocked', 'blocked' => [ContactBlocked], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.blocked","blocked":["ContactBlocked"],"users":["User"]}
+{"_": "contacts.blocked", "blocked": [ContactBlocked], "users": [User]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_blocked={_='contacts.blocked', blocked={ContactBlocked}, users={User}, }
+contacts_blocked={_='contacts.blocked', blocked={ContactBlocked}, users={User}}
 
 ```
 

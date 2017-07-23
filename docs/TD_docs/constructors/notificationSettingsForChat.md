@@ -23,13 +23,13 @@ Notification settings applied to particular chat
 ### Example:
 
 ```
-$notificationSettingsForChat = ['_' => 'notificationSettingsForChat', 'chat_id' => long, ];
+$notificationSettingsForChat = ['_' => 'notificationSettingsForChat', 'chat_id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"notificationSettingsForChat","chat_id":"long"}
+{"_": "notificationSettingsForChat", "chat_id": long}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-notificationSettingsForChat={_='notificationSettingsForChat', chat_id=long, }
+notificationSettingsForChat={_='notificationSettingsForChat', chat_id=long}
 
 ```
 

@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - createSecretChat
-* params - {"secret_chat_id":"int"}
+* params - {"secret_chat_id": int, }
 
 ```
 

@@ -22,13 +22,13 @@ User starts to play a game
 ### Example:
 
 ```
-$sendMessageStartPlayGameAction = ['_' => 'sendMessageStartPlayGameAction', ];
+$sendMessageStartPlayGameAction = ['_' => 'sendMessageStartPlayGameAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageStartPlayGameAction"}
+{"_": "sendMessageStartPlayGameAction"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageStartPlayGameAction={_='sendMessageStartPlayGameAction', }
+sendMessageStartPlayGameAction={_='sendMessageStartPlayGameAction'}
 
 ```
 

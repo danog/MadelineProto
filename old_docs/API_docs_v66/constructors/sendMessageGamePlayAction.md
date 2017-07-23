@@ -16,13 +16,13 @@ description: sendMessageGamePlayAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageGamePlayAction = ['_' => 'sendMessageGamePlayAction', ];
+$sendMessageGamePlayAction = ['_' => 'sendMessageGamePlayAction'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageGamePlayAction"}
+{"_": "sendMessageGamePlayAction"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageGamePlayAction={_='sendMessageGamePlayAction', }
+sendMessageGamePlayAction={_='sendMessageGamePlayAction'}
 
 ```
 

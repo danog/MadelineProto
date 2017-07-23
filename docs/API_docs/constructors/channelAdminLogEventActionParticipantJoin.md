@@ -16,13 +16,13 @@ description: channelAdminLogEventActionParticipantJoin attributes, type and exam
 ### Example:
 
 ```
-$channelAdminLogEventActionParticipantJoin = ['_' => 'channelAdminLogEventActionParticipantJoin', ];
+$channelAdminLogEventActionParticipantJoin = ['_' => 'channelAdminLogEventActionParticipantJoin'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionParticipantJoin"}
+{"_": "channelAdminLogEventActionParticipantJoin"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionParticipantJoin={_='channelAdminLogEventActionParticipantJoin', }
+channelAdminLogEventActionParticipantJoin={_='channelAdminLogEventActionParticipantJoin'}
 
 ```
 

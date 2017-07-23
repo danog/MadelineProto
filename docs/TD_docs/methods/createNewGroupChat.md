@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Chat = $MadelineProto->createNewGroupChat(['user_ids' => [int], 'title' => string, ]);
+$Chat = $MadelineProto->createNewGroupChat(['user_ids' => [int], 'title' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - createNewGroupChat
-* params - {"user_ids":["int"],"title":"string"}
+* params - {"user_ids": [int], "title": "string", }
 
 ```
 
@@ -70,6 +70,6 @@ title - Json encoded string
 Or, if you're into Lua:
 
 ```
-Chat = createNewGroupChat({user_ids={int}, title=string, })
+Chat = createNewGroupChat({user_ids={int}, title='string', })
 ```
 

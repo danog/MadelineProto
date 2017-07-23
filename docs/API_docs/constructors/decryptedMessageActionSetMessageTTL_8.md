@@ -21,13 +21,13 @@ description: decryptedMessageActionSetMessageTTL attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionSetMessageTTL_8 = ['_' => 'decryptedMessageActionSetMessageTTL', 'ttl_seconds' => int, ];
+$decryptedMessageActionSetMessageTTL_8 = ['_' => 'decryptedMessageActionSetMessageTTL', 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionSetMessageTTL","ttl_seconds":"int"}
+{"_": "decryptedMessageActionSetMessageTTL", "ttl_seconds": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionSetMessageTTL_8={_='decryptedMessageActionSetMessageTTL', ttl_seconds=int, }
+decryptedMessageActionSetMessageTTL_8={_='decryptedMessageActionSetMessageTTL', ttl_seconds=int}
 
 ```
 

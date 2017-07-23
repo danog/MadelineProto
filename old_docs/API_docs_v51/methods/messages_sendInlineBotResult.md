@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => string, ]);
+$Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendInlineBotResult
-* params - {"broadcast":"Bool","silent":"Bool","background":"Bool","peer":"InputPeer","reply_to_msg_id":"int","query_id":"long","id":"string"}
+* params - {"broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "query_id": long, "id": "string", }
 
 ```
 
@@ -75,6 +75,6 @@ id - Json encoded string
 Or, if you're into Lua:
 
 ```
-Updates = messages.sendInlineBotResult({broadcast=Bool, silent=Bool, background=Bool, peer=InputPeer, reply_to_msg_id=int, query_id=long, id=string, })
+Updates = messages.sendInlineBotResult({broadcast=Bool, silent=Bool, background=Bool, peer=InputPeer, reply_to_msg_id=int, query_id=long, id='string', })
 ```
 

@@ -21,13 +21,13 @@ description: peerChat attributes, type and example
 ### Example:
 
 ```
-$peerChat = ['_' => 'peerChat', 'chat_id' => int, ];
+$peerChat = ['_' => 'peerChat', 'chat_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"peerChat","chat_id":"int"}
+{"_": "peerChat", "chat_id": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-peerChat={_='peerChat', chat_id=int, }
+peerChat={_='peerChat', chat_id=int}
 
 ```
 

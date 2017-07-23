@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reorderStickerSets
-* params - {"masks":"Bool","order":["long"]}
+* params - {"masks": Bool, "order": [long], }
 
 ```
 

@@ -16,13 +16,13 @@ description: inputPeerEmpty attributes, type and example
 ### Example:
 
 ```
-$inputPeerEmpty = ['_' => 'inputPeerEmpty', ];
+$inputPeerEmpty = ['_' => 'inputPeerEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPeerEmpty"}
+{"_": "inputPeerEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPeerEmpty={_='inputPeerEmpty', }
+inputPeerEmpty={_='inputPeerEmpty'}
 
 ```
 

@@ -16,13 +16,13 @@ description: channelRoleEditor attributes, type and example
 ### Example:
 
 ```
-$channelRoleEditor = ['_' => 'channelRoleEditor', ];
+$channelRoleEditor = ['_' => 'channelRoleEditor'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelRoleEditor"}
+{"_": "channelRoleEditor"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-channelRoleEditor={_='channelRoleEditor', }
+channelRoleEditor={_='channelRoleEditor'}
 
 ```
 

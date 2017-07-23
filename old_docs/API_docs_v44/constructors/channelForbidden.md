@@ -23,13 +23,13 @@ description: channelForbidden attributes, type and example
 ### Example:
 
 ```
-$channelForbidden = ['_' => 'channelForbidden', 'id' => int, 'access_hash' => long, 'title' => string, ];
+$channelForbidden = ['_' => 'channelForbidden', 'id' => int, 'access_hash' => long, 'title' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelForbidden","id":"int","access_hash":"long","title":"string"}
+{"_": "channelForbidden", "id": int, "access_hash": long, "title": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-channelForbidden={_='channelForbidden', id=int, access_hash=long, title=string, }
+channelForbidden={_='channelForbidden', id=int, access_hash=long, title='string'}
 
 ```
 

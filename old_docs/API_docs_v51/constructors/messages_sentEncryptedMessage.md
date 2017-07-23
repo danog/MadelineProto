@@ -21,13 +21,13 @@ description: messages_sentEncryptedMessage attributes, type and example
 ### Example:
 
 ```
-$messages_sentEncryptedMessage = ['_' => 'messages.sentEncryptedMessage', 'date' => int, ];
+$messages_sentEncryptedMessage = ['_' => 'messages.sentEncryptedMessage', 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.sentEncryptedMessage","date":"int"}
+{"_": "messages.sentEncryptedMessage", "date": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_sentEncryptedMessage={_='messages.sentEncryptedMessage', date=int, }
+messages_sentEncryptedMessage={_='messages.sentEncryptedMessage', date=int}
 
 ```
 

@@ -16,13 +16,13 @@ description: topPeerCategoryBotsPM attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryBotsPM = ['_' => 'topPeerCategoryBotsPM', ];
+$topPeerCategoryBotsPM = ['_' => 'topPeerCategoryBotsPM'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"topPeerCategoryBotsPM"}
+{"_": "topPeerCategoryBotsPM"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-topPeerCategoryBotsPM={_='topPeerCategoryBotsPM', }
+topPeerCategoryBotsPM={_='topPeerCategoryBotsPM'}
 
 ```
 

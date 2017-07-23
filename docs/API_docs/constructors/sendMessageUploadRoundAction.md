@@ -21,13 +21,13 @@ description: sendMessageUploadRoundAction attributes, type and example
 ### Example:
 
 ```
-$sendMessageUploadRoundAction = ['_' => 'sendMessageUploadRoundAction', 'progress' => int, ];
+$sendMessageUploadRoundAction = ['_' => 'sendMessageUploadRoundAction', 'progress' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"sendMessageUploadRoundAction","progress":"int"}
+{"_": "sendMessageUploadRoundAction", "progress": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-sendMessageUploadRoundAction={_='sendMessageUploadRoundAction', progress=int, }
+sendMessageUploadRoundAction={_='sendMessageUploadRoundAction', progress=int}
 
 ```
 

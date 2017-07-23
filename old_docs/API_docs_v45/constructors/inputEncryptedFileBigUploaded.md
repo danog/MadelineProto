@@ -23,13 +23,13 @@ description: inputEncryptedFileBigUploaded attributes, type and example
 ### Example:
 
 ```
-$inputEncryptedFileBigUploaded = ['_' => 'inputEncryptedFileBigUploaded', 'id' => long, 'parts' => int, 'key_fingerprint' => int, ];
+$inputEncryptedFileBigUploaded = ['_' => 'inputEncryptedFileBigUploaded', 'id' => long, 'parts' => int, 'key_fingerprint' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputEncryptedFileBigUploaded","id":"long","parts":"int","key_fingerprint":"int"}
+{"_": "inputEncryptedFileBigUploaded", "id": long, "parts": int, "key_fingerprint": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputEncryptedFileBigUploaded={_='inputEncryptedFileBigUploaded', id=long, parts=int, key_fingerprint=int, }
+inputEncryptedFileBigUploaded={_='inputEncryptedFileBigUploaded', id=long, parts=int, key_fingerprint=int}
 
 ```
 

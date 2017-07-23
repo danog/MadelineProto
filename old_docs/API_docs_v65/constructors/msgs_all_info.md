@@ -22,13 +22,13 @@ description: msgs_all_info attributes, type and example
 ### Example:
 
 ```
-$msgs_all_info = ['_' => 'msgs_all_info', 'msg_ids' => [long], 'info' => string, ];
+$msgs_all_info = ['_' => 'msgs_all_info', 'msg_ids' => [long], 'info' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"msgs_all_info","msg_ids":["long"],"info":"string"}
+{"_": "msgs_all_info", "msg_ids": [long], "info": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-msgs_all_info={_='msgs_all_info', msg_ids={long}, info=string, }
+msgs_all_info={_='msgs_all_info', msg_ids={long}, info='string'}
 
 ```
 

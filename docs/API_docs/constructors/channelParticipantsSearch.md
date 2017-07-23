@@ -21,13 +21,13 @@ description: channelParticipantsSearch attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsSearch = ['_' => 'channelParticipantsSearch', 'q' => string, ];
+$channelParticipantsSearch = ['_' => 'channelParticipantsSearch', 'q' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelParticipantsSearch","q":"string"}
+{"_": "channelParticipantsSearch", "q": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelParticipantsSearch={_='channelParticipantsSearch', q=string, }
+channelParticipantsSearch={_='channelParticipantsSearch', q='string'}
 
 ```
 

@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$StickerSet = $MadelineProto->searchStickerSet(['name' => string, ]);
+$StickerSet = $MadelineProto->searchStickerSet(['name' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - searchStickerSet
-* params - {"name":"string"}
+* params - {"name": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ name - Json encoded string
 Or, if you're into Lua:
 
 ```
-StickerSet = searchStickerSet({name=string, })
+StickerSet = searchStickerSet({name='string', })
 ```
 

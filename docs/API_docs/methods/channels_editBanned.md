@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.editBanned
-* params - {"channel":"InputChannel","user_id":"InputUser","banned_rights":"ChannelBannedRights"}
+* params - {"channel": InputChannel, "user_id": InputUser, "banned_rights": ChannelBannedRights, }
 
 ```
 

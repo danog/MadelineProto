@@ -22,13 +22,13 @@ description: phone_phoneCall attributes, type and example
 ### Example:
 
 ```
-$phone_phoneCall = ['_' => 'phone.phoneCall', 'phone_call' => PhoneCall, 'users' => [User], ];
+$phone_phoneCall = ['_' => 'phone.phoneCall', 'phone_call' => PhoneCall, 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"phone.phoneCall","phone_call":"PhoneCall","users":["User"]}
+{"_": "phone.phoneCall", "phone_call": PhoneCall, "users": [User]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-phone_phoneCall={_='phone.phoneCall', phone_call=PhoneCall, users={User}, }
+phone_phoneCall={_='phone.phoneCall', phone_call=PhoneCall, users={User}}
 
 ```
 

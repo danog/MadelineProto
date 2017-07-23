@@ -27,13 +27,13 @@ description: dcOption attributes, type and example
 ### Example:
 
 ```
-$dcOption = ['_' => 'dcOption', 'ipv6' => Bool, 'media_only' => Bool, 'tcpo_only' => Bool, 'cdn' => Bool, 'id' => int, 'ip_address' => string, 'port' => int, ];
+$dcOption = ['_' => 'dcOption', 'ipv6' => Bool, 'media_only' => Bool, 'tcpo_only' => Bool, 'cdn' => Bool, 'id' => int, 'ip_address' => 'string', 'port' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"dcOption","ipv6":"Bool","media_only":"Bool","tcpo_only":"Bool","cdn":"Bool","id":"int","ip_address":"string","port":"int"}
+{"_": "dcOption", "ipv6": Bool, "media_only": Bool, "tcpo_only": Bool, "cdn": Bool, "id": int, "ip_address": "string", "port": int}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-dcOption={_='dcOption', ipv6=Bool, media_only=Bool, tcpo_only=Bool, cdn=Bool, id=int, ip_address=string, port=int, }
+dcOption={_='dcOption', ipv6=Bool, media_only=Bool, tcpo_only=Bool, cdn=Bool, id=int, ip_address='string', port=int}
 
 ```
 

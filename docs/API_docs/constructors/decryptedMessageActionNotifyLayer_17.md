@@ -21,13 +21,13 @@ description: decryptedMessageActionNotifyLayer attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionNotifyLayer_17 = ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => int, ];
+$decryptedMessageActionNotifyLayer_17 = ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionNotifyLayer","layer":"int"}
+{"_": "decryptedMessageActionNotifyLayer", "layer": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionNotifyLayer_17={_='decryptedMessageActionNotifyLayer', layer=int, }
+decryptedMessageActionNotifyLayer_17={_='decryptedMessageActionNotifyLayer', layer=int}
 
 ```
 

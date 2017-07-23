@@ -16,13 +16,13 @@ description: messages_allStickersNotModified attributes, type and example
 ### Example:
 
 ```
-$messages_allStickersNotModified = ['_' => 'messages.allStickersNotModified', ];
+$messages_allStickersNotModified = ['_' => 'messages.allStickersNotModified'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.allStickersNotModified"}
+{"_": "messages.allStickersNotModified"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_allStickersNotModified={_='messages.allStickersNotModified', }
+messages_allStickersNotModified={_='messages.allStickersNotModified'}
 
 ```
 

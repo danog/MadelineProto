@@ -25,13 +25,13 @@ description: draftMessage attributes, type and example
 ### Example:
 
 ```
-$draftMessage = ['_' => 'draftMessage', 'no_webpage' => Bool, 'reply_to_msg_id' => int, 'message' => string, 'entities' => [MessageEntity], 'date' => int, ];
+$draftMessage = ['_' => 'draftMessage', 'no_webpage' => Bool, 'reply_to_msg_id' => int, 'message' => 'string', 'entities' => [MessageEntity], 'date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"draftMessage","no_webpage":"Bool","reply_to_msg_id":"int","message":"string","entities":["MessageEntity"],"date":"int"}
+{"_": "draftMessage", "no_webpage": Bool, "reply_to_msg_id": int, "message": "string", "entities": [MessageEntity], "date": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-draftMessage={_='draftMessage', no_webpage=Bool, reply_to_msg_id=int, message=string, entities={MessageEntity}, date=int, }
+draftMessage={_='draftMessage', no_webpage=Bool, reply_to_msg_id=int, message='string', entities={MessageEntity}, date=int}
 
 ```
 

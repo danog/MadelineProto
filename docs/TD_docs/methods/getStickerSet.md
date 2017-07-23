@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getStickerSet
-* params - {"set_id":"long"}
+* params - {"set_id": long, }
 
 ```
 

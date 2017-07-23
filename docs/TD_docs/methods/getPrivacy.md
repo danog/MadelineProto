@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getPrivacy
-* params - {"key":"PrivacyKey"}
+* params - {"key": PrivacyKey, }
 
 ```
 

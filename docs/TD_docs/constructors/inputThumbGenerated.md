@@ -26,13 +26,13 @@ Generated thumb
 ### Example:
 
 ```
-$inputThumbGenerated = ['_' => 'inputThumbGenerated', 'original_path' => string, 'conversion' => string, 'width' => int, 'height' => int, ];
+$inputThumbGenerated = ['_' => 'inputThumbGenerated', 'original_path' => 'string', 'conversion' => 'string', 'width' => int, 'height' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputThumbGenerated","original_path":"string","conversion":"string","width":"int","height":"int"}
+{"_": "inputThumbGenerated", "original_path": "string", "conversion": "string", "width": int, "height": int}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-inputThumbGenerated={_='inputThumbGenerated', original_path=string, conversion=string, width=int, height=int, }
+inputThumbGenerated={_='inputThumbGenerated', original_path='string', conversion='string', width=int, height=int}
 
 ```
 

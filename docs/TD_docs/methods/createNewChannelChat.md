@@ -40,7 +40,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Chat = $MadelineProto->createNewChannelChat(['title' => string, 'is_supergroup' => Bool, 'about' => string, ]);
+$Chat = $MadelineProto->createNewChannelChat(['title' => 'string', 'is_supergroup' => Bool, 'about' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - createNewChannelChat
-* params - {"title":"string","is_supergroup":"Bool","about":"string"}
+* params - {"title": "string", "is_supergroup": Bool, "about": "string", }
 
 ```
 
@@ -72,6 +72,6 @@ about - Json encoded string
 Or, if you're into Lua:
 
 ```
-Chat = createNewChannelChat({title=string, is_supergroup=Bool, about=string, })
+Chat = createNewChannelChat({title='string', is_supergroup=Bool, about='string', })
 ```
 

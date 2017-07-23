@@ -16,13 +16,13 @@ description: privacyKeyChatInvite attributes, type and example
 ### Example:
 
 ```
-$privacyKeyChatInvite = ['_' => 'privacyKeyChatInvite', ];
+$privacyKeyChatInvite = ['_' => 'privacyKeyChatInvite'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"privacyKeyChatInvite"}
+{"_": "privacyKeyChatInvite"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-privacyKeyChatInvite={_='privacyKeyChatInvite', }
+privacyKeyChatInvite={_='privacyKeyChatInvite'}
 
 ```
 

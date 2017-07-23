@@ -23,13 +23,13 @@ description: decryptedMessageActionAcceptKey attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionAcceptKey_20 = ['_' => 'decryptedMessageActionAcceptKey', 'exchange_id' => long, 'g_b' => bytes, 'key_fingerprint' => long, ];
+$decryptedMessageActionAcceptKey_20 = ['_' => 'decryptedMessageActionAcceptKey', 'exchange_id' => long, 'g_b' => 'bytes', 'key_fingerprint' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"decryptedMessageActionAcceptKey","exchange_id":"long","g_b":"bytes","key_fingerprint":"long"}
+{"_": "decryptedMessageActionAcceptKey", "exchange_id": long, "g_b": "bytes", "key_fingerprint": long}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageActionAcceptKey_20={_='decryptedMessageActionAcceptKey', exchange_id=long, g_b=bytes, key_fingerprint=long, }
+decryptedMessageActionAcceptKey_20={_='decryptedMessageActionAcceptKey', exchange_id=long, g_b='bytes', key_fingerprint=long}
 
 ```
 

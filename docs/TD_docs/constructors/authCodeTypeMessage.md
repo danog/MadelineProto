@@ -23,13 +23,13 @@ Code is delivered through private Telegram message, which can be viewed in the o
 ### Example:
 
 ```
-$authCodeTypeMessage = ['_' => 'authCodeTypeMessage', 'length' => int, ];
+$authCodeTypeMessage = ['_' => 'authCodeTypeMessage', 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"authCodeTypeMessage","length":"int"}
+{"_": "authCodeTypeMessage", "length": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-authCodeTypeMessage={_='authCodeTypeMessage', length=int, }
+authCodeTypeMessage={_='authCodeTypeMessage', length=int}
 
 ```
 

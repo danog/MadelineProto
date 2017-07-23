@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$User = $MadelineProto->account->updateProfile(['first_name' => string, 'last_name' => string, ]);
+$User = $MadelineProto->account->updateProfile(['first_name' => 'string', 'last_name' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateProfile
-* params - {"first_name":"string","last_name":"string"}
+* params - {"first_name": "string", "last_name": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ last_name - Json encoded string
 Or, if you're into Lua:
 
 ```
-User = account.updateProfile({first_name=string, last_name=string, })
+User = account.updateProfile({first_name='string', last_name='string', })
 ```
 

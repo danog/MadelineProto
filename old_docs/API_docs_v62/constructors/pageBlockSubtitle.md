@@ -21,13 +21,13 @@ description: pageBlockSubtitle attributes, type and example
 ### Example:
 
 ```
-$pageBlockSubtitle = ['_' => 'pageBlockSubtitle', 'text' => RichText, ];
+$pageBlockSubtitle = ['_' => 'pageBlockSubtitle', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockSubtitle","text":"RichText"}
+{"_": "pageBlockSubtitle", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockSubtitle={_='pageBlockSubtitle', text=RichText, }
+pageBlockSubtitle={_='pageBlockSubtitle', text=RichText}
 
 ```
 

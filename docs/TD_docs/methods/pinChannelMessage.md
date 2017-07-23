@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - pinChannelMessage
-* params - {"channel_id":"int","message_id":"long","disable_notification":"Bool"}
+* params - {"channel_id": int, "message_id": long, "disable_notification": Bool, }
 
 ```
 

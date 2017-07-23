@@ -33,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_TermsOfService = $MadelineProto->help->getTermsOfService(['lang_code' => string, ]);
+$help_TermsOfService = $MadelineProto->help->getTermsOfService(['lang_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getTermsOfService
-* params - {"lang_code":"string"}
+* params - {"lang_code": "string", }
 
 ```
 
@@ -63,6 +63,6 @@ lang_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-help_TermsOfService = help.getTermsOfService({lang_code=string, })
+help_TermsOfService = help.getTermsOfService({lang_code='string', })
 ```
 

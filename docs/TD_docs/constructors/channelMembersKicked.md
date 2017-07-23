@@ -22,13 +22,13 @@ Return kicked from the channel
 ### Example:
 
 ```
-$channelMembersKicked = ['_' => 'channelMembersKicked', ];
+$channelMembersKicked = ['_' => 'channelMembersKicked'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelMembersKicked"}
+{"_": "channelMembersKicked"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelMembersKicked={_='channelMembersKicked', }
+channelMembersKicked={_='channelMembersKicked'}
 
 ```
 

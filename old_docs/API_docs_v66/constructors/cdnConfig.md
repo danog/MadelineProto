@@ -21,13 +21,13 @@ description: cdnConfig attributes, type and example
 ### Example:
 
 ```
-$cdnConfig = ['_' => 'cdnConfig', 'public_keys' => [CdnPublicKey], ];
+$cdnConfig = ['_' => 'cdnConfig', 'public_keys' => [CdnPublicKey]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"cdnConfig","public_keys":["CdnPublicKey"]}
+{"_": "cdnConfig", "public_keys": [CdnPublicKey]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-cdnConfig={_='cdnConfig', public_keys={CdnPublicKey}, }
+cdnConfig={_='cdnConfig', public_keys={CdnPublicKey}}
 
 ```
 

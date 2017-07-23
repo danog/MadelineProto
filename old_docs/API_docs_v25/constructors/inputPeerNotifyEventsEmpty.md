@@ -16,13 +16,13 @@ description: inputPeerNotifyEventsEmpty attributes, type and example
 ### Example:
 
 ```
-$inputPeerNotifyEventsEmpty = ['_' => 'inputPeerNotifyEventsEmpty', ];
+$inputPeerNotifyEventsEmpty = ['_' => 'inputPeerNotifyEventsEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPeerNotifyEventsEmpty"}
+{"_": "inputPeerNotifyEventsEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPeerNotifyEventsEmpty={_='inputPeerNotifyEventsEmpty', }
+inputPeerNotifyEventsEmpty={_='inputPeerNotifyEventsEmpty'}
 
 ```
 

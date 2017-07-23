@@ -22,13 +22,13 @@ description: pong attributes, type and example
 ### Example:
 
 ```
-$pong = ['_' => 'pong', 'msg_id' => long, 'ping_id' => long, ];
+$pong = ['_' => 'pong', 'msg_id' => long, 'ping_id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pong","msg_id":"long","ping_id":"long"}
+{"_": "pong", "msg_id": long, "ping_id": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-pong={_='pong', msg_id=long, ping_id=long, }
+pong={_='pong', msg_id=long, ping_id=long}
 
 ```
 

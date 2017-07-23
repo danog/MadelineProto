@@ -22,13 +22,13 @@ description: updateReadMessages attributes, type and example
 ### Example:
 
 ```
-$updateReadMessages = ['_' => 'updateReadMessages', 'messages' => [int], 'pts' => int, ];
+$updateReadMessages = ['_' => 'updateReadMessages', 'messages' => [int], 'pts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateReadMessages","messages":["int"],"pts":"int"}
+{"_": "updateReadMessages", "messages": [int], "pts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateReadMessages={_='updateReadMessages', messages={int}, pts=int, }
+updateReadMessages={_='updateReadMessages', messages={int}, pts=int}
 
 ```
 

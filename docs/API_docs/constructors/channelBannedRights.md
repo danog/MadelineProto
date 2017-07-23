@@ -29,13 +29,13 @@ description: channelBannedRights attributes, type and example
 ### Example:
 
 ```
-$channelBannedRights = ['_' => 'channelBannedRights', 'view_messages' => Bool, 'send_messages' => Bool, 'send_media' => Bool, 'send_stickers' => Bool, 'send_gifs' => Bool, 'send_games' => Bool, 'send_inline' => Bool, 'embed_links' => Bool, 'until_date' => int, ];
+$channelBannedRights = ['_' => 'channelBannedRights', 'view_messages' => Bool, 'send_messages' => Bool, 'send_media' => Bool, 'send_stickers' => Bool, 'send_gifs' => Bool, 'send_games' => Bool, 'send_inline' => Bool, 'embed_links' => Bool, 'until_date' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelBannedRights","view_messages":"Bool","send_messages":"Bool","send_media":"Bool","send_stickers":"Bool","send_gifs":"Bool","send_games":"Bool","send_inline":"Bool","embed_links":"Bool","until_date":"int"}
+{"_": "channelBannedRights", "view_messages": Bool, "send_messages": Bool, "send_media": Bool, "send_stickers": Bool, "send_gifs": Bool, "send_games": Bool, "send_inline": Bool, "embed_links": Bool, "until_date": int}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-channelBannedRights={_='channelBannedRights', view_messages=Bool, send_messages=Bool, send_media=Bool, send_stickers=Bool, send_gifs=Bool, send_games=Bool, send_inline=Bool, embed_links=Bool, until_date=int, }
+channelBannedRights={_='channelBannedRights', view_messages=Bool, send_messages=Bool, send_media=Bool, send_stickers=Bool, send_gifs=Bool, send_games=Bool, send_inline=Bool, embed_links=Bool, until_date=int}
 
 ```
 

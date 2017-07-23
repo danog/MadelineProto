@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateStatus
-* params - {"offline":"Bool"}
+* params - {"offline": Bool, }
 
 ```
 

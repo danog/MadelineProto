@@ -31,13 +31,13 @@ Contains information about chat invite link
 ### Example:
 
 ```
-$chatInviteLinkInfo = ['_' => 'chatInviteLinkInfo', 'chat_id' => long, 'title' => string, 'photo' => chatPhoto, 'member_count' => int, 'members' => [user], 'is_group' => Bool, 'is_channel' => Bool, 'is_public_channel' => Bool, 'is_supergroup_channel' => Bool, ];
+$chatInviteLinkInfo = ['_' => 'chatInviteLinkInfo', 'chat_id' => long, 'title' => 'string', 'photo' => chatPhoto, 'member_count' => int, 'members' => [user], 'is_group' => Bool, 'is_channel' => Bool, 'is_public_channel' => Bool, 'is_supergroup_channel' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatInviteLinkInfo","chat_id":"long","title":"string","photo":"chatPhoto","member_count":"int","members":["user"],"is_group":"Bool","is_channel":"Bool","is_public_channel":"Bool","is_supergroup_channel":"Bool"}
+{"_": "chatInviteLinkInfo", "chat_id": long, "title": "string", "photo": chatPhoto, "member_count": int, "members": [user], "is_group": Bool, "is_channel": Bool, "is_public_channel": Bool, "is_supergroup_channel": Bool}
 ```
 
 
@@ -45,7 +45,7 @@ Or, if you're into Lua:
 
 
 ```
-chatInviteLinkInfo={_='chatInviteLinkInfo', chat_id=long, title=string, photo=chatPhoto, member_count=int, members={user}, is_group=Bool, is_channel=Bool, is_public_channel=Bool, is_supergroup_channel=Bool, }
+chatInviteLinkInfo={_='chatInviteLinkInfo', chat_id=long, title='string', photo=chatPhoto, member_count=int, members={user}, is_group=Bool, is_channel=Bool, is_public_channel=Bool, is_supergroup_channel=Bool}
 
 ```
 

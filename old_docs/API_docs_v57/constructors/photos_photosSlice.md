@@ -23,13 +23,13 @@ description: photos_photosSlice attributes, type and example
 ### Example:
 
 ```
-$photos_photosSlice = ['_' => 'photos.photosSlice', 'count' => int, 'photos' => [Photo], 'users' => [User], ];
+$photos_photosSlice = ['_' => 'photos.photosSlice', 'count' => int, 'photos' => [Photo], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"photos.photosSlice","count":"int","photos":["Photo"],"users":["User"]}
+{"_": "photos.photosSlice", "count": int, "photos": [Photo], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-photos_photosSlice={_='photos.photosSlice', count=int, photos={Photo}, users={User}, }
+photos_photosSlice={_='photos.photosSlice', count=int, photos={Photo}, users={User}}
 
 ```
 

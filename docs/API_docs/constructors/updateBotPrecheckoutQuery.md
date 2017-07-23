@@ -27,13 +27,13 @@ description: updateBotPrecheckoutQuery attributes, type and example
 ### Example:
 
 ```
-$updateBotPrecheckoutQuery = ['_' => 'updateBotPrecheckoutQuery', 'query_id' => long, 'user_id' => int, 'payload' => bytes, 'info' => PaymentRequestedInfo, 'shipping_option_id' => string, 'currency' => string, 'total_amount' => long, ];
+$updateBotPrecheckoutQuery = ['_' => 'updateBotPrecheckoutQuery', 'query_id' => long, 'user_id' => int, 'payload' => 'bytes', 'info' => PaymentRequestedInfo, 'shipping_option_id' => 'string', 'currency' => 'string', 'total_amount' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateBotPrecheckoutQuery","query_id":"long","user_id":"int","payload":"bytes","info":"PaymentRequestedInfo","shipping_option_id":"string","currency":"string","total_amount":"long"}
+{"_": "updateBotPrecheckoutQuery", "query_id": long, "user_id": int, "payload": "bytes", "info": PaymentRequestedInfo, "shipping_option_id": "string", "currency": "string", "total_amount": long}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-updateBotPrecheckoutQuery={_='updateBotPrecheckoutQuery', query_id=long, user_id=int, payload=bytes, info=PaymentRequestedInfo, shipping_option_id=string, currency=string, total_amount=long, }
+updateBotPrecheckoutQuery={_='updateBotPrecheckoutQuery', query_id=long, user_id=int, payload='bytes', info=PaymentRequestedInfo, shipping_option_id='string', currency='string', total_amount=long}
 
 ```
 

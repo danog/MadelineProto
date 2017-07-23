@@ -21,13 +21,13 @@ description: inputMediaGame attributes, type and example
 ### Example:
 
 ```
-$inputMediaGame = ['_' => 'inputMediaGame', 'id' => InputGame, ];
+$inputMediaGame = ['_' => 'inputMediaGame', 'id' => InputGame];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaGame","id":"InputGame"}
+{"_": "inputMediaGame", "id": InputGame}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaGame={_='inputMediaGame', id=InputGame, }
+inputMediaGame={_='inputMediaGame', id=InputGame}
 
 ```
 

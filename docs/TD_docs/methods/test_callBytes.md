@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$test_Bytes = $MadelineProto->test->callBytes(['x' => bytes, ]);
+$test_Bytes = $MadelineProto->test->callBytes(['x' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callBytes
-* params - {"x":"bytes"}
+* params - {"x": "bytes", }
 
 ```
 
@@ -66,6 +66,6 @@ x - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-test_Bytes = test.callBytes({x=bytes, })
+test_Bytes = test.callBytes({x='bytes', })
 ```
 

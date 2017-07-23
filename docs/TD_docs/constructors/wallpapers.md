@@ -23,13 +23,13 @@ Contains list of wallpapers
 ### Example:
 
 ```
-$wallpapers = ['_' => 'wallpapers', 'wallpapers' => [wallpaper], ];
+$wallpapers = ['_' => 'wallpapers', 'wallpapers' => [wallpaper]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"wallpapers","wallpapers":["wallpaper"]}
+{"_": "wallpapers", "wallpapers": [wallpaper]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-wallpapers={_='wallpapers', wallpapers={wallpaper}, }
+wallpapers={_='wallpapers', wallpapers={wallpaper}}
 
 ```
 

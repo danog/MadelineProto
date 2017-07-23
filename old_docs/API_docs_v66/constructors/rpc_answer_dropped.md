@@ -23,13 +23,13 @@ description: rpc_answer_dropped attributes, type and example
 ### Example:
 
 ```
-$rpc_answer_dropped = ['_' => 'rpc_answer_dropped', 'msg_id' => long, 'seq_no' => int, 'bytes' => int, ];
+$rpc_answer_dropped = ['_' => 'rpc_answer_dropped', 'msg_id' => long, 'seq_no' => int, 'bytes' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"rpc_answer_dropped","msg_id":"long","seq_no":"int","bytes":"int"}
+{"_": "rpc_answer_dropped", "msg_id": long, "seq_no": int, "bytes": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-rpc_answer_dropped={_='rpc_answer_dropped', msg_id=long, seq_no=int, bytes=int, }
+rpc_answer_dropped={_='rpc_answer_dropped', msg_id=long, seq_no=int, bytes=int}
 
 ```
 

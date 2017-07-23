@@ -24,13 +24,13 @@ description: account_passwordInputSettings attributes, type and example
 ### Example:
 
 ```
-$account_passwordInputSettings = ['_' => 'account.passwordInputSettings', 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, 'email' => string, ];
+$account_passwordInputSettings = ['_' => 'account.passwordInputSettings', 'new_salt' => 'bytes', 'new_password_hash' => 'bytes', 'hint' => 'string', 'email' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"account.passwordInputSettings","new_salt":"bytes","new_password_hash":"bytes","hint":"string","email":"string"}
+{"_": "account.passwordInputSettings", "new_salt": "bytes", "new_password_hash": "bytes", "hint": "string", "email": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-account_passwordInputSettings={_='account.passwordInputSettings', new_salt=bytes, new_password_hash=bytes, hint=string, email=string, }
+account_passwordInputSettings={_='account.passwordInputSettings', new_salt='bytes', new_password_hash='bytes', hint='string', email='string'}
 
 ```
 

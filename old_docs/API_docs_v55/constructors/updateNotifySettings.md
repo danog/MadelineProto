@@ -22,13 +22,13 @@ description: updateNotifySettings attributes, type and example
 ### Example:
 
 ```
-$updateNotifySettings = ['_' => 'updateNotifySettings', 'peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings, ];
+$updateNotifySettings = ['_' => 'updateNotifySettings', 'peer' => NotifyPeer, 'notify_settings' => PeerNotifySettings];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNotifySettings","peer":"NotifyPeer","notify_settings":"PeerNotifySettings"}
+{"_": "updateNotifySettings", "peer": NotifyPeer, "notify_settings": PeerNotifySettings}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNotifySettings={_='updateNotifySettings', peer=NotifyPeer, notify_settings=PeerNotifySettings, }
+updateNotifySettings={_='updateNotifySettings', peer=NotifyPeer, notify_settings=PeerNotifySettings}
 
 ```
 

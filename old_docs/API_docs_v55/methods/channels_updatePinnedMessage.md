@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.updatePinnedMessage
-* params - {"silent":"Bool","channel":"InputChannel","id":"int"}
+* params - {"silent": Bool, "channel": InputChannel, "id": int, }
 
 ```
 

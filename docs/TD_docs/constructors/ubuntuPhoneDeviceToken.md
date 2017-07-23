@@ -23,13 +23,13 @@ Token for Ubuntu Push Service
 ### Example:
 
 ```
-$ubuntuPhoneDeviceToken = ['_' => 'ubuntuPhoneDeviceToken', 'token' => string, ];
+$ubuntuPhoneDeviceToken = ['_' => 'ubuntuPhoneDeviceToken', 'token' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"ubuntuPhoneDeviceToken","token":"string"}
+{"_": "ubuntuPhoneDeviceToken", "token": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-ubuntuPhoneDeviceToken={_='ubuntuPhoneDeviceToken', token=string, }
+ubuntuPhoneDeviceToken={_='ubuntuPhoneDeviceToken', token='string'}
 
 ```
 

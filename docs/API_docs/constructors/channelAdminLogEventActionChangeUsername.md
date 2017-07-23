@@ -22,13 +22,13 @@ description: channelAdminLogEventActionChangeUsername attributes, type and examp
 ### Example:
 
 ```
-$channelAdminLogEventActionChangeUsername = ['_' => 'channelAdminLogEventActionChangeUsername', 'prev_value' => string, 'new_value' => string, ];
+$channelAdminLogEventActionChangeUsername = ['_' => 'channelAdminLogEventActionChangeUsername', 'prev_value' => 'string', 'new_value' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionChangeUsername","prev_value":"string","new_value":"string"}
+{"_": "channelAdminLogEventActionChangeUsername", "prev_value": "string", "new_value": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionChangeUsername={_='channelAdminLogEventActionChangeUsername', prev_value=string, new_value=string, }
+channelAdminLogEventActionChangeUsername={_='channelAdminLogEventActionChangeUsername', prev_value='string', new_value='string'}
 
 ```
 

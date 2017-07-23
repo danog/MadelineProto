@@ -24,13 +24,13 @@ description: msg_detailed_info attributes, type and example
 ### Example:
 
 ```
-$msg_detailed_info = ['_' => 'msg_detailed_info', 'msg_id' => long, 'answer_msg_id' => long, 'bytes' => int, 'status' => int, ];
+$msg_detailed_info = ['_' => 'msg_detailed_info', 'msg_id' => long, 'answer_msg_id' => long, 'bytes' => int, 'status' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"msg_detailed_info","msg_id":"long","answer_msg_id":"long","bytes":"int","status":"int"}
+{"_": "msg_detailed_info", "msg_id": long, "answer_msg_id": long, "bytes": int, "status": int}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-msg_detailed_info={_='msg_detailed_info', msg_id=long, answer_msg_id=long, bytes=int, status=int, }
+msg_detailed_info={_='msg_detailed_info', msg_id=long, answer_msg_id=long, bytes=int, status=int}
 
 ```
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.resetTopPeerRating
-* params - {"category":"TopPeerCategory","peer":"InputPeer"}
+* params - {"category": TopPeerCategory, "peer": InputPeer, }
 
 ```
 

@@ -21,13 +21,13 @@ description: channelParticipantsBanned attributes, type and example
 ### Example:
 
 ```
-$channelParticipantsBanned = ['_' => 'channelParticipantsBanned', 'q' => string, ];
+$channelParticipantsBanned = ['_' => 'channelParticipantsBanned', 'q' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelParticipantsBanned","q":"string"}
+{"_": "channelParticipantsBanned", "q": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelParticipantsBanned={_='channelParticipantsBanned', q=string, }
+channelParticipantsBanned={_='channelParticipantsBanned', q='string'}
 
 ```
 

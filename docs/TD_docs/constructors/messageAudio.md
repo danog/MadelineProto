@@ -25,13 +25,13 @@ Audio message
 ### Example:
 
 ```
-$messageAudio = ['_' => 'messageAudio', 'audio' => audio, 'caption' => string, 'is_listened' => Bool, ];
+$messageAudio = ['_' => 'messageAudio', 'audio' => audio, 'caption' => 'string', 'is_listened' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageAudio","audio":"audio","caption":"string","is_listened":"Bool"}
+{"_": "messageAudio", "audio": audio, "caption": "string", "is_listened": Bool}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-messageAudio={_='messageAudio', audio=audio, caption=string, is_listened=Bool, }
+messageAudio={_='messageAudio', audio=audio, caption='string', is_listened=Bool}
 
 ```
 

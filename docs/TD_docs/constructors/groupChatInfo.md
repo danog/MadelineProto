@@ -23,13 +23,13 @@ Chat with zero or more other users
 ### Example:
 
 ```
-$groupChatInfo = ['_' => 'groupChatInfo', 'group' => group, ];
+$groupChatInfo = ['_' => 'groupChatInfo', 'group' => group];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"groupChatInfo","group":"group"}
+{"_": "groupChatInfo", "group": group}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-groupChatInfo={_='groupChatInfo', group=group, }
+groupChatInfo={_='groupChatInfo', group=group}
 
 ```
 

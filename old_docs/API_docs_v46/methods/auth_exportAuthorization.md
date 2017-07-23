@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.exportAuthorization
-* params - {"dc_id":"int"}
+* params - {"dc_id": int, }
 
 ```
 

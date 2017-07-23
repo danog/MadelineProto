@@ -21,13 +21,13 @@ description: channelAdminLogEventActionToggleSignatures attributes, type and exa
 ### Example:
 
 ```
-$channelAdminLogEventActionToggleSignatures = ['_' => 'channelAdminLogEventActionToggleSignatures', 'new_value' => Bool, ];
+$channelAdminLogEventActionToggleSignatures = ['_' => 'channelAdminLogEventActionToggleSignatures', 'new_value' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionToggleSignatures","new_value":"Bool"}
+{"_": "channelAdminLogEventActionToggleSignatures", "new_value": Bool}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionToggleSignatures={_='channelAdminLogEventActionToggleSignatures', new_value=Bool, }
+channelAdminLogEventActionToggleSignatures={_='channelAdminLogEventActionToggleSignatures', new_value=Bool}
 
 ```
 

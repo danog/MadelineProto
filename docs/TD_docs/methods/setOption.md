@@ -39,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->setOption(['name' => string, 'value' => OptionValue, ]);
+$Ok = $MadelineProto->setOption(['name' => 'string', 'value' => OptionValue, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setOption
-* params - {"name":"string","value":"OptionValue"}
+* params - {"name": "string", "value": OptionValue, }
 
 ```
 
@@ -70,6 +70,6 @@ value - Json encoded OptionValue
 Or, if you're into Lua:
 
 ```
-Ok = setOption({name=string, value=OptionValue, })
+Ok = setOption({name='string', value=OptionValue, })
 ```
 

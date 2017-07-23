@@ -21,13 +21,13 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser], ];
+$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputPrivacyValueAllowUsers","users":["InputUser"]}
+{"_": "inputPrivacyValueAllowUsers", "users": [InputUser]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputPrivacyValueAllowUsers={_='inputPrivacyValueAllowUsers', users={InputUser}, }
+inputPrivacyValueAllowUsers={_='inputPrivacyValueAllowUsers', users={InputUser}}
 
 ```
 

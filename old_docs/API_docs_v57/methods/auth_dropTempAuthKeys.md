@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.dropTempAuthKeys
-* params - {"except_auth_keys":["long"]}
+* params - {"except_auth_keys": [long], }
 
 ```
 

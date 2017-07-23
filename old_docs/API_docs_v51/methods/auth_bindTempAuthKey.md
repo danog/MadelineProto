@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->auth->bindTempAuthKey(['perm_auth_key_id' => long, 'nonce' => long, 'expires_at' => int, 'encrypted_message' => bytes, ]);
+$Bool = $MadelineProto->auth->bindTempAuthKey(['perm_auth_key_id' => long, 'nonce' => long, 'expires_at' => int, 'encrypted_message' => 'bytes', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.bindTempAuthKey
-* params - {"perm_auth_key_id":"long","nonce":"long","expires_at":"int","encrypted_message":"bytes"}
+* params - {"perm_auth_key_id": long, "nonce": long, "expires_at": int, "encrypted_message": "bytes", }
 
 ```
 
@@ -69,6 +69,6 @@ encrypted_message - Json encoded bytes
 Or, if you're into Lua:
 
 ```
-Bool = auth.bindTempAuthKey({perm_auth_key_id=long, nonce=long, expires_at=int, encrypted_message=bytes, })
+Bool = auth.bindTempAuthKey({perm_auth_key_id=long, nonce=long, expires_at=int, encrypted_message='bytes', })
 ```
 

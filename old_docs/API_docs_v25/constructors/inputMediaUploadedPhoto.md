@@ -21,13 +21,13 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, ];
+$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaUploadedPhoto","file":"InputFile"}
+{"_": "inputMediaUploadedPhoto", "file": InputFile}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaUploadedPhoto={_='inputMediaUploadedPhoto', file=InputFile, }
+inputMediaUploadedPhoto={_='inputMediaUploadedPhoto', file=InputFile}
 
 ```
 

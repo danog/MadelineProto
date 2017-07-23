@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - get_future_salts
-* params - {"num":"int"}
+* params - {"num": int, }
 
 ```
 

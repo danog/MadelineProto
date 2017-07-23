@@ -22,13 +22,13 @@ description: messages_highScores attributes, type and example
 ### Example:
 
 ```
-$messages_highScores = ['_' => 'messages.highScores', 'scores' => [HighScore], 'users' => [User], ];
+$messages_highScores = ['_' => 'messages.highScores', 'scores' => [HighScore], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.highScores","scores":["HighScore"],"users":["User"]}
+{"_": "messages.highScores", "scores": [HighScore], "users": [User]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_highScores={_='messages.highScores', scores={HighScore}, users={User}, }
+messages_highScores={_='messages.highScores', scores={HighScore}, users={User}}
 
 ```
 

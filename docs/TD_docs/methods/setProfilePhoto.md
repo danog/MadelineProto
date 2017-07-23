@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->setProfilePhoto(['photo_path' => string, ]);
+$Ok = $MadelineProto->setProfilePhoto(['photo_path' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setProfilePhoto
-* params - {"photo_path":"string"}
+* params - {"photo_path": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ photo_path - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = setProfilePhoto({photo_path=string, })
+Ok = setProfilePhoto({photo_path='string', })
 ```
 

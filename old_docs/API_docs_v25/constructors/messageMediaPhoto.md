@@ -21,13 +21,13 @@ description: messageMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo, ];
+$messageMediaPhoto = ['_' => 'messageMediaPhoto', 'photo' => Photo];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaPhoto","photo":"Photo"}
+{"_": "messageMediaPhoto", "photo": Photo}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaPhoto={_='messageMediaPhoto', photo=Photo, }
+messageMediaPhoto={_='messageMediaPhoto', photo=Photo}
 
 ```
 

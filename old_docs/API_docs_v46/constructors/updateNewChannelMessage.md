@@ -23,13 +23,13 @@ description: updateNewChannelMessage attributes, type and example
 ### Example:
 
 ```
-$updateNewChannelMessage = ['_' => 'updateNewChannelMessage', 'message' => Message, 'channel_pts' => int, 'channel_pts_count' => int, ];
+$updateNewChannelMessage = ['_' => 'updateNewChannelMessage', 'message' => Message, 'channel_pts' => int, 'channel_pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewChannelMessage","message":"Message","channel_pts":"int","channel_pts_count":"int"}
+{"_": "updateNewChannelMessage", "message": Message, "channel_pts": int, "channel_pts_count": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewChannelMessage={_='updateNewChannelMessage', message=Message, channel_pts=int, channel_pts_count=int, }
+updateNewChannelMessage={_='updateNewChannelMessage', message=Message, channel_pts=int, channel_pts_count=int}
 
 ```
 

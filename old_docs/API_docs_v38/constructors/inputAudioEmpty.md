@@ -16,13 +16,13 @@ description: inputAudioEmpty attributes, type and example
 ### Example:
 
 ```
-$inputAudioEmpty = ['_' => 'inputAudioEmpty', ];
+$inputAudioEmpty = ['_' => 'inputAudioEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputAudioEmpty"}
+{"_": "inputAudioEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputAudioEmpty={_='inputAudioEmpty', }
+inputAudioEmpty={_='inputAudioEmpty'}
 
 ```
 

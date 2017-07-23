@@ -16,13 +16,13 @@ description: inputMessagesFilterEmpty attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterEmpty = ['_' => 'inputMessagesFilterEmpty', ];
+$inputMessagesFilterEmpty = ['_' => 'inputMessagesFilterEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterEmpty"}
+{"_": "inputMessagesFilterEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterEmpty={_='inputMessagesFilterEmpty', }
+inputMessagesFilterEmpty={_='inputMessagesFilterEmpty'}
 
 ```
 

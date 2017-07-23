@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - ping
-* params - {"ping_id":"long"}
+* params - {"ping_id": long, }
 
 ```
 

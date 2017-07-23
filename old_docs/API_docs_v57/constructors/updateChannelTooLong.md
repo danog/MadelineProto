@@ -22,13 +22,13 @@ description: updateChannelTooLong attributes, type and example
 ### Example:
 
 ```
-$updateChannelTooLong = ['_' => 'updateChannelTooLong', 'channel_id' => int, 'pts' => int, ];
+$updateChannelTooLong = ['_' => 'updateChannelTooLong', 'channel_id' => int, 'pts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChannelTooLong","channel_id":"int","pts":"int"}
+{"_": "updateChannelTooLong", "channel_id": int, "pts": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChannelTooLong={_='updateChannelTooLong', channel_id=int, pts=int, }
+updateChannelTooLong={_='updateChannelTooLong', channel_id=int, pts=int}
 
 ```
 

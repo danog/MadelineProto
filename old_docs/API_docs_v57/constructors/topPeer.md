@@ -22,13 +22,13 @@ description: topPeer attributes, type and example
 ### Example:
 
 ```
-$topPeer = ['_' => 'topPeer', 'peer' => Peer, 'rating' => double, ];
+$topPeer = ['_' => 'topPeer', 'peer' => Peer, 'rating' => double];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"topPeer","peer":"Peer","rating":"double"}
+{"_": "topPeer", "peer": Peer, "rating": double}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-topPeer={_='topPeer', peer=Peer, rating=double, }
+topPeer={_='topPeer', peer=Peer, rating=double}
 
 ```
 

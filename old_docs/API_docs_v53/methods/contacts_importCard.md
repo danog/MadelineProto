@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.importCard
-* params - {"export_card":["int"]}
+* params - {"export_card": [int], }
 
 ```
 

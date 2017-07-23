@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getChats
-* params - {"offset_order":"long","offset_chat_id":"long","limit":"int"}
+* params - {"offset_order": long, "offset_chat_id": long, "limit": int, }
 
 ```
 

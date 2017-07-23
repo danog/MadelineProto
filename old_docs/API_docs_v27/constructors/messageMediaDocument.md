@@ -21,13 +21,13 @@ description: messageMediaDocument attributes, type and example
 ### Example:
 
 ```
-$messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document, ];
+$messageMediaDocument = ['_' => 'messageMediaDocument', 'document' => Document];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaDocument","document":"Document"}
+{"_": "messageMediaDocument", "document": Document}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaDocument={_='messageMediaDocument', document=Document, }
+messageMediaDocument={_='messageMediaDocument', document=Document}
 
 ```
 

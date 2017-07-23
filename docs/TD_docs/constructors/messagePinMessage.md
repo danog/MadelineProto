@@ -23,13 +23,13 @@ Some message was pinned
 ### Example:
 
 ```
-$messagePinMessage = ['_' => 'messagePinMessage', 'message_id' => long, ];
+$messagePinMessage = ['_' => 'messagePinMessage', 'message_id' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messagePinMessage","message_id":"long"}
+{"_": "messagePinMessage", "message_id": long}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messagePinMessage={_='messagePinMessage', message_id=long, }
+messagePinMessage={_='messagePinMessage', message_id=long}
 
 ```
 

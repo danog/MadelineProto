@@ -28,13 +28,13 @@ Represents a group of zero or more other users
 ### Example:
 
 ```
-$group = ['_' => 'group', 'id' => int, 'member_count' => int, 'status' => ChatMemberStatus, 'anyone_can_edit' => Bool, 'is_active' => Bool, 'migrated_to_channel_id' => int, ];
+$group = ['_' => 'group', 'id' => int, 'member_count' => int, 'status' => ChatMemberStatus, 'anyone_can_edit' => Bool, 'is_active' => Bool, 'migrated_to_channel_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"group","id":"int","member_count":"int","status":"ChatMemberStatus","anyone_can_edit":"Bool","is_active":"Bool","migrated_to_channel_id":"int"}
+{"_": "group", "id": int, "member_count": int, "status": ChatMemberStatus, "anyone_can_edit": Bool, "is_active": Bool, "migrated_to_channel_id": int}
 ```
 
 
@@ -42,7 +42,7 @@ Or, if you're into Lua:
 
 
 ```
-group={_='group', id=int, member_count=int, status=ChatMemberStatus, anyone_can_edit=Bool, is_active=Bool, migrated_to_channel_id=int, }
+group={_='group', id=int, member_count=int, status=ChatMemberStatus, anyone_can_edit=Bool, is_active=Bool, migrated_to_channel_id=int}
 
 ```
 

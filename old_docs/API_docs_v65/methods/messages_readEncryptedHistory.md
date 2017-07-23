@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.readEncryptedHistory
-* params - {"peer":"InputEncryptedChat","max_date":"int"}
+* params - {"peer": InputEncryptedChat, "max_date": int, }
 
 ```
 

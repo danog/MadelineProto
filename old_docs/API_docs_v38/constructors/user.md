@@ -29,13 +29,13 @@ description: user attributes, type and example
 ### Example:
 
 ```
-$user = ['_' => 'user', 'id' => int, 'access_hash' => long, 'first_name' => string, 'last_name' => string, 'username' => string, 'phone' => string, 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int, ];
+$user = ['_' => 'user', 'id' => int, 'access_hash' => long, 'first_name' => 'string', 'last_name' => 'string', 'username' => 'string', 'phone' => 'string', 'photo' => UserProfilePhoto, 'status' => UserStatus, 'bot_info_version' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"user","id":"int","access_hash":"long","first_name":"string","last_name":"string","username":"string","phone":"string","photo":"UserProfilePhoto","status":"UserStatus","bot_info_version":"int"}
+{"_": "user", "id": int, "access_hash": long, "first_name": "string", "last_name": "string", "username": "string", "phone": "string", "photo": UserProfilePhoto, "status": UserStatus, "bot_info_version": int}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-user={_='user', id=int, access_hash=long, first_name=string, last_name=string, username=string, phone=string, photo=UserProfilePhoto, status=UserStatus, bot_info_version=int, }
+user={_='user', id=int, access_hash=long, first_name='string', last_name='string', username='string', phone='string', photo=UserProfilePhoto, status=UserStatus, bot_info_version=int}
 
 ```
 

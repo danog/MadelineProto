@@ -22,13 +22,13 @@ description: chatLocated attributes, type and example
 ### Example:
 
 ```
-$chatLocated = ['_' => 'chatLocated', 'chat_id' => int, 'distance' => int, ];
+$chatLocated = ['_' => 'chatLocated', 'chat_id' => int, 'distance' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatLocated","chat_id":"int","distance":"int"}
+{"_": "chatLocated", "chat_id": int, "distance": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-chatLocated={_='chatLocated', chat_id=int, distance=int, }
+chatLocated={_='chatLocated', chat_id=int, distance=int}
 
 ```
 

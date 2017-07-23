@@ -23,13 +23,13 @@ Token for MPNS
 ### Example:
 
 ```
-$mpnsDeviceToken = ['_' => 'mpnsDeviceToken', 'token' => string, ];
+$mpnsDeviceToken = ['_' => 'mpnsDeviceToken', 'token' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"mpnsDeviceToken","token":"string"}
+{"_": "mpnsDeviceToken", "token": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-mpnsDeviceToken={_='mpnsDeviceToken', token=string, }
+mpnsDeviceToken={_='mpnsDeviceToken', token='string'}
 
 ```
 

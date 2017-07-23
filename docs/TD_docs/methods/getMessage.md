@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getMessage
-* params - {"chat_id":"InputPeer","message_id":"long"}
+* params - {"chat_id": InputPeer, "message_id": long, }
 
 ```
 

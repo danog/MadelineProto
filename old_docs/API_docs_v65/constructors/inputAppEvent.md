@@ -24,13 +24,13 @@ description: inputAppEvent attributes, type and example
 ### Example:
 
 ```
-$inputAppEvent = ['_' => 'inputAppEvent', 'time' => double, 'type' => string, 'peer' => long, 'data' => string, ];
+$inputAppEvent = ['_' => 'inputAppEvent', 'time' => double, 'type' => 'string', 'peer' => long, 'data' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputAppEvent","time":"double","type":"string","peer":"long","data":"string"}
+{"_": "inputAppEvent", "time": double, "type": "string", "peer": long, "data": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inputAppEvent={_='inputAppEvent', time=double, type=string, peer=long, data=string, }
+inputAppEvent={_='inputAppEvent', time=double, type='string', peer=long, data='string'}
 
 ```
 

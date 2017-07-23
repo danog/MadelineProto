@@ -23,13 +23,13 @@ description: messages_affectedHistory attributes, type and example
 ### Example:
 
 ```
-$messages_affectedHistory = ['_' => 'messages.affectedHistory', 'pts' => int, 'seq' => int, 'offset' => int, ];
+$messages_affectedHistory = ['_' => 'messages.affectedHistory', 'pts' => int, 'seq' => int, 'offset' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.affectedHistory","pts":"int","seq":"int","offset":"int"}
+{"_": "messages.affectedHistory", "pts": int, "seq": int, "offset": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_affectedHistory={_='messages.affectedHistory', pts=int, seq=int, offset=int, }
+messages_affectedHistory={_='messages.affectedHistory', pts=int, seq=int, offset=int}
 
 ```
 

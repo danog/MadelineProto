@@ -42,7 +42,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$InlineQueryResults = $MadelineProto->getInlineQueryResults(['bot_user_id' => int, 'chat_id' => InputPeer, 'user_location' => location, 'query' => string, 'offset' => string, ]);
+$InlineQueryResults = $MadelineProto->getInlineQueryResults(['bot_user_id' => int, 'chat_id' => InputPeer, 'user_location' => location, 'query' => 'string', 'offset' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -54,7 +54,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getInlineQueryResults
-* params - {"bot_user_id":"int","chat_id":"InputPeer","user_location":"location","query":"string","offset":"string"}
+* params - {"bot_user_id": int, "chat_id": InputPeer, "user_location": location, "query": "string", "offset": "string", }
 
 ```
 
@@ -76,6 +76,6 @@ offset - Json encoded string
 Or, if you're into Lua:
 
 ```
-InlineQueryResults = getInlineQueryResults({bot_user_id=int, chat_id=InputPeer, user_location=location, query=string, offset=string, })
+InlineQueryResults = getInlineQueryResults({bot_user_id=int, chat_id=InputPeer, user_location=location, query='string', offset='string', })
 ```
 

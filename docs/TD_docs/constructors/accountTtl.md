@@ -23,13 +23,13 @@ Contains infotmation about period of inactivity, after which the account of curr
 ### Example:
 
 ```
-$accountTtl = ['_' => 'accountTtl', 'days' => int, ];
+$accountTtl = ['_' => 'accountTtl', 'days' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"accountTtl","days":"int"}
+{"_": "accountTtl", "days": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-accountTtl={_='accountTtl', days=int, }
+accountTtl={_='accountTtl', days=int}
 
 ```
 

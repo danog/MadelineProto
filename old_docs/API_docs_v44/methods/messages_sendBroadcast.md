@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->messages->sendBroadcast(['contacts' => [InputUser], 'message' => string, 'media' => InputMedia, ]);
+$Updates = $MadelineProto->messages->sendBroadcast(['contacts' => [InputUser], 'message' => 'string', 'media' => InputMedia, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendBroadcast
-* params - {"contacts":["InputUser"],"message":"string","media":"InputMedia"}
+* params - {"contacts": [InputUser], "message": "string", "media": InputMedia, }
 
 ```
 
@@ -67,7 +67,7 @@ media - Json encoded InputMedia
 Or, if you're into Lua:
 
 ```
-Updates = messages.sendBroadcast({contacts={InputUser}, message=string, media=InputMedia, })
+Updates = messages.sendBroadcast({contacts={InputUser}, message='string', media=InputMedia, })
 ```
 
 

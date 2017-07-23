@@ -22,13 +22,13 @@ Creator of the chat, can delete any message, kick any user and add editors and m
 ### Example:
 
 ```
-$chatMemberStatusCreator = ['_' => 'chatMemberStatusCreator', ];
+$chatMemberStatusCreator = ['_' => 'chatMemberStatusCreator'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatMemberStatusCreator"}
+{"_": "chatMemberStatusCreator"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-chatMemberStatusCreator={_='chatMemberStatusCreator', }
+chatMemberStatusCreator={_='chatMemberStatusCreator'}
 
 ```
 

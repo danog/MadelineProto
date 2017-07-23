@@ -24,13 +24,13 @@ Video message
 ### Example:
 
 ```
-$messageVideo = ['_' => 'messageVideo', 'video' => video, 'caption' => string, ];
+$messageVideo = ['_' => 'messageVideo', 'video' => video, 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageVideo","video":"video","caption":"string"}
+{"_": "messageVideo", "video": video, "caption": "string"}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-messageVideo={_='messageVideo', video=video, caption=string, }
+messageVideo={_='messageVideo', video=video, caption='string'}
 
 ```
 

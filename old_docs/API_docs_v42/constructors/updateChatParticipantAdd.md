@@ -25,13 +25,13 @@ description: updateChatParticipantAdd attributes, type and example
 ### Example:
 
 ```
-$updateChatParticipantAdd = ['_' => 'updateChatParticipantAdd', 'chat_id' => int, 'user_id' => int, 'inviter_id' => int, 'date' => int, 'version' => int, ];
+$updateChatParticipantAdd = ['_' => 'updateChatParticipantAdd', 'chat_id' => int, 'user_id' => int, 'inviter_id' => int, 'date' => int, 'version' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateChatParticipantAdd","chat_id":"int","user_id":"int","inviter_id":"int","date":"int","version":"int"}
+{"_": "updateChatParticipantAdd", "chat_id": int, "user_id": int, "inviter_id": int, "date": int, "version": int}
 ```
 
 
@@ -39,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-updateChatParticipantAdd={_='updateChatParticipantAdd', chat_id=int, user_id=int, inviter_id=int, date=int, version=int, }
+updateChatParticipantAdd={_='updateChatParticipantAdd', chat_id=int, user_id=int, inviter_id=int, date=int, version=int}
 
 ```
 

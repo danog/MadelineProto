@@ -23,13 +23,13 @@ description: messages_chatFull attributes, type and example
 ### Example:
 
 ```
-$messages_chatFull = ['_' => 'messages.chatFull', 'full_chat' => ChatFull, 'chats' => [Chat], 'users' => [User], ];
+$messages_chatFull = ['_' => 'messages.chatFull', 'full_chat' => ChatFull, 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messages.chatFull","full_chat":"ChatFull","chats":["Chat"],"users":["User"]}
+{"_": "messages.chatFull", "full_chat": ChatFull, "chats": [Chat], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_chatFull={_='messages.chatFull', full_chat=ChatFull, chats={Chat}, users={User}, }
+messages_chatFull={_='messages.chatFull', full_chat=ChatFull, chats={Chat}, users={User}}
 
 ```
 

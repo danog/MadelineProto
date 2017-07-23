@@ -41,7 +41,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Message = $MadelineProto->editMessageCaption(['chat_id' => InputPeer, 'message_id' => long, 'reply_markup' => ReplyMarkup, 'caption' => string, ]);
+$Message = $MadelineProto->editMessageCaption(['chat_id' => InputPeer, 'message_id' => long, 'reply_markup' => ReplyMarkup, 'caption' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - editMessageCaption
-* params - {"chat_id":"InputPeer","message_id":"long","reply_markup":"ReplyMarkup","caption":"string"}
+* params - {"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, "caption": "string", }
 
 ```
 
@@ -74,7 +74,7 @@ caption - Json encoded string
 Or, if you're into Lua:
 
 ```
-Message = editMessageCaption({chat_id=InputPeer, message_id=long, reply_markup=ReplyMarkup, caption=string, })
+Message = editMessageCaption({chat_id=InputPeer, message_id=long, reply_markup=ReplyMarkup, caption='string', })
 ```
 
 

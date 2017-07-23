@@ -40,7 +40,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$geochats_Messages = $MadelineProto->geochats->search(['peer' => InputGeoChat, 'q' => string, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
+$geochats_Messages = $MadelineProto->geochats->search(['peer' => InputGeoChat, 'q' => 'string', 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.search
-* params - {"peer":"InputGeoChat","q":"string","filter":"MessagesFilter","min_date":"int","max_date":"int","offset":"int","max_id":"int","limit":"int"}
+* params - {"peer": InputGeoChat, "q": "string", "filter": MessagesFilter, "min_date": int, "max_date": int, "offset": int, "max_id": int, "limit": int, }
 
 ```
 
@@ -77,6 +77,6 @@ limit - Json encoded int
 Or, if you're into Lua:
 
 ```
-geochats_Messages = geochats.search({peer=InputGeoChat, q=string, filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
+geochats_Messages = geochats.search({peer=InputGeoChat, q='string', filter=MessagesFilter, min_date=int, max_date=int, offset=int, max_id=int, limit=int, })
 ```
 

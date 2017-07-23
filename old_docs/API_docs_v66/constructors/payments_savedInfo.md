@@ -22,13 +22,13 @@ description: payments_savedInfo attributes, type and example
 ### Example:
 
 ```
-$payments_savedInfo = ['_' => 'payments.savedInfo', 'has_saved_credentials' => Bool, 'saved_info' => PaymentRequestedInfo, ];
+$payments_savedInfo = ['_' => 'payments.savedInfo', 'has_saved_credentials' => Bool, 'saved_info' => PaymentRequestedInfo];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"payments.savedInfo","has_saved_credentials":"Bool","saved_info":"PaymentRequestedInfo"}
+{"_": "payments.savedInfo", "has_saved_credentials": Bool, "saved_info": PaymentRequestedInfo}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-payments_savedInfo={_='payments.savedInfo', has_saved_credentials=Bool, saved_info=PaymentRequestedInfo, }
+payments_savedInfo={_='payments.savedInfo', has_saved_credentials=Bool, saved_info=PaymentRequestedInfo}
 
 ```
 

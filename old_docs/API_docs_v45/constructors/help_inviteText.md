@@ -21,13 +21,13 @@ description: help_inviteText attributes, type and example
 ### Example:
 
 ```
-$help_inviteText = ['_' => 'help.inviteText', 'message' => string, ];
+$help_inviteText = ['_' => 'help.inviteText', 'message' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"help.inviteText","message":"string"}
+{"_": "help.inviteText", "message": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-help_inviteText={_='help.inviteText', message=string, }
+help_inviteText={_='help.inviteText', message='string'}
 
 ```
 

@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - finishFileGeneration
-* params - {"generation_id":"long"}
+* params - {"generation_id": long, }
 
 ```
 

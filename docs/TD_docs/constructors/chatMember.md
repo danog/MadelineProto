@@ -27,13 +27,13 @@ User with information about its chat joining/kicking
 ### Example:
 
 ```
-$chatMember = ['_' => 'chatMember', 'user_id' => int, 'inviter_user_id' => int, 'join_date' => int, 'status' => ChatMemberStatus, 'bot_info' => botInfo, ];
+$chatMember = ['_' => 'chatMember', 'user_id' => int, 'inviter_user_id' => int, 'join_date' => int, 'status' => ChatMemberStatus, 'bot_info' => botInfo];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatMember","user_id":"int","inviter_user_id":"int","join_date":"int","status":"ChatMemberStatus","bot_info":"botInfo"}
+{"_": "chatMember", "user_id": int, "inviter_user_id": int, "join_date": int, "status": ChatMemberStatus, "bot_info": botInfo}
 ```
 
 
@@ -41,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-chatMember={_='chatMember', user_id=int, inviter_user_id=int, join_date=int, status=ChatMemberStatus, bot_info=botInfo, }
+chatMember={_='chatMember', user_id=int, inviter_user_id=int, join_date=int, status=ChatMemberStatus, bot_info=botInfo}
 
 ```
 

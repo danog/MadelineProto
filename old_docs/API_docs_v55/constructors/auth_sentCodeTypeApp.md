@@ -21,13 +21,13 @@ description: auth_sentCodeTypeApp attributes, type and example
 ### Example:
 
 ```
-$auth_sentCodeTypeApp = ['_' => 'auth.sentCodeTypeApp', 'length' => int, ];
+$auth_sentCodeTypeApp = ['_' => 'auth.sentCodeTypeApp', 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"auth.sentCodeTypeApp","length":"int"}
+{"_": "auth.sentCodeTypeApp", "length": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-auth_sentCodeTypeApp={_='auth.sentCodeTypeApp', length=int, }
+auth_sentCodeTypeApp={_='auth.sentCodeTypeApp', length=int}
 
 ```
 

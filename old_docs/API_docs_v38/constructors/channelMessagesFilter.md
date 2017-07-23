@@ -21,13 +21,13 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange], ];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelMessagesFilter","ranges":["MessageRange"]}
+{"_": "channelMessagesFilter", "ranges": [MessageRange]}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-channelMessagesFilter={_='channelMessagesFilter', ranges={MessageRange}, }
+channelMessagesFilter={_='channelMessagesFilter', ranges={MessageRange}}
 
 ```
 

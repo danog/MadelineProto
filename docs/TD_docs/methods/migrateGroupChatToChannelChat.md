@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - migrateGroupChatToChannelChat
-* params - {"chat_id":"InputPeer"}
+* params - {"chat_id": InputPeer, }
 
 ```
 

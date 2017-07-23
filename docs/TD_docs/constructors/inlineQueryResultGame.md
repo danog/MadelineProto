@@ -24,13 +24,13 @@ Represents information about a game
 ### Example:
 
 ```
-$inlineQueryResultGame = ['_' => 'inlineQueryResultGame', 'id' => string, 'game' => game, ];
+$inlineQueryResultGame = ['_' => 'inlineQueryResultGame', 'id' => 'string', 'game' => game];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inlineQueryResultGame","id":"string","game":"game"}
+{"_": "inlineQueryResultGame", "id": "string", "game": game}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-inlineQueryResultGame={_='inlineQueryResultGame', id=string, game=game, }
+inlineQueryResultGame={_='inlineQueryResultGame', id='string', game=game}
 
 ```
 

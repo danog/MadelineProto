@@ -22,13 +22,13 @@ description: messageEntityBold attributes, type and example
 ### Example:
 
 ```
-$messageEntityBold = ['_' => 'messageEntityBold', 'offset' => int, 'length' => int, ];
+$messageEntityBold = ['_' => 'messageEntityBold', 'offset' => int, 'length' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityBold","offset":"int","length":"int"}
+{"_": "messageEntityBold", "offset": int, "length": int}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityBold={_='messageEntityBold', offset=int, length=int, }
+messageEntityBold={_='messageEntityBold', offset=int, length=int}
 
 ```
 

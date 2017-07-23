@@ -16,13 +16,13 @@ description: storage_fileMov attributes, type and example
 ### Example:
 
 ```
-$storage_fileMov = ['_' => 'storage.fileMov', ];
+$storage_fileMov = ['_' => 'storage.fileMov'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"storage.fileMov"}
+{"_": "storage.fileMov"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-storage_fileMov={_='storage.fileMov', }
+storage_fileMov={_='storage.fileMov'}
 
 ```
 

@@ -30,13 +30,13 @@ description: updateShortChatMessage attributes, type and example
 ### Example:
 
 ```
-$updateShortChatMessage = ['_' => 'updateShortChatMessage', 'id' => int, 'from_id' => int, 'chat_id' => int, 'message' => string, 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => int, 'fwd_date' => int, 'reply_to_msg_id' => int, ];
+$updateShortChatMessage = ['_' => 'updateShortChatMessage', 'id' => int, 'from_id' => int, 'chat_id' => int, 'message' => 'string', 'pts' => int, 'pts_count' => int, 'date' => int, 'fwd_from_id' => int, 'fwd_date' => int, 'reply_to_msg_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateShortChatMessage","id":"int","from_id":"int","chat_id":"int","message":"string","pts":"int","pts_count":"int","date":"int","fwd_from_id":"int","fwd_date":"int","reply_to_msg_id":"int"}
+{"_": "updateShortChatMessage", "id": int, "from_id": int, "chat_id": int, "message": "string", "pts": int, "pts_count": int, "date": int, "fwd_from_id": int, "fwd_date": int, "reply_to_msg_id": int}
 ```
 
 
@@ -44,7 +44,7 @@ Or, if you're into Lua:
 
 
 ```
-updateShortChatMessage={_='updateShortChatMessage', id=int, from_id=int, chat_id=int, message=string, pts=int, pts_count=int, date=int, fwd_from_id=int, fwd_date=int, reply_to_msg_id=int, }
+updateShortChatMessage={_='updateShortChatMessage', id=int, from_id=int, chat_id=int, message='string', pts=int, pts_count=int, date=int, fwd_from_id=int, fwd_date=int, reply_to_msg_id=int}
 
 ```
 

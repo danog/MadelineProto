@@ -16,13 +16,13 @@ description: draftMessageEmpty attributes, type and example
 ### Example:
 
 ```
-$draftMessageEmpty = ['_' => 'draftMessageEmpty', ];
+$draftMessageEmpty = ['_' => 'draftMessageEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"draftMessageEmpty"}
+{"_": "draftMessageEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-draftMessageEmpty={_='draftMessageEmpty', }
+draftMessageEmpty={_='draftMessageEmpty'}
 
 ```
 

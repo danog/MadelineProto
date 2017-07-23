@@ -23,13 +23,13 @@ description: phoneCallDiscarded attributes, type and example
 ### Example:
 
 ```
-$phoneCallDiscarded = ['_' => 'phoneCallDiscarded', 'id' => long, 'reason' => PhoneCallDiscardReason, 'duration' => int, ];
+$phoneCallDiscarded = ['_' => 'phoneCallDiscarded', 'id' => long, 'reason' => PhoneCallDiscardReason, 'duration' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"phoneCallDiscarded","id":"long","reason":"PhoneCallDiscardReason","duration":"int"}
+{"_": "phoneCallDiscarded", "id": long, "reason": PhoneCallDiscardReason, "duration": int}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-phoneCallDiscarded={_='phoneCallDiscarded', id=long, reason=PhoneCallDiscardReason, duration=int, }
+phoneCallDiscarded={_='phoneCallDiscarded', id=long, reason=PhoneCallDiscardReason, duration=int}
 
 ```
 

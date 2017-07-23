@@ -23,13 +23,13 @@ description: encryptedMessageService attributes, type and example
 ### Example:
 
 ```
-$encryptedMessageService = ['_' => 'encryptedMessageService', 'chat_id' => int, 'date' => int, 'decrypted_message' => DecryptedMessage, ];
+$encryptedMessageService = ['_' => 'encryptedMessageService', 'chat_id' => int, 'date' => int, 'decrypted_message' => DecryptedMessage];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"encryptedMessageService","chat_id":"int","date":"int","decrypted_message":"DecryptedMessage"}
+{"_": "encryptedMessageService", "chat_id": int, "date": int, "decrypted_message": DecryptedMessage}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-encryptedMessageService={_='encryptedMessageService', chat_id=int, date=int, decrypted_message=DecryptedMessage, }
+encryptedMessageService={_='encryptedMessageService', chat_id=int, date=int, decrypted_message=DecryptedMessage}
 
 ```
 

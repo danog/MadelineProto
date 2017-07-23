@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account->setPassword(['current_password_hash' => bytes, 'new_salt' => bytes, 'new_password_hash' => bytes, 'hint' => string, ]);
+$Bool = $MadelineProto->account->setPassword(['current_password_hash' => 'bytes', 'new_salt' => 'bytes', 'new_password_hash' => 'bytes', 'hint' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.setPassword
-* params - {"current_password_hash":"bytes","new_salt":"bytes","new_password_hash":"bytes","hint":"string"}
+* params - {"current_password_hash": "bytes", "new_salt": "bytes", "new_password_hash": "bytes", "hint": "string", }
 
 ```
 
@@ -69,6 +69,6 @@ hint - Json encoded string
 Or, if you're into Lua:
 
 ```
-Bool = account.setPassword({current_password_hash=bytes, new_salt=bytes, new_password_hash=bytes, hint=string, })
+Bool = account.setPassword({current_password_hash='bytes', new_salt='bytes', new_password_hash='bytes', hint='string', })
 ```
 

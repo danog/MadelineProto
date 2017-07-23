@@ -30,13 +30,13 @@ description: video attributes, type and example
 ### Example:
 
 ```
-$video = ['_' => 'video', 'id' => long, 'access_hash' => long, 'date' => int, 'duration' => int, 'mime_type' => string, 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'w' => int, 'h' => int, ];
+$video = ['_' => 'video', 'id' => long, 'access_hash' => long, 'date' => int, 'duration' => int, 'mime_type' => 'string', 'size' => int, 'thumb' => PhotoSize, 'dc_id' => int, 'w' => int, 'h' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"video","id":"long","access_hash":"long","date":"int","duration":"int","mime_type":"string","size":"int","thumb":"PhotoSize","dc_id":"int","w":"int","h":"int"}
+{"_": "video", "id": long, "access_hash": long, "date": int, "duration": int, "mime_type": "string", "size": int, "thumb": PhotoSize, "dc_id": int, "w": int, "h": int}
 ```
 
 
@@ -44,7 +44,7 @@ Or, if you're into Lua:
 
 
 ```
-video={_='video', id=long, access_hash=long, date=int, duration=int, mime_type=string, size=int, thumb=PhotoSize, dc_id=int, w=int, h=int, }
+video={_='video', id=long, access_hash=long, date=int, duration=int, mime_type='string', size=int, thumb=PhotoSize, dc_id=int, w=int, h=int}
 
 ```
 

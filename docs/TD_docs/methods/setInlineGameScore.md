@@ -42,7 +42,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->setInlineGameScore(['inline_message_id' => string, 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
+$Ok = $MadelineProto->setInlineGameScore(['inline_message_id' => 'string', 'edit_message' => Bool, 'user_id' => int, 'score' => int, 'force' => Bool, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -54,7 +54,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setInlineGameScore
-* params - {"inline_message_id":"string","edit_message":"Bool","user_id":"int","score":"int","force":"Bool"}
+* params - {"inline_message_id": "string", "edit_message": Bool, "user_id": int, "score": int, "force": Bool, }
 
 ```
 
@@ -76,6 +76,6 @@ force - Json encoded Bool
 Or, if you're into Lua:
 
 ```
-Ok = setInlineGameScore({inline_message_id=string, edit_message=Bool, user_id=int, score=int, force=Bool, })
+Ok = setInlineGameScore({inline_message_id='string', edit_message=Bool, user_id=int, score=int, force=Bool, })
 ```
 

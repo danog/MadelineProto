@@ -21,13 +21,13 @@ description: account_passwordSettings attributes, type and example
 ### Example:
 
 ```
-$account_passwordSettings = ['_' => 'account.passwordSettings', 'email' => string, ];
+$account_passwordSettings = ['_' => 'account.passwordSettings', 'email' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"account.passwordSettings","email":"string"}
+{"_": "account.passwordSettings", "email": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-account_passwordSettings={_='account.passwordSettings', email=string, }
+account_passwordSettings={_='account.passwordSettings', email='string'}
 
 ```
 

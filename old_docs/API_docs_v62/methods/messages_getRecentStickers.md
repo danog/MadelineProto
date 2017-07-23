@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getRecentStickers
-* params - {"attached":"Bool","hash":"int"}
+* params - {"attached": Bool, "hash": int, }
 
 ```
 

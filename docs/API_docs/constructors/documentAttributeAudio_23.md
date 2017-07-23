@@ -21,13 +21,13 @@ description: documentAttributeAudio attributes, type and example
 ### Example:
 
 ```
-$documentAttributeAudio_23 = ['_' => 'documentAttributeAudio', 'duration' => int, ];
+$documentAttributeAudio_23 = ['_' => 'documentAttributeAudio', 'duration' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"documentAttributeAudio","duration":"int"}
+{"_": "documentAttributeAudio", "duration": int}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-documentAttributeAudio_23={_='documentAttributeAudio', duration=int, }
+documentAttributeAudio_23={_='documentAttributeAudio', duration=int}
 
 ```
 

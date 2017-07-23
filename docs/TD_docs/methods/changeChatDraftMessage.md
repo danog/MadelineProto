@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChatDraftMessage
-* params - {"chat_id":"InputPeer","draft_message":"draftMessage"}
+* params - {"chat_id": InputPeer, "draft_message": draftMessage, }
 
 ```
 

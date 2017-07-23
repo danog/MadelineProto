@@ -22,13 +22,13 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => Bool, 'ranges' => [MessageRange], ];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'important_only' => Bool, 'ranges' => [MessageRange]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelMessagesFilter","important_only":"Bool","ranges":["MessageRange"]}
+{"_": "channelMessagesFilter", "important_only": Bool, "ranges": [MessageRange]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelMessagesFilter={_='channelMessagesFilter', important_only=Bool, ranges={MessageRange}, }
+channelMessagesFilter={_='channelMessagesFilter', important_only=Bool, ranges={MessageRange}}
 
 ```
 

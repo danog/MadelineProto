@@ -24,13 +24,13 @@ List of recently used stickers was updated
 ### Example:
 
 ```
-$updateRecentStickers = ['_' => 'updateRecentStickers', 'is_attached' => Bool, 'sticker_ids' => [int], ];
+$updateRecentStickers = ['_' => 'updateRecentStickers', 'is_attached' => Bool, 'sticker_ids' => [int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateRecentStickers","is_attached":"Bool","sticker_ids":["int"]}
+{"_": "updateRecentStickers", "is_attached": Bool, "sticker_ids": [int]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateRecentStickers={_='updateRecentStickers', is_attached=Bool, sticker_ids={int}, }
+updateRecentStickers={_='updateRecentStickers', is_attached=Bool, sticker_ids={int}}
 
 ```
 

@@ -24,13 +24,13 @@ New message received, maybe outcoming message sent from other device
 ### Example:
 
 ```
-$updateNewMessage = ['_' => 'updateNewMessage', 'message' => message, 'disable_notification' => Bool, ];
+$updateNewMessage = ['_' => 'updateNewMessage', 'message' => message, 'disable_notification' => Bool];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"updateNewMessage","message":"message","disable_notification":"Bool"}
+{"_": "updateNewMessage", "message": message, "disable_notification": Bool}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-updateNewMessage={_='updateNewMessage', message=message, disable_notification=Bool, }
+updateNewMessage={_='updateNewMessage', message=message, disable_notification=Bool}
 
 ```
 

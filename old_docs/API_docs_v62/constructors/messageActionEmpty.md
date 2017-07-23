@@ -16,13 +16,13 @@ description: messageActionEmpty attributes, type and example
 ### Example:
 
 ```
-$messageActionEmpty = ['_' => 'messageActionEmpty', ];
+$messageActionEmpty = ['_' => 'messageActionEmpty'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageActionEmpty"}
+{"_": "messageActionEmpty"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-messageActionEmpty={_='messageActionEmpty', }
+messageActionEmpty={_='messageActionEmpty'}
 
 ```
 

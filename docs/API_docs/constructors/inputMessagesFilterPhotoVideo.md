@@ -16,13 +16,13 @@ description: inputMessagesFilterPhotoVideo attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterPhotoVideo = ['_' => 'inputMessagesFilterPhotoVideo', ];
+$inputMessagesFilterPhotoVideo = ['_' => 'inputMessagesFilterPhotoVideo'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterPhotoVideo"}
+{"_": "inputMessagesFilterPhotoVideo"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterPhotoVideo={_='inputMessagesFilterPhotoVideo', }
+inputMessagesFilterPhotoVideo={_='inputMessagesFilterPhotoVideo'}
 
 ```
 

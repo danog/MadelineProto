@@ -29,13 +29,13 @@ description: messageMediaInvoice attributes, type and example
 ### Example:
 
 ```
-$messageMediaInvoice = ['_' => 'messageMediaInvoice', 'shipping_address_requested' => Bool, 'test' => Bool, 'title' => string, 'description' => string, 'photo' => WebDocument, 'receipt_msg_id' => int, 'currency' => string, 'total_amount' => long, 'start_param' => string, ];
+$messageMediaInvoice = ['_' => 'messageMediaInvoice', 'shipping_address_requested' => Bool, 'test' => Bool, 'title' => 'string', 'description' => 'string', 'photo' => WebDocument, 'receipt_msg_id' => int, 'currency' => 'string', 'total_amount' => long, 'start_param' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageMediaInvoice","shipping_address_requested":"Bool","test":"Bool","title":"string","description":"string","photo":"WebDocument","receipt_msg_id":"int","currency":"string","total_amount":"long","start_param":"string"}
+{"_": "messageMediaInvoice", "shipping_address_requested": Bool, "test": Bool, "title": "string", "description": "string", "photo": WebDocument, "receipt_msg_id": int, "currency": "string", "total_amount": long, "start_param": "string"}
 ```
 
 
@@ -43,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaInvoice={_='messageMediaInvoice', shipping_address_requested=Bool, test=Bool, title=string, description=string, photo=WebDocument, receipt_msg_id=int, currency=string, total_amount=long, start_param=string, }
+messageMediaInvoice={_='messageMediaInvoice', shipping_address_requested=Bool, test=Bool, title='string', description='string', photo=WebDocument, receipt_msg_id=int, currency='string', total_amount=long, start_param='string'}
 
 ```
 

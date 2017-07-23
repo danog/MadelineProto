@@ -23,13 +23,13 @@ Contains chat invite link
 ### Example:
 
 ```
-$chatInviteLink = ['_' => 'chatInviteLink', 'invite_link' => string, ];
+$chatInviteLink = ['_' => 'chatInviteLink', 'invite_link' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"chatInviteLink","invite_link":"string"}
+{"_": "chatInviteLink", "invite_link": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-chatInviteLink={_='chatInviteLink', invite_link=string, }
+chatInviteLink={_='chatInviteLink', invite_link='string'}
 
 ```
 

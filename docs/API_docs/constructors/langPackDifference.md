@@ -24,13 +24,13 @@ description: langPackDifference attributes, type and example
 ### Example:
 
 ```
-$langPackDifference = ['_' => 'langPackDifference', 'lang_code' => string, 'from_version' => int, 'version' => int, 'strings' => [LangPackString], ];
+$langPackDifference = ['_' => 'langPackDifference', 'lang_code' => 'string', 'from_version' => int, 'version' => int, 'strings' => [LangPackString]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"langPackDifference","lang_code":"string","from_version":"int","version":"int","strings":["LangPackString"]}
+{"_": "langPackDifference", "lang_code": "string", "from_version": int, "version": int, "strings": [LangPackString]}
 ```
 
 
@@ -38,7 +38,7 @@ Or, if you're into Lua:
 
 
 ```
-langPackDifference={_='langPackDifference', lang_code=string, from_version=int, version=int, strings={LangPackString}, }
+langPackDifference={_='langPackDifference', lang_code='string', from_version=int, version=int, strings={LangPackString}}
 
 ```
 

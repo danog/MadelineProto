@@ -21,13 +21,13 @@ description: pageBlockHeader attributes, type and example
 ### Example:
 
 ```
-$pageBlockHeader = ['_' => 'pageBlockHeader', 'text' => RichText, ];
+$pageBlockHeader = ['_' => 'pageBlockHeader', 'text' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"pageBlockHeader","text":"RichText"}
+{"_": "pageBlockHeader", "text": RichText}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-pageBlockHeader={_='pageBlockHeader', text=RichText, }
+pageBlockHeader={_='pageBlockHeader', text=RichText}
 
 ```
 

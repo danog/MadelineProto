@@ -22,13 +22,13 @@ description: inputWebFileLocation attributes, type and example
 ### Example:
 
 ```
-$inputWebFileLocation = ['_' => 'inputWebFileLocation', 'url' => string, 'access_hash' => long, ];
+$inputWebFileLocation = ['_' => 'inputWebFileLocation', 'url' => 'string', 'access_hash' => long];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputWebFileLocation","url":"string","access_hash":"long"}
+{"_": "inputWebFileLocation", "url": "string", "access_hash": long}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputWebFileLocation={_='inputWebFileLocation', url=string, access_hash=long, }
+inputWebFileLocation={_='inputWebFileLocation', url='string', access_hash=long}
 
 ```
 

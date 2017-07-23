@@ -34,7 +34,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Updates = $MadelineProto->channels->editTitle(['channel' => InputChannel, 'title' => string, ]);
+$Updates = $MadelineProto->channels->editTitle(['channel' => InputChannel, 'title' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.editTitle
-* params - {"channel":"InputChannel","title":"string"}
+* params - {"channel": InputChannel, "title": "string", }
 
 ```
 
@@ -65,6 +65,6 @@ title - Json encoded string
 Or, if you're into Lua:
 
 ```
-Updates = channels.editTitle({channel=InputChannel, title=string, })
+Updates = channels.editTitle({channel=InputChannel, title='string', })
 ```
 

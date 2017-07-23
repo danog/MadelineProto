@@ -35,7 +35,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$auth_Authorization = $MadelineProto->auth->signIn(['phone_number' => string, 'phone_code_hash' => string, 'phone_code' => string, ]);
+$auth_Authorization = $MadelineProto->auth->signIn(['phone_number' => 'string', 'phone_code_hash' => 'string', 'phone_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.signIn
-* params - {"phone_number":"string","phone_code_hash":"string","phone_code":"string"}
+* params - {"phone_number": "string", "phone_code_hash": "string", "phone_code": "string", }
 
 ```
 
@@ -67,6 +67,6 @@ phone_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-auth_Authorization = auth.signIn({phone_number=string, phone_code_hash=string, phone_code=string, })
+auth_Authorization = auth.signIn({phone_number='string', phone_code_hash='string', phone_code='string', })
 ```
 

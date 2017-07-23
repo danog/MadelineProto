@@ -22,13 +22,13 @@ description: stickerSetMultiCovered attributes, type and example
 ### Example:
 
 ```
-$stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Document], ];
+$stickerSetMultiCovered = ['_' => 'stickerSetMultiCovered', 'set' => StickerSet, 'covers' => [Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"stickerSetMultiCovered","set":"StickerSet","covers":["Document"]}
+{"_": "stickerSetMultiCovered", "set": StickerSet, "covers": [Document]}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-stickerSetMultiCovered={_='stickerSetMultiCovered', set=StickerSet, covers={Document}, }
+stickerSetMultiCovered={_='stickerSetMultiCovered', set=StickerSet, covers={Document}}
 
 ```
 

@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$help_AppUpdate = $MadelineProto->help->getAppUpdate(['device_model' => string, 'system_version' => string, 'app_version' => string, 'lang_code' => string, ]);
+$help_AppUpdate = $MadelineProto->help->getAppUpdate(['device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'lang_code' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getAppUpdate
-* params - {"device_model":"string","system_version":"string","app_version":"string","lang_code":"string"}
+* params - {"device_model": "string", "system_version": "string", "app_version": "string", "lang_code": "string", }
 
 ```
 
@@ -69,6 +69,6 @@ lang_code - Json encoded string
 Or, if you're into Lua:
 
 ```
-help_AppUpdate = help.getAppUpdate({device_model=string, system_version=string, app_version=string, lang_code=string, })
+help_AppUpdate = help.getAppUpdate({device_model='string', system_version='string', app_version='string', lang_code='string', })
 ```
 

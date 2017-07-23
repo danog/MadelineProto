@@ -36,7 +36,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, 'caption' => string, 'geo_point' => InputGeoPoint, 'crop' => InputPhotoCrop, ]);
+$photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, 'caption' => 'string', 'geo_point' => InputGeoPoint, 'crop' => InputPhotoCrop, ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.uploadProfilePhoto
-* params - {"file":"InputFile","caption":"string","geo_point":"InputGeoPoint","crop":"InputPhotoCrop"}
+* params - {"file": InputFile, "caption": "string", "geo_point": InputGeoPoint, "crop": InputPhotoCrop, }
 
 ```
 
@@ -69,6 +69,6 @@ crop - Json encoded InputPhotoCrop
 Or, if you're into Lua:
 
 ```
-photos_Photo = photos.uploadProfilePhoto({file=InputFile, caption=string, geo_point=InputGeoPoint, crop=InputPhotoCrop, })
+photos_Photo = photos.uploadProfilePhoto({file=InputFile, caption='string', geo_point=InputGeoPoint, crop=InputPhotoCrop, })
 ```
 

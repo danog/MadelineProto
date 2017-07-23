@@ -26,13 +26,13 @@ Represents current state of the two-step verification
 ### Example:
 
 ```
-$passwordState = ['_' => 'passwordState', 'has_password' => Bool, 'password_hint' => string, 'has_recovery_email' => Bool, 'unconfirmed_recovery_email_pattern' => string, ];
+$passwordState = ['_' => 'passwordState', 'has_password' => Bool, 'password_hint' => 'string', 'has_recovery_email' => Bool, 'unconfirmed_recovery_email_pattern' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"passwordState","has_password":"Bool","password_hint":"string","has_recovery_email":"Bool","unconfirmed_recovery_email_pattern":"string"}
+{"_": "passwordState", "has_password": Bool, "password_hint": "string", "has_recovery_email": Bool, "unconfirmed_recovery_email_pattern": "string"}
 ```
 
 
@@ -40,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-passwordState={_='passwordState', has_password=Bool, password_hint=string, has_recovery_email=Bool, unconfirmed_recovery_email_pattern=string, }
+passwordState={_='passwordState', has_password=Bool, password_hint='string', has_recovery_email=Bool, unconfirmed_recovery_email_pattern='string'}
 
 ```
 

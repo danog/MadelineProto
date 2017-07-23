@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Ok = $MadelineProto->changeUsername(['username' => string, ]);
+$Ok = $MadelineProto->changeUsername(['username' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeUsername
-* params - {"username":"string"}
+* params - {"username": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ username - Json encoded string
 Or, if you're into Lua:
 
 ```
-Ok = changeUsername({username=string, })
+Ok = changeUsername({username='string', })
 ```
 

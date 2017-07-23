@@ -23,13 +23,13 @@ description: messageEntityPre attributes, type and example
 ### Example:
 
 ```
-$messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int, 'language' => string, ];
+$messageEntityPre = ['_' => 'messageEntityPre', 'offset' => int, 'length' => int, 'language' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"messageEntityPre","offset":"int","length":"int","language":"string"}
+{"_": "messageEntityPre", "offset": int, "length": int, "language": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-messageEntityPre={_='messageEntityPre', offset=int, length=int, language=string, }
+messageEntityPre={_='messageEntityPre', offset=int, length=int, language='string'}
 
 ```
 

@@ -22,13 +22,13 @@ description: keyboardButtonUrl attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => string, 'url' => string, ];
+$keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => 'string', 'url' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"keyboardButtonUrl","text":"string","url":"string"}
+{"_": "keyboardButtonUrl", "text": "string", "url": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-keyboardButtonUrl={_='keyboardButtonUrl', text=string, url=string, }
+keyboardButtonUrl={_='keyboardButtonUrl', text='string', url='string'}
 
 ```
 

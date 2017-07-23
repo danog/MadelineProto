@@ -38,7 +38,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$RecoveryEmail = $MadelineProto->getRecoveryEmail(['password' => string, ]);
+$RecoveryEmail = $MadelineProto->getRecoveryEmail(['password' => 'string', ]);
 ```
 
 Or, if you're using [PWRTelegram](https://pwrtelegram.xyz):
@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getRecoveryEmail
-* params - {"password":"string"}
+* params - {"password": "string", }
 
 ```
 
@@ -68,6 +68,6 @@ password - Json encoded string
 Or, if you're into Lua:
 
 ```
-RecoveryEmail = getRecoveryEmail({password=string, })
+RecoveryEmail = getRecoveryEmail({password='string', })
 ```
 

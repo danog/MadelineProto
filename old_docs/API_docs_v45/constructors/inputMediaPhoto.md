@@ -22,13 +22,13 @@ description: inputMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaPhoto = ['_' => 'inputMediaPhoto', 'id' => InputPhoto, 'caption' => string, ];
+$inputMediaPhoto = ['_' => 'inputMediaPhoto', 'id' => InputPhoto, 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMediaPhoto","id":"InputPhoto","caption":"string"}
+{"_": "inputMediaPhoto", "id": InputPhoto, "caption": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaPhoto={_='inputMediaPhoto', id=InputPhoto, caption=string, }
+inputMediaPhoto={_='inputMediaPhoto', id=InputPhoto, caption='string'}
 
 ```
 

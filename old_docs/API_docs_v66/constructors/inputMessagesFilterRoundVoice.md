@@ -16,13 +16,13 @@ description: inputMessagesFilterRoundVoice attributes, type and example
 ### Example:
 
 ```
-$inputMessagesFilterRoundVoice = ['_' => 'inputMessagesFilterRoundVoice', ];
+$inputMessagesFilterRoundVoice = ['_' => 'inputMessagesFilterRoundVoice'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"inputMessagesFilterRoundVoice"}
+{"_": "inputMessagesFilterRoundVoice"}
 ```
 
 
@@ -30,7 +30,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMessagesFilterRoundVoice={_='inputMessagesFilterRoundVoice', }
+inputMessagesFilterRoundVoice={_='inputMessagesFilterRoundVoice'}
 
 ```
 

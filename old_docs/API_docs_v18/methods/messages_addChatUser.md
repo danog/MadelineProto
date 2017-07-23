@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.addChatUser
-* params - {"chat_id":"InputPeer","user_id":"InputUser","fwd_limit":"int"}
+* params - {"chat_id": InputPeer, "user_id": InputUser, "fwd_limit": int, }
 
 ```
 

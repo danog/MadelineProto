@@ -23,13 +23,13 @@ Payload from a game callback button
 ### Example:
 
 ```
-$callbackQueryGame = ['_' => 'callbackQueryGame', 'game_short_name' => string, ];
+$callbackQueryGame = ['_' => 'callbackQueryGame', 'game_short_name' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"callbackQueryGame","game_short_name":"string"}
+{"_": "callbackQueryGame", "game_short_name": "string"}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-callbackQueryGame={_='callbackQueryGame', game_short_name=string, }
+callbackQueryGame={_='callbackQueryGame', game_short_name='string'}
 
 ```
 

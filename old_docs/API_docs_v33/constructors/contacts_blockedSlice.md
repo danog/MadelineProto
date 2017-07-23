@@ -23,13 +23,13 @@ description: contacts_blockedSlice attributes, type and example
 ### Example:
 
 ```
-$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [ContactBlocked], 'users' => [User], ];
+$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [ContactBlocked], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"contacts.blockedSlice","count":"int","blocked":["ContactBlocked"],"users":["User"]}
+{"_": "contacts.blockedSlice", "count": int, "blocked": [ContactBlocked], "users": [User]}
 ```
 
 
@@ -37,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-contacts_blockedSlice={_='contacts.blockedSlice', count=int, blocked={ContactBlocked}, users={User}, }
+contacts_blockedSlice={_='contacts.blockedSlice', count=int, blocked={ContactBlocked}, users={User}}
 
 ```
 

@@ -22,13 +22,13 @@ description: account_noPassword attributes, type and example
 ### Example:
 
 ```
-$account_noPassword = ['_' => 'account.noPassword', 'new_salt' => bytes, 'email_unconfirmed_pattern' => string, ];
+$account_noPassword = ['_' => 'account.noPassword', 'new_salt' => 'bytes', 'email_unconfirmed_pattern' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"account.noPassword","new_salt":"bytes","email_unconfirmed_pattern":"string"}
+{"_": "account.noPassword", "new_salt": "bytes", "email_unconfirmed_pattern": "string"}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-account_noPassword={_='account.noPassword', new_salt=bytes, email_unconfirmed_pattern=string, }
+account_noPassword={_='account.noPassword', new_salt='bytes', email_unconfirmed_pattern='string'}
 
 ```
 

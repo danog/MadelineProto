@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChatReportSpamState
-* params - {"chat_id":"InputPeer","is_spam_chat":"Bool"}
+* params - {"chat_id": InputPeer, "is_spam_chat": Bool, }
 
 ```
 

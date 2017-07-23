@@ -21,13 +21,13 @@ description: dataJSON attributes, type and example
 ### Example:
 
 ```
-$dataJSON = ['_' => 'dataJSON', 'data' => string, ];
+$dataJSON = ['_' => 'dataJSON', 'data' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"dataJSON","data":"string"}
+{"_": "dataJSON", "data": "string"}
 ```
 
 
@@ -35,7 +35,7 @@ Or, if you're into Lua:
 
 
 ```
-dataJSON={_='dataJSON', data=string, }
+dataJSON={_='dataJSON', data='string'}
 
 ```
 

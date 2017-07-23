@@ -22,13 +22,13 @@ description: channelAdminLogEventActionEditMessage attributes, type and example
 ### Example:
 
 ```
-$channelAdminLogEventActionEditMessage = ['_' => 'channelAdminLogEventActionEditMessage', 'prev_message' => Message, 'new_message' => Message, ];
+$channelAdminLogEventActionEditMessage = ['_' => 'channelAdminLogEventActionEditMessage', 'prev_message' => Message, 'new_message' => Message];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_":"channelAdminLogEventActionEditMessage","prev_message":"Message","new_message":"Message"}
+{"_": "channelAdminLogEventActionEditMessage", "prev_message": Message, "new_message": Message}
 ```
 
 
@@ -36,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-channelAdminLogEventActionEditMessage={_='channelAdminLogEventActionEditMessage', prev_message=Message, new_message=Message, }
+channelAdminLogEventActionEditMessage={_='channelAdminLogEventActionEditMessage', prev_message=Message, new_message=Message}
 
 ```
 
