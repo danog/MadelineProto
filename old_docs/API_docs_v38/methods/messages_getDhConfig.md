@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getDhConfig
-* params - {"version": int, "random_length": int, }
+* params - `{"version": int, "random_length": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDhConfig`
 
 Parameters:
 
-```
 version - Json encoded int
 random_length - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

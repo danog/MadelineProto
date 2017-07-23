@@ -247,7 +247,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - '.$rmethod.'
-* params - {'.$json_params.'}
+* params - `{'.$json_params.'}`
 
 
 
@@ -257,9 +257,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$rmethod.'`
 
 Parameters:
 
-```
 '.$pwr_params.'
-```
+
 
 Or, if you\'re into Lua:
 

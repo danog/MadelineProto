@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - reportChannelSpam
-* params - {"channel_id": int, "user_id": int, "message_ids": [long], }
+* params - `{"channel_id": int, "user_id": int, "message_ids": [long], }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/reportChannelSpam`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 user_id - Json encoded int
 message_ids - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

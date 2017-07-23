@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getAppChangelog
-* params - {"prev_app_version": "string", }
+* params - `{"prev_app_version": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getAppChangelog`
 
 Parameters:
 
-```
 prev_app_version - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

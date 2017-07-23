@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - http_wait
-* params - {"max_delay": int, "wait_after": int, "max_wait": int, }
+* params - `{"max_delay": int, "wait_after": int, "max_wait": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/http_wait`
 
 Parameters:
 
-```
 max_delay - Json encoded int
 wait_after - Json encoded int
 max_wait - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.updateProfilePhoto
-* params - {"id": InputPhoto, "crop": InputPhotoCrop, }
+* params - `{"id": InputPhoto, "crop": InputPhotoCrop, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.updateProfilePhoto`
 
 Parameters:
 
-```
 id - Json encoded InputPhoto
 crop - Json encoded InputPhotoCrop
 
-```
+
 
 Or, if you're into Lua:
 

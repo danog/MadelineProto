@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - rpc_drop_answer
-* params - {"req_msg_id": long, }
+* params - `{"req_msg_id": long, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/rpc_drop_answer`
 
 Parameters:
 
-```
 req_msg_id - Json encoded long
 
-```
+
 
 Or, if you're into Lua:
 

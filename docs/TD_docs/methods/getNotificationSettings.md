@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getNotificationSettings
-* params - {"scope": NotificationSettingsScope, }
+* params - `{"scope": NotificationSettingsScope, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getNotificationSettings`
 
 Parameters:
 
-```
 scope - Json encoded NotificationSettingsScope
 
-```
+
 
 Or, if you're into Lua:
 

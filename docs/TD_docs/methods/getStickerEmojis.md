@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getStickerEmojis
-* params - {"sticker": InputFile, }
+* params - `{"sticker": InputFile, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerEmojis`
 
 Parameters:
 
-```
 sticker - Json encoded InputFile
 
-```
+
 
 Or, if you're into Lua:
 

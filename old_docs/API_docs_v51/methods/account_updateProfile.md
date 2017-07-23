@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateProfile
-* params - {"first_name": "string", "last_name": "string", "about": "string", }
+* params - `{"first_name": "string", "last_name": "string", "about": "string", }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateProfile`
 
 Parameters:
 
-```
 first_name - Json encoded string
 last_name - Json encoded string
 about - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

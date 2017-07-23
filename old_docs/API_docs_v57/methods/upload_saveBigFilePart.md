@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - upload.saveBigFilePart
-* params - {"file_id": long, "file_part": int, "file_total_parts": int, "bytes": "bytes", }
+* params - `{"file_id": long, "file_part": int, "file_total_parts": int, "bytes": "bytes", }`
 
 
 
@@ -58,13 +58,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.saveBigFilePart`
 
 Parameters:
 
-```
 file_id - Json encoded long
 file_part - Json encoded int
 file_total_parts - Json encoded int
 bytes - Json encoded bytes
 
-```
+
 
 Or, if you're into Lua:
 

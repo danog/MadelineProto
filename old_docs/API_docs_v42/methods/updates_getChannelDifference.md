@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updates.getChannelDifference
-* params - {"channel": InputChannel, "filter": ChannelMessagesFilter, "pts": int, "limit": int, }
+* params - `{"channel": InputChannel, "filter": ChannelMessagesFilter, "pts": int, "limit": int, }`
 
 
 
@@ -58,13 +58,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getChannelDifference`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 filter - Json encoded ChannelMessagesFilter
 pts - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

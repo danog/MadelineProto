@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setProfilePhoto
-* params - {"photo_path": "string", }
+* params - `{"photo_path": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setProfilePhoto`
 
 Parameters:
 
-```
 photo_path - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

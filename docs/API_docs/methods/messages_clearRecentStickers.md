@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.clearRecentStickers
-* params - {"attached": Bool, }
+* params - `{"attached": Bool, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.clearRecentStickers`
 
 Parameters:
 
-```
 attached - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

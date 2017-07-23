@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChatMemberStatus
-* params - {"chat_id": InputPeer, "user_id": int, "status": ChatMemberStatus, }
+* params - `{"chat_id": InputPeer, "user_id": int, "status": ChatMemberStatus, }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatMemberStatus`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 user_id - Json encoded int
 status - Json encoded ChatMemberStatus
 
-```
+
 
 Or, if you're into Lua:
 

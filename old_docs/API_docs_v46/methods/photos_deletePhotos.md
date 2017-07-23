@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.deletePhotos
-* params - {"id": [InputPhoto], }
+* params - `{"id": [InputPhoto], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.deletePhotos`
 
 Parameters:
 
-```
 id - Json encoded  array of InputPhoto
 
-```
+
 
 Or, if you're into Lua:
 

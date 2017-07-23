@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.search
-* params - {"q": "string", "limit": int, }
+* params - `{"q": "string", "limit": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.search`
 
 Parameters:
 
-```
 q - Json encoded string
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

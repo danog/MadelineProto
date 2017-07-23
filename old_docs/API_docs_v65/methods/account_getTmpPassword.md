@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.getTmpPassword
-* params - {"password_hash": "bytes", "period": int, }
+* params - `{"password_hash": "bytes", "period": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getTmpPassword`
 
 Parameters:
 
-```
 password_hash - Json encoded bytes
 period - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

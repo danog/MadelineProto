@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updateStickerSet
-* params - {"set_id": long, "is_installed": Bool, "is_archived": Bool, }
+* params - `{"set_id": long, "is_installed": Bool, "is_archived": Bool, }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updateStickerSet`
 
 Parameters:
 
-```
 set_id - Json encoded long
 is_installed - Json encoded Bool
 is_archived - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

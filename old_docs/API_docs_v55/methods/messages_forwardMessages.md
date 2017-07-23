@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.forwardMessages
-* params - {"silent": Bool, "background": Bool, "from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }
+* params - `{"silent": Bool, "background": Bool, "from_peer": InputPeer, "id": [int], "to_peer": InputPeer, }`
 
 
 
@@ -59,14 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.forwardMessages`
 
 Parameters:
 
-```
 silent - Json encoded Bool
 background - Json encoded Bool
 from_peer - Json encoded InputPeer
 id - Json encoded  array of int
 to_peer - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

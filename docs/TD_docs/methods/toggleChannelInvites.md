@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - toggleChannelInvites
-* params - {"channel_id": int, "anyone_can_invite": Bool, }
+* params - `{"channel_id": int, "anyone_can_invite": Bool, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelInvites`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 anyone_can_invite - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.saveAppLog
-* params - {"events": [InputAppEvent], }
+* params - `{"events": [InputAppEvent], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.saveAppLog`
 
 Parameters:
 
-```
 events - Json encoded  array of InputAppEvent
 
-```
+
 
 Or, if you're into Lua:
 

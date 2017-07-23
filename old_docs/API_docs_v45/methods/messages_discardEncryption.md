@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.discardEncryption
-* params - {"chat_id": int, }
+* params - `{"chat_id": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.discardEncryption`
 
 Parameters:
 
-```
 chat_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

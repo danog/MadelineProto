@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - unpinChannelMessage
-* params - {"channel_id": int, }
+* params - `{"channel_id": int, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/unpinChannelMessage`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

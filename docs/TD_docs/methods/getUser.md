@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getUser
-* params - {"user_id": int, }
+* params - `{"user_id": int, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getUser`
 
 Parameters:
 
-```
 user_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

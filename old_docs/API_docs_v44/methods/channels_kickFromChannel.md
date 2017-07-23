@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.kickFromChannel
-* params - {"channel": InputChannel, "user_id": InputUser, "kicked": Bool, }
+* params - `{"channel": InputChannel, "user_id": InputUser, "kicked": Bool, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.kickFromChannel`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 user_id - Json encoded InputUser
 kicked - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

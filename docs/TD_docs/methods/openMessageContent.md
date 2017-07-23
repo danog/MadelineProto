@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - openMessageContent
-* params - {"chat_id": InputPeer, "message_id": long, }
+* params - `{"chat_id": InputPeer, "message_id": long, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/openMessageContent`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
 
-```
+
 
 Or, if you're into Lua:
 

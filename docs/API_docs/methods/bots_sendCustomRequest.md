@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - bots.sendCustomRequest
-* params - {"custom_method": "string", "params": DataJSON, }
+* params - `{"custom_method": "string", "params": DataJSON, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/bots.sendCustomRequest`
 
 Parameters:
 
-```
 custom_method - Json encoded string
 params - Json encoded DataJSON
 
-```
+
 
 Or, if you're into Lua:
 

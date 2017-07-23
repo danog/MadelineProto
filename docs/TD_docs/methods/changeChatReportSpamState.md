@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChatReportSpamState
-* params - {"chat_id": InputPeer, "is_spam_chat": Bool, }
+* params - `{"chat_id": InputPeer, "is_spam_chat": Bool, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChatReportSpamState`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 is_spam_chat - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

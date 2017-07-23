@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setOption
-* params - {"name": "string", "value": OptionValue, }
+* params - `{"name": "string", "value": OptionValue, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setOption`
 
 Parameters:
 
-```
 name - Json encoded string
 value - Json encoded OptionValue
 
-```
+
 
 Or, if you're into Lua:
 

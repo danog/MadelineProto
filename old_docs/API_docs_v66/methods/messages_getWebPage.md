@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getWebPage
-* params - {"url": "string", "hash": int, }
+* params - `{"url": "string", "hash": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getWebPage`
 
 Parameters:
 
-```
 url - Json encoded string
 hash - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

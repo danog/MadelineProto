@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteChatUser
-* params - {"chat_id": InputPeer, "user_id": InputUser, }
+* params - `{"chat_id": InputPeer, "user_id": InputUser, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteChatUser`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 user_id - Json encoded InputUser
 
-```
+
 
 Or, if you're into Lua:
 

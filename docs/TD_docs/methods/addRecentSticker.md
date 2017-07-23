@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - addRecentSticker
-* params - {"is_attached": Bool, "sticker": InputFile, }
+* params - `{"is_attached": Bool, "sticker": InputFile, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addRecentSticker`
 
 Parameters:
 
-```
 is_attached - Json encoded Bool
 sticker - Json encoded InputFile
 
-```
+
 
 Or, if you're into Lua:
 

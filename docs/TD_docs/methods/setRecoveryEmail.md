@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setRecoveryEmail
-* params - {"password": "string", "new_recovery_email": "string", }
+* params - `{"password": "string", "new_recovery_email": "string", }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setRecoveryEmail`
 
 Parameters:
 
-```
 password - Json encoded string
 new_recovery_email - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

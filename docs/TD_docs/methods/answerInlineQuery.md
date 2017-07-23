@@ -56,7 +56,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - answerInlineQuery
-* params - {"inline_query_id": long, "is_personal": Bool, "results": [InputInlineQueryResult], "cache_time": int, "next_offset": "string", "switch_pm_text": "string", "switch_pm_parameter": "string", }
+* params - `{"inline_query_id": long, "is_personal": Bool, "results": [InputInlineQueryResult], "cache_time": int, "next_offset": "string", "switch_pm_text": "string", "switch_pm_parameter": "string", }`
 
 
 
@@ -66,7 +66,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/answerInlineQuery`
 
 Parameters:
 
-```
 inline_query_id - Json encoded long
 is_personal - Json encoded Bool
 results - Json encoded  array of InputInlineQueryResult
@@ -75,7 +74,7 @@ next_offset - Json encoded string
 switch_pm_text - Json encoded string
 switch_pm_parameter - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

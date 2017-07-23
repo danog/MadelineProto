@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.checkUsername
-* params - {"channel": InputChannel, "username": "string", }
+* params - `{"channel": InputChannel, "username": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.checkUsername`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 username - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.readHistory
-* params - {"channel": InputChannel, "max_id": int, }
+* params - `{"channel": InputChannel, "max_id": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.readHistory`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 max_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

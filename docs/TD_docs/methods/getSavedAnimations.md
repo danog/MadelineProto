@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getSavedAnimations
-* params - {}
+* params - `{}`
 
 
 
@@ -59,9 +59,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getSavedAnimations`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

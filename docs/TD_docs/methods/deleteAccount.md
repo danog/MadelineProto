@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteAccount
-* params - {"reason": "string", }
+* params - `{"reason": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteAccount`
 
 Parameters:
 
-```
 reason - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

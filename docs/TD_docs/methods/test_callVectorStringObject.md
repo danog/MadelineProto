@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callVectorStringObject
-* params - {"x": [test_String], }
+* params - `{"x": [test_String], }`
 
 
 
@@ -58,10 +58,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callVectorStringObject`
 
 Parameters:
 
-```
 x - Json encoded  array of test_String
 
-```
+
 
 Or, if you're into Lua:
 

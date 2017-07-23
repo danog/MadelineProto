@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getNearestDc
-* params - {}
+* params - `{}`
 
 
 
@@ -50,9 +50,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getNearestDc`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

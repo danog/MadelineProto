@@ -54,7 +54,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendMessage
-* params - {"no_webpage": Bool, "broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}
+* params - `{"no_webpage": Bool, "broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}`
 
 
 
@@ -64,10 +64,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMessage`
 
 Parameters:
 
-```
 parse_mode - string
 
-```
+
 
 Or, if you're into Lua:
 

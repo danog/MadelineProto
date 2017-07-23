@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getMessagesViews
-* params - {"peer": InputPeer, "id": [int], "increment": Bool, }
+* params - `{"peer": InputPeer, "id": [int], "increment": Bool, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getMessagesViews`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 id - Json encoded  array of int
 increment - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

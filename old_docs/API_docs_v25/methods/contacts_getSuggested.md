@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.getSuggested
-* params - {"limit": int, }
+* params - `{"limit": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getSuggested`
 
 Parameters:
 
-```
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

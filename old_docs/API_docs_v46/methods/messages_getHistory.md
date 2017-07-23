@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getHistory
-* params - {"peer": InputPeer, "offset_id": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }
+* params - `{"peer": InputPeer, "offset_id": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }`
 
 
 
@@ -60,7 +60,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getHistory`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 offset_id - Json encoded int
 add_offset - Json encoded int
@@ -68,7 +67,7 @@ limit - Json encoded int
 max_id - Json encoded int
 min_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

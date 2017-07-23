@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - searchPublicChats
-* params - {"username_prefix": "string", }
+* params - `{"username_prefix": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchPublicChats`
 
 Parameters:
 
-```
 username_prefix - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

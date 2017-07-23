@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - resetAuth
-* params - {"force": Bool, }
+* params - `{"force": Bool, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/resetAuth`
 
 Parameters:
 
-```
 force - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

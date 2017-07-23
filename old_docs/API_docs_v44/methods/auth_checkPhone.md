@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.checkPhone
-* params - {"phone_number": "string", }
+* params - `{"phone_number": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.checkPhone`
 
 Parameters:
 
-```
 phone_number - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

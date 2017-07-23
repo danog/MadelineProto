@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.registerDevice
-* params - {"token_type": int, "token": "string", }
+* params - `{"token_type": int, "token": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.registerDevice`
 
 Parameters:
 
-```
 token_type - Json encoded int
 token - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

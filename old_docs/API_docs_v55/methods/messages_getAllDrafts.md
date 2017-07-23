@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getAllDrafts
-* params - {}
+* params - `{}`
 
 
 
@@ -50,9 +50,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAllDrafts`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

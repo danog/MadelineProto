@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteProfilePhoto
-* params - {"profile_photo_id": long, }
+* params - `{"profile_photo_id": long, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteProfilePhoto`
 
 Parameters:
 
-```
 profile_photo_id - Json encoded long
 
-```
+
 
 Or, if you're into Lua:
 

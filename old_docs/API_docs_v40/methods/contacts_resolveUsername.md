@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.resolveUsername
-* params - {"username": "string", }
+* params - `{"username": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.resolveUsername`
 
 Parameters:
 
-```
 username - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

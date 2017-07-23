@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.confirmPhone
-* params - {"phone_code_hash": "string", "phone_code": "string", }
+* params - `{"phone_code_hash": "string", "phone_code": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.confirmPhone`
 
 Parameters:
 
-```
 phone_code_hash - Json encoded string
 phone_code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

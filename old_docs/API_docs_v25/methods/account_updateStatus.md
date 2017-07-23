@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateStatus
-* params - {"offline": Bool, }
+* params - `{"offline": Bool, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateStatus`
 
 Parameters:
 
-```
 offline - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

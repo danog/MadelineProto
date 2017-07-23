@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteMessages
-* params - {"chat_id": InputPeer, "message_ids": [long], }
+* params - `{"chat_id": InputPeer, "message_ids": [long], }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteMessages`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 message_ids - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

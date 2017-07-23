@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.sendConfirmPhoneCode
-* params - {"allow_flashcall": Bool, "hash": "string", "current_number": Bool, }
+* params - `{"allow_flashcall": Bool, "hash": "string", "current_number": Bool, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.sendConfirmPhoneCode`
 
 Parameters:
 
-```
 allow_flashcall - Json encoded Bool
 hash - Json encoded string
 current_number - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

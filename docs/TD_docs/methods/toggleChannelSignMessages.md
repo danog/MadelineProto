@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - toggleChannelSignMessages
-* params - {"channel_id": int, "sign_messages": Bool, }
+* params - `{"channel_id": int, "sign_messages": Bool, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelSignMessages`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 sign_messages - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

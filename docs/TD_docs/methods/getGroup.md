@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getGroup
-* params - {"group_id": int, }
+* params - `{"group_id": int, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getGroup`
 
 Parameters:
 
-```
 group_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

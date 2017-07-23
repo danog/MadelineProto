@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.getNotifySettings
-* params - {"peer": InputNotifyPeer, }
+* params - `{"peer": InputNotifyPeer, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.getNotifySettings`
 
 Parameters:
 
-```
 peer - Json encoded InputNotifyPeer
 
-```
+
 
 Or, if you're into Lua:
 

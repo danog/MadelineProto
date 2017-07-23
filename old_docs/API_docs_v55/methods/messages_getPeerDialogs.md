@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getPeerDialogs
-* params - {"peers": [InputPeer], }
+* params - `{"peers": [InputPeer], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getPeerDialogs`
 
 Parameters:
 
-```
 peers - Json encoded  array of InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

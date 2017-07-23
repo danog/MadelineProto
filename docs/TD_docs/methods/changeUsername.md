@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeUsername
-* params - {"username": "string", }
+* params - `{"username": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeUsername`
 
 Parameters:
 
-```
 username - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - bots.answerWebhookJSONQuery
-* params - {"query_id": long, "data": DataJSON, }
+* params - `{"query_id": long, "data": DataJSON, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/bots.answerWebhookJSONQuery`
 
 Parameters:
 
-```
 query_id - Json encoded long
 data - Json encoded DataJSON
 
-```
+
 
 Or, if you're into Lua:
 

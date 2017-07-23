@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - importContacts
-* params - {"contacts": [contact], }
+* params - `{"contacts": [contact], }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/importContacts`
 
 Parameters:
 
-```
 contacts - Json encoded  array of contact
 
-```
+
 
 Or, if you're into Lua:
 

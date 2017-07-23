@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - searchStickerSet
-* params - {"name": "string", }
+* params - `{"name": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchStickerSet`
 
 Parameters:
 
-```
 name - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

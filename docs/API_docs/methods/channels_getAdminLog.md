@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.getAdminLog
-* params - {"channel": InputChannel, "q": "string", "events_filter": ChannelAdminLogEventsFilter, "admins": [InputUser], "max_id": long, "min_id": long, "limit": int, }
+* params - `{"channel": InputChannel, "q": "string", "events_filter": ChannelAdminLogEventsFilter, "admins": [InputUser], "max_id": long, "min_id": long, "limit": int, }`
 
 
 
@@ -61,7 +61,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getAdminLog`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 q - Json encoded string
 events_filter - Json encoded ChannelAdminLogEventsFilter
@@ -70,7 +69,7 @@ max_id - Json encoded long
 min_id - Json encoded long
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

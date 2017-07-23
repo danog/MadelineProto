@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - pinChannelMessage
-* params - {"channel_id": int, "message_id": long, "disable_notification": Bool, }
+* params - `{"channel_id": int, "message_id": long, "disable_notification": Bool, }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/pinChannelMessage`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 message_id - Json encoded long
 disable_notification - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

@@ -54,7 +54,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setPassword
-* params - {"old_password": "string", "new_password": "string", "new_hint": "string", "set_recovery_email": Bool, "new_recovery_email": "string", }
+* params - `{"old_password": "string", "new_password": "string", "new_hint": "string", "set_recovery_email": Bool, "new_recovery_email": "string", }`
 
 
 
@@ -64,14 +64,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setPassword`
 
 Parameters:
 
-```
 old_password - Json encoded string
 new_password - Json encoded string
 new_hint - Json encoded string
 set_recovery_email - Json encoded Bool
 new_recovery_email - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

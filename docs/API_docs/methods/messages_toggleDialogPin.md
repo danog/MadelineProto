@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.toggleDialogPin
-* params - {"pinned": Bool, "peer": InputPeer, }
+* params - `{"pinned": Bool, "peer": InputPeer, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleDialogPin`
 
 Parameters:
 
-```
 pinned - Json encoded Bool
 peer - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

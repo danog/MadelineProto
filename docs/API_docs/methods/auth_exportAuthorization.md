@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.exportAuthorization
-* params - {"dc_id": int, }
+* params - `{"dc_id": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.exportAuthorization`
 
 Parameters:
 
-```
 dc_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

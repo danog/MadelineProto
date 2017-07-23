@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - photos.uploadProfilePhoto
-* params - {"file": InputFile, "caption": "string", "geo_point": InputGeoPoint, "crop": InputPhotoCrop, }
+* params - `{"file": InputFile, "caption": "string", "geo_point": InputGeoPoint, "crop": InputPhotoCrop, }`
 
 
 
@@ -58,13 +58,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.uploadProfilePhoto`
 
 Parameters:
 
-```
 file - Json encoded InputFile
 caption - Json encoded string
 geo_point - Json encoded InputGeoPoint
 crop - Json encoded InputPhotoCrop
 
-```
+
 
 Or, if you're into Lua:
 

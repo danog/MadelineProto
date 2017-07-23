@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.search
-* params - {"peer": InputPeer, "q": "string", "filter": MessagesFilter, "min_date": int, "max_date": int, "offset": int, "max_id": int, "limit": int, }
+* params - `{"peer": InputPeer, "q": "string", "filter": MessagesFilter, "min_date": int, "max_date": int, "offset": int, "max_id": int, "limit": int, }`
 
 
 
@@ -62,7 +62,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.search`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 q - Json encoded string
 filter - Json encoded MessagesFilter
@@ -72,7 +71,7 @@ offset - Json encoded int
 max_id - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.readHistory
-* params - {"peer": InputPeer, "max_id": int, }
+* params - `{"peer": InputPeer, "max_id": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readHistory`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 max_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

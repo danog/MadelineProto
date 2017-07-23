@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.editChatTitle
-* params - {"peer": InputGeoChat, "title": "string", "address": "string", }
+* params - `{"peer": InputGeoChat, "title": "string", "address": "string", }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.editChatTitle`
 
 Parameters:
 
-```
 peer - Json encoded InputGeoChat
 title - Json encoded string
 address - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

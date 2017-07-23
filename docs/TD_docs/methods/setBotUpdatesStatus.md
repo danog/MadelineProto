@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setBotUpdatesStatus
-* params - {"pending_update_count": int, "error_message": "string", }
+* params - `{"pending_update_count": int, "error_message": "string", }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setBotUpdatesStatus`
 
 Parameters:
 
-```
 pending_update_count - Json encoded int
 error_message - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

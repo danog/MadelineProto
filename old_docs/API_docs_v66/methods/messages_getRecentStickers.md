@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getRecentStickers
-* params - {"attached": Bool, "hash": int, }
+* params - `{"attached": Bool, "hash": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getRecentStickers`
 
 Parameters:
 
-```
 attached - Json encoded Bool
 hash - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

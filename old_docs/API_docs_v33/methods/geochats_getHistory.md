@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.getHistory
-* params - {"peer": InputGeoChat, "offset": int, "max_id": int, "limit": int, }
+* params - `{"peer": InputGeoChat, "offset": int, "max_id": int, "limit": int, }`
 
 
 
@@ -58,13 +58,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getHistory`
 
 Parameters:
 
-```
 peer - Json encoded InputGeoChat
 offset - Json encoded int
 max_id - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

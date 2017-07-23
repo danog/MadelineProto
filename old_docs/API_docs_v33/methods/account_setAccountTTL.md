@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.setAccountTTL
-* params - {"ttl": AccountDaysTTL, }
+* params - `{"ttl": AccountDaysTTL, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.setAccountTTL`
 
 Parameters:
 
-```
 ttl - Json encoded AccountDaysTTL
 
-```
+
 
 Or, if you're into Lua:
 

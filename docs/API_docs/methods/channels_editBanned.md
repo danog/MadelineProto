@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.editBanned
-* params - {"channel": InputChannel, "user_id": InputUser, "banned_rights": ChannelBannedRights, }
+* params - `{"channel": InputChannel, "user_id": InputUser, "banned_rights": ChannelBannedRights, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editBanned`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 user_id - Json encoded InputUser
 banned_rights - Json encoded ChannelBannedRights
 
-```
+
 
 Or, if you're into Lua:
 

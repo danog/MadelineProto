@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.getFullChannel
-* params - {"channel": InputChannel, }
+* params - `{"channel": InputChannel, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getFullChannel`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 
-```
+
 
 Or, if you're into Lua:
 

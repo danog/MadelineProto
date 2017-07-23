@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.receivedQueue
-* params - {"max_qts": int, }
+* params - `{"max_qts": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.receivedQueue`
 
 Parameters:
 
-```
 max_qts - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

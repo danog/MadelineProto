@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - viewTrendingStickerSets
-* params - {"sticker_set_ids": [long], }
+* params - `{"sticker_set_ids": [long], }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/viewTrendingStickerSets`
 
 Parameters:
 
-```
 sticker_set_ids - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

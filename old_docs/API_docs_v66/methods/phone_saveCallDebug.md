@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.saveCallDebug
-* params - {"peer": InputPhoneCall, "debug": DataJSON, }
+* params - `{"peer": InputPhoneCall, "debug": DataJSON, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.saveCallDebug`
 
 Parameters:
 
-```
 peer - Json encoded InputPhoneCall
 debug - Json encoded DataJSON
 
-```
+
 
 Or, if you're into Lua:
 

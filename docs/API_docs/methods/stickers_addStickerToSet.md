@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.addStickerToSet
-* params - {"stickerset": InputStickerSet, "sticker": InputStickerSetItem, }
+* params - `{"stickerset": InputStickerSet, "sticker": InputStickerSetItem, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.addStickerToSet`
 
 Parameters:
 
-```
 stickerset - Json encoded InputStickerSet
 sticker - Json encoded InputStickerSetItem
 
-```
+
 
 Or, if you're into Lua:
 

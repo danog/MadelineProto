@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.installStickerSet
-* params - {"stickerset": InputStickerSet, "disabled": Bool, }
+* params - `{"stickerset": InputStickerSet, "disabled": Bool, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.installStickerSet`
 
 Parameters:
 
-```
 stickerset - Json encoded InputStickerSet
 disabled - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

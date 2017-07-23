@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editChatTitle
-* params - {"chat_id": InputPeer, "title": "string", }
+* params - `{"chat_id": InputPeer, "title": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editChatTitle`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 title - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

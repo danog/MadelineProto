@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getInlineBotResults
-* params - {"bot": InputUser, "peer": InputPeer, "geo_point": InputGeoPoint, "query": "string", "offset": "string", }
+* params - `{"bot": InputUser, "peer": InputPeer, "geo_point": InputGeoPoint, "query": "string", "offset": "string", }`
 
 
 
@@ -59,14 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineBotResults`
 
 Parameters:
 
-```
 bot - Json encoded InputUser
 peer - Json encoded InputPeer
 geo_point - Json encoded InputGeoPoint
 query - Json encoded string
 offset - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

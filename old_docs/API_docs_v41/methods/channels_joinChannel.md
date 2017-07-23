@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.joinChannel
-* params - {"channel": InputChannel, }
+* params - `{"channel": InputChannel, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.joinChannel`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 
-```
+
 
 Or, if you're into Lua:
 

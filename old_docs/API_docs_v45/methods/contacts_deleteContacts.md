@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.deleteContacts
-* params - {"id": [InputUser], }
+* params - `{"id": [InputUser], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.deleteContacts`
 
 Parameters:
 
-```
 id - Json encoded  array of InputUser
 
-```
+
 
 Or, if you're into Lua:
 

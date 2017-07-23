@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updateDeviceLocked
-* params - {"period": int, }
+* params - `{"period": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateDeviceLocked`
 
 Parameters:
 
-```
 period - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

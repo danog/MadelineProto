@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendBroadcast
-* params - {"contacts": [InputUser], "message": "string", "media": InputMedia, }
+* params - `{"contacts": [InputUser], "message": "string", "media": InputMedia, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendBroadcast`
 
 Parameters:
 
-```
 contacts - Json encoded  array of InputUser
 message - Json encoded string
 media - Json encoded InputMedia
 
-```
+
 
 Or, if you're into Lua:
 

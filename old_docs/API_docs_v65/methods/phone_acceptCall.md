@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.acceptCall
-* params - {"peer": InputPhoneCall, "g_b": "bytes", "protocol": PhoneCallProtocol, }
+* params - `{"peer": InputPhoneCall, "g_b": "bytes", "protocol": PhoneCallProtocol, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.acceptCall`
 
 Parameters:
 
-```
 peer - Json encoded InputPhoneCall
 g_b - Json encoded bytes
 protocol - Json encoded PhoneCallProtocol
 
-```
+
 
 Or, if you're into Lua:
 

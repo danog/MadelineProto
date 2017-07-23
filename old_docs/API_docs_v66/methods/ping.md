@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - ping
-* params - {"ping_id": long, }
+* params - `{"ping_id": long, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/ping`
 
 Parameters:
 
-```
 ping_id - Json encoded long
 
-```
+
 
 Or, if you're into Lua:
 

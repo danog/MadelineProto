@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.getFullChat
-* params - {"peer": InputGeoChat, }
+* params - `{"peer": InputGeoChat, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getFullChat`
 
 Parameters:
 
-```
 peer - Json encoded InputGeoChat
 
-```
+
 
 Or, if you're into Lua:
 

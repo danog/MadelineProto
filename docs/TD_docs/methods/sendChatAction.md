@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - sendChatAction
-* params - {"chat_id": InputPeer, "action": SendMessageAction, }
+* params - `{"chat_id": InputPeer, "action": SendMessageAction, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/sendChatAction`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 action - Json encoded SendMessageAction
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.exportMessageLink
-* params - {"channel": InputChannel, "id": int, }
+* params - `{"channel": InputChannel, "id": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.exportMessageLink`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

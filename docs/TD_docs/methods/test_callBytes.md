@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.callBytes
-* params - {"x": "bytes", }
+* params - `{"x": "bytes", }`
 
 
 
@@ -58,10 +58,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.callBytes`
 
 Parameters:
 
-```
 x - Json encoded bytes
 
-```
+
 
 Or, if you're into Lua:
 

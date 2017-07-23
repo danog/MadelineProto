@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - upload.getFile
-* params - {"location": InputFileLocation, "offset": int, "limit": int, }
+* params - `{"location": InputFileLocation, "offset": int, "limit": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getFile`
 
 Parameters:
 
-```
 location - Json encoded InputFileLocation
 offset - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

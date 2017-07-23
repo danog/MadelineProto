@@ -54,7 +54,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - answerCallbackQuery
-* params - {"callback_query_id": long, "text": "string", "show_alert": Bool, "url": "string", "cache_time": int, }
+* params - `{"callback_query_id": long, "text": "string", "show_alert": Bool, "url": "string", "cache_time": int, }`
 
 
 
@@ -64,14 +64,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/answerCallbackQuery`
 
 Parameters:
 
-```
 callback_query_id - Json encoded long
 text - Json encoded string
 show_alert - Json encoded Bool
 url - Json encoded string
 cache_time - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

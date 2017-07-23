@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setGameScore
-* params - {"edit_message": Bool, "force": Bool, "peer": InputPeer, "id": int, "user_id": InputUser, "score": int, }
+* params - `{"edit_message": Bool, "force": Bool, "peer": InputPeer, "id": int, "user_id": InputUser, "score": int, }`
 
 
 
@@ -60,7 +60,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setGameScore`
 
 Parameters:
 
-```
 edit_message - Json encoded Bool
 force - Json encoded Bool
 peer - Json encoded InputPeer
@@ -68,7 +67,7 @@ id - Json encoded int
 user_id - Json encoded InputUser
 score - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

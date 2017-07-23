@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.dropTempAuthKeys
-* params - {"except_auth_keys": [long], }
+* params - `{"except_auth_keys": [long], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.dropTempAuthKeys`
 
 Parameters:
 
-```
 except_auth_keys - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

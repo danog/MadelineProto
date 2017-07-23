@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - geochats.getLocated
-* params - {"geo_point": InputGeoPoint, "radius": int, "limit": int, }
+* params - `{"geo_point": InputGeoPoint, "radius": int, "limit": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getLocated`
 
 Parameters:
 
-```
 geo_point - Json encoded InputGeoPoint
 radius - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

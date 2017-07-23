@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - req_pq
-* params - {"nonce": int128, }
+* params - `{"nonce": int128, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/req_pq`
 
 Parameters:
 
-```
 nonce - Json encoded int128
 
-```
+
 
 Or, if you're into Lua:
 

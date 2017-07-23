@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteHistory
-* params - {"peer": InputPeer, "offset": int, }
+* params - `{"peer": InputPeer, "offset": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteHistory`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 offset - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

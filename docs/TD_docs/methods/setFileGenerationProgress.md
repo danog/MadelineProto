@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setFileGenerationProgress
-* params - {"generation_id": long, "ready": int, }
+* params - `{"generation_id": long, "ready": int, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setFileGenerationProgress`
 
 Parameters:
 
-```
 generation_id - Json encoded long
 ready - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

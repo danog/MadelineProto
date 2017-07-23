@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.createChannel
-* params - {"title": "string", }
+* params - `{"title": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.createChannel`
 
 Parameters:
 
-```
 title - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

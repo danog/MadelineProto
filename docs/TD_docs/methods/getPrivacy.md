@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getPrivacy
-* params - {"key": PrivacyKey, }
+* params - `{"key": PrivacyKey, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getPrivacy`
 
 Parameters:
 
-```
 key - Json encoded PrivacyKey
 
-```
+
 
 Or, if you're into Lua:
 

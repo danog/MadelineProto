@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - updates.getDifference
-* params - {"pts": int, "date": int, "qts": int, }
+* params - `{"pts": int, "date": int, "qts": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updates.getDifference`
 
 Parameters:
 
-```
 pts - Json encoded int
 date - Json encoded int
 qts - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changePhoneNumber
-* params - {"phone_number": "string", "allow_flash_call": Bool, "is_current_phone_number": Bool, }
+* params - `{"phone_number": "string", "allow_flash_call": Bool, "is_current_phone_number": Bool, }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changePhoneNumber`
 
 Parameters:
 
-```
 phone_number - Json encoded string
 allow_flash_call - Json encoded Bool
 is_current_phone_number - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

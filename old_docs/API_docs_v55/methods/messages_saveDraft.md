@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.saveDraft
-* params - {"no_webpage": Bool, "reply_to_msg_id": int, "peer": InputPeer, "message": "string", "entities": [MessageEntity], "parse_mode": "string"}
+* params - `{"no_webpage": Bool, "reply_to_msg_id": int, "peer": InputPeer, "message": "string", "entities": [MessageEntity], "parse_mode": "string"}`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.saveDraft`
 
 Parameters:
 
-```
 parse_mode - string
 
-```
+
 
 Or, if you're into Lua:
 

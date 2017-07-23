@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - editMessageCaption
-* params - {"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, "caption": "string", }
+* params - `{"chat_id": InputPeer, "message_id": long, "reply_markup": ReplyMarkup, "caption": "string", }`
 
 
 
@@ -63,13 +63,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editMessageCaption`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 message_id - Json encoded long
 reply_markup - Json encoded ReplyMarkup
 caption - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

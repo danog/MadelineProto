@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getSupport
-* params - {}
+* params - `{}`
 
 
 
@@ -50,9 +50,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getSupport`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

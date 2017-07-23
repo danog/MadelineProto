@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - initConnection
-* params - {"api_id": int, "device_model": "string", "system_version": "string", "app_version": "string", "lang_code": "string", "query": !X, }
+* params - `{"api_id": int, "device_model": "string", "system_version": "string", "app_version": "string", "lang_code": "string", "query": !X, }`
 
 
 
@@ -60,7 +60,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/initConnection`
 
 Parameters:
 
-```
 api_id - Json encoded int
 device_model - Json encoded string
 system_version - Json encoded string
@@ -68,7 +67,7 @@ app_version - Json encoded string
 lang_code - Json encoded string
 query - Json encoded !X
 
-```
+
 
 Or, if you're into Lua:
 

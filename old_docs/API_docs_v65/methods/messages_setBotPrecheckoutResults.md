@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setBotPrecheckoutResults
-* params - {"success": Bool, "query_id": long, "error": "string", }
+* params - `{"success": Bool, "query_id": long, "error": "string", }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotPrecheckoutRes
 
 Parameters:
 
-```
 success - Json encoded Bool
 query_id - Json encoded long
 error - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getFilePersistent
-* params - {"persistent_file_id": "string", }
+* params - `{"persistent_file_id": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getFilePersistent`
 
 Parameters:
 
-```
 persistent_file_id - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

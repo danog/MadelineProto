@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - get_future_salts
-* params - {"num": int, }
+* params - `{"num": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/get_future_salts`
 
 Parameters:
 
-```
 num - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

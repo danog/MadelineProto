@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.resetTopPeerRating
-* params - {"category": TopPeerCategory, "peer": InputPeer, }
+* params - `{"category": TopPeerCategory, "peer": InputPeer, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.resetTopPeerRating`
 
 Parameters:
 
-```
 category - Json encoded TopPeerCategory
 peer - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

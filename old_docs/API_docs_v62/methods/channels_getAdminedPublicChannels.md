@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.getAdminedPublicChannels
-* params - {}
+* params - `{}`
 
 
 
@@ -50,9 +50,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.getAdminedPublicChan
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

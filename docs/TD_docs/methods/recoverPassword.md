@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - recoverPassword
-* params - {"recovery_code": "string", }
+* params - `{"recovery_code": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/recoverPassword`
 
 Parameters:
 
-```
 recovery_code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

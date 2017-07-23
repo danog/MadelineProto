@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - payments.getPaymentReceipt
-* params - {"msg_id": int, }
+* params - `{"msg_id": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.getPaymentReceipt`
 
 Parameters:
 
-```
 msg_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

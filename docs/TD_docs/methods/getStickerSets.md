@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getStickerSets
-* params - {"is_masks": Bool, }
+* params - `{"is_masks": Bool, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getStickerSets`
 
 Parameters:
 
-```
 is_masks - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

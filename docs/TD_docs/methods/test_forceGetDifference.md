@@ -43,7 +43,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.forceGetDifference
-* params - {}
+* params - `{}`
 
 
 
@@ -53,9 +53,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.forceGetDifference`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

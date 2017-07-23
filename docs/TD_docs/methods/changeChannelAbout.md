@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - changeChannelAbout
-* params - {"channel_id": int, "about": "string", }
+* params - `{"channel_id": int, "about": "string", }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeChannelAbout`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 about - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

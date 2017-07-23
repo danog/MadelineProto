@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - checkChangePhoneNumberCode
-* params - {"code": "string", }
+* params - `{"code": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/checkChangePhoneNumberCode`
 
 Parameters:
 
-```
 code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

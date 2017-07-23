@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getDifference
-* params - {"from_version": int, }
+* params - `{"from_version": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/langpack.getDifference`
 
 Parameters:
 
-```
 from_version - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - addRecentlyFoundChat
-* params - {"chat_id": InputPeer, }
+* params - `{"chat_id": InputPeer, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addRecentlyFoundChat`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

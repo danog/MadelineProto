@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - invokeWithLayer18
-* params - {"query": !X, }
+* params - `{"query": !X, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeWithLayer18`
 
 Parameters:
 
-```
 query - Json encoded !X
 
-```
+
 
 Or, if you're into Lua:
 

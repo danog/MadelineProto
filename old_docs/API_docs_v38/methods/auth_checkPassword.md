@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.checkPassword
-* params - {"password_hash": "bytes", }
+* params - `{"password_hash": "bytes", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.checkPassword`
 
 Parameters:
 
-```
 password_hash - Json encoded bytes
 
-```
+
 
 Or, if you're into Lua:
 

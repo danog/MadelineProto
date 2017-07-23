@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - account.updatePasswordSettings
-* params - {"current_password_hash": "bytes", "new_settings": account_PasswordInputSettings, }
+* params - `{"current_password_hash": "bytes", "new_settings": account_PasswordInputSettings, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updatePasswordSetting
 
 Parameters:
 
-```
 current_password_hash - Json encoded bytes
 new_settings - Json encoded account_PasswordInputSettings
 
-```
+
 
 Or, if you're into Lua:
 

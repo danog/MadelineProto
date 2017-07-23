@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getCommonChats
-* params - {"user_id": InputUser, "max_id": int, "limit": int, }
+* params - `{"user_id": InputUser, "max_id": int, "limit": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getCommonChats`
 
 Parameters:
 
-```
 user_id - Json encoded InputUser
 max_id - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

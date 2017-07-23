@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - deleteSavedAnimation
-* params - {"animation": InputFile, }
+* params - `{"animation": InputFile, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/deleteSavedAnimation`
 
 Parameters:
 
-```
 animation - Json encoded InputFile
 
-```
+
 
 Or, if you're into Lua:
 

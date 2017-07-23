@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reorderStickerSets
-* params - {"masks": Bool, "order": [long], }
+* params - `{"masks": Bool, "order": [long], }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reorderStickerSets`
 
 Parameters:
 
-```
 masks - Json encoded Bool
 order - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

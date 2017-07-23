@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.setBotShippingResults
-* params - {"query_id": long, "error": "string", "shipping_options": [ShippingOption], }
+* params - `{"query_id": long, "error": "string", "shipping_options": [ShippingOption], }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotShippingResult
 
 Parameters:
 
-```
 query_id - Json encoded long
 error - Json encoded string
 shipping_options - Json encoded  array of ShippingOption
 
-```
+
 
 Or, if you're into Lua:
 

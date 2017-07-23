@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reportSpam
-* params - {"peer": InputPeer, }
+* params - `{"peer": InputPeer, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reportSpam`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

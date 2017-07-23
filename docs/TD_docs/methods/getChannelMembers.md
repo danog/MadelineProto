@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getChannelMembers
-* params - {"channel_id": int, "filter": ChannelMembersFilter, "offset": int, "limit": int, }
+* params - `{"channel_id": int, "filter": ChannelMembersFilter, "offset": int, "limit": int, }`
 
 
 
@@ -63,13 +63,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChannelMembers`
 
 Parameters:
 
-```
 channel_id - Json encoded int
 filter - Json encoded ChannelMembersFilter
 offset - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

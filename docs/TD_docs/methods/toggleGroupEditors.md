@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - toggleGroupEditors
-* params - {"group_id": int, "anyone_can_edit": Bool, }
+* params - `{"group_id": int, "anyone_can_edit": Bool, }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleGroupEditors`
 
 Parameters:
 
-```
 group_id - Json encoded int
 anyone_can_edit - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.searchGifs
-* params - {"q": "string", "offset": int, }
+* params - `{"q": "string", "offset": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.searchGifs`
 
 Parameters:
 
-```
 q - Json encoded string
 offset - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

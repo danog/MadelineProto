@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.editAdmin
-* params - {"channel": InputChannel, "user_id": InputUser, "role": ChannelParticipantRole, }
+* params - `{"channel": InputChannel, "user_id": InputUser, "role": ChannelParticipantRole, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editAdmin`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 user_id - Json encoded InputUser
 role - Json encoded ChannelParticipantRole
 
-```
+
 
 Or, if you're into Lua:
 

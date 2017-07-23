@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - setAlarm
-* params - {"seconds": double, }
+* params - `{"seconds": double, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setAlarm`
 
 Parameters:
 
-```
 seconds - Json encoded double
 
-```
+
 
 Or, if you're into Lua:
 

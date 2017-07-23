@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editChatPhoto
-* params - {"chat_id": InputPeer, "photo": InputChatPhoto, }
+* params - `{"chat_id": InputPeer, "photo": InputChatPhoto, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editChatPhoto`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 photo - Json encoded InputChatPhoto
 
-```
+
 
 Or, if you're into Lua:
 

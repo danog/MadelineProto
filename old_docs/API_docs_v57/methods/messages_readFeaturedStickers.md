@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.readFeaturedStickers
-* params - {"id": [long], }
+* params - `{"id": [long], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readFeaturedStickers
 
 Parameters:
 
-```
 id - Json encoded  array of long
 
-```
+
 
 Or, if you're into Lua:
 

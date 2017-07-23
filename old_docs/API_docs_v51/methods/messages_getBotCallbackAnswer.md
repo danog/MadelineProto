@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getBotCallbackAnswer
-* params - {"peer": InputPeer, "msg_id": int, "data": "bytes", }
+* params - `{"peer": InputPeer, "msg_id": int, "data": "bytes", }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getBotCallbackAnswer
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 msg_id - Json encoded int
 data - Json encoded bytes
 
-```
+
 
 Or, if you're into Lua:
 

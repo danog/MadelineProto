@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - langpack.getStrings
-* params - {"lang_code": "string", "keys": ["string"], }
+* params - `{"lang_code": "string", "keys": ["string"], }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/langpack.getStrings`
 
 Parameters:
 
-```
 lang_code - Json encoded string
 keys - Json encoded  array of string
 
-```
+
 
 Or, if you're into Lua:
 

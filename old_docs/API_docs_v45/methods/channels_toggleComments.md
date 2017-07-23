@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.toggleComments
-* params - {"channel": InputChannel, "enabled": Bool, }
+* params - `{"channel": InputChannel, "enabled": Bool, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.toggleComments`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 enabled - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

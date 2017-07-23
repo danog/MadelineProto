@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getArchivedStickers
-* params - {"masks": Bool, "offset_id": long, "limit": int, }
+* params - `{"masks": Bool, "offset_id": long, "limit": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getArchivedStickers`
 
 Parameters:
 
-```
 masks - Json encoded Bool
 offset_id - Json encoded long
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

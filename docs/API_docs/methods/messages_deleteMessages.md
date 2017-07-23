@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteMessages
-* params - {"revoke": Bool, "id": [int], }
+* params - `{"revoke": Bool, "id": [int], }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteMessages`
 
 Parameters:
 
-```
 revoke - Json encoded Bool
 id - Json encoded  array of int
 
-```
+
 
 Or, if you're into Lua:
 

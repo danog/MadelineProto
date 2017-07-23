@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - phone.requestCall
-* params - {"user_id": InputUser, "g_a_hash": "bytes", "protocol": PhoneCallProtocol, }
+* params - `{"user_id": InputUser, "g_a_hash": "bytes", "protocol": PhoneCallProtocol, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.requestCall`
 
 Parameters:
 
-```
 user_id - Json encoded InputUser
 g_a_hash - Json encoded bytes
 protocol - Json encoded PhoneCallProtocol
 
-```
+
 
 Or, if you're into Lua:
 

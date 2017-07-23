@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.getBlocked
-* params - {"offset": int, "limit": int, }
+* params - `{"offset": int, "limit": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getBlocked`
 
 Parameters:
 
-```
 offset - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

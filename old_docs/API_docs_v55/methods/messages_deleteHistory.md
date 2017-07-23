@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.deleteHistory
-* params - {"just_clear": Bool, "peer": InputPeer, "max_id": int, }
+* params - `{"just_clear": Bool, "peer": InputPeer, "max_id": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteHistory`
 
 Parameters:
 
-```
 just_clear - Json encoded Bool
 peer - Json encoded InputPeer
 max_id - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

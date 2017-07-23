@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getGameHighScores
-* params - {"peer": InputPeer, "id": int, "user_id": InputUser, }
+* params - `{"peer": InputPeer, "id": int, "user_id": InputUser, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getGameHighScores`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 id - Json encoded int
 user_id - Json encoded InputUser
 
-```
+
 
 Or, if you're into Lua:
 

@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendEncryptedService
-* params - {"peer": InputEncryptedChat, "message": DecryptedMessage, }
+* params - `{"peer": InputEncryptedChat, "message": DecryptedMessage, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendEncryptedService
 
 Parameters:
 
-```
 peer - Json encoded InputEncryptedChat
 message - Json encoded DecryptedMessage
 
-```
+
 
 Or, if you're into Lua:
 

@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.getTopPeers
-* params - {"correspondents": Bool, "bots_pm": Bool, "bots_inline": Bool, "phone_calls": Bool, "groups": Bool, "channels": Bool, "offset": int, "limit": int, "hash": int, }
+* params - `{"correspondents": Bool, "bots_pm": Bool, "bots_inline": Bool, "phone_calls": Bool, "groups": Bool, "channels": Bool, "offset": int, "limit": int, "hash": int, }`
 
 
 
@@ -63,7 +63,6 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getTopPeers`
 
 Parameters:
 
-```
 correspondents - Json encoded Bool
 bots_pm - Json encoded Bool
 bots_inline - Json encoded Bool
@@ -74,7 +73,7 @@ offset - Json encoded int
 limit - Json encoded int
 hash - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

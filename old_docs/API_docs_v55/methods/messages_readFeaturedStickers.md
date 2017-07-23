@@ -40,7 +40,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.readFeaturedStickers
-* params - {}
+* params - `{}`
 
 
 
@@ -50,9 +50,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readFeaturedStickers
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

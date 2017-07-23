@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getStickers
-* params - {"emoticon": "string", "hash": "string", }
+* params - `{"emoticon": "string", "hash": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getStickers`
 
 Parameters:
 
-```
 emoticon - Json encoded string
 hash - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

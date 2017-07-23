@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - help.getTermsOfService
-* params - {"lang_code": "string", }
+* params - `{"lang_code": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/help.getTermsOfService`
 
 Parameters:
 
-```
 lang_code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

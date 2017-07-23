@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getAttachedStickers
-* params - {"media": InputStickeredMedia, }
+* params - `{"media": InputStickeredMedia, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAttachedStickers`
 
 Parameters:
 
-```
 media - Json encoded InputStickeredMedia
 
-```
+
 
 Or, if you're into Lua:
 

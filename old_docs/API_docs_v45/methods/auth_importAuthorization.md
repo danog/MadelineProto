@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.importAuthorization
-* params - {"id": int, "bytes": "bytes", }
+* params - `{"id": int, "bytes": "bytes", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.importAuthorization`
 
 Parameters:
 
-```
 id - Json encoded int
 bytes - Json encoded bytes
 
-```
+
 
 Or, if you're into Lua:
 

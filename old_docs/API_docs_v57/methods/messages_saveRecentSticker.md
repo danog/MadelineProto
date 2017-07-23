@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.saveRecentSticker
-* params - {"attached": Bool, "id": InputDocument, "unsave": Bool, }
+* params - `{"attached": Bool, "id": InputDocument, "unsave": Bool, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.saveRecentSticker`
 
 Parameters:
 
-```
 attached - Json encoded Bool
 id - Json encoded InputDocument
 unsave - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

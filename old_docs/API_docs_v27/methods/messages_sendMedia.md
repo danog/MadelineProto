@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.sendMedia
-* params - {"peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, }
+* params - `{"peer": InputPeer, "reply_to_msg_id": int, "media": InputMedia, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMedia`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 reply_to_msg_id - Json encoded int
 media - Json encoded InputMedia
 
-```
+
 
 Or, if you're into Lua:
 

@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.sendCode
-* params - {"phone_number": "string", "sms_type": int, "api_id": int, "api_hash": "string", "lang_code": "string", }
+* params - `{"phone_number": "string", "sms_type": int, "api_id": int, "api_hash": "string", "lang_code": "string", }`
 
 
 
@@ -59,14 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.sendCode`
 
 Parameters:
 
-```
 phone_number - Json encoded string
 sms_type - Json encoded int
 api_id - Json encoded int
 api_hash - Json encoded string
 lang_code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

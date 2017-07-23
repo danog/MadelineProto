@@ -52,7 +52,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getChats
-* params - {"offset_order": long, "offset_chat_id": long, "limit": int, }
+* params - `{"offset_order": long, "offset_chat_id": long, "limit": int, }`
 
 
 
@@ -62,12 +62,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChats`
 
 Parameters:
 
-```
 offset_order - Json encoded long
 offset_chat_id - Json encoded long
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.checkChatInvite
-* params - {"hash": "string", }
+* params - `{"hash": "string", }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.checkChatInvite`
 
 Parameters:
 
-```
 hash - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

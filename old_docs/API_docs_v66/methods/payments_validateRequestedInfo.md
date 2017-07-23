@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - payments.validateRequestedInfo
-* params - {"save": Bool, "msg_id": int, "info": PaymentRequestedInfo, }
+* params - `{"save": Bool, "msg_id": int, "info": PaymentRequestedInfo, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.validateRequestedInf
 
 Parameters:
 
-```
 save - Json encoded Bool
 msg_id - Json encoded int
 info - Json encoded PaymentRequestedInfo
 
-```
+
 
 Or, if you're into Lua:
 

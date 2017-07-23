@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.changeStickerPosition
-* params - {"sticker": InputDocument, "position": int, }
+* params - `{"sticker": InputDocument, "position": int, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.changeStickerPositio
 
 Parameters:
 
-```
 sticker - Json encoded InputDocument
 position - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

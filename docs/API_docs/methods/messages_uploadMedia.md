@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.uploadMedia
-* params - {"peer": InputPeer, "media": InputMedia, }
+* params - `{"peer": InputPeer, "media": InputMedia, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.uploadMedia`
 
 Parameters:
 
-```
 peer - Json encoded InputPeer
 media - Json encoded InputMedia
 
-```
+
 
 Or, if you're into Lua:
 

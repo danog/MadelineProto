@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.signIn
-* params - {"phone_number": "string", "phone_code_hash": "string", "phone_code": "string", }
+* params - `{"phone_number": "string", "phone_code_hash": "string", "phone_code": "string", }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.signIn`
 
 Parameters:
 
-```
 phone_number - Json encoded string
 phone_code_hash - Json encoded string
 phone_code - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

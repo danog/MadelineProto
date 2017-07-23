@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getDialogs
-* params - {"offset": int, "max_id": int, "limit": int, }
+* params - `{"offset": int, "max_id": int, "limit": int, }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDialogs`
 
 Parameters:
 
-```
 offset - Json encoded int
 max_id - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

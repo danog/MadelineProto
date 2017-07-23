@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.toggleChatAdmins
-* params - {"chat_id": InputPeer, "enabled": Bool, }
+* params - `{"chat_id": InputPeer, "enabled": Bool, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.toggleChatAdmins`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 enabled - Json encoded Bool
 
-```
+
 
 Or, if you're into Lua:
 

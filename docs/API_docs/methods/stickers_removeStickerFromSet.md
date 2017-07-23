@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - stickers.removeStickerFromSet
-* params - {"sticker": InputDocument, }
+* params - `{"sticker": InputDocument, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/stickers.removeStickerFromSet
 
 Parameters:
 
-```
 sticker - Json encoded InputDocument
 
-```
+
 
 Or, if you're into Lua:
 

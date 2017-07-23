@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - finishFileGeneration
-* params - {"generation_id": long, }
+* params - `{"generation_id": long, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/finishFileGeneration`
 
 Parameters:
 
-```
 generation_id - Json encoded long
 
-```
+
 
 Or, if you're into Lua:
 

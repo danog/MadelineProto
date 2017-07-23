@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - importChatInviteLink
-* params - {"invite_link": "string", }
+* params - `{"invite_link": "string", }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/importChatInviteLink`
 
 Parameters:
 
-```
 invite_link - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

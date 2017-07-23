@@ -53,7 +53,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getChatHistory
-* params - {"chat_id": InputPeer, "from_message_id": long, "offset": int, "limit": int, }
+* params - `{"chat_id": InputPeer, "from_message_id": long, "offset": int, "limit": int, }`
 
 
 
@@ -63,13 +63,12 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChatHistory`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 from_message_id - Json encoded long
 offset - Json encoded int
 limit - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

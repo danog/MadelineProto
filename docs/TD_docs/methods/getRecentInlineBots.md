@@ -49,7 +49,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - getRecentInlineBots
-* params - {}
+* params - `{}`
 
 
 
@@ -59,9 +59,8 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getRecentInlineBots`
 
 Parameters:
 
-```
 
-```
+
 
 Or, if you're into Lua:
 

@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.migrateChat
-* params - {"chat_id": InputPeer, }
+* params - `{"chat_id": InputPeer, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.migrateChat`
 
 Parameters:
 
-```
 chat_id - Json encoded InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

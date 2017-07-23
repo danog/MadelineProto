@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.reorderPinnedDialogs
-* params - {"force": Bool, "order": [InputPeer], }
+* params - `{"force": Bool, "order": [InputPeer], }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reorderPinnedDialogs
 
 Parameters:
 
-```
 force - Json encoded Bool
 order - Json encoded  array of InputPeer
 
-```
+
 
 Or, if you're into Lua:
 

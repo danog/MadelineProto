@@ -47,7 +47,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.createChannel
-* params - {"title": "string", "about": "string", "users": [InputUser], }
+* params - `{"title": "string", "about": "string", "users": [InputUser], }`
 
 
 
@@ -57,12 +57,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.createChannel`
 
 Parameters:
 
-```
 title - Json encoded string
 about - Json encoded string
 users - Json encoded  array of InputUser
 
-```
+
 
 Or, if you're into Lua:
 

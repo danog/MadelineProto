@@ -48,7 +48,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - test.squareInt
-* params - {"x": int, }
+* params - `{"x": int, }`
 
 
 
@@ -58,10 +58,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/test.squareInt`
 
 Parameters:
 
-```
 x - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 

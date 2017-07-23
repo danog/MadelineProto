@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.deleteUserHistory
-* params - {"channel": InputChannel, "user_id": InputUser, }
+* params - `{"channel": InputChannel, "user_id": InputUser, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.deleteUserHistory`
 
 Parameters:
 
-```
 channel - Json encoded InputChannel
 user_id - Json encoded InputUser
 
-```
+
 
 Or, if you're into Lua:
 

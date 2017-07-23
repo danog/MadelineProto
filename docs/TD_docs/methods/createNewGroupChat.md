@@ -51,7 +51,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - createNewGroupChat
-* params - {"user_ids": [int], "title": "string", }
+* params - `{"user_ids": [int], "title": "string", }`
 
 
 
@@ -61,11 +61,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/createNewGroupChat`
 
 Parameters:
 
-```
 user_ids - Json encoded  array of int
 title - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

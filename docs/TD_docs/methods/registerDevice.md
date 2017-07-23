@@ -50,7 +50,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - registerDevice
-* params - {"device_token": DeviceToken, }
+* params - `{"device_token": DeviceToken, }`
 
 
 
@@ -60,10 +60,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/registerDevice`
 
 Parameters:
 
-```
 device_token - Json encoded DeviceToken
 
-```
+
 
 Or, if you're into Lua:
 

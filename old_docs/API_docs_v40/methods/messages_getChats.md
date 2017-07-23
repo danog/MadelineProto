@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getChats
-* params - {"id": [InputChat], }
+* params - `{"id": [InputChat], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getChats`
 
 Parameters:
 
-```
 id - Json encoded  array of InputChat
 
-```
+
 
 Or, if you're into Lua:
 

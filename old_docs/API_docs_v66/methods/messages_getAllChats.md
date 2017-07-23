@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getAllChats
-* params - {"except_ids": [int], }
+* params - `{"except_ids": [int], }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getAllChats`
 
 Parameters:
 
-```
 except_ids - Json encoded  array of int
 
-```
+
 
 Or, if you're into Lua:
 

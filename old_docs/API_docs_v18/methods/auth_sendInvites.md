@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - auth.sendInvites
-* params - {"phone_numbers": ["string"], "message": "string", }
+* params - `{"phone_numbers": ["string"], "message": "string", }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.sendInvites`
 
 Parameters:
 
-```
 phone_numbers - Json encoded  array of string
 message - Json encoded string
 
-```
+
 
 Or, if you're into Lua:
 

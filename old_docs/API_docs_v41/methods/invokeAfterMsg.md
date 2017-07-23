@@ -46,7 +46,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - invokeAfterMsg
-* params - {"msg_id": long, "query": !X, }
+* params - `{"msg_id": long, "query": !X, }`
 
 
 
@@ -56,11 +56,10 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/invokeAfterMsg`
 
 Parameters:
 
-```
 msg_id - Json encoded long
 query - Json encoded !X
 
-```
+
 
 Or, if you're into Lua:
 

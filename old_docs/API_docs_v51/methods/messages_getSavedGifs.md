@@ -45,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.getSavedGifs
-* params - {"hash": int, }
+* params - `{"hash": int, }`
 
 
 
@@ -55,10 +55,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getSavedGifs`
 
 Parameters:
 
-```
 hash - Json encoded int
 
-```
+
 
 Or, if you're into Lua:
 
