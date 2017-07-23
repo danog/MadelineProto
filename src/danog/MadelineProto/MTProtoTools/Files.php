@@ -353,8 +353,11 @@ trait Files
 
         return true;
     }
+
     private $cdn_hashes = [];
-    private function add_cdn_hashes($file, $hashes) {
+
+    private function add_cdn_hashes($file, $hashes)
+    {
         if (!isset($this->cdn_hashes[$file])) {
             $this->cdn_hashes = [];
         }
@@ -362,7 +365,9 @@ trait Files
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => $hash['hash']];
         }
     }
-    private function check_cdn_hashes($file, $offset, $data, &$datacenter) {
+
+    private function check_cdn_hashes($file, $offset, $data, &$datacenter)
+    {
         if (!isset($this->cdn_hashes[$file][$offset])) {
             $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
         }
@@ -373,7 +378,8 @@ trait Files
             throw new \danog\MadelineProto\SecurityException('CDN hashe mismatch for offset '.$offset);
         }
     }
-    private function clear_cdn_hashes($file) {
-        
+
+    private function clear_cdn_hashes($file)
+    {
     }
 }
