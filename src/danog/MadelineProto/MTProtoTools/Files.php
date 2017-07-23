@@ -35,7 +35,7 @@ trait Files
                 \danog\MadelineProto\Logger::log(['Upload status: '.$percent.'%'], \danog\MadelineProto\Logger::NOTICE);
             };
         }
-        $part_size = 512 * 1024;
+        $part_size = 128 * 1024;
         $part_total_num = (int) ceil($file_size / $part_size);
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
@@ -306,7 +306,7 @@ trait Files
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
-                $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]);
+                $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 continue;
             }
             if ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
@@ -352,5 +352,28 @@ trait Files
         }
 
         return true;
+    }
+    private $cdn_hashes = [];
+    private function add_cdn_hashes($file, $hashes) {
+        if (!isset($this->cdn_hashes[$file])) {
+            $this->cdn_hashes = [];
+        }
+        foreach ($hashes as $hash) {
+            $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => $hash['hash']];
+        }
+    }
+    private function check_cdn_hashes($file, $offset, $data, &$datacenter) {
+        if (!isset($this->cdn_hashes[$file][$offset])) {
+            $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
+        }
+        if (!isset($this->cdn_hashes[$file][$offset])) {
+            throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
+        }
+        if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
+            throw new \danog\MadelineProto\SecurityException('CDN hashe mismatch for offset '.$offset);
+        }
+    }
+    private function clear_cdn_hashes($file) {
+        
     }
 }

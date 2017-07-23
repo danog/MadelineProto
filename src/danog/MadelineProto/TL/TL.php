@@ -631,7 +631,7 @@ trait TL
             if ($this->in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
-            if ($this->in_array($arg['name'], ['peer_tag'])) {
+            if ($this->in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
 

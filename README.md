@@ -16,7 +16,7 @@ Also note that MadelineProto will perform better if python and a big math extens
 
 This project is in beta state.  
 
-The MadelineProto API documentation can be found [here (layer 68)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
+The MadelineProto API documentation can be found [here (layer 70)](https://daniil.it/MadelineProto/API_docs/). VERY IMPORTANT READ THIS. 
 
 
 Features:

@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 54;
+    const V = 56;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -77,6 +77,7 @@ class MTProto extends \Volatile
         'updates.getState'             => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
 
         'upload.getCdnFile'      => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getCdnFileHashes'      => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
         'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
         'upload.getFile'         => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
         'upload.saveFilePart'    => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
@@ -195,6 +196,11 @@ class MTProto extends \Volatile
 
         // Detect ipv6
         $this->ipv6 = strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
+
+        if (isset($matches[1]) && self::V < (int) $matches[1]) {
+            throw new \danog\MadelineProto\Exception('Please update to the latest version of MadelineProto.', 0, null, 'MadelineProto', 1);
+        }
 
         // Parse settings
         $this->parse_settings($settings);
@@ -279,7 +285,7 @@ class MTProto extends \Volatile
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-        if (isset($matches[1]) && self::V !== $matches[1]) {
+        if (isset($matches[1]) && self::V < (int) $matches[1]) {
             throw new \danog\MadelineProto\Exception('Please update to the latest version of MadelineProto.', 0, null, 'MadelineProto', 1);
         }
         $keys = array_keys((array) get_object_vars($this));
@@ -504,10 +510,10 @@ class MTProto extends \Volatile
                 'lang_code'       => 'en',
             ],
             'tl_schema'     => [ // TL scheme files
-                'layer'         => 68, // layer version
+                'layer'         => 70, // layer version
                 'src'           => [
                     'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram'     => __DIR__.'/TL_telegram_v68.tl', // telegram TL scheme
+                    'telegram'     => __DIR__.'/TL_telegram_v70.tl', // telegram TL scheme
                     'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
                     //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
@@ -528,7 +534,7 @@ class MTProto extends \Volatile
                 'logger_param'       => '/tmp/MadelineProto.log',
                 'logger'             => 3, // overwrite previous setting and echo logs
                 'logger_level'       => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
-                'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d',
+                'rollbar_token'      => 'c07d9b2f73c2461297b0beaef6c1662f',
                 //'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
             ],
             'max_tries'         => [
@@ -589,7 +595,7 @@ class MTProto extends \Volatile
 
     public function setup_logger()
     {
-        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => (isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5'])) ? $this->settings['logger']['rollbar_token'] : 'beef2d426496462ba34dcaad33d44a14'], false, false);
+        \Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => (isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14'])) || $this->settings['pwr']['pwr'] ? $this->settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
         \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
 
