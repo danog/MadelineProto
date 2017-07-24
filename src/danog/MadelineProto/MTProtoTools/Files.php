@@ -354,6 +354,7 @@ trait Files
         if ($cdn) {
             $this->clear_cdn_hashes($message_media['file_token']);
         }
+
         return true;
     }
 
@@ -381,12 +382,14 @@ trait Files
             throw new \danog\MadelineProto\SecurityException('CDN hashe mismatch for offset '.$offset);
         }
         unset($this->cdn_hashes[$file][$offset]);
+
         return true;
     }
 
     private function clear_cdn_hashes($file)
     {
         unset($this->cdn_hashes[$file]);
+
         return true;
     }
 }
