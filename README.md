@@ -423,7 +423,7 @@ You can also run [this script](https://daniil.it/php.sh), that will compile the 
 
 It accepts one parameter with the ID of the person to call, and returns a VoIP object that can be used to play audio files, set the hold files, change the configuration and set the output file.
 
-Input/output audio can be converted from/to any audio/video file using ffmpeg (just don't forget to provide the correct number of channels, sample rate and bit depth, `fmpeg -i anyaudioorvideo -f s"$bitnumber"le -ac $channelNumber -ar $bitRate -acodec pcm_s"$bitnumber"le output.raw`).
+Input/output audio can be converted from/to any audio/video file using ffmpeg (just don't forget to provide the correct number of channels, sample rate and bit depth, `ffmpeg -i anyaudioorvideo -f s"$bitnumber"le -ac $channelNumber -ar $bitRate -acodec pcm_s"$bitnumber"le output.raw`).
 
 You can also stream the audio track of video streams (even from youtube), or audio streams. Just stream the data to a FIFO, and use ffmpeg to output the converted audio to another FIFO that will be used as input file.
 
