@@ -20,10 +20,12 @@
         "ext-curl": "*",
         "ext-sockets": "*",
         "ext-xml": "*"
-
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
+    },
+    "suggest": {
+        "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https:/github.com/danog/php-libtgvoip)"
     },
     "authors": [
         {
