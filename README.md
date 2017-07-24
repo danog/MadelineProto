@@ -433,7 +433,7 @@ MadelineProto works using raw signed PCM audio with the sample rate and the bit 
 Requesting calls is easy, just run the `request_call` method.
 
 ```
-$controller = $MadelineProto->request_call('@danogentili')->play('input.raw')->then('inputb.raw')->setHoldFiles(['hold.raw'])->setOutputFile('output.raw');
+$controller = $MadelineProto->request_call('@danogentili')->play('input.raw')->then('inputb.raw')->playOhHold(['hold.raw'])->setOutputFile('output.raw');
 $controller->configuration['log_file_path'] = $controller->getOtherID().'.log';
 
 // We need to receive updates in order to know that the other use accepted the call
