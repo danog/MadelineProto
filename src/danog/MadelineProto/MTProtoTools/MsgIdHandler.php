@@ -28,14 +28,14 @@ trait MsgIdHandler
         }
         $max_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta + 30))->bitwise_leftShift(32);
         if ($max_message_id->compare($new_message_id) < 0) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.').');
+            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.'). Consider syncing your date.');
         }
         if ($aargs['outgoing']) {
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4.');
+                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4. Consider syncing your date.');
             }
             if (!\danog\MadelineProto\Logger::$has_thread && $new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], false)) <= 0) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.').', 1);
+                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', 1);
             }
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
@@ -54,11 +54,11 @@ trait MsgIdHandler
             $key = $this->get_max_id($aargs['datacenter'], true);
             if ($aargs['container']) {
                 if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) >= 0) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal to the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.'], \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
                 if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) <= 0) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.').'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.'], \danog\MadelineProto\Logger::WARNING);
                 }
             }
 
