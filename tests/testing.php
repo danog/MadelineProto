@@ -29,7 +29,9 @@ if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(getcwd());
     $dotenv->load();
 }
-
+if (getenv('TEST_SECRET_CHAT') == '') {
+    die('TEST_SECRET_CHAT is not defined in .env, please define it.'.PHP_EOL);
+}
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 

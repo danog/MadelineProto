@@ -195,7 +195,7 @@ class MTProto extends \Volatile
         \danog\MadelineProto\Logger::class_exists();
 
         // Detect ipv6
-        $this->ipv6 = strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
 
         if (isset($matches[1]) && self::V < (int) $matches[1]) {
