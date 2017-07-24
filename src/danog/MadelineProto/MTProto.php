@@ -276,7 +276,7 @@ class MTProto extends \Volatile
             return;
         }
         foreach ($this->calls as $id => $controller) {
-            if (is_array($controller)) {
+            if (!is_object($controller)) {
                 unset($this->calls[$id]);
             } elseif ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $controller->discard();

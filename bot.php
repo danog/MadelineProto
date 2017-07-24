@@ -29,7 +29,27 @@ try {
 }
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
+/*
+$dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
+$MadelineProto->API->updates_state['sync_loading'] = true;
+$res = ['dialogs' => [0]];
+$datacenter = $MadelineProto->API->datacenter->curdc;
+        $count = 0;
+        while (count($res['dialogs'])) {
+            \danog\MadelineProto\Logger::log(['Getting dialogs...']);
+            $res = $MadelineProto->API->method_call('messages.getDialogs', $MadelineProto->API->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $count += count($res['dialogs']);
+            $old_params = $MadelineProto->API->dialog_params;
+            $MadelineProto->API->dialog_params['offset_date'] = end($res['messages'])['date'];
+            $MadelineProto->API->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
+            $MadelineProto->API->dialog_params['offset_id'] = end($res['messages'])['id'];
+            if ($MadelineProto->API->dialog_params === $old_params) {
+                break;
+            }
+        }
 
+        $MadelineProto->API->updates_state['sync_loading'] = false;
+*/
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
