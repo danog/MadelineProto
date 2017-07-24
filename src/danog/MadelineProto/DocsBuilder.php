@@ -751,7 +751,7 @@ Call states (these constants are incrementing integers, thus can be compared lik
 
 * `getState()` - Gets the controller state, as a VoIPController state constant
 * `getCallState()` - Gets the call state, as a call state constant
-* `getVisualization()` - Gets the visualization of the encryption key, as an array of emojis
+* `getVisualization()` - Gets the visualization of the encryption key, as an array of emojis, can be called only when the call state is bigger than or equal to `CALL_STATE_READY`. If called sooner, returns false.
 * `getStats()` Gets connection stats
 * `getOtherID()` - Gets the id of the other call participant, as a bot API ID
 * `getProtocol()` - Gets the protocol used by the current call, as a [PhoneCallProtocol](https://daniil.it/MadelineProto/API_docs/types/PhoneCallProtocol.html) object
