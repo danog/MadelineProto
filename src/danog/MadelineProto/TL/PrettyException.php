@@ -40,6 +40,6 @@ trait PrettyException
                 $tl = false;
             }
         }
-        $this->tl_trace = $this->tl_trace.$init !== '' ? "['".$init."']" : '';
+        $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
     }
 }
