@@ -292,11 +292,10 @@ trait PeerHandler
 
     public function get_full_info($id)
     {
-        $id = $this->get_info($id)['bot_api_id'];
-        if (time() - $this->full_chat_last_updated($id) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
-            return $this->full_chats[$id];
-        }
         $partial = $this->get_info($id);
+        if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
+            return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
+        }
         switch ($partial['type']) {
             case 'user':
             case 'bot':
@@ -312,11 +311,12 @@ trait PeerHandler
             $full = $this->method_call('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
             break;
         }
-        $partial['full'] = $full;
-        $partial['last_update'] = time();
-        $this->full_chats[$partial['bot_api_id']] = $partial;
+        $res = [];
+        $res['full'] = $full;
+        $res['last_update'] = time();
+        $this->full_chats[$partial['bot_api_id']] = $res;
 
-        return $partial;
+        return array_merge($partial, $res);
     }
 
     public function get_pwr_chat($id, $fullfetch = true, $send = true)

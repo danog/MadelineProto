@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 58;
+    const V = 59;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -67,10 +67,10 @@ class MTProto extends \Volatile
         'messages.discardEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
         'messages.requestEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats',
 
-        'phone.requestCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
-        'phone.acceptCall'  => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
-        'phone.confirmCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
-        'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling calls',
+        'phone.requestCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls',
+        'phone.acceptCall'  => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls',
+        'phone.confirmCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls',
+        'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls',
 
         'updates.getChannelDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
         'updates.getDifference'        => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
@@ -196,11 +196,6 @@ class MTProto extends \Volatile
 
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-        preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-
-        if (isset($matches[1]) && self::V < (int) $matches[1]) {
-            throw new \danog\MadelineProto\Exception('Please update to the latest version of MadelineProto.', 0, null, 'MadelineProto', 1);
-        }
 
         // Parse settings
         $this->parse_settings($settings);
@@ -276,18 +271,18 @@ class MTProto extends \Volatile
             return;
         }
         foreach ($this->calls as $id => $controller) {
-            if (!is_object($controller) || $controller->getMadeline() !== $this) {
+            if (!is_object($controller)) {
                 unset($this->calls[$id]);
-            } elseif ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+            } else if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $controller->setMadeline($this);
                 $controller->discard();
+            } else {
+                $controller->setMadeline($this);
             }
         }
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-        if (isset($matches[1]) && self::V < (int) $matches[1]) {
-            throw new \danog\MadelineProto\Exception('Please update to the latest version of MadelineProto.', 0, null, 'MadelineProto', 1);
-        }
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
@@ -331,6 +326,9 @@ class MTProto extends \Volatile
             unset($settings['tl_schema']);
             if (isset($settings['authorization']['rsa_key'])) {
                 unset($settings['authorization']['rsa_key']);
+            }
+            foreach ($this->full_chats as $id => $full) {
+                $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
             }
             foreach ($settings['connection_settings'] as $key => &$connection) {
                 if (!is_array($connection)) {

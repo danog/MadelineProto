@@ -29,27 +29,8 @@ try {
 }
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
-/*
-$dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
-$MadelineProto->API->updates_state['sync_loading'] = true;
-$res = ['dialogs' => [0]];
-$datacenter = $MadelineProto->API->datacenter->curdc;
-        $count = 0;
-        while (count($res['dialogs'])) {
-            \danog\MadelineProto\Logger::log(['Getting dialogs...']);
-            $res = $MadelineProto->API->method_call('messages.getDialogs', $MadelineProto->API->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
-            $count += count($res['dialogs']);
-            $old_params = $MadelineProto->API->dialog_params;
-            $MadelineProto->API->dialog_params['offset_date'] = end($res['messages'])['date'];
-            $MadelineProto->API->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
-            $MadelineProto->API->dialog_params['offset_id'] = end($res['messages'])['id'];
-            if ($MadelineProto->API->dialog_params === $old_params) {
-                break;
-            }
-        }
+echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 
-        $MadelineProto->API->updates_state['sync_loading'] = false;
-*/
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
@@ -72,7 +53,7 @@ while (true) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                 }
                 try {
-                    if (isset($update['update']['message']['from_id']) && isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
+                    if (isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
                         $time = time();
                         $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);

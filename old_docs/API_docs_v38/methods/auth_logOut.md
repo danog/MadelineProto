@@ -6,6 +6,11 @@ description: auth.logOut parameters, return type and example
 [Back to methods index](index.md)
 
 
+*You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)*
+
+
+
+
 
 
 ### Return type: [Bool](../types/Bool.md)

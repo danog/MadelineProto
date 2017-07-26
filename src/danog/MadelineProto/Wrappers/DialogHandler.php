@@ -20,10 +20,10 @@ trait DialogHandler
             $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
         }
         $this->updates_state['sync_loading'] = true;
-        $res = ['dialogs' => [0]];
+        $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $count = 0;
-        while (count($res['dialogs'])) {
+        while ($count < $res['count']) {
             \danog\MadelineProto\Logger::log(['Getting dialogs...']);
             $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $count += count($res['dialogs']);

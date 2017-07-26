@@ -6,6 +6,11 @@ description: phone.discardCall parameters, return type and example
 [Back to methods index](index.md)
 
 
+*You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls*
+
+
+
+
 ### Parameters:
 
 | Name     |    Type       | Required |

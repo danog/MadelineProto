@@ -14,9 +14,13 @@ namespace danog\MadelineProto;
 
 class Exception extends \Exception
 {
+    use TL\PrettyException;
+    public function __toString() {
+        return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
+    }
     public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
     {
-        parent::__construct($message, $code, $previous);
+        $this->prettify_tl();
         if ($file !== null) {
             if (basename($file) === 'Threaded.php') {
                 $line = debug_backtrace(0)[2]['line'];
@@ -27,16 +31,18 @@ class Exception extends \Exception
         if ($line !== null) {
             $this->line = $line;
         }
-        if (\danog\MadelineProto\Logger::$constructed) {
+        parent::__construct($message, $code, $previous);
+
+/*        if (\danog\MadelineProto\Logger::$constructed) {
             \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
-        }
-        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden'])) {
+        }*/
+        if (in_array($message, ['Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.'])) {
             return;
         }
-        if (strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, "Couldn't get response") !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, 'id.pwrtelegram.xyz') !== false) {
+        if (strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, "Couldn't get response") !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, 'id.pwrtelegram.xyz') !== false || strpos($message, 'Please update ') !== false || strpos($message, 'posix_isatty') !== false) {
             return;
         }
-        \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
+//        \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
     }
 
     /**
@@ -50,7 +56,6 @@ class Exception extends \Exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
         }
-        $e = new self($errstr, $errno, null, $errfile, $errline);
-        throw $e;
+        throw new self($errstr, $errno, null, $errfile, $errline);
     }
 }

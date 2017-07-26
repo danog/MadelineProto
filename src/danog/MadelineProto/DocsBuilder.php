@@ -204,6 +204,9 @@ description: '.$description.'
 
 
 ';
+            if (isset(MTProto::DISALLOWED_METHODS[$rmethod])) {
+                $header .= '*'.MTProto::DISALLOWED_METHODS[$rmethod]."*\n\n\n\n\n";
+            }
             if ($this->td) {
                 $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
@@ -898,22 +901,22 @@ A string of bytes of variable length, with length smaller than or equal to 16777
 
         file_put_contents('types/int.md', '---
 title: integer
-description: A 32 bit signed integer ranging from -2147483647 to 2147483647
+description: A 32 bit signed integer ranging from -2147483648 to 2147483647
 ---
 ## Type: int  
 [Back to constructor index](index.md)
 
-A 32 bit signed integer ranging from `-2147483647` to `2147483647`.
+A 32 bit signed integer ranging from `-2147483648` to `2147483647`.
 ');
 
         file_put_contents('types/long.md', '---
 title: long
-description: A 32 bit signed integer ranging from -9223372036854775807 to 9223372036854775807
+description: A 32 bit signed integer ranging from -9223372036854775808 to 9223372036854775807
 ---
 ## Type: long  
 [Back to constructor index](index.md)
 
-A 64 bit signed integer ranging from `-9223372036854775807` to `9223372036854775807`.
+A 64 bit signed integer ranging from `-9223372036854775808` to `9223372036854775807`.
 ');
 
         file_put_contents('types/int128.md', '---

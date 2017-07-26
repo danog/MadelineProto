@@ -111,7 +111,7 @@ trait AuthKeyHandler
                     'new_nonce'       => $new_nonce,
                     'expires_in'      => $expires_in,
                 ];
-                $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized);
+                $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
 
                 /*
                 * ***********************************************************************
@@ -286,7 +286,7 @@ trait AuthKeyHandler
                             'server_nonce'    => $server_nonce,
                             'retry_id'        => $retry_id,
                             'g_b'             => $g_b_str,
-                        ]
+                        ], 'client_DH_inner_data'
                     );
 
                     /*
@@ -530,7 +530,7 @@ trait AuthKeyHandler
                         'perm_auth_key_id'            => $perm_auth_key_id,
                         'temp_session_id'             => $temp_session_id,
                         'expires_at'                  => $expires_at,
-                    ]
+                    ], 'bind_temp_auth_key_inner'
                 );
                 $message_id = $this->generate_message_id($datacenter);
 

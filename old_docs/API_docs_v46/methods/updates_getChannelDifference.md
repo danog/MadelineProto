@@ -6,6 +6,11 @@ description: updates.getChannelDifference parameters, return type and example
 [Back to methods index](index.md)
 
 
+*You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates*
+
+
+
+
 ### Parameters:
 
 | Name     |    Type       | Required |

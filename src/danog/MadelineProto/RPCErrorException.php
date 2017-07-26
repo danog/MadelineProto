@@ -14,12 +14,15 @@ namespace danog\MadelineProto;
 
 class RPCErrorException extends \Exception
 {
+    use TL\PrettyException;
+    public function __toString() { return 'Telegram returned an RPC error: '.$this->message.' ('.$this->rpc.'), caused by '.$this->file.':'.$this->line.PHP_EOL.PHP_EOL.'TL trace:'.PHP_EOL.$this->getTLTrace().PHP_EOL; }
     public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         $this->rpc = $message;
         switch ($message) {
             case 'RPC_MCGET_FAIL':
             case 'RPC_CALL_FAIL': $message = 'Telegram is having internal issues, please try again later.'; break;
+            case 'USER_PRIVACY_RESTRICTED':$message = "The user's privacy settings do not allow you to do this"; break;
             case 'CHANNEL_PRIVATE':$message = "You haven't joined this channel/supergroup"; break;
             case 'FLOOD_WAIT_666':$message = 'Spooky af m8'; break;
             case 'USER_IS_BOT':$message = "Bots can't send messages to themselves"; break;
@@ -60,15 +63,18 @@ class RPCErrorException extends \Exception
             case -429: $message = 'Too many requests'; break;
         }
         parent::__construct($message, $code, $previous);
-        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED'])) {
+        $this->prettify_tl();
+        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN'])) {
             return;
         }
         if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
             return;
         }
         $additional = [];
-        foreach (debug_backtrace() as $level) {
+        foreach ($this->getTrace() as $level) {
             if (isset($level['function']) && $level['function'] === 'method_call') {
+                $this->line = $level['line'];
+                $this->file = $level['file'];
                 $additional = $level['args'];
                 break;
             }

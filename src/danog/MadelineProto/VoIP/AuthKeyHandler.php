@@ -250,7 +250,6 @@ trait AuthKeyHandler
             \danog\MadelineProto\Logger::log(['Saving debug data for call '.$call['id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
-        $this->handle_future_salts($this->calls[$call['id']]->getOtherID());
         $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
             $this->pwr_update_handler($update);

@@ -60,9 +60,9 @@ class Serialization
                 $unserialized = \danog\Serialization::unserialize($unserialized);
             } catch (Bug74586Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
-            } catch (Exception $e) {
+            /*} catch (Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
-            } catch (\Error $e) {
+            */} catch (\Error $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
             }
         } else {

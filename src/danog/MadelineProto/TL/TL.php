@@ -226,11 +226,6 @@ trait TL
         return $this->methods->method_namespace;
     }
 
-    public function serialize_bool($bool)
-    {
-        return $this->constructors->find_by_predicate($bool ? 'boolTrue' : 'boolFalse')['id'];
-    }
-
     public function deserialize_bool($id)
     {
         $tl_elem = $this->constructors->find_by_id($id);
@@ -241,18 +236,18 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object($type, $object, $layer = -1)
+    public function serialize_object($type, $object, $ctx, $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
                 if (!is_numeric($object)) {
-                    throw new Exception('given value ('.$object.") isn't numeric");
+                    throw new Exception("given value isn't numeric");
                 }
 
                 return $this->pack_signed_int($object);
             case '#':
                 if (!is_numeric($object)) {
-                    throw new Exception('given value ('.$object.") isn't numeric");
+                    throw new Exception("given value isn't numeric");
                 }
 
                 return $this->pack_unsigned_int($object);
@@ -324,7 +319,7 @@ trait TL
 
                 return $concat;
             case 'Bool':
-                return $this->serialize_bool((bool) $object);
+                return $this->constructors->find_by_predicate($bool ? 'boolTrue' : 'boolFalse')['id'];
             case 'true':
                 return;
             case '!X':
@@ -335,8 +330,8 @@ trait TL
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
-                foreach ($object as $current_object) {
-                    $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object);
+                foreach ($object as $k => $current_object) {
+                    $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object, $k);
                 }
 
                 return $concat;
@@ -383,7 +378,7 @@ trait TL
             $concat .= $constructorData['id'];
         }
 
-        return $concat.$this->serialize_params($constructorData, $object, $layer);
+        return $concat.$this->serialize_params($constructorData, $object, $constructorData['predicate'], $layer);
     }
 
     public function serialize_method($method, $arguments)
@@ -393,10 +388,10 @@ trait TL
             throw new Exception('Could not find method: '.$method);
         }
 
-        return $tl['id'].$this->serialize_params($tl, $arguments);
+        return $tl['id'].$this->serialize_params($tl, $arguments, $method);
     }
 
-    public function serialize_params($tl, $arguments, $layer = -1)
+    public function serialize_params($tl, $arguments, $ctx, $layer = -1)
     {
         $serialized = '';
 
@@ -430,11 +425,11 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + (4 * (random_int(0, PHP_INT_MAX) % 3))));
+                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + (4 * (random_int(0, PHP_INT_MAX) % 3))), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($arguments['message'])) {
-                    $serialized .= $this->serialize_object($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']));
+                    $serialized .= $this->serialize_object($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -454,7 +449,7 @@ trait TL
                             }
                     }
                 }
-                throw new Exception('Missing required parameter ('.$current_argument['name'].')');
+                throw new Exception('Missing required parameter', $current_argument['name']);
             }
             if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
@@ -467,7 +462,7 @@ trait TL
             }
 
             //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
-            $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $layer);
+            $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }
 
         return $serialized;

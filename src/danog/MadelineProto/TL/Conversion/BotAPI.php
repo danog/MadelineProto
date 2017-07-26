@@ -232,7 +232,7 @@ trait BotAPI
             return $data;
 
             case 'messageMediaPhoto':
-            $res['caption'] = $data['caption'];
+            if (isset($data['caption'])) $res['caption'] = $data['caption'];
             $res['photo'] = [];
             foreach ($data['photo']['sizes'] as $key => $photo) {
                 $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
@@ -326,9 +326,9 @@ trait BotAPI
             $data['document']['_'] = 'bot_'.$type_name;
             $res['file_size'] = $data['document']['size'];
             $res['mime_type'] = $data['document']['mime_type'];
-            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document']).chr(2)));
+            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document'], 'File').chr(2)));
 
-            return [$type_name => $res, 'caption' => $data['caption']];
+            return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
             throw new Exception("Can't convert ".$data['_'].' to a bot API object');
         }
