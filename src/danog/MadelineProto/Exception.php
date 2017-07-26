@@ -15,9 +15,12 @@ namespace danog\MadelineProto;
 class Exception extends \Exception
 {
     use TL\PrettyException;
-    public function __toString() {
+
+    public function __toString()
+    {
         return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
     }
+
     public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
     {
         $this->prettify_tl();

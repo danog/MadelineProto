@@ -249,7 +249,7 @@ trait CallHandler
                 $server_answer = [$server_answer];
                 foreach ($message_chunks as $message) {
                     $args['message'] = $message;
-                    $server_answer[]= $this->method_call($method, $args, $aargs);
+                    $server_answer[] = $this->method_call($method, $args, $aargs);
                 }
             }
 
