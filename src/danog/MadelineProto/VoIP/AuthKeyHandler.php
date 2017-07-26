@@ -73,7 +73,14 @@ trait AuthKeyHandler
         $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
-        $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
+        try {
+            $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            if ($e->RPC === 'CALL_ALREADY_ACCEPTED') {
+                return true;
+            }
+            throw $e;
+        }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
 
         $this->handle_pending_updates();

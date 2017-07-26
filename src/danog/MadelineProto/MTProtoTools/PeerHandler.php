@@ -326,7 +326,7 @@ trait PeerHandler
         switch ($full['type']) {
             case 'user':
             case 'bot':
-                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone', 'lang_code'] as $key) {
+                foreach (['first_name', 'last_name', 'username', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone', 'lang_code', 'bot_nochats'] as $key) {
                     if (isset($full['User'][$key])) {
                         $res[$key] = $full['User'][$key];
                     }
@@ -412,8 +412,26 @@ trait PeerHandler
                 if (isset($participant['inviter_id'])) {
                     $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
                 }
+                if (isset($participant['promoted_by'])) {
+                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, false);
+                }
+                if (isset($participant['kicked_by'])) {
+                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, false);
+                }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
+                }
+                if (isset($participant['admin_rights'])) {
+                    $newres['admin_rights'] = $participant['admin_rights'];
+                }
+                if (isset($participant['banned_rights'])) {
+                    $newres['banned_rights'] = $participant['banned_rights'];
+                }
+                if (isset($participant['can_edit'])) {
+                    $newres['can_edit'] = $participant['can_edit'];
+                }
+                if (isset($participant['left'])) {
+                    $newres['left'] = $participant['left'];
                 }
                 switch ($participant['_']) {
                     case 'chatParticipant':
@@ -435,46 +453,64 @@ trait PeerHandler
             $res['participants'] = [];
             $limit = 200;
             $offset = -$limit;
+            $filters = ['channelParticipantsBanned', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsRecent'];
             $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
             $count = $gres['count'];
-            $key = -1;
-            while ($offset <= $count) {
-                foreach ($gres['participants'] as $participant) {
-                    $newres = [];
-                    $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
-                    $key++;
-                    if (isset($participant['inviter_id'])) {
-                        $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+            while (count($filters)) {
+                $filter = array_pop($filters);
+                while ($offset <= $count) {
+                    foreach ($gres['participants'] as $participant) {
+                        $newres = [];
+                        $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
+                        if (isset($participant['inviter_id'])) {
+                            $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+                        }
+                        if (isset($participant['kicked_by'])) {
+                            $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, false);
+                        }
+                        if (isset($participant['promoted_by'])) {
+                            $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, false);
+                        }
+                        if (isset($participant['date'])) {
+                            $newres['date'] = $participant['date'];
+                        }
+                        switch ($participant['_']) {
+                            case 'channelParticipantSelf':
+                            $newres['role'] = 'user';
+                            if (isset($newres['admin_rights'])) {
+                                $newres['admin_rights'] = $full['Chat']['admin_rights'];
+                            }
+                            if (isset($newres['banned_rights'])) {
+                                $newres['banned_rights'] = $full['Chat']['banned_rights'];
+                            }
+                            break;
+
+                            case 'channelParticipant':
+                            $newres['role'] = 'user';
+                            break;
+
+                            case 'channelParticipantCreator':
+                            $newres['role'] = 'creator';
+                            break;
+
+                            case 'channelParticipantAdmin':
+                            $newres['role'] = 'admin';
+                            break;
+
+                            case 'channelParticipantBanned':
+                            $newres['role'] = 'banned';
+                            break;
+
+                        }
+                        $res['participants'][$participant['user_id']] = $newres;
                     }
-                    if (isset($participant['date'])) {
-                        $newres['date'] = $participant['date'];
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
+
+                    if (empty($gres['participants'])) {
+                        break;
                     }
-                    switch ($participant['_']) {
-                        case 'channelParticipant':
-                        $newres['role'] = 'user';
-                        break;
-
-                        case 'channelParticipantModerator':
-                        $newres['role'] = 'moderator';
-                        break;
-
-                        case 'channelParticipantEditor':
-                        $newres['role'] = 'editor';
-                        break;
-
-                        case 'channelParticipantCreator':
-                        $newres['role'] = 'creator';
-                        break;
-
-                        case 'channelParticipantKicked':
-                        $newres['role'] = 'kicked';
-                        break;
-
-                    }
-                    $res['participants'][$key] = $newres;
                 }
-                $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
-                if (empty($gres['participants'])) {
+                if ($offset >= $count) {
                     break;
                 }
             }

@@ -81,8 +81,15 @@ class Lua
             $cb($result, $cb_extra);
         }
         array_walk_recursive($result, function (&$value, $key) {
-            if ($value instanceof \danog\MadelineProto\TL\Types\Button) {
-                $value = $value->jsonSerialize();
+            if (is_object($value)) {
+                $newval = [];
+                foreach (get_class_methods($value) as $key => $name) {
+                    $newval[$key] = [$value, $name];
+                }
+                foreach ($value as $key => $name) {
+                    $newval[$key] = $name;
+                }
+                $value = $newval;
             }
         });
 

@@ -27,17 +27,17 @@ trait PrettyException
         foreach (array_reverse($this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
-                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:    \t".$frame['args'][2];
+                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:      \t".$frame['args'][2];
                     $tl = true;
                 }
             } else {
                 if ($tl) {
                     $this->tl_trace .= PHP_EOL;
                 }
-                if (isset($frame['function']) && $frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) {
+                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
-                $this->tl_trace .= isset($frame['file']) ? str_pad(basename($frame['file']).'('.$frame['line'].'):', 16)."\t" : '';
+                $this->tl_trace .= isset($frame['file']) ? str_pad(basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
                 $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
                 $this->tl_trace .= isset($frame['args']) ? substr(json_encode($frame['args']), 1, -1) : '';
                 $this->tl_trace .= ')';

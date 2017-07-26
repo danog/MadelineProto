@@ -287,10 +287,15 @@ trait Files
             try {
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->rpc === 'OFFSET_INVALID') {
+                switch ($e->rpc) {
+                    case 'OFFSET_INVALID':
                     \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);
                     break;
-                } else {
+                    case 'FILE_TOKEN_INVALID':
+                    $cdn = false;
+                    continue 2;
+
+                    default:
                     throw $e;
                 }
             }
@@ -306,7 +311,20 @@ trait Files
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
-                $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                try {
+                    $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    switch ($e->rpc) {
+                        case 'FILE_TOKEN_INVALID':
+                        case 'REQUEST_TOKEN_INVALID':
+                        $cdn = false;
+                        continue 2;
+
+                        default:
+                        throw $e;
+                    }
+
+                }
                 continue;
             }
             if ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {

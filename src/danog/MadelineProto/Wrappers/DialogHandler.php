@@ -16,22 +16,20 @@ trait DialogHandler
 {
     public function get_dialogs($force = false)
     {
-        if (!isset($this->dialog_params['offset_date']) || $force) {
-            $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty']];
+        if (!isset($this->dialog_params['offset_date']) || $force || is_null($this->dialog_params['offset_date'])) {
+            $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];
         }
         $this->updates_state['sync_loading'] = true;
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
-        $count = 0;
-        while ($count < $res['count']) {
+        while ($this->dialog_params['count'] < $res['count']) {
             \danog\MadelineProto\Logger::log(['Getting dialogs...']);
             $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
-            $count += count($res['dialogs']);
-            $old_params = $this->dialog_params;
+            $this->dialog_params['count'] += count($res['dialogs']);
             $this->dialog_params['offset_date'] = end($res['messages'])['date'];
             $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
             $this->dialog_params['offset_id'] = end($res['messages'])['id'];
-            if ($this->dialog_params === $old_params) {
+            if (!isset($res['count'])) {
                 break;
             }
         }

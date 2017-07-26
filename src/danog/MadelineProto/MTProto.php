@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 61;
+    const V = 63;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -315,7 +315,7 @@ class MTProto extends \Volatile
                 $this->updates_state['sync_loading'] = isset($trace['args'][1]) && $trace['args'][1];
             }
         }
-
+        $force = false;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log(['Serialization is out of date, reconstructing object!'], Logger::WARNING);
@@ -347,6 +347,7 @@ class MTProto extends \Volatile
             $this->reset_session(true, true);
             $this->config = ['expires' => -1];
             $this->__construct($settings);
+            $force = true;
         }
         $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
@@ -355,7 +356,7 @@ class MTProto extends \Volatile
             $this->get_cdn_config($this->datacenter->curdc);
         }
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
-            $this->get_dialogs();
+            $this->get_dialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
             \danog\MadelineProto\Logger::log(['Getting updates after deserialization...'], Logger::NOTICE);

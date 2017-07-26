@@ -408,7 +408,10 @@ trait BotAPI
             $text = $this->html_entity_decode($node->textContent);
             $href = $node->getAttribute('href');
             if (preg_match('|mention:|', $href)) {
-                $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $this->get_info(str_replace('mention:', '', $href))['InputUser']];
+                if (!isset(($mention = $this->get_info(str_replace('mention:', '', $href)))['InputUser'])) {
+                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+                }
+                $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $mention['InputUser']];
             } elseif (preg_match('|buttonurl:|', $href)) {
                 if (!isset($entities['buttons'])) {
                     $entities['buttons'] = [];

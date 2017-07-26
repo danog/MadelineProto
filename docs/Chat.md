@@ -22,6 +22,7 @@ description: chat attributes, type and example
 |restriction\_reason|[string](API_docs/types/string.md) | Optional|Restriction reason|
 |status|[UserStatus](API_docs/types/UserStatus.md) | Optional|Describes last time user was online|
 |bot\_inline\_placeholder|[string](API_docs/types/string.md) | Optional|Inline placeholder of inline bot|
+|bot\_nochats|[Bool](API_docs/types/Bool.md) | Optional|Can the bot be added to a group|
 |about|[string](API_docs/types/string.md) | Optional|Description of supergroups/channels or bios of users|
 |bot\_info|[BotInfo](API_docs/types/BotInfo.md) | Optional|Bot info of bots|
 |phone\_calls\_available|[Bool](API_docs/types/Bool.md) | Optional|Are phone calls available for that user?|
