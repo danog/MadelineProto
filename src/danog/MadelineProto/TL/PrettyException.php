@@ -15,17 +15,23 @@ namespace danog\MadelineProto\TL;
 trait PrettyException
 {
     private $tl_trace;
-    public function getTLTrace() {
+
+    public function getTLTrace()
+    {
         return $this->tl_trace;
     }
-    public function prettify_tl($init = '') {
+
+    public function prettify_tl($init = '')
+    {
         $tl = false;
-        foreach (array_reverse($this->getTrace()) as $frame){
+        foreach (array_reverse($this->getTrace()) as $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:    \t".$frame['args'][2];
                 $tl = true;
             } else {
-                if ($tl) $this->tl_trace .= PHP_EOL;
+                if ($tl) {
+                    $this->tl_trace .= PHP_EOL;
+                }
                 $this->tl_trace .= isset($frame['file']) ? str_pad(basename($frame['file']).'('.$frame['line'].'):', 16)."\t" : '';
                 $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
                 $this->tl_trace .= isset($frame['args']) ? substr(json_encode($frame['args']), 1, -1) : '';
