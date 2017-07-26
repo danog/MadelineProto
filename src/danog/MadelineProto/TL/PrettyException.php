@@ -26,8 +26,10 @@ trait PrettyException
         $tl = false;
         foreach (array_reverse($this->getTrace()) as $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
-                $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:    \t".$frame['args'][2];
-                $tl = true;
+                if ($frame['args'][2] !== '') {
+                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:    \t".$frame['args'][2];
+                    $tl = true;
+                }
             } else {
                 if ($tl) {
                     $this->tl_trace .= PHP_EOL;
@@ -41,5 +43,6 @@ trait PrettyException
             }
         }
         $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
+        $this->tl_trace = implode(PHP_EOL, array_reverse(explode(PHP_EOL, $this->tl_trace)));
     }
 }

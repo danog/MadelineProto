@@ -378,7 +378,7 @@ trait TL
             $concat .= $constructorData['id'];
         }
 
-        return $concat.$this->serialize_params($constructorData, $object, $constructorData['predicate'], $layer);
+        return $concat.$this->serialize_params($constructorData, $object, '', $layer);
     }
 
     public function serialize_method($method, $arguments)

@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 60;
+    const V = 61;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
