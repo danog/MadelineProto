@@ -455,7 +455,7 @@ trait PeerHandler
             $offset = -$limit;
             $filters = ['channelParticipantsBanned', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsRecent'];
             $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
-            $count = $res['participants_count'] + $res['kicked_count'] + $res['admin_count'];
+            $count = $res['participants_count'] + (isset($res['kicked_count']) ? $res['kicked_count'] : 0) + (isset($res['admins_count']) ? $res['admins_count'] : 0) + (isset($res['banned_count']) ? $res['banned_count'] : 0);
             while (count($filters)) {
                 $filter = array_pop($filters);
                 while ($offset <= $count) {
