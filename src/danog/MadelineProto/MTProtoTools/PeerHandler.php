@@ -452,9 +452,8 @@ trait PeerHandler
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants']) {
             $res['participants'] = [];
             $limit = 200;
-            $filters = ['channelParticipantsBanned', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsRecent'];
-            while (count($filters)) {
-                $filter = array_pop($filters);
+            $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
+            foreach ($filters as $filter) {
                 $offset = -$limit;
                 try {
                     $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
@@ -519,6 +518,7 @@ trait PeerHandler
                     }
                 }
             }
+            $res['participants'] = array_values($res['participants']);
         }
         if ($fullfetch || $send) {
             $this->store_db($res);
