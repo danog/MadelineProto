@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 63;
+    const V = 64;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -191,6 +191,9 @@ class MTProto extends \Volatile
 
     public function ___construct($settings = [])
     {
+        if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
+            throw new Exception('Please install this fork of phpseclib: https://github.com/danog/phpseclib');
+        }
         $this->emojis = json_decode(self::JSON_EMOJIS);
         \danog\MadelineProto\Logger::class_exists();
 
@@ -269,6 +272,9 @@ class MTProto extends \Volatile
         $this->setup_logger();
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
+        }
+        if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
+            throw new Exception('Please install this fork of phpseclib: https://github.com/danog/phpseclib');
         }
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
