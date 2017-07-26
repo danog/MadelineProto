@@ -232,7 +232,9 @@ trait BotAPI
             return $data;
 
             case 'messageMediaPhoto':
-            if (isset($data['caption'])) $res['caption'] = $data['caption'];
+            if (isset($data['caption'])) {
+                $res['caption'] = $data['caption'];
+            }
             $res['photo'] = [];
             foreach ($data['photo']['sizes'] as $key => $photo) {
                 $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);

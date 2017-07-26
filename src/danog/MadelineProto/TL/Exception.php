@@ -15,8 +15,14 @@ namespace danog\MadelineProto\TL;
 class Exception extends \Exception
 {
     use PrettyException;
-    public function __toString() { return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL; }
-    public function __construct($message, $file = '') {
+
+    public function __toString()
+    {
+        return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+    }
+
+    public function __construct($message, $file = '')
+    {
         parent::__construct($message);
         $this->prettify_tl($file);
     }

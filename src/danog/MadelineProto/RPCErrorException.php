@@ -15,7 +15,12 @@ namespace danog\MadelineProto;
 class RPCErrorException extends \Exception
 {
     use TL\PrettyException;
-    public function __toString() { return 'Telegram returned an RPC error: '.$this->message.' ('.$this->rpc.'), caused by '.$this->file.':'.$this->line.PHP_EOL.PHP_EOL.'TL trace:'.PHP_EOL.$this->getTLTrace().PHP_EOL; }
+
+    public function __toString()
+    {
+        return 'Telegram returned an RPC error: '.$this->message.' ('.$this->rpc.'), caused by '.$this->file.':'.$this->line.PHP_EOL.PHP_EOL.'TL trace:'.PHP_EOL.$this->getTLTrace().PHP_EOL;
+    }
+
     public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         $this->rpc = $message;
