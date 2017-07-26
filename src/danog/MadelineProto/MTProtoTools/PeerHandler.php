@@ -459,7 +459,11 @@ trait PeerHandler
                 try {
                     $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    if ($e->rpc === 'CHAT_ADMIN_REQUIRED') continue; else throw $e;
+                    if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
+                        continue;
+                    } else {
+                        throw $e;
+                    }
                 }
                 $count = $gres['count'];
                 while ($offset <= $count) {
@@ -514,7 +518,6 @@ trait PeerHandler
                         break;
                     }
                 }
-
             }
         }
         if ($fullfetch || $send) {
