@@ -323,7 +323,6 @@ trait Files
                         default:
                         throw $e;
                     }
-
                 }
                 continue;
             }
