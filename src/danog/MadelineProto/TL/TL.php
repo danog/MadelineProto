@@ -319,7 +319,7 @@ trait TL
 
                 return $concat;
             case 'Bool':
-                return $this->constructors->find_by_predicate($bool ? 'boolTrue' : 'boolFalse')['id'];
+                return $this->constructors->find_by_predicate(((bool)$object) ? 'boolTrue' : 'boolFalse')['id'];
             case 'true':
                 return;
             case '!X':
