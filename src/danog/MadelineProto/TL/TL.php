@@ -338,7 +338,6 @@ trait TL
 
         }
         $auto = false;
-
         if ((!$this->is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && $this->in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
@@ -348,6 +347,7 @@ trait TL
         }
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);
+
             if ($constructorData === false) {
                 throw new Exception('Predicate was not set!');
             }

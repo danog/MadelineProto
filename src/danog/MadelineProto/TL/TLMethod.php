@@ -17,54 +17,49 @@ class TLMethod extends \Volatile
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;
     use TLParams;
-    public $id = [];
-    public $method = [];
-    public $type = [];
-    public $params = [];
+    public $by_id = [];
+    public $by_method = [];
     public $method_namespace = [];
-    public $key = 0;
 
     public function __sleep()
     {
-        return ['id', 'method', 'type', 'params', 'method_namespace', 'key'];
+        return ['by_id', 'by_method', 'method_namespace'];
     }
 
     public function add($json_dict)
     {
-        $this->id[$this->key] = $json_dict['id'];
-        $this->method[$this->key] = $json_dict['method'];
-        $this->type[$this->key] = $json_dict['type'];
-        $this->params[$this->key] = $json_dict['params'];
+        $this->by_id[$json_dict['id']] = ['method' => $json_dict['method'], 'type' => $json_dict['type'], 'params' => $json_dict['params']];
+        $this->by_method[$json_dict['method']] = $json_dict['id'];
+
         $namespace = explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
             $this->method_namespace[$namespace[1]] = $namespace[0];
         }
 
-        $this->parse_params($this->key);
-        $this->key++;
+        $this->parse_params($json_dict['id']);
     }
 
-    public function find_by_method($method)
-    {
-        $key = array_search($method, (array) $this->method, true);
-
-        return ($key === false) ? false : [
-            'id'                => $this->id[$key],
-            'method'            => $this->method[$key],
-            'type'              => $this->type[$key],
-            'params'            => $this->array_cast_recursive($this->params[$key]),
-        ];
-    }
 
     public function find_by_id($id)
     {
-        $key = array_search($id, (array) $this->id, true);
-
-        return ($key === false) ? false : [
-            'id'                => $this->id[$key],
-            'method'            => $this->method[$key],
-            'type'              => $this->type[$key],
-            'params'            => $this->array_cast_recursive($this->params[$key]),
-        ];
+        if (isset($this->by_id[$id])) {
+            $method = $this->by_id[$id];
+            $method['id'] = $id;
+            $method['params'] = $this->array_cast_recursive($method['params']);
+            return $method;
+        }
+        return false;
     }
+
+    public function find_by_method($method_name)
+    {
+        if (isset($this->by_method[$method_name])) {
+            $method = $this->by_id[$this->by_method[$method_name]];
+            $method['id'] = $this->by_method[$method_name];
+            $method['params'] = $this->array_cast_recursive($method['params']);
+            return $method;
+        }
+        return false;
+    }
+
 }
