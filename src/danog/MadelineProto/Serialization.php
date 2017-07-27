@@ -28,14 +28,14 @@ class Serialization
      */
     public static function serialize($filename, $instance, $force = false)
     {
-        if (!file_exists($lock = '.'.$filename.'.lock')) {
+        if (!file_exists($lock = $filename.'.lock')) {
             touch($lock);
             clearstatcache();
         }
         $lock = fopen($lock, 'r');
         flock($lock, LOCK_EX);
-        $wrote = file_put_contents('.'.$filename, \danog\Serialization::serialize($instance, true));
-        rename('.'.$filename, $filename);
+        $wrote = file_put_contents($filename.'.temp.session', \danog\Serialization::serialize($instance, true));
+        rename($filename.'.temp.session', $filename);
         flock($lock, LOCK_UN);
         fclose($lock);
 
@@ -55,7 +55,7 @@ class Serialization
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         if (file_exists($filename)) {
-            if (!file_exists($lock = '.'.$filename.'.lock')) {
+            if (!file_exists($lock = $filename.'.lock')) {
                 touch($lock);
                 clearstatcache();
             }
