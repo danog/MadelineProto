@@ -14,7 +14,7 @@ namespace danog\MadelineProto\TL;
 
 trait PrettyException
 {
-    private $tl_trace;
+    public $tl_trace;
 
     public function getTLTrace()
     {

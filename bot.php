@@ -17,6 +17,7 @@ $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
+    var_dump($e->getMessage());
     if (file_exists('token.php')) {
         require_once 'token.php';
         $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -27,11 +28,9 @@ try {
         die;
     }
 }
-var_dump($a);
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
-$MadelineProto->messages->sendMessage(['peer' => ['_' => 'inputPeerChat'], 'message' => '']);
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout

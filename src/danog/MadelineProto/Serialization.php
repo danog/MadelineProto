@@ -28,7 +28,17 @@ class Serialization
      */
     public static function serialize($filename, $instance, $force = false)
     {
-        return file_put_contents($filename, \danog\Serialization::serialize($instance, true), LOCK_EX);
+        if (!file_exists($lock = '.'.$filename.'.lock')) {
+            touch($lock);
+            clearstatcache();
+        }
+        $lock = fopen($lock, 'r');
+        flock($lock, LOCK_EX);
+        $wrote = file_put_contents('.'.$filename, \danog\Serialization::serialize($instance, true));
+        rename('.'.$filename, $filename);
+        flock($lock, LOCK_UN);
+        fclose($lock);
+        return $wrote;
     }
 
     /**
@@ -43,13 +53,16 @@ class Serialization
     public static function deserialize($filename, $no_updates = false)
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
-
         if (file_exists($filename)) {
-            $file = fopen($filename, 'r+');
-            flock($file, LOCK_SH);
-            $unserialized = stream_get_contents($file);
-            flock($file, LOCK_UN);
-            fclose($file);
+            if (!file_exists($lock = '.'.$filename.'.lock')) {
+                touch($lock);
+                clearstatcache();
+            }
+            $lock = fopen($lock, 'r');
+            flock($lock, LOCK_SH);
+            $unserialized = file_get_contents($filename);
+            flock($lock, LOCK_UN);
+            fclose($lock);
             $unserialized = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
             foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\Types\Button', 'TL\Types\Bytes', 'APIFactory'] as $class) {
                 class_exists('\danog\MadelineProto\\'.$class);
