@@ -38,6 +38,7 @@ class Serialization
         rename('.'.$filename, $filename);
         flock($lock, LOCK_UN);
         fclose($lock);
+
         return $wrote;
     }
 
