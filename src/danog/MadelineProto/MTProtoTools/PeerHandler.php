@@ -452,12 +452,19 @@ trait PeerHandler
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants']) {
             $res['participants'] = [];
             $limit = 200;
-            $offset = -$limit;
-            $filters = ['channelParticipantsBanned', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsRecent'];
-            $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => 'channelParticipantsRecent'], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
-            $count = $gres['count'];
-            while (count($filters)) {
-                $filter = array_pop($filters);
+            $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
+            foreach ($filters as $filter) {
+                $offset = -$limit;
+                try {
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
+                        continue;
+                    } else {
+                        throw $e;
+                    }
+                }
+                $count = $gres['count'];
                 while ($offset <= $count) {
                     foreach ($gres['participants'] as $participant) {
                         $newres = [];
@@ -510,10 +517,8 @@ trait PeerHandler
                         break;
                     }
                 }
-                if ($offset >= $count) {
-                    break;
-                }
             }
+            $res['participants'] = array_values($res['participants']);
         }
         if ($fullfetch || $send) {
             $this->store_db($res);
