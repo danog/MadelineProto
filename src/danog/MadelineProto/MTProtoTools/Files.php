@@ -35,7 +35,7 @@ trait Files
                 \danog\MadelineProto\Logger::log(['Upload status: '.$percent.'%'], \danog\MadelineProto\Logger::NOTICE);
             };
         }
-        $part_size = 128 * 1024;
+        $part_size = 512 * 1024;
         $part_total_num = (int) ceil($file_size / $part_size);
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
@@ -263,7 +263,7 @@ trait Files
             $end = $message_media['size'];
         }
         $size = $end - $offset;
-        $part_size = 512 * 1024;
+        $part_size = 128 * 1024;
         $percent = 0;
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
