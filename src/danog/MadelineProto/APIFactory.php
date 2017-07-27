@@ -135,7 +135,20 @@ class APIFactory
             return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
         }
         try {
-            return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+            $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+            array_walk_recursive($deserialized, function (&$value, $key) {
+                if (is_object($value)) {
+                   $newval = [];
+                    foreach (get_class_methods($value) as $key => $name) {
+                        $newval[$key] = [$value, $name];
+                    }
+                    foreach ($value as $key => $name) {
+                        $newval[$key] = $name;
+                    }
+                    $value = $newval;
+                }
+            });
+            return $deserialized;
         } catch (\danog\MadelineProto\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         } catch (\danog\MadelineProto\RPCErrorException $e) {

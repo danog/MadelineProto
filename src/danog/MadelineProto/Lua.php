@@ -58,6 +58,11 @@ class Lua
             }
             $this->{$namespace} = $methods[$namespace];
         }
+        $this->MadelineProto->lua = true;
+        foreach ($this->MadelineProto->get_methods_namespaced() as $method => $namespace) {
+            $this->MadelineProto->{$namespace}->lua = true;
+        }
+
     }
 
     public function tdcli_function($params, $cb = null, $cb_extra = null)
@@ -133,6 +138,18 @@ class Lua
 
     public function __call($name, $params)
     {
+        array_walk_recursive($params, function (&$value, $key) {
+            if (is_object($value)) {
+                $newval = [];
+                foreach (get_class_methods($value) as $key => $name) {
+                    $newval[$key] = [$value, $name];
+                }
+                foreach ($value as $key => $name) {
+                    $newval[$key] = $name;
+                }
+                $value = $newval;
+            }
+        });
         try {
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
