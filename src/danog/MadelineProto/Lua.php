@@ -62,7 +62,6 @@ class Lua
         foreach ($this->MadelineProto->get_methods_namespaced() as $method => $namespace) {
             $this->MadelineProto->{$namespace}->lua = true;
         }
-
     }
 
     public function tdcli_function($params, $cb = null, $cb_extra = null)
