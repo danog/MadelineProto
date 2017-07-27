@@ -39,7 +39,9 @@ class TLConstructor extends \Volatile
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
             $this->layers[$json_dict['layer']] = $json_dict['layer'];
             ksort($this->layers);
-        } else $json_dict['layer'] = '';
+        } else {
+            $json_dict['layer'] = '';
+        }
         $this->by_predicate_and_layer[$json_dict['predicate'].$json_dict['layer']] = $json_dict['id'];
         $this->parse_params($json_dict['id'], $scheme_type === 'mtproto');
     }
@@ -50,9 +52,11 @@ class TLConstructor extends \Volatile
             if ($constructor['type'] === $type) {
                 $constructor['id'] = $id;
                 $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+
                 return $constructor;
             }
         }
+
         return false;
     }
 
@@ -64,18 +68,23 @@ class TLConstructor extends \Volatile
                     $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                 }
             }
-            if (!isset($chosenid)) return false;
+            if (!isset($chosenid)) {
+                return false;
+            }
             $constructor = $this->by_id[$chosenid];
             $constructor['id'] = $chosenid;
             $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+
             return $constructor;
         }
         if (isset($this->by_predicate_and_layer[$predicate])) {
             $constructor = $this->by_id[$this->by_predicate_and_layer[$predicate]];
             $constructor['id'] = $this->by_predicate_and_layer[$predicate];
             $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+
             return $constructor;
         }
+
         return false;
     }
 
@@ -85,8 +94,10 @@ class TLConstructor extends \Volatile
             $constructor = $this->by_id[$id];
             $constructor['id'] = $id;
             $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+
             return $constructor;
         }
+
         return false;
     }
 }

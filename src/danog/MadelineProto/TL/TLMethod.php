@@ -39,15 +39,16 @@ class TLMethod extends \Volatile
         $this->parse_params($json_dict['id']);
     }
 
-
     public function find_by_id($id)
     {
         if (isset($this->by_id[$id])) {
             $method = $this->by_id[$id];
             $method['id'] = $id;
             $method['params'] = $this->array_cast_recursive($method['params']);
+
             return $method;
         }
+
         return false;
     }
 
@@ -57,9 +58,10 @@ class TLMethod extends \Volatile
             $method = $this->by_id[$this->by_method[$method_name]];
             $method['id'] = $this->by_method[$method_name];
             $method['params'] = $this->array_cast_recursive($method['params']);
+
             return $method;
         }
+
         return false;
     }
-
 }
