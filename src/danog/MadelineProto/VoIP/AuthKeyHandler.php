@@ -76,7 +76,7 @@ trait AuthKeyHandler
         try {
             $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->RPC === 'CALL_ALREADY_ACCEPTED') {
+            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 return true;
             }
             throw $e;
