@@ -150,7 +150,9 @@ class Lua
     {
         return $this->Lua->{$name} = $value;
     }
-    public static function convert_objects(&$data) {
+
+    public static function convert_objects(&$data)
+    {
         array_walk_recursive($data, function (&$value, $key) {
             if (is_object($value)) {
                 $newval = [];
@@ -160,7 +162,9 @@ class Lua
                 foreach ($value as $key => $name) {
                     $newval[$key] = $name;
                 }
-                if ($newval === []) $newval = $value->__toString();
+                if ($newval === []) {
+                    $newval = $value->__toString();
+                }
                 $value = $newval;
             }
         });
