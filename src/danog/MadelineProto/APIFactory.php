@@ -136,18 +136,7 @@ class APIFactory
         }
         try {
             $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && $this->is_array($arguments[0])) ? $arguments[0] : [], $aargs);
-            array_walk_recursive($deserialized, function (&$value, $key) {
-                if (is_object($value)) {
-                    $newval = [];
-                    foreach (get_class_methods($value) as $key => $name) {
-                        $newval[$key] = [$value, $name];
-                    }
-                    foreach ($value as $key => $name) {
-                        $newval[$key] = $name;
-                    }
-                    $value = $newval;
-                }
-            });
+            Lua::convert_objects($deserialized);
 
             return $deserialized;
         } catch (\danog\MadelineProto\Exception $e) {

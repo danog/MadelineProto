@@ -84,18 +84,7 @@ class Lua
         if (is_callable($cb)) {
             $cb($result, $cb_extra);
         }
-        array_walk_recursive($result, function (&$value, $key) {
-            if (is_object($value)) {
-                $newval = [];
-                foreach (get_class_methods($value) as $key => $name) {
-                    $newval[$key] = [$value, $name];
-                }
-                foreach ($value as $key => $name) {
-                    $newval[$key] = $name;
-                }
-                $value = $newval;
-            }
-        });
+        self::convert_objects($result);
 
         return $result;
     }
@@ -137,18 +126,7 @@ class Lua
 
     public function __call($name, $params)
     {
-        array_walk_recursive($params, function (&$value, $key) {
-            if (is_object($value)) {
-                $newval = [];
-                foreach (get_class_methods($value) as $key => $name) {
-                    $newval[$key] = [$value, $name];
-                }
-                foreach ($value as $key => $name) {
-                    $newval[$key] = $name;
-                }
-                $value = $newval;
-            }
-        });
+        self::convert_objects($params);
         try {
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -171,5 +149,20 @@ class Lua
     public function __set($name, $value)
     {
         return $this->Lua->{$name} = $value;
+    }
+    public static function convert_objects(&$data) {
+        array_walk_recursive($data, function (&$value, $key) {
+            if (is_object($value)) {
+                $newval = [];
+                foreach (get_class_methods($value) as $key => $name) {
+                    $newval[$key] = [$value, $name];
+                }
+                foreach ($value as $key => $name) {
+                    $newval[$key] = $name;
+                }
+                if ($newval === []) $newval = $value->__toString();
+                $value = $newval;
+            }
+        });
     }
 }
