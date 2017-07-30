@@ -44,7 +44,7 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
 
-    const V = 66;
+    const V = 67;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -263,7 +263,7 @@ class MTProto extends \Volatile
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'calls', 'hook_url', 'storage', 'emojis'];
+        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis'];
     }
 
     public function __wakeup()

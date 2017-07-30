@@ -111,7 +111,7 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
                 }
            }
         }
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+        //echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
     }
 }
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
