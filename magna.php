@@ -85,8 +85,8 @@ $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
 */
 $songs = [
-    'Aronchupa - Little Swing' => 'input.raw',
-    'Parov Stelar - Booty Swing' => 'inputa.raw',
+    'Aronchupa - Little Swing'     => 'input.raw',
+    'Parov Stelar - Booty Swing'   => 'inputa.raw',
     'Caravan Palace - Lone Digger' => 'inputb.raw',
 //    'Swingrowers - Butterfly' => 'inputc.raw',
     'Postmodern Jukebox - Thrift Shop' => 'inputd.raw',
@@ -117,9 +117,9 @@ $calls = [];
 var_dump($update['update']['phone_call']->configuration['shared_config']);
 */
                     try {
-//                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Emojis: '.implode('', $update['update']['phone_call']->getVisualization())]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {}
-
+                        //                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Emojis: '.implode('', $update['update']['phone_call']->getVisualization())]);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
                 }
 
            }
