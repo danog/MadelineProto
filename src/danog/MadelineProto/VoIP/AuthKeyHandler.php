@@ -150,11 +150,11 @@ trait AuthKeyHandler
             'endpoints'     => array_merge([$res['connection']], $res['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-        $this->calls[$params['id']]->startTheMagic();
+        $res = $this->calls[$params['id']]->startTheMagic();
 
         $this->handle_pending_updates();
 
-        return true;
+        return $res;
     }
 
     public function complete_call($params)
@@ -168,7 +168,7 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
+        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
             \danog\MadelineProto\Logger::log(['Could not find and complete call '.$params['id']]);
 
             return false;
@@ -212,9 +212,7 @@ trait AuthKeyHandler
             'endpoints'     => array_merge([$params['connection']], $params['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-        $this->calls[$params['id']]->startTheMagic();
-
-        return true;
+        return $this->calls[$params['id']]->startTheMagic();
     }
 
     public function call_status($id)
