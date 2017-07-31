@@ -22,9 +22,15 @@ trait DialogHandler
         $this->updates_state['sync_loading'] = true;
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
+        $peers = [];
         while ($this->dialog_params['count'] < $res['count']) {
             \danog\MadelineProto\Logger::log(['Getting dialogs...']);
             $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            foreach ($res['dialogs'] as $dialog) {
+                if (!in_array($dialog['peer'], $peers)) {
+                    $peers[] = $dialog['peer'];
+                }
+            }
             $this->dialog_params['count'] += count($res['dialogs']);
             $this->dialog_params['offset_date'] = end($res['messages'])['date'];
             $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
@@ -35,5 +41,7 @@ trait DialogHandler
         }
 
         $this->updates_state['sync_loading'] = false;
+
+        return $peers;
     }
 }

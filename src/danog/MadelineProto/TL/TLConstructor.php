@@ -68,7 +68,7 @@ class TLConstructor extends \Volatile
                     if (isset($this->by_predicate_and_layer[$predicate.$alayer])) {
                         $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                     }
-                } else if (!isset($chosenid)) {
+                } elseif (!isset($chosenid)) {
                     $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                 }
             }
