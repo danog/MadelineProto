@@ -65,6 +65,7 @@ class RPCErrorException extends \Exception
             case 'PEER_ID_INVALID': $message = 'The provided peer id is invalid'; break;
             case 'CHAT_ID_INVALID': $message = 'The provided chat id is invalid'; break;
             case 'MESSAGE_DELETE_FORBIDDEN': $message = "You can't delete one of the messages you tried to delete, most likely because it is a service message."; break;
+            case 'CHAT_ADMIN_REQUIRED': $message = 'You must be an admin in this chat to do this'; break;
             case -429: $message = 'Too many requests'; break;
         }
         parent::__construct($message, $code, $previous);
