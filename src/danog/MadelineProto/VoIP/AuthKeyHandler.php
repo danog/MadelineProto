@@ -83,11 +83,13 @@ trait AuthKeyHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already accepted']);
+
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already declined']);
                 $this->calls[$res['phone_call']['id']]->discard();
+
                 return false;
             }
             throw $e;
@@ -96,6 +98,7 @@ trait AuthKeyHandler
 
         $this->handle_pending_updates();
         $this->get_updates_difference();
+
         return true;
     }
 
