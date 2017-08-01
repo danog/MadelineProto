@@ -90,7 +90,8 @@ if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
         $MadelineProto->get_updates();
     }
-    var_dump($controller->getVisualization());
+    $MadelineProto->messages->sendMessage(['peer' => $controller->getOtherID(), 'message' => 'Emojis: '.implode('', $controller->getVisualization())]);
+    var_dump($controller->configuration);
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
         $MadelineProto->get_updates();
     }

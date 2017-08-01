@@ -66,6 +66,11 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
+        if ($this->call_status($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
+            \danog\MadelineProto\Logger::log(['Could not find and accept call '.$call['id']]);
+
+            return false;
+        }
         \danog\MadelineProto\Logger::log(['Accepting call from '.$this->calls[$call['id']]->getOtherID().'...'], \danog\MadelineProto\Logger::VERBOSE);
 
         $dh_config = $this->get_dh_config();
@@ -77,7 +82,15 @@ trait AuthKeyHandler
             $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already accepted']);
+
                 return true;
+            }
+            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already declined']);
+                $this->calls[$call['id']]->discard();
+
+                return false;
             }
             throw $e;
         }
@@ -85,6 +98,8 @@ trait AuthKeyHandler
 
         $this->handle_pending_updates();
         $this->get_updates_difference();
+
+        return true;
     }
 
     public function confirm_call($params)
@@ -113,8 +128,9 @@ trait AuthKeyHandler
 
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
-        foreach (str_split(hash('sha256', $key.$this->calls[$params['id']]->storage['g_a'], true), 8) as $number) {
-            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+        foreach (str_split(hash('sha256', $key.str_pad($this->calls[$params['id']]->storage['g_a'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+            $number[0] = chr(ord($number[0]) & 0x7F);
+            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString())];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
 
@@ -134,11 +150,11 @@ trait AuthKeyHandler
             'endpoints'     => array_merge([$res['connection']], $res['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-        $this->calls[$params['id']]->startTheMagic();
+        $res = $this->calls[$params['id']]->startTheMagic();
 
         $this->handle_pending_updates();
 
-        return true;
+        return $res;
     }
 
     public function complete_call($params)
@@ -152,7 +168,7 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
+        if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
             \danog\MadelineProto\Logger::log(['Could not find and complete call '.$params['id']]);
 
             return false;
@@ -172,8 +188,10 @@ trait AuthKeyHandler
         }
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count($this->emojis));
-        foreach (str_split(hash('sha256', $key.str_pad($params['g_a_or_b'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
-            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, -256))->divide($length)[1]->toString())];
+
+        foreach (str_split(hash('sha256', $key.str_pad($params['g_a_or_b']->toBytes(), 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+            $number[0] = chr(ord($number[0]) & 0x7F);
+            $visualization[] = $this->emojis[(int) ((new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString())];
         }
 
         $this->calls[$params['id']]->setVisualization($visualization);
@@ -194,9 +212,8 @@ trait AuthKeyHandler
             'endpoints'     => array_merge([$params['connection']], $params['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-        $this->calls[$params['id']]->startTheMagic();
 
-        return true;
+        return $this->calls[$params['id']]->startTheMagic();
     }
 
     public function call_status($id)

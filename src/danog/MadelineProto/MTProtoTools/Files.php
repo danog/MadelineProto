@@ -306,11 +306,16 @@ trait Files
                 $message_media['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
                 $datacenter = $res['dc_id'].'_cdn';
+                if (!isset($this->datacenter->sockets[$datacenter])) {
+                    $this->config['expires'] = -1;
+                    $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+                }
                 \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
                 continue;
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
+                $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
                 try {
                     $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
