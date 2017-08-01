@@ -301,12 +301,15 @@ trait Files
             }
             if ($res['_'] === 'upload.fileCdnRedirect') {
                 $cdn = true;
-                $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
                 $message_media['file_token'] = $res['file_token'];
                 $message_media['cdn_key'] = $res['encryption_key'];
                 $message_media['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
                 $datacenter = $res['dc_id'].'_cdn';
+                if (!isset($this->datacenter->sockets[$datacenter])) {
+                    $this->config['expires'] = -1;
+                    $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+                }
                 \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
                 continue;
             }
