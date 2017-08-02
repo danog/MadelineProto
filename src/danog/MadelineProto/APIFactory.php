@@ -143,6 +143,16 @@ class APIFactory
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\TL\Exception $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\PTSException $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\SecurityException $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        } catch (\danog\MadelineProto\TL\Conversion\Exception $e) {
+            return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
 }
