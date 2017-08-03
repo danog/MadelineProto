@@ -46,6 +46,7 @@ var_dump(is_null($this->{$name}));
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof Connection) {
+                \danog\MadelineProto\Logger::log(['Connecting to DC '.$key.'...'], \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
                 $socket->close_and_reopen();
             } else {
