@@ -76,6 +76,7 @@ token.php
 *~uploading*
 session.mad
 *.madeline
+*.madeline.lock
 enc.tar.xz
 a
 web_data.php
