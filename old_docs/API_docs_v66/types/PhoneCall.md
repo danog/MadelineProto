@@ -146,6 +146,7 @@ The audio configuration is an array structured in the following way:
 * `playOnHold(array $files)` - Array of audio files encoded in PCM, with the audio input configuration to loop on hold (when the files given with play/then have finished playing). If not called, no data will be played, returns `$this`
 * `isPlaying()` - Returns true if MadelineProto is still playing the files given with play/then, false if the hold files (or nothing) is being played
 * `setMicMute(bool $mute)` - Stops/resumes playing files/hold files, returns `$this`
+* `setBitrate(int $bitrate)` - Sets maximum outgoing bitrate, and increases the bitrate of the call to the maximum outgoing bitrate (high values increase the quality of the song), returns `$this`
 
 * `setOutputFile(string $outputfile)` - Writes incoming audio data to file encoded in PCM, with the audio output configuration, returns `$this`
 * `unsetOutputFile()` - Stops writing audio data to previously set file, returns `$this`
