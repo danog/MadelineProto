@@ -84,42 +84,36 @@ echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote '.\
 $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
 */
-$songs = [
-    'Aronchupa - Little Swing'     => 'input.raw',
-    'Parov Stelar - Booty Swing'   => 'inputa.raw',
-    'Caravan Palace - Lone Digger' => 'inputb.raw',
-//    'Swingrowers - Butterfly' => 'inputc.raw',
-    'Postmodern Jukebox - Thrift Shop' => 'inputd.raw',
-];
 $calls = [];
     $offset = 0;
     while (1) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        foreach ($calls as $key => $call) {
+            if ($call->getOutputState() >= \danog\MadelineProto\VoIP::AUDIO_STATE_CREATED) {
+                $call->setBitrate(100*1000);
+                try {
+                    $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Emojis: '.implode('', $call->getVisualization())]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                }
+                unset($calls[$key]);
+            }
+        }
         foreach ($updates as $update) {
             \danog\MadelineProto\Logger::log([$update]);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updatePhoneCall':
                 if (is_object($update['update']['phone_call']) && isset($update['update']['phone_call']->madeline) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-                    shuffle($songs);
+                    include('songs.php');
+                    $update['update']['phone_call']->configuration['enable_NS'] = false;
+                    $update['update']['phone_call']->configuration['enable_AGC'] = false;
+                    $update['update']['phone_call']->configuration['enable_AEC'] = false;
+                    $update['update']['phone_call']->parseConfig();
                     if ($update['update']['phone_call']->accept() === false) {
                         echo 'DID NOT ACCEPT A CALL';
                     }
                     $calls[$update['update']['phone_call']->getOtherID()] = $update['update']['phone_call'];
                     $update['update']['phone_call']->playOnHold($songs);
-//                    while ($MadelineProto->call_status($update['update']['phone_call']->getCallID()['id']) < \danog\MadelineProto\VoIP::CALL_STATE_READY) { $MadelineProto->get_updates();var_dump($update['update']['phone_call']->getCallState()); }
-/*
-                    $update['update']['phone_call']->configuration['shared_config']['audio_max_bitrate'] = 1000*1000;
-                    $update['update']['phone_call']->configuration['shared_config']['audio_init_bitrate'] = 700*1000;
-                    $update['update']['phone_call']->configuration['shared_config']['audio_bitrate_step_incr'] = 100*1000;
-                    $update['update']['phone_call']->configuration['shared_config']['audio_bitrate_step_decr'] = 0;
-                    $update['update']['phone_call']->parseConfig();
-var_dump($update['update']['phone_call']->configuration['shared_config']);
-*/
-                    try {
-                        //                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Emojis: '.implode('', $update['update']['phone_call']->getVisualization())]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    }
                 }
 
            }
