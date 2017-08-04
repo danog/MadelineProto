@@ -414,7 +414,7 @@ trait AuthKeyHandler
             }
         }
 
-        throw new \danog\MadelineProto\SecurityException('Auth Failed');
+        if (strpos($datacenter, 'cdn') === false) throw new \danog\MadelineProto\SecurityException('Auth Failed');
     }
 
     public function check_G($g_a, $p)
