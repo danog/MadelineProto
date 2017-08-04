@@ -212,6 +212,7 @@ trait AuthKeyHandler
             'endpoints'     => array_merge([$params['connection']], $params['alternative_connections']),
         ], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
+
         return $this->calls[$params['id']]->startTheMagic();
     }
 

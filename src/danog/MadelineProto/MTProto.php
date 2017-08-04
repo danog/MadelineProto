@@ -777,7 +777,11 @@ class MTProto extends \Volatile
             unset($dc['ipv6']);
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
-        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $curdc = $this->datacenter->curdc;
+        $this->datacenter->dclist = $this->settings['connection'];
+        $this->datacenter->settings = $this->settings['connection_settings'];
+        $this->connect_to_all_dcs();
+        $this->datacenter->curdc = $curdc;
     }
 
     public function get_self()
