@@ -8,4 +8,4 @@ $songs = [
 //    'Swingrowers - Butterfly' => 'inputc.raw',
     'Postmodern Jukebox - Thrift Shop' => 'inputd.raw',
 ];
-shuffle($songs);
+for ($x = 0; $x < count($songs); $x++) { shuffle($songs); }
