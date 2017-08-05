@@ -90,7 +90,6 @@ $calls = [];
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($calls as $key => $call) {
             if ($call->getOutputState() >= \danog\MadelineProto\VoIP::AUDIO_STATE_CREATED) {
-                $call->setBitrate(100 * 1000);
                 try {
                     $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Emojis: '.implode('', $call->getVisualization())]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -108,6 +107,13 @@ $calls = [];
                     $update['update']['phone_call']->configuration['enable_NS'] = false;
                     $update['update']['phone_call']->configuration['enable_AGC'] = false;
                     $update['update']['phone_call']->configuration['enable_AEC'] = false;
+                    $update['update']['phone_call']->configuration['shared_config'] = [
+                        'audio_init_bitrate' => 40*1000,
+                        'audio_max_bitrate' => 50*1000,
+                        'audio_min_bitrate' => 15*1000,
+                        //'audio_bitrate_step_decr' => 0,
+                        //'audio_bitrate_step_incr' => 2000,
+                    ];
                     $update['update']['phone_call']->parseConfig();
                     if ($update['update']['phone_call']->accept() === false) {
                         echo 'DID NOT ACCEPT A CALL';
