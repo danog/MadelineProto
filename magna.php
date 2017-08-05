@@ -102,8 +102,10 @@ $calls = [];
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updateNewMessage':
-                    include('songs.php');
-                    if ($update['update']['message']['out'] || $update['update']['message']['to_id']['_'] !== 'peerUser' || !isset($update['update']['message']['from_id'])) continue;
+                    include 'songs.php';
+                    if ($update['update']['message']['out'] || $update['update']['message']['to_id']['_'] !== 'peerUser' || !isset($update['update']['message']['from_id'])) {
+                        continue;
+                    }
                     try {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Call me!']);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
