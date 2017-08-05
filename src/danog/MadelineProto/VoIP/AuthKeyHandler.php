@@ -144,8 +144,6 @@ trait AuthKeyHandler
             'enable_NS'            => true,
             'enable_AEC'           => true,
             'enable_AGC'           => true,
-            'log_file_path'        => '/dev/null',
-            'stats_dump_file_path' => '/dev/null',
 
             'auth_key'      => $key,
             'network_type'  => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET,
@@ -206,8 +204,6 @@ trait AuthKeyHandler
             'enable_NS'            => true,
             'enable_AEC'           => true,
             'enable_AGC'           => true,
-            'log_file_path'        => '/dev/null',
-            'stats_dump_file_path' => '/dev/null',
 
             'auth_key'      => $key,
             'network_type'  => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET,
