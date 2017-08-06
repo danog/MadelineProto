@@ -71,7 +71,7 @@ class RPCErrorException extends \Exception
         }
         parent::__construct($message, $code, $previous);
         $this->prettify_tl();
-        
+
         $additional = [];
         foreach ($this->getTrace() as $level) {
             if (isset($level['function']) && $level['function'] === 'method_call') {
