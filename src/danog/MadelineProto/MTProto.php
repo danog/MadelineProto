@@ -606,6 +606,9 @@ class MTProto extends \Volatile
 
     public function reset_session($de = true, $auth_key = false)
     {
+        if (!is_object($this->datacenter)) {
+            throw new Exception("The session is corrupted!");
+        }
         foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
                 \danog\MadelineProto\Logger::log(['Resetting session id'.($auth_key ? ', authorization key' : '').' and seq_no in DC '.$id.'...'], Logger::VERBOSE);
