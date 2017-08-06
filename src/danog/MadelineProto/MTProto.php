@@ -607,7 +607,7 @@ class MTProto extends \Volatile
     public function reset_session($de = true, $auth_key = false)
     {
         if (!is_object($this->datacenter)) {
-            throw new Exception("The session is corrupted!");
+            throw new Exception('The session is corrupted!');
         }
         foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
