@@ -406,7 +406,7 @@ trait ResponseHandler
                     (isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from']))) {
                     \danog\MadelineProto\Logger::log(['getDifference: good - getting user for updateShortMessage'], \danog\MadelineProto\Logger::VERBOSE);
 
-                    return $this->get_updates_difference();
+                    $this->get_updates_difference();
                 }
 
                 $message = $updates;
