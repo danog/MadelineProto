@@ -262,6 +262,23 @@ Parameters:
 
 '.$pwr_params.'
 
+If you\' re using the [MadelineProto HTTP API](https://api.madelineproto.xyz):
+
+### As a bot:
+
+POST/GET to `https://api.madelineproto.xyz/botTOKEN/'.$rmethod.'
+
+Parameters:
+
+'.$pwr_params.'
+
+### As a user:
+
+POST/GRT to `https://api.madelineproto.xyz/userTOKEN/'.$rmethod.'`
+
+Parameters:
+
+'.$pwr_params.'
 
 Or, if you\'re into Lua:
 
