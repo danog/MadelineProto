@@ -349,7 +349,7 @@ trait TL
             $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);
 
             if ($constructorData === false) {
-                throw new Exception('Predicate was not set!');
+                throw new Exception('Predicate (value under _) was not set!');
             }
             $auto = true;
             $object['_'] = $constructorData['predicate'];
