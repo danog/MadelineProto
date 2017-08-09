@@ -506,8 +506,8 @@ class MTProto extends \Volatile
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
-                //'api_id'          => 65536,
-                //'api_hash'        => '4251a2777e179232705e2462706f4143',
+                //'api_id'          => 6,
+                //'api_hash'        => 'eb06d4abfb49dc3eeb1aeb98ae0f581e',
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // ðŸŒš
