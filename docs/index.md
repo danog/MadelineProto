@@ -622,7 +622,7 @@ git clone https://github.com/danog/MadelineProto
 cd MadelineProto
 ```
 
-Now copy .env.example to .env, edit the its values, read the docs and take a look at tests/testing.php, bot.php.
+Now copy .env.example to .env, edit its values, read the docs and take a look at tests/testing.php, bot.php.
 
 ### Dependencies
 
