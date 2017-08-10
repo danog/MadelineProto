@@ -184,6 +184,8 @@ $media = [];
 
 // Sticker
 $inputFile = $MadelineProto->upload('tests/lel.webp');
+$inputFile['_'] = 'inputPhotoEmpty';
+var_dump($inputFile);
 $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/lel.webp'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]];
 
 // Video

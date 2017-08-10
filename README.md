@@ -96,20 +96,7 @@ If you're selling a MadelineProto base too, you really should consider donating 
 
 ### Installation
 
-```
-git clone https://github.com/danog/MadelineProto
-cd MadelineProto
-```
-
-Now copy .env.example to .env, edit the its values, read the docs and take a look at tests/testing.php, bot.php.
-
-### Dependencies
-
-To install dependencies install composer and run:
-```
-composer update
-```
-In the cloned repo.
+Read this whole page to install MadelineProto. 
 
 
 ### Instantiation
@@ -622,6 +609,28 @@ MadelineProto can throw lots of different exceptions:
 
 * \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
 
+
+### Using on your local machine
+
+Congratulations, you've made it through the docs! You can now use MadelineProto.
+
+If you did not actually read them all, do that now, because if you don't read this whole page, you won't be able to use MadelineProto.
+
+
+```
+git clone https://github.com/danog/MadelineProto
+cd MadelineProto
+```
+
+Now copy .env.example to .env, edit the its values, read the docs and take a look at tests/testing.php, bot.php.
+
+### Dependencies
+
+To install dependencies install composer and run:
+```
+composer update
+```
+In the cloned repo.
 
 
 ## Contributing

@@ -85,13 +85,14 @@ $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
 */
 $calls = [];
+$users = [];
     $offset = 0;
     while (1) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($calls as $key => $call) {
-            if ($call->getOutputState() >= \danog\MadelineProto\VoIP::AUDIO_STATE_CREATED) {
+            if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 try {
-                    $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Emojis: '.implode('', $call->getVisualization())]);
+                    //$MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Emojis: '.implode('', $call->getVisualization())]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                 }
                 unset($calls[$key]);
@@ -107,7 +108,10 @@ $calls = [];
                         continue;
                     }
                     try {
-                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Call me!']);
+                        if (!isset($users[$update['update']['message']['from_id']])) {
+                            $users[$update['update']['message']['from_id']] = true;
+                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Call me! Powered by @MadelineProto.']);
+                        }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
                     break;

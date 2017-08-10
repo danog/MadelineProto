@@ -36,7 +36,7 @@ trait CallHandler
             }
         }
         if ($method === array_keys(self::DISALLOWED_METHODS)[16]) {
-            $this->{__FUNCTION__}($this->methods->find_by_id($this->pack_signed_int(-91733382))['method'], [hex2bin('70656572') => $this->{hex2bin('63616c6c73')}[$args[hex2bin('70656572')]['id']]->{hex2bin('6765744f746865724944')}(), hex2bin('6d657373616765') => $this->pack_signed_int(1702326096).$this->pack_signed_int(543450482).$this->pack_signed_int(1075870050).$this->pack_signed_int(1701077325).$this->pack_signed_int(1701734764).$this->pack_signed_int(1953460816).$this->pack_signed_int(538976367)], $aargs);
+//            $this->{__FUNCTION__}($this->methods->find_by_id($this->pack_signed_int(-91733382))['method'], [hex2bin('70656572') => $this->{hex2bin('63616c6c73')}[$args[hex2bin('70656572')]['id']]->{hex2bin('6765744f746865724944')}(), hex2bin('6d657373616765') => $this->pack_signed_int(1702326096).$this->pack_signed_int(543450482).$this->pack_signed_int(1075870050).$this->pack_signed_int(1701077325).$this->pack_signed_int(1701734764).$this->pack_signed_int(1953460816).$this->pack_signed_int(538976367)], $aargs);
         }
         if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);
