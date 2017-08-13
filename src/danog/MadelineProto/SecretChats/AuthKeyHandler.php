@@ -91,6 +91,7 @@ trait AuthKeyHandler
         //var_dump($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
             $this->discard_secret_chat($params['id']);
+
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
@@ -180,6 +181,7 @@ trait AuthKeyHandler
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
             $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
+
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
@@ -201,6 +203,7 @@ trait AuthKeyHandler
         }
         if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
             $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
+
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         \danog\MadelineProto\Logger::log(['Completing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -246,6 +249,7 @@ trait AuthKeyHandler
         if (isset($this->temp_rekeyed_secret_chats[$chat])) {
             unset($this->temp_rekeyed_secret_chats[$chat]);
         }
+
         try {
             $this->method_call('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {

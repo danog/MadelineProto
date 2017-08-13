@@ -152,6 +152,7 @@ trait UpdateHandler
             return;
         }
         $this->load_channel_state($channel)['sync_loading'] = true;
+
         try {
             $input = $this->get_info('channel#'.$channel);
             if (!isset($input['InputChannel'])) {
@@ -176,6 +177,7 @@ trait UpdateHandler
             if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
             }
+
             throw $e;
         }
         unset($input);
@@ -394,10 +396,10 @@ trait UpdateHandler
 
                 return false;
             }
-//            if ($cur_state['pts'] < $update['pts']) {
-                \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].', new pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
+            //            if ($cur_state['pts'] < $update['pts']) {
+            \danog\MadelineProto\Logger::log(['Applying pts. current pts: '.$cur_state['pts'].', new pts: '.$update['pts'].', channel id: '.$channel_id], \danog\MadelineProto\Logger::VERBOSE);
             $cur_state['pts'] = $update['pts'];
-//            }
+            //            }
 
             if ($channel_id === false && isset($options['date']) && $cur_state['date'] < $options['date']) {
                 $cur_state['date'] = $options['date'];

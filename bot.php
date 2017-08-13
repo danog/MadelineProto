@@ -47,11 +47,13 @@ while (true) {
                 if ($res == '') {
                     $res = var_export($update, true);
                 }
+
                 try {
                     //                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['_'] === 'updateNewMessage' ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                 }
+
                 try {
                     if (isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
                         $time = time();

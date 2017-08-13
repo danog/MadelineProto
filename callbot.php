@@ -29,6 +29,7 @@ while (true) {
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
+
                 try {
                     if ($update['update']['message']['message'] === 'callstorm') {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'callstorming you', 'reply_to_msg_id' => $update['update']['message']['id']]);

@@ -70,13 +70,14 @@ class Serialization
             }
             class_exists('\Volatile');
             \danog\MadelineProto\Logger::class_exists();
+
             try {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
             } catch (Bug74586Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
-            /*} catch (Exception $e) {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
-            */
+                /*} catch (Exception $e) {
+                    $unserialized = \danog\Serialization::unserialize($unserialized);
+                */
             } catch (\Error $e) {
                 $unserialized = \danog\Serialization::unserialize($unserialized);
             }

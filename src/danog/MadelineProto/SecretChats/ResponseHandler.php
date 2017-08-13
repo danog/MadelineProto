@@ -58,7 +58,7 @@ trait ResponseHandler
                     $seq--;
                     if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
                         throw new \danog\MadelineProto\ResponseException('Resending of messages is not yet supported');
-//                        $this->send_encrypted_message($update['message']['chat_id'], $update['message']['decrypted_message']);
+                        //                        $this->send_encrypted_message($update['message']['chat_id'], $update['message']['decrypted_message']);
                     }
                 }
 

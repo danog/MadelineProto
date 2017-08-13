@@ -61,11 +61,13 @@ trait MessageHandler
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
                     $this->discard_secret_chat($message['message']['chat_id']);
+
                     throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
                 }
                 $old = true;
             } else {
                 $this->discard_secret_chat($message['message']['chat_id']);
+
                 throw new \danog\MadelineProto\SecurityException('Key fingerprint mismatch');
             }
         }

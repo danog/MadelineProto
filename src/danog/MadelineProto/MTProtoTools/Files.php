@@ -73,7 +73,7 @@ trait Files
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
-//            $constructor['md5_checksum'] = '';
+            //            $constructor['md5_checksum'] = '';
         }
 
         return $constructor;
@@ -316,6 +316,7 @@ trait Files
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
                 $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+
                 try {
                     $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {

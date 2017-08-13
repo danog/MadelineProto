@@ -127,6 +127,7 @@ class Lua
     public function __call($name, $params)
     {
         self::convert_objects($params);
+
         try {
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {

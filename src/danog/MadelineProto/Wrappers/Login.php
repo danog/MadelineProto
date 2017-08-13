@@ -97,6 +97,7 @@ trait Login
         }
         $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log(['Logging in as a normal user...'], \danog\MadelineProto\Logger::NOTICE);
+
         try {
             $authorization = $this->method_call(
                 'auth.signIn',
@@ -122,6 +123,7 @@ trait Login
 
                 return ['_' => 'account.needSignup'];
             }
+
             throw $e;
         }
         $this->authorized = self::LOGGED_IN;

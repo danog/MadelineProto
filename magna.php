@@ -17,6 +17,7 @@ if (file_exists('web_data.php')) {
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = false;
+
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
@@ -107,6 +108,7 @@ $users = [];
                     if ($update['update']['message']['out'] || $update['update']['message']['to_id']['_'] !== 'peerUser' || !isset($update['update']['message']['from_id'])) {
                         continue;
                     }
+
                     try {
                         if (!isset($users[$update['update']['message']['from_id']])) {
                             $users[$update['update']['message']['from_id']] = true;

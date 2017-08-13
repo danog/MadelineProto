@@ -46,13 +46,13 @@ class Connection extends \Volatile
     public $call_queue = [];
 
     public $i = [];
-/*    public function __get($name) {
-        echo "GETTING $name\n";
-        if (isset($this->i[$name]) && $this->{$name} === null) var_dump($this->i[$name]);
-        if ($this->{$name} instanceof \Volatile) $this->i[$name] = debug_backtrace(0);
-var_dump(is_null($this->{$name}));
-        return $this->{$name};
-    }*/
+    /*    public function __get($name) {
+            echo "GETTING $name\n";
+            if (isset($this->i[$name]) && $this->{$name} === null) var_dump($this->i[$name]);
+            if ($this->{$name} instanceof \Volatile) $this->i[$name] = debug_backtrace(0);
+    var_dump(is_null($this->{$name}));
+            return $this->{$name};
+        }*/
 
     public function ___construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
@@ -290,6 +290,7 @@ var_dump(is_null($this->{$name}));
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
+
                     throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 
@@ -309,6 +310,7 @@ var_dump(is_null($this->{$name}));
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
+
                     throw new Exception("WARNING: Wrong length was read (should've read ".($length).', read '.strlen($packet).')!');
                 }
 

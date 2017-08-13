@@ -272,6 +272,7 @@ trait ResponseHandler
                                 }
                                 \danog\MadelineProto\Logger::log(['No'], \danog\MadelineProto\Logger::VERBOSE);
                             }
+
                             throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], true));
                             break;
                     }
@@ -318,6 +319,7 @@ trait ResponseHandler
         switch ($server_answer['error_code']) {
             case 303:
                 $this->datacenter->curdc = $aargs['datacenter'] = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+
                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
             case 401:
                 switch ($server_answer['error_message']) {
@@ -342,6 +344,7 @@ trait ResponseHandler
                 if (is_numeric($seconds) && $seconds < $limit) {
                     \danog\MadelineProto\Logger::log(['Flood, waiting '.$seconds.' seconds...'], \danog\MadelineProto\Logger::NOTICE);
                     sleep($seconds);
+
                     throw new \danog\MadelineProto\Exception('Re-executing query...');
                 }
             default:

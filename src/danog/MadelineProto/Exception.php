@@ -59,6 +59,7 @@ class Exception extends \Exception
         if (error_reporting() === 0) {
             return true; // return true to continue through the others error handlers
         }
+
         throw new self($errstr, $errno, null, $errfile, $errline);
     }
 }

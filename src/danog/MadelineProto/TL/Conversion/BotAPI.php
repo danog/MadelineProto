@@ -445,6 +445,7 @@ trait BotAPI
         }
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
+
             try {
                 $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();

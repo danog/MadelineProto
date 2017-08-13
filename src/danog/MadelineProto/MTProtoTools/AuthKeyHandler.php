@@ -456,25 +456,25 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime (p isn't a prime).");
         }
 
-       /*
-                * ***********************************************************************
-                * Check validity of p
-                * Is (p - 1) / 2 a prime?
-                *
-                * Almost always fails
-                */
-                /*
-                \danog\MadelineProto\Logger::log(['Executing p/g checks (2/3)...'], \danog\MadelineProto\Logger::VERBOSE);
-                if (!$p->subtract($this->one)->divide($this->two)[0]->isPrime()) {
-                    throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
-                }
-                */
+        /*
+                 * ***********************************************************************
+                 * Check validity of p
+                 * Is (p - 1) / 2 a prime?
+                 *
+                 * Almost always fails
+                 */
+        /*
+        \danog\MadelineProto\Logger::log(['Executing p/g checks (2/3)...'], \danog\MadelineProto\Logger::VERBOSE);
+        if (!$p->subtract($this->one)->divide($this->two)[0]->isPrime()) {
+            throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
+        }
+        */
 
-                /*
-                * ***********************************************************************
-                * Check validity of p
-                * 2^2047 < p < 2^2048
-                */
+        /*
+        * ***********************************************************************
+        * Check validity of p
+        * 2^2047 < p < 2^2048
+        */
         \danog\MadelineProto\Logger::log(['Executing p/g checks (2/2)...'], \danog\MadelineProto\Logger::VERBOSE);
         if ($p->compare($this->twoe2047) <= 0 // 2^2047 < p or p > 2^2047 or ! p <= 2^2047
          || $p->compare($this->twoe2048) >= 0 // p < 2^2048 or ! p >= 2^2048
@@ -482,11 +482,11 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
         }
 
-                /*
-                * ***********************************************************************
-                * Check validity of g
-                * 1 < g < p - 1
-                */
+        /*
+        * ***********************************************************************
+        * Check validity of g
+        * 1 < g < p - 1
+        */
         \danog\MadelineProto\Logger::log(['Executing g check...'], \danog\MadelineProto\Logger::VERBOSE);
 
         if ($g->compare($this->one) <= 0 // 1 < g or g > 1 or ! g <= 1
@@ -559,6 +559,7 @@ trait AuthKeyHandler
                 $this->datacenter->sockets[$datacenter]->new_incoming = [];
             }
         }
+
         throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
     }
 }

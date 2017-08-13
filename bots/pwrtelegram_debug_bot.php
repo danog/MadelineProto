@@ -13,6 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require '../vendor/autoload.php';
 $settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 include_once 'token.php';
+
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('b.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
@@ -184,10 +185,11 @@ while (true) {
                 } catch (\danog\MadelineProto\Exception $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                 }
+
                 try {
                     if (isset($update['update']['message']['media']) && $update['update']['message']['media'] == 'messageMediaPhoto' && $update['update']['message']['media'] == 'messageMediaDocument') {
                         $time = time();
-//                        $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
+                        //                        $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
 //                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {

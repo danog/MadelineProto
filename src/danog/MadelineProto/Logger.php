@@ -114,6 +114,7 @@ class Logger
             if (!defined('\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
                 throw new \danog\MadelineProto\Exception(hex2bin('506c6561736520757064617465207068702d6c69627467766f6970'), 0, null, 'MadelineProto', 1);
             }
+
             try {
                 \Threaded::extend('\danog\MadelineProto\VoIP');
             } catch (\RuntimeException $e) {
@@ -125,6 +126,7 @@ class Logger
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+
         try {
             self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
         } catch (\danog\MadelineProto\Exception $e) {

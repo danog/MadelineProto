@@ -30,6 +30,7 @@ trait PeerHandler
                             var_dump(ord($char));
                         }*/
                         $this->chats[$user['id']] = $user;
+
                         try {
                             $this->get_pwr_chat($user['id'], false, true);
                         } catch (\danog\MadelineProto\Exception $e) {
@@ -56,6 +57,7 @@ trait PeerHandler
                 case 'chatForbidden':
                     if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
                         $this->chats[-$chat['id']] = $chat;
+
                         try {
                             $this->get_pwr_chat(-$chat['id'], true, true);
                         } catch (\danog\MadelineProto\Exception $e) {
@@ -75,6 +77,7 @@ trait PeerHandler
                     $bot_api_id = $this->to_supergroup($chat['id']);
                     if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
                         $this->chats[$bot_api_id] = $chat;
+
                         try {
                             if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
                                 $this->get_pwr_chat($this->to_supergroup($chat['id']), true, true);
@@ -219,6 +222,7 @@ trait PeerHandler
                     return $this->get_info('@'.$dbres['result']);
                 }
             }
+
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         $id = str_replace('@', '', $id);
@@ -232,6 +236,7 @@ trait PeerHandler
 
             return $this->get_info($id, false);
         }
+
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
 
@@ -455,6 +460,7 @@ trait PeerHandler
             $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
             foreach ($filters as $filter) {
                 $offset = -$limit;
+
                 try {
                     $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -553,6 +559,7 @@ trait PeerHandler
         if (empty($this->qres)) {
             return false;
         }
+
         try {
             $payload = json_encode($this->qres);
             $path = '/tmp/ids'.hash('sha256', $payload);
@@ -574,6 +581,7 @@ trait PeerHandler
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }
+
         throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($res, true));
     }
 

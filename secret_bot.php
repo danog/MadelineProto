@@ -17,6 +17,7 @@ if (file_exists('web_data.php')) {
 
 echo 'Deserializing MadelineProto from s.madeline...'.PHP_EOL;
 $MadelineProto = false;
+
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('s.madeline');
 } catch (\danog\MadelineProto\Exception $e) {

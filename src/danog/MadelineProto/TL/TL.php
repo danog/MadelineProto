@@ -359,6 +359,7 @@ trait TL
         $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
         if ($constructorData === false) {
             \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_ERROR);
+
             throw new Exception('Could not extract type "'.$predicate.'"');
         }
 
@@ -449,6 +450,7 @@ trait TL
                             }
                     }
                 }
+
                 throw new Exception('Missing required parameter', $current_argument['name']);
             }
             if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {

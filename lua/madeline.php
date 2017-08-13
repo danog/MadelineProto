@@ -14,6 +14,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require '../vendor/autoload.php';
 $settings = [];
 $Lua = false;
+
 try {
     $Lua = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {

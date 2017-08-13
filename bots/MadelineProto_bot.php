@@ -15,6 +15,7 @@ require '../vendor/autoload.php';
 $settings = [];
 $settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
 $MadelineProto = false;
+
 try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('MadelineProto_bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
@@ -66,6 +67,7 @@ while (true) {
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
+
                 try {
                     if (isset($update['update']['message']['message']) && preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
@@ -78,6 +80,7 @@ while (true) {
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
                     continue;
                 }
+
                 try {
                     if (preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'],  'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
@@ -112,11 +115,13 @@ while (true) {
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+
                     try {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     } catch (\danog\MadelineProto\Exception $e) {
                     }
+
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);
@@ -130,6 +135,7 @@ while (true) {
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     } catch (\danog\MadelineProto\Exception $e) {
                     }
+
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);

@@ -13,6 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 require '../vendor/autoload.php';
 $settings = [];
+
 try {
     $Lua = \danog\MadelineProto\Serialization::deserialize('td.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
