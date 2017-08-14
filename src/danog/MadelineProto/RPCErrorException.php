@@ -70,7 +70,7 @@ class RPCErrorException extends \Exception
             case 'PEER_FLOOD': $message = 'Too many requests'; break;
         }
         if ($this->rpc === $message) {
-            $res = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?description_for='.$this->rpc));
+            $res = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?description_for='.$this->rpc), true);
             if ($res['ok']) {
                 $message = $res['result'];
             }
