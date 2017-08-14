@@ -42,6 +42,14 @@ class Button extends \Volatile implements \JsonSerializable
         }
     }
 
+
+    public function __debugInfo() {
+        return [
+            'data' => $this->data,
+            'info' => ['peer' => $this->info['peer'], 'id' => $this->info['id']]
+        ];
+    }
+
     public function jsonSerialize()
     {
         return (array) $this->data;

@@ -157,8 +157,8 @@ class Lua
         array_walk_recursive($data, function (&$value, $key) {
             if (is_object($value)) {
                 $newval = [];
-                foreach (get_class_methods($value) as $key => $name) {
-                    $newval[$key] = [$value, $name];
+                if (method_exists($value, 'click')) {
+                    $newval['click'] = [$value, 'click'];
                 }
                 foreach ($value as $key => $name) {
                     $newval[$key] = $name;
