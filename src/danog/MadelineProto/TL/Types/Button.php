@@ -42,11 +42,11 @@ class Button extends \Volatile implements \JsonSerializable
         }
     }
 
-
-    public function __debugInfo() {
+    public function __debugInfo()
+    {
         return [
             'data' => $this->data,
-            'info' => ['peer' => $this->info['peer'], 'id' => $this->info['id']]
+            'info' => ['peer' => $this->info['peer'], 'id' => $this->info['id']],
         ];
     }
 
