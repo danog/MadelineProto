@@ -161,7 +161,9 @@ class Lua
                     $newval[$name] = [$value, $name];
                 }
                 foreach ($value as $key => $name) {
-                    if ($key === 'madeline') continue;
+                    if ($key === 'madeline') {
+                        continue;
+                    }
                     $newval[$key] = $name;
                 }
                 if ($newval === []) {
