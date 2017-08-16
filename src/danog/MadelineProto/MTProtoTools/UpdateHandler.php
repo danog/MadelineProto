@@ -127,8 +127,6 @@ trait UpdateHandler
         }
     }
 
-    
- 
     public function check_msg_id($message)
     {
         $peer_id = $this->get_info($message['to_id'])['bot_api_id'];
@@ -136,12 +134,13 @@ trait UpdateHandler
 
         if (!isset($this->msg_ids[$peer_id]) || $message_id > $this->msg_ids[$peer_id]) {
             $this->msg_ids[$peer_id] = $message_id;
+
             return true;
         }
+
         return false;
     }
 
-    
     public function get_channel_difference($channel)
     {
         if (!$this->settings['updates']['handle_updates']) {
@@ -400,6 +399,7 @@ trait UpdateHandler
             if (isset($update['message']['id'], $update['message']['to_id'])) {
                 if (!$this->check_msg_id($update['message'])) {
                     \danog\MadelineProto\Logger::log(['Duplicate update by message id, channel id: '.$channel_id], \danog\MadelineProto\Logger::ERROR);
+
                     return false;
                 }
             }
