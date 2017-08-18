@@ -4,9 +4,6 @@ description: List of constructors
 ---
 # Constructors  
 [Back to API documentation index](..)
-
-
-
 ***
 <br><br>[$audio](../constructors/audio.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), 'duration' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'size' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), \];<a name="audio"></a>  
 

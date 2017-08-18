@@ -13,6 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 require 'vendor/autoload.php';
 $param = 1;
 \danog\MadelineProto\Logger::constructor($param);
+set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 \danog\MadelineProto\Logger::log(['Copying readme...'], \danog\MadelineProto\Logger::NOTICE);
 

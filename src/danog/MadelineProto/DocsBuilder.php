@@ -15,6 +15,8 @@ namespace danog\MadelineProto;
 class DocsBuilder
 {
     use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\DocsBuilder\Methods;
+    use \danog\MadelineProto\DocsBuilder\Constructors;
     use Tools;
 
     public $td = false;
@@ -36,10 +38,12 @@ class DocsBuilder
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
 
+    public $types = [];
+    public $any = '*';
+    public function end($what) { return end($what); }
+    public function escape($hwat) { return str_replace('_', '\_', $hwat); }
     public function mk_docs()
     {
-        $types = [];
-        $any = '*';
         \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
 
         file_put_contents($this->index, '---
@@ -57,512 +61,8 @@ description: '.$this->settings['description'].'
 
 [Back to main documentation](..)
 ');
-
-        foreach (glob('methods/'.$any) as $unlink) {
-            unlink($unlink);
-        }
-
-        if (file_exists('methods')) {
-            rmdir('methods');
-        }
-
-        mkdir('methods');
-
-        $methods = [];
-
-        \danog\MadelineProto\Logger::log(['Generating methods documentation...'], \danog\MadelineProto\Logger::NOTICE);
-
-        foreach ($this->methods->method as $key => $rmethod) {
-            $method = str_replace('.', '_', $rmethod);
-            $real_method = str_replace('.', '->', $rmethod);
-            $rtype = $this->methods->type[$key];
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
-            $real_type = preg_replace('/.*_of_/', '', $type);
-            if (!isset($types[$real_type])) {
-                $types[$real_type] = ['constructors' => [], 'methods' => []];
-            }
-            if (!in_array($key, $types[$real_type]['methods'])) {
-                $types[$real_type]['methods'][] = $key;
-            }
-
-            $params = '';
-            foreach ($this->methods->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
-                    continue;
-                }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
-                    $param['name'] = 'message';
-                    $param['type'] = 'DecryptedMessage';
-                }
-                if ($param['name'] === 'chat_id' && $rmethod !== 'messages.discardEncryption') {
-                    $param['type'] = 'InputPeer';
-                }
-                $stype = 'type';
-                $link_type = 'types';
-                if (isset($param['subtype'])) {
-                    $stype = 'subtype';
-                    if ($param['type'] === 'vector') {
-                        $link_type = 'constructors';
-                    }
-                }
-                $ptype = str_replace('.', '_', $param[$stype]);
-                switch ($ptype) {
-                    case 'true':
-                    case 'false':
-                        $ptype = 'Bool';
-                }
-                $params .= "'".$param['name']."' => ";
-                $ptype =
-                    '['.
-                     str_replace('_', '\_', $ptype).
-                    '](../'.$link_type.'/'.$ptype.'.md)';
-
-                $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
-            }
-            $md_method = '['.$real_method.']('.$method.'.md)';
-
-            $methods[$method] = '$MadelineProto->'.$md_method.'(\['.$params.'\]) === [$'.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)<a name="'.$method.'"></a>  
-
-';
-
-            $params = '';
-            $lua_params = '';
-            $pwr_params = '';
-            $json_params = '';
-            $table = empty($this->methods->params[$key]) ? '' : '### Parameters:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
-';
-            if (isset($this->td_descriptions['methods'][$rmethod])) {
-                $table = '### Params:
-
-| Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
-';
-            }
-
-            $hasentities = false;
-            $hasreplymarkup = false;
-            $hasmessage = false;
-            foreach ($this->methods->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
-                    continue;
-                }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
-                    $param['name'] = 'message';
-                    $param['type'] = 'DecryptedMessage';
-                }
-                if ($param['name'] === 'chat_id' && $rmethod !== 'messages.discardEncryption') {
-                    $param['type'] = 'InputPeer';
-                }
-
-                $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
-                switch ($ptype) {
-                    case 'true':
-                    case 'false':
-                        $ptype = 'Bool';
-                }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
-                if (isset($this->td_descriptions['methods'][$rmethod])) {
-                    $table .= $this->td_descriptions['methods'][$rmethod]['params'][$param['name']].'|';
-                }
-                $table .= PHP_EOL;
-
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
-
-                $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
-                $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
-                $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n";
-                $lua_params .= $param['name'].'=';
-                $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype).', ';
-                if ($param['name'] === 'reply_markup') {
-                    $hasreplymarkup = true;
-                }
-                if ($param['name'] === 'message') {
-                    $hasmessage = true;
-                }
-                if ($param['name'] === 'entities') {
-                    $hasentities = true;
-                    $table .= '|parse\_mode| [string](../types/string.md) | Optional |
-';
-                    $params .= "'parse_mode' => 'string', ";
-                    $lua_params .= "parse_mode='string', ";
-                    $json_params .= '"parse_mode": "string"';
-                    $pwr_params = "parse_mode - string\n";
-                }
-            }
-            $description = isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'] : ($rmethod.' parameters, return type and example');
-            $header = '---
-title: '.$rmethod.'
-description: '.$description.'
----
-## Method: '.str_replace('_', '\_', $rmethod).'  
-[Back to methods index](index.md)
-
-
-';
-            if (isset(MTProto::DISALLOWED_METHODS[$rmethod])) {
-                $header .= '*'.MTProto::DISALLOWED_METHODS[$rmethod]."*\n\n\n\n\n";
-            }
-            if ($this->td) {
-                $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
-
-
-';
-            }
-            $header .= isset($this->td_descriptions['methods'][$rmethod]) ? $this->td_descriptions['methods'][$rmethod]['description'].PHP_EOL.PHP_EOL : '';
-            $table .= '
-
-';
-            $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md)
-
-';
-            $example = str_replace('[]', '', '### Example:
-
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
-if (isset($number)) { // Login as a user
-    $sentCode = $MadelineProto->phone_login($number);
-    echo \'Enter the code you received: \';
-    $code = \'\';
-    for ($x = 0; $x < $sentCode[\'type\'][\'length\']; $x++) {
-        $code .= fgetc(STDIN);
-    }
-    $MadelineProto->complete_phone_login($code);
-}
-
-$'.$type.' = $MadelineProto->'.$real_method.'(['.$params.']);
-```
-
-Or, if you\'re using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - '.$rmethod.'
-* params - `{'.$json_params.'}`
-
-
-
-### As a user:
-
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$rmethod.'`
-
-Parameters:
-
-'.$pwr_params.'
-
-
-Or, if you\'re into Lua:
-
-```
-'.$type.' = '.$rmethod.'({'.$lua_params.'})
-```
-
-');
-            if ($hasreplymarkup) {
-                $example .= '
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-
-';
-            }
-            if ($hasmessage) {
-                $example .= '
-## Return value 
-
-If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\_', $type).'](../types/'.$real_type.'.md) will be returned instead.
-
-
-';
-            }
-            if ($hasentities) {
-                $example .= '
-## Usage of parse_mode:
-
-Set parse_mode to html to enable HTML parsing of the message.  
-
-Set parse_mode to Markdown to enable markown AND html parsing of the message.  
-
-The following tags are currently supported:
-
-```
-<br>a newline
-<b><i>bold works ok, internal tags are stripped</i> </b>
-<strong>bold</strong>
-<em>italic</em>
-<i>italic</i>
-<code>inline fixed-width code</code>
-<pre>pre-formatted fixed-width code block</pre>
-<a href="https://github.com">URL</a>
-<a href="mention:@danogentili">Mention by username</a>
-<a href="mention:186785362">Mention by user id</a>
-<pre language="json">Pre tags can have a language attribute</pre>
-```
-
-You can also use normal markdown, note that to create mentions you must use the `mention:` syntax like in html:  
-
-```
-[Mention by username](mention:@danogentili)
-[Mention by user id](mention:186785362)
-```
-
-MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
-';
-            }
-            file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
-        }
-
-        \danog\MadelineProto\Logger::log(['Generating methods index...'], \danog\MadelineProto\Logger::NOTICE);
-
-        ksort($methods);
-        $last_namespace = '';
-        foreach ($methods as $method => &$value) {
-            $new_namespace = preg_replace('/_.*/', '', $method);
-            $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
-            $value = $br.$value;
-            $last_namespace = $new_namespace;
-        }
-
-        file_put_contents('methods/'.$this->index, '---
-title: Methods
-description: List of methods
----
-# Methods  
-[Back to API documentation index](..)
-
-
-
-'.implode('', $methods));
-
-        foreach (glob('constructors/'.$any) as $unlink) {
-            unlink($unlink);
-        }
-
-        if (file_exists('constructors')) {
-            rmdir('constructors');
-        }
-
-        mkdir('constructors');
-
-        $constructors = [];
-        \danog\MadelineProto\Logger::log(['Generating constructors documentation...'], \danog\MadelineProto\Logger::NOTICE);
-
-        foreach ($this->constructors->predicate as $key => $rconstructor) {
-            if (preg_match('/%/', $type)) {
-                $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
-            }
-            $layer = isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '';
-            $rtype = $this->constructors->type[$key];
-
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rtype);
-            $real_type = preg_replace('/.*_of_/', '', $type);
-            $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $rconstructor);
-            $real_constructor = preg_replace('/.*_of_/', '', $constructor);
-
-            if (!isset($types[$real_type])) {
-                $types[$real_type] = ['constructors' => [], 'methods' => []];
-            }
-            if (!in_array($key, $types[$real_type]['constructors'])) {
-                $types[$real_type]['constructors'][] = $key;
-            }
-
-            $params = '';
-            foreach ($this->constructors->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
-                    continue;
-                }
-                if ($type === 'EncryptedMessage' && $param['name'] === 'bytes') {
-                    $param['name'] = 'decrypted_message';
-                    $param['type'] = 'DecryptedMessage';
-                }
-                $stype = 'type';
-                $link_type = 'types';
-                if (isset($param['subtype'])) {
-                    $stype = 'subtype';
-                    if ($param['type'] === 'vector') {
-                        $link_type = 'constructors';
-                    }
-                }
-
-                $ptype = str_replace('.', '_', $param[$stype]);
-                switch ($ptype) {
-                    case 'true':
-                    case 'false':
-                        $ptype = 'Bool';
-                }
-                if (preg_match('/%/', $ptype)) {
-                    $ptype = $this->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
-                }
-
-                $params .= "'".$param['name']."' => ";
-                $ptype =
-                    '['.
-                    str_replace('_', '\_', $ptype).
-                    '](../'.$link_type.'/'.$ptype.'.md)';
-
-                $params .= (isset($param['subtype']) ? '\['.$ptype.'\]' : $ptype).', ';
-            }
-            $md_constructor = str_replace('_', '\_', $constructor.$layer);
-
-            $constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$real_constructor.$layer.'.md) = \['.$params.'\];<a name="'.$constructor.$layer.'"></a>  
-
-';
-
-            $table = empty($this->constructors->params[$key]) ? '' : '### Attributes:
-
-| Name     |    Type       | Required |
-|----------|:-------------:|---------:|
-';
-            if (isset($this->td_descriptions['constructors'][$rconstructor])) {
-                $table = '### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
-';
-            }
-
-            $params = '';
-            $lua_params = '';
-            $pwr_params = '';
-            $hasreplymarkup = false;
-            foreach ($this->constructors->params[$key] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
-                    continue;
-                }
-                if ($type === 'EncryptedMessage' && $param['name'] === 'bytes') {
-                    $param['name'] = 'decrypted_message';
-                    $param['type'] = 'DecryptedMessage';
-                }
-                $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
-
-                $link_type = 'types';
-                if (isset($param['subtype'])) {
-                    if ($param['type'] === 'vector') {
-                        $link_type = 'constructors';
-                    }
-                }
-                if (preg_match('/%/', $ptype)) {
-                    $ptype = $this->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
-                }
-                switch ($ptype) {
-                    case 'true':
-                    case 'false':
-                        $ptype = 'Bool';
-                }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$link_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
-                if (isset($this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']])) {
-                    $table .= $this->td_descriptions['constructors'][$rconstructor]['params'][$param['name']].'|';
-                }
-                $table .= PHP_EOL;
-
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
-
-                $params .= ", '".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype);
-                $lua_params .= ', '.$param['name'].'=';
-                $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype);
-                $pwr_params .= ', "'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype);
-                if ($param['name'] === 'reply_markup') {
-                    $hasreplymarkup = true;
-                }
-            }
-            $params = "['_' => '".$rconstructor."'".$params.']';
-            $lua_params = "{_='".$rconstructor."'".$lua_params.'}';
-            $pwr_params = '{"_": "'.$rconstructor.'"'.$pwr_params.'}';
-            $description = isset($this->td_descriptions['constructors'][$rconstructor]) ? $this->td_descriptions['constructors'][$rconstructor]['description'] : ($constructor.' attributes, type and example');
-            $header = '---
-title: '.$rconstructor.'
-description: '.$description.'
----
-## Constructor: '.str_replace('_', '\_', $rconstructor.$layer).'  
-[Back to constructors index](index.md)
-
-
-
-';
-            $table .= '
-
-
-';
-            if (isset($this->td_descriptions['constructors'][$rconstructor])) {
-                $header .= $this->td_descriptions['constructors'][$rconstructor]['description'].PHP_EOL.PHP_EOL;
-            }
-
-            $type = '### Type: ['.str_replace('_', '\_', $real_type).'](../types/'.$real_type.'.md)
-
-
-';
-            $example = '### Example:
-
-```
-$'.$constructor.$layer.' = '.$params.';
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-'.$pwr_params.'
-```
-
-
-Or, if you\'re into Lua:  
-
-
-```
-'.$constructor.$layer.'='.$lua_params.'
-
-```
-
-
-';
-            if ($hasreplymarkup) {
-                $example .= '
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-
-';
-            }
-            file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
-        }
-
-        \danog\MadelineProto\Logger::log(['Generating constructors index...'], \danog\MadelineProto\Logger::NOTICE);
-
-        ksort($constructors);
-        $last_namespace = '';
-        foreach ($constructors as $method => &$value) {
-            $new_namespace = preg_replace('/_.*/', '', $method);
-            $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
-            $value = $br.$value;
-            $last_namespace = $new_namespace;
-        }
-        file_put_contents('constructors/'.$this->index, '---
-title: Constructors
-description: List of constructors
----
-# Constructors  
-[Back to API documentation index](..)
-
-
-
-'.implode('', $constructors));
+        $this->mk_methodS();
+        $this->mk_constructors();
 
         foreach (glob('types/*') as $unlink) {
             unlink($unlink);
@@ -573,30 +73,30 @@ description: List of constructors
         }
         mkdir('types');
 
-        ksort($types);
+        ksort($this->types);
         $index = '';
 
         \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
-        foreach ($types as $otype => $keys) {
-            $new_namespace = preg_replace('/_.*/', '', $method);
-            $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
+        $last_namespace = '';
+        foreach ($this->types as $otype => $keys) {
+            $new_namespace = preg_replace('/_.*/', '', $otype);
+            //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
             $type = preg_replace('/.*_of_/', '', $type);
-            $index .= $br.'['.str_replace('_', '\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
+            $index .= '['.str_replace('_', '\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
-            foreach ($keys['constructors'] as $key) {
-                $predicate = str_replace('.', '_', $this->constructors->predicate[$key]).(isset($this->constructors->layer[$key]) ? '_'.$this->constructors->layer[$key] : '');
+            foreach ($keys['constructors'] as $data) {
+                $predicate = str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
                 $md_predicate = str_replace('_', '\_', $predicate);
                 $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
             }
             $methods = '';
-            foreach ($keys['methods'] as $key) {
-                $name = str_replace('.', '_', $this->methods->method[$key]);
+            foreach ($keys['methods'] as $data) {
+                $name = str_replace('.', '_', $data['method']);
                 $md_name = str_replace('_', '->', $name);
                 $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
 

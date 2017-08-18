@@ -74,16 +74,16 @@ class AnnotationsBuilder
     {
         \danog\MadelineProto\Logger::log(['Creating internal classes...'], \danog\MadelineProto\Logger::NOTICE);
         $handle = fopen(dirname(__FILE__).'/InternalDoc.php', 'w');
-        foreach ($this->methods->method as $key => $rmethod) {
-            if (!strpos($rmethod, '.')) {
+        foreach ($this->methods->by_id as $id => $data) {
+            if (!strpos($data['method'], '.')) {
                 continue;
             }
-            list($namespace, $method) = explode('.', $rmethod);
+            list($namespace, $method) = explode('.', $data['method']);
             if (!in_array($namespace, $this->get_method_namespaces())) {
                 continue;
             }
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $this->methods->type[$key]);
-            foreach ($this->methods->params[$key] as $param) {
+            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            foreach ($data['params'] as $param) {
                 if (in_array($param['name'], ['flags', 'random_id'])) {
                     continue;
                 }

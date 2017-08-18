@@ -11,7 +11,7 @@ description: List of methods
 <br><br>$MadelineProto->[addChatMember](addChatMember.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [int](../types/int.md), 'forward_limit' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="addChatMember"></a>  
 
 ***
-<br><br>$MadelineProto->[addChatMembers](addChatMembers.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_ids' => \[[int](../constructors/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="addChatMembers"></a>  
+<br><br>$MadelineProto->[addChatMembers](addChatMembers.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="addChatMembers"></a>  
 
 ***
 <br><br>$MadelineProto->[addRecentSticker](addRecentSticker.md)(\['is_attached' => [Bool](../types/Bool.md), 'sticker' => [InputFile](../types/InputFile.md), \]) === [$Stickers](../types/Stickers.md)<a name="addRecentSticker"></a>  
@@ -26,7 +26,7 @@ description: List of methods
 <br><br>$MadelineProto->[answerCallbackQuery](answerCallbackQuery.md)(\['callback_query_id' => [long](../types/long.md), 'text' => [string](../types/string.md), 'show_alert' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="answerCallbackQuery"></a>  
 
 ***
-<br><br>$MadelineProto->[answerInlineQuery](answerInlineQuery.md)(\['inline_query_id' => [long](../types/long.md), 'is_personal' => [Bool](../types/Bool.md), 'results' => \[[InputInlineQueryResult](../constructors/InputInlineQueryResult.md)\], 'cache_time' => [int](../types/int.md), 'next_offset' => [string](../types/string.md), 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerInlineQuery"></a>  
+<br><br>$MadelineProto->[answerInlineQuery](answerInlineQuery.md)(\['inline_query_id' => [long](../types/long.md), 'is_personal' => [Bool](../types/Bool.md), 'results' => \[[InputInlineQueryResult](../types/InputInlineQueryResult.md)\], 'cache_time' => [int](../types/int.md), 'next_offset' => [string](../types/string.md), 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerInlineQuery"></a>  
 
 ***
 <br><br>$MadelineProto->[blockUser](blockUser.md)(\['user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="blockUser"></a>  
@@ -38,7 +38,7 @@ description: List of methods
 <br><br>$MadelineProto->[changeAbout](changeAbout.md)(\['about' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeAbout"></a>  
 
 ***
-<br><br>$MadelineProto->[changeAccountTtl](changeAccountTtl.md)(\['ttl' => [accountTtl](../types/accountTtl.md), \]) === [$Ok](../types/Ok.md)<a name="changeAccountTtl"></a>  
+<br><br>$MadelineProto->[changeAccountTtl](changeAccountTtl.md)(\['ttl' => [accountTtl](../constructors/accountTtl.md), \]) === [$Ok](../types/Ok.md)<a name="changeAccountTtl"></a>  
 
 ***
 <br><br>$MadelineProto->[changeChannelAbout](changeChannelAbout.md)(\['channel_id' => [int](../types/int.md), 'about' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeChannelAbout"></a>  
@@ -47,7 +47,7 @@ description: List of methods
 <br><br>$MadelineProto->[changeChannelUsername](changeChannelUsername.md)(\['channel_id' => [int](../types/int.md), 'username' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeChannelUsername"></a>  
 
 ***
-<br><br>$MadelineProto->[changeChatDraftMessage](changeChatDraftMessage.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'draft_message' => [draftMessage](../types/draftMessage.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatDraftMessage"></a>  
+<br><br>$MadelineProto->[changeChatDraftMessage](changeChatDraftMessage.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatDraftMessage"></a>  
 
 ***
 <br><br>$MadelineProto->[changeChatMemberStatus](changeChatMemberStatus.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [int](../types/int.md), 'status' => [ChatMemberStatus](../types/ChatMemberStatus.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatMemberStatus"></a>  
@@ -104,7 +104,7 @@ description: List of methods
 <br><br>$MadelineProto->[createNewChannelChat](createNewChannelChat.md)(\['title' => [string](../types/string.md), 'is_supergroup' => [Bool](../types/Bool.md), 'about' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="createNewChannelChat"></a>  
 
 ***
-<br><br>$MadelineProto->[createNewGroupChat](createNewGroupChat.md)(\['user_ids' => \[[int](../constructors/int.md)\], 'title' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="createNewGroupChat"></a>  
+<br><br>$MadelineProto->[createNewGroupChat](createNewGroupChat.md)(\['user_ids' => \[[int](../types/int.md)\], 'title' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="createNewGroupChat"></a>  
 
 ***
 <br><br>$MadelineProto->[createNewSecretChat](createNewSecretChat.md)(\['user_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createNewSecretChat"></a>  
@@ -128,10 +128,10 @@ description: List of methods
 <br><br>$MadelineProto->[deleteChatReplyMarkup](deleteChatReplyMarkup.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="deleteChatReplyMarkup"></a>  
 
 ***
-<br><br>$MadelineProto->[deleteContacts](deleteContacts.md)(\['user_ids' => \[[int](../constructors/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteContacts"></a>  
+<br><br>$MadelineProto->[deleteContacts](deleteContacts.md)(\['user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteContacts"></a>  
 
 ***
-<br><br>$MadelineProto->[deleteMessages](deleteMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../constructors/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteMessages"></a>  
+<br><br>$MadelineProto->[deleteMessages](deleteMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteMessages"></a>  
 
 ***
 <br><br>$MadelineProto->[deleteMessagesFromUser](deleteMessagesFromUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteMessagesFromUser"></a>  
@@ -179,7 +179,7 @@ description: List of methods
 <br><br>$MadelineProto->[finishFileGeneration](finishFileGeneration.md)(\['generation_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="finishFileGeneration"></a>  
 
 ***
-<br><br>$MadelineProto->[forwardMessages](forwardMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'from_chat_id' => [long](../types/long.md), 'message_ids' => \[[long](../constructors/long.md)\], 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="forwardMessages"></a>  
+<br><br>$MadelineProto->[forwardMessages](forwardMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'from_chat_id' => [long](../types/long.md), 'message_ids' => \[[long](../types/long.md)\], 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="forwardMessages"></a>  
 
 ***
 <br><br>$MadelineProto->[getAccountTtl](getAccountTtl.md)(\[\]) === [$AccountTtl](../types/AccountTtl.md)<a name="getAccountTtl"></a>  
@@ -254,7 +254,7 @@ description: List of methods
 <br><br>$MadelineProto->[getInlineGameHighScores](getInlineGameHighScores.md)(\['inline_message_id' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \]) === [$GameHighScores](../types/GameHighScores.md)<a name="getInlineGameHighScores"></a>  
 
 ***
-<br><br>$MadelineProto->[getInlineQueryResults](getInlineQueryResults.md)(\['bot_user_id' => [int](../types/int.md), 'chat_id' => [InputPeer](../types/InputPeer.md), 'user_location' => [location](../types/location.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \]) === [$InlineQueryResults](../types/InlineQueryResults.md)<a name="getInlineQueryResults"></a>  
+<br><br>$MadelineProto->[getInlineQueryResults](getInlineQueryResults.md)(\['bot_user_id' => [int](../types/int.md), 'chat_id' => [InputPeer](../types/InputPeer.md), 'user_location' => [location](../constructors/location.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \]) === [$InlineQueryResults](../types/InlineQueryResults.md)<a name="getInlineQueryResults"></a>  
 
 ***
 <br><br>$MadelineProto->[getMe](getMe.md)(\[\]) === [$User](../types/User.md)<a name="getMe"></a>  
@@ -263,7 +263,7 @@ description: List of methods
 <br><br>$MadelineProto->[getMessage](getMessage.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_id' => [long](../types/long.md), \]) === [$Message](../types/Message.md)<a name="getMessage"></a>  
 
 ***
-<br><br>$MadelineProto->[getMessages](getMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../constructors/long.md)\], \]) === [$Messages](../types/Messages.md)<a name="getMessages"></a>  
+<br><br>$MadelineProto->[getMessages](getMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../types/long.md)\], \]) === [$Messages](../types/Messages.md)<a name="getMessages"></a>  
 
 ***
 <br><br>$MadelineProto->[getNotificationSettings](getNotificationSettings.md)(\['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), \]) === [$NotificationSettings](../types/NotificationSettings.md)<a name="getNotificationSettings"></a>  
@@ -353,10 +353,10 @@ description: List of methods
 <br><br>$MadelineProto->[registerDevice](registerDevice.md)(\['device_token' => [DeviceToken](../types/DeviceToken.md), \]) === [$Ok](../types/Ok.md)<a name="registerDevice"></a>  
 
 ***
-<br><br>$MadelineProto->[reorderStickerSets](reorderStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[long](../constructors/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="reorderStickerSets"></a>  
+<br><br>$MadelineProto->[reorderStickerSets](reorderStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="reorderStickerSets"></a>  
 
 ***
-<br><br>$MadelineProto->[reportChannelSpam](reportChannelSpam.md)(\['channel_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message_ids' => \[[long](../constructors/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="reportChannelSpam"></a>  
+<br><br>$MadelineProto->[reportChannelSpam](reportChannelSpam.md)(\['channel_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="reportChannelSpam"></a>  
 
 ***
 <br><br>$MadelineProto->[requestAuthPasswordRecovery](requestAuthPasswordRecovery.md)(\[\]) === [$AuthState](../types/AuthState.md)<a name="requestAuthPasswordRecovery"></a>  
@@ -434,7 +434,7 @@ description: List of methods
 <br><br>$MadelineProto->[setInlineGameScore](setInlineGameScore.md)(\['inline_message_id' => [string](../types/string.md), 'edit_message' => [Bool](../types/Bool.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), 'force' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="setInlineGameScore"></a>  
 
 ***
-<br><br>$MadelineProto->[setNotificationSettings](setNotificationSettings.md)(\['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), 'notification_settings' => [notificationSettings](../types/notificationSettings.md), \]) === [$Ok](../types/Ok.md)<a name="setNotificationSettings"></a>  
+<br><br>$MadelineProto->[setNotificationSettings](setNotificationSettings.md)(\['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), \]) === [$Ok](../types/Ok.md)<a name="setNotificationSettings"></a>  
 
 ***
 <br><br>$MadelineProto->[setOption](setOption.md)(\['name' => [string](../types/string.md), 'value' => [OptionValue](../types/OptionValue.md), \]) === [$Ok](../types/Ok.md)<a name="setOption"></a>  
@@ -443,7 +443,7 @@ description: List of methods
 <br><br>$MadelineProto->[setPassword](setPassword.md)(\['old_password' => [string](../types/string.md), 'new_password' => [string](../types/string.md), 'new_hint' => [string](../types/string.md), 'set_recovery_email' => [Bool](../types/Bool.md), 'new_recovery_email' => [string](../types/string.md), \]) === [$PasswordState](../types/PasswordState.md)<a name="setPassword"></a>  
 
 ***
-<br><br>$MadelineProto->[setPrivacy](setPrivacy.md)(\['key' => [PrivacyKey](../types/PrivacyKey.md), 'rules' => [privacyRules](../types/privacyRules.md), \]) === [$Ok](../types/Ok.md)<a name="setPrivacy"></a>  
+<br><br>$MadelineProto->[setPrivacy](setPrivacy.md)(\['key' => [PrivacyKey](../types/PrivacyKey.md), 'rules' => [privacyRules](../constructors/privacyRules.md), \]) === [$Ok](../types/Ok.md)<a name="setPrivacy"></a>  
 
 ***
 <br><br>$MadelineProto->[setProfilePhoto](setProfilePhoto.md)(\['photo_path' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="setProfilePhoto"></a>  
@@ -497,8 +497,8 @@ $MadelineProto->[test->testNet](test_testNet.md)(\[\]) === [$test\_Empty](../typ
 <br><br>$MadelineProto->[updateStickerSet](updateStickerSet.md)(\['set_id' => [long](../types/long.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="updateStickerSet"></a>  
 
 ***
-<br><br>$MadelineProto->[viewMessages](viewMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../constructors/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewMessages"></a>  
+<br><br>$MadelineProto->[viewMessages](viewMessages.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'message_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewMessages"></a>  
 
 ***
-<br><br>$MadelineProto->[viewTrendingStickerSets](viewTrendingStickerSets.md)(\['sticker_set_ids' => \[[long](../constructors/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewTrendingStickerSets"></a>  
+<br><br>$MadelineProto->[viewTrendingStickerSets](viewTrendingStickerSets.md)(\['sticker_set_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewTrendingStickerSets"></a>  
 

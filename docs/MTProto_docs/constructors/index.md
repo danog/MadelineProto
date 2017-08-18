@@ -4,9 +4,6 @@ description: List of constructors
 ---
 # Constructors  
 [Back to API documentation index](..)
-
-
-
 ***
 <br><br>[$MTmessage](../constructors/MTmessage.md) = \['msg_id' => [long](../types/long.md), 'seqno' => [int](../types/int.md), 'bytes' => [int](../types/int.md), 'body' => [Object](../types/Object.md), \];<a name="MTmessage"></a>  
 

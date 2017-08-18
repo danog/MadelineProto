@@ -11,15 +11,15 @@ Notifies about activity in chat
 
 ### Possible values (constructors):
 
-[sendMessageTypingAction](../constructors/sendMessageTypingAction.md)  
+[sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md)  
 
-[sendMessageCancelAction](../constructors/sendMessageCancelAction.md)  
+[sendMessageCancelAction\_17](../constructors/sendMessageCancelAction_17.md)  
 
-[sendMessageRecordVideoAction](../constructors/sendMessageRecordVideoAction.md)  
+[sendMessageRecordVideoAction\_17](../constructors/sendMessageRecordVideoAction_17.md)  
 
 [sendMessageUploadVideoAction](../constructors/sendMessageUploadVideoAction.md)  
 
-[sendMessageRecordAudioAction](../constructors/sendMessageRecordAudioAction.md)  
+[sendMessageRecordAudioAction\_17](../constructors/sendMessageRecordAudioAction_17.md)  
 
 [sendMessageUploadAudioAction](../constructors/sendMessageUploadAudioAction.md)  
 
@@ -27,9 +27,9 @@ Notifies about activity in chat
 
 [sendMessageUploadDocumentAction](../constructors/sendMessageUploadDocumentAction.md)  
 
-[sendMessageGeoLocationAction](../constructors/sendMessageGeoLocationAction.md)  
+[sendMessageGeoLocationAction\_17](../constructors/sendMessageGeoLocationAction_17.md)  
 
-[sendMessageChooseContactAction](../constructors/sendMessageChooseContactAction.md)  
+[sendMessageChooseContactAction\_17](../constructors/sendMessageChooseContactAction_17.md)  
 
 [sendMessageGamePlayAction](../constructors/sendMessageGamePlayAction.md)  
 
@@ -37,15 +37,15 @@ Notifies about activity in chat
 
 [sendMessageUploadRoundAction](../constructors/sendMessageUploadRoundAction.md)  
 
-[sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md)  
+[sendMessageTypingAction](../constructors/sendMessageTypingAction.md)  
 
-[sendMessageCancelAction\_17](../constructors/sendMessageCancelAction_17.md)  
+[sendMessageCancelAction](../constructors/sendMessageCancelAction.md)  
 
-[sendMessageRecordVideoAction\_17](../constructors/sendMessageRecordVideoAction_17.md)  
+[sendMessageRecordVideoAction](../constructors/sendMessageRecordVideoAction.md)  
 
 [sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md)  
 
-[sendMessageRecordAudioAction\_17](../constructors/sendMessageRecordAudioAction_17.md)  
+[sendMessageRecordAudioAction](../constructors/sendMessageRecordAudioAction.md)  
 
 [sendMessageUploadAudioAction\_17](../constructors/sendMessageUploadAudioAction_17.md)  
 
@@ -53,9 +53,9 @@ Notifies about activity in chat
 
 [sendMessageUploadDocumentAction\_17](../constructors/sendMessageUploadDocumentAction_17.md)  
 
-[sendMessageGeoLocationAction\_17](../constructors/sendMessageGeoLocationAction_17.md)  
+[sendMessageGeoLocationAction](../constructors/sendMessageGeoLocationAction.md)  
 
-[sendMessageChooseContactAction\_17](../constructors/sendMessageChooseContactAction_17.md)  
+[sendMessageChooseContactAction](../constructors/sendMessageChooseContactAction.md)  
 
 
 

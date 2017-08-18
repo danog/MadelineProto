@@ -28,6 +28,9 @@ trait CallHandler
         if (!isset($aargs['datacenter'])) {
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
+        if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
+            $aargs['datacenter'] = $args['id']['dc_id'];
+        }
         if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
             if ($method === 'channels.getParticipants' && isset($args['filter']) && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
                 \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);

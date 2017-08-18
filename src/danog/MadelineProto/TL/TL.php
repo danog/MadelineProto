@@ -14,12 +14,12 @@ namespace danog\MadelineProto\TL;
 
 trait TL
 {
-    private $encrypted_layer = -1;
-    private $constructors;
-    private $methods;
-    private $td_constructors;
-    private $td_methods;
-    private $td_descriptions;
+    public $encrypted_layer = -1;
+    public $constructors;
+    public $methods;
+    public $td_constructors;
+    public $td_methods;
+    public $td_descriptions;
 
     public function construct_tl($files)
     {
@@ -190,8 +190,8 @@ trait TL
             }
         }
         if (isset($files['td']) && isset($files['telegram'])) {
-            foreach ($this->td_constructors->id as $key => $id) {
-                $name = $this->td_constructors->predicate[$key];
+            foreach ($this->td_constructors->by_id as $id => $data) {
+                $name = $data['predicate'];
                 if ($this->constructors->find_by_id($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
@@ -203,8 +203,8 @@ trait TL
                     }
                 }
             }
-            foreach ($this->td_methods->id as $key => $id) {
-                $name = $this->td_methods->method[$key];
+            foreach ($this->td_methods->by_id as $id => $data) {
+                $name = $data['method'];
                 if ($this->methods->find_by_id($id) === false) {
                     unset($this->td_descriptions['methods'][$name]);
                 } else {

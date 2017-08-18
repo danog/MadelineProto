@@ -4,9 +4,6 @@ description: List of constructors
 ---
 # Constructors  
 [Back to API documentation index](..)
-
-
-
 ***
 <br><br>[$accountDaysTTL](../constructors/accountDaysTTL.md) = \['days' => [int](../types/int.md), \];<a name="accountDaysTTL"></a>  
 
@@ -424,7 +421,7 @@ description: List of constructors
 ***
 <br><br>[$help\_appUpdate](../constructors/help_appUpdate.md) = \['id' => [int](../types/int.md), 'critical' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'text' => [string](../types/string.md), \];<a name="help_appUpdate"></a>  
 
-[$help\_configSimple](../constructors/help_configSimple.md) = \['date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), 'ip_port_list' => \[[ipPort](../types/ipPort.md)\], \];<a name="help_configSimple"></a>  
+[$help\_configSimple](../constructors/help_configSimple.md) = \['date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), 'ip_port_list' => \[[ipPort](../constructors/ipPort.md)\], \];<a name="help_configSimple"></a>  
 
 [$help\_inviteText](../constructors/help_inviteText.md) = \['message' => [string](../types/string.md), \];<a name="help_inviteText"></a>  
 
