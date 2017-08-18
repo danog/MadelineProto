@@ -14,7 +14,7 @@ namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
 {
-    public function get_dialogs($force = false)
+    public function get_dialogs($force = true)
     {
         if (!isset($this->dialog_params['offset_date']) || $force || is_null($this->dialog_params['offset_date'])) {
             $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];

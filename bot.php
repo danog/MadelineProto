@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
 require 'vendor/autoload.php';
 $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
@@ -18,15 +19,9 @@ try {
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
-    if (file_exists('token.php')) {
-        require_once 'token.php';
-        $MadelineProto = new \danog\MadelineProto\API($settings);
-        $authorization = $MadelineProto->bot_login($token);
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
-    } else {
-        echo 'token.php does not exist';
-        die;
-    }
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
