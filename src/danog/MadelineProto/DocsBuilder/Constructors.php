@@ -14,7 +14,8 @@ namespace danog\MadelineProto\DocsBuilder;
 
 trait Constructors
 {
-    public function mk_constructors() {
+    public function mk_constructors()
+    {
         foreach (glob('constructors/'.$this->any) as $unlink) {
             unlink($unlink);
         }

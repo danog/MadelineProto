@@ -14,8 +14,8 @@ namespace danog\MadelineProto\DocsBuilder;
 
 trait Methods
 {
-    public function mk_methods() {
-
+    public function mk_methods()
+    {
         foreach (glob($this->settings['output_dir'].'methods/'.$this->any) as $unlink) {
             unlink($this->settings['output_dir'].$unlink);
         }
@@ -56,7 +56,7 @@ trait Methods
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
                 $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512'])) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
-                
+
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
 
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\['.$param[$type_or_subtype].'\]' : $param[$type_or_subtype]).', ';
@@ -291,6 +291,5 @@ description: List of methods
 
 
 '.implode('', $this->docs_methods));
-
     }
 }
