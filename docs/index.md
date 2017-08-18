@@ -103,8 +103,10 @@ mkdir MadelineProtoBot
 cd MadelineProtoBot
 git init .
 git submodule add https://github.com/danog/MadelineProto
-cp -a MadelineProto/*php MadelineProto/tests MadelineProto/bots MadelineProto/.env* .
+cd MadelineProto
+composer update
 cp .env.example .env
+cp -a *php tests bots .env* ..
 ```
 
 Now open `.env` and edit its values as needed.
