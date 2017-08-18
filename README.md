@@ -16,11 +16,11 @@ PHP MTProto client
 - [Installation](#installation)
 - [Examples](#examples)
 - [Methods](#methods)
+- [Uploading and downloading files](#uploading-and-downloading-files)
 - [Usage](#usage)
 - [Settings](#settings)
 - [Update management (getting incoming messages)](#handling-updates)
 - [Using a proxy](#using-a-proxy)
-- [Uploading and downloading files](#uploading-and-downloading-files)
 - [Calls](#calls)
 - [Secret chats](#secret-chats)
 - [Lua binding](#lua-binding)
@@ -124,6 +124,29 @@ You can find examples for nearly every MadelineProto function in
 
 A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 70)](https://daniil.it/MadelineProto/API_docs/).
 
+If an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username (`@username`) or bot API id (`-1029449`, `1249421`, `-100412412901`).  
+
+Methods that allow sending message entities ([messages.sendMessage](http://docs.madelineproto.xyz/API_docs/methods/messages_sendMessage.html) for example) also have an additional `parse_mode` parameter that enables or disables html/markdown parsing of the message to be sent. See the [method-specific](http://docs.madelineproto.xyz/API_docs/methods/messages_sendMessage.html) documentation for more info.  
+
+To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true:
+
+```
+$bot_API_object = $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['botAPI' => true]);
+```
+
+To disable fetching the result of a method, the array that must be provided as second parameter to method wrapper must have the `noResponse` key set to true.
+
+```
+$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['noResponse' => true]);
+```
+
+reply_markup accepts bot API reply markup objects as well as MTProto ones.
+
+```
+$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel', 'reply_markup' => $MTProto_markup]);
+$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel', 'reply_markup' => $bot_API_markup]);
+```
+
 
 Use `phone_login` to login, see [here for the parameters and the result](https://daniil.it/MadelineProto/phone_login.html).  
 Use `complete_phone_login` to complete the login, see [here for the parameters and the result](https://daniil.it/MadelineProto/complete_phone_login.html).  
@@ -142,6 +165,7 @@ You must use `get_dialogs` to get a list of all of the chats, see [here for the 
 
 You must use `get_self` to get info about the current user, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_self.html)
 
+## Uploading and downloading files
 
 MadelineProto provides wrapper methods to upload and download files that support bot API file ids.
 
@@ -175,29 +199,6 @@ $output_file_name = $MadelineProto->download_to_dir($message_media, '/tmp/dldir'
 $custom_output_file_name = $MadelineProto->download_to_file($message_media, '/tmp/dldir/customname.ext');
 $stream = fopen('php://output', 'w'); // Stream to browser like with echo
 $MadelineProto->download_to_stream($message_media, $stream, $cb, $offset, $endoffset); // offset and endoffset are optional parameters that specify the byte from which to start downloading and the byte where to stop downloading (the latter non-inclusive), if not specified default to 0 and the size of the file
-```
-
-If an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username (`@username`) or bot API id (`-1029449`, `1249421`, `-100412412901`).  
-
-Methods that allow sending message entities ([messages.sendMessage](http://docs.madelineproto.xyz/API_docs/methods/messages_sendMessage.html) for example) also have an additional `parse_mode` parameter that enables or disables html/markdown parsing of the message to be sent. See the [method-specific](http://docs.madelineproto.xyz/API_docs/methods/messages_sendMessage.html) documentation for more info.  
-
-To convert the results of methods to bot API objects you must provide a second parameter to method wrappers, containing an array with the `botAPI` key set to true:
-
-```
-$bot_API_object = $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['botAPI' => true]);
-```
-
-To disable fetching the result of a method, the array that must be provided as second parameter to method wrapper must have the `noResponse` key set to true.
-
-```
-$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['noResponse' => true]);
-```
-
-reply_markup accepts bot API reply markup objects as well as MTProto ones.
-
-```
-$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel', 'reply_markup' => $MTProto_markup]);
-$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel', 'reply_markup' => $bot_API_markup]);
 ```
 
 ## Usage
