@@ -70,8 +70,8 @@ class RPCErrorException extends \Exception
             case 'PEER_FLOOD': $message = 'Too many requests'; break;
         }
         if ($this->rpc === $message) {
-            $res = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?description_for='.$this->rpc), true);
-            if ($res['ok']) {
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?description_for='.$this->rpc), true);
+            if (isset($res['ok']) && $res['ok']) {
                 $message = $res['result'];
             }
         }
@@ -87,7 +87,7 @@ class RPCErrorException extends \Exception
                 break;
             }
         }
-        file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$additional[0].'&code='.$code.'&error='.$this->rpc);
+        @file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$additional[0].'&code='.$code.'&error='.$this->rpc);
         /*
         if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
             return;
