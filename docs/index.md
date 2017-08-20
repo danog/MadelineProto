@@ -5,10 +5,10 @@ description: PHP implementation of telegram's MTProto protocol
 # MadelineProto
 <p>
     <a href="https://styleci.io/repos/61838413">
-        <amp-img src="https://styleci.io/repos/61838413/shield" alt="StyleCI" />
+        <amp-img layout='responsive' width="103" height="20" src="https://styleci.io/repos/61838413/shield" alt="StyleCI" />
     </a>
     <a href="https://travis-ci.org/danog/MadelineProto">
-        <amp-img src="https://travis-ci.org/danog/MadelineProto.svg?branch=master" alt="Build Status" />
+        <amp-img layour='responsive' width="90" height="20" src="https://travis-ci.org/danog/MadelineProto.svg?branch=master" alt="Build Status" />
     </a>
 </p>
 
