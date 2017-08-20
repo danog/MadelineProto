@@ -14,7 +14,7 @@ Adds new member to chat. Members can't be added to private or secret chats. Memb
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the user to add|
 |forward\_limit|[int](../types/int.md) | Yes|Number of previous messages from chat to forward to new member, ignored for channel chats|

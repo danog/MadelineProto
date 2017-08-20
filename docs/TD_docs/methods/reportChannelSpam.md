@@ -14,7 +14,7 @@ Reports some supergroup channel messages from a user as spam messages
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Channel identifier|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of messages sent in the supergroup by the user, the list should be non-empty|

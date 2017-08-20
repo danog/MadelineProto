@@ -9,7 +9,7 @@ description: messages.setInlineBotResults parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |gallery|[Bool](../types/Bool.md) | Optional|
 |private|[Bool](../types/Bool.md) | Optional|
 |query\_id|[long](../types/long.md) | Yes|

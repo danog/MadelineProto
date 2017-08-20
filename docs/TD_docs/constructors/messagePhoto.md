@@ -12,7 +12,7 @@ Photo message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |photo|[photo](../types/photo.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Photo caption|
 

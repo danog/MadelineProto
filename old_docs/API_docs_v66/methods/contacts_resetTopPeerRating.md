@@ -9,7 +9,7 @@ description: contacts.resetTopPeerRating parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 

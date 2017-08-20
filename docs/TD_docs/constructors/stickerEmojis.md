@@ -12,7 +12,7 @@ Represents list of all emojis corresponding to a sticker in a sticker set. The l
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |emojis|Array of [string](../constructors/string.md) | Yes|List of emojis|
 
 

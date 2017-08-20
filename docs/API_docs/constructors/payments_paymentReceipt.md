@@ -10,7 +10,7 @@ description: payments_paymentReceipt attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |date|[int](../types/int.md) | Yes|
 |bot\_id|[int](../types/int.md) | Yes|
 |invoice|[Invoice](../types/Invoice.md) | Yes|

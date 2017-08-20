@@ -10,7 +10,7 @@ description: authorization attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[long](../types/long.md) | Yes|
 |device\_model|[string](../types/string.md) | Yes|
 |platform|[string](../types/string.md) | Yes|

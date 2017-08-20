@@ -10,7 +10,7 @@ description: accountDaysTTL attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |days|[int](../types/int.md) | Yes|
 
 

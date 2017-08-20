@@ -10,7 +10,7 @@ description: geochats_statedMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[GeoChatMessage](../types/GeoChatMessage.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

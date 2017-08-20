@@ -10,7 +10,7 @@ description: simpleDataBlock attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |raw\_data|[string](../types/string.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: messageMediaGame attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |game|[Game](../types/Game.md) | Yes|
 
 

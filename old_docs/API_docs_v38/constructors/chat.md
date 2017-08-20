@@ -10,7 +10,7 @@ description: chat attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|

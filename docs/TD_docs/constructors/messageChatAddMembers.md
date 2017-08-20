@@ -12,7 +12,7 @@ Chat members added
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |members|Array of [user](../constructors/user.md) | Yes|New chat member|
 
 

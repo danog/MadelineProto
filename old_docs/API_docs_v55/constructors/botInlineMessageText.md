@@ -10,7 +10,7 @@ description: botInlineMessageText attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|

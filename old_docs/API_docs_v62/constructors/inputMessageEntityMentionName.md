@@ -10,7 +10,7 @@ description: inputMessageEntityMentionName attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |length|[int](../types/int.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|

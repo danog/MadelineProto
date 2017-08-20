@@ -14,7 +14,7 @@ Check bot's authentication token to log in as a bot. Works only when authGetStat
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |token|[string](../types/string.md) | Yes|Bot token|
 
 

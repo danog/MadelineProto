@@ -10,7 +10,7 @@ description: updateBotInlineSend attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |query|[string](../types/string.md) | Yes|
 |geo|[GeoPoint](../types/GeoPoint.md) | Optional|

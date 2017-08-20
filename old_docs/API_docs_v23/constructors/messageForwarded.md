@@ -10,7 +10,7 @@ description: messageForwarded attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |fwd\_from\_id|[int](../types/int.md) | Yes|
 |fwd\_date|[int](../types/int.md) | Yes|

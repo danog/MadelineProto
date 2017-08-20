@@ -10,7 +10,7 @@ description: auth_authorization attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |tmp\_sessions|[int](../types/int.md) | Optional|
 |user|[User](../types/User.md) | Yes|
 

@@ -9,7 +9,7 @@ description: messages.sendMedia parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
 |clear\_draft|[Bool](../types/Bool.md) | Optional|

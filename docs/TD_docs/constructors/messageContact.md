@@ -12,7 +12,7 @@ User contact message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |contact|[contact](../types/contact.md) | Yes|Message content|
 
 

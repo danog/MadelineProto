@@ -10,7 +10,7 @@ description: decryptedMessageActionNotifyLayer attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |layer|[int](../types/int.md) | Yes|
 
 

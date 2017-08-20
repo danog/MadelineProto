@@ -12,7 +12,7 @@ Describes message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Unique message identifier|
 |sender\_user\_id|[int](../types/int.md) | Yes|Identifier of the user who sent the message, 0 if unknown. It can be unknown for channel posts which are not signed by the author|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|

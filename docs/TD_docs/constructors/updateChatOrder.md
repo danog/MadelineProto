@@ -12,7 +12,7 @@ Order of the chat in the chat list has changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |order|[long](../types/long.md) | Yes|New value of the order|
 

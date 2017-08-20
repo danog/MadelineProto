@@ -9,7 +9,7 @@ description: messages.saveDraft parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|

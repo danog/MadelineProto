@@ -14,7 +14,7 @@ Changes chat draft message
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |draft\_message|[draftMessage](../types/draftMessage.md) | Yes|New draft message, nullable|
 

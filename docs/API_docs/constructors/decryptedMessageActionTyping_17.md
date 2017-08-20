@@ -10,7 +10,7 @@ description: decryptedMessageActionTyping attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 

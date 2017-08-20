@@ -10,7 +10,7 @@ description: rpc_result attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |req\_msg\_id|[long](../types/long.md) | Yes|
 |result|[Object](../types/Object.md) | Yes|
 

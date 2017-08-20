@@ -9,7 +9,7 @@ description: auth.bindTempAuthKey parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |perm\_auth\_key\_id|[long](../types/long.md) | Yes|
 |nonce|[long](../types/long.md) | Yes|
 |expires\_at|[int](../types/int.md) | Yes|

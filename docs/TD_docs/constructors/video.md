@@ -12,7 +12,7 @@ Describes video file
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |duration|[int](../types/int.md) | Yes|Duration of the video in seconds as defined by sender|
 |width|[int](../types/int.md) | Yes|Video width as defined by sender|
 |height|[int](../types/int.md) | Yes|Video height as defined by sender|

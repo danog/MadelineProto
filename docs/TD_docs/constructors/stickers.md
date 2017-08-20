@@ -12,7 +12,7 @@ Represents list of stickers
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |stickers|Array of [sticker](../constructors/sticker.md) | Yes|Stickers|
 
 

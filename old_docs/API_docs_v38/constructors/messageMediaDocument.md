@@ -10,7 +10,7 @@ description: messageMediaDocument attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |document|[Document](../types/Document.md) | Yes|
 
 

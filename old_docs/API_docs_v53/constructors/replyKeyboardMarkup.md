@@ -10,7 +10,7 @@ description: replyKeyboardMarkup attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |resize|[Bool](../types/Bool.md) | Optional|
 |single\_use|[Bool](../types/Bool.md) | Optional|
 |selective|[Bool](../types/Bool.md) | Optional|

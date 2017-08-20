@@ -12,7 +12,7 @@ Some data about a secret chat has been changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |secret\_chat|[secretChat](../types/secretChat.md) | Yes|New data about the secret chat|
 
 

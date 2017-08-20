@@ -10,7 +10,7 @@ description: stickerPack attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |emoticon|[string](../types/string.md) | Yes|
 |documents|Array of [long](../types/long.md) | Yes|
 

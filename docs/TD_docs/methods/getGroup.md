@@ -14,7 +14,7 @@ Returns information about a group by its identifier, offline request if current 
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |group\_id|[int](../types/int.md) | Yes|Group identifier|
 
 

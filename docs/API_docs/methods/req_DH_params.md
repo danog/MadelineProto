@@ -9,7 +9,7 @@ description: req_DH_params parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[int128](../types/int128.md) | Yes|
 |server\_nonce|[int128](../types/int128.md) | Yes|
 |p|[string](../types/string.md) | Yes|

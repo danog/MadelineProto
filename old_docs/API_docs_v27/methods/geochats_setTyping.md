@@ -9,7 +9,7 @@ description: geochats.setTyping parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 |typing|[Bool](../types/Bool.md) | Yes|
 

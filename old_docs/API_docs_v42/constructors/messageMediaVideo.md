@@ -10,7 +10,7 @@ description: messageMediaVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |video|[Video](../types/Video.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 

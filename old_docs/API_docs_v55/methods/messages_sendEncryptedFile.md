@@ -9,7 +9,7 @@ description: messages.sendEncryptedFile parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 |message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
 |file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Yes|

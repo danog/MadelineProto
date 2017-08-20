@@ -10,7 +10,7 @@ description: messages_allStickers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[string](../types/string.md) | Yes|
 |sets|Array of [StickerSet](../types/StickerSet.md) | Yes|
 

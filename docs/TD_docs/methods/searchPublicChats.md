@@ -14,7 +14,7 @@ Searches public chats by prefix of their username. Currently only private and ch
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |username\_prefix|[string](../types/string.md) | Yes|Prefix of the username to search|
 
 

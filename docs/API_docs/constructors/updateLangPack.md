@@ -10,7 +10,7 @@ description: updateLangPack attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |difference|[LangPackDifference](../types/LangPackDifference.md) | Yes|
 
 

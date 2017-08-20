@@ -10,7 +10,7 @@ description: MTmessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[long](../types/long.md) | Yes|
 |seqno|[int](../types/int.md) | Yes|
 |bytes|[int](../types/int.md) | Yes|

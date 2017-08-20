@@ -12,7 +12,7 @@ Represents sticker set
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Sticker set identifier|
 |title|[string](../types/string.md) | Yes|Title of the sticker set|
 |name|[string](../types/string.md) | Yes|Name of the sticker set|

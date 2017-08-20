@@ -14,7 +14,7 @@ Bots only. Updates game score of the specified user in the game
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat a message with the game belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message|
 |edit\_message|[Bool](../types/Bool.md) | Yes|True, if message should be edited|

@@ -10,7 +10,7 @@ description: contacts_blocked attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |blocked|Array of [ContactBlocked](../types/ContactBlocked.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

@@ -12,7 +12,7 @@ Contains list of game high scores
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |scores|Array of [gameHighScore](../constructors/gameHighScore.md) | Yes|List of game high scores|
 
 

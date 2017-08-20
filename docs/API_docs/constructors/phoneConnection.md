@@ -10,7 +10,7 @@ description: phoneConnection attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[long](../types/long.md) | Yes|
 |ip|[string](../types/string.md) | Yes|
 |ipv6|[string](../types/string.md) | Yes|

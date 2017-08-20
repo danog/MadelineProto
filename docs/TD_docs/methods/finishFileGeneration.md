@@ -14,7 +14,7 @@ Finishes file generation
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |generation\_id|[long](../types/long.md) | Yes|Identifier of the generation process|
 
 

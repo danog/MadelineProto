@@ -14,7 +14,7 @@ Returns list of installed sticker sets without archived sticker sets
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |is\_masks|[Bool](../types/Bool.md) | Yes|Pass true to return masks, pass false to return stickers|
 
 

@@ -10,7 +10,7 @@ description: messageMediaInvoice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |shipping\_address\_requested|[Bool](../types/Bool.md) | Optional|
 |test|[Bool](../types/Bool.md) | Optional|
 |title|[string](../types/string.md) | Yes|

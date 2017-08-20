@@ -9,7 +9,7 @@ description: contacts.search parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |q|[string](../types/string.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 

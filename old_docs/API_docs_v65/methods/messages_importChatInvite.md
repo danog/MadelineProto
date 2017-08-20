@@ -9,7 +9,7 @@ description: messages.importChatInvite parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[string](../types/string.md) | Yes|
 
 

@@ -9,7 +9,7 @@ description: messages.readMessageContents parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [int](../types/int.md) | Yes|
 
 

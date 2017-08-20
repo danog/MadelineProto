@@ -14,7 +14,7 @@ Sends a message. Returns sent message. UpdateChatTopMessage will not be sent, so
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat to send message|
 |reply\_to\_message\_id|[long](../types/long.md) | Yes|Identifier of a message to reply to or 0|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|Pass true, to disable notification about the message, doesn't works in secret chats|

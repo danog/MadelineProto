@@ -14,7 +14,7 @@ Returns all active sessions of logged in user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Sessions](../types/Sessions.md)

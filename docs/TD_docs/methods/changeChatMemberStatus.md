@@ -14,7 +14,7 @@ Changes status of the chat member, need appropriate privileges. In channel chats
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the user to edit status, bots can be editors in the channel chats|
 |status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|New status of the member in the chat|

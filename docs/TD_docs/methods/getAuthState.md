@@ -14,7 +14,7 @@ Returns current authorization state, offline request
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

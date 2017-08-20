@@ -9,7 +9,7 @@ description: auth.dropTempAuthKeys parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |except\_auth\_keys|Array of [long](../types/long.md) | Yes|
 
 

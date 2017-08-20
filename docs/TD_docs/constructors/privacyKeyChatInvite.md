@@ -12,7 +12,7 @@ Privacy key for managing ability of invitation of the user to chats
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

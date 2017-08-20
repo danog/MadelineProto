@@ -9,7 +9,7 @@ description: messages.installStickerSet parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 |disabled|[Bool](../types/Bool.md) | Yes|
 

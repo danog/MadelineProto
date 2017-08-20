@@ -14,7 +14,7 @@ Requests to send password recovery code to email
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [PasswordRecoveryInfo](../types/PasswordRecoveryInfo.md)

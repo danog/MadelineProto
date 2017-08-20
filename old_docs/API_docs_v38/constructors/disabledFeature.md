@@ -10,7 +10,7 @@ description: disabledFeature attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |feature|[string](../types/string.md) | Yes|
 |description|[string](../types/string.md) | Yes|
 

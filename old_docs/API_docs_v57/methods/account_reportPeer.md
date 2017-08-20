@@ -9,7 +9,7 @@ description: account.reportPeer parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |reason|[ReportReason](../types/ReportReason.md) | Yes|
 

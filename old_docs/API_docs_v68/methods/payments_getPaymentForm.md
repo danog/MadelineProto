@@ -9,7 +9,7 @@ description: payments.getPaymentForm parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[int](../types/int.md) | Yes|
 
 

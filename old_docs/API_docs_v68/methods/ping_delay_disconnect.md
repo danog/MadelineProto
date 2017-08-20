@@ -9,7 +9,7 @@ description: ping_delay_disconnect parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ping\_id|[long](../types/long.md) | Yes|
 |disconnect\_delay|[int](../types/int.md) | Yes|
 

@@ -10,7 +10,7 @@ description: contacts_contacts attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |contacts|Array of [Contact](../types/Contact.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

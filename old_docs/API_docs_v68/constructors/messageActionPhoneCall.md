@@ -10,7 +10,7 @@ description: messageActionPhoneCall attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |call\_id|[long](../types/long.md) | Yes|
 |reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Optional|
 |duration|[int](../types/int.md) | Optional|

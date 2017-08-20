@@ -9,7 +9,7 @@ description: account.sendConfirmPhoneCode parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |allow\_flashcall|[Bool](../types/Bool.md) | Optional|
 |hash|[string](../types/string.md) | Yes|
 |current\_number|[Bool](../types/Bool.md) | Optional|

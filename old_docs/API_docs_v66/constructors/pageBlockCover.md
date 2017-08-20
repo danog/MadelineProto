@@ -10,7 +10,7 @@ description: pageBlockCover attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |cover|[PageBlock](../types/PageBlock.md) | Yes|
 
 

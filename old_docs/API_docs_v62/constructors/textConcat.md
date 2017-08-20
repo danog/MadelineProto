@@ -10,7 +10,7 @@ description: textConcat attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |texts|Array of [RichText](../types/RichText.md) | Yes|
 
 

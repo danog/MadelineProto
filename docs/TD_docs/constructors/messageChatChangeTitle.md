@@ -12,7 +12,7 @@ Chat title changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |title|[string](../types/string.md) | Yes|New chat title|
 
 

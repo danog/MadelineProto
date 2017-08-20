@@ -14,7 +14,7 @@ Changes chat photo. Photo can't be changed for private chats. Photo will not cha
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |photo|[InputFile](../types/InputFile.md) | Yes|New chat photo. You can use zero InputFileId to delete photo. Files accessible only by HTTP URL are not acceptable|
 

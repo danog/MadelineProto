@@ -14,7 +14,7 @@ Returns saved animations
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Animations](../types/Animations.md)

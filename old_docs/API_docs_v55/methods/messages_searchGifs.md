@@ -9,7 +9,7 @@ description: messages.searchGifs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |q|[string](../types/string.md) | Yes|
 |offset|[int](../types/int.md) | Yes|
 

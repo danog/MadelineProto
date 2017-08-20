@@ -9,7 +9,7 @@ description: stickers.createStickerSet parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |masks|[Bool](../types/Bool.md) | Optional|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |title|[string](../types/string.md) | Yes|

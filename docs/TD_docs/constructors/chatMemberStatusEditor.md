@@ -12,7 +12,7 @@ In broadcast channels, member that can post messages to the broadcast channel an
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

@@ -10,7 +10,7 @@ description: updateChannelGroup attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel\_id|[int](../types/int.md) | Yes|
 |group|[MessageGroup](../types/MessageGroup.md) | Yes|
 

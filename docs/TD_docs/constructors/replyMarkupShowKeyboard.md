@@ -12,7 +12,7 @@ Contains custom keyboard layout for fast reply to bot
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |rows|Array of [keyboardButton>](../constructors/keyboardButton>.md) | Yes|List of rows of bot keyboard buttons|
 |resize\_keyboard|[Bool](../types/Bool.md) | Yes|Do clients need to resize keyboard vertically|
 |one\_time|[Bool](../types/Bool.md) | Yes|Do clients need to hide keyboard after use|

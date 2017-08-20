@@ -10,7 +10,7 @@ description: keyboardButtonRow attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |buttons|Array of [KeyboardButton](../types/KeyboardButton.md) | Yes|
 
 

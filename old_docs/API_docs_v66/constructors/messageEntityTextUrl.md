@@ -10,7 +10,7 @@ description: messageEntityTextUrl attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |length|[int](../types/int.md) | Yes|
 |url|[string](../types/string.md) | Yes|

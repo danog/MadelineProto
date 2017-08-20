@@ -12,7 +12,7 @@ Object of this type returns on successful function call for some functions
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

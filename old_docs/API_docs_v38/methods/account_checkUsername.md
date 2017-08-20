@@ -9,7 +9,7 @@ description: account.checkUsername parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |username|[string](../types/string.md) | Yes|
 
 

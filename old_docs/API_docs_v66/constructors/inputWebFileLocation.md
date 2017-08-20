@@ -10,7 +10,7 @@ description: inputWebFileLocation attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
 

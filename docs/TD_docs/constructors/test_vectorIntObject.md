@@ -10,7 +10,7 @@ description: test_vectorIntObject attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |value|Array of [test\_Int](../constructors/test_Int.md) | Yes|
 
 

@@ -14,7 +14,7 @@ Adds many new members to the chat. Currently, available only for channels. Can't
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |user\_ids|Array of [int](../types/int.md) | Yes|Identifiers of the users to add|
 

@@ -10,7 +10,7 @@ description: documentAttributeSticker attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |mask|[Bool](../types/Bool.md) | Optional|
 |alt|[string](../types/string.md) | Yes|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|

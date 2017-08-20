@@ -12,7 +12,7 @@ Some data about a group has been changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |group|[group](../types/group.md) | Yes|New data about the group|
 
 

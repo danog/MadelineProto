@@ -12,7 +12,7 @@ Contains infotmation about period of inactivity, after which the account of curr
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |days|[int](../types/int.md) | Yes|Number of days of inactivity before account deletion, should be from 30 up to 366|
 
 

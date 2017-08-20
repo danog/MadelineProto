@@ -10,7 +10,7 @@ description: paymentSavedCredentialsCard attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 

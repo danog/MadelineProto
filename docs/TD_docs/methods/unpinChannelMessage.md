@@ -14,7 +14,7 @@ Removes pinned message in the supergroup channel. Needs editor privileges in the
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 
 

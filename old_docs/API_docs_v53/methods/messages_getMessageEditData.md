@@ -9,7 +9,7 @@ description: messages.getMessageEditData parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |id|[int](../types/int.md) | Yes|
 

@@ -14,7 +14,7 @@ Stops file downloading. If file already downloaded do nothing.
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |file\_id|[int](../types/int.md) | Yes|Identifier of file to cancel download|
 
 

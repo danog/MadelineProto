@@ -14,7 +14,7 @@ Edits text of text or game message. Non-bots can edit message in a limited perio
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat the message belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|Bots only. New message reply markup|

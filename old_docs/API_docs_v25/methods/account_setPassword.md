@@ -9,7 +9,7 @@ description: account.setPassword parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |current\_password\_hash|[bytes](../types/bytes.md) | Yes|
 |new\_salt|[bytes](../types/bytes.md) | Yes|
 |new\_password\_hash|[bytes](../types/bytes.md) | Yes|

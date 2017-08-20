@@ -14,7 +14,7 @@ Changes information about the channel. Needs creator privileges in the broadcast
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 |about|[string](../types/string.md) | Yes|New value of about, 0-255 characters|
 

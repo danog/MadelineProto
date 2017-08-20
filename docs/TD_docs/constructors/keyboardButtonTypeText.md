@@ -12,7 +12,7 @@ Simple button with a text, which should be sent when the button is pressed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

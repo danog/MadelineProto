@@ -10,7 +10,7 @@ description: upload_fileCdnRedirect attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dc\_id|[int](../types/int.md) | Yes|
 |file\_token|[bytes](../types/bytes.md) | Yes|
 |encryption\_key|[bytes](../types/bytes.md) | Yes|

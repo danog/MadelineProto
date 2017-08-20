@@ -10,7 +10,7 @@ description: photos_photos attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |photos|Array of [Photo](../types/Photo.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

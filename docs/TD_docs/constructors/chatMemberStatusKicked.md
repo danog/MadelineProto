@@ -12,7 +12,7 @@ User was kicked from the chat (and obviously is not a chat member)
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

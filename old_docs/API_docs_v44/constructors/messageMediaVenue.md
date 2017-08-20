@@ -10,7 +10,7 @@ description: messageMediaVenue attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |geo|[GeoPoint](../types/GeoPoint.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|

@@ -12,7 +12,7 @@ Only for channels, member that can delete messages of unprivileged members and k
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

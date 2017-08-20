@@ -10,7 +10,7 @@ description: updateUserTyping attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 

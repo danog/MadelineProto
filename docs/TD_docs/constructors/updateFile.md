@@ -12,7 +12,7 @@ File is downloaded/uploaded
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |file|[file](../types/file.md) | Yes|Synced file|
 
 

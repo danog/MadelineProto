@@ -10,7 +10,7 @@ description: payments_savedInfo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |has\_saved\_credentials|[Bool](../types/Bool.md) | Optional|
 |saved\_info|[PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Optional|
 

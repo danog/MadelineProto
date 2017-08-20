@@ -14,7 +14,7 @@ Returns information about messages. If message is not found, returns null on the
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, messages belongs to|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of the messages to get|
 

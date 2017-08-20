@@ -10,7 +10,7 @@ description: fileLocation attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dc\_id|[int](../types/int.md) | Yes|
 |volume\_id|[long](../types/long.md) | Yes|
 |local\_id|[int](../types/int.md) | Yes|

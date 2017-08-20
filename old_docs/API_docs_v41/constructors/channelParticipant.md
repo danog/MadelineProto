@@ -10,7 +10,7 @@ description: channelParticipant attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 

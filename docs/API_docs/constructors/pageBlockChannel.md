@@ -10,7 +10,7 @@ description: pageBlockChannel attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[Chat](../types/Chat.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: langPackDifference attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |lang\_code|[string](../types/string.md) | Yes|
 |from\_version|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|

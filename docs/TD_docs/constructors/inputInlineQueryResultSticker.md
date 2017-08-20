@@ -12,7 +12,7 @@ Represents link to a webp sticker
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the sticker thumb, if exists|
 |sticker\_url|[string](../types/string.md) | Yes|Url of the webp sticker (file with a sticker must not exceed 5MB)|

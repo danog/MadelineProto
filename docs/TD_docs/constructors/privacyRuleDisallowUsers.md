@@ -12,7 +12,7 @@ Rule to disallow all specified users
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers|
 
 

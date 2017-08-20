@@ -9,7 +9,7 @@ description: geochats.createGeoChat parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
 |address|[string](../types/string.md) | Yes|

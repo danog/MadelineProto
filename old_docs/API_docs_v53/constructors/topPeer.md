@@ -10,7 +10,7 @@ description: topPeer attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |rating|[double](../types/double.md) | Yes|
 

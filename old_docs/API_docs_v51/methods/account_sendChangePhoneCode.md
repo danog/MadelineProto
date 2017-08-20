@@ -9,7 +9,7 @@ description: account.sendChangePhoneCode parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |allow\_flashcall|[Bool](../types/Bool.md) | Optional|
 |phone\_number|[string](../types/string.md) | Yes|
 |current\_number|[Bool](../types/Bool.md) | Optional|

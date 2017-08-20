@@ -10,7 +10,7 @@ description: botInfo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|
 |share\_text|[string](../types/string.md) | Yes|

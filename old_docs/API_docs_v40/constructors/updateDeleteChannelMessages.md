@@ -10,7 +10,7 @@ description: updateDeleteChannelMessages attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |messages|Array of [int](../types/int.md) | Yes|
 |pts|[int](../types/int.md) | Yes|

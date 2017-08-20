@@ -12,7 +12,7 @@ Privacy key for managing visibility of the user status
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

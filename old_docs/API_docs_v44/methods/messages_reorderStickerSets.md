@@ -9,7 +9,7 @@ description: messages.reorderStickerSets parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |order|Array of [long](../types/long.md) | Yes|
 
 

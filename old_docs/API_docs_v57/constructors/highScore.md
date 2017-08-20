@@ -10,7 +10,7 @@ description: highScore attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pos|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|
 |score|[int](../types/int.md) | Yes|

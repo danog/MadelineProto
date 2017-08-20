@@ -12,7 +12,7 @@ Deleted user or deleted bot. There is no any information about it except user_id
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

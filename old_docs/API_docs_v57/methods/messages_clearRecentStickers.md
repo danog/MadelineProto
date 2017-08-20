@@ -9,7 +9,7 @@ description: messages.clearRecentStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |attached|[Bool](../types/Bool.md) | Optional|
 
 

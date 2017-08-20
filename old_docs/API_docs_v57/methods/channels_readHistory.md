@@ -9,7 +9,7 @@ description: channels.readHistory parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 

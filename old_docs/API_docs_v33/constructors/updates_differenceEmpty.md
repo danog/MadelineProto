@@ -10,7 +10,7 @@ description: updates_differenceEmpty attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |date|[int](../types/int.md) | Yes|
 |seq|[int](../types/int.md) | Yes|
 

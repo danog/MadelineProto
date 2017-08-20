@@ -10,7 +10,7 @@ description: pageBlockEmbedPost attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |webpage\_id|[long](../types/long.md) | Yes|
 |author\_photo\_id|[long](../types/long.md) | Yes|

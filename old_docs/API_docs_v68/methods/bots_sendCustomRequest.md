@@ -9,7 +9,7 @@ description: bots.sendCustomRequest parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |custom\_method|[string](../types/string.md) | Yes|
 |params|[DataJSON](../types/DataJSON.md) | Yes|
 

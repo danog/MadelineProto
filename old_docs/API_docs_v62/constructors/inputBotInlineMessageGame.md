@@ -10,7 +10,7 @@ description: inputBotInlineMessageGame attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 

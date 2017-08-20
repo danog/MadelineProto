@@ -10,7 +10,7 @@ description: decryptedMessageActionAcceptKey attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |exchange\_id|[long](../types/long.md) | Yes|
 |g\_b|[bytes](../types/bytes.md) | Yes|
 |key\_fingerprint|[long](../types/long.md) | Yes|

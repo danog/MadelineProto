@@ -12,7 +12,7 @@ User is a member of the chat, but have no any additional privileges
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

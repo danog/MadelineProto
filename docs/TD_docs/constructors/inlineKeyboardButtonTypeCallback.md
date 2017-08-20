@@ -12,7 +12,7 @@ A button which sends to the bot special callback query
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |data|[bytes](../types/bytes.md) | Yes|Data to be sent to the bot through a callack query|
 
 

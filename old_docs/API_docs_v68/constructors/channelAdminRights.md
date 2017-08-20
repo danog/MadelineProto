@@ -10,7 +10,7 @@ description: channelAdminRights attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |change\_info|[Bool](../types/Bool.md) | Optional|
 |post\_messages|[Bool](../types/Bool.md) | Optional|
 |edit\_messages|[Bool](../types/Bool.md) | Optional|

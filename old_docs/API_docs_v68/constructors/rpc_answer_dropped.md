@@ -10,7 +10,7 @@ description: rpc_answer_dropped attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[long](../types/long.md) | Yes|
 |seq\_no|[int](../types/int.md) | Yes|
 |bytes|[int](../types/int.md) | Yes|

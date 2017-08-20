@@ -10,7 +10,7 @@ description: upload_file attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |type|[storage\_FileType](../types/storage_FileType.md) | Yes|
 |mtime|[int](../types/int.md) | Yes|
 |bytes|[bytes](../types/bytes.md) | Yes|

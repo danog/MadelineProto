@@ -10,7 +10,7 @@ description: cdnFileHash attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 |hash|[bytes](../types/bytes.md) | Yes|

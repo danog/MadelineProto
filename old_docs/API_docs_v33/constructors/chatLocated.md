@@ -10,7 +10,7 @@ description: chatLocated attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |distance|[int](../types/int.md) | Yes|
 

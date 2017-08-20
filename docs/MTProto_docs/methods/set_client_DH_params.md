@@ -9,7 +9,7 @@ description: set_client_DH_params parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[int128](../types/int128.md) | Yes|
 |server\_nonce|[int128](../types/int128.md) | Yes|
 |encrypted\_data|[bytes](../types/bytes.md) | Yes|

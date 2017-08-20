@@ -12,7 +12,7 @@ Generated thumb
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |original\_path|[string](../types/string.md) | Yes|Path to the original file|
 |conversion|[string](../types/string.md) | Yes|String specifying conversion applied to the original file, should be persistent across application restart|
 |width|[int](../types/int.md) | Yes|Thumb width, use 0 if unknown|

@@ -10,7 +10,7 @@ description: decryptedMessageActionReadMessages attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |random\_ids|Array of [long](../types/long.md) | Yes|
 
 

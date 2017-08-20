@@ -10,7 +10,7 @@ description: dcOption attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ipv6|[Bool](../types/Bool.md) | Optional|
 |media\_only|[Bool](../types/Bool.md) | Optional|
 |tcpo\_only|[Bool](../types/Bool.md) | Optional|

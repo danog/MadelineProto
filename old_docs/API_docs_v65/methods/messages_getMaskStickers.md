@@ -9,7 +9,7 @@ description: messages.getMaskStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[int](../types/int.md) | Yes|
 
 

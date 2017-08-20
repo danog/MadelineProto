@@ -10,7 +10,7 @@ description: account_password attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |current\_salt|[bytes](../types/bytes.md) | Yes|
 |new\_salt|[bytes](../types/bytes.md) | Yes|
 |hint|[string](../types/string.md) | Yes|

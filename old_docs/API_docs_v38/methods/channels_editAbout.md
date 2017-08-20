@@ -9,7 +9,7 @@ description: channels.editAbout parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |about|[string](../types/string.md) | Yes|
 

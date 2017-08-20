@@ -14,7 +14,7 @@ Sends notification about user activity in a chat
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|Action description|
 

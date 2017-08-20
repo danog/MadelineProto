@@ -10,7 +10,7 @@ description: messages_stickerSetInstallResultArchive attributes, type and exampl
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Yes|
 
 

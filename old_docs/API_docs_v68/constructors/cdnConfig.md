@@ -10,7 +10,7 @@ description: cdnConfig attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |public\_keys|Array of [CdnPublicKey](../types/CdnPublicKey.md) | Yes|
 
 

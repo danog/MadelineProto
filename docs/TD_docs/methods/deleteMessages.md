@@ -14,7 +14,7 @@ Deletes messages. UpdateDeleteMessages will not be sent for messages deleted thr
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of messages to delete|
 

@@ -10,7 +10,7 @@ description: decryptedMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[string](../types/string.md) | Yes|
 |media|[DecryptedMessageMedia](../types/DecryptedMessageMedia.md) | Yes|
 

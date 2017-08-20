@@ -10,7 +10,7 @@ description: channelBannedRights attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |view\_messages|[Bool](../types/Bool.md) | Optional|
 |send\_messages|[Bool](../types/Bool.md) | Optional|
 |send\_media|[Bool](../types/Bool.md) | Optional|

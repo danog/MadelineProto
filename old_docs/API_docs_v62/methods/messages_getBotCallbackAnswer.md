@@ -9,7 +9,7 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |game|[Bool](../types/Bool.md) | Optional|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |msg\_id|[int](../types/int.md) | Yes|

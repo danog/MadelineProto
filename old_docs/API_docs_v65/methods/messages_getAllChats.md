@@ -9,7 +9,7 @@ description: messages.getAllChats parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |except\_ids|Array of [int](../types/int.md) | Yes|
 
 

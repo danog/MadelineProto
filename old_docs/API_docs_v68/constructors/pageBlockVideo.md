@@ -10,7 +10,7 @@ description: pageBlockVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |autoplay|[Bool](../types/Bool.md) | Optional|
 |loop|[Bool](../types/Bool.md) | Optional|
 |video\_id|[long](../types/long.md) | Yes|

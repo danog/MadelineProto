@@ -9,7 +9,7 @@ description: auth.recoverPassword parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |code|[string](../types/string.md) | Yes|
 
 

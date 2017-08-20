@@ -9,7 +9,7 @@ description: bots.answerWebhookJSONQuery parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |query\_id|[long](../types/long.md) | Yes|
 |data|[DataJSON](../types/DataJSON.md) | Yes|
 

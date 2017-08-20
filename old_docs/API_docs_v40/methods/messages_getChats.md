@@ -9,7 +9,7 @@ description: messages.getChats parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [InputChat](../types/InputChat.md) | Yes|
 
 

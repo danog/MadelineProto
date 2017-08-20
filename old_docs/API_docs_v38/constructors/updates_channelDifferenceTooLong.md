@@ -10,7 +10,7 @@ description: updates_channelDifferenceTooLong attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pts|[int](../types/int.md) | Yes|
 |timeout|[int](../types/int.md) | Optional|
 |top\_message|[int](../types/int.md) | Yes|

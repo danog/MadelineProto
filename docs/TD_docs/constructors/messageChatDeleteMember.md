@@ -12,7 +12,7 @@ Chat member deleted
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user|[user](../types/user.md) | Yes|Left or kicked chat member|
 
 

@@ -9,7 +9,7 @@ description: phone.saveCallDebug parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 |debug|[DataJSON](../types/DataJSON.md) | Yes|
 

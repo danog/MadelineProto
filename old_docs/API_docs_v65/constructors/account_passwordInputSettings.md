@@ -10,7 +10,7 @@ description: account_passwordInputSettings attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |new\_salt|[bytes](../types/bytes.md) | Optional|
 |new\_password\_hash|[bytes](../types/bytes.md) | Optional|
 |hint|[string](../types/string.md) | Optional|

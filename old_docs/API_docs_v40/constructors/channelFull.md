@@ -10,7 +10,7 @@ description: channelFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|

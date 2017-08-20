@@ -14,7 +14,7 @@ Changes chat title. Title can't be changed for private chats. Title will not cha
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |title|[string](../types/string.md) | Yes|New title of a chat, 0-255 characters|
 

@@ -12,7 +12,7 @@ Contains part of the list of user photos
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |total\_count|[int](../types/int.md) | Yes|Total number of user profile photos|
 |photos|Array of [photo](../constructors/photo.md) | Yes|List of photos|
 

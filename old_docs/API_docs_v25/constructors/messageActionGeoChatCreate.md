@@ -10,7 +10,7 @@ description: messageActionGeoChatCreate attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|
 

@@ -12,7 +12,7 @@ Screenshot of messages in secret chat was taken
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

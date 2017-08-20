@@ -9,7 +9,7 @@ description: auth.importAuthorization parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |bytes|[bytes](../types/bytes.md) | Yes|
 

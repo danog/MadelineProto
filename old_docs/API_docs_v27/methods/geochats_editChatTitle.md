@@ -9,7 +9,7 @@ description: geochats.editChatTitle parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|

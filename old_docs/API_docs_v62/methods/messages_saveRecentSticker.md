@@ -9,7 +9,7 @@ description: messages.saveRecentSticker parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |attached|[Bool](../types/Bool.md) | Optional|
 |id|[InputDocument](../types/InputDocument.md) | Yes|
 |unsave|[Bool](../types/Bool.md) | Yes|

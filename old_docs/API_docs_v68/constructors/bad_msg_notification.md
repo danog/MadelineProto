@@ -10,7 +10,7 @@ description: bad_msg_notification attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bad\_msg\_id|[long](../types/long.md) | Yes|
 |bad\_msg\_seqno|[int](../types/int.md) | Yes|
 |error\_code|[int](../types/int.md) | Yes|

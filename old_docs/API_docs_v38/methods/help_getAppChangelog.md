@@ -9,7 +9,7 @@ description: help.getAppChangelog parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |device\_model|[string](../types/string.md) | Yes|
 |system\_version|[string](../types/string.md) | Yes|
 |app\_version|[string](../types/string.md) | Yes|

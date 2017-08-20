@@ -10,7 +10,7 @@ description: updateShortSentMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |out|[Bool](../types/Bool.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 |pts|[int](../types/int.md) | Yes|

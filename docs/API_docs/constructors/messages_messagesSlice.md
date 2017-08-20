@@ -10,7 +10,7 @@ description: messages_messagesSlice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |count|[int](../types/int.md) | Yes|
 |messages|Array of [Message](../types/Message.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|

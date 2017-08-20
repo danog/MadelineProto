@@ -9,7 +9,7 @@ description: channels.exportMessageLink parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |id|[int](../types/int.md) | Yes|
 

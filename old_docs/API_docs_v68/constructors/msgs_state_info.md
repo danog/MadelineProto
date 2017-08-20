@@ -10,7 +10,7 @@ description: msgs_state_info attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |req\_msg\_id|[long](../types/long.md) | Yes|
 |info|[string](../types/string.md) | Yes|
 

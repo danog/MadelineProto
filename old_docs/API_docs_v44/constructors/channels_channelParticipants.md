@@ -10,7 +10,7 @@ description: channels_channelParticipants attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |count|[int](../types/int.md) | Yes|
 |participants|Array of [ChannelParticipant](../types/ChannelParticipant.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

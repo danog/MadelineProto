@@ -12,7 +12,7 @@ Photo message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |photo|[InputFile](../types/InputFile.md) | Yes|Photo to send|
 |thumb|[InputThumb](../types/InputThumb.md) | Yes|Photo thumb to send, is sent to the other party in secret chats only|
 |added\_sticker\_file\_ids|Array of [int](../constructors/int.md) | Yes|File identifiers of stickers added onto the photo|

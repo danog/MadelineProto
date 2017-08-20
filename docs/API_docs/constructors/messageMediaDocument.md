@@ -10,7 +10,7 @@ description: messageMediaDocument attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |document|[Document](../types/Document.md) | Optional|
 |caption|[string](../types/string.md) | Optional|
 |ttl\_seconds|[int](../types/int.md) | Optional|

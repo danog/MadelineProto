@@ -10,7 +10,7 @@ description: inputMediaGame attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputGame](../types/InputGame.md) | Yes|
 
 

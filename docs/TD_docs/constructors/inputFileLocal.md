@@ -12,7 +12,7 @@ File deifned by local path
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |path|[string](../types/string.md) | Yes|Local path to the file|
 
 

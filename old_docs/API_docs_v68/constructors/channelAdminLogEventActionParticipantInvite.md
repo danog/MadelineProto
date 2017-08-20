@@ -10,7 +10,7 @@ description: channelAdminLogEventActionParticipantInvite attributes, type and ex
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |participant|[ChannelParticipant](../types/ChannelParticipant.md) | Yes|
 
 

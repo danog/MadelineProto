@@ -10,7 +10,7 @@ description: decryptedMessageActionRequestKey attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |exchange\_id|[long](../types/long.md) | Yes|
 |g\_a|[bytes](../types/bytes.md) | Yes|
 

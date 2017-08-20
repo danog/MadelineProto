@@ -9,7 +9,7 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |force|[Bool](../types/Bool.md) | Optional|
 |order|Array of [InputPeer](../types/InputPeer.md) | Yes|
 

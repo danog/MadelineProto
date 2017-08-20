@@ -12,7 +12,7 @@ User is offline
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |was\_online|[int](../types/int.md) | Yes|Unix time user was online last time|
 
 

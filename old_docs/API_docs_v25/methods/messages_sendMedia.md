@@ -9,7 +9,7 @@ description: messages.sendMedia parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |reply\_to\_msg\_id|[int](../types/int.md) | Yes|
 |media|[InputMedia](../types/InputMedia.md) | Yes|

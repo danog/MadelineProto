@@ -12,7 +12,7 @@ Chat with unlimited number of members
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel|[channel](../types/channel.md) | Yes|Information about the chat|
 
 

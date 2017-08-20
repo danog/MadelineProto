@@ -9,7 +9,7 @@ description: payments.sendPaymentForm parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[int](../types/int.md) | Yes|
 |requested\_info\_id|[string](../types/string.md) | Optional|
 |shipping\_option\_id|[string](../types/string.md) | Optional|

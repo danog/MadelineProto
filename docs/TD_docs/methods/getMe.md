@@ -14,7 +14,7 @@ Returns current logged in user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [User](../types/User.md)

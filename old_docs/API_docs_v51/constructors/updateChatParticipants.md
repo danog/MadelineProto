@@ -10,7 +10,7 @@ description: updateChatParticipants attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |participants|[ChatParticipants](../types/ChatParticipants.md) | Yes|
 
 

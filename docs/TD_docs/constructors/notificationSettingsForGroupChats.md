@@ -12,7 +12,7 @@ Notification settings applied to all group and broadcast channel chats (supergro
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

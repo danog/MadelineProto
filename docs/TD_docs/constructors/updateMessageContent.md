@@ -12,7 +12,7 @@ Sent message gets new content
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |message\_id|[long](../types/long.md) | Yes|Message identifier|
 |new\_content|[MessageContent](../types/MessageContent.md) | Yes|New message content|

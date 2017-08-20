@@ -12,7 +12,7 @@ Boolean option
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |value|[Bool](../types/Bool.md) | Yes|Value of an option|
 
 

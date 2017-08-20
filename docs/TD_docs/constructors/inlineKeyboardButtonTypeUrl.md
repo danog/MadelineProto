@@ -12,7 +12,7 @@ A button which opens the specified URL
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |url|[string](../types/string.md) | Yes|URL to open|
 
 

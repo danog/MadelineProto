@@ -10,7 +10,7 @@ description: dh_gen_ok attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[int128](../types/int128.md) | Yes|
 |server\_nonce|[int128](../types/int128.md) | Yes|
 |new\_nonce\_hash1|[int128](../types/int128.md) | Yes|

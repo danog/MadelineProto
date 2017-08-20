@@ -12,7 +12,7 @@ Represents an audio cached on the telegram server
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |audio|[audio](../types/audio.md) | Yes|The audio|
 

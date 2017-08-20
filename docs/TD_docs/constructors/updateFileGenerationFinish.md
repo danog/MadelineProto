@@ -12,7 +12,7 @@ File generation is finished
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |file|[file](../types/file.md) | Yes|Generated file|
 
 

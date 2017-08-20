@@ -10,7 +10,7 @@ description: documentAttributeVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |round\_message|[Bool](../types/Bool.md) | Optional|
 |duration|[int](../types/int.md) | Yes|
 |w|[int](../types/int.md) | Yes|

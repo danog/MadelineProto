@@ -10,7 +10,7 @@ description: inputAppEvent attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |time|[double](../types/double.md) | Yes|
 |type|[string](../types/string.md) | Yes|
 |peer|[long](../types/long.md) | Yes|

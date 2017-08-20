@@ -10,7 +10,7 @@ description: chat attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |creator|[Bool](../types/Bool.md) | Optional|
 |kicked|[Bool](../types/Bool.md) | Optional|
 |left|[Bool](../types/Bool.md) | Optional|

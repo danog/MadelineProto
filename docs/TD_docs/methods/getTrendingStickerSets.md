@@ -14,7 +14,7 @@ Returns list of trending sticker sets
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [StickerSets](../types/StickerSets.md)

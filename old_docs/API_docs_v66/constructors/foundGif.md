@@ -10,7 +10,7 @@ description: foundGif attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |thumb\_url|[string](../types/string.md) | Yes|
 |content\_url|[string](../types/string.md) | Yes|

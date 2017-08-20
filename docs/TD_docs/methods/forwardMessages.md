@@ -14,7 +14,7 @@ Forwards previously sent messages. Returns forwarded messages in the same order 
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of a chat to forward messages|
 |from\_chat\_id|[long](../types/long.md) | Yes|Identifier of a chat to forward from|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of messages to forward|

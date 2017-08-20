@@ -10,7 +10,7 @@ description: messages_recentStickers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[int](../types/int.md) | Yes|
 |stickers|Array of [Document](../types/Document.md) | Yes|
 

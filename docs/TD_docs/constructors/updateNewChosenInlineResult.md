@@ -12,7 +12,7 @@ Bots only. User has chosen a result of the inline query
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |sender\_user\_id|[int](../types/int.md) | Yes|Identifier of the user who sent the query|
 |user\_location|[location](../types/location.md) | Yes|User location, provided by the client, nullable|
 |query|[string](../types/string.md) | Yes|Text of the query|

@@ -10,7 +10,7 @@ description: decryptedMessageActionResend attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |start\_seq\_no|[int](../types/int.md) | Yes|
 |end\_seq\_no|[int](../types/int.md) | Yes|
 

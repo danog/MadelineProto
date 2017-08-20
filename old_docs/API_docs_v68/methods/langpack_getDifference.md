@@ -9,7 +9,7 @@ description: langpack.getDifference parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |from\_version|[int](../types/int.md) | Yes|
 
 

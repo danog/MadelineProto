@@ -14,7 +14,7 @@ Removes animation from the list of saved animations
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |animation|[InputFile](../types/InputFile.md) | Yes|Animation file to delete|
 
 

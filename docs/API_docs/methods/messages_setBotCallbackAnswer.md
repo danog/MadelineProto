@@ -9,7 +9,7 @@ description: messages.setBotCallbackAnswer parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |alert|[Bool](../types/Bool.md) | Optional|
 |query\_id|[long](../types/long.md) | Yes|
 |message|[string](../types/string.md) | Optional|

@@ -9,7 +9,7 @@ description: messages.getDocumentByHash parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |sha256|[bytes](../types/bytes.md) | Yes|
 |size|[int](../types/int.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|

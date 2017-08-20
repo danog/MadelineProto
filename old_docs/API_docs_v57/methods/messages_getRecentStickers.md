@@ -9,7 +9,7 @@ description: messages.getRecentStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |attached|[Bool](../types/Bool.md) | Optional|
 |hash|[int](../types/int.md) | Yes|
 

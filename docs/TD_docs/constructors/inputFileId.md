@@ -12,7 +12,7 @@ File defined by its id
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|Unique file identifier|
 
 

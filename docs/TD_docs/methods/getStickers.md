@@ -14,7 +14,7 @@ Returns stickers corresponding to given emoji
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |emoji|[string](../types/string.md) | Yes|String representation of emoji. If empty, returns all known stickers|
 
 

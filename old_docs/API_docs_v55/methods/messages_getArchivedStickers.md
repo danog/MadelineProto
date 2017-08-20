@@ -9,7 +9,7 @@ description: messages.getArchivedStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset\_id|[long](../types/long.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 

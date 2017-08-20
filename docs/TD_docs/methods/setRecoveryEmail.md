@@ -14,7 +14,7 @@ Changes user recovery email. If new recovery email is specified, then error EMAI
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |password|[string](../types/string.md) | Yes|Current user password|
 |new\_recovery\_email|[string](../types/string.md) | Yes|New recovery email|
 

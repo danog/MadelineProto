@@ -10,7 +10,7 @@ description: keyboardButtonUrl attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |text|[string](../types/string.md) | Yes|
 |url|[string](../types/string.md) | Yes|
 

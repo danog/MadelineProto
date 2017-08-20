@@ -74,13 +74,13 @@ trait Methods
             $table = empty($data['params']) ? '' : '### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 ';
             if (isset($this->td_descriptions['methods'][$data['method']])) {
                 $table = '### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 ';
             }
 

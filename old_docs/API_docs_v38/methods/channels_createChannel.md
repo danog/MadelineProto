@@ -9,7 +9,7 @@ description: channels.createChannel parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |about|[string](../types/string.md) | Yes|
 |users|Array of [InputUser](../types/InputUser.md) | Yes|

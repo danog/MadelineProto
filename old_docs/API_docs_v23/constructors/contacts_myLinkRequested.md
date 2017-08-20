@@ -10,7 +10,7 @@ description: contacts_myLinkRequested attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |contact|[Bool](../types/Bool.md) | Yes|
 
 

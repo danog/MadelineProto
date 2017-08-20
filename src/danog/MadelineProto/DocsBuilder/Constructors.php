@@ -77,13 +77,13 @@ trait Constructors
             $table = empty($data['params']) ? '' : '### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 ';
             if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
                 $table = '### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 ';
             }
             $params = '';

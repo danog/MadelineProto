@@ -10,7 +10,7 @@ description: chatInvite attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[Bool](../types/Bool.md) | Optional|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |public|[Bool](../types/Bool.md) | Optional|

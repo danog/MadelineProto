@@ -12,7 +12,7 @@ User with information about its chat joining/kicking
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user\_id|[int](../types/int.md) | Yes|User identifier of the chat member|
 |inviter\_user\_id|[int](../types/int.md) | Yes|Identifier of a user invited this member to/kicked this member from the chat, 0 if unknown|
 |join\_date|[int](../types/int.md) | Yes|Date the user has joined a chat, unix time|

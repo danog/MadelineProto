@@ -12,7 +12,7 @@ Represents list of animations
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |animations|Array of [animation](../constructors/animation.md) | Yes|Animations|
 
 

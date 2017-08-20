@@ -10,7 +10,7 @@ description: pageBlockEmbed attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |full\_width|[Bool](../types/Bool.md) | Optional|
 |allow\_scrolling|[Bool](../types/Bool.md) | Optional|
 |url|[string](../types/string.md) | Optional|

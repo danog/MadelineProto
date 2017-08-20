@@ -10,7 +10,7 @@ description: messages_sentMessageLink attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |media|[MessageMedia](../types/MessageMedia.md) | Yes|

@@ -9,7 +9,7 @@ description: messages.getWebPagePreview parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[string](../types/string.md) | Yes|
 
 

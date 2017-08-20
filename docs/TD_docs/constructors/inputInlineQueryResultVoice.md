@@ -12,7 +12,7 @@ Represents link to a opus encoded audio file in ogg container
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |title|[string](../types/string.md) | Yes|Title of the voice file|
 |voice\_url|[string](../types/string.md) | Yes|Url of the voice file|

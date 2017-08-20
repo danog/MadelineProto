@@ -9,7 +9,7 @@ description: messages.getStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |emoticon|[string](../types/string.md) | Yes|
 |hash|[string](../types/string.md) | Yes|
 

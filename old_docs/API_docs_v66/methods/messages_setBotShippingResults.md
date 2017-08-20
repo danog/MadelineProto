@@ -9,7 +9,7 @@ description: messages.setBotShippingResults parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |query\_id|[long](../types/long.md) | Yes|
 |error|[string](../types/string.md) | Optional|
 |shipping\_options|Array of [ShippingOption](../types/ShippingOption.md) | Optional|

@@ -10,7 +10,7 @@ description: geochats_messagesSlice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |count|[int](../types/int.md) | Yes|
 |messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|

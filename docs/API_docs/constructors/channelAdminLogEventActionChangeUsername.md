@@ -10,7 +10,7 @@ description: channelAdminLogEventActionChangeUsername attributes, type and examp
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |prev\_value|[string](../types/string.md) | Yes|
 |new\_value|[string](../types/string.md) | Yes|
 

@@ -10,7 +10,7 @@ description: channelMessagesFilter attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |exclude\_new\_messages|[Bool](../types/Bool.md) | Optional|
 |ranges|Array of [MessageRange](../types/MessageRange.md) | Yes|
 

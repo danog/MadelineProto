@@ -10,7 +10,7 @@ description: inputBotInlineResultGame attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |short\_name|[string](../types/string.md) | Yes|
 |send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Yes|

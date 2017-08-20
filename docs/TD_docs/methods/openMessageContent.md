@@ -14,7 +14,7 @@ Message content is opened, for example the user has opened a photo, a video, a d
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier of the message|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message with opened content|
 

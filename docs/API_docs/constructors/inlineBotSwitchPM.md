@@ -10,7 +10,7 @@ description: inlineBotSwitchPM attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |text|[string](../types/string.md) | Yes|
 |start\_param|[string](../types/string.md) | Yes|
 

@@ -10,7 +10,7 @@ description: messages_stickerSet attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |set|[StickerSet](../types/StickerSet.md) | Yes|
 |packs|Array of [StickerPack](../types/StickerPack.md) | Yes|
 |documents|Array of [Document](../types/Document.md) | Yes|

@@ -12,7 +12,7 @@ Bots only. New incoming callback query
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Unique query identifier|
 |sender\_user\_id|[int](../types/int.md) | Yes|Identifier of the user who sent the query|
 |chat\_id|[long](../types/long.md) | Yes|Identifier of the chat, in which the query was sent|

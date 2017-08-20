@@ -14,7 +14,7 @@ Returns background wallpapers
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Wallpapers](../types/Wallpapers.md)

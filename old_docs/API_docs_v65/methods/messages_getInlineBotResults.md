@@ -9,7 +9,7 @@ description: messages.getInlineBotResults parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bot|[InputUser](../types/InputUser.md) | Yes|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|

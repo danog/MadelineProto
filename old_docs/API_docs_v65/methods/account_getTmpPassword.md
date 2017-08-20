@@ -9,7 +9,7 @@ description: account.getTmpPassword parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |password\_hash|[bytes](../types/bytes.md) | Yes|
 |period|[int](../types/int.md) | Yes|
 

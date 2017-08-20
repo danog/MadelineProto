@@ -9,7 +9,7 @@ description: phone.setCallRating parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 |rating|[int](../types/int.md) | Yes|
 |comment|[string](../types/string.md) | Yes|

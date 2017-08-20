@@ -10,7 +10,7 @@ description: messages_savedGifs attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[int](../types/int.md) | Yes|
 |gifs|Array of [Document](../types/Document.md) | Yes|
 

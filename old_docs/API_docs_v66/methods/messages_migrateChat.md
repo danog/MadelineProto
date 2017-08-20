@@ -9,7 +9,7 @@ description: messages.migrateChat parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 
 

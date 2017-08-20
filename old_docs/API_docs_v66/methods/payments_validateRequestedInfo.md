@@ -9,7 +9,7 @@ description: payments.validateRequestedInfo parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |save|[Bool](../types/Bool.md) | Optional|
 |msg\_id|[int](../types/int.md) | Yes|
 |info|[PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|

@@ -9,7 +9,7 @@ description: messages.deleteMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |revoke|[Bool](../types/Bool.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
 

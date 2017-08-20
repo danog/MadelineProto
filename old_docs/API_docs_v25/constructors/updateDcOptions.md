@@ -10,7 +10,7 @@ description: updateDcOptions attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dc\_options|Array of [DcOption](../types/DcOption.md) | Yes|
 
 

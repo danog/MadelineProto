@@ -12,7 +12,7 @@ Represents user contact
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |contact|[contact](../types/contact.md) | Yes|User contact|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the result thumb, if exists|

@@ -10,7 +10,7 @@ description: updateChatParticipantAdd attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|
 |inviter\_id|[int](../types/int.md) | Yes|

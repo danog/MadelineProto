@@ -9,7 +9,7 @@ description: phone.receivedCall parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 
 

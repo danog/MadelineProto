@@ -9,7 +9,7 @@ description: stickers.changeStickerPosition parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |sticker|[InputDocument](../types/InputDocument.md) | Yes|
 |position|[int](../types/int.md) | Yes|
 

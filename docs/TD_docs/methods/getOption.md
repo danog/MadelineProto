@@ -14,7 +14,7 @@ Returns value of an option by its name. See list of available options on https: 
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |name|[string](../types/string.md) | Yes|Name of the option|
 
 

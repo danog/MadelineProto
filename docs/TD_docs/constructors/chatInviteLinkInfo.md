@@ -12,7 +12,7 @@ Contains information about chat invite link
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier of the invite link or 0 if user is not a member of this chat|
 |title|[string](../types/string.md) | Yes|Title of the chat|
 |photo|[chatPhoto](../types/chatPhoto.md) | Yes|Chat photo, nullable|

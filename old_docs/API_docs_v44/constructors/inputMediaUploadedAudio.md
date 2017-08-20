@@ -10,7 +10,7 @@ description: inputMediaUploadedAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |duration|[int](../types/int.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|

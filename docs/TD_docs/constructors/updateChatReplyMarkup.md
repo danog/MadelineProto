@@ -12,7 +12,7 @@ Default chat reply markup has changed. It can happen because new message with re
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |reply\_markup\_message\_id|[long](../types/long.md) | Yes|Identifier of the message from which reply markup need to be used or 0 if there is no default custom reply markup in the chat|
 

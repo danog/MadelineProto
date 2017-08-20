@@ -10,7 +10,7 @@ description: webPageExternal attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |display\_url|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Optional|

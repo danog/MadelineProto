@@ -9,7 +9,7 @@ description: messages.sendMessage parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|

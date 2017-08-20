@@ -9,7 +9,7 @@ description: account.getPrivacy parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
 
 

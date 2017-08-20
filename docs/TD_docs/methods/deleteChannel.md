@@ -14,7 +14,7 @@ Deletes channel along with all messages in corresponding chat. Releases channel 
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 
 

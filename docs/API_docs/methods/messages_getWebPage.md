@@ -9,7 +9,7 @@ description: messages.getWebPage parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |hash|[int](../types/int.md) | Yes|
 

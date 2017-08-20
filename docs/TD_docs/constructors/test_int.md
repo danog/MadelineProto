@@ -10,7 +10,7 @@ description: test_int attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |value|[int](../types/int.md) | Yes|
 
 

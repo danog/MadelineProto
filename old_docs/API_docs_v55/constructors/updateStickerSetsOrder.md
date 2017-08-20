@@ -10,7 +10,7 @@ description: updateStickerSetsOrder attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |order|Array of [long](../types/long.md) | Yes|
 
 

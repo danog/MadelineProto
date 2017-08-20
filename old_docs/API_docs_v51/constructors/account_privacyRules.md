@@ -10,7 +10,7 @@ description: account_privacyRules attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

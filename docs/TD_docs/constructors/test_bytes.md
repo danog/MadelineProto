@@ -10,7 +10,7 @@ description: test_bytes attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |value|[bytes](../types/bytes.md) | Yes|
 
 

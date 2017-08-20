@@ -10,7 +10,7 @@ description: userFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user|[User](../types/User.md) | Yes|
 |link|[contacts\_Link](../types/contacts_Link.md) | Yes|
 |profile\_photo|[Photo](../types/Photo.md) | Yes|

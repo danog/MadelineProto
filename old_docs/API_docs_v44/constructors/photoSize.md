@@ -10,7 +10,7 @@ description: photoSize attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |type|[string](../types/string.md) | Yes|
 |location|[FileLocation](../types/FileLocation.md) | Yes|
 |w|[int](../types/int.md) | Yes|

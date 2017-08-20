@@ -10,7 +10,7 @@ description: messageMediaPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |photo|[Photo](../types/Photo.md) | Optional|
 |caption|[string](../types/string.md) | Optional|
 |ttl\_seconds|[int](../types/int.md) | Optional|

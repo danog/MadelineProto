@@ -12,7 +12,7 @@ Code is delivered through private Telegram message, which can be viewed in the o
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |length|[int](../types/int.md) | Yes|Length of the code|
 
 

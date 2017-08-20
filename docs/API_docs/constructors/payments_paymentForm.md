@@ -10,7 +10,7 @@ description: payments_paymentForm attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |can\_save\_credentials|[Bool](../types/Bool.md) | Optional|
 |password\_missing|[Bool](../types/Bool.md) | Optional|
 |bot\_id|[int](../types/int.md) | Yes|

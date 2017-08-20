@@ -10,7 +10,7 @@ description: updateServiceNotification attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |popup|[Bool](../types/Bool.md) | Optional|
 |inbox\_date|[int](../types/int.md) | Optional|
 |type|[string](../types/string.md) | Yes|

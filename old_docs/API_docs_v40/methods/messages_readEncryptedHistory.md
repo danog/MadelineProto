@@ -9,7 +9,7 @@ description: messages.readEncryptedHistory parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 |max\_date|[int](../types/int.md) | Yes|
 

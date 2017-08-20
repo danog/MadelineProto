@@ -12,7 +12,7 @@ Represents one button of the bot keyboard
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |text|[string](../types/string.md) | Yes|Text of the button|
 |type|[KeyboardButtonType](../types/KeyboardButtonType.md) | Yes|Type of the button|
 

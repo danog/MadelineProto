@@ -9,7 +9,7 @@ description: contacts.getSuggested parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |limit|[int](../types/int.md) | Yes|
 
 

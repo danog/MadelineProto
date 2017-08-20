@@ -10,7 +10,7 @@ description: client_DH_inner_data attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[int128](../types/int128.md) | Yes|
 |server\_nonce|[int128](../types/int128.md) | Yes|
 |retry\_id|[long](../types/long.md) | Yes|

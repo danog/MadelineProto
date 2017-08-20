@@ -10,7 +10,7 @@ description: help_inviteText attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[string](../types/string.md) | Yes|
 
 

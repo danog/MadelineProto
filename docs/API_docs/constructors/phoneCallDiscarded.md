@@ -10,7 +10,7 @@ description: phoneCallDiscarded attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |need\_rating|[Bool](../types/Bool.md) | Optional|
 |need\_debug|[Bool](../types/Bool.md) | Optional|
 |id|[long](../types/long.md) | Yes|

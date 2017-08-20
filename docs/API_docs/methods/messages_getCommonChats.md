@@ -9,7 +9,7 @@ description: messages.getCommonChats parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

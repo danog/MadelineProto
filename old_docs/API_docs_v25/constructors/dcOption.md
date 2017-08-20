@@ -10,7 +10,7 @@ description: dcOption attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |hostname|[string](../types/string.md) | Yes|
 |ip\_address|[string](../types/string.md) | Yes|

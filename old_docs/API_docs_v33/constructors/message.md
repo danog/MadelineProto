@@ -10,7 +10,7 @@ description: message attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |from\_id|[int](../types/int.md) | Yes|
 |to\_id|[Peer](../types/Peer.md) | Yes|

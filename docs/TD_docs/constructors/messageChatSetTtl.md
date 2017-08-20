@@ -12,7 +12,7 @@ Messages ttl setting in secret chat has changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |ttl|[int](../types/int.md) | Yes|New ttl|
 
 

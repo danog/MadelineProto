@@ -12,7 +12,7 @@ Contains list of channel identifiers
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_ids|Array of [int](../constructors/int.md) | Yes|List of channel identifiers|
 
 

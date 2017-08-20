@@ -10,7 +10,7 @@ description: user attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |self|[Bool](../types/Bool.md) | Optional|
 |contact|[Bool](../types/Bool.md) | Optional|
 |mutual\_contact|[Bool](../types/Bool.md) | Optional|

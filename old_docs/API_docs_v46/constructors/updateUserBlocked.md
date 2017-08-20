@@ -10,7 +10,7 @@ description: updateUserBlocked attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |blocked|[Bool](../types/Bool.md) | Yes|
 

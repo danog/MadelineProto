@@ -10,7 +10,7 @@ description: dialogChannel attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |top\_message|[int](../types/int.md) | Yes|
 |top\_important\_message|[int](../types/int.md) | Yes|

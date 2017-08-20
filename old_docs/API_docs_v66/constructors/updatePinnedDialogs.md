@@ -10,7 +10,7 @@ description: updatePinnedDialogs attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |order|Array of [Peer](../types/Peer.md) | Optional|
 
 

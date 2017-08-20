@@ -9,7 +9,7 @@ description: contacts.deleteContact parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputUser](../types/InputUser.md) | Yes|
 
 

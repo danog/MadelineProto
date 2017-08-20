@@ -10,7 +10,7 @@ description: geoPoint attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |long|[double](../types/double.md) | Yes|
 |lat|[double](../types/double.md) | Yes|
 

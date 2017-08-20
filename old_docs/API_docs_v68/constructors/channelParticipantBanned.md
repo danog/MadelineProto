@@ -10,7 +10,7 @@ description: channelParticipantBanned attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |left|[Bool](../types/Bool.md) | Optional|
 |user\_id|[int](../types/int.md) | Yes|
 |kicked\_by|[int](../types/int.md) | Yes|

@@ -14,7 +14,7 @@ Clears list of recently found chats
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

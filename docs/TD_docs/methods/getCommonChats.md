@@ -14,7 +14,7 @@ Returns list of common chats with an other given user. Chats are sorted by their
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 |offset\_chat\_id|[long](../types/long.md) | Yes|Chat identifier to return chats from, use 0 for the first request|
 |limit|[int](../types/int.md) | Yes|Maximum number of chats to be returned, up to 100|

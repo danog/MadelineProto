@@ -10,7 +10,7 @@ description: updateReadChannelOutbox attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel\_id|[int](../types/int.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 

@@ -10,7 +10,7 @@ description: photoSizeEmpty attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |type|[string](../types/string.md) | Yes|
 
 

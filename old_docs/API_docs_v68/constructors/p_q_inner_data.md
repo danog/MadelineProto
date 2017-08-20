@@ -10,7 +10,7 @@ description: p_q_inner_data attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pq|[string](../types/string.md) | Yes|
 |p|[string](../types/string.md) | Yes|
 |q|[string](../types/string.md) | Yes|

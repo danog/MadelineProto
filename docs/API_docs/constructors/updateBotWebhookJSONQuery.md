@@ -10,7 +10,7 @@ description: updateBotWebhookJSONQuery attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |query\_id|[long](../types/long.md) | Yes|
 |data|[DataJSON](../types/DataJSON.md) | Yes|
 |timeout|[int](../types/int.md) | Yes|

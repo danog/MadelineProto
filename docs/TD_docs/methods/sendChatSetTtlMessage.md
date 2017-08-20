@@ -14,7 +14,7 @@ Changes current ttl setting in a secret chat and sends corresponding message
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |ttl|[int](../types/int.md) | Yes|New value of ttl in seconds|
 

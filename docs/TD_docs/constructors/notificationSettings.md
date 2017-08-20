@@ -12,7 +12,7 @@ Contains information about notification settings for chat or chats
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |mute\_for|[int](../types/int.md) | Yes|Time left before notifications will be unmuted|
 |sound|[string](../types/string.md) | Yes|Audio file name for notifications, iPhone apps only|
 |show\_preview|[Bool](../types/Bool.md) | Yes|Display message text/media in notification|

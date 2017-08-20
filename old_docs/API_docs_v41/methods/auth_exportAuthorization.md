@@ -9,7 +9,7 @@ description: auth.exportAuthorization parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dc\_id|[int](../types/int.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: messageActionChatEditPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |photo|[Photo](../types/Photo.md) | Yes|
 
 

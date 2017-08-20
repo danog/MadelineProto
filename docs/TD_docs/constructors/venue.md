@@ -12,7 +12,7 @@ Describes venue
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |location|[location](../types/location.md) | Yes|Venue location as defined by sender|
 |title|[string](../types/string.md) | Yes|Venue name as defined by sender|
 |address|[string](../types/string.md) | Yes|Venue address as defined by sender|

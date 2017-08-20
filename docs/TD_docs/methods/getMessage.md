@@ -14,7 +14,7 @@ Returns information about a message
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, message belongs to|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message to get|
 

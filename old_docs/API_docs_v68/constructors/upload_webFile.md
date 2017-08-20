@@ -10,7 +10,7 @@ description: upload_webFile attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |size|[int](../types/int.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|
 |file\_type|[storage\_FileType](../types/storage_FileType.md) | Yes|

@@ -10,7 +10,7 @@ description: wallPaper attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |sizes|Array of [PhotoSize](../types/PhotoSize.md) | Yes|

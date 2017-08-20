@@ -10,7 +10,7 @@ description: test_string attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |value|[string](../types/string.md) | Yes|
 
 

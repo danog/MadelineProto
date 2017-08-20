@@ -12,7 +12,7 @@ Currently there is no any information about the user except user_id. It can happ
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

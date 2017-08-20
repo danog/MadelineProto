@@ -10,7 +10,7 @@ description: inputStickeredMediaDocument attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputDocument](../types/InputDocument.md) | Yes|
 
 

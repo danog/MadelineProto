@@ -12,7 +12,7 @@ Represents user
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|User identifier|
 |first\_name|[string](../types/string.md) | Yes|User first name|
 |last\_name|[string](../types/string.md) | Yes|User last name|

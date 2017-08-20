@@ -12,7 +12,7 @@ Code is delievered by voice call to the specified phone number
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |length|[int](../types/int.md) | Yes|Length of the code|
 
 

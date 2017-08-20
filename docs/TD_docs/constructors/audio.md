@@ -12,7 +12,7 @@ Describes audio file. Audio is usually in mp3 format
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |duration|[int](../types/int.md) | Yes|Duration of the audio in seconds as defined by sender|
 |title|[string](../types/string.md) | Yes|Title of the audio as defined by sender|
 |performer|[string](../types/string.md) | Yes|Performer of the audio as defined by sender|

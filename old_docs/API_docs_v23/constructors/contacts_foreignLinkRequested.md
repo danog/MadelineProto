@@ -10,7 +10,7 @@ description: contacts_foreignLinkRequested attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |has\_phone|[Bool](../types/Bool.md) | Yes|
 
 

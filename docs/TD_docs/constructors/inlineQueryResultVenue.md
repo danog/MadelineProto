@@ -12,7 +12,7 @@ Represents information about a venue
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |venue|[venue](../types/venue.md) | Yes|The result|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the result thumb, if exists|

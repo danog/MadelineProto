@@ -10,7 +10,7 @@ description: payments_validatedRequestedInfo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Optional|
 |shipping\_options|Array of [ShippingOption](../types/ShippingOption.md) | Optional|
 

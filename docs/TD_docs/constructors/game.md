@@ -12,7 +12,7 @@ Describes a game
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Game id|
 |short\_name|[string](../types/string.md) | Yes|Game short name, to share a game use a URL https: telegram.me/{bot_username}?game={game_short_name}|
 |title|[string](../types/string.md) | Yes|Game title|

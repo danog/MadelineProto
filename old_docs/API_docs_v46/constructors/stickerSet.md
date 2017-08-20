@@ -10,7 +10,7 @@ description: stickerSet attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |installed|[Bool](../types/Bool.md) | Optional|
 |disabled|[Bool](../types/Bool.md) | Optional|
 |official|[Bool](../types/Bool.md) | Optional|

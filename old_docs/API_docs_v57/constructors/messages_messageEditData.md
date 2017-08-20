@@ -10,7 +10,7 @@ description: messages_messageEditData attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |caption|[Bool](../types/Bool.md) | Optional|
 
 

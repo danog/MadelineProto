@@ -10,7 +10,7 @@ description: destroy_session_ok attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |session\_id|[long](../types/long.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: inputMediaVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |video|[InputVideo](../types/InputVideo.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 

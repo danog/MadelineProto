@@ -9,7 +9,7 @@ description: messages.forwardMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
 |from\_peer|[InputPeer](../types/InputPeer.md) | Yes|

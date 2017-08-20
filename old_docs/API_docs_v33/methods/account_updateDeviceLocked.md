@@ -9,7 +9,7 @@ description: account.updateDeviceLocked parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |period|[int](../types/int.md) | Yes|
 
 

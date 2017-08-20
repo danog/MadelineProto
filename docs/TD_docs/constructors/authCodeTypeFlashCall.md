@@ -12,7 +12,7 @@ Code is delivered by the immediately cancelled call to the specified phone numbe
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |pattern|[string](../types/string.md) | Yes|Pattern of the phone number from which the call will be done|
 
 

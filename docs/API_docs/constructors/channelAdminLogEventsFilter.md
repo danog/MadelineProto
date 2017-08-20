@@ -10,7 +10,7 @@ description: channelAdminLogEventsFilter attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |join|[Bool](../types/Bool.md) | Optional|
 |leave|[Bool](../types/Bool.md) | Optional|
 |invite|[Bool](../types/Bool.md) | Optional|

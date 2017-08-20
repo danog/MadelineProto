@@ -12,7 +12,7 @@ Represents a channel with zero or more subscribers. There two different kinds of
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|Channel identifier|
 |username|[string](../types/string.md) | Yes|Channel username, empty for private channels|
 |date|[int](../types/int.md) | Yes|Date when current user has joined the channel or date when channel was created, if user is not a member. Unix time|

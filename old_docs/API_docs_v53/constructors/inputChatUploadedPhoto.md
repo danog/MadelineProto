@@ -10,7 +10,7 @@ description: inputChatUploadedPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
 

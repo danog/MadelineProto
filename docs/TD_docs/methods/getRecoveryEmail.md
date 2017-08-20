@@ -14,7 +14,7 @@ Returns set up recovery email. This method can be used to verify a password prov
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |password|[string](../types/string.md) | Yes|Current user password|
 
 

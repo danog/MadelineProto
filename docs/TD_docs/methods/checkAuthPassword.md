@@ -14,7 +14,7 @@ Checks password for correctness. Works only when authGetState returns authStateW
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |password|[string](../types/string.md) | Yes|Password to check|
 
 

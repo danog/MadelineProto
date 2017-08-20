@@ -9,7 +9,7 @@ description: initConnection parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |api\_id|[int](../types/int.md) | Yes|
 |device\_model|[string](../types/string.md) | Yes|
 |system\_version|[string](../types/string.md) | Yes|

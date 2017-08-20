@@ -10,7 +10,7 @@ description: server_DH_params_ok attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[int128](../types/int128.md) | Yes|
 |server\_nonce|[int128](../types/int128.md) | Yes|
 |encrypted\_answer|[bytes](../types/bytes.md) | Yes|

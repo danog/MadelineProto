@@ -10,7 +10,7 @@ description: foundGifCached attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |photo|[Photo](../types/Photo.md) | Yes|
 |document|[Document](../types/Document.md) | Yes|

@@ -10,7 +10,7 @@ description: messageActionChatCreate attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |users|Array of [int](../types/int.md) | Yes|
 

@@ -10,7 +10,7 @@ description: messages_botResults attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |gallery|[Bool](../types/Bool.md) | Optional|
 |query\_id|[long](../types/long.md) | Yes|
 |next\_offset|[string](../types/string.md) | Optional|

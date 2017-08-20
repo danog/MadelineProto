@@ -9,7 +9,7 @@ description: messages.receivedQueue parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |max\_qts|[int](../types/int.md) | Yes|
 
 

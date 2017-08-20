@@ -14,7 +14,7 @@ Deletes profile photo. If something changes, updateUser will be sent
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |profile\_photo\_id|[long](../types/long.md) | Yes|Identifier of profile photo to delete|
 
 

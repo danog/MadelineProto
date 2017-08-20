@@ -9,7 +9,7 @@ description: messages.getInlineBotResults parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bot|[InputUser](../types/InputUser.md) | Yes|
 |query|[string](../types/string.md) | Yes|
 |offset|[string](../types/string.md) | Yes|

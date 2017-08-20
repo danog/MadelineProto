@@ -10,7 +10,7 @@ description: shippingOption attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |prices|Array of [LabeledPrice](../types/LabeledPrice.md) | Yes|

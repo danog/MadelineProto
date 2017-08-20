@@ -14,7 +14,7 @@ Returns profile photos of the user. Result of this query can't be invalidated, s
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 |offset|[int](../types/int.md) | Yes|Photos to skip, must be non-negative|
 |limit|[int](../types/int.md) | Yes|Maximum number of photos to be returned, can't be greater than 100|

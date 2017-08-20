@@ -12,7 +12,7 @@ Audio message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |audio|[InputFile](../types/InputFile.md) | Yes|Audio file to send|
 |album\_cover\_thumb|[InputThumb](../types/InputThumb.md) | Yes|Thumb of the album's cover, if available|
 |duration|[int](../types/int.md) | Yes|Duration of audio in seconds, may be replaced by the server|

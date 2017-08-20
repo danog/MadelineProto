@@ -10,7 +10,7 @@ description: auth_sentCodeTypeApp attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |length|[int](../types/int.md) | Yes|
 
 

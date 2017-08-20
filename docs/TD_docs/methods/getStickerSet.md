@@ -14,7 +14,7 @@ Returns information about sticker set by its identifier
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |set\_id|[long](../types/long.md) | Yes|Identifier of the sticker set|
 
 

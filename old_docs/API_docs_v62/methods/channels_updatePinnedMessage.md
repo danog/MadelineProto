@@ -9,7 +9,7 @@ description: channels.updatePinnedMessage parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |silent|[Bool](../types/Bool.md) | Optional|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |id|[int](../types/int.md) | Yes|

@@ -14,7 +14,7 @@ Returns information about channel members or kicked from channel users. Can be u
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 |filter|[ChannelMembersFilter](../types/ChannelMembersFilter.md) | Yes|Kind of channel users to return, defaults to channelMembersRecent|
 |offset|[int](../types/int.md) | Yes|Number of channel users to skip|

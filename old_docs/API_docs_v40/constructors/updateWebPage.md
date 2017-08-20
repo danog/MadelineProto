@@ -10,7 +10,7 @@ description: updateWebPage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |webpage|[WebPage](../types/WebPage.md) | Yes|
 
 

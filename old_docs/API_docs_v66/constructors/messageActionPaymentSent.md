@@ -10,7 +10,7 @@ description: messageActionPaymentSent attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |currency|[string](../types/string.md) | Yes|
 |total\_amount|[long](../types/long.md) | Yes|
 

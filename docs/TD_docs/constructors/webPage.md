@@ -12,7 +12,7 @@ Describes web page preview
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |url|[string](../types/string.md) | Yes|Original URL of link|
 |display\_url|[string](../types/string.md) | Yes|URL to display|
 |type|[string](../types/string.md) | Yes|Type of web page: article, photo, audio, video, document, profile, app or something other|

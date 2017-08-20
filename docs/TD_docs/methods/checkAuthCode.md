@@ -14,7 +14,7 @@ Checks authentication code. Works only when authGetState returns authStateWaitCo
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |code|[string](../types/string.md) | Yes|Verification code from SMS, Telegram message, voice call or flash call|
 |first\_name|[string](../types/string.md) | Yes|User first name, if user is yet not registered, 1-255 characters|
 |last\_name|[string](../types/string.md) | Yes|Optional user last name, if user is yet not registered, 0-255 characters|

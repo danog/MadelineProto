@@ -12,7 +12,7 @@ Message fails to send. Be aware that some being sent messages can be irrecoverab
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |message\_id|[long](../types/long.md) | Yes|Message identifier|
 |error\_code|[int](../types/int.md) | Yes|Error code|

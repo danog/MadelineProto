@@ -12,7 +12,7 @@ User uploads a video
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |progress|[int](../types/int.md) | Yes|Upload progress in percents|
 
 

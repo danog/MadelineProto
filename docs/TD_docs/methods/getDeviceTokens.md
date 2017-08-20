@@ -14,7 +14,7 @@ Returns list of used device tokens
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [DeviceTokenSet](../types/DeviceTokenSet.md)

@@ -10,7 +10,7 @@ description: updateNewGeoChatMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[GeoChatMessage](../types/GeoChatMessage.md) | Yes|
 
 

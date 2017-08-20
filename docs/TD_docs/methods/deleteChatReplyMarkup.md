@@ -14,7 +14,7 @@ Deletes default reply markup from chat. This method needs to be called after one
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |message\_id|[long](../types/long.md) | Yes|Message identifier of used keyboard|
 

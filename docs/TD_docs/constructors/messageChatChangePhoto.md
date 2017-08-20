@@ -12,7 +12,7 @@ Chat photo changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |photo|[photo](../types/photo.md) | Yes|New chat photo|
 
 

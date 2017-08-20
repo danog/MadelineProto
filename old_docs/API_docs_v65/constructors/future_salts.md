@@ -10,7 +10,7 @@ description: future_salts attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |req\_msg\_id|[long](../types/long.md) | Yes|
 |now|[int](../types/int.md) | Yes|
 |salts|Array of [future\_salt](../constructors/future_salt.md) | Yes|

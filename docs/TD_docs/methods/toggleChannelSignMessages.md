@@ -14,7 +14,7 @@ Enables or disables sender signature on sent messages in the channel. Needs crea
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 |sign\_messages|[Bool](../types/Bool.md) | Yes|New value of sign_messages|
 

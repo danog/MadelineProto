@@ -10,7 +10,7 @@ description: webPage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[long](../types/long.md) | Yes|
 |url|[string](../types/string.md) | Yes|
 |display\_url|[string](../types/string.md) | Yes|

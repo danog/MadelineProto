@@ -9,7 +9,7 @@ description: stickers.addStickerToSet parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 |sticker|[InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|
 

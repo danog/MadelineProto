@@ -10,7 +10,7 @@ description: inputFileLocation attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |volume\_id|[long](../types/long.md) | Yes|
 |local\_id|[int](../types/int.md) | Yes|
 |secret|[long](../types/long.md) | Yes|

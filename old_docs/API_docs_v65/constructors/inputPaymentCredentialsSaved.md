@@ -10,7 +10,7 @@ description: inputPaymentCredentialsSaved attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |tmp\_password|[bytes](../types/bytes.md) | Yes|
 

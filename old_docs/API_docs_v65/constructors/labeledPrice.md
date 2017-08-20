@@ -10,7 +10,7 @@ description: labeledPrice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |label|[string](../types/string.md) | Yes|
 |amount|[long](../types/long.md) | Yes|
 

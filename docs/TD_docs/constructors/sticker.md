@@ -12,7 +12,7 @@ Describes sticker
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |set\_id|[long](../types/long.md) | Yes|Identifier of sticker set to which the sticker belongs or 0 if none|
 |width|[int](../types/int.md) | Yes|Sticker width as defined by sender|
 |height|[int](../types/int.md) | Yes|Sticker height as defined by sender|

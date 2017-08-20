@@ -10,7 +10,7 @@ description: updateChatParticipantAdmin attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|
 |is\_admin|[Bool](../types/Bool.md) | Yes|

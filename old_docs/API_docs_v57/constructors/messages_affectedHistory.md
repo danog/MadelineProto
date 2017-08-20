@@ -10,7 +10,7 @@ description: messages_affectedHistory attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|
 |offset|[int](../types/int.md) | Yes|

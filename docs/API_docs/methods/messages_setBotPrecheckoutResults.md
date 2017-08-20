@@ -9,7 +9,7 @@ description: messages.setBotPrecheckoutResults parameters, return type and examp
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |success|[Bool](../types/Bool.md) | Optional|
 |query\_id|[long](../types/long.md) | Yes|
 |error|[string](../types/string.md) | Optional|

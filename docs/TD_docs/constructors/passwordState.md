@@ -12,7 +12,7 @@ Represents current state of the two-step verification
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |has\_password|[Bool](../types/Bool.md) | Yes|Is password set up|
 |password\_hint|[string](../types/string.md) | Yes|Hint on password, can be empty|
 |has\_recovery\_email|[Bool](../types/Bool.md) | Yes|Is recovery email set up|

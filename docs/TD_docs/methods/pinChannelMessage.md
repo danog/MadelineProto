@@ -14,7 +14,7 @@ Pins a message in a supergroup channel chat. Needs editor privileges in the chan
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the new pinned message|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|True, if there should be no notification about the pinned message|

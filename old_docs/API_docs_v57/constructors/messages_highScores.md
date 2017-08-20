@@ -10,7 +10,7 @@ description: messages_highScores attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |scores|Array of [HighScore](../types/HighScore.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

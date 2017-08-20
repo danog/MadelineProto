@@ -10,7 +10,7 @@ description: updateShort attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |update|[Update](../types/Update.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 

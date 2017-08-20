@@ -10,7 +10,7 @@ description: messages_dhConfig attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |g|[int](../types/int.md) | Yes|
 |p|[bytes](../types/bytes.md) | Yes|
 |version|[int](../types/int.md) | Yes|

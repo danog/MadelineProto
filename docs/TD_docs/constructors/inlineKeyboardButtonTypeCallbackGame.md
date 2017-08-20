@@ -12,7 +12,7 @@ A button with a game which sends to the bot special callback query, must be in t
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

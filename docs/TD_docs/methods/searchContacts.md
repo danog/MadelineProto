@@ -14,7 +14,7 @@ Searches for specified query in the first name, last name and username of the kn
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |query|[string](../types/string.md) | Yes|Query to search for, can be empty to return all contacts|
 |limit|[int](../types/int.md) | Yes|Maximum number of users to be returned|
 

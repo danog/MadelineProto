@@ -12,7 +12,7 @@ User is successfully authorized. TDLib can answer queries
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

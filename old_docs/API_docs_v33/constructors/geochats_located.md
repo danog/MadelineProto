@@ -10,7 +10,7 @@ description: geochats_located attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |results|Array of [ChatLocated](../types/ChatLocated.md) | Yes|
 |messages|Array of [GeoChatMessage](../types/GeoChatMessage.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|

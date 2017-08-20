@@ -9,7 +9,7 @@ description: messages.getDhConfig parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |version|[int](../types/int.md) | Yes|
 |random\_length|[int](../types/int.md) | Yes|
 

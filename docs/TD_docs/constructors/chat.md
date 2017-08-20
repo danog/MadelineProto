@@ -12,7 +12,7 @@ Chat (private chat or group chat or channel chat)
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Chat unique identifier|
 |title|[string](../types/string.md) | Yes|Chat title|
 |photo|[chatPhoto](../types/chatPhoto.md) | Yes|Chat photo, nullable|

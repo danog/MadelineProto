@@ -10,7 +10,7 @@ description: upload_cdnFile attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bytes|[bytes](../types/bytes.md) | Yes|
 
 

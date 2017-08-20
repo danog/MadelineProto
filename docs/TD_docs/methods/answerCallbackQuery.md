@@ -14,7 +14,7 @@ Bots only. Sets result of the callback query
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |callback\_query\_id|[long](../types/long.md) | Yes|Identifier of the callback query|
 |text|[string](../types/string.md) | Yes|Text of the answer|
 |show\_alert|[Bool](../types/Bool.md) | Yes|If true, an alert should be shown to the user instead of a toast|

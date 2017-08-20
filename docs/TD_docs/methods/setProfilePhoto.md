@@ -14,7 +14,7 @@ Uploads new profile photo for logged in user. Photo will not change until change
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |photo\_path|[string](../types/string.md) | Yes|Path to new profile photo|
 
 

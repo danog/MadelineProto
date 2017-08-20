@@ -14,7 +14,7 @@ Changes about information of logged in user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |about|[string](../types/string.md) | Yes|New value of userFull.about, 0-255 characters|
 
 

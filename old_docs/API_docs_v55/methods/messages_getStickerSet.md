@@ -9,7 +9,7 @@ description: messages.getStickerSet parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
 
 

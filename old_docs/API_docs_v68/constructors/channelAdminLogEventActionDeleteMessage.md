@@ -10,7 +10,7 @@ description: channelAdminLogEventActionDeleteMessage attributes, type and exampl
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[Message](../types/Message.md) | Yes|
 
 

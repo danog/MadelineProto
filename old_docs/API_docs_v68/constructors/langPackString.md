@@ -10,7 +10,7 @@ description: langPackString attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |key|[string](../types/string.md) | Yes|
 |value|[string](../types/string.md) | Yes|
 

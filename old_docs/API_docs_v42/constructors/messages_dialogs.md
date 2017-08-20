@@ -10,7 +10,7 @@ description: messages_dialogs attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dialogs|Array of [Dialog](../types/Dialog.md) | Yes|
 |messages|Array of [Message](../types/Message.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|

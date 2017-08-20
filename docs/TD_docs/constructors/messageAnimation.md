@@ -12,7 +12,7 @@ Animation message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |animation|[animation](../types/animation.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Animation caption|
 

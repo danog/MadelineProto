@@ -10,7 +10,7 @@ description: auth_checkedPhone attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_registered|[Bool](../types/Bool.md) | Yes|
 |phone\_invited|[Bool](../types/Bool.md) | Yes|
 

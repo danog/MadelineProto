@@ -10,7 +10,7 @@ description: userSelf attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |first\_name|[string](../types/string.md) | Yes|
 |last\_name|[string](../types/string.md) | Yes|

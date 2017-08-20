@@ -14,7 +14,7 @@ Returns period of inactivity, after which the account of currently logged in use
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AccountTtl](../types/AccountTtl.md)

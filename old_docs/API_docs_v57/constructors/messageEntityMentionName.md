@@ -10,7 +10,7 @@ description: messageEntityMentionName attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |length|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|

@@ -9,7 +9,7 @@ description: contacts.importCard parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |export\_card|Array of [int](../types/int.md) | Yes|
 
 

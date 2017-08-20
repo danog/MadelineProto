@@ -12,7 +12,7 @@ String option
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |value|[string](../types/string.md) | Yes|Value of an option|
 
 

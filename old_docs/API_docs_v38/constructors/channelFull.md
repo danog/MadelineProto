@@ -10,7 +10,7 @@ description: channelFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |about|[string](../types/string.md) | Yes|
 |participants\_count|[int](../types/int.md) | Optional|

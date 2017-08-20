@@ -12,7 +12,7 @@ Message with a game
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |game|[game](../types/game.md) | Yes|The game|
 
 

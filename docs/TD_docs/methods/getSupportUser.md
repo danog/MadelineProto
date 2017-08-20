@@ -14,7 +14,7 @@ Returns user that can be contacted to get support
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [User](../types/User.md)

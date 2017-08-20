@@ -12,7 +12,7 @@ Contains list of chats
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chats|Array of [chat](../constructors/chat.md) | Yes|List of chats|
 
 

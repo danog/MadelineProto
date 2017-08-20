@@ -9,7 +9,7 @@ description: channels.toggleSignatures parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |enabled|[Bool](../types/Bool.md) | Yes|
 

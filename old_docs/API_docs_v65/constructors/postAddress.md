@@ -10,7 +10,7 @@ description: postAddress attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |street\_line1|[string](../types/string.md) | Yes|
 |street\_line2|[string](../types/string.md) | Yes|
 |city|[string](../types/string.md) | Yes|

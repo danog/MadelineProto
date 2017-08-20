@@ -9,7 +9,7 @@ description: account.getPasswordSettings parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |current\_password\_hash|[bytes](../types/bytes.md) | Yes|
 
 

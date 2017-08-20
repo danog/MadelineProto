@@ -10,7 +10,7 @@ description: langPackLanguage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |name|[string](../types/string.md) | Yes|
 |native\_name|[string](../types/string.md) | Yes|
 |lang\_code|[string](../types/string.md) | Yes|

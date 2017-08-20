@@ -10,7 +10,7 @@ description: inputMediaAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputAudio](../types/InputAudio.md) | Yes|
 
 

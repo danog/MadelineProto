@@ -10,7 +10,7 @@ description: channelAdminLogEventActionToggleInvites attributes, type and exampl
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |new\_value|[Bool](../types/Bool.md) | Yes|
 
 

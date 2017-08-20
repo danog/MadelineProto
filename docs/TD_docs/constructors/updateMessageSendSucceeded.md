@@ -12,7 +12,7 @@ Message is successfully sent
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |message|[message](../types/message.md) | Yes|Information about sent message. Usually only message identifier, date and content are changed, but some other fields may also change|
 |old\_message\_id|[long](../types/long.md) | Yes|Previous temporary message identifier|
 

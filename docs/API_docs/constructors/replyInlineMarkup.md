@@ -10,7 +10,7 @@ description: replyInlineMarkup attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |rows|Array of [KeyboardButtonRow](../types/KeyboardButtonRow.md) | Yes|
 
 

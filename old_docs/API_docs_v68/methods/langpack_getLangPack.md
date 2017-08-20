@@ -9,7 +9,7 @@ description: langpack.getLangPack parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |lang\_code|[string](../types/string.md) | Yes|
 
 

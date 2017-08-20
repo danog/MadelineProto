@@ -12,7 +12,7 @@ Animation message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |animation|[InputFile](../types/InputFile.md) | Yes|Animation file to send|
 |thumb|[InputThumb](../types/InputThumb.md) | Yes|Animation thumb, if available|
 |width|[int](../types/int.md) | Yes|Width of the animation, may be replaced by the server|

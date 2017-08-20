@@ -9,7 +9,7 @@ description: messages.forwardMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
 |with\_my\_score|[Bool](../types/Bool.md) | Optional|

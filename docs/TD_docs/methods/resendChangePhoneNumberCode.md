@@ -14,7 +14,7 @@ Resends authentication code sent to change user's phone number. Wotks only if in
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

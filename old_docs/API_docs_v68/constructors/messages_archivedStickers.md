@@ -10,7 +10,7 @@ description: messages_archivedStickers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |count|[int](../types/int.md) | Yes|
 |sets|Array of [StickerSetCovered](../types/StickerSetCovered.md) | Yes|
 

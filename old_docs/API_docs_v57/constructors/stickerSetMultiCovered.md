@@ -10,7 +10,7 @@ description: stickerSetMultiCovered attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |set|[StickerSet](../types/StickerSet.md) | Yes|
 |covers|Array of [Document](../types/Document.md) | Yes|
 

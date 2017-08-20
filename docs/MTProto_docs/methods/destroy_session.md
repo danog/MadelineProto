@@ -9,7 +9,7 @@ description: destroy_session parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |session\_id|[long](../types/long.md) | Yes|
 
 

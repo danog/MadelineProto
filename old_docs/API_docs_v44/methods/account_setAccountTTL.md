@@ -9,7 +9,7 @@ description: account.setAccountTTL parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|
 
 

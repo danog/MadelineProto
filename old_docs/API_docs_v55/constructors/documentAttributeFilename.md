@@ -10,7 +10,7 @@ description: documentAttributeFilename attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file\_name|[string](../types/string.md) | Yes|
 
 

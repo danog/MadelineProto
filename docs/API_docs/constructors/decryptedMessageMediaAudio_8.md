@@ -10,7 +10,7 @@ description: decryptedMessageMediaAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |duration|[int](../types/int.md) | Yes|
 |size|[int](../types/int.md) | Yes|
 |key|[bytes](../types/bytes.md) | Yes|

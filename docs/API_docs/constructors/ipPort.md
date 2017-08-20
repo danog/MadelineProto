@@ -10,7 +10,7 @@ description: ipPort attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ipv4|[int](../types/int.md) | Yes|
 |port|[int](../types/int.md) | Yes|
 

@@ -12,7 +12,7 @@ List of saved animations was updated. Need to drop saved animations cache if hav
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

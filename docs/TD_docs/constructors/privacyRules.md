@@ -12,7 +12,7 @@ List of privacy rules. Rules are matched in the specified order. First matched r
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |rules|Array of [PrivacyRule](../constructors/PrivacyRule.md) | Yes|List of rules|
 
 

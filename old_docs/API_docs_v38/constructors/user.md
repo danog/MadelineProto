@@ -10,7 +10,7 @@ description: user attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |access\_hash|[long](../types/long.md) | Optional|
 |first\_name|[string](../types/string.md) | Optional|

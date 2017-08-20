@@ -10,7 +10,7 @@ description: replyKeyboardForceReply attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |single\_use|[Bool](../types/Bool.md) | Optional|
 |selective|[Bool](../types/Bool.md) | Optional|
 

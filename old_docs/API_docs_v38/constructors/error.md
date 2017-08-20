@@ -10,7 +10,7 @@ description: error attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |code|[int](../types/int.md) | Yes|
 |text|[string](../types/string.md) | Yes|
 

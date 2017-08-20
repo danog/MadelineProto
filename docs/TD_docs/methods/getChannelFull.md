@@ -14,7 +14,7 @@ Returns full information about a channel by its identifier, cached for at most 1
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Channel identifier|
 
 

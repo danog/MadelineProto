@@ -10,7 +10,7 @@ description: paymentRequestedInfo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |name|[string](../types/string.md) | Optional|
 |phone|[string](../types/string.md) | Optional|
 |email|[string](../types/string.md) | Optional|

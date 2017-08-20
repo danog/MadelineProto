@@ -9,7 +9,7 @@ description: messages.deleteChannelMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |id|Array of [int](../types/int.md) | Yes|
 

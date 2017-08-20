@@ -12,7 +12,7 @@ Represents link to a page containing an embedded video player or a video file
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |title|[string](../types/string.md) | Yes|Title of the result|
 |description|[string](../types/string.md) | Yes|Short description of the result, if known|

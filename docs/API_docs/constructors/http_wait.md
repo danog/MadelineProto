@@ -10,7 +10,7 @@ description: http_wait attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |max\_delay|[int](../types/int.md) | Yes|
 |wait\_after|[int](../types/int.md) | Yes|
 |max\_wait|[int](../types/int.md) | Yes|

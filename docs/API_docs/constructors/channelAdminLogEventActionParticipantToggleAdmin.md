@@ -10,7 +10,7 @@ description: channelAdminLogEventActionParticipantToggleAdmin attributes, type a
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |prev\_participant|[ChannelParticipant](../types/ChannelParticipant.md) | Yes|
 |new\_participant|[ChannelParticipant](../types/ChannelParticipant.md) | Yes|
 

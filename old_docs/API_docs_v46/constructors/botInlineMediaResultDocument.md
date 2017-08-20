@@ -10,7 +10,7 @@ description: botInlineMediaResultDocument attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Yes|
 |document|[Document](../types/Document.md) | Yes|

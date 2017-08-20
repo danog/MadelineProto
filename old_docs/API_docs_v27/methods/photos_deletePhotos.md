@@ -9,7 +9,7 @@ description: photos.deletePhotos parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [InputPhoto](../types/InputPhoto.md) | Yes|
 
 

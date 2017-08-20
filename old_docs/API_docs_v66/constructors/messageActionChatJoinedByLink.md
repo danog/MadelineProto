@@ -10,7 +10,7 @@ description: messageActionChatJoinedByLink attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |inviter\_id|[int](../types/int.md) | Yes|
 
 

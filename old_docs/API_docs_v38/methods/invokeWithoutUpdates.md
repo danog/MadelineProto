@@ -9,7 +9,7 @@ description: invokeWithoutUpdates parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |query|[!X](../types/!X.md) | Yes|
 
 

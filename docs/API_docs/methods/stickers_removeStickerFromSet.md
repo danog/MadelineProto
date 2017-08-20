@@ -9,7 +9,7 @@ description: stickers.removeStickerFromSet parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |sticker|[InputDocument](../types/InputDocument.md) | Yes|
 
 

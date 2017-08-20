@@ -10,7 +10,7 @@ description: account_passwordSettings attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |email|[string](../types/string.md) | Yes|
 
 

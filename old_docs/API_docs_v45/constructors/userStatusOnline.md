@@ -10,7 +10,7 @@ description: userStatusOnline attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |expires|[int](../types/int.md) | Yes|
 
 

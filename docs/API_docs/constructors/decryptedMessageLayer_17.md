@@ -10,7 +10,7 @@ description: decryptedMessageLayer attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |layer|[int](../types/int.md) | Yes|
 |in\_seq\_no|[int](../types/int.md) | Yes|
 |out\_seq\_no|[int](../types/int.md) | Yes|

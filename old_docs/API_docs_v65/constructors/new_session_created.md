@@ -10,7 +10,7 @@ description: new_session_created attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |first\_msg\_id|[long](../types/long.md) | Yes|
 |unique\_id|[long](../types/long.md) | Yes|
 |server\_salt|[long](../types/long.md) | Yes|

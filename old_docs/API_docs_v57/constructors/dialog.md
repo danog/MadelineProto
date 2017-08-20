@@ -10,7 +10,7 @@ description: dialog attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |top\_message|[int](../types/int.md) | Yes|
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|

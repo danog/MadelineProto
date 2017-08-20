@@ -9,7 +9,7 @@ description: messages.sendBroadcast parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |contacts|Array of [InputUser](../types/InputUser.md) | Yes|
 |message|[string](../types/string.md) | Yes|
 |media|[InputMedia](../types/InputMedia.md) | Yes|

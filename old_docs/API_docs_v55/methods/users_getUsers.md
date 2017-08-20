@@ -9,7 +9,7 @@ description: users.getUsers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [InputUser](../types/InputUser.md) | Yes|
 
 

@@ -9,7 +9,7 @@ description: http_wait parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |max\_delay|[int](../types/int.md) | Yes|
 |wait\_after|[int](../types/int.md) | Yes|
 |max\_wait|[int](../types/int.md) | Yes|

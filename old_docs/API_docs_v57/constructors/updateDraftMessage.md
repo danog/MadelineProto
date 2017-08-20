@@ -10,7 +10,7 @@ description: updateDraftMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |draft|[DraftMessage](../types/DraftMessage.md) | Yes|
 

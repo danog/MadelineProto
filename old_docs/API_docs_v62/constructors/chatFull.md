@@ -10,7 +10,7 @@ description: chatFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |participants|[ChatParticipants](../types/ChatParticipants.md) | Yes|
 |chat\_photo|[Photo](../types/Photo.md) | Yes|

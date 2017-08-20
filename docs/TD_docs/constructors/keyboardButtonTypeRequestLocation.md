@@ -12,7 +12,7 @@ A button which sends user location when pressed, available only in private chats
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

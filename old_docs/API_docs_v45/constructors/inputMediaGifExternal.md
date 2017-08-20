@@ -10,7 +10,7 @@ description: inputMediaGifExternal attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
 |q|[string](../types/string.md) | Yes|
 

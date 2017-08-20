@@ -10,7 +10,7 @@ description: decryptedMessageService attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |action|[DecryptedMessageAction](../types/DecryptedMessageAction.md) | Yes|
 
 

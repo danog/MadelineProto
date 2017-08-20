@@ -12,7 +12,7 @@ Some messages was deleted
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |message\_ids|Array of [long](../constructors/long.md) | Yes|Identifiers of deleted message|
 

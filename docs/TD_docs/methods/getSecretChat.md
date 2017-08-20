@@ -14,7 +14,7 @@ Returns information about a secret chat by its identifier, offline request
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |secret\_chat\_id|[int](../types/int.md) | Yes|Secret chat identifier|
 
 

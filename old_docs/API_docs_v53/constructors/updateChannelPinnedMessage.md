@@ -10,7 +10,7 @@ description: updateChannelPinnedMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel\_id|[int](../types/int.md) | Yes|
 |id|[int](../types/int.md) | Yes|
 

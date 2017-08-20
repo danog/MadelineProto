@@ -10,7 +10,7 @@ description: updateDialogPinned attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pinned|[Bool](../types/Bool.md) | Optional|
 |peer|[Peer](../types/Peer.md) | Yes|
 

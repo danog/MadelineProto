@@ -10,7 +10,7 @@ description: updateEditChannelMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[Message](../types/Message.md) | Yes|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|

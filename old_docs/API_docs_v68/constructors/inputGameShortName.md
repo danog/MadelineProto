@@ -10,7 +10,7 @@ description: inputGameShortName attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bot\_id|[InputUser](../types/InputUser.md) | Yes|
 |short\_name|[string](../types/string.md) | Yes|
 

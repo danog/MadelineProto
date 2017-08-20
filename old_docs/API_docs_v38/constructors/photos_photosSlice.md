@@ -10,7 +10,7 @@ description: photos_photosSlice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |count|[int](../types/int.md) | Yes|
 |photos|Array of [Photo](../types/Photo.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

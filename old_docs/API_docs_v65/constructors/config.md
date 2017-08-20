@@ -10,7 +10,7 @@ description: config attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phonecalls\_enabled|[Bool](../types/Bool.md) | Optional|
 |date|[int](../types/int.md) | Yes|
 |expires|[int](../types/int.md) | Yes|

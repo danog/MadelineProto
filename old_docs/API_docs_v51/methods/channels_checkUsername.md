@@ -9,7 +9,7 @@ description: channels.checkUsername parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |username|[string](../types/string.md) | Yes|
 

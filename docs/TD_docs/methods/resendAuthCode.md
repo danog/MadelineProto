@@ -14,7 +14,7 @@ Resends authentication code to the user. Works only when authGetState returns au
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

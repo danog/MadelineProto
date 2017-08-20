@@ -10,7 +10,7 @@ description: inputPhotoCrop attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |crop\_left|[double](../types/double.md) | Yes|
 |crop\_top|[double](../types/double.md) | Yes|
 |crop\_width|[double](../types/double.md) | Yes|

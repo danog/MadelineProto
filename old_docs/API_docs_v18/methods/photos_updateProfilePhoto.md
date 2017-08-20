@@ -9,7 +9,7 @@ description: photos.updateProfilePhoto parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputPhoto](../types/InputPhoto.md) | Yes|
 |crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
 

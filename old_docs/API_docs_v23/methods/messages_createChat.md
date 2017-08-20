@@ -9,7 +9,7 @@ description: messages.createChat parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |users|Array of [InputUser](../types/InputUser.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 

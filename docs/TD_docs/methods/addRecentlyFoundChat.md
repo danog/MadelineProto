@@ -14,7 +14,7 @@ Adds chat to the list of recently found chats. The chat is added to the beginnin
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat to add|
 
 

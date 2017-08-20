@@ -12,7 +12,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |x|Array of [test\_Int](../types/test_Int.md) | Yes|
 
 

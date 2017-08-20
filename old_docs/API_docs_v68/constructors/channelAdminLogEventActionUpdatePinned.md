@@ -10,7 +10,7 @@ description: channelAdminLogEventActionUpdatePinned attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[Message](../types/Message.md) | Yes|
 
 

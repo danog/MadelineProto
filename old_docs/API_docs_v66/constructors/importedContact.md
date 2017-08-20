@@ -10,7 +10,7 @@ description: importedContact attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |client\_id|[long](../types/long.md) | Yes|
 

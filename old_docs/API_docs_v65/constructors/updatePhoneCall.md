@@ -10,7 +10,7 @@ description: updatePhoneCall attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
 
 

@@ -12,7 +12,7 @@ Some date about chat has been changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat|[chat](../types/chat.md) | Yes|New data about the chat|
 
 

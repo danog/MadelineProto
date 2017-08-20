@@ -10,7 +10,7 @@ description: pageBlockList attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ordered|[Bool](../types/Bool.md) | Yes|
 |items|Array of [RichText](../types/RichText.md) | Yes|
 

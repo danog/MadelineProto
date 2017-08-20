@@ -10,7 +10,7 @@ description: account_noPassword attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |new\_salt|[bytes](../types/bytes.md) | Yes|
 
 

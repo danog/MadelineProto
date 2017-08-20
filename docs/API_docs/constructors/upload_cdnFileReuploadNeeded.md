@@ -10,7 +10,7 @@ description: upload_cdnFileReuploadNeeded attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |request\_token|[bytes](../types/bytes.md) | Yes|
 
 

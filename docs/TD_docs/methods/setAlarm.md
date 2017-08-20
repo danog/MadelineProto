@@ -14,7 +14,7 @@ Returns Ok after specified amount of the time passed
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |seconds|[double](../types/double.md) | Yes|Number of seconds before that function returns|
 
 

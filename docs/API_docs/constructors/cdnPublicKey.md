@@ -10,7 +10,7 @@ description: cdnPublicKey attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |dc\_id|[int](../types/int.md) | Yes|
 |public\_key|[string](../types/string.md) | Yes|
 

@@ -9,7 +9,7 @@ description: messages.getMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [int](../types/int.md) | Yes|
 
 

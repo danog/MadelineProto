@@ -14,7 +14,7 @@ Returns current privacy settings
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |key|[PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
 
 

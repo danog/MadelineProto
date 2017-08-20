@@ -14,7 +14,7 @@ Returns full information about a group by its identifier
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |group\_id|[int](../types/int.md) | Yes|Group identifier|
 
 

@@ -12,7 +12,7 @@ User authorization state has changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |auth\_state|[AuthState](../types/AuthState.md) | Yes|New authorization state|
 
 

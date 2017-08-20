@@ -10,7 +10,7 @@ description: documentAttributeSticker attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |alt|[string](../types/string.md) | Yes|
 
 

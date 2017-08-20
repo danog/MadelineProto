@@ -10,7 +10,7 @@ description: chatParticipants attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |admin\_id|[int](../types/int.md) | Yes|
 |participants|Array of [ChatParticipant](../types/ChatParticipant.md) | Yes|

@@ -10,7 +10,7 @@ description: pageBlockCollage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |items|Array of [PageBlock](../types/PageBlock.md) | Yes|
 |caption|[RichText](../types/RichText.md) | Yes|
 

@@ -10,7 +10,7 @@ description: inputPhoneContact attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |client\_id|[long](../types/long.md) | Yes|
 |phone|[string](../types/string.md) | Yes|
 |first\_name|[string](../types/string.md) | Yes|

@@ -9,7 +9,7 @@ description: messages.getInlineGameHighScores parameters, return type and exampl
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 

@@ -10,7 +10,7 @@ description: updateNewStickerSet attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |stickerset|[messages\_StickerSet](../types/messages_StickerSet.md) | Yes|
 
 

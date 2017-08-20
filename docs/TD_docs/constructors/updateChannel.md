@@ -12,7 +12,7 @@ Some data about a channel has been changed
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel|[channel](../types/channel.md) | Yes|New data about the channel|
 
 

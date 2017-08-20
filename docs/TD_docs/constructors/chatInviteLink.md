@@ -12,7 +12,7 @@ Contains chat invite link
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |invite\_link|[string](../types/string.md) | Yes|Chat invite link|
 
 

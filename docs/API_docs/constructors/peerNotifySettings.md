@@ -10,7 +10,7 @@ description: peerNotifySettings attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |show\_previews|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |mute\_until|[int](../types/int.md) | Yes|

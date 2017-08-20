@@ -12,7 +12,7 @@ Some message was pinned
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the pinned message, can be identifier of the deleted message|
 
 

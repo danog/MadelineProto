@@ -12,7 +12,7 @@ Gives full information about a user (except full list of profile photos)
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user|[user](../types/user.md) | Yes|General info about the user|
 |is\_blocked|[Bool](../types/Bool.md) | Yes|Is user blacklisted by current user|
 |about|[string](../types/string.md) | Yes|Short user description|

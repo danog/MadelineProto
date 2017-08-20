@@ -14,7 +14,7 @@ Resets all notification settings to the default value. By default the only muted
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

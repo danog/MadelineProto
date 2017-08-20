@@ -9,7 +9,7 @@ description: langpack.getStrings parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |lang\_code|[string](../types/string.md) | Yes|
 |keys|Array of [string](../types/string.md) | Yes|
 

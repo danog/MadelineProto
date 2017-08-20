@@ -10,7 +10,7 @@ description: updateEncryptedMessagesRead attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |max\_date|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|

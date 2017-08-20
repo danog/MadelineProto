@@ -10,7 +10,7 @@ description: documentAttributeImageSize attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |w|[int](../types/int.md) | Yes|
 |h|[int](../types/int.md) | Yes|
 

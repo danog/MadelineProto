@@ -10,7 +10,7 @@ description: messages_stickers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |hash|[string](../types/string.md) | Yes|
 |stickers|Array of [Document](../types/Document.md) | Yes|
 

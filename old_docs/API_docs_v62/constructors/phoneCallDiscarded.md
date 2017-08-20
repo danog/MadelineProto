@@ -10,7 +10,7 @@ description: phoneCallDiscarded attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[long](../types/long.md) | Yes|
 |reason|[PhoneCallDiscardReason](../types/PhoneCallDiscardReason.md) | Optional|
 |duration|[int](../types/int.md) | Optional|

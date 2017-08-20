@@ -9,7 +9,7 @@ description: invokeAfterMsg parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[long](../types/long.md) | Yes|
 |query|[!X](../types/!X.md) | Yes|
 

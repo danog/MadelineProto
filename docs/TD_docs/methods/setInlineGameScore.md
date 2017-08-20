@@ -14,7 +14,7 @@ Bots only. Updates game score of the specified user in the game
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |inline\_message\_id|[string](../types/string.md) | Yes|Inline message identifier|
 |edit\_message|[Bool](../types/Bool.md) | Yes|True, if message should be edited|
 |user\_id|[int](../types/int.md) | Yes|User identifier|

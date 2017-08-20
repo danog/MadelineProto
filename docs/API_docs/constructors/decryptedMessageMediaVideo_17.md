@@ -10,7 +10,7 @@ description: decryptedMessageMediaVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |thumb|[bytes](../types/bytes.md) | Yes|
 |thumb\_w|[int](../types/int.md) | Yes|
 |thumb\_h|[int](../types/int.md) | Yes|

@@ -14,7 +14,7 @@ Returns list of sticker sets attached to a file, currently only photos and video
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |file\_id|[int](../types/int.md) | Yes|File identifier|
 
 

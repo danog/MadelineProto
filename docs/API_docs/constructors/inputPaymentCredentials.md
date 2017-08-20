@@ -10,7 +10,7 @@ description: inputPaymentCredentials attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |save|[Bool](../types/Bool.md) | Optional|
 |data|[DataJSON](../types/DataJSON.md) | Yes|
 

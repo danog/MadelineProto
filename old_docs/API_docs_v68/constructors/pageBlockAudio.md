@@ -10,7 +10,7 @@ description: pageBlockAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |audio\_id|[long](../types/long.md) | Yes|
 |caption|[RichText](../types/RichText.md) | Yes|
 

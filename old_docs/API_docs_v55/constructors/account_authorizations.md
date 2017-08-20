@@ -10,7 +10,7 @@ description: account_authorizations attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |authorizations|Array of [Authorization](../types/Authorization.md) | Yes|
 
 

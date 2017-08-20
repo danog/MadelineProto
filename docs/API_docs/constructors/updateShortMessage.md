@@ -10,7 +10,7 @@ description: updateShortMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |out|[Bool](../types/Bool.md) | Optional|
 |mentioned|[Bool](../types/Bool.md) | Optional|
 |media\_unread|[Bool](../types/Bool.md) | Optional|

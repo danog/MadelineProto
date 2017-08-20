@@ -12,7 +12,7 @@ Gives full information about a group
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |group|[group](../types/group.md) | Yes|General info about the group|
 |creator\_user\_id|[int](../types/int.md) | Yes|User identifier of the group creator, 0 if unknown|
 |members|Array of [chatMember](../constructors/chatMember.md) | Yes|Group members|

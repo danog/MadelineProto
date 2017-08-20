@@ -12,7 +12,7 @@ Message with location
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |location|[location](../types/location.md) | Yes|Location to send|
 
 

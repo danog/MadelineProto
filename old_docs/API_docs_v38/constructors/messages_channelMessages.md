@@ -10,7 +10,7 @@ description: messages_channelMessages attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pts|[int](../types/int.md) | Yes|
 |count|[int](../types/int.md) | Yes|
 |messages|Array of [Message](../types/Message.md) | Yes|

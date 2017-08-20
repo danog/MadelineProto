@@ -10,7 +10,7 @@ description: channelAdminLogEventActionToggleSignatures attributes, type and exa
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |new\_value|[Bool](../types/Bool.md) | Yes|
 
 

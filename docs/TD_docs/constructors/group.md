@@ -12,7 +12,7 @@ Represents a group of zero or more other users
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|Group identifier|
 |member\_count|[int](../types/int.md) | Yes|Group member count|
 |status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|Status of the current user in the group|

@@ -12,7 +12,7 @@ New channel chat created
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |title|[string](../types/string.md) | Yes|Title of created channel chat|
 
 

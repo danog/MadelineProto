@@ -14,7 +14,7 @@ Returns notification settings for a given scope
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |scope|[NotificationSettingsScope](../types/NotificationSettingsScope.md) | Yes|Scope to return information about notification settings|
 
 

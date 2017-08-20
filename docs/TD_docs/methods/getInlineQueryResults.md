@@ -14,7 +14,7 @@ Sends inline query to a bot and returns its results. Unavailable for bots
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |bot\_user\_id|[int](../types/int.md) | Yes|Identifier of the bot send query to|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, where the query is sent|
 |user\_location|[location](../types/location.md) | Yes|User location, only if needed|

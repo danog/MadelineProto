@@ -10,7 +10,7 @@ description: gzip_packed attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |packed\_data|[bytes](../types/bytes.md) | Yes|
 
 

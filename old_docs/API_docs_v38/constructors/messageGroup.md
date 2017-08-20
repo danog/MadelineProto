@@ -10,7 +10,7 @@ description: messageGroup attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |min\_id|[int](../types/int.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 |count|[int](../types/int.md) | Yes|

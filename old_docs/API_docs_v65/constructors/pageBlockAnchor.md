@@ -10,7 +10,7 @@ description: pageBlockAnchor attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |name|[string](../types/string.md) | Yes|
 
 

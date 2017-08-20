@@ -10,7 +10,7 @@ description: updateChatUserTyping attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|

@@ -10,7 +10,7 @@ description: dataJSON attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |data|[string](../types/string.md) | Yes|
 
 

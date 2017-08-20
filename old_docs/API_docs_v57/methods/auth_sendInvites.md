@@ -9,7 +9,7 @@ description: auth.sendInvites parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_numbers|Array of [string](../types/string.md) | Yes|
 |message|[string](../types/string.md) | Yes|
 

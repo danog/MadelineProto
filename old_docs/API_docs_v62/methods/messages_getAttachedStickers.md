@@ -9,7 +9,7 @@ description: messages.getAttachedStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |media|[InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|
 
 

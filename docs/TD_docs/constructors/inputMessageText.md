@@ -12,7 +12,7 @@ Text message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |text|[string](../types/string.md) | Yes|Text to send|
 |disable\_web\_page\_preview|[Bool](../types/Bool.md) | Yes|Pass true to disable rich preview for link in the message text|
 |clear\_draft|[Bool](../types/Bool.md) | Yes|Pass true if chat draft message should be deleted|

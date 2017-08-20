@@ -9,7 +9,7 @@ description: messages.startBot parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |bot|[InputUser](../types/InputUser.md) | Yes|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |start\_param|[string](../types/string.md) | Yes|

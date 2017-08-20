@@ -10,7 +10,7 @@ description: inputStickerSetItem attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |document|[InputDocument](../types/InputDocument.md) | Yes|
 |emoji|[string](../types/string.md) | Yes|
 |mask\_coords|[MaskCoords](../types/MaskCoords.md) | Optional|

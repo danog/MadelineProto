@@ -9,7 +9,7 @@ description: account.setPrivacy parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
 |rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|
 

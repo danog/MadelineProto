@@ -10,7 +10,7 @@ description: draftMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |message|[string](../types/string.md) | Yes|

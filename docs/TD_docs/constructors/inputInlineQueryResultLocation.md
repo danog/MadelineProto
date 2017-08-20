@@ -12,7 +12,7 @@ Represents a point on the map
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |location|[location](../types/location.md) | Yes|Result|
 |title|[string](../types/string.md) | Yes|Title of the result|

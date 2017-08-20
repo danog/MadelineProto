@@ -10,7 +10,7 @@ description: msg_container attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |messages|Array of [MTmessage](../constructors/MTmessage.md) | Yes|
 
 

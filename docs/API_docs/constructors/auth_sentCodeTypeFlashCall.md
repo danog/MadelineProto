@@ -10,7 +10,7 @@ description: auth_sentCodeTypeFlashCall attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pattern|[string](../types/string.md) | Yes|
 
 

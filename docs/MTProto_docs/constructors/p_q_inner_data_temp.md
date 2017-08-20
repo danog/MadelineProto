@@ -10,7 +10,7 @@ description: p_q_inner_data_temp attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pq|[bytes](../types/bytes.md) | Yes|
 |p|[bytes](../types/bytes.md) | Yes|
 |q|[bytes](../types/bytes.md) | Yes|

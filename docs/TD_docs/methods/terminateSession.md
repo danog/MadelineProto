@@ -14,7 +14,7 @@ Terminates another session of logged in user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |session\_id|[long](../types/long.md) | Yes|Session identifier|
 
 

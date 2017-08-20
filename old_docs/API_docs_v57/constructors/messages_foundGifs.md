@@ -10,7 +10,7 @@ description: messages_foundGifs attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |next\_offset|[int](../types/int.md) | Yes|
 |results|Array of [FoundGif](../types/FoundGif.md) | Yes|
 

@@ -9,7 +9,7 @@ description: account.deleteAccount parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |reason|[string](../types/string.md) | Yes|
 
 

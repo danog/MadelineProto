@@ -12,7 +12,7 @@ Contains list of users
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |total\_count|[int](../types/int.md) | Yes|Approximate total count of found users|
 |users|Array of [user](../constructors/user.md) | Yes|List of users|
 

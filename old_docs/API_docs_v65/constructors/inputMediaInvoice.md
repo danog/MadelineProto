@@ -10,7 +10,7 @@ description: inputMediaInvoice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |description|[string](../types/string.md) | Yes|
 |photo|[InputWebDocument](../types/InputWebDocument.md) | Optional|

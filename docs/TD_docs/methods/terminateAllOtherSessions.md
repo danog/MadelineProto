@@ -14,7 +14,7 @@ Terminates all other sessions of logged in user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

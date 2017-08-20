@@ -12,7 +12,7 @@ Message with information about venue
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |venue|[venue](../types/venue.md) | Yes|Message content|
 
 

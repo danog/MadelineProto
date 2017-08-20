@@ -9,7 +9,7 @@ description: geochats.search parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 |q|[string](../types/string.md) | Yes|
 |filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|

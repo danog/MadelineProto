@@ -10,7 +10,7 @@ description: inputMediaUploadedVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |duration|[int](../types/int.md) | Yes|
 |w|[int](../types/int.md) | Yes|

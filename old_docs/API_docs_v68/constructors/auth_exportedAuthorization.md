@@ -10,7 +10,7 @@ description: auth_exportedAuthorization attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |bytes|[bytes](../types/bytes.md) | Yes|
 

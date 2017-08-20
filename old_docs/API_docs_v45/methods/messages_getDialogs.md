@@ -9,7 +9,7 @@ description: messages.getDialogs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset\_date|[int](../types/int.md) | Yes|
 |offset\_id|[int](../types/int.md) | Yes|
 |offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|

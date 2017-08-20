@@ -9,7 +9,7 @@ description: account.updateStatus parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offline|[Bool](../types/Bool.md) | Yes|
 
 

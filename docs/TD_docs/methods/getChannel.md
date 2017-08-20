@@ -14,7 +14,7 @@ Returns information about a channel by its identifier, offline request if curren
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Channel identifier|
 
 

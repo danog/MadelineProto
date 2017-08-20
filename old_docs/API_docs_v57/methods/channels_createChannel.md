@@ -9,7 +9,7 @@ description: channels.createChannel parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
 |title|[string](../types/string.md) | Yes|

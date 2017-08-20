@@ -9,7 +9,7 @@ description: geochats.getHistory parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
 |offset|[int](../types/int.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|

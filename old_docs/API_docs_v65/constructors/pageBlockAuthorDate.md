@@ -10,7 +10,7 @@ description: pageBlockAuthorDate attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |author|[RichText](../types/RichText.md) | Yes|
 |published\_date|[int](../types/int.md) | Yes|
 

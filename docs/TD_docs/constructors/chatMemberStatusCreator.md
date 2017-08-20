@@ -12,7 +12,7 @@ Creator of the chat, can delete any message, kick any user and add editors and m
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

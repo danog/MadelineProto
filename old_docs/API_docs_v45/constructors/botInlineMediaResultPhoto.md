@@ -10,7 +10,7 @@ description: botInlineMediaResultPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Yes|
 |photo|[Photo](../types/Photo.md) | Yes|

@@ -10,7 +10,7 @@ description: updateShortChatMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |unread|[Bool](../types/Bool.md) | Optional|
 |out|[Bool](../types/Bool.md) | Optional|
 |mentioned|[Bool](../types/Bool.md) | Optional|

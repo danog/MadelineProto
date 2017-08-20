@@ -10,7 +10,7 @@ description: pageFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |blocks|Array of [PageBlock](../types/PageBlock.md) | Yes|
 |photos|Array of [Photo](../types/Photo.md) | Yes|
 |videos|Array of [Document](../types/Document.md) | Yes|

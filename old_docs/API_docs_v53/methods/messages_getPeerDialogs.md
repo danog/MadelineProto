@@ -9,7 +9,7 @@ description: messages.getPeerDialogs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peers|Array of [InputPeer](../types/InputPeer.md) | Yes|
 
 

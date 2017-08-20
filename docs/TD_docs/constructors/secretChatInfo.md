@@ -12,7 +12,7 @@ Secret chat with one user
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |secret\_chat|[secretChat](../types/secretChat.md) | Yes|Information about the chat|
 
 

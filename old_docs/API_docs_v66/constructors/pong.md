@@ -10,7 +10,7 @@ description: pong attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[long](../types/long.md) | Yes|
 |ping\_id|[long](../types/long.md) | Yes|
 

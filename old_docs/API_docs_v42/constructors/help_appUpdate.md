@@ -10,7 +10,7 @@ description: help_appUpdate attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |critical|[Bool](../types/Bool.md) | Yes|
 |url|[string](../types/string.md) | Yes|

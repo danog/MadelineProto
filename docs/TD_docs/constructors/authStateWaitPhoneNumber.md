@@ -12,7 +12,7 @@ TDLib needs user's phone number to authorize
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

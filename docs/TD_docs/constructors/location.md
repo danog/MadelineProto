@@ -12,7 +12,7 @@ Describes location on Earth
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |latitude|[double](../types/double.md) | Yes|Latitude of location in degrees as defined by sender|
 |longitude|[double](../types/double.md) | Yes|Longitude of location in degrees as defined by sender|
 

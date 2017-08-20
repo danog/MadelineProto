@@ -12,7 +12,7 @@ Group chat is migrated to supergroup channel and deactivated
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Identifier of the channel it is migrated to|
 
 

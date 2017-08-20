@@ -10,7 +10,7 @@ description: langPackStringPluralized attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |key|[string](../types/string.md) | Yes|
 |zero\_value|[string](../types/string.md) | Optional|
 |one\_value|[string](../types/string.md) | Optional|

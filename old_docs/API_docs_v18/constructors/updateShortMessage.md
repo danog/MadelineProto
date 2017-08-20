@@ -10,7 +10,7 @@ description: updateShortMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |from\_id|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Yes|

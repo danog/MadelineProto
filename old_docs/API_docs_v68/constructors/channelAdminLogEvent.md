@@ -10,7 +10,7 @@ description: channelAdminLogEvent attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[long](../types/long.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|

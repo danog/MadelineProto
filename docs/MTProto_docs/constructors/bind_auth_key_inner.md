@@ -10,7 +10,7 @@ description: bind_auth_key_inner attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |nonce|[long](../types/long.md) | Yes|
 |temp\_auth\_key\_id|[long](../types/long.md) | Yes|
 |perm\_auth\_key\_id|[long](../types/long.md) | Yes|

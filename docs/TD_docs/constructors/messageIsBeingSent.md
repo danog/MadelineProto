@@ -12,7 +12,7 @@ Message is outgoing but is yet not delivered to the server
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

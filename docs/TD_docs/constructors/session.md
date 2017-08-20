@@ -12,7 +12,7 @@ Contains information about one session in some application used by the user
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Session identifier|
 |is\_current|[Bool](../types/Bool.md) | Yes|True, if it is current session|
 |app\_id|[int](../types/int.md) | Yes|Application identifier, provided by the application|

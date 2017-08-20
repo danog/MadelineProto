@@ -12,7 +12,7 @@ Service notification from the server. Upon receiving client should show popup wi
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |type|[string](../types/string.md) | Yes|Type of the notification|
 |content|[MessageContent](../types/MessageContent.md) | Yes|Notification content|
 

@@ -9,7 +9,7 @@ description: account.updateNotifySettings parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|
 |settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|
 

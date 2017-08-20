@@ -10,7 +10,7 @@ description: phone_phoneCall attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

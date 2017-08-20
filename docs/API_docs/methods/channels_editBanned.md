@@ -9,7 +9,7 @@ description: channels.editBanned parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |banned\_rights|[ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|

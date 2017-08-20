@@ -10,7 +10,7 @@ description: updateEncryption attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat|[EncryptedChat](../types/EncryptedChat.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 

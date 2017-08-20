@@ -12,7 +12,7 @@ Represents results of the inline query. Use sendInlineQueryResultMessage to send
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |inline\_query\_id|[long](../types/long.md) | Yes|Unique identifier of the inline query|
 |next\_offset|[string](../types/string.md) | Yes|Offset for the next request. If it is empty, there is no more results|
 |results|Array of [InlineQueryResult](../constructors/InlineQueryResult.md) | Yes|Results of the query|

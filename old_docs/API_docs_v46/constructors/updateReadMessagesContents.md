@@ -10,7 +10,7 @@ description: updateReadMessagesContents attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |messages|Array of [int](../types/int.md) | Yes|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|

@@ -9,7 +9,7 @@ description: messages.setInlineGameScore parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
 |force|[Bool](../types/Bool.md) | Optional|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|

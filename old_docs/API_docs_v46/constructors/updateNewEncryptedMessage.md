@@ -10,7 +10,7 @@ description: updateNewEncryptedMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |encr\_message|[EncryptedMessage](../types/EncryptedMessage.md) | Yes|
 |qts|[int](../types/int.md) | Yes|
 

@@ -9,7 +9,7 @@ description: messages.addChatUser parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |fwd\_limit|[int](../types/int.md) | Yes|

@@ -14,7 +14,7 @@ Searches for messages in all chats except secret chats. Returns result in revers
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |query|[string](../types/string.md) | Yes|Query to search for|
 |offset\_date|[int](../types/int.md) | Yes|Date of the message to search from, you can use 0 or any date in the future to get results from the beginning|
 |offset\_chat\_id|[long](../types/long.md) | Yes|Chat identifier of the last found message or 0 for the first request|

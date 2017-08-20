@@ -10,7 +10,7 @@ description: userFull attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |blocked|[Bool](../types/Bool.md) | Optional|
 |user|[User](../types/User.md) | Yes|
 |about|[string](../types/string.md) | Optional|

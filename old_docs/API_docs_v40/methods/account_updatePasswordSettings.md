@@ -9,7 +9,7 @@ description: account.updatePasswordSettings parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |current\_password\_hash|[bytes](../types/bytes.md) | Yes|
 |new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Yes|
 

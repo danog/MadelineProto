@@ -9,7 +9,7 @@ description: messages.search parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |q|[string](../types/string.md) | Yes|
 |from\_id|[InputUser](../types/InputUser.md) | Optional|

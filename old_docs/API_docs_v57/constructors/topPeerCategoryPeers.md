@@ -10,7 +10,7 @@ description: topPeerCategoryPeers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|
 |count|[int](../types/int.md) | Yes|
 |peers|Array of [TopPeer](../types/TopPeer.md) | Yes|

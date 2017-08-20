@@ -14,7 +14,7 @@ Returns list of created public channels
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Channels](../types/Channels.md)

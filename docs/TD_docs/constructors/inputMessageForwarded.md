@@ -12,7 +12,7 @@ Forwarded message
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |from\_chat\_id|[long](../types/long.md) | Yes|Chat identifier of the message to forward|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message to forward|
 |in\_game\_share|[Bool](../types/Bool.md) | Yes|Pass true to share a game message within a launched game, for Game messages only|

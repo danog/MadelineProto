@@ -12,7 +12,7 @@ Local file with the thumb
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |path|[string](../types/string.md) | Yes|Path to the file with the thumb|
 |width|[int](../types/int.md) | Yes|Thumb width, use 0 if unknown|
 |height|[int](../types/int.md) | Yes|Thumb height, use 0 if unknown|

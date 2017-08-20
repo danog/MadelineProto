@@ -12,7 +12,7 @@ Token for Ubuntu Push Service
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |token|[string](../types/string.md) | Yes|The token|
 
 

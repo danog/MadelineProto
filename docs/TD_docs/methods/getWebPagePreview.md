@@ -14,7 +14,7 @@ Get web page preview by text of the message. Do not call this function to often
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |message\_text|[string](../types/string.md) | Yes|Message text|
 
 

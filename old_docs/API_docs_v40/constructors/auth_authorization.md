@@ -10,7 +10,7 @@ description: auth_authorization attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user|[User](../types/User.md) | Yes|
 
 

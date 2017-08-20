@@ -10,7 +10,7 @@ description: future_salt attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |valid\_since|[int](../types/int.md) | Yes|
 |valid\_until|[int](../types/int.md) | Yes|
 |salt|[long](../types/long.md) | Yes|

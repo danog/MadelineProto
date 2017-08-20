@@ -10,7 +10,7 @@ description: documentAttributeAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |duration|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |performer|[string](../types/string.md) | Yes|

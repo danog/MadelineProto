@@ -14,7 +14,7 @@ Changes username of logged in user. If something changes, updateUser will be sen
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |username|[string](../types/string.md) | Yes|New value of username. Use empty string to remove username|
 
 

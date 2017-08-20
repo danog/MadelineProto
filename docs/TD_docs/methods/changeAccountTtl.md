@@ -14,7 +14,7 @@ Changes period of inactivity, after which the account of currently logged in use
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |ttl|[accountTtl](../types/accountTtl.md) | Yes|New account TTL|
 
 

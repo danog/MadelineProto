@@ -12,7 +12,7 @@ Return privileged members, i.e. creator, editors and moderators are returned
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 

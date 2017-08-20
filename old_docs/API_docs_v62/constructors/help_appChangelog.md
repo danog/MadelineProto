@@ -10,7 +10,7 @@ description: help_appChangelog attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |message|[string](../types/string.md) | Yes|
 |media|[MessageMedia](../types/MessageMedia.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Yes|

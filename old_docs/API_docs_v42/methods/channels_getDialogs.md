@@ -9,7 +9,7 @@ description: channels.getDialogs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 

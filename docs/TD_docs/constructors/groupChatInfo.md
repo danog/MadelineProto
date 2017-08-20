@@ -12,7 +12,7 @@ Chat with zero or more other users
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |group|[group](../types/group.md) | Yes|Information about the chat|
 
 

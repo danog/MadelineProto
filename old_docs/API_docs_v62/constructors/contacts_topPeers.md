@@ -10,7 +10,7 @@ description: contacts_topPeers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |categories|Array of [TopPeerCategoryPeers](../types/TopPeerCategoryPeers.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

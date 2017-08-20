@@ -14,7 +14,7 @@ Checks chat invite link for validness and returns information about the correspo
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |invite\_link|[string](../types/string.md) | Yes|Invite link to check. Should begin with "https: telegram.me/joinchat/"|
 
 

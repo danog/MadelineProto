@@ -10,7 +10,7 @@ description: updateReadChannelInbox attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 

@@ -12,7 +12,7 @@ Contains list of chat members
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |total\_count|[int](../types/int.md) | Yes|Approximate total count of found chat members|
 |members|Array of [chatMember](../constructors/chatMember.md) | Yes|List of members|
 

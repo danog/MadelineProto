@@ -9,7 +9,7 @@ description: channels.getChannels parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [InputChannel](../types/InputChannel.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: inputGeoPoint attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |latitude|[double](../types/double.md) | Yes|
 |longitude|[double](../types/double.md) | Yes|
 

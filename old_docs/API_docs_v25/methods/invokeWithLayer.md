@@ -9,7 +9,7 @@ description: invokeWithLayer parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |layer|[int](../types/int.md) | Yes|
 |query|[!X](../types/!X.md) | Yes|
 

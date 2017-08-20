@@ -12,7 +12,7 @@ Token for MPNS
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |token|[string](../types/string.md) | Yes|The token|
 
 

@@ -14,7 +14,7 @@ Recovers password with recovery code sent to email
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |recovery\_code|[string](../types/string.md) | Yes|Recovery code to check|
 
 

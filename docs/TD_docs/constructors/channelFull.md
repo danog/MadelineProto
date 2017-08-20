@@ -12,7 +12,7 @@ Gives full information about a channel
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |channel|[channel](../types/channel.md) | Yes|General info about the channel|
 |about|[string](../types/string.md) | Yes|Information about the channel|
 |member\_count|[int](../types/int.md) | Yes|Channel member count, 0 if unknown|

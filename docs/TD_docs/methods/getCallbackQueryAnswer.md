@@ -14,7 +14,7 @@ Sends callback query to a bot and returns answer to it. Unavailable for bots
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat with a message|
 |message\_id|[long](../types/long.md) | Yes|Identifier of the message, from which the query is originated|
 |payload|[CallbackQueryPayload](../types/CallbackQueryPayload.md) | Yes|Query payload|

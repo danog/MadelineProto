@@ -14,7 +14,7 @@ Returns current state of two-step verification
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [PasswordState](../types/PasswordState.md)

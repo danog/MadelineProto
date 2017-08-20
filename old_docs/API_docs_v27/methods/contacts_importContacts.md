@@ -9,7 +9,7 @@ description: contacts.importContacts parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |contacts|Array of [InputContact](../types/InputContact.md) | Yes|
 |replace|[Bool](../types/Bool.md) | Yes|
 

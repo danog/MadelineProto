@@ -10,7 +10,7 @@ description: updates_state attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pts|[int](../types/int.md) | Yes|
 |qts|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|

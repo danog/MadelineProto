@@ -7,7 +7,7 @@ description: PHP implementation of telegram's MTProto protocol
 [![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
 
 
-<img src='https://daniil.it/MadelineProto/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/MadelineProto/logo-hover.png';" onmouseout="this.src='https://daniil.it/MadelineProto/logo.png';" />
+<img src='https://docs.madelineproto.xyz/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/MadelineProto/logo-hover.png';" onmouseout="this.src='https://daniil.it/MadelineProto/logo.png';" />
 
 Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).  
 

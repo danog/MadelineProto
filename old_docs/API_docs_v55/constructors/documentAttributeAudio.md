@@ -10,7 +10,7 @@ description: documentAttributeAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |voice|[Bool](../types/Bool.md) | Optional|
 |duration|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Optional|

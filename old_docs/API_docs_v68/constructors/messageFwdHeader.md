@@ -10,7 +10,7 @@ description: messageFwdHeader attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |from\_id|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Yes|
 |channel\_id|[int](../types/int.md) | Optional|

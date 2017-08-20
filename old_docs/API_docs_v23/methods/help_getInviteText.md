@@ -9,7 +9,7 @@ description: help.getInviteText parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |lang\_code|[string](../types/string.md) | Yes|
 
 

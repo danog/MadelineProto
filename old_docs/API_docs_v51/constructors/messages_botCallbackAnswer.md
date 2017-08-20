@@ -10,7 +10,7 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |alert|[Bool](../types/Bool.md) | Optional|
 |message|[string](../types/string.md) | Optional|
 

@@ -10,7 +10,7 @@ description: inputMediaUploadedDocument attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |file\_name|[string](../types/string.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|

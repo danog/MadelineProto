@@ -10,7 +10,7 @@ description: inputMediaUploadedThumbVideo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |thumb|[InputFile](../types/InputFile.md) | Yes|
 |duration|[int](../types/int.md) | Yes|

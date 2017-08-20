@@ -10,7 +10,7 @@ description: botInlineMessageMediaAuto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |caption|[string](../types/string.md) | Yes|
 
 

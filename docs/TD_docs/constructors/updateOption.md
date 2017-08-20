@@ -12,7 +12,7 @@ Some option changed its value
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |name|[string](../types/string.md) | Yes|Option name|
 |value|[OptionValue](../types/OptionValue.md) | Yes|New option value|
 

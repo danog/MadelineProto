@@ -12,7 +12,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |x|Array of [test\_String](../types/test_String.md) | Yes|
 
 

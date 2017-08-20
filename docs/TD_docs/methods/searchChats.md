@@ -14,7 +14,7 @@ Searches for specified query in the title and username of known chats, offline r
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |query|[string](../types/string.md) | Yes|Query to search for, if query is empty, returns up to 20 recently found chats|
 |limit|[int](../types/int.md) | Yes|Maximum number of chats to be returned|
 

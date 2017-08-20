@@ -14,7 +14,7 @@ Searches sticker set by its short name
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |name|[string](../types/string.md) | Yes|Name of the sticker set|
 
 

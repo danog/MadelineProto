@@ -10,7 +10,7 @@ description: messages_chats attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

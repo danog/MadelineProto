@@ -10,7 +10,7 @@ description: messageMediaAudio attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |audio|[Audio](../types/Audio.md) | Yes|
 
 

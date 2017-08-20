@@ -10,7 +10,7 @@ description: invoice attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |test|[Bool](../types/Bool.md) | Optional|
 |name\_requested|[Bool](../types/Bool.md) | Optional|
 |phone\_requested|[Bool](../types/Bool.md) | Optional|

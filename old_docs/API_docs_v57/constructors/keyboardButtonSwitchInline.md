@@ -10,7 +10,7 @@ description: keyboardButtonSwitchInline attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |same\_peer|[Bool](../types/Bool.md) | Optional|
 |text|[string](../types/string.md) | Yes|
 |query|[string](../types/string.md) | Yes|

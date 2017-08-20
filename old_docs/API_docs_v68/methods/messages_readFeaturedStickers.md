@@ -9,7 +9,7 @@ description: messages.readFeaturedStickers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|Array of [long](../types/long.md) | Yes|
 
 

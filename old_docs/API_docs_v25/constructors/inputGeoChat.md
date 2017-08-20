@@ -10,7 +10,7 @@ description: inputGeoChat attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[int](../types/int.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
 

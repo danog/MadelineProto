@@ -10,7 +10,7 @@ description: decryptedMessageMediaVenue attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |lat|[double](../types/double.md) | Yes|
 |long|[double](../types/double.md) | Yes|
 |title|[string](../types/string.md) | Yes|

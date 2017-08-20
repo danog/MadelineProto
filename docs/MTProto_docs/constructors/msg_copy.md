@@ -10,7 +10,7 @@ description: msg_copy attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |orig\_message|[MTMessage](../types/MTMessage.md) | Yes|
 
 

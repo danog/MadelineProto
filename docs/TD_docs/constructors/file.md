@@ -12,7 +12,7 @@ Represents a file
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|Unique file identifier, 0 for empty file|
 |persistent\_id|[string](../types/string.md) | Yes|Persistent file identifier, if exists. Can be used across application restarts or even other devices for current logged user. If begins with "http: " or "https: ", it is HTTP URL of the file. Currently, TDLib is unable to download files if only they URL is known|
 |size|[int](../types/int.md) | Yes|File size, 0 if unknown|

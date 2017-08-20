@@ -10,7 +10,7 @@ description: userProfilePhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |photo\_id|[long](../types/long.md) | Yes|
 |photo\_small|[FileLocation](../types/FileLocation.md) | Yes|
 |photo\_big|[FileLocation](../types/FileLocation.md) | Yes|

@@ -10,7 +10,7 @@ description: payments_paymentResult attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |updates|[Updates](../types/Updates.md) | Yes|
 
 

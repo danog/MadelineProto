@@ -9,7 +9,7 @@ description: ping parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ping\_id|[long](../types/long.md) | Yes|
 
 

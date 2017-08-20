@@ -12,7 +12,7 @@ Ordinary chat with one user
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |user|[user](../types/user.md) | Yes|Information about interlocutor|
 
 

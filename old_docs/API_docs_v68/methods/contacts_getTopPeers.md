@@ -9,7 +9,7 @@ description: contacts.getTopPeers parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |correspondents|[Bool](../types/Bool.md) | Optional|
 |bots\_pm|[Bool](../types/Bool.md) | Optional|
 |bots\_inline|[Bool](../types/Bool.md) | Optional|

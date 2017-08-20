@@ -10,7 +10,7 @@ description: nearestDc attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |country|[string](../types/string.md) | Yes|
 |this\_dc|[int](../types/int.md) | Yes|
 |nearest\_dc|[int](../types/int.md) | Yes|

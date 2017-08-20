@@ -10,7 +10,7 @@ description: contacts_importedContacts attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |imported|Array of [ImportedContact](../types/ImportedContact.md) | Yes|
 |retry\_contacts|Array of [long](../types/long.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

@@ -10,7 +10,7 @@ description: popularContact attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |client\_id|[long](../types/long.md) | Yes|
 |importers|[int](../types/int.md) | Yes|
 

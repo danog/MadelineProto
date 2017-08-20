@@ -10,7 +10,7 @@ description: decryptedMessageActionSetMessageTTL attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |ttl\_seconds|[int](../types/int.md) | Yes|
 
 

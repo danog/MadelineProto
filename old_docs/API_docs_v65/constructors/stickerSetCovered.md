@@ -10,7 +10,7 @@ description: stickerSetCovered attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |set|[StickerSet](../types/StickerSet.md) | Yes|
 |cover|[Document](../types/Document.md) | Yes|
 

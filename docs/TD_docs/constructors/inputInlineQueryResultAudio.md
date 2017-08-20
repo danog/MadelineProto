@@ -12,7 +12,7 @@ Represents link to a mp3 audio file
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |title|[string](../types/string.md) | Yes|Title of the audio|
 |performer|[string](../types/string.md) | Yes|Performer of the audio|

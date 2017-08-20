@@ -10,7 +10,7 @@ description: keyboardButtonCallback attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |text|[string](../types/string.md) | Yes|
 |data|[bytes](../types/bytes.md) | Yes|
 

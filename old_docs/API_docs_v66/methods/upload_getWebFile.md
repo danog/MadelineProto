@@ -9,7 +9,7 @@ description: upload.getWebFile parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |location|[InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|
 |offset|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

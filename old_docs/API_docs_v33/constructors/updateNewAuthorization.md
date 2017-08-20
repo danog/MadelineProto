@@ -10,7 +10,7 @@ description: updateNewAuthorization attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |auth\_key\_id|[long](../types/long.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |device|[string](../types/string.md) | Yes|

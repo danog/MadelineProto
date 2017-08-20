@@ -10,7 +10,7 @@ description: textUrl attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |text|[RichText](../types/RichText.md) | Yes|
 |url|[string](../types/string.md) | Yes|
 |webpage\_id|[long](../types/long.md) | Yes|

@@ -9,7 +9,7 @@ description: messages.deleteHistory parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |offset|[int](../types/int.md) | Yes|
 

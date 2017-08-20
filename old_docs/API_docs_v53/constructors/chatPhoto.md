@@ -10,7 +10,7 @@ description: chatPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |photo\_small|[FileLocation](../types/FileLocation.md) | Yes|
 |photo\_big|[FileLocation](../types/FileLocation.md) | Yes|
 

@@ -10,7 +10,7 @@ description: privacyValueDisallowUsers attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |users|Array of [int](../types/int.md) | Yes|
 
 

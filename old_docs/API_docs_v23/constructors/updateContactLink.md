@@ -10,7 +10,7 @@ description: updateContactLink attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |my\_link|[contacts\_MyLink](../types/contacts_MyLink.md) | Yes|
 |foreign\_link|[contacts\_ForeignLink](../types/contacts_ForeignLink.md) | Yes|

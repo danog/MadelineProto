@@ -10,7 +10,7 @@ description: rpc_error attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |error\_code|[int](../types/int.md) | Yes|
 |error\_message|[string](../types/string.md) | Yes|
 

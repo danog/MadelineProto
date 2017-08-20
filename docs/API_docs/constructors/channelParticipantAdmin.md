@@ -10,7 +10,7 @@ description: channelParticipantAdmin attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |can\_edit|[Bool](../types/Bool.md) | Optional|
 |user\_id|[int](../types/int.md) | Yes|
 |inviter\_id|[int](../types/int.md) | Yes|

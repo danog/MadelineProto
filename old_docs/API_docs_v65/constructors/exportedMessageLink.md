@@ -10,7 +10,7 @@ description: exportedMessageLink attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |link|[string](../types/string.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: peerSettings attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |report\_spam|[Bool](../types/Bool.md) | Optional|
 
 

@@ -10,7 +10,7 @@ description: inputEncryptedFileUploaded attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[long](../types/long.md) | Yes|
 |parts|[int](../types/int.md) | Yes|
 |md5\_checksum|[string](../types/string.md) | Yes|

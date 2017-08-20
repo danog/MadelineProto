@@ -14,7 +14,7 @@ Changes user password. If new recovery email is specified, then error EMAIL_UNCO
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |old\_password|[string](../types/string.md) | Yes|Old user password|
 |new\_password|[string](../types/string.md) | Yes|New user password, may be empty to remove the password|
 |new\_hint|[string](../types/string.md) | Yes|New password hint, can be empty|

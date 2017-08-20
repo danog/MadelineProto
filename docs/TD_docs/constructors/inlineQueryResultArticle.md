@@ -12,7 +12,7 @@ Represents link to an article or web page
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |url|[string](../types/string.md) | Yes|Url of the result, if exists|
 |hide\_url|[Bool](../types/Bool.md) | Yes|True, if url must be not shown|

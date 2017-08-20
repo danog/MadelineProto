@@ -10,7 +10,7 @@ description: channelAdminLogEventActionChangePhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |prev\_photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
 |new\_photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
 

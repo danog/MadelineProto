@@ -10,7 +10,7 @@ description: account_sentChangePhoneCode attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_code\_hash|[string](../types/string.md) | Yes|
 |send\_call\_timeout|[int](../types/int.md) | Yes|
 

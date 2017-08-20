@@ -10,7 +10,7 @@ description: channelAdminLogEventActionEditMessage attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |prev\_message|[Message](../types/Message.md) | Yes|
 |new\_message|[Message](../types/Message.md) | Yes|
 

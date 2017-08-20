@@ -10,7 +10,7 @@ description: phoneCallProtocol attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |udp\_p2p|[Bool](../types/Bool.md) | Optional|
 |udp\_reflector|[Bool](../types/Bool.md) | Optional|
 |min\_layer|[int](../types/int.md) | Yes|

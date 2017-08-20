@@ -10,7 +10,7 @@ description: msgs_state_req attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_ids|Array of [long](../types/long.md) | Yes|
 
 

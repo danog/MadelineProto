@@ -12,7 +12,7 @@ Object of this type may be returned on every function call in case of the error
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |code|[int](../types/int.md) | Yes|Error code, maybe changed in the future|
 |message|[string](../types/string.md) | Yes|Error message, may be changed in the future|
 

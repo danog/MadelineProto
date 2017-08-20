@@ -9,7 +9,7 @@ description: messages.editChatAdmin parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
 |user\_id|[InputUser](../types/InputUser.md) | Yes|
 |is\_admin|[Bool](../types/Bool.md) | Yes|

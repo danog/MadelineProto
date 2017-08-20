@@ -9,7 +9,7 @@ description: help.saveAppLog parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |events|Array of [InputAppEvent](../types/InputAppEvent.md) | Yes|
 
 

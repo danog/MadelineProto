@@ -9,7 +9,7 @@ description: messages.readHistory parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |peer|[InputPeer](../types/InputPeer.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 |offset|[int](../types/int.md) | Yes|

@@ -10,7 +10,7 @@ description: contacts_suggested attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |results|Array of [ContactSuggested](../types/ContactSuggested.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 

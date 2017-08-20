@@ -10,7 +10,7 @@ description: pageBlockPreformatted attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |text|[RichText](../types/RichText.md) | Yes|
 |language|[string](../types/string.md) | Yes|
 

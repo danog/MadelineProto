@@ -14,7 +14,7 @@ Returns list of chats in the right order, chats are sorted by (order, chat_id) i
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |offset\_order|[long](../types/long.md) | Yes|Chat order to return chats from|
 |offset\_chat\_id|[long](../types/long.md) | Yes|Chat identifier to return chats from|
 |limit|[int](../types/int.md) | Yes|Maximum number of chats to be returned|

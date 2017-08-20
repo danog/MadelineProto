@@ -12,7 +12,7 @@ Contains list of sessions
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |sessions|Array of [session](../constructors/session.md) | Yes|List of sessions|
 
 

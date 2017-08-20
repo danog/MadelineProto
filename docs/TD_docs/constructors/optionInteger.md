@@ -12,7 +12,7 @@ Integer option
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |value|[int](../types/int.md) | Yes|Value of an option|
 
 

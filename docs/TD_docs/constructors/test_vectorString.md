@@ -10,7 +10,7 @@ description: test_vectorString attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |value|Array of [string](../constructors/string.md) | Yes|
 
 

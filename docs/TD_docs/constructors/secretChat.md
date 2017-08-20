@@ -12,7 +12,7 @@ Represents a secret chat
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[int](../types/int.md) | Yes|Secret chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the interlocutor|
 |state|[int](../types/int.md) | Yes|State of the secret chat, 0 - yet not created, 1 - active, 2 - closed|

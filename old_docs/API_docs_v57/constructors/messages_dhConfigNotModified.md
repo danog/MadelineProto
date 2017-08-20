@@ -10,7 +10,7 @@ description: messages_dhConfigNotModified attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |random|[bytes](../types/bytes.md) | Yes|
 
 

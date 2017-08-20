@@ -9,7 +9,7 @@ description: help.setBotUpdatesStatus parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |pending\_updates\_count|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Yes|
 

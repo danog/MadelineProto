@@ -10,7 +10,7 @@ description: inputStickerSetShortName attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |short\_name|[string](../types/string.md) | Yes|
 
 

@@ -14,7 +14,7 @@ Requests to send password recovery code to email. Works only when authGetState r
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

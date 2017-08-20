@@ -10,7 +10,7 @@ description: messageMediaGeo attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |geo|[GeoPoint](../types/GeoPoint.md) | Yes|
 
 

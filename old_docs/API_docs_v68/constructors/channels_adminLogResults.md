@@ -10,7 +10,7 @@ description: channels_adminLogResults attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |events|Array of [ChannelAdminLogEvent](../types/ChannelAdminLogEvent.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|

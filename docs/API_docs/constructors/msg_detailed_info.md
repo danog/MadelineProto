@@ -10,7 +10,7 @@ description: msg_detailed_info attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |msg\_id|[long](../types/long.md) | Yes|
 |answer\_msg\_id|[long](../types/long.md) | Yes|
 |bytes|[int](../types/int.md) | Yes|

@@ -10,7 +10,7 @@ description: inputMessagesFilterPhoneCalls attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |missed|[Bool](../types/Bool.md) | Optional|
 
 

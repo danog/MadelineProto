@@ -9,7 +9,7 @@ description: messages.searchGlobal parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |q|[string](../types/string.md) | Yes|
 |offset\_date|[int](../types/int.md) | Yes|
 |offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|

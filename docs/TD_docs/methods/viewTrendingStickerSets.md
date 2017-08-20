@@ -14,7 +14,7 @@ Trending sticker sets are viewed by the user
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |sticker\_set\_ids|Array of [long](../types/long.md) | Yes|Identifiers of viewed trending sticker sets|
 
 

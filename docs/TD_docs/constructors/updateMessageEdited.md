@@ -12,7 +12,7 @@ Message was edited. Changes in the message content will come in a separate updat
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[long](../types/long.md) | Yes|Chat identifier|
 |message\_id|[long](../types/long.md) | Yes|Message identifier|
 |edit\_date|[int](../types/int.md) | Yes|Date the message was edited, unix time|

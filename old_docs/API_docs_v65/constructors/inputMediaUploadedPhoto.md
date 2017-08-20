@@ -10,7 +10,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 |stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|

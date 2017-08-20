@@ -10,7 +10,7 @@ description: userStatusOffline attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |was\_online|[int](../types/int.md) | Yes|
 
 

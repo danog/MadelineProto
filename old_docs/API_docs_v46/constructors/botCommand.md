@@ -10,7 +10,7 @@ description: botCommand attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |command|[string](../types/string.md) | Yes|
 |description|[string](../types/string.md) | Yes|
 

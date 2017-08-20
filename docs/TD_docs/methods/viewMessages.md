@@ -14,7 +14,7 @@ Messages are viewed by the user. Many useful activities depends on message being
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
 |message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of viewed messages|
 

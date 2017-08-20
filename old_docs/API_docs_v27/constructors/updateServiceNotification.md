@@ -10,7 +10,7 @@ description: updateServiceNotification attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |type|[string](../types/string.md) | Yes|
 |message|[string](../types/string.md) | Yes|
 |media|[MessageMedia](../types/MessageMedia.md) | Yes|

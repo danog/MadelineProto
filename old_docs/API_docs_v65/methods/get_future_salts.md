@@ -9,7 +9,7 @@ description: get_future_salts parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |num|[int](../types/int.md) | Yes|
 
 

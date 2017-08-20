@@ -9,7 +9,7 @@ description: auth.checkPassword parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |password\_hash|[bytes](../types/bytes.md) | Yes|
 
 

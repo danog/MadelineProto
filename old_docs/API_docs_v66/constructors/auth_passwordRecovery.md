@@ -10,7 +10,7 @@ description: auth_passwordRecovery attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |email\_pattern|[string](../types/string.md) | Yes|
 
 

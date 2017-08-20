@@ -9,7 +9,7 @@ description: contest.saveDeveloperInfo parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |vk\_id|[int](../types/int.md) | Yes|
 |name|[string](../types/string.md) | Yes|
 |phone\_number|[string](../types/string.md) | Yes|

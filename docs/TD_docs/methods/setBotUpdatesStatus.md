@@ -14,7 +14,7 @@ Bots only. Informs server about number of pending bot updates if they aren't pro
 ### Params:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |pending\_update\_count|[int](../types/int.md) | Yes|Number of pending updates|
 |error\_message|[string](../types/string.md) | Yes|Last error's message|
 

@@ -10,7 +10,7 @@ description: wallPaperSolid attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |bg\_color|[int](../types/int.md) | Yes|

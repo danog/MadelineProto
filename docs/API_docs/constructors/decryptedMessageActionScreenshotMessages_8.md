@@ -10,7 +10,7 @@ description: decryptedMessageActionScreenshotMessages attributes, type and examp
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |random\_ids|Array of [long](../types/long.md) | Yes|
 
 

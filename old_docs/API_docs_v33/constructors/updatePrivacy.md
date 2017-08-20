@@ -10,7 +10,7 @@ description: updatePrivacy attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |key|[PrivacyKey](../types/PrivacyKey.md) | Yes|
 |rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Yes|
 

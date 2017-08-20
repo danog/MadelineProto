@@ -10,7 +10,7 @@ description: sendMessageUploadDocumentAction attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |progress|[int](../types/int.md) | Yes|
 
 

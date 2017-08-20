@@ -9,7 +9,7 @@ description: account.registerDevice parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |token\_type|[int](../types/int.md) | Yes|
 |token|[string](../types/string.md) | Yes|
 

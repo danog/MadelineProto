@@ -10,7 +10,7 @@ description: account_tmpPassword attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |tmp\_password|[bytes](../types/bytes.md) | Yes|
 |valid\_until|[int](../types/int.md) | Yes|
 

@@ -10,7 +10,7 @@ description: decryptedDataBlock attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |voice\_call\_id|[int128](../types/int128.md) | Optional|
 |in\_seq\_no|[int](../types/int.md) | Optional|
 |out\_seq\_no|[int](../types/int.md) | Optional|

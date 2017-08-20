@@ -12,7 +12,7 @@ Represents a sticker cached on the telegram server
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
-|----------|:-------------:|:--------:|------------:|
+|----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
 |sticker|[sticker](../types/sticker.md) | Yes|The sticker|
 

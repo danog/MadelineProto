@@ -10,7 +10,7 @@ description: updates_difference attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |new\_messages|Array of [Message](../types/Message.md) | Yes|
 |new\_encrypted\_messages|Array of [EncryptedMessage](../types/EncryptedMessage.md) | Yes|
 |other\_updates|Array of [Update](../types/Update.md) | Yes|

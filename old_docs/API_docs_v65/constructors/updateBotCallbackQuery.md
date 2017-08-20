@@ -10,7 +10,7 @@ description: updateBotCallbackQuery attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |query\_id|[long](../types/long.md) | Yes|
 |user\_id|[int](../types/int.md) | Yes|
 |peer|[Peer](../types/Peer.md) | Yes|

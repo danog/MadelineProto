@@ -9,7 +9,7 @@ description: messages.receivedMessages parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |max\_id|[int](../types/int.md) | Yes|
 
 

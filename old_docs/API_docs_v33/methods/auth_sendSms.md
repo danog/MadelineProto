@@ -9,7 +9,7 @@ description: auth.sendSms parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |phone\_number|[string](../types/string.md) | Yes|
 |phone\_code\_hash|[string](../types/string.md) | Yes|
 

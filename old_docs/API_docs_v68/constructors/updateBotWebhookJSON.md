@@ -10,7 +10,7 @@ description: updateBotWebhookJSON attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |
-|----------|:-------------:|---------:|
+|----------|---------------|----------|
 |data|[DataJSON](../types/DataJSON.md) | Yes|
 
 
