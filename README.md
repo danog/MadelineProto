@@ -4,7 +4,7 @@
         <img layout='responsive' width="103" height="20" src="https://styleci.io/repos/61838413/shield" alt="StyleCI" />
     </a>
     <a href="https://travis-ci.org/danog/MadelineProto">
-        <img layour='responsive' width="90" height="20" src="https://travis-ci.org/danog/MadelineProto.svg?branch=master" alt="Build Status" />
+        <img layout='responsive' width="90" height="20" src="https://travis-ci.org/danog/MadelineProto.svg?branch=master" alt="Build Status" />
     </a>
 </p>
 
