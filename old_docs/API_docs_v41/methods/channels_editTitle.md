@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editTitle`
 Parameters:
 
 channel - Json encoded InputChannel
+
 title - Json encoded string
+
 
 
 

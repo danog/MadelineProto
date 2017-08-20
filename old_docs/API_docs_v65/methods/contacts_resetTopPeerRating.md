@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.resetTopPeerRating`
 Parameters:
 
 category - Json encoded TopPeerCategory
+
 peer - Json encoded InputPeer
+
 
 
 

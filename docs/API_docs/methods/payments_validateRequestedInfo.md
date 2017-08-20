@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.validateRequestedInf
 Parameters:
 
 save - Json encoded Bool
+
 msg_id - Json encoded int
+
 info - Json encoded PaymentRequestedInfo
+
 
 
 

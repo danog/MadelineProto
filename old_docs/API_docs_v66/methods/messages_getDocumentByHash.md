@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDocumentByHash`
 Parameters:
 
 sha256 - Json encoded bytes
+
 size - Json encoded int
+
 mime_type - Json encoded string
+
 
 
 

@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.createChat`
 Parameters:
 
 users - Json encoded  array of InputUser
+
 title - Json encoded string
+
 
 
 

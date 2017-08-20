@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChatMember`
 Parameters:
 
 chat_id - Json encoded InputPeer
+
 user_id - Json encoded int
+
 
 
 

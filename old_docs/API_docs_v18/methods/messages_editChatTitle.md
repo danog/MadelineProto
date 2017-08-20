@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editChatTitle`
 Parameters:
 
 chat_id - Json encoded InputPeer
+
 title - Json encoded string
+
 
 
 

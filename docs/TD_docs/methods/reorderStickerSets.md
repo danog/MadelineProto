@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/reorderStickerSets`
 Parameters:
 
 is_masks - Json encoded Bool
+
 sticker_set_ids - Json encoded  array of long
+
 
 
 

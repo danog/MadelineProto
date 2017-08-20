@@ -59,9 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getHistory`
 Parameters:
 
 peer - Json encoded InputGeoChat
+
 offset - Json encoded int
+
 max_id - Json encoded int
+
 limit - Json encoded int
+
 
 
 

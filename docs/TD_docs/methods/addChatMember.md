@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/addChatMember`
 Parameters:
 
 chat_id - Json encoded InputPeer
+
 user_id - Json encoded int
+
 forward_limit - Json encoded int
+
 
 
 

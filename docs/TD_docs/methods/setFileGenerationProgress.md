@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setFileGenerationProgress`
 Parameters:
 
 generation_id - Json encoded long
+
 ready - Json encoded int
+
 
 
 

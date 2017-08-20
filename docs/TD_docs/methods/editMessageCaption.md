@@ -64,9 +64,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/editMessageCaption`
 Parameters:
 
 chat_id - Json encoded InputPeer
+
 message_id - Json encoded long
+
 reply_markup - Json encoded ReplyMarkup
+
 caption - Json encoded string
+
 
 
 

@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendBroadcast`
 Parameters:
 
 contacts - Json encoded  array of InputUser
+
 message - Json encoded string
+
 media - Json encoded InputMedia
+
 
 
 

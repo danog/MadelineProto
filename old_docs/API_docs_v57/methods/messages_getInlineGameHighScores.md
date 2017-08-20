@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineGameHighSco
 Parameters:
 
 id - Json encoded InputBotInlineMessageID
+
 user_id - Json encoded InputUser
+
 
 
 

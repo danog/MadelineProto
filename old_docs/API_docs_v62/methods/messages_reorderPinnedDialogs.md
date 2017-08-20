@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.reorderPinnedDialogs
 Parameters:
 
 force - Json encoded Bool
+
 order - Json encoded  array of InputPeer
+
 
 
 

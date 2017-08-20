@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.importAuthorization`
 Parameters:
 
 id - Json encoded int
+
 bytes - Json encoded bytes
+
 
 
 

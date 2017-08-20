@@ -60,10 +60,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getInlineBotResults`
 Parameters:
 
 bot - Json encoded InputUser
+
 peer - Json encoded InputPeer
+
 geo_point - Json encoded InputGeoPoint
+
 query - Json encoded string
+
 offset - Json encoded string
+
 
 
 

@@ -65,10 +65,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchChatMessages`
 Parameters:
 
 chat_id - Json encoded InputPeer
+
 query - Json encoded string
+
 from_message_id - Json encoded long
+
 limit - Json encoded int
+
 filter - Json encoded SearchMessagesFilter
+
 
 
 

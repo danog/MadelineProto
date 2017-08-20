@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChats`
 Parameters:
 
 offset_order - Json encoded long
+
 offset_chat_id - Json encoded long
+
 limit - Json encoded int
+
 
 
 

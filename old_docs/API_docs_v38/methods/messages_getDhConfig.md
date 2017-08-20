@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDhConfig`
 Parameters:
 
 version - Json encoded int
+
 random_length - Json encoded int
+
 
 
 

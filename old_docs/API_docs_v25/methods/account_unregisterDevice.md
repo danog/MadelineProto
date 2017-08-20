@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.unregisterDevice`
 Parameters:
 
 token_type - Json encoded int
+
 token - Json encoded string
+
 
 
 

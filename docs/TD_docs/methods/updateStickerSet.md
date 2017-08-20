@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/updateStickerSet`
 Parameters:
 
 set_id - Json encoded long
+
 is_installed - Json encoded Bool
+
 is_archived - Json encoded Bool
+
 
 
 

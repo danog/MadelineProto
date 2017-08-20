@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleGroupEditors`
 Parameters:
 
 group_id - Json encoded int
+
 anyone_can_edit - Json encoded Bool
+
 
 
 

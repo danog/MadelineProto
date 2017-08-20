@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getWebPage`
 Parameters:
 
 url - Json encoded string
+
 hash - Json encoded int
+
 
 
 

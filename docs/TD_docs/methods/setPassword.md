@@ -65,10 +65,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setPassword`
 Parameters:
 
 old_password - Json encoded string
+
 new_password - Json encoded string
+
 new_hint - Json encoded string
+
 set_recovery_email - Json encoded Bool
+
 new_recovery_email - Json encoded string
+
 
 
 

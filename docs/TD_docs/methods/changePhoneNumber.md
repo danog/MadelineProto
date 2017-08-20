@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changePhoneNumber`
 Parameters:
 
 phone_number - Json encoded string
+
 allow_flash_call - Json encoded Bool
+
 is_current_phone_number - Json encoded Bool
+
 
 
 

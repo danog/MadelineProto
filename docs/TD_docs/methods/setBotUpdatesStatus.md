@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setBotUpdatesStatus`
 Parameters:
 
 pending_update_count - Json encoded int
+
 error_message - Json encoded string
+
 
 
 

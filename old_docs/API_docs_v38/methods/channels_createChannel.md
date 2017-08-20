@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.createChannel`
 Parameters:
 
 title - Json encoded string
+
 about - Json encoded string
+
 users - Json encoded  array of InputUser
+
 
 
 

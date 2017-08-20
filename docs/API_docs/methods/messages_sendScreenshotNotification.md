@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendScreenshotNotifi
 Parameters:
 
 peer - Json encoded InputPeer
+
 reply_to_msg_id - Json encoded int
+
 
 
 

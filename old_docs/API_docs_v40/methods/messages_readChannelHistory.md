@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.readChannelHistory`
 Parameters:
 
 peer - Json encoded InputPeer
+
 max_id - Json encoded int
+
 
 
 

@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.getRecents`
 Parameters:
 
 offset - Json encoded int
+
 limit - Json encoded int
+
 
 
 

@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getBlockedUsers`
 Parameters:
 
 offset - Json encoded int
+
 limit - Json encoded int
+
 
 
 

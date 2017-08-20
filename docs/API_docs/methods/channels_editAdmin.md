@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editAdmin`
 Parameters:
 
 channel - Json encoded InputChannel
+
 user_id - Json encoded InputUser
+
 admin_rights - Json encoded ChannelAdminRights
+
 
 
 

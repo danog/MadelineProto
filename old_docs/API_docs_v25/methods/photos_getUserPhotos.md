@@ -59,9 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/photos.getUserPhotos`
 Parameters:
 
 user_id - Json encoded InputUser
+
 offset - Json encoded int
+
 max_id - Json encoded int
+
 limit - Json encoded int
+
 
 
 

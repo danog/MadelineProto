@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/searchChats`
 Parameters:
 
 query - Json encoded string
+
 limit - Json encoded int
+
 
 
 

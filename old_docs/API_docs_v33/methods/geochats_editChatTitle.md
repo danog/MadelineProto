@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.editChatTitle`
 Parameters:
 
 peer - Json encoded InputGeoChat
+
 title - Json encoded string
+
 address - Json encoded string
+
 
 
 

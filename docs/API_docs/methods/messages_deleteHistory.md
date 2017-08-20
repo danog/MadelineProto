@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteHistory`
 Parameters:
 
 just_clear - Json encoded Bool
+
 peer - Json encoded InputPeer
+
 max_id - Json encoded int
+
 
 
 

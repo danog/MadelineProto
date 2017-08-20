@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.installStickerSet`
 Parameters:
 
 stickerset - Json encoded InputStickerSet
+
 disabled - Json encoded Bool
+
 
 
 

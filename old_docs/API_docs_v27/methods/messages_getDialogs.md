@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getDialogs`
 Parameters:
 
 offset - Json encoded int
+
 max_id - Json encoded int
+
 limit - Json encoded int
+
 
 
 

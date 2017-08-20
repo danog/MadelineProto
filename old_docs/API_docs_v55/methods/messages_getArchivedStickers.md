@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getArchivedStickers`
 Parameters:
 
 offset_id - Json encoded long
+
 limit - Json encoded int
+
 
 
 

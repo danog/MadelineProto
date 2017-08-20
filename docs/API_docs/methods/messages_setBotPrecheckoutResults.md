@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setBotPrecheckoutRes
 Parameters:
 
 success - Json encoded Bool
+
 query_id - Json encoded long
+
 error - Json encoded string
+
 
 
 

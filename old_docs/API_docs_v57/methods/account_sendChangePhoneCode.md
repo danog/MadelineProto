@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.sendChangePhoneCode`
 Parameters:
 
 allow_flashcall - Json encoded Bool
+
 phone_number - Json encoded string
+
 current_number - Json encoded Bool
+
 
 
 

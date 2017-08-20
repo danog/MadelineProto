@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getCommonChats`
 Parameters:
 
 user_id - Json encoded int
+
 offset_chat_id - Json encoded long
+
 limit - Json encoded int
+
 
 
 

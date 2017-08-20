@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelInvites`
 Parameters:
 
 channel_id - Json encoded int
+
 anyone_can_invite - Json encoded Bool
+
 
 
 

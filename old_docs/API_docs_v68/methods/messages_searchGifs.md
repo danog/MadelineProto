@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.searchGifs`
 Parameters:
 
 q - Json encoded string
+
 offset - Json encoded int
+
 
 
 

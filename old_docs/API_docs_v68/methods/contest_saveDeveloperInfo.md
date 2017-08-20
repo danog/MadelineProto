@@ -60,10 +60,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contest.saveDeveloperInfo`
 Parameters:
 
 vk_id - Json encoded int
+
 name - Json encoded string
+
 phone_number - Json encoded string
+
 age - Json encoded int
+
 city - Json encoded string
+
 
 
 

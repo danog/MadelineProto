@@ -65,10 +65,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/answerCallbackQuery`
 Parameters:
 
 callback_query_id - Json encoded long
+
 text - Json encoded string
+
 show_alert - Json encoded Bool
+
 url - Json encoded string
+
 cache_time - Json encoded int
+
 
 
 

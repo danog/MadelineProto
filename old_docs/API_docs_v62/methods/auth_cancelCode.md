@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/auth.cancelCode`
 Parameters:
 
 phone_number - Json encoded string
+
 phone_code_hash - Json encoded string
+
 
 
 

@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.sendMessage`
 Parameters:
 
 peer - Json encoded InputGeoChat
+
 message - Json encoded string
+
 
 
 

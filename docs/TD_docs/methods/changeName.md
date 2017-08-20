@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/changeName`
 Parameters:
 
 first_name - Json encoded string
+
 last_name - Json encoded string
+
 
 
 

@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.importContacts`
 Parameters:
 
 contacts - Json encoded  array of InputContact
+
 replace - Json encoded Bool
+
 
 
 

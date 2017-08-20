@@ -117,7 +117,7 @@ trait Methods
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
-                $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n";
+                $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";
                 $lua_params .= $param['name'].'=';
                 $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype).', ';
                 if ($param['name'] === 'reply_markup') {

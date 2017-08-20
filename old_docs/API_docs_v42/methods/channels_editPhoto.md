@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/channels.editPhoto`
 Parameters:
 
 channel - Json encoded InputChannel
+
 photo - Json encoded InputChatPhoto
+
 
 
 

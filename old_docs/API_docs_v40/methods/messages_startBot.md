@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.startBot`
 Parameters:
 
 bot - Json encoded InputUser
+
 chat_id - Json encoded InputPeer
+
 start_param - Json encoded string
+
 
 
 

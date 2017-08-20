@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMedia`
 Parameters:
 
 peer - Json encoded InputPeer
+
 media - Json encoded InputMedia
+
 
 
 

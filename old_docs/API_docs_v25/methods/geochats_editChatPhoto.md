@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.editChatPhoto`
 Parameters:
 
 peer - Json encoded InputGeoChat
+
 photo - Json encoded InputChatPhoto
+
 
 
 

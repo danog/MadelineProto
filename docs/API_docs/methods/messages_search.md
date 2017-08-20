@@ -64,14 +64,23 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.search`
 Parameters:
 
 peer - Json encoded InputPeer
+
 q - Json encoded string
+
 from_id - Json encoded InputUser
+
 filter - Json encoded MessagesFilter
+
 min_date - Json encoded int
+
 max_date - Json encoded int
+
 offset - Json encoded int
+
 max_id - Json encoded int
+
 limit - Json encoded int
+
 
 
 

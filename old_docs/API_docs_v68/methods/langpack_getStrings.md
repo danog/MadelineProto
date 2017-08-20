@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/langpack.getStrings`
 Parameters:
 
 lang_code - Json encoded string
+
 keys - Json encoded  array of string
+
 
 
 

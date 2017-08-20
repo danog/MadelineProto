@@ -63,13 +63,21 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/contacts.getTopPeers`
 Parameters:
 
 correspondents - Json encoded Bool
+
 bots_pm - Json encoded Bool
+
 bots_inline - Json encoded Bool
+
 groups - Json encoded Bool
+
 channels - Json encoded Bool
+
 offset - Json encoded int
+
 limit - Json encoded int
+
 hash - Json encoded int
+
 
 
 

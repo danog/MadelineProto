@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/set_client_DH_params`
 Parameters:
 
 nonce - Json encoded int128
+
 server_nonce - Json encoded int128
+
 encrypted_data - Json encoded bytes
+
 
 
 

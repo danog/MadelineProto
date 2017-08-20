@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteHistory`
 Parameters:
 
 peer - Json encoded InputPeer
+
 offset - Json encoded int
+
 
 
 

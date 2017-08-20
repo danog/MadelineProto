@@ -59,9 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendMessage`
 Parameters:
 
 peer - Json encoded InputPeer
+
 reply_to_msg_id - Json encoded int
+
 message - Json encoded string
+
 reply_markup - Json encoded ReplyMarkup
+
 
 
 

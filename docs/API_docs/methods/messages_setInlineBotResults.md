@@ -62,12 +62,19 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setInlineBotResults`
 Parameters:
 
 gallery - Json encoded Bool
+
 private - Json encoded Bool
+
 query_id - Json encoded long
+
 results - Json encoded  array of InputBotInlineResult
+
 cache_time - Json encoded int
+
 next_offset - Json encoded string
+
 switch_pm - Json encoded InlineBotSwitchPM
+
 
 
 

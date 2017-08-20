@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getBotCallbackAnswer
 Parameters:
 
 peer - Json encoded InputPeer
+
 msg_id - Json encoded int
+
 data - Json encoded bytes
+
 
 
 

@@ -62,7 +62,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setRecoveryEmail`
 Parameters:
 
 password - Json encoded string
+
 new_recovery_email - Json encoded string
+
 
 
 

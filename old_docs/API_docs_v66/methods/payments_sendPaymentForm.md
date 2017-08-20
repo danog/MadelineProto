@@ -59,9 +59,13 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/payments.sendPaymentForm`
 Parameters:
 
 msg_id - Json encoded int
+
 requested_info_id - Json encoded string
+
 shipping_option_id - Json encoded string
+
 credentials - Json encoded InputPaymentCredentials
+
 
 
 

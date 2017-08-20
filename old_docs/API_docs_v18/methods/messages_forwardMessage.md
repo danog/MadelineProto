@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.forwardMessage`
 Parameters:
 
 peer - Json encoded InputPeer
+
 id - Json encoded int
+
 
 
 

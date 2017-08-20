@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/upload.getWebFile`
 Parameters:
 
 location - Json encoded InputWebFileLocation
+
 offset - Json encoded int
+
 limit - Json encoded int
+
 
 
 

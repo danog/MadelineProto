@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/phone.setCallRating`
 Parameters:
 
 peer - Json encoded InputPhoneCall
+
 rating - Json encoded int
+
 comment - Json encoded string
+
 
 
 

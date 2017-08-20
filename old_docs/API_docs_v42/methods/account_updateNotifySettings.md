@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/account.updateNotifySettings`
 Parameters:
 
 peer - Json encoded InputNotifyPeer
+
 settings - Json encoded InputPeerNotifySettings
+
 
 
 

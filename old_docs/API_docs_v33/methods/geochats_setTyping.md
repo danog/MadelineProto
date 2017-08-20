@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/geochats.setTyping`
 Parameters:
 
 peer - Json encoded InputGeoChat
+
 typing - Json encoded Bool
+
 
 
 

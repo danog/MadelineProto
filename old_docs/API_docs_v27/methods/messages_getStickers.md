@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.getStickers`
 Parameters:
 
 emoticon - Json encoded string
+
 hash - Json encoded string
+
 
 
 

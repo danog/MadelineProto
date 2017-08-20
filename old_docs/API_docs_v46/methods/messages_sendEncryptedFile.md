@@ -58,8 +58,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.sendEncryptedFile`
 Parameters:
 
 peer - Json encoded InputEncryptedChat
+
 message - Json encoded DecryptedMessage
+
 file - Json encoded InputEncryptedFile
+
 
 
 

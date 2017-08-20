@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.deleteMessages`
 Parameters:
 
 revoke - Json encoded Bool
+
 id - Json encoded  array of int
+
 
 
 

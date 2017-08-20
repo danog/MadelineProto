@@ -60,10 +60,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.searchGlobal`
 Parameters:
 
 q - Json encoded string
+
 offset_date - Json encoded int
+
 offset_peer - Json encoded InputPeer
+
 offset_id - Json encoded int
+
 limit - Json encoded int
+
 
 
 

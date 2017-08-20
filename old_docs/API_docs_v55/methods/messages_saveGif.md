@@ -57,7 +57,9 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.saveGif`
 Parameters:
 
 id - Json encoded InputDocument
+
 unsave - Json encoded Bool
+
 
 
 

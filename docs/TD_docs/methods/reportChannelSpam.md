@@ -63,8 +63,11 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/reportChannelSpam`
 Parameters:
 
 channel_id - Json encoded int
+
 user_id - Json encoded int
+
 message_ids - Json encoded  array of long
+
 
 
 

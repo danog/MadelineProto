@@ -60,10 +60,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.setGameScore`
 Parameters:
 
 edit_message - Json encoded Bool
+
 peer - Json encoded InputPeer
+
 id - Json encoded int
+
 user_id - Json encoded InputUser
+
 score - Json encoded int
+
 
 
 
