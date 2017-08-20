@@ -8,7 +8,7 @@ description: complete_2FA_login parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 |password| A string with the password|
 
 ### Return type: [auth.Authorization](API_docs/types/auth_Authorization.md)

@@ -8,7 +8,7 @@ description: get_dialogs parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 
 ### Return type: Array of [Peer objects](API_docs/types/Peer.md)
 

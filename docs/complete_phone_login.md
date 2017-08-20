@@ -8,7 +8,7 @@ description: complete_phone_login parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 |code| A string with the phone code|
 
 ### Return type: [auth.Authorization](API_docs/types/auth_Authorization.md) or [account.Password](http://docs.madelineproto.xyz/API_docs/types/account_Password.html) or `['_' => 'account.needSignup']`

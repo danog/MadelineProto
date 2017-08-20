@@ -9,7 +9,7 @@ description: PWRTelegram participant attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required | Description|
-|----------|:-------------:|:--------:|-----------:|
+|----------|---------------|----------|------------|
 |user|[Chat](Chat.md) | Yes| The participant|
 |inviter|[Chat](Chat.md) | Optional|The user that invited this participant|
 |promoted_by|[Chat](Chat.md) | Optional|The user that promoted this participant|

@@ -8,7 +8,7 @@ description: get_self parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 
 ### Return type: [User objects](API_docs/types/User.md)
 

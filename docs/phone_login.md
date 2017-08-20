@@ -8,7 +8,7 @@ description: phone_login parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 |number| A string with the phone number, including the country code|
 
 ### Return type: [auth.SentCode](API_docs/types/auth_SentCode.md)

@@ -8,7 +8,7 @@ description: complete_signup parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 |first_name| A string with the first name|
 |last_name| Optional, string with the last name|
 

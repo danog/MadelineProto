@@ -8,7 +8,7 @@ description: bot_login parameters, return type and example
 ### Parameters:
 
 | Name     |    Type       |
-|----------|:-------------:|
+|----------|---------------|
 |token| A string with the bot token|
 
 ### Return type: [auth.Authorization](API_docs/types/auth_Authorization.md)

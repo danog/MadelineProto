@@ -9,7 +9,7 @@ description: chat attributes, type and example
 ### Attributes:
 
 | Name     |    Type       | Required |Description|
-|----------|:-------------:|:--------:|----------:|
+|----------|---------------|----------|-----------|
 |type|[string](API_docs/types/string.md) | Yes|bot, user, channel, supergroup or chat|
 |id|[long](API_docs/types/long.md) | Yes|bot API chat id|
 |access\_hash|[long](API_docs/types/long.md) | Optional|access hash of peer|
