@@ -4,6 +4,10 @@ description: PHP implementation of telegram's MTProto protocol
 ---
 # MadelineProto, a PHP MTProto telegram client
 
+This library can be used to create php telegram bots (like bot API bots, only better) and php telegram userbots (like tg-cli userbots, only better).
+
+This library can also be used to create lua telegram bots (like bot API bots, only better) and lua telegram userbots (like tg-cli userbots, only better).
+
 ## Index: 
 
 - [Features](#features)
