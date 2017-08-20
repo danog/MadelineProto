@@ -13,11 +13,6 @@ description: PHP implementation of telegram's MTProto protocol
 </p>
 
 
-<amp-img width='1000' height='300' layout='responsive' src='https://docs.madelineproto.xyz/logo.png' alt='MadelineProto logo' />
-
-
-Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).  
-
 PHP MTProto client
 
 ## Index: 
