@@ -21,7 +21,7 @@ file_put_contents('docs/index.md', '---
 title: MadelineProto documentation
 description: PHP implementation of telegram\'s MTProto protocol
 ---
-'.file_get_contents('README.md'));
+'.str_replace('<img', '<amp-img', file_get_contents('README.md')));
 
 $docs = [
     [

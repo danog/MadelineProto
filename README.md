@@ -1,9 +1,16 @@
 # MadelineProto
-[![StyleCI](https://styleci.io/repos/61838413/shield)](https://styleci.io/repos/61838413)
-[![Build Status](https://travis-ci.org/danog/MadelineProto.svg?branch=master)](https://travis-ci.org/danog/MadelineProto)  
+<p>
+    <a href="https://styleci.io/repos/61838413">
+        <img src="https://styleci.io/repos/61838413/shield" alt="StyleCI" />
+    </a>
+    <a href="https://travis-ci.org/danog/MadelineProto">
+        <img src="https://travis-ci.org/danog/MadelineProto.svg?branch=master" alt="Build Status" />
+    </a>
+</p>
 
 
-<img src='https://docs.madelineproto.xyz/logo.png' alt='MadelineProto logo' onmouseover="this.src='https://daniil.it/MadelineProto/logo-hover.png';" onmouseout="this.src='https://daniil.it/MadelineProto/logo.png';" />
+<img width='1000' height='300' layout='responsive' src='https://docs.madelineproto.xyz/logo.png' alt='MadelineProto logo' />
+
 
 Logo created by [Matthew Hesketh](http://matthewhesketh.com) (thanks again!).  
 
