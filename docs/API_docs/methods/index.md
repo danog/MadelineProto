@@ -149,7 +149,11 @@ $MadelineProto->[channels->leaveChannel](channels_leaveChannel.md)(\['channel' =
 
 $MadelineProto->[channels->readHistory](channels_readHistory.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'max_id' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="channels_readHistory"></a>  
 
+$MadelineProto->[channels->readMessageContents](channels_readMessageContents.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'id' => \[[int](../types/int.md)\], \]) === [$Bool](../types/Bool.md)<a name="channels_readMessageContents"></a>  
+
 $MadelineProto->[channels->reportSpam](channels_reportSpam.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'user_id' => [InputUser](../types/InputUser.md), 'id' => \[[int](../types/int.md)\], \]) === [$Bool](../types/Bool.md)<a name="channels_reportSpam"></a>  
+
+$MadelineProto->[channels->setStickers](channels_setStickers.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="channels_setStickers"></a>  
 
 $MadelineProto->[channels->toggleInvites](channels_toggleInvites.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="channels_toggleInvites"></a>  
 
@@ -170,7 +174,7 @@ $MadelineProto->[contacts->exportCard](contacts_exportCard.md)(\[\]) === [$Vecto
 
 $MadelineProto->[contacts->getBlocked](contacts_getBlocked.md)(\['offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$contacts\_Blocked](../types/contacts_Blocked.md)<a name="contacts_getBlocked"></a>  
 
-$MadelineProto->[contacts->getContacts](contacts_getContacts.md)(\['hash' => [string](../types/string.md), \]) === [$contacts\_Contacts](../types/contacts_Contacts.md)<a name="contacts_getContacts"></a>  
+$MadelineProto->[contacts->getContacts](contacts_getContacts.md)(\['hash' => [int](../types/int.md), \]) === [$contacts\_Contacts](../types/contacts_Contacts.md)<a name="contacts_getContacts"></a>  
 
 $MadelineProto->[contacts->getStatuses](contacts_getStatuses.md)(\[\]) === [$Vector\_of\_ContactStatus](../types/ContactStatus.md)<a name="contacts_getStatuses"></a>  
 
@@ -178,7 +182,9 @@ $MadelineProto->[contacts->getTopPeers](contacts_getTopPeers.md)(\['corresponden
 
 $MadelineProto->[contacts->importCard](contacts_importCard.md)(\['export_card' => \[[int](../types/int.md)\], \]) === [$User](../types/User.md)<a name="contacts_importCard"></a>  
 
-$MadelineProto->[contacts->importContacts](contacts_importContacts.md)(\['contacts' => \[[InputContact](../types/InputContact.md)\], 'replace' => [Bool](../types/Bool.md), \]) === [$contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)<a name="contacts_importContacts"></a>  
+$MadelineProto->[contacts->importContacts](contacts_importContacts.md)(\['contacts' => \[[InputContact](../types/InputContact.md)\], \]) === [$contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)<a name="contacts_importContacts"></a>  
+
+$MadelineProto->[contacts->resetSaved](contacts_resetSaved.md)(\[\]) === [$Bool](../types/Bool.md)<a name="contacts_resetSaved"></a>  
 
 $MadelineProto->[contacts->resetTopPeerRating](contacts_resetTopPeerRating.md)(\['category' => [TopPeerCategory](../types/TopPeerCategory.md), 'peer' => [InputPeer](../types/InputPeer.md), \]) === [$Bool](../types/Bool.md)<a name="contacts_resetTopPeerRating"></a>  
 
@@ -275,6 +281,8 @@ $MadelineProto->[messages->editMessage](messages_editMessage.md)(\['no_webpage' 
 
 $MadelineProto->[messages->exportChatInvite](messages_exportChatInvite.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$ExportedChatInvite](../types/ExportedChatInvite.md)<a name="messages_exportChatInvite"></a>  
 
+$MadelineProto->[messages->faveSticker](messages_faveSticker.md)(\['id' => [InputDocument](../types/InputDocument.md), 'unfave' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_faveSticker"></a>  
+
 $MadelineProto->[messages->forwardMessage](messages_forwardMessage.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_forwardMessage"></a>  
 
 $MadelineProto->[messages->forwardMessages](messages_forwardMessages.md)(\['silent' => [Bool](../types/Bool.md), 'background' => [Bool](../types/Bool.md), 'with_my_score' => [Bool](../types/Bool.md), 'from_peer' => [InputPeer](../types/InputPeer.md), 'id' => \[[int](../types/int.md)\], 'to_peer' => [InputPeer](../types/InputPeer.md), \]) === [$Updates](../types/Updates.md)<a name="messages_forwardMessages"></a>  
@@ -300,6 +308,8 @@ $MadelineProto->[messages->getDhConfig](messages_getDhConfig.md)(\['version' => 
 $MadelineProto->[messages->getDialogs](messages_getDialogs.md)(\['exclude_pinned' => [Bool](../types/Bool.md), 'offset_date' => [int](../types/int.md), 'offset_id' => [int](../types/int.md), 'offset_peer' => [InputPeer](../types/InputPeer.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Dialogs](../types/messages_Dialogs.md)<a name="messages_getDialogs"></a>  
 
 $MadelineProto->[messages->getDocumentByHash](messages_getDocumentByHash.md)(\['sha256' => [bytes](../types/bytes.md), 'size' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), \]) === [$Document](../types/Document.md)<a name="messages_getDocumentByHash"></a>  
+
+$MadelineProto->[messages->getFavedStickers](messages_getFavedStickers.md)(\['hash' => [int](../types/int.md), \]) === [$messages\_FavedStickers](../types/messages_FavedStickers.md)<a name="messages_getFavedStickers"></a>  
 
 $MadelineProto->[messages->getFeaturedStickers](messages_getFeaturedStickers.md)(\['hash' => [int](../types/int.md), \]) === [$messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)<a name="messages_getFeaturedStickers"></a>  
 
@@ -332,6 +342,8 @@ $MadelineProto->[messages->getRecentStickers](messages_getRecentStickers.md)(\['
 $MadelineProto->[messages->getSavedGifs](messages_getSavedGifs.md)(\['hash' => [int](../types/int.md), \]) === [$messages\_SavedGifs](../types/messages_SavedGifs.md)<a name="messages_getSavedGifs"></a>  
 
 $MadelineProto->[messages->getStickerSet](messages_getStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="messages_getStickerSet"></a>  
+
+$MadelineProto->[messages->getUnreadMentions](messages_getUnreadMentions.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset_id' => [int](../types/int.md), 'add_offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'min_id' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getUnreadMentions"></a>  
 
 $MadelineProto->[messages->getWebPage](messages_getWebPage.md)(\['url' => [string](../types/string.md), 'hash' => [int](../types/int.md), \]) === [$WebPage](../types/WebPage.md)<a name="messages_getWebPage"></a>  
 
@@ -373,7 +385,7 @@ $MadelineProto->[messages->saveGif](messages_saveGif.md)(\['id' => [InputDocumen
 
 $MadelineProto->[messages->saveRecentSticker](messages_saveRecentSticker.md)(\['attached' => [Bool](../types/Bool.md), 'id' => [InputDocument](../types/InputDocument.md), 'unsave' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_saveRecentSticker"></a>  
 
-$MadelineProto->[messages->search](messages_search.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'q' => [string](../types/string.md), 'from_id' => [InputUser](../types/InputUser.md), 'filter' => [MessagesFilter](../types/MessagesFilter.md), 'min_date' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_search"></a>  
+$MadelineProto->[messages->search](messages_search.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'q' => [string](../types/string.md), 'from_id' => [InputUser](../types/InputUser.md), 'filter' => [MessagesFilter](../types/MessagesFilter.md), 'min_date' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'offset_id' => [int](../types/int.md), 'add_offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'min_id' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_search"></a>  
 
 $MadelineProto->[messages->searchGifs](messages_searchGifs.md)(\['q' => [string](../types/string.md), 'offset' => [int](../types/int.md), \]) === [$messages\_FoundGifs](../types/messages_FoundGifs.md)<a name="messages_searchGifs"></a>  
 

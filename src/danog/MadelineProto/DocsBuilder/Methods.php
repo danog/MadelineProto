@@ -16,15 +16,15 @@ trait Methods
 {
     public function mk_methods()
     {
-        foreach (glob($this->settings['output_dir'].'methods/'.$this->any) as $unlink) {
-            unlink($this->settings['output_dir'].$unlink);
+        foreach (glob('methods/'.$this->any) as $unlink) {
+            unlink($unlink);
         }
 
-        if (file_exists($this->settings['output_dir'].'methods')) {
-            rmdir($this->settings['output_dir'].'methods');
+        if (file_exists('methods')) {
+            rmdir('methods');
         }
 
-        mkdir($this->settings['output_dir'].'methods');
+        mkdir('methods');
 
         $this->docs_methods = [];
 

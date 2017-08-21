@@ -119,7 +119,7 @@ You can find examples for nearly every MadelineProto function in
 
 ## Methods
 
-A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 70)](https://daniil.it/MadelineProto/API_docs/).
+A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 71)](https://daniil.it/MadelineProto/API_docs/).
 
 If an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username (`@username`) or bot API id (`-1029449`, `1249421`, `-100412412901`).  
 

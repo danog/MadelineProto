@@ -27,6 +27,8 @@ description: constructors and methods of type messages_Messages
 
 [$MadelineProto->messages->searchGlobal](../methods/messages_searchGlobal.md)  
 
+[$MadelineProto->messages->getUnreadMentions](../methods/messages_getUnreadMentions.md)  
+
 [$MadelineProto->channels->getMessages](../methods/channels_getMessages.md)  
 
 

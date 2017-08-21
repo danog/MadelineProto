@@ -18,6 +18,7 @@ description: updates_channelDifferenceTooLong attributes, type and example
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|
 |read\_outbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
+|unread\_mentions\_count|[int](../types/int.md) | Yes|
 |messages|Array of [Message](../types/Message.md) | Yes|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
@@ -30,13 +31,13 @@ description: updates_channelDifferenceTooLong attributes, type and example
 ### Example:
 
 ```
-$updates_channelDifferenceTooLong = ['_' => 'updates.channelDifferenceTooLong', 'final' => Bool, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
+$updates_channelDifferenceTooLong = ['_' => 'updates.channelDifferenceTooLong', 'final' => Bool, 'pts' => int, 'timeout' => int, 'top_message' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'unread_mentions_count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "updates.channelDifferenceTooLong", "final": Bool, "pts": int, "timeout": int, "top_message": int, "read_inbox_max_id": int, "read_outbox_max_id": int, "unread_count": int, "messages": [Message], "chats": [Chat], "users": [User]}
+{"_": "updates.channelDifferenceTooLong", "final": Bool, "pts": int, "timeout": int, "top_message": int, "read_inbox_max_id": int, "read_outbox_max_id": int, "unread_count": int, "unread_mentions_count": int, "messages": [Message], "chats": [Chat], "users": [User]}
 ```
 
 
@@ -44,7 +45,7 @@ Or, if you're into Lua:
 
 
 ```
-updates_channelDifferenceTooLong={_='updates.channelDifferenceTooLong', final=Bool, pts=int, timeout=int, top_message=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, messages={Message}, chats={Chat}, users={User}}
+updates_channelDifferenceTooLong={_='updates.channelDifferenceTooLong', final=Bool, pts=int, timeout=int, top_message=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, unread_mentions_count=int, messages={Message}, chats={Chat}, users={User}}
 
 ```
 

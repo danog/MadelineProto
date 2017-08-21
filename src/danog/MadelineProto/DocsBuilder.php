@@ -276,6 +276,7 @@ Call states (these constants are incrementing integers, thus can be compared lik
 * `getDebugString()` - Gets VoIPController debug string
 * `getLastError()` - Gets the last error as a VoIPController error constant
 * `getVersion()` - Gets VoIPController version
+* `getSignalBarsCount()` - Gets number of signal bars (0-4)
 
 * `parseConfig()` - Parses the configuration
 

@@ -135,6 +135,12 @@ Contains notifications about data changes
 
 [updateLangPack](../constructors/updateLangPack.md)  
 
+[updateFavedStickers](../constructors/updateFavedStickers.md)  
+
+[updateChannelReadMessagesContents](../constructors/updateChannelReadMessagesContents.md)  
+
+[updateContactsReset](../constructors/updateContactsReset.md)  
+
 
 
 ### Methods that return an object of this type (methods):

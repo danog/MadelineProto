@@ -11,7 +11,6 @@ description: contacts.importContacts parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |contacts|Array of [InputContact](../types/InputContact.md) | Yes|
-|replace|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
@@ -34,7 +33,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
+$contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -46,7 +45,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - contacts.importContacts
-* params - `{"contacts": [InputContact], "replace": Bool, }`
+* params - `{"contacts": [InputContact], }`
 
 
 
@@ -58,14 +57,12 @@ Parameters:
 
 contacts - Json encoded  array of InputContact
 
-replace - Json encoded Bool
-
 
 
 
 Or, if you're into Lua:
 
 ```
-contacts_ImportedContacts = contacts.importContacts({contacts={InputContact}, replace=Bool, })
+contacts_ImportedContacts = contacts.importContacts({contacts={InputContact}, })
 ```
 

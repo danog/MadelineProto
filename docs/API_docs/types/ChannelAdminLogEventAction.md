@@ -37,6 +37,8 @@ description: constructors and methods of type ChannelAdminLogEventAction
 
 [channelAdminLogEventActionParticipantToggleAdmin](../constructors/channelAdminLogEventActionParticipantToggleAdmin.md)  
 
+[channelAdminLogEventActionChangeStickerSet](../constructors/channelAdminLogEventActionChangeStickerSet.md)  
+
 
 
 ### Methods that return an object of this type (methods):

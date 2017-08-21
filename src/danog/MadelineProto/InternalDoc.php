@@ -458,7 +458,7 @@ interface contacts
 
     /**
      * @param array params [
-     *               string hash,
+     *               int hash,
      *              ]
      *
      * @return contacts_Contacts
@@ -468,7 +468,6 @@ interface contacts
     /**
      * @param array params [
      *               InputContact contacts,
-     *               Bool replace,
      *              ]
      *
      * @return contacts_ImportedContacts
@@ -580,6 +579,11 @@ interface contacts
      * @return bool
      */
     public function resetTopPeerRating(array $params);
+
+    /**
+     * @return bool
+     */
+    public function resetSaved();
 }
 
 interface messages
@@ -629,9 +633,11 @@ interface messages
      *               MessagesFilter filter,
      *               int min_date,
      *               int max_date,
-     *               int offset,
-     *               int max_id,
+     *               int offset_id,
+     *               int add_offset,
      *               int limit,
+     *               int max_id,
+     *               int min_id,
      *              ]
      *
      * @return messages_Messages
@@ -1499,6 +1505,39 @@ interface messages
      * @return Updates
      */
     public function sendScreenshotNotification(array $params);
+
+    /**
+     * @param array params [
+     *               int hash,
+     *              ]
+     *
+     * @return messages_FavedStickers
+     */
+    public function getFavedStickers(array $params);
+
+    /**
+     * @param array params [
+     *               InputDocument id,
+     *               Bool unfave,
+     *              ]
+     *
+     * @return bool
+     */
+    public function faveSticker(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int offset_id,
+     *               int add_offset,
+     *               int limit,
+     *               int max_id,
+     *               int min_id,
+     *              ]
+     *
+     * @return messages_Messages
+     */
+    public function getUnreadMentions(array $params);
 }
 
 interface updates
@@ -2004,6 +2043,26 @@ interface channels
      * @return channels_AdminLogResults
      */
     public function getAdminLog(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               InputStickerSet stickerset,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setStickers(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               int id,
+     *              ]
+     *
+     * @return bool
+     */
+    public function readMessageContents(array $params);
 }
 
 interface bots

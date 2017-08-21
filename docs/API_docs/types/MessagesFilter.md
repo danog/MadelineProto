@@ -37,6 +37,10 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterRoundVideo](../constructors/inputMessagesFilterRoundVideo.md)  
 
+[inputMessagesFilterMyMentions](../constructors/inputMessagesFilterMyMentions.md)  
+
+[inputMessagesFilterMyMentionsUnread](../constructors/inputMessagesFilterMyMentionsUnread.md)  
+
 
 
 ### Methods that return an object of this type (methods):

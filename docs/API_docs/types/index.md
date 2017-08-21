@@ -420,6 +420,8 @@ description: List of types
 
 [messages\_Dialogs](messages_Dialogs.md)<a name="messages_Dialogs"></a>  
 
+[messages\_FavedStickers](messages_FavedStickers.md)<a name="messages_FavedStickers"></a>  
+
 [messages\_FeaturedStickers](messages_FeaturedStickers.md)<a name="messages_FeaturedStickers"></a>  
 
 [messages\_FoundGifs](messages_FoundGifs.md)<a name="messages_FoundGifs"></a>  
