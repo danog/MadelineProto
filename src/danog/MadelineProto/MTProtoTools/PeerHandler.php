@@ -393,7 +393,7 @@ trait PeerHandler
                         $res[$key] = $full['Chat'][$key];
                     }
                 }
-                foreach (['can_view_participants', 'can_set_username', 'participants_count', 'admins_count', 'kicked_count', 'banned_count', 'migrated_from_chat_id', 'migrated_from_max_id', 'pinned_msg_id', 'about'] as $key) {
+                foreach (['can_set_stickers', 'stickerset', 'can_view_participants', 'can_set_username', 'participants_count', 'admins_count', 'kicked_count', 'banned_count', 'migrated_from_chat_id', 'migrated_from_max_id', 'pinned_msg_id', 'about'] as $key) {
                     if (isset($full['full'][$key])) {
                         $res[$key] = $full['full'][$key];
                     }

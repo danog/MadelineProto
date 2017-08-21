@@ -41,6 +41,8 @@ description: chat attributes, type and example
 |signatures|[Bool](API_docs/types/Bool.md) | Optional|Are channel signatures enabled?|
 |can\_view\_participants|[Bool](API_docs/types/Bool.md) | Optional|Can you view participants (you can still view the bots in channels even if this is false)|
 |can\_set\_username|[Bool](API_docs/types/Bool.md) | Optional|Can you set the username of this channel/supergroup?|
+|can\_set\_stickers|[Bool](API_docs/types/Bool.md) | Optional|Can you set the associated stickerpack of this channel/supergroup?|
+|stickerset|[StickerSet](API_docs/types/StickerSet.md) | Optional|StickerSet associtaed to this channel/supergroup|
 |migrated\_from\_chat\_id|[int](API_docs/types/int.md) | Optional|MTProto chat id of the original chat (render it negative to make it a bot API chat id)|
 |migrated\_from\_max\_id|[int](API_docs/types/int.md) | Optional|Last message id before migration|
 |pinned\_msg\_id|[int](API_docs/types/int.md) | Optional|Message id of pinned message|
