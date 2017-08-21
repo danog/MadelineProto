@@ -114,11 +114,6 @@ class Logger
             if (!defined('\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
                 throw new \danog\MadelineProto\Exception(hex2bin('506c6561736520757064617465207068702d6c69627467766f6970'), 0, null, 'MadelineProto', 1);
             }
-
-            try {
-                \Threaded::extend('\danog\MadelineProto\VoIP');
-            } catch (\RuntimeException $e) {
-            }
         }
         self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
         self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);

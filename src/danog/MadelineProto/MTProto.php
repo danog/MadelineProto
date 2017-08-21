@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto extends \Volatile
+class MTProto
 {
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
@@ -576,7 +576,7 @@ class MTProto extends \Volatile
                 'requests' => true,  // Should I get info about unknown peers from PWRTelegram?
             ],
         ];
-        $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
+        $settings = array_replace_recursive($default_settings, $settings);
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception('You must provide an api key and an api id, get your own @ my.telegram.org', 0, null, 'MadelineProto', 1);
         }

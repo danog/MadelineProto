@@ -19,10 +19,10 @@ trait CallHandler
 {
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
-        if (!$this->is_array($args)) {
+        if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
-        if (!$this->is_array($aargs)) {
+        if (!is_array($aargs)) {
             throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
         }
         if (!isset($aargs['datacenter'])) {
@@ -31,7 +31,7 @@ trait CallHandler
         if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
             $aargs['datacenter'] = $args['id']['dc_id'];
         }
-        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
+        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && array_key_exists($method, self::DISALLOWED_METHODS)) {
             if ($method === 'channels.getParticipants' && isset($args['filter']) && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
                 \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);
             } else {
@@ -206,7 +206,7 @@ trait CallHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
-                if ($this->in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
+                if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
                     //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
                 } else {
                     $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
@@ -216,7 +216,7 @@ trait CallHandler
             } catch (\RuntimeException $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
-                if ($this->in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
+                if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
                     //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
                 } else {
                     $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
@@ -271,7 +271,7 @@ trait CallHandler
 
     public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
-        if (!$this->is_array($args)) {
+        if (!is_array($args)) {
             throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
         }
         if (!isset($aargs['datacenter'])) {

@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL\Types;
 
-class Button extends \Volatile implements \JsonSerializable
+class Button implements \JsonSerializable
 {
     use \danog\Serializable;
     private $info = [];

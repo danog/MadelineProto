@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class RSA extends \Volatile
+class RSA
 {
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
