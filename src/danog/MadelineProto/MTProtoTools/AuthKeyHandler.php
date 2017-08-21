@@ -88,7 +88,7 @@ trait AuthKeyHandler
                 }
 
                 if (!$pq->equals($p->multiply($q))) {
-                    throw new \danog\MadelineProto\SecurityException("couldn't compute p and q.");
+                    throw new \danog\MadelineProto\SecurityException("couldn't compute p and q. Original pq: $pq, computed p: $p, computed q: $q, computed pq: ".$p->multiply($q));
                 }
 
                 \danog\MadelineProto\Logger::log(['Factorization '.$pq.' = '.$p.' * '.$q], \danog\MadelineProto\Logger::VERBOSE);
