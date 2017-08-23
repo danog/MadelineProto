@@ -1,7 +1,7 @@
 <?php
 
 if (!extension_loaded('pthreads')) {
-    class Volatile extends Threaded
+    class Volatile
     {
         public function __set($offset, $value)
         {
