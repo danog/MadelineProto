@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages connection to telegram servers.
  */
-class Connection 
+class Connection
 {
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;

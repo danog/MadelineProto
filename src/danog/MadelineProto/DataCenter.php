@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages datacenters.
  */
-class DataCenter 
+class DataCenter
 {
     use \danog\MadelineProto\Tools;
     use \danog\Serializable;
