@@ -33,7 +33,7 @@ class TLMethod extends \Volatile
 
         $namespace = explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
-            $this->method_namespace[$namespace[1]] = $namespace[0];
+            $this->method_namespace[] = [$namespace[0] => $namespace[1]];
         }
 
         $this->parse_params($json_dict['id']);
