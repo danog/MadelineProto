@@ -46,14 +46,16 @@ class Lua
         }
         $methods = [];
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            list($namespace, $method) = $pair;
+            $namespace = key($pair);
+            $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
             }
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            list($namespace, $method) = $pair;
+            $namespace = key($pair);
+            $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
             }
@@ -61,6 +63,7 @@ class Lua
         }
         $this->MadelineProto->lua = true;
         foreach ($this->MadelineProto->get_methods_namespaced() as $method => $namespace) {
+            $namespace = key($pair);
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }

@@ -220,7 +220,7 @@ trait TL
     {
         $res = [];
         foreach ($this->methods->method_namespace as $pair) {
-            list($a, $b) = $pair;
+            $a = key($pair);
             $res[$a] = $a;
         }
 
