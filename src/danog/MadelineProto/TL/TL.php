@@ -218,7 +218,9 @@ trait TL
 
     public function get_method_namespaces()
     {
-        return array_unique($this->array_values($this->methods->method_namespace));
+        $res = [];
+        foreach ($this->methods->method_namespace as $pair) { $res[$pair[0]] = $pair[0]; }
+        return $res;
     }
 
     public function get_methods_namespaced()
