@@ -34,7 +34,7 @@ class Serialization
         }
         $lock = fopen($lock, 'r');
         flock($lock, LOCK_EX);
-        $wrote = file_put_contents($filename.'.temp.session', serialize($instance, true));
+        $wrote = file_put_contents($filename.'.temp.session', serialize($instance));
         rename($filename.'.temp.session', $filename);
         flock($lock, LOCK_UN);
         fclose($lock);
