@@ -17,13 +17,13 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait UpdateHandler
 {
-    private $pending_updates = [];
-    private $updates_state = ['_' => 'MadelineProto.Updates_state', 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
-    private $got_state = false;
-    private $channels_state = [];
+    protected $pending_updates = [];
+    protected $updates_state = ['_' => 'MadelineProto.Updates_state', 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
+    protected $got_state = false;
+    protected $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
-    private $getting_state = false;
+    protected $getting_state = false;
 
     public function pwr_update_handler($update)
     {

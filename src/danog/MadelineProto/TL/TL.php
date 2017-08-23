@@ -508,7 +508,7 @@ trait TL
                 return unpack('V', stream_get_contents($stream, 4))[1];
             case 'long':
                 if (isset($type['idstrlong'])) {
-                    return 'a'.stream_get_contents($stream, 8);
+                    return stream_get_contents($stream, 8);
                 }
 
                 return \danog\MadelineProto\Logger::$bigint || isset($type['strlong']) ? stream_get_contents($stream, 8) : $this->unpack_signed_long(stream_get_contents($stream, 8));

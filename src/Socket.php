@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 if (!extension_loaded('pthreads')) {
     class Socket
     {
-        private $sock;
+        protected $sock;
 
         public function __construct(int $domain, int $type, int $protocol)
         {

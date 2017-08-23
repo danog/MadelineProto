@@ -37,7 +37,7 @@ class AnnotationsBuilder
      * Insert properties
      * save the file with new content.
      */
-    private function setProperties()
+    protected function setProperties()
     {
         \danog\MadelineProto\Logger::log(['Generating properties...'], \danog\MadelineProto\Logger::NOTICE);
         $fixture = DocBlockFactory::createInstance();
@@ -70,7 +70,7 @@ class AnnotationsBuilder
     /**
      * Create file InternalDoc with all interfaces.
      */
-    private function createInternalClasses()
+    protected function createInternalClasses()
     {
         \danog\MadelineProto\Logger::log(['Creating internal classes...'], \danog\MadelineProto\Logger::NOTICE);
         $handle = fopen(dirname(__FILE__).'/InternalDoc.php', 'w');

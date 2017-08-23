@@ -157,37 +157,37 @@ class MTProto
 
     public $hook_url = false;
     public $settings = [];
-    private $config = ['expires' => -1];
+    protected $config = ['expires' => -1];
     public $authorization = null;
     public $authorized = 0;
 
-    private $rsa_keys = [];
-    private $last_recv = 0;
-    private $dh_config = ['version' => 0];
+    protected $rsa_keys = [];
+    protected $last_recv = 0;
+    protected $dh_config = ['version' => 0];
     public $chats = [];
     public $last_stored = 0;
     public $qres = [];
 
     public $full_chats = [];
-    private $msg_ids = [];
-    private $v = 0;
+    protected $msg_ids = [];
+    public $v = 0;
 
-    private $dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];
-    private $zero;
-    private $one;
-    private $two;
-    private $three;
-    private $four;
-    private $twoe1984;
-    private $twoe2047;
-    private $twoe2048;
+    protected $dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];
+    protected $zero;
+    protected $one;
+    protected $two;
+    protected $three;
+    protected $four;
+    protected $twoe1984;
+    protected $twoe2047;
+    protected $twoe2048;
 
-    private $ipv6 = false;
+    protected $ipv6 = false;
     public $run_workers = false;
     public $threads = false;
     public $setdem = false;
     public $storage = [];
-    private $emojis;
+    protected $emojis;
 
     public function ___construct($settings = [])
     {
@@ -639,7 +639,7 @@ class MTProto
         }
     }
 
-    private $initing_authorization = false;
+    protected $initing_authorization = false;
 
     // Creates authorization keys
     public function init_authorization()

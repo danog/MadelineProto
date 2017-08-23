@@ -93,7 +93,7 @@ class Lua
         $this->Lua->tdcli_update_callback($this->MadelineProto->mtproto_to_tdcli($update));
     }
 
-    private function convert_array($array)
+    protected function convert_array($array)
     {
         if (!is_array($value)) {
             return $array;
@@ -105,7 +105,7 @@ class Lua
         }
     }
 
-    private function is_sequential(array $arr)
+    protected function is_sequential(array $arr)
     {
         if ([] === $arr) {
             return false;

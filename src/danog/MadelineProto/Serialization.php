@@ -34,7 +34,7 @@ class Serialization
         }
         $lock = fopen($lock, 'r');
         flock($lock, LOCK_EX);
-        $wrote = file_put_contents($filename.'.temp.session', \danog\Serialization::serialize($instance, true));
+        $wrote = file_put_contents($filename.'.temp.session', serialize($instance, true));
         rename($filename.'.temp.session', $filename);
         flock($lock, LOCK_UN);
         fclose($lock);
@@ -72,14 +72,14 @@ class Serialization
             \danog\MadelineProto\Logger::class_exists();
 
             try {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
+                $unserialized = unserialize($unserialized);
             } catch (Bug74586Exception $e) {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
+                $unserialized = unserialize($unserialized);
                 /*} catch (Exception $e) {
-                    $unserialized = \danog\Serialization::unserialize($unserialized);
+                    $unserialized = unserialize($unserialized);
                 */
             } catch (\Error $e) {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
+                $unserialized = unserialize($unserialized);
             }
         } else {
             throw new Exception('File does not exist');

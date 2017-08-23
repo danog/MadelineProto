@@ -381,9 +381,9 @@ trait Files
         return true;
     }
 
-    private $cdn_hashes = [];
+    protected $cdn_hashes = [];
 
-    private function add_cdn_hashes($file, $hashes)
+    protected function add_cdn_hashes($file, $hashes)
     {
         if (!isset($this->cdn_hashes[$file])) {
             $this->cdn_hashes = [];
@@ -393,7 +393,7 @@ trait Files
         }
     }
 
-    private function check_cdn_hash($file, $offset, $data, &$datacenter)
+    protected function check_cdn_hash($file, $offset, $data, &$datacenter)
     {
         if (!isset($this->cdn_hashes[$file][$offset])) {
             $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
@@ -409,7 +409,7 @@ trait Files
         return true;
     }
 
-    private function clear_cdn_hashes($file)
+    protected function clear_cdn_hashes($file)
     {
         unset($this->cdn_hashes[$file]);
 

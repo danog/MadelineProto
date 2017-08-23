@@ -15,8 +15,8 @@ namespace danog\MadelineProto\TL\Types;
 class Button implements \JsonSerializable
 {
     use \danog\Serializable;
-    private $info = [];
-    private $data = [];
+    protected $info = [];
+    protected $data = [];
 
     public function ___construct($API, $message, $button)
     {

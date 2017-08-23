@@ -90,7 +90,7 @@ trait CallHandler
                         reset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
                         $key = key($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
                         if ($key[0] === "\0") {
-                            $key = 'a'.$key;
+                            $key = $key;
                         }
                         unset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][$key]);
                     }

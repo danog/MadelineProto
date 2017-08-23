@@ -15,7 +15,7 @@ namespace danog\MadelineProto\TL\Types;
 class Bytes implements \JsonSerializable
 {
     use \danog\Serializable;
-    private $bytes = [];
+    protected $bytes = [];
 
     public function ___construct($bytes)
     {

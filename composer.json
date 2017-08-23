@@ -39,6 +39,7 @@
         },
         "files": [
             "src/Socket.php"
+            "src/Volatile.php"
         ]
     }
 }

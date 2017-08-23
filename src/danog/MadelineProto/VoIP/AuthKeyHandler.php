@@ -20,7 +20,7 @@ namespace danog\MadelineProto\VoIP;
  */
 trait AuthKeyHandler
 {
-    private $calls = [];
+    protected $calls = [];
 
     public function request_call($user)
     {
