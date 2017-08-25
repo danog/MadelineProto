@@ -14,14 +14,15 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/../').':'.r
 chdir(dirname(__FILE__).'/../');
 require_once 'vendor/autoload.php';
 
-
-if(!function_exists("readline")) {
-    function readline($prompt = null){
-        if($prompt){
+if (!function_exists('readline')) {
+    function readline($prompt = null)
+    {
+        if ($prompt) {
             echo $prompt;
         }
-        $fp = fopen("php://stdin","r");
+        $fp = fopen('php://stdin', 'r');
         $line = rtrim(fgets($fp, 1024));
+
         return $line;
     }
 }
