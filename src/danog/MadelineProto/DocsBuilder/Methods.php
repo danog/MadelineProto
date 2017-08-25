@@ -295,7 +295,7 @@ $MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($
 
 $MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
 
-$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA.html)($password);
+$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
 
 $MadelineProto->[bot_login](https://docs.madelineproto.xyz/complete_phone_login.html)($token);
 
