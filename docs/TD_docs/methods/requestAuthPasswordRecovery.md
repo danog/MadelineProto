@@ -1,6 +1,6 @@
 ---
 title: requestAuthPasswordRecovery
-description: Requests to send password recovery code to email. Works only when authGetState returns authStateWaitPassword. Returns authStateWaitPassword on success
+description: Requests to send password recovery code to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateWaitPassword on success
 ---
 ## Method: requestAuthPasswordRecovery  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Requests to send password recovery code to email. Works only when a
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Requests to send password recovery code to email. Works only when authGetState returns authStateWaitPassword. Returns authStateWaitPassword on success
+Requests to send password recovery code to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateWaitPassword on success
 
 ### Params:
 

@@ -15,6 +15,10 @@ description: constructors and methods of type Ok
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->processDcUpdate](../methods/processDcUpdate.md)  
+
+[$MadelineProto->deleteTopChat](../methods/deleteTopChat.md)  
+
 [$MadelineProto->addRecentlyFoundChat](../methods/addRecentlyFoundChat.md)  
 
 [$MadelineProto->deleteRecentlyFoundChat](../methods/deleteRecentlyFoundChat.md)  
@@ -22,6 +26,8 @@ description: constructors and methods of type Ok
 [$MadelineProto->deleteRecentlyFoundChats](../methods/deleteRecentlyFoundChats.md)  
 
 [$MadelineProto->deleteChatHistory](../methods/deleteChatHistory.md)  
+
+[$MadelineProto->sendChatScreenshotTakenNotification](../methods/sendChatScreenshotTakenNotification.md)  
 
 [$MadelineProto->deleteMessages](../methods/deleteMessages.md)  
 
@@ -37,13 +43,15 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->answerCallbackQuery](../methods/answerCallbackQuery.md)  
 
+[$MadelineProto->answerShippingQuery](../methods/answerShippingQuery.md)  
+
+[$MadelineProto->answerPreCheckoutQuery](../methods/answerPreCheckoutQuery.md)  
+
 [$MadelineProto->setInlineGameScore](../methods/setInlineGameScore.md)  
 
 [$MadelineProto->deleteChatReplyMarkup](../methods/deleteChatReplyMarkup.md)  
 
 [$MadelineProto->sendChatAction](../methods/sendChatAction.md)  
-
-[$MadelineProto->sendChatScreenshotTakenNotification](../methods/sendChatScreenshotTakenNotification.md)  
 
 [$MadelineProto->openChat](../methods/openChat.md)  
 
@@ -59,21 +67,39 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->changeChatDraftMessage](../methods/changeChatDraftMessage.md)  
 
+[$MadelineProto->toggleChatIsPinned](../methods/toggleChatIsPinned.md)  
+
+[$MadelineProto->setChatClientData](../methods/setChatClientData.md)  
+
 [$MadelineProto->addChatMember](../methods/addChatMember.md)  
 
 [$MadelineProto->addChatMembers](../methods/addChatMembers.md)  
 
 [$MadelineProto->changeChatMemberStatus](../methods/changeChatMemberStatus.md)  
 
+[$MadelineProto->setPinnedChats](../methods/setPinnedChats.md)  
+
 [$MadelineProto->downloadFile](../methods/downloadFile.md)  
 
 [$MadelineProto->cancelDownloadFile](../methods/cancelDownloadFile.md)  
+
+[$MadelineProto->cancelUploadFile](../methods/cancelUploadFile.md)  
 
 [$MadelineProto->setFileGenerationProgress](../methods/setFileGenerationProgress.md)  
 
 [$MadelineProto->finishFileGeneration](../methods/finishFileGeneration.md)  
 
+[$MadelineProto->deleteFile](../methods/deleteFile.md)  
+
 [$MadelineProto->importChatInviteLink](../methods/importChatInviteLink.md)  
+
+[$MadelineProto->acceptCall](../methods/acceptCall.md)  
+
+[$MadelineProto->discardCall](../methods/discardCall.md)  
+
+[$MadelineProto->rateCall](../methods/rateCall.md)  
+
+[$MadelineProto->debugCall](../methods/debugCall.md)  
 
 [$MadelineProto->blockUser](../methods/blockUser.md)  
 
@@ -81,11 +107,11 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->deleteContacts](../methods/deleteContacts.md)  
 
-[$MadelineProto->updateStickerSet](../methods/updateStickerSet.md)  
+[$MadelineProto->changeStickerSet](../methods/changeStickerSet.md)  
 
 [$MadelineProto->viewTrendingStickerSets](../methods/viewTrendingStickerSets.md)  
 
-[$MadelineProto->reorderStickerSets](../methods/reorderStickerSets.md)  
+[$MadelineProto->reorderInstalledStickerSets](../methods/reorderInstalledStickerSets.md)  
 
 [$MadelineProto->deleteRecentSticker](../methods/deleteRecentSticker.md)  
 
@@ -94,6 +120,8 @@ description: constructors and methods of type Ok
 [$MadelineProto->addSavedAnimation](../methods/addSavedAnimation.md)  
 
 [$MadelineProto->deleteSavedAnimation](../methods/deleteSavedAnimation.md)  
+
+[$MadelineProto->deleteRecentHashtag](../methods/deleteRecentHashtag.md)  
 
 [$MadelineProto->setNotificationSettings](../methods/setNotificationSettings.md)  
 
@@ -113,7 +141,7 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->terminateAllOtherSessions](../methods/terminateAllOtherSessions.md)  
 
-[$MadelineProto->toggleGroupEditors](../methods/toggleGroupEditors.md)  
+[$MadelineProto->toggleGroupAdministrators](../methods/toggleGroupAdministrators.md)  
 
 [$MadelineProto->changeChannelUsername](../methods/changeChannelUsername.md)  
 
@@ -121,7 +149,7 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->toggleChannelSignMessages](../methods/toggleChannelSignMessages.md)  
 
-[$MadelineProto->changeChannelAbout](../methods/changeChannelAbout.md)  
+[$MadelineProto->changeChannelDescription](../methods/changeChannelDescription.md)  
 
 [$MadelineProto->pinChannelMessage](../methods/pinChannelMessage.md)  
 
@@ -132,6 +160,10 @@ description: constructors and methods of type Ok
 [$MadelineProto->deleteChannel](../methods/deleteChannel.md)  
 
 [$MadelineProto->closeSecretChat](../methods/closeSecretChat.md)  
+
+[$MadelineProto->deleteSavedOrderInfo](../methods/deleteSavedOrderInfo.md)  
+
+[$MadelineProto->deleteSavedCredentials](../methods/deleteSavedCredentials.md)  
 
 [$MadelineProto->registerDevice](../methods/registerDevice.md)  
 
@@ -145,11 +177,31 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->changeChatReportSpamState](../methods/changeChatReportSpamState.md)  
 
+[$MadelineProto->reportChat](../methods/reportChat.md)  
+
+[$MadelineProto->setNetworkType](../methods/setNetworkType.md)  
+
+[$MadelineProto->addNetworkStatistics](../methods/addNetworkStatistics.md)  
+
+[$MadelineProto->resetNetworkStatistics](../methods/resetNetworkStatistics.md)  
+
 [$MadelineProto->setBotUpdatesStatus](../methods/setBotUpdatesStatus.md)  
+
+[$MadelineProto->setStickerPositionInSet](../methods/setStickerPositionInSet.md)  
+
+[$MadelineProto->deleteStickerFromSet](../methods/deleteStickerFromSet.md)  
+
+[$MadelineProto->answerCustomQuery](../methods/answerCustomQuery.md)  
 
 [$MadelineProto->setAlarm](../methods/setAlarm.md)  
 
-[$MadelineProto->test->forceGetDifference](../methods/test_forceGetDifference.md)  
+[$MadelineProto->setProxy](../methods/setProxy.md)  
+
+[$MadelineProto->testCallEmpty](../methods/testCallEmpty.md)  
+
+[$MadelineProto->testNetwork](../methods/testNetwork.md)  
+
+[$MadelineProto->testGetDifference](../methods/testGetDifference.md)  
 
 
 

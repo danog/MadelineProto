@@ -1,18 +1,12 @@
 ---
 title: sendMessageRecordVideoAction
-description: User records a video
+description: sendMessageRecordVideoAction attributes, type and example
 ---
 ## Constructor: sendMessageRecordVideoAction  
 [Back to constructors index](index.md)
 
 
 
-User records a video
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

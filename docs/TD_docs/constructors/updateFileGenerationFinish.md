@@ -1,13 +1,13 @@
 ---
 title: updateFileGenerationFinish
-description: File generation is finished
+description: DEPRECATED. Use updateFile instead. File generation is finished
 ---
 ## Constructor: updateFileGenerationFinish  
 [Back to constructors index](index.md)
 
 
 
-File generation is finished
+DEPRECATED. Use updateFile instead. File generation is finished
 
 ### Attributes:
 

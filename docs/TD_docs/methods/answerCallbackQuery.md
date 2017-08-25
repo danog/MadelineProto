@@ -1,6 +1,6 @@
 ---
 title: answerCallbackQuery
-description: Bots only. Sets result of the callback query
+description: Bots only. Sets result of a callback query
 ---
 ## Method: answerCallbackQuery  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Bots only. Sets result of the callback query
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Bots only. Sets result of the callback query
+Bots only. Sets result of a callback query
 
 ### Params:
 

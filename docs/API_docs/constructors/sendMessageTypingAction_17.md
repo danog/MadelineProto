@@ -1,18 +1,12 @@
 ---
 title: sendMessageTypingAction
-description: User typing message
+description: sendMessageTypingAction attributes, type and example
 ---
 ## Constructor: sendMessageTypingAction\_17  
 [Back to constructors index](index.md)
 
 
 
-User typing message
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

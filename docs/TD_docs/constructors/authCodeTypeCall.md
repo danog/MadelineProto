@@ -1,13 +1,13 @@
 ---
 title: authCodeTypeCall
-description: Code is delievered by voice call to the specified phone number
+description: Code is delivered by phone call to the specified phone number
 ---
 ## Constructor: authCodeTypeCall  
 [Back to constructors index](index.md)
 
 
 
-Code is delievered by voice call to the specified phone number
+Code is delivered by phone call to the specified phone number
 
 ### Attributes:
 

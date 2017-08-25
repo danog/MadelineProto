@@ -13,8 +13,8 @@ Message was edited. Changes in the message content will come in a separate updat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
-|message\_id|[long](../types/long.md) | Yes|Message identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|message\_id|[int53](../types/int53.md) | Yes|Message identifier|
 |edit\_date|[int](../types/int.md) | Yes|Date the message was edited, unix time|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup, nullable|
 

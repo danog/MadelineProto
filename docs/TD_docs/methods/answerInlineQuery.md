@@ -1,6 +1,6 @@
 ---
 title: answerInlineQuery
-description: Bots only. Sets result of the inline query
+description: Bots only. Sets result of an inline query
 ---
 ## Method: answerInlineQuery  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Bots only. Sets result of the inline query
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Bots only. Sets result of the inline query
+Bots only. Sets result of an inline query
 
 ### Params:
 

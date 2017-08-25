@@ -15,7 +15,7 @@ Uploads new profile photo for logged in user. Photo will not change until change
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|photo\_path|[string](../types/string.md) | Yes|Path to new profile photo|
+|photo|[InputFile](../types/InputFile.md) | Yes|Profile photo to set. inputFileId and inputFilePersistentId may be unsupported|
 
 
 ### Return type: [Ok](../types/Ok.md)

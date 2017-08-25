@@ -13,8 +13,8 @@ View count of the message has changed
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
-|message\_id|[long](../types/long.md) | Yes|Message identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|message\_id|[int53](../types/int53.md) | Yes|Message identifier|
 |views|[int](../types/int.md) | Yes|New value of view count|
 
 

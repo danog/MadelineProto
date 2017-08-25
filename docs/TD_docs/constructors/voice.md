@@ -1,13 +1,13 @@
 ---
 title: voice
-description: Describes voice record. Voice must be encoded with Opus codec and must be stored inside Ogg container
+description: Describes voice note. Voice must be encoded with Opus codec and must be stored inside Ogg container
 ---
 ## Constructor: voice  
 [Back to constructors index](index.md)
 
 
 
-Describes voice record. Voice must be encoded with Opus codec and must be stored inside Ogg container
+Describes voice note. Voice must be encoded with Opus codec and must be stored inside Ogg container
 
 ### Attributes:
 

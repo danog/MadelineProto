@@ -1,13 +1,13 @@
 ---
 title: updateFileProgress
-description: File is partly downloaded/uploaded
+description: DEPRECATED. Use updateFile instead. File is partly downloaded/uploaded
 ---
 ## Constructor: updateFileProgress  
 [Back to constructors index](index.md)
 
 
 
-File is partly downloaded/uploaded
+DEPRECATED. Use updateFile instead. File is partly downloaded/uploaded
 
 ### Attributes:
 

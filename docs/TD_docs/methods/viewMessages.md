@@ -16,7 +16,7 @@ Messages are viewed by the user. Many useful activities depends on message being
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
-|message\_ids|Array of [long](../types/long.md) | Yes|Identifiers of viewed messages|
+|message\_ids|Array of [int53](../types/int53.md) | Yes|Identifiers of viewed messages|
 
 
 ### Return type: [Ok](../types/Ok.md)

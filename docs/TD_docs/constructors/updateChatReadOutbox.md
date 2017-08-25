@@ -13,8 +13,8 @@ Some outcoming messages was read
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
-|last\_read\_outbox\_message\_id|[long](../types/long.md) | Yes|Identifier of last read outgoing message|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|last\_read\_outbox\_message\_id|[int53](../types/int53.md) | Yes|Identifier of last read outgoing message|
 
 
 

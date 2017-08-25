@@ -17,6 +17,7 @@ Represents link to an animated (i.e. without sound) H.264/MPEG-4 AVC video
 |title|[string](../types/string.md) | Yes|Title of the result|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the static result thumb (jpeg or gif), if exists|
 |mpeg4\_url|[string](../types/string.md) | Yes|Url of the mp4-file (file size must not exceed 1MB)|
+|mpeg4\_duration|[int](../types/int.md) | Yes|Duration of the video in seconds|
 |mpeg4\_width|[int](../types/int.md) | Yes|Width of the video|
 |mpeg4\_height|[int](../types/int.md) | Yes|Height of the video|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|Message reply markup, should be of type replyMarkupInlineKeyboard or null|

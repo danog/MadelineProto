@@ -1,6 +1,6 @@
 ---
 title: getWebPagePreview
-description: Get web page preview by text of the message. Do not call this function to often
+description: Returns web page preview by text of the message. Do not call this function to often. Returns error 404 if web page has no preview
 ---
 ## Method: getWebPagePreview  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Get web page preview by text of the message. Do not call this funct
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Get web page preview by text of the message. Do not call this function to often
+Returns web page preview by text of the message. Do not call this function to often. Returns error 404 if web page has no preview
 
 ### Params:
 

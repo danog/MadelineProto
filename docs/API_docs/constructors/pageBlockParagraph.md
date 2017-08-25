@@ -1,17 +1,19 @@
 ---
 title: pageBlockParagraph
-description: pageBlockParagraph attributes, type and example
+description: A text paragraph
 ---
 ## Constructor: pageBlockParagraph  
 [Back to constructors index](index.md)
 
 
 
+A text paragraph
+
 ### Attributes:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|text|[RichText](../types/RichText.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|text|[RichText](../types/RichText.md) | Yes|Paragraph text|
 
 
 

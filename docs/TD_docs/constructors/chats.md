@@ -1,19 +1,19 @@
 ---
 title: chats
-description: Contains list of chats
+description: Represents list of chats
 ---
 ## Constructor: chats  
 [Back to constructors index](index.md)
 
 
 
-Contains list of chats
+Represents list of chats
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chats|Array of [chat](../constructors/chat.md) | Yes|List of chats|
+|chat\_ids|Array of [int53](../constructors/int53.md) | Yes|List of chat identifiers|
 
 
 

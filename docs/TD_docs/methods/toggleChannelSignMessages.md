@@ -1,6 +1,6 @@
 ---
 title: toggleChannelSignMessages
-description: Enables or disables sender signature on sent messages in the channel. Needs creator privileges in the channel. Not available for supergroups
+description: Enables or disables sender signature on sent messages in the channel. Needs appropriate rights in the channel. Not available for supergroups
 ---
 ## Method: toggleChannelSignMessages  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Enables or disables sender signature on sent messages in the channe
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Enables or disables sender signature on sent messages in the channel. Needs creator privileges in the channel. Not available for supergroups
+Enables or disables sender signature on sent messages in the channel. Needs appropriate rights in the channel. Not available for supergroups
 
 ### Params:
 

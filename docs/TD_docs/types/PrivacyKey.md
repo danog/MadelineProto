@@ -15,6 +15,8 @@ Describes available privacy settings
 
 [privacyKeyChatInvite](../constructors/privacyKeyChatInvite.md)  
 
+[privacyKeyCall](../constructors/privacyKeyCall.md)  
+
 
 
 ### Methods that return an object of this type (methods):

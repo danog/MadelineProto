@@ -7,8 +7,6 @@ description: constructors and methods of type SendMessageAction
 
 
 
-Notifies about activity in chat
-
 ### Possible values (constructors):
 
 [sendMessageTypingAction\_17](../constructors/sendMessageTypingAction_17.md)  

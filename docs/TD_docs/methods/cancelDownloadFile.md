@@ -1,6 +1,6 @@
 ---
 title: cancelDownloadFile
-description: Stops file downloading. If file already downloaded do nothing.
+description: Stops file downloading. If file is already downloaded, does nothing
 ---
 ## Method: cancelDownloadFile  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Stops file downloading. If file already downloaded do nothing.
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Stops file downloading. If file already downloaded do nothing.
+Stops file downloading. If file is already downloaded, does nothing
 
 ### Params:
 

@@ -1,6 +1,6 @@
 ---
 title: getOption
-description: Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options
+description: Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options. Can be called before authorization
 ---
 ## Method: getOption  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns value of an option by its name. See list of available optio
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options
+Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options. Can be called before authorization
 
 ### Params:
 

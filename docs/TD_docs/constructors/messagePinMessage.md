@@ -13,7 +13,7 @@ Some message was pinned
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message\_id|[long](../types/long.md) | Yes|Identifier of the pinned message, can be identifier of the deleted message|
+|message\_id|[int53](../types/int53.md) | Yes|Identifier of the pinned message, can be identifier of the deleted message|
 
 
 

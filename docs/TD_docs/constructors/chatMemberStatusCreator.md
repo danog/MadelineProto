@@ -1,13 +1,13 @@
 ---
 title: chatMemberStatusCreator
-description: Creator of the chat, can delete any message, kick any user and add editors and moderators in channels
+description: User is creator of the chat which has all administrator priviledges
 ---
 ## Constructor: chatMemberStatusCreator  
 [Back to constructors index](index.md)
 
 
 
-Creator of the chat, can delete any message, kick any user and add editors and moderators in channels
+User is creator of the chat which has all administrator priviledges
 
 ### Attributes:
 

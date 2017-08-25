@@ -1,6 +1,6 @@
 ---
 title: toggleChannelInvites
-description: Gives or revokes right to invite new members to all current members of the channel. Needs creator privileges in the channel. Available only for supergroups
+description: Gives or revokes right to invite new members to all current members of the channel. Needs appropriate rights in the channel. Available only for supergroups
 ---
 ## Method: toggleChannelInvites  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Gives or revokes right to invite new members to all current members
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Gives or revokes right to invite new members to all current members of the channel. Needs creator privileges in the channel. Available only for supergroups
+Gives or revokes right to invite new members to all current members of the channel. Needs appropriate rights in the channel. Available only for supergroups
 
 ### Params:
 

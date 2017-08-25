@@ -1,6 +1,6 @@
 ---
 title: setOption
-description: Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set
+description: Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set. Can be called before authorization
 ---
 ## Method: setOption  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sets value of an option. See list of available options on https: co
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set
+Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set. Can be called before authorization
 
 ### Params:
 

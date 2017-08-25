@@ -15,9 +15,9 @@ Creates new channel chat and send corresponding messageChannelChatCreate, return
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|title|[string](../types/string.md) | Yes|Title of new channel chat, 0-255 characters|
+|title|[string](../types/string.md) | Yes|Title of new channel chat, 1-255 characters|
 |is\_supergroup|[Bool](../types/Bool.md) | Yes|True, if supergroup chat should be created|
-|about|[string](../types/string.md) | Yes|Information about the channel, 0-255 characters|
+|description|[string](../types/string.md) | Yes|Channel description, 0-255 characters|
 
 
 ### Return type: [Chat](../types/Chat.md)

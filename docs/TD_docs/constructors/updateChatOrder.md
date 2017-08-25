@@ -13,7 +13,7 @@ Order of the chat in the chat list has changed
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |order|[long](../types/long.md) | Yes|New value of the order|
 
 

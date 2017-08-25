@@ -1,6 +1,6 @@
 ---
 title: getCallbackQueryAnswer
-description: Sends callback query to a bot and returns answer to it. Unavailable for bots
+description: Sends callback query to a bot and returns answer to it. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots
 ---
 ## Method: getCallbackQueryAnswer  
 [Back to methods index](index.md)
@@ -9,14 +9,14 @@ description: Sends callback query to a bot and returns answer to it. Unavailable
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sends callback query to a bot and returns answer to it. Unavailable for bots
+Sends callback query to a bot and returns answer to it. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots
 
 ### Params:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat with a message|
-|message\_id|[long](../types/long.md) | Yes|Identifier of the message, from which the query is originated|
+|message\_id|[int53](../types/int53.md) | Yes|Identifier of the message, from which the query is originated|
 |payload|[CallbackQueryPayload](../types/CallbackQueryPayload.md) | Yes|Query payload|
 
 

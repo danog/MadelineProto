@@ -1,6 +1,6 @@
 ---
 title: resendAuthCode
-description: Resends authentication code to the user. Works only when authGetState returns authStateWaitCode and next_code_type of result is not null. Returns authStateWaitCode on success
+description: Resends authentication code to the user. Works only when getAuthState returns authStateWaitCode and next_code_type of result is not null. Returns authStateWaitCode on success
 ---
 ## Method: resendAuthCode  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Resends authentication code to the user. Works only when authGetSta
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Resends authentication code to the user. Works only when authGetState returns authStateWaitCode and next_code_type of result is not null. Returns authStateWaitCode on success
+Resends authentication code to the user. Works only when getAuthState returns authStateWaitCode and next_code_type of result is not null. Returns authStateWaitCode on success
 
 ### Params:
 

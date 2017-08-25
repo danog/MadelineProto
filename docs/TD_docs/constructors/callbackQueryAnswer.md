@@ -1,13 +1,13 @@
 ---
 title: callbackQueryAnswer
-description: Contains answer of the bot to the callback query
+description: Contains answer of a bot to a callback query
 ---
 ## Constructor: callbackQueryAnswer  
 [Back to constructors index](index.md)
 
 
 
-Contains answer of the bot to the callback query
+Contains answer of a bot to a callback query
 
 ### Attributes:
 

@@ -11,17 +11,17 @@ Represents a token for push notifications
 
 ### Possible values (constructors):
 
-[apnsDeviceToken](../constructors/apnsDeviceToken.md)  
+[deviceTokenApns](../constructors/deviceTokenApns.md)  
 
-[gcmDeviceToken](../constructors/gcmDeviceToken.md)  
+[deviceTokenGcm](../constructors/deviceTokenGcm.md)  
 
-[mpnsDeviceToken](../constructors/mpnsDeviceToken.md)  
+[deviceTokenMpns](../constructors/deviceTokenMpns.md)  
 
-[simplePushDeviceToken](../constructors/simplePushDeviceToken.md)  
+[deviceTokenSimplePush](../constructors/deviceTokenSimplePush.md)  
 
-[ubuntuPhoneDeviceToken](../constructors/ubuntuPhoneDeviceToken.md)  
+[deviceTokenUbuntuPhone](../constructors/deviceTokenUbuntuPhone.md)  
 
-[blackberryDeviceToken](../constructors/blackberryDeviceToken.md)  
+[deviceTokenBlackberry](../constructors/deviceTokenBlackberry.md)  
 
 
 

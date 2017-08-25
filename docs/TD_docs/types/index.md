@@ -22,6 +22,18 @@ description: List of types
 
 [BotInfo](BotInfo.md)<a name="BotInfo"></a>  
 
+[Call](Call.md)<a name="Call"></a>  
+
+[CallConnection](CallConnection.md)<a name="CallConnection"></a>  
+
+[CallDiscardReason](CallDiscardReason.md)<a name="CallDiscardReason"></a>  
+
+[CallId](CallId.md)<a name="CallId"></a>  
+
+[CallProtocol](CallProtocol.md)<a name="CallProtocol"></a>  
+
+[CallState](CallState.md)<a name="CallState"></a>  
+
 [CallbackQueryAnswer](CallbackQueryAnswer.md)<a name="CallbackQueryAnswer"></a>  
 
 [CallbackQueryPayload](CallbackQueryPayload.md)<a name="CallbackQueryPayload"></a>  
@@ -32,11 +44,17 @@ description: List of types
 
 [ChannelMembersFilter](ChannelMembersFilter.md)<a name="ChannelMembersFilter"></a>  
 
-[Channels](Channels.md)<a name="Channels"></a>  
-
 [Chat](Chat.md)<a name="Chat"></a>  
 
-[ChatInfo](ChatInfo.md)<a name="ChatInfo"></a>  
+[ChatAction](ChatAction.md)<a name="ChatAction"></a>  
+
+[ChatEvent](ChatEvent.md)<a name="ChatEvent"></a>  
+
+[ChatEventAction](ChatEventAction.md)<a name="ChatEventAction"></a>  
+
+[ChatEventLogFilters](ChatEventLogFilters.md)<a name="ChatEventLogFilters"></a>  
+
+[ChatEvents](ChatEvents.md)<a name="ChatEvents"></a>  
 
 [ChatInviteLink](ChatInviteLink.md)<a name="ChatInviteLink"></a>  
 
@@ -50,15 +68,21 @@ description: List of types
 
 [ChatPhoto](ChatPhoto.md)<a name="ChatPhoto"></a>  
 
+[ChatReportReason](ChatReportReason.md)<a name="ChatReportReason"></a>  
+
 [ChatReportSpamState](ChatReportSpamState.md)<a name="ChatReportSpamState"></a>  
+
+[ChatType](ChatType.md)<a name="ChatType"></a>  
 
 [Chats](Chats.md)<a name="Chats"></a>  
 
+[ConnectionState](ConnectionState.md)<a name="ConnectionState"></a>  
+
 [Contact](Contact.md)<a name="Contact"></a>  
 
-[DeviceToken](DeviceToken.md)<a name="DeviceToken"></a>  
+[CustomRequestResult](CustomRequestResult.md)<a name="CustomRequestResult"></a>  
 
-[DeviceTokenSet](DeviceTokenSet.md)<a name="DeviceTokenSet"></a>  
+[DeviceToken](DeviceToken.md)<a name="DeviceToken"></a>  
 
 [Document](Document.md)<a name="Document"></a>  
 
@@ -67,6 +91,10 @@ description: List of types
 [Error](Error.md)<a name="Error"></a>  
 
 [File](File.md)<a name="File"></a>  
+
+[FileType](FileType.md)<a name="FileType"></a>  
+
+[FoundMessages](FoundMessages.md)<a name="FoundMessages"></a>  
 
 [Game](Game.md)<a name="Game"></a>  
 
@@ -78,6 +106,10 @@ description: List of types
 
 [GroupFull](GroupFull.md)<a name="GroupFull"></a>  
 
+[Hashtags](Hashtags.md)<a name="Hashtags"></a>  
+
+[ImportedContacts](ImportedContacts.md)<a name="ImportedContacts"></a>  
+
 [InlineKeyboardButton](InlineKeyboardButton.md)<a name="InlineKeyboardButton"></a>  
 
 [InlineKeyboardButtonType](InlineKeyboardButtonType.md)<a name="InlineKeyboardButtonType"></a>  
@@ -86,17 +118,25 @@ description: List of types
 
 [InlineQueryResults](InlineQueryResults.md)<a name="InlineQueryResults"></a>  
 
+[InputCredentials](InputCredentials.md)<a name="InputCredentials"></a>  
+
 [InputFile](InputFile.md)<a name="InputFile"></a>  
 
 [InputInlineQueryResult](InputInlineQueryResult.md)<a name="InputInlineQueryResult"></a>  
 
 [InputMessageContent](InputMessageContent.md)<a name="InputMessageContent"></a>  
 
+[InputSticker](InputSticker.md)<a name="InputSticker"></a>  
+
 [InputThumb](InputThumb.md)<a name="InputThumb"></a>  
+
+[Invoice](Invoice.md)<a name="Invoice"></a>  
 
 [KeyboardButton](KeyboardButton.md)<a name="KeyboardButton"></a>  
 
 [KeyboardButtonType](KeyboardButtonType.md)<a name="KeyboardButtonType"></a>  
+
+[LabeledPrice](LabeledPrice.md)<a name="LabeledPrice"></a>  
 
 [LinkState](LinkState.md)<a name="LinkState"></a>  
 
@@ -108,13 +148,17 @@ description: List of types
 
 [MessageContent](MessageContent.md)<a name="MessageContent"></a>  
 
-[MessageEntity](MessageEntity.md)<a name="MessageEntity"></a>  
-
 [MessageForwardInfo](MessageForwardInfo.md)<a name="MessageForwardInfo"></a>  
 
 [MessageSendState](MessageSendState.md)<a name="MessageSendState"></a>  
 
 [Messages](Messages.md)<a name="Messages"></a>  
+
+[NetworkStatistics](NetworkStatistics.md)<a name="NetworkStatistics"></a>  
+
+[NetworkStatisticsEntry](NetworkStatisticsEntry.md)<a name="NetworkStatisticsEntry"></a>  
+
+[NetworkType](NetworkType.md)<a name="NetworkType"></a>  
 
 [NotificationSettings](NotificationSettings.md)<a name="NotificationSettings"></a>  
 
@@ -124,9 +168,21 @@ description: List of types
 
 [OptionValue](OptionValue.md)<a name="OptionValue"></a>  
 
+[OrderInfo](OrderInfo.md)<a name="OrderInfo"></a>  
+
+[PageBlock](PageBlock.md)<a name="PageBlock"></a>  
+
 [PasswordRecoveryInfo](PasswordRecoveryInfo.md)<a name="PasswordRecoveryInfo"></a>  
 
 [PasswordState](PasswordState.md)<a name="PasswordState"></a>  
+
+[PaymentForm](PaymentForm.md)<a name="PaymentForm"></a>  
+
+[PaymentReceipt](PaymentReceipt.md)<a name="PaymentReceipt"></a>  
+
+[PaymentResult](PaymentResult.md)<a name="PaymentResult"></a>  
+
+[PaymentsProviderStripe](PaymentsProviderStripe.md)<a name="PaymentsProviderStripe"></a>  
 
 [Photo](Photo.md)<a name="Photo"></a>  
 
@@ -140,19 +196,29 @@ description: List of types
 
 [ProfilePhoto](ProfilePhoto.md)<a name="ProfilePhoto"></a>  
 
+[Proxy](Proxy.md)<a name="Proxy"></a>  
+
+[PublicMessageLink](PublicMessageLink.md)<a name="PublicMessageLink"></a>  
+
 [RecoveryEmail](RecoveryEmail.md)<a name="RecoveryEmail"></a>  
 
 [ReplyMarkup](ReplyMarkup.md)<a name="ReplyMarkup"></a>  
+
+[RichText](RichText.md)<a name="RichText"></a>  
+
+[SavedCredentials](SavedCredentials.md)<a name="SavedCredentials"></a>  
 
 [SearchMessagesFilter](SearchMessagesFilter.md)<a name="SearchMessagesFilter"></a>  
 
 [SecretChat](SecretChat.md)<a name="SecretChat"></a>  
 
-[SendMessageAction](SendMessageAction.md)<a name="SendMessageAction"></a>  
-
 [Session](Session.md)<a name="Session"></a>  
 
 [Sessions](Sessions.md)<a name="Sessions"></a>  
+
+[ShippingAddress](ShippingAddress.md)<a name="ShippingAddress"></a>  
+
+[ShippingOption](ShippingOption.md)<a name="ShippingOption"></a>  
 
 [Sticker](Sticker.md)<a name="Sticker"></a>  
 
@@ -166,7 +232,39 @@ description: List of types
 
 [Stickers](Stickers.md)<a name="Stickers"></a>  
 
+[StorageStatistics](StorageStatistics.md)<a name="StorageStatistics"></a>  
+
+[StorageStatisticsByChat](StorageStatisticsByChat.md)<a name="StorageStatisticsByChat"></a>  
+
+[StorageStatisticsByFileType](StorageStatisticsByFileType.md)<a name="StorageStatisticsByFileType"></a>  
+
+[StorageStatisticsFast](StorageStatisticsFast.md)<a name="StorageStatisticsFast"></a>  
+
+[TemporaryPasswordState](TemporaryPasswordState.md)<a name="TemporaryPasswordState"></a>  
+
+[TestBytes](TestBytes.md)<a name="TestBytes"></a>  
+
+[TestInt](TestInt.md)<a name="TestInt"></a>  
+
+[TestString](TestString.md)<a name="TestString"></a>  
+
+[TestVectorInt](TestVectorInt.md)<a name="TestVectorInt"></a>  
+
+[TestVectorIntObject](TestVectorIntObject.md)<a name="TestVectorIntObject"></a>  
+
+[TestVectorString](TestVectorString.md)<a name="TestVectorString"></a>  
+
+[TestVectorStringObject](TestVectorStringObject.md)<a name="TestVectorStringObject"></a>  
+
+[Text](Text.md)<a name="Text"></a>  
+
+[TextEntity](TextEntity.md)<a name="TextEntity"></a>  
+
+[TextEntityType](TextEntityType.md)<a name="TextEntityType"></a>  
+
 [TextParseMode](TextParseMode.md)<a name="TextParseMode"></a>  
+
+[TopChatCategory](TopChatCategory.md)<a name="TopChatCategory"></a>  
 
 [Update](Update.md)<a name="Update"></a>  
 
@@ -182,9 +280,13 @@ description: List of types
 
 [Users](Users.md)<a name="Users"></a>  
 
+[ValidatedOrderInfo](ValidatedOrderInfo.md)<a name="ValidatedOrderInfo"></a>  
+
 [Venue](Venue.md)<a name="Venue"></a>  
 
 [Video](Video.md)<a name="Video"></a>  
+
+[VideoNote](VideoNote.md)<a name="VideoNote"></a>  
 
 [Voice](Voice.md)<a name="Voice"></a>  
 
@@ -194,19 +296,5 @@ description: List of types
 
 [WebPage](WebPage.md)<a name="WebPage"></a>  
 
-[test\_Bytes](test_Bytes.md)<a name="test_Bytes"></a>  
-
-[test\_Empty](test_Empty.md)<a name="test_Empty"></a>  
-
-[test\_Int](test_Int.md)<a name="test_Int"></a>  
-
-[test\_String](test_String.md)<a name="test_String"></a>  
-
-[test\_VectorInt](test_VectorInt.md)<a name="test_VectorInt"></a>  
-
-[test\_VectorIntObject](test_VectorIntObject.md)<a name="test_VectorIntObject"></a>  
-
-[test\_VectorString](test_VectorString.md)<a name="test_VectorString"></a>  
-
-[test\_VectorStringObject](test_VectorStringObject.md)<a name="test_VectorStringObject"></a>  
+[WebPageInstantView](WebPageInstantView.md)<a name="WebPageInstantView"></a>  
 

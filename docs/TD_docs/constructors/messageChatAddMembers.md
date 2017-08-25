@@ -13,7 +13,7 @@ Chat members added
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|members|Array of [user](../constructors/user.md) | Yes|New chat member|
+|member\_user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers of new chat members|
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: viewTrendingStickerSets
-description: Trending sticker sets are viewed by the user
+description: Informs that some trending sticker sets are viewed by the user
 ---
 ## Method: viewTrendingStickerSets  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Trending sticker sets are viewed by the user
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Trending sticker sets are viewed by the user
+Informs that some trending sticker sets are viewed by the user
 
 ### Params:
 

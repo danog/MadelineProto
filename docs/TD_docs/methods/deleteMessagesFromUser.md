@@ -1,6 +1,6 @@
 ---
 title: deleteMessagesFromUser
-description: Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs appropriate privileges
+description: Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs can_delete_messages administrator privileges
 ---
 ## Method: deleteMessagesFromUser  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Deletes all messages in the chat sent by the specified user. Works 
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs appropriate privileges
+Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs can_delete_messages administrator privileges
 
 ### Params:
 

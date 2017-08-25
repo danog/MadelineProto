@@ -1,6 +1,6 @@
 ---
 title: setAlarm
-description: Returns Ok after specified amount of the time passed
+description: Returns Ok after specified amount of the time passed. Can be called before authorization
 ---
 ## Method: setAlarm  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns Ok after specified amount of the time passed
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns Ok after specified amount of the time passed
+Returns Ok after specified amount of the time passed. Can be called before authorization
 
 ### Params:
 

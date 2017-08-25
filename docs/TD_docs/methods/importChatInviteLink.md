@@ -15,7 +15,7 @@ Imports chat invite link, adds current user to a chat if possible. Member will n
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|invite\_link|[string](../types/string.md) | Yes|Invite link to import. Should begin with "https: telegram.me/joinchat/"|
+|invite\_link|[string](../types/string.md) | Yes|Invite link to import. Should begin with "https: t.me/joinchat/", "https: telegram.me/joinchat/" or "https: telegram.dog/joinchat/"|
 
 
 ### Return type: [Ok](../types/Ok.md)

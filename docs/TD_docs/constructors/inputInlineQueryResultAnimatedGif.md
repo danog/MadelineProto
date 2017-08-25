@@ -17,6 +17,7 @@ Represents link to an animated gif
 |title|[string](../types/string.md) | Yes|Title of the result|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the static result thumb (jpeg or gif), if exists|
 |gif\_url|[string](../types/string.md) | Yes|Url of the gif-file (file size must not exceed 1MB)|
+|gif\_duration|[int](../types/int.md) | Yes|Duration of the gif in seconds|
 |gif\_width|[int](../types/int.md) | Yes|Width of the gif|
 |gif\_height|[int](../types/int.md) | Yes|Height of the gif|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|Message reply markup, should be of type replyMarkupInlineKeyboard or null|

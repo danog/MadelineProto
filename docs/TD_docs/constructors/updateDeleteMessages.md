@@ -13,8 +13,8 @@ Some messages was deleted
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
-|message\_ids|Array of [long](../constructors/long.md) | Yes|Identifiers of deleted message|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|message\_ids|Array of [int53](../constructors/int53.md) | Yes|Identifiers of deleted message|
 
 
 

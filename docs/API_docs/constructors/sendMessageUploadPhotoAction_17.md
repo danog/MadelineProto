@@ -1,18 +1,12 @@
 ---
 title: sendMessageUploadPhotoAction
-description: User uploads a photo
+description: sendMessageUploadPhotoAction attributes, type and example
 ---
 ## Constructor: sendMessageUploadPhotoAction\_17  
 [Back to constructors index](index.md)
 
 
 
-User uploads a photo
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: getUserProfilePhotos
-description: Returns profile photos of the user. Result of this query can't be invalidated, so it must be used with care
+description: Returns profile photos of the user. Result of this query may be outdated: some photos may be already deleted
 ---
 ## Method: getUserProfilePhotos  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns profile photos of the user. Result of this query can't be i
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns profile photos of the user. Result of this query can't be invalidated, so it must be used with care
+Returns profile photos of the user. Result of this query may be outdated: some photos may be already deleted
 
 ### Params:
 

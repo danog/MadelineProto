@@ -1,6 +1,6 @@
 ---
 title: recoverAuthPassword
-description: Recovers password with recovery code sent to email. Works only when authGetState returns authStateWaitPassword. Returns authStateOk on success
+description: Recovers password with recovery code sent to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateOk on success
 ---
 ## Method: recoverAuthPassword  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Recovers password with recovery code sent to email. Works only when
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Recovers password with recovery code sent to email. Works only when authGetState returns authStateWaitPassword. Returns authStateOk on success
+Recovers password with recovery code sent to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateOk on success
 
 ### Params:
 

@@ -1,6 +1,6 @@
 ---
 title: unpinChannelMessage
-description: Removes pinned message in the supergroup channel. Needs editor privileges in the channel
+description: Removes pinned message in the supergroup channel. Needs appropriate rights in the channel
 ---
 ## Method: unpinChannelMessage  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Removes pinned message in the supergroup channel. Needs editor priv
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Removes pinned message in the supergroup channel. Needs editor privileges in the channel
+Removes pinned message in the supergroup channel. Needs appropriate rights in the channel
 
 ### Params:
 

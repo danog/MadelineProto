@@ -1,6 +1,6 @@
 ---
 title: getChannelMembers
-description: Returns information about channel members or kicked from channel users. Can be used only if channel_full->can_get_members == true
+description: Returns information about channel members or banned users. Can be used only if channel_full->can_get_members == true. Administrator privileges may be additionally needed for some filters
 ---
 ## Method: getChannelMembers  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns information about channel members or kicked from channel us
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns information about channel members or kicked from channel users. Can be used only if channel_full->can_get_members == true
+Returns information about channel members or banned users. Can be used only if channel_full->can_get_members == true. Administrator privileges may be additionally needed for some filters
 
 ### Params:
 

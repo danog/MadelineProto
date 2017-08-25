@@ -17,8 +17,6 @@ description: constructors and methods of type Users
 
 [$MadelineProto->getBlockedUsers](../methods/getBlockedUsers.md)  
 
-[$MadelineProto->importContacts](../methods/importContacts.md)  
-
 [$MadelineProto->searchContacts](../methods/searchContacts.md)  
 
 [$MadelineProto->getRecentInlineBots](../methods/getRecentInlineBots.md)  

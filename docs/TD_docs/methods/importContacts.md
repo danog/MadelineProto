@@ -1,6 +1,6 @@
 ---
 title: importContacts
-description: Adds new contacts/edits existing contacts, contacts user identifiers are ignored. Returns list of corresponding users in the same order as input contacts. If contact doesn't registered in Telegram, user with id == 0 will be returned
+description: Adds new contacts/edits existing contacts, contacts user identifiers are ignored
 ---
 ## Method: importContacts  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Adds new contacts/edits existing contacts, contacts user identifier
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Adds new contacts/edits existing contacts, contacts user identifiers are ignored. Returns list of corresponding users in the same order as input contacts. If contact doesn't registered in Telegram, user with id == 0 will be returned
+Adds new contacts/edits existing contacts, contacts user identifiers are ignored
 
 ### Params:
 
@@ -18,5 +18,5 @@ Adds new contacts/edits existing contacts, contacts user identifiers are ignored
 |contacts|Array of [contact](../types/contact.md) | Yes|List of contacts to import/edit|
 
 
-### Return type: [Users](../types/Users.md)
+### Return type: [ImportedContacts](../types/ImportedContacts.md)
 

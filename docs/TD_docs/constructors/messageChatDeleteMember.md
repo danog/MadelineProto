@@ -13,7 +13,7 @@ Chat member deleted
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user|[user](../types/user.md) | Yes|Left or kicked chat member|
+|user\_id|[int](../types/int.md) | Yes|User identifier of deleted chat memeber|
 
 
 

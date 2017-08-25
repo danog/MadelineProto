@@ -1,6 +1,6 @@
 ---
 title: searchChatMessages
-description: Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasimg message_id. Doesn't work in secret chats
+description: Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasing message_id. Doesn't work in secret chats with non-empty query (searchSecretMessages should be used instead) or without enabled message database
 ---
 ## Method: searchChatMessages  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Searches for messages with given words in the chat. Returns result 
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasimg message_id. Doesn't work in secret chats
+Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasing message_id. Doesn't work in secret chats with non-empty query (searchSecretMessages should be used instead) or without enabled message database
 
 ### Params:
 
@@ -17,8 +17,9 @@ Searches for messages with given words in the chat. Returns result in reverse ch
 |----------|---------------|----------|-------------|
 |chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier to search in|
 |query|[string](../types/string.md) | Yes|Query to search for|
-|from\_message\_id|[long](../types/long.md) | Yes|Identifier of the message from which we need a history, you can use 0 to get results from beginning|
-|limit|[int](../types/int.md) | Yes|Maximum number of messages to be returned, can't be greater than 100|
+|sender\_user\_id|[int](../types/int.md) | Yes|If not 0, only messages sent by the specified user will be returned. Doesn't supported in secret chats|
+|from\_message\_id|[int53](../types/int53.md) | Yes|Identifier of the message from which we need a history, you can use 0 to get results from the beginning|
+|limit|[int](../types/int.md) | Yes|Maximum number of messages to be returned, can't be greater than 100. There may be less than limit messages returned even the end of the history is not reached|
 |filter|[SearchMessagesFilter](../types/SearchMessagesFilter.md) | Yes|Filter for content of searched messages|
 
 

@@ -1,6 +1,6 @@
 ---
 title: getInlineQueryResults
-description: Sends inline query to a bot and returns its results. Unavailable for bots
+description: Sends inline query to a bot and returns its results. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots
 ---
 ## Method: getInlineQueryResults  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sends inline query to a bot and returns its results. Unavailable fo
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sends inline query to a bot and returns its results. Unavailable for bots
+Sends inline query to a bot and returns its results. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots
 
 ### Params:
 

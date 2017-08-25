@@ -25,6 +25,8 @@ Content of a message to send
 
 [inputMessageVideo](../constructors/inputMessageVideo.md)  
 
+[inputMessageVideoNote](../constructors/inputMessageVideoNote.md)  
+
 [inputMessageVoice](../constructors/inputMessageVoice.md)  
 
 [inputMessageLocation](../constructors/inputMessageLocation.md)  
@@ -34,6 +36,8 @@ Content of a message to send
 [inputMessageContact](../constructors/inputMessageContact.md)  
 
 [inputMessageGame](../constructors/inputMessageGame.md)  
+
+[inputMessageInvoice](../constructors/inputMessageInvoice.md)  
 
 [inputMessageForwarded](../constructors/inputMessageForwarded.md)  
 

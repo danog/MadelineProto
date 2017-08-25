@@ -13,7 +13,6 @@ Gives full information about a group
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|group|[group](../types/group.md) | Yes|General info about the group|
 |creator\_user\_id|[int](../types/int.md) | Yes|User identifier of the group creator, 0 if unknown|
 |members|Array of [chatMember](../constructors/chatMember.md) | Yes|Group members|
 |invite\_link|[string](../types/string.md) | Yes|Invite link for this group, available only for group creator and only after it is generated at least once|

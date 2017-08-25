@@ -13,7 +13,7 @@ Chat draft has changed. Be aware that the update may come in the currently open 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[long](../types/long.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |draft\_message|[draftMessage](../types/draftMessage.md) | Yes|New chat draft_message, nullable|
 
 

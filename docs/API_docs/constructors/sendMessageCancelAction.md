@@ -1,18 +1,12 @@
 ---
 title: sendMessageCancelAction
-description: User cancels typing
+description: sendMessageCancelAction attributes, type and example
 ---
 ## Constructor: sendMessageCancelAction  
 [Back to constructors index](index.md)
 
 
 
-User cancels typing
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -21,7 +21,11 @@ description: constructors and methods of type Chats
 
 [$MadelineProto->searchChats](../methods/searchChats.md)  
 
+[$MadelineProto->getTopChats](../methods/getTopChats.md)  
+
 [$MadelineProto->getCommonChats](../methods/getCommonChats.md)  
+
+[$MadelineProto->getCreatedPublicChats](../methods/getCreatedPublicChats.md)  
 
 
 

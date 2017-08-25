@@ -7,6 +7,8 @@ description: constructors and methods of type RichText
 
 
 
+Describes a text inside web page instant view
+
 ### Possible values (constructors):
 
 [textEmpty](../constructors/textEmpty.md)  

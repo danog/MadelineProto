@@ -1,6 +1,6 @@
 ---
 title: exportChatInviteLink
-description: Generates new chat invite link, previously generated link is revoked. Available for group and channel chats. Only creator of the chat can export chat invite link
+description: Generates new chat invite link, previously generated link is revoked. Available for group and channel chats. In groups can be called only by creator, in channels requires appropriate rights
 ---
 ## Method: exportChatInviteLink  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Generates new chat invite link, previously generated link is revoke
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Generates new chat invite link, previously generated link is revoked. Available for group and channel chats. Only creator of the chat can export chat invite link
+Generates new chat invite link, previously generated link is revoked. Available for group and channel chats. In groups can be called only by creator, in channels requires appropriate rights
 
 ### Params:
 

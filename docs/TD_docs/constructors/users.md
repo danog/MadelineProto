@@ -1,20 +1,20 @@
 ---
 title: users
-description: Contains list of users
+description: Represents list of users
 ---
 ## Constructor: users  
 [Back to constructors index](index.md)
 
 
 
-Contains list of users
+Represents list of users
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |total\_count|[int](../types/int.md) | Yes|Approximate total count of found users|
-|users|Array of [user](../constructors/user.md) | Yes|List of users|
+|user\_ids|Array of [int](../constructors/int.md) | Yes|List of user identifiers|
 
 
 

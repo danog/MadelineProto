@@ -13,6 +13,7 @@ Describes animation file. Animation should be encoded in gif or mp4 format
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
+|duration|[int](../types/int.md) | Yes|Duration of the animation in seconds as defined by sender|
 |width|[int](../types/int.md) | Yes|Width of the animation|
 |height|[int](../types/int.md) | Yes|Height of the animation|
 |file\_name|[string](../types/string.md) | Yes|Original name of a file as defined by sender|

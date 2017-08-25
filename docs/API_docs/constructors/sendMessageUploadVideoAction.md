@@ -1,19 +1,17 @@
 ---
 title: sendMessageUploadVideoAction
-description: User uploads a video
+description: sendMessageUploadVideoAction attributes, type and example
 ---
 ## Constructor: sendMessageUploadVideoAction  
 [Back to constructors index](index.md)
 
 
 
-User uploads a video
-
 ### Attributes:
 
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
-|progress|[int](../types/int.md) | Yes|Upload progress in percents|
+| Name     |    Type       | Required |
+|----------|---------------|----------|
+|progress|[int](../types/int.md) | Yes|
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: checkAuthBotToken
-description: Check bot's authentication token to log in as a bot. Works only when authGetState returns authStateWaitPhoneNumber. Can be used instead of setAuthPhoneNumber and checkAuthCode to log in. Returns authStateOk on success
+description: Check bot's authentication token to log in as a bot. Works only when getAuthState returns authStateWaitPhoneNumber. Can be used instead of setAuthPhoneNumber and checkAuthCode to log in. Returns authStateOk on success
 ---
 ## Method: checkAuthBotToken  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Check bot's authentication token to log in as a bot. Works only whe
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Check bot's authentication token to log in as a bot. Works only when authGetState returns authStateWaitPhoneNumber. Can be used instead of setAuthPhoneNumber and checkAuthCode to log in. Returns authStateOk on success
+Check bot's authentication token to log in as a bot. Works only when getAuthState returns authStateWaitPhoneNumber. Can be used instead of setAuthPhoneNumber and checkAuthCode to log in. Returns authStateOk on success
 
 ### Params:
 

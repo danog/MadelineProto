@@ -1,6 +1,6 @@
 ---
 title: setAuthPhoneNumber
-description: Sets user's phone number and sends authentication code to the user. Works only when authGetState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
+description: Sets user's phone number and sends authentication code to the user. Works only when getAuthState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
 ---
 ## Method: setAuthPhoneNumber  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sets user's phone number and sends authentication code to the user.
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sets user's phone number and sends authentication code to the user. Works only when authGetState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
+Sets user's phone number and sends authentication code to the user. Works only when getAuthState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
 
 ### Params:
 

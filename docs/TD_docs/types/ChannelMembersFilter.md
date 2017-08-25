@@ -11,13 +11,17 @@ Specifies kind of chat users to return in getChannelMembers
 
 ### Possible values (constructors):
 
-[channelMembersRecent](../constructors/channelMembersRecent.md)  
+[channelMembersFilterRecent](../constructors/channelMembersFilterRecent.md)  
 
-[channelMembersAdministrators](../constructors/channelMembersAdministrators.md)  
+[channelMembersFilterAdministrators](../constructors/channelMembersFilterAdministrators.md)  
 
-[channelMembersKicked](../constructors/channelMembersKicked.md)  
+[channelMembersFilterSearch](../constructors/channelMembersFilterSearch.md)  
 
-[channelMembersBots](../constructors/channelMembersBots.md)  
+[channelMembersFilterRestricted](../constructors/channelMembersFilterRestricted.md)  
+
+[channelMembersFilterBanned](../constructors/channelMembersFilterBanned.md)  
+
+[channelMembersFilterBots](../constructors/channelMembersFilterBots.md)  
 
 
 

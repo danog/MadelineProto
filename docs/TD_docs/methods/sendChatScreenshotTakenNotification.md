@@ -1,6 +1,6 @@
 ---
 title: sendChatScreenshotTakenNotification
-description: Sends notification about screenshot taken in a chat. Works only in secret chats
+description: Sends notification about screenshot taken in a chat. Works only in private and secret chats
 ---
 ## Method: sendChatScreenshotTakenNotification  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sends notification about screenshot taken in a chat. Works only in 
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sends notification about screenshot taken in a chat. Works only in secret chats
+Sends notification about screenshot taken in a chat. Works only in private and secret chats
 
 ### Params:
 

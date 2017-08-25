@@ -11,9 +11,9 @@ Represents payload of a callback query
 
 ### Possible values (constructors):
 
-[callbackQueryData](../constructors/callbackQueryData.md)  
+[callbackQueryPayloadData](../constructors/callbackQueryPayloadData.md)  
 
-[callbackQueryGame](../constructors/callbackQueryGame.md)  
+[callbackQueryPayloadGame](../constructors/callbackQueryPayloadGame.md)  
 
 
 
