@@ -4,11 +4,7 @@ description: get_dialogs parameters, return type and example
 ---
 ## Method: get_dialogs  
 
-
-### Parameters:
-
-| Name     |    Type       |
-|----------|---------------|
+Gets full list of dialogs
 
 ### Return type: Array of [Peer objects](API_docs/types/Peer.md)
 

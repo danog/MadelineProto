@@ -154,6 +154,9 @@ Use `bot_login` to login as a bot, see [here for the parameters and the result](
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
 
 
+Use `logout` to logout, see [here for the parameters and the result](https://daniil.it/MadelineProto/logout.html).  
+
+
 Use `get_pwr_chat` to get chat info, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_pwr_chat.html).  
 You can also use `get_info` to get chat info, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_info.html)
 You can also use `get_full_info` to get chat info, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_full_info.html).  
