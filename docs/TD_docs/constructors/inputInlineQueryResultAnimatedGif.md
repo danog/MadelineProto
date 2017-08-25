@@ -27,31 +27,3 @@ Represents link to an animated gif
 ### Type: [InputInlineQueryResult](../types/InputInlineQueryResult.md)
 
 
-### Example:
-
-```
-$inputInlineQueryResultAnimatedGif = ['_' => 'inputInlineQueryResultAnimatedGif', 'id' => 'string', 'title' => 'string', 'thumb_url' => 'string', 'gif_url' => 'string', 'gif_width' => int, 'gif_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputInlineQueryResultAnimatedGif", "id": "string", "title": "string", "thumb_url": "string", "gif_url": "string", "gif_width": int, "gif_height": int, "reply_markup": ReplyMarkup, "input_message_content": InputMessageContent}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputInlineQueryResultAnimatedGif={_='inputInlineQueryResultAnimatedGif', id='string', title='string', thumb_url='string', gif_url='string', gif_width=int, gif_height=int, reply_markup=ReplyMarkup, input_message_content=InputMessageContent}
-
-```
-
-
-
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-

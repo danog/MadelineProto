@@ -19,25 +19,3 @@ Return kicked from the channel
 ### Type: [ChannelMembersFilter](../types/ChannelMembersFilter.md)
 
 
-### Example:
-
-```
-$channelMembersKicked = ['_' => 'channelMembersKicked'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "channelMembersKicked"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-channelMembersKicked={_='channelMembersKicked'}
-
-```
-
-

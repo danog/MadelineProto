@@ -20,25 +20,3 @@ Token for simple push
 ### Type: [DeviceToken](../types/DeviceToken.md)
 
 
-### Example:
-
-```
-$simplePushDeviceToken = ['_' => 'simplePushDeviceToken', 'token' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "simplePushDeviceToken", "token": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-simplePushDeviceToken={_='simplePushDeviceToken', token='string'}
-
-```
-
-

@@ -23,25 +23,3 @@ Voice message
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessageVoice = ['_' => 'inputMessageVoice', 'voice' => InputFile, 'duration' => int, 'waveform' => 'bytes', 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessageVoice", "voice": InputFile, "duration": int, "waveform": "bytes", "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessageVoice={_='inputMessageVoice', voice=InputFile, duration=int, waveform='bytes', caption='string'}
-
-```
-
-

@@ -21,25 +21,3 @@ Represents list of sticker sets
 ### Type: [StickerSets](../types/StickerSets.md)
 
 
-### Example:
-
-```
-$stickerSets = ['_' => 'stickerSets', 'total_count' => int, 'sets' => [stickerSetInfo]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "stickerSets", "total_count": int, "sets": [stickerSetInfo]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-stickerSets={_='stickerSets', total_count=int, sets={stickerSetInfo}}
-
-```
-
-

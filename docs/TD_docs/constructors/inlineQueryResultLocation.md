@@ -25,25 +25,3 @@ Represents a point on the map
 ### Type: [InlineQueryResult](../types/InlineQueryResult.md)
 
 
-### Example:
-
-```
-$inlineQueryResultLocation = ['_' => 'inlineQueryResultLocation', 'id' => 'string', 'location' => location, 'title' => 'string', 'thumb_url' => 'string', 'thumb_width' => int, 'thumb_height' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inlineQueryResultLocation", "id": "string", "location": location, "title": "string", "thumb_url": "string", "thumb_width": int, "thumb_height": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inlineQueryResultLocation={_='inlineQueryResultLocation', id='string', location=location, title='string', thumb_url='string', thumb_width=int, thumb_height=int}
-
-```
-
-

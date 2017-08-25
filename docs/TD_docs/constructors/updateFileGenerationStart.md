@@ -23,25 +23,3 @@ File generation process need to be started by the client
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateFileGenerationStart = ['_' => 'updateFileGenerationStart', 'generation_id' => long, 'original_path' => 'string', 'destination_path' => 'string', 'conversion' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateFileGenerationStart", "generation_id": long, "original_path": "string", "destination_path": "string", "conversion": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateFileGenerationStart={_='updateFileGenerationStart', generation_id=long, original_path='string', destination_path='string', conversion='string'}
-
-```
-
-

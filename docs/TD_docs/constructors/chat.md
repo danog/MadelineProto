@@ -31,25 +31,3 @@ Chat (private chat or group chat or channel chat)
 ### Type: [Chat](../types/Chat.md)
 
 
-### Example:
-
-```
-$chat = ['_' => 'chat', 'id' => long, 'title' => 'string', 'photo' => chatPhoto, 'top_message' => message, 'order' => long, 'unread_count' => int, 'last_read_inbox_message_id' => long, 'last_read_outbox_message_id' => long, 'notification_settings' => notificationSettings, 'reply_markup_message_id' => long, 'draft_message' => draftMessage, 'type' => ChatInfo];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chat", "id": long, "title": "string", "photo": chatPhoto, "top_message": message, "order": long, "unread_count": int, "last_read_inbox_message_id": long, "last_read_outbox_message_id": long, "notification_settings": notificationSettings, "reply_markup_message_id": long, "draft_message": draftMessage, "type": ChatInfo}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chat={_='chat', id=long, title='string', photo=chatPhoto, top_message=message, order=long, unread_count=int, last_read_inbox_message_id=long, last_read_outbox_message_id=long, notification_settings=notificationSettings, reply_markup_message_id=long, draft_message=draftMessage, type=ChatInfo}
-
-```
-
-

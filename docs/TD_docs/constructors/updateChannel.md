@@ -20,25 +20,3 @@ Some data about a channel has been changed
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateChannel = ['_' => 'updateChannel', 'channel' => channel];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateChannel", "channel": channel}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateChannel={_='updateChannel', channel=channel}
-
-```
-
-

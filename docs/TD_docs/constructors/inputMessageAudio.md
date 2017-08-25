@@ -25,25 +25,3 @@ Audio message
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessageAudio = ['_' => 'inputMessageAudio', 'audio' => InputFile, 'album_cover_thumb' => InputThumb, 'duration' => int, 'title' => 'string', 'performer' => 'string', 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessageAudio", "audio": InputFile, "album_cover_thumb": InputThumb, "duration": int, "title": "string", "performer": "string", "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessageAudio={_='inputMessageAudio', audio=InputFile, album_cover_thumb=InputThumb, duration=int, title='string', performer='string', caption='string'}
-
-```
-
-

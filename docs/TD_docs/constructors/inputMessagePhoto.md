@@ -25,25 +25,3 @@ Photo message
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessagePhoto = ['_' => 'inputMessagePhoto', 'photo' => InputFile, 'thumb' => InputThumb, 'added_sticker_file_ids' => [int], 'width' => int, 'height' => int, 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessagePhoto", "photo": InputFile, "thumb": InputThumb, "added_sticker_file_ids": [int], "width": int, "height": int, "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessagePhoto={_='inputMessagePhoto', photo=InputFile, thumb=InputThumb, added_sticker_file_ids={int}, width=int, height=int, caption='string'}
-
-```
-
-

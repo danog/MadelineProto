@@ -21,25 +21,3 @@ User blocked/unblocked
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateUserBlocked = ['_' => 'updateUserBlocked', 'user_id' => int, 'is_blocked' => Bool];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateUserBlocked", "user_id": int, "is_blocked": Bool}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateUserBlocked={_='updateUserBlocked', user_id=int, is_blocked=Bool}
-
-```
-
-

@@ -21,25 +21,3 @@ Chat draft has changed. Be aware that the update may come in the currently open 
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateChatDraftMessage = ['_' => 'updateChatDraftMessage', 'chat_id' => long, 'draft_message' => draftMessage];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateChatDraftMessage", "chat_id": long, "draft_message": draftMessage}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateChatDraftMessage={_='updateChatDraftMessage', chat_id=long, draft_message=draftMessage}
-
-```
-
-

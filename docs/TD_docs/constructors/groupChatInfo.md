@@ -20,25 +20,3 @@ Chat with zero or more other users
 ### Type: [ChatInfo](../types/ChatInfo.md)
 
 
-### Example:
-
-```
-$groupChatInfo = ['_' => 'groupChatInfo', 'group' => group];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "groupChatInfo", "group": group}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-groupChatInfo={_='groupChatInfo', group=group}
-
-```
-
-

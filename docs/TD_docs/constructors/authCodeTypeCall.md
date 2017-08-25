@@ -20,25 +20,3 @@ Code is delievered by voice call to the specified phone number
 ### Type: [AuthCodeType](../types/AuthCodeType.md)
 
 
-### Example:
-
-```
-$authCodeTypeCall = ['_' => 'authCodeTypeCall', 'length' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "authCodeTypeCall", "length": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-authCodeTypeCall={_='authCodeTypeCall', length=int}
-
-```
-
-

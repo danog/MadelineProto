@@ -124,6 +124,9 @@ description: constructors and methods of type '.$type.'
 
 ';
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
+
+            if (!isset($this->settings['td'])) {
+
             if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
                 $header .= 'The following syntaxes can also be used:
 
@@ -177,6 +180,7 @@ $result = $'.$type.'->click();
 
 ';
             }
+            }
             $constructors = '### Possible values (constructors):
 
 '.$constructors.'
@@ -187,6 +191,7 @@ $result = $'.$type.'->click();
 '.$methods.'
 
 ';
+            if (!isset($this->settings['td'])) {
             if (in_array($type, ['PhoneCall'])) {
                 $methods = '';
                 $constructors = '';
@@ -368,7 +373,7 @@ Note: when modifying this property, *never* overwrite the previous values. Alway
 After modifying it, you must always parse the new configuration with a call to `parseConfig`.
 
 ';
-            }
+            }}
             if (file_exists('types/'.$type.'.md')) {
                 \danog\MadelineProto\Logger::log([$type]);
             }

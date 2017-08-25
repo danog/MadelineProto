@@ -20,25 +20,3 @@ File is downloaded/uploaded
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateFile = ['_' => 'updateFile', 'file' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateFile", "file": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateFile={_='updateFile', file=file}
-
-```
-
-

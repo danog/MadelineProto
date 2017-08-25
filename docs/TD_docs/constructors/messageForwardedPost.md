@@ -23,25 +23,3 @@ Message is orifinally a channel post
 ### Type: [MessageForwardInfo](../types/MessageForwardInfo.md)
 
 
-### Example:
-
-```
-$messageForwardedPost = ['_' => 'messageForwardedPost', 'chat_id' => long, 'sender_user_id' => int, 'date' => int, 'message_id' => long];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageForwardedPost", "chat_id": long, "sender_user_id": int, "date": int, "message_id": long}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageForwardedPost={_='messageForwardedPost', chat_id=long, sender_user_id=int, date=int, message_id=long}
-
-```
-
-

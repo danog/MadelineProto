@@ -23,25 +23,3 @@ TDLib needs user authentication code to finish authorization
 ### Type: [AuthState](../types/AuthState.md)
 
 
-### Example:
-
-```
-$authStateWaitCode = ['_' => 'authStateWaitCode', 'is_registered' => Bool, 'code_type' => AuthCodeType, 'next_code_type' => AuthCodeType, 'timeout' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "authStateWaitCode", "is_registered": Bool, "code_type": AuthCodeType, "next_code_type": AuthCodeType, "timeout": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-authStateWaitCode={_='authStateWaitCode', is_registered=Bool, code_type=AuthCodeType, next_code_type=AuthCodeType, timeout=int}
-
-```
-
-

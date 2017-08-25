@@ -21,25 +21,3 @@ New group chat created
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageGroupChatCreate = ['_' => 'messageGroupChatCreate', 'title' => 'string', 'members' => [user]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageGroupChatCreate", "title": "string", "members": [user]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageGroupChatCreate={_='messageGroupChatCreate', title='string', members={user}}
-
-```
-
-

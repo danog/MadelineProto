@@ -25,25 +25,3 @@ Describes animation file. Animation should be encoded in gif or mp4 format
 ### Type: [Animation](../types/Animation.md)
 
 
-### Example:
-
-```
-$animation = ['_' => 'animation', 'width' => int, 'height' => int, 'file_name' => 'string', 'mime_type' => 'string', 'thumb' => photoSize, 'animation' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "animation", "width": int, "height": int, "file_name": "string", "mime_type": "string", "thumb": photoSize, "animation": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-animation={_='animation', width=int, height=int, file_name='string', mime_type='string', thumb=photoSize, animation=file}
-
-```
-
-

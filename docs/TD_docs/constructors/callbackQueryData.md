@@ -20,25 +20,3 @@ Payload from a general callback button
 ### Type: [CallbackQueryPayload](../types/CallbackQueryPayload.md)
 
 
-### Example:
-
-```
-$callbackQueryData = ['_' => 'callbackQueryData', 'data' => 'bytes'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "callbackQueryData", "data": "bytes"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-callbackQueryData={_='callbackQueryData', data='bytes'}
-
-```
-
-

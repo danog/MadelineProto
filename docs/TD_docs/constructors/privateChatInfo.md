@@ -20,25 +20,3 @@ Ordinary chat with one user
 ### Type: [ChatInfo](../types/ChatInfo.md)
 
 
-### Example:
-
-```
-$privateChatInfo = ['_' => 'privateChatInfo', 'user' => user];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "privateChatInfo", "user": user}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-privateChatInfo={_='privateChatInfo', user=user}
-
-```
-
-

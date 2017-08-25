@@ -23,25 +23,3 @@ Message fails to send. Be aware that some being sent messages can be irrecoverab
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateMessageSendFailed = ['_' => 'updateMessageSendFailed', 'chat_id' => long, 'message_id' => long, 'error_code' => int, 'error_message' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateMessageSendFailed", "chat_id": long, "message_id": long, "error_code": int, "error_message": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateMessageSendFailed={_='updateMessageSendFailed', chat_id=long, message_id=long, error_code=int, error_message='string'}
-
-```
-
-

@@ -19,25 +19,3 @@ User is a member of the chat, but have no any additional privileges
 ### Type: [ChatMemberStatus](../types/ChatMemberStatus.md)
 
 
-### Example:
-
-```
-$chatMemberStatusMember = ['_' => 'chatMemberStatusMember'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chatMemberStatusMember"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chatMemberStatusMember={_='chatMemberStatusMember'}
-
-```
-
-

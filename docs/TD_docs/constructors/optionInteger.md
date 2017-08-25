@@ -20,25 +20,3 @@ Integer option
 ### Type: [OptionValue](../types/OptionValue.md)
 
 
-### Example:
-
-```
-$optionInteger = ['_' => 'optionInteger', 'value' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "optionInteger", "value": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-optionInteger={_='optionInteger', value=int}
-
-```
-
-

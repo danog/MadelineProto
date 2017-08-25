@@ -21,25 +21,3 @@ Contains list of messages
 ### Type: [Messages](../types/Messages.md)
 
 
-### Example:
-
-```
-$messages = ['_' => 'messages', 'total_count' => int, 'messages' => [message]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messages", "total_count": int, "messages": [message]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messages={_='messages', total_count=int, messages={message}}
-
-```
-
-

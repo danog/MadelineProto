@@ -18,25 +18,3 @@ description: test_vectorStringObject attributes, type and example
 ### Type: [test\_VectorStringObject](../types/test_VectorStringObject.md)
 
 
-### Example:
-
-```
-$test_vectorStringObject = ['_' => 'test.vectorStringObject', 'value' => [test_String]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "test.vectorStringObject", "value": [test_String]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-test_vectorStringObject={_='test.vectorStringObject', value={test_String}}
-
-```
-
-

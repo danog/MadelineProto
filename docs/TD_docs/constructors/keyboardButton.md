@@ -21,25 +21,3 @@ Represents one button of the bot keyboard
 ### Type: [KeyboardButton](../types/KeyboardButton.md)
 
 
-### Example:
-
-```
-$keyboardButton = ['_' => 'keyboardButton', 'text' => 'string', 'type' => KeyboardButtonType];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "keyboardButton", "text": "string", "type": KeyboardButtonType}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-keyboardButton={_='keyboardButton', text='string', type=KeyboardButtonType}
-
-```
-
-

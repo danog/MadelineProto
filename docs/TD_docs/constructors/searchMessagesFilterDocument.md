@@ -19,25 +19,3 @@ Return only document messages
 ### Type: [SearchMessagesFilter](../types/SearchMessagesFilter.md)
 
 
-### Example:
-
-```
-$searchMessagesFilterDocument = ['_' => 'searchMessagesFilterDocument'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "searchMessagesFilterDocument"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-searchMessagesFilterDocument={_='searchMessagesFilterDocument'}
-
-```
-
-

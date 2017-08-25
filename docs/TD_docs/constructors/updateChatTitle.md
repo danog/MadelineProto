@@ -21,25 +21,3 @@ Title of chat was changed
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateChatTitle = ['_' => 'updateChatTitle', 'chat_id' => long, 'title' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateChatTitle", "chat_id": long, "title": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateChatTitle={_='updateChatTitle', chat_id=long, title='string'}
-
-```
-
-

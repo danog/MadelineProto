@@ -25,25 +25,3 @@ Bots only. New incoming callback query
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateNewCallbackQuery = ['_' => 'updateNewCallbackQuery', 'id' => long, 'sender_user_id' => int, 'chat_id' => long, 'message_id' => long, 'chat_instance' => long, 'payload' => CallbackQueryPayload];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateNewCallbackQuery", "id": long, "sender_user_id": int, "chat_id": long, "message_id": long, "chat_instance": long, "payload": CallbackQueryPayload}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateNewCallbackQuery={_='updateNewCallbackQuery', id=long, sender_user_id=int, chat_id=long, message_id=long, chat_instance=long, payload=CallbackQueryPayload}
-
-```
-
-

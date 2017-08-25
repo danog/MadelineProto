@@ -24,25 +24,3 @@ Animation message
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessageAnimation = ['_' => 'inputMessageAnimation', 'animation' => InputFile, 'thumb' => InputThumb, 'width' => int, 'height' => int, 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessageAnimation", "animation": InputFile, "thumb": InputThumb, "width": int, "height": int, "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessageAnimation={_='inputMessageAnimation', animation=InputFile, thumb=InputThumb, width=int, height=int, caption='string'}
-
-```
-
-

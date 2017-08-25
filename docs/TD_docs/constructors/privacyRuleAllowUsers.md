@@ -20,25 +20,3 @@ Rule to allow specified users
 ### Type: [PrivacyRule](../types/PrivacyRule.md)
 
 
-### Example:
-
-```
-$privacyRuleAllowUsers = ['_' => 'privacyRuleAllowUsers', 'user_ids' => [int]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "privacyRuleAllowUsers", "user_ids": [int]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-privacyRuleAllowUsers={_='privacyRuleAllowUsers', user_ids={int}}
-
-```
-
-

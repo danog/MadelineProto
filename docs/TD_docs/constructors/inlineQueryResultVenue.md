@@ -24,25 +24,3 @@ Represents information about a venue
 ### Type: [InlineQueryResult](../types/InlineQueryResult.md)
 
 
-### Example:
-
-```
-$inlineQueryResultVenue = ['_' => 'inlineQueryResultVenue', 'id' => 'string', 'venue' => venue, 'thumb_url' => 'string', 'thumb_width' => int, 'thumb_height' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inlineQueryResultVenue", "id": "string", "venue": venue, "thumb_url": "string", "thumb_width": int, "thumb_height": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inlineQueryResultVenue={_='inlineQueryResultVenue', id='string', venue=venue, thumb_url='string', thumb_width=int, thumb_height=int}
-
-```
-
-

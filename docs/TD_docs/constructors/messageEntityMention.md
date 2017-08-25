@@ -21,25 +21,3 @@ Mention of the user by his username
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityMention = ['_' => 'messageEntityMention', 'offset' => int, 'length' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityMention", "offset": int, "length": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityMention={_='messageEntityMention', offset=int, length=int}
-
-```
-
-

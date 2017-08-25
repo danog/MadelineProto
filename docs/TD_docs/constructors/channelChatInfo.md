@@ -20,25 +20,3 @@ Chat with unlimited number of members
 ### Type: [ChatInfo](../types/ChatInfo.md)
 
 
-### Example:
-
-```
-$channelChatInfo = ['_' => 'channelChatInfo', 'channel' => channel];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "channelChatInfo", "channel": channel}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-channelChatInfo={_='channelChatInfo', channel=channel}
-
-```
-
-

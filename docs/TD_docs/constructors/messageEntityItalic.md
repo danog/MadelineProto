@@ -21,25 +21,3 @@ Italic text
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityItalic = ['_' => 'messageEntityItalic', 'offset' => int, 'length' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityItalic", "offset": int, "length": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityItalic={_='messageEntityItalic', offset=int, length=int}
-
-```
-
-

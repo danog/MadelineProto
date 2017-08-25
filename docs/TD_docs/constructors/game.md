@@ -27,25 +27,3 @@ Describes a game
 ### Type: [Game](../types/Game.md)
 
 
-### Example:
-
-```
-$game = ['_' => 'game', 'id' => long, 'short_name' => 'string', 'title' => 'string', 'text' => 'string', 'text_entities' => [MessageEntity], 'description' => 'string', 'photo' => photo, 'animation' => animation];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "game", "id": long, "short_name": "string", "title": "string", "text": "string", "text_entities": [MessageEntity], "description": "string", "photo": photo, "animation": animation}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-game={_='game', id=long, short_name='string', title='string', text='string', text_entities={MessageEntity}, description='string', photo=photo, animation=animation}
-
-```
-
-

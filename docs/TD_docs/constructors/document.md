@@ -23,25 +23,3 @@ Describes document of any type
 ### Type: [Document](../types/Document.md)
 
 
-### Example:
-
-```
-$document = ['_' => 'document', 'file_name' => 'string', 'mime_type' => 'string', 'thumb' => photoSize, 'document' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "document", "file_name": "string", "mime_type": "string", "thumb": photoSize, "document": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-document={_='document', file_name='string', mime_type='string', thumb=photoSize, document=file}
-
-```
-
-

@@ -26,25 +26,3 @@ Describes audio file. Audio is usually in mp3 format
 ### Type: [Audio](../types/Audio.md)
 
 
-### Example:
-
-```
-$audio = ['_' => 'audio', 'duration' => int, 'title' => 'string', 'performer' => 'string', 'file_name' => 'string', 'mime_type' => 'string', 'album_cover_thumb' => photoSize, 'audio' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "audio", "duration": int, "title": "string", "performer": "string", "file_name": "string", "mime_type": "string", "album_cover_thumb": photoSize, "audio": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-audio={_='audio', duration=int, title='string', performer='string', file_name='string', mime_type='string', album_cover_thumb=photoSize, audio=file}
-
-```
-
-

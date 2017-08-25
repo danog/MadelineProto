@@ -21,25 +21,3 @@ Default chat reply markup has changed. It can happen because new message with re
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateChatReplyMarkup = ['_' => 'updateChatReplyMarkup', 'chat_id' => long, 'reply_markup_message_id' => long];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateChatReplyMarkup", "chat_id": long, "reply_markup_message_id": long}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateChatReplyMarkup={_='updateChatReplyMarkup', chat_id=long, reply_markup_message_id=long}
-
-```
-
-

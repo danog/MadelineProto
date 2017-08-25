@@ -22,25 +22,3 @@ Text description showed instead of the url
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityTextUrl = ['_' => 'messageEntityTextUrl', 'offset' => int, 'length' => int, 'url' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityTextUrl", "offset": int, "length": int, "url": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityTextUrl={_='messageEntityTextUrl', offset=int, length=int, url='string'}
-
-```
-
-

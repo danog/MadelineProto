@@ -21,25 +21,3 @@ Url beginning with http
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityUrl = ['_' => 'messageEntityUrl', 'offset' => int, 'length' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityUrl", "offset": int, "length": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityUrl={_='messageEntityUrl', offset=int, length=int}
-
-```
-
-

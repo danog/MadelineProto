@@ -19,25 +19,3 @@ Screenshot of messages in secret chat was taken
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageScreenshotTaken = ['_' => 'messageScreenshotTaken'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageScreenshotTaken"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageScreenshotTaken={_='messageScreenshotTaken'}
-
-```
-
-

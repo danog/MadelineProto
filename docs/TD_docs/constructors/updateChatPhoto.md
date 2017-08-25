@@ -21,25 +21,3 @@ Chat photo was changed
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateChatPhoto = ['_' => 'updateChatPhoto', 'chat_id' => long, 'photo' => chatPhoto];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateChatPhoto", "chat_id": long, "photo": chatPhoto}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateChatPhoto={_='updateChatPhoto', chat_id=long, photo=chatPhoto}
-
-```
-
-

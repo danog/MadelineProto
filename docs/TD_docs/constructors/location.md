@@ -21,25 +21,3 @@ Describes location on Earth
 ### Type: [Location](../types/Location.md)
 
 
-### Example:
-
-```
-$location = ['_' => 'location', 'latitude' => double, 'longitude' => double];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "location", "latitude": double, "longitude": double}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-location={_='location', latitude=double, longitude=double}
-
-```
-
-

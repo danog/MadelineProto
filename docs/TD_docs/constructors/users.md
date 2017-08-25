@@ -21,25 +21,3 @@ Contains list of users
 ### Type: [Users](../types/Users.md)
 
 
-### Example:
-
-```
-$users = ['_' => 'users', 'total_count' => int, 'users' => [user]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "users", "total_count": int, "users": [user]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-users={_='users', total_count=int, users={user}}
-
-```
-
-

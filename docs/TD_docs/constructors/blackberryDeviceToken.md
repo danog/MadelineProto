@@ -20,25 +20,3 @@ Token for Blackberry Push Service
 ### Type: [DeviceToken](../types/DeviceToken.md)
 
 
-### Example:
-
-```
-$blackberryDeviceToken = ['_' => 'blackberryDeviceToken', 'token' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "blackberryDeviceToken", "token": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-blackberryDeviceToken={_='blackberryDeviceToken', token='string'}
-
-```
-
-

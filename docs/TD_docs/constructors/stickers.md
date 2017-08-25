@@ -20,25 +20,3 @@ Represents list of stickers
 ### Type: [Stickers](../types/Stickers.md)
 
 
-### Example:
-
-```
-$stickers = ['_' => 'stickers', 'stickers' => [sticker]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "stickers", "stickers": [sticker]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-stickers={_='stickers', stickers={sticker}}
-
-```
-
-

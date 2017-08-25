@@ -20,25 +20,3 @@ Token for APNS
 ### Type: [DeviceToken](../types/DeviceToken.md)
 
 
-### Example:
-
-```
-$apnsDeviceToken = ['_' => 'apnsDeviceToken', 'token' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "apnsDeviceToken", "token": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-apnsDeviceToken={_='apnsDeviceToken', token='string'}
-
-```
-
-

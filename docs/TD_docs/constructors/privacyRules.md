@@ -20,25 +20,3 @@ List of privacy rules. Rules are matched in the specified order. First matched r
 ### Type: [PrivacyRules](../types/PrivacyRules.md)
 
 
-### Example:
-
-```
-$privacyRules = ['_' => 'privacyRules', 'rules' => [PrivacyRule]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "privacyRules", "rules": [PrivacyRule]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-privacyRules={_='privacyRules', rules={PrivacyRule}}
-
-```
-
-

@@ -20,25 +20,3 @@ Message with a game
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageGame = ['_' => 'messageGame', 'game' => game];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageGame", "game": game}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageGame={_='messageGame', game=game}
-
-```
-
-

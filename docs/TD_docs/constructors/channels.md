@@ -20,25 +20,3 @@ Contains list of channel identifiers
 ### Type: [Channels](../types/Channels.md)
 
 
-### Example:
-
-```
-$channels = ['_' => 'channels', 'channel_ids' => [int]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "channels", "channel_ids": [int]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-channels={_='channels', channel_ids={int}}
-
-```
-
-

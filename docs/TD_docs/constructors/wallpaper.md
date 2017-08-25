@@ -21,25 +21,3 @@ Contains information about one wallpaper
 ### Type: [Wallpaper](../types/Wallpaper.md)
 
 
-### Example:
-
-```
-$wallpaper = ['_' => 'wallpaper', 'sizes' => [photoSize], 'color' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "wallpaper", "sizes": [photoSize], "color": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-wallpaper={_='wallpaper', sizes={photoSize}, color=int}
-
-```
-
-

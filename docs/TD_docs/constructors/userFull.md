@@ -24,25 +24,3 @@ Gives full information about a user (except full list of profile photos)
 ### Type: [UserFull](../types/UserFull.md)
 
 
-### Example:
-
-```
-$userFull = ['_' => 'userFull', 'user' => user, 'is_blocked' => Bool, 'about' => 'string', 'common_chat_count' => int, 'bot_info' => botInfo];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "userFull", "user": user, "is_blocked": Bool, "about": "string", "common_chat_count": int, "bot_info": botInfo}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-userFull={_='userFull', user=user, is_blocked=Bool, about='string', common_chat_count=int, bot_info=botInfo}
-
-```
-
-

@@ -28,25 +28,3 @@ Represents a channel with zero or more subscribers. There two different kinds of
 ### Type: [Channel](../types/Channel.md)
 
 
-### Example:
-
-```
-$channel = ['_' => 'channel', 'id' => int, 'username' => 'string', 'date' => int, 'status' => ChatMemberStatus, 'anyone_can_invite' => Bool, 'sign_messages' => Bool, 'is_supergroup' => Bool, 'is_verified' => Bool, 'restriction_reason' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "channel", "id": int, "username": "string", "date": int, "status": ChatMemberStatus, "anyone_can_invite": Bool, "sign_messages": Bool, "is_supergroup": Bool, "is_verified": Bool, "restriction_reason": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-channel={_='channel', id=int, username='string', date=int, status=ChatMemberStatus, anyone_can_invite=Bool, sign_messages=Bool, is_supergroup=Bool, is_verified=Bool, restriction_reason='string'}
-
-```
-
-

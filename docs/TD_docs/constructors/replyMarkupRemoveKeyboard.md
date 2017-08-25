@@ -20,25 +20,3 @@ Instruct clients to remove keyboard after receiving this message. This kind of k
 ### Type: [ReplyMarkup](../types/ReplyMarkup.md)
 
 
-### Example:
-
-```
-$replyMarkupRemoveKeyboard = ['_' => 'replyMarkupRemoveKeyboard', 'personal' => Bool];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "replyMarkupRemoveKeyboard", "personal": Bool}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-replyMarkupRemoveKeyboard={_='replyMarkupRemoveKeyboard', personal=Bool}
-
-```
-
-

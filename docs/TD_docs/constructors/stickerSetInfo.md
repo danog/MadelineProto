@@ -29,25 +29,3 @@ Represents short information about sticker set
 ### Type: [StickerSetInfo](../types/StickerSetInfo.md)
 
 
-### Example:
-
-```
-$stickerSetInfo = ['_' => 'stickerSetInfo', 'id' => long, 'title' => 'string', 'name' => 'string', 'is_installed' => Bool, 'is_archived' => Bool, 'is_official' => Bool, 'is_masks' => Bool, 'is_viewed' => Bool, 'size' => int, 'covers' => [sticker]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "stickerSetInfo", "id": long, "title": "string", "name": "string", "is_installed": Bool, "is_archived": Bool, "is_official": Bool, "is_masks": Bool, "is_viewed": Bool, "size": int, "covers": [sticker]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-stickerSetInfo={_='stickerSetInfo', id=long, title='string', name='string', is_installed=Bool, is_archived=Bool, is_official=Bool, is_masks=Bool, is_viewed=Bool, size=int, covers={sticker}}
-
-```
-
-

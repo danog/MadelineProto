@@ -20,25 +20,3 @@ Some message was pinned
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messagePinMessage = ['_' => 'messagePinMessage', 'message_id' => long];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messagePinMessage", "message_id": long}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messagePinMessage={_='messagePinMessage', message_id=long}
-
-```
-
-

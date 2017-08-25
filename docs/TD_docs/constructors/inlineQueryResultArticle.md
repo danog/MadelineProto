@@ -27,25 +27,3 @@ Represents link to an article or web page
 ### Type: [InlineQueryResult](../types/InlineQueryResult.md)
 
 
-### Example:
-
-```
-$inlineQueryResultArticle = ['_' => 'inlineQueryResultArticle', 'id' => 'string', 'url' => 'string', 'hide_url' => Bool, 'title' => 'string', 'description' => 'string', 'thumb_url' => 'string', 'thumb_width' => int, 'thumb_height' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inlineQueryResultArticle", "id": "string", "url": "string", "hide_url": Bool, "title": "string", "description": "string", "thumb_url": "string", "thumb_width": int, "thumb_height": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inlineQueryResultArticle={_='inlineQueryResultArticle', id='string', url='string', hide_url=Bool, title='string', description='string', thumb_url='string', thumb_width=int, thumb_height=int}
-
-```
-
-

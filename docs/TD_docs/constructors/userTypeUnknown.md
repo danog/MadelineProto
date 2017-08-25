@@ -19,25 +19,3 @@ Currently there is no any information about the user except user_id. It can happ
 ### Type: [UserType](../types/UserType.md)
 
 
-### Example:
-
-```
-$userTypeUnknown = ['_' => 'userTypeUnknown'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "userTypeUnknown"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-userTypeUnknown={_='userTypeUnknown'}
-
-```
-
-

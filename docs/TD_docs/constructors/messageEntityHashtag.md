@@ -21,25 +21,3 @@ Hashtag beginning with #
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityHashtag = ['_' => 'messageEntityHashtag', 'offset' => int, 'length' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityHashtag", "offset": int, "length": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityHashtag={_='messageEntityHashtag', offset=int, length=int}
-
-```
-
-

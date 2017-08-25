@@ -21,25 +21,3 @@ List of installed sticker sets was updated
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateStickerSets = ['_' => 'updateStickerSets', 'is_masks' => Bool, 'sticker_set_ids' => [long]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateStickerSets", "is_masks": Bool, "sticker_set_ids": [long]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateStickerSets={_='updateStickerSets', is_masks=Bool, sticker_set_ids={long}}
-
-```
-
-

@@ -20,25 +20,3 @@ Chat members added
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageChatAddMembers = ['_' => 'messageChatAddMembers', 'members' => [user]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageChatAddMembers", "members": [user]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageChatAddMembers={_='messageChatAddMembers', members={user}}
-
-```
-
-

@@ -23,25 +23,3 @@ Represents a video cached on the telegram server
 ### Type: [InlineQueryResult](../types/InlineQueryResult.md)
 
 
-### Example:
-
-```
-$inlineQueryResultVideo = ['_' => 'inlineQueryResultVideo', 'id' => 'string', 'video' => video, 'title' => 'string', 'description' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inlineQueryResultVideo", "id": "string", "video": video, "title": "string", "description": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inlineQueryResultVideo={_='inlineQueryResultVideo', id='string', video=video, title='string', description='string'}
-
-```
-
-

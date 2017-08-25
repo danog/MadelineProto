@@ -19,25 +19,3 @@ User sends geolocation
 ### Type: [SendMessageAction](../types/SendMessageAction.md)
 
 
-### Example:
-
-```
-$sendMessageGeoLocationAction = ['_' => 'sendMessageGeoLocationAction'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "sendMessageGeoLocationAction"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-sendMessageGeoLocationAction={_='sendMessageGeoLocationAction'}
-
-```
-
-

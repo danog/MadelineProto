@@ -20,25 +20,3 @@ Contains list of chats
 ### Type: [Chats](../types/Chats.md)
 
 
-### Example:
-
-```
-$chats = ['_' => 'chats', 'chats' => [chat]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chats", "chats": [chat]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chats={_='chats', chats={chat}}
-
-```
-
-

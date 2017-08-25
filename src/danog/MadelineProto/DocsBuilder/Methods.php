@@ -164,6 +164,8 @@ description: '.$description.'
             $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$php_type.'.md)
 
 ';
+            $example = '';
+            if (!isset($this->settings['td'])) {
             $example = str_replace('[]', '', '### Example:
 
 
@@ -265,7 +267,7 @@ You can also use normal markdown, note that to create mentions you must use the 
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
-            }
+            }}
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
 

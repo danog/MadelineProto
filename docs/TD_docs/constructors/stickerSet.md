@@ -29,25 +29,3 @@ Represents sticker set
 ### Type: [StickerSet](../types/StickerSet.md)
 
 
-### Example:
-
-```
-$stickerSet = ['_' => 'stickerSet', 'id' => long, 'title' => 'string', 'name' => 'string', 'is_installed' => Bool, 'is_archived' => Bool, 'is_official' => Bool, 'is_masks' => Bool, 'is_viewed' => Bool, 'stickers' => [sticker], 'emojis' => [stickerEmojis]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "stickerSet", "id": long, "title": "string", "name": "string", "is_installed": Bool, "is_archived": Bool, "is_official": Bool, "is_masks": Bool, "is_viewed": Bool, "stickers": [sticker], "emojis": [stickerEmojis]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-stickerSet={_='stickerSet', id=long, title='string', name='string', is_installed=Bool, is_archived=Bool, is_official=Bool, is_masks=Bool, is_viewed=Bool, stickers={sticker}, emojis={stickerEmojis}}
-
-```
-
-

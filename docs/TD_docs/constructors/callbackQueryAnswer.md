@@ -22,25 +22,3 @@ Contains answer of the bot to the callback query
 ### Type: [CallbackQueryAnswer](../types/CallbackQueryAnswer.md)
 
 
-### Example:
-
-```
-$callbackQueryAnswer = ['_' => 'callbackQueryAnswer', 'text' => 'string', 'show_alert' => Bool, 'url' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "callbackQueryAnswer", "text": "string", "show_alert": Bool, "url": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-callbackQueryAnswer={_='callbackQueryAnswer', text='string', show_alert=Bool, url='string'}
-
-```
-
-

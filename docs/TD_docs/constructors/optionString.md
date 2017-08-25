@@ -20,25 +20,3 @@ String option
 ### Type: [OptionValue](../types/OptionValue.md)
 
 
-### Example:
-
-```
-$optionString = ['_' => 'optionString', 'value' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "optionString", "value": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-optionString={_='optionString', value='string'}
-
-```
-
-

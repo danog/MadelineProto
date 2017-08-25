@@ -19,25 +19,3 @@ Notification settings applied to all private chats
 ### Type: [NotificationSettingsScope](../types/NotificationSettingsScope.md)
 
 
-### Example:
-
-```
-$notificationSettingsForPrivateChats = ['_' => 'notificationSettingsForPrivateChats'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "notificationSettingsForPrivateChats"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-notificationSettingsForPrivateChats={_='notificationSettingsForPrivateChats'}
-
-```
-
-

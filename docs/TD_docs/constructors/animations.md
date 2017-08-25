@@ -20,25 +20,3 @@ Represents list of animations
 ### Type: [Animations](../types/Animations.md)
 
 
-### Example:
-
-```
-$animations = ['_' => 'animations', 'animations' => [animation]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "animations", "animations": [animation]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-animations={_='animations', animations={animation}}
-
-```
-
-

@@ -19,25 +19,3 @@ Rule to allow all user contacts
 ### Type: [PrivacyRule](../types/PrivacyRule.md)
 
 
-### Example:
-
-```
-$privacyRuleAllowContacts = ['_' => 'privacyRuleAllowContacts'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "privacyRuleAllowContacts"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-privacyRuleAllowContacts={_='privacyRuleAllowContacts'}
-
-```
-
-

@@ -20,25 +20,3 @@ Some data about a user has been changed
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateUser = ['_' => 'updateUser', 'user' => user];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateUser", "user": user}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateUser={_='updateUser', user=user}
-
-```
-
-

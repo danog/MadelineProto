@@ -22,25 +22,3 @@ Forwarded message
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessageForwarded = ['_' => 'inputMessageForwarded', 'from_chat_id' => long, 'message_id' => long, 'in_game_share' => Bool];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessageForwarded", "from_chat_id": long, "message_id": long, "in_game_share": Bool}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessageForwarded={_='inputMessageForwarded', from_chat_id=long, message_id=long, in_game_share=Bool}
-
-```
-
-

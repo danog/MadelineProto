@@ -22,25 +22,3 @@ Text message
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageText = ['_' => 'messageText', 'text' => 'string', 'entities' => [MessageEntity], 'web_page' => webPage];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageText", "text": "string", "entities": [MessageEntity], "web_page": webPage}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageText={_='messageText', text='string', entities={MessageEntity}, web_page=webPage}
-
-```
-
-

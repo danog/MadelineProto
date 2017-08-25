@@ -22,25 +22,3 @@ Text needs to be formatted as inside of pre and code HTML tags
 ### Type: [MessageEntity](../types/MessageEntity.md)
 
 
-### Example:
-
-```
-$messageEntityPreCode = ['_' => 'messageEntityPreCode', 'offset' => int, 'length' => int, 'language' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageEntityPreCode", "offset": int, "length": int, "language": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageEntityPreCode={_='messageEntityPreCode', offset=int, length=int, language='string'}
-
-```
-
-

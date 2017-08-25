@@ -20,25 +20,3 @@ Contains infotmation about period of inactivity, after which the account of curr
 ### Type: [AccountTtl](../types/AccountTtl.md)
 
 
-### Example:
-
-```
-$accountTtl = ['_' => 'accountTtl', 'days' => int];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "accountTtl", "days": int}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-accountTtl={_='accountTtl', days=int}
-
-```
-
-

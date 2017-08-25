@@ -21,25 +21,3 @@ Contains information about draft of a message
 ### Type: [DraftMessage](../types/DraftMessage.md)
 
 
-### Example:
-
-```
-$draftMessage = ['_' => 'draftMessage', 'reply_to_message_id' => long, 'input_message_text' => InputMessageContent];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "draftMessage", "reply_to_message_id": long, "input_message_text": InputMessageContent}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-draftMessage={_='draftMessage', reply_to_message_id=long, input_message_text=InputMessageContent}
-
-```
-
-
