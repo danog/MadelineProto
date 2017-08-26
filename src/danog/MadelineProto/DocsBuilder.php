@@ -124,10 +124,8 @@ description: constructors and methods of type '.$type.'
 
 ';
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
-
-            if (!isset($this->settings['td'])) {
-                if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-                    $header .= 'The following syntaxes can also be used:
+            if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+                $header .= 'The following syntaxes can also be used:
 
 ```
 $'.$type." = '@username'; // Username
@@ -145,9 +143,9 @@ A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUse
 
 
 ";
-                }
-                if (in_array($type, ['InputEncryptedChat'])) {
-                    $header .= 'The following syntax can also be used:
+            }
+            if (in_array($type, ['InputEncryptedChat'])) {
+                $header .= 'The following syntax can also be used:
 
 ```
 $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
@@ -155,9 +153,9 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 
 
 ';
-                }
-                if (in_array($type, ['KeyboardButton'])) {
-                    $header .= 'Clicking these buttons:
+            }
+            if (in_array($type, ['KeyboardButton'])) {
+                $header .= 'Clicking these buttons:
 
 To click these buttons simply run the `click` method:  
 
@@ -178,7 +176,6 @@ $result = $'.$type.'->click();
 
 
 ';
-                }
             }
             $constructors = '### Possible values (constructors):
 
@@ -190,11 +187,10 @@ $result = $'.$type.'->click();
 '.$methods.'
 
 ';
-            if (!isset($this->settings['td'])) {
-                if (in_array($type, ['PhoneCall'])) {
-                    $methods = '';
-                    $constructors = '';
-                    $header .= 'This is an object of type `\danog\MadelineProto\VoIP`.
+            if (in_array($type, ['PhoneCall'])) {
+                $methods = '';
+                $constructors = '';
+                $header .= 'This is an object of type `\danog\MadelineProto\VoIP`.
 
 It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
 
@@ -372,7 +368,6 @@ Note: when modifying this property, *never* overwrite the previous values. Alway
 After modifying it, you must always parse the new configuration with a call to `parseConfig`.
 
 ';
-                }
             }
             if (file_exists('types/'.$type.'.md')) {
                 \danog\MadelineProto\Logger::log([$type]);

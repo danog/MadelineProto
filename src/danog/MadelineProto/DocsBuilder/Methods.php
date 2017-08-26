@@ -164,9 +164,7 @@ description: '.$description.'
             $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$php_type.'.md)
 
 ';
-            $example = '';
-            if (!isset($this->settings['td'])) {
-                $example = str_replace('[]', '', '### Example:
+            $example = str_replace('[]', '', '### Example:
 
 
 ```
@@ -216,26 +214,26 @@ Or, if you\'re into Lua:
 ```
 
 ');
-                if ($hasreplymarkup) {
-                    $example .= '
+            if ($hasreplymarkup) {
+                $example .= '
 ## Usage of reply_markup
 
 You can provide bot API reply_markup objects here.  
 
 
 ';
-                }
-                if ($hasmessage) {
-                    $example .= '
+            }
+            if ($hasmessage) {
+                $example .= '
 ## Return value 
 
 If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\_', $type).'](../types/'.$php_type.'.md) will be returned instead.
 
 
 ';
-                }
-                if ($hasentities) {
-                    $example .= '
+            }
+            if ($hasentities) {
+                $example .= '
 ## Usage of parse_mode:
 
 Set parse_mode to html to enable HTML parsing of the message.  
@@ -267,7 +265,6 @@ You can also use normal markdown, note that to create mentions you must use the 
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
-                }
             }
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
@@ -291,27 +288,6 @@ description: List of methods
 # Methods  
 [Back to API documentation index](..)
 
-
-$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
-
-$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
-
-$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
-
-$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
-
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/complete_phone_login.html)($token);
-
-
-$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
-
-$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
-
-$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
-
-$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
-
-$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 
 '.implode('', $this->docs_methods));
