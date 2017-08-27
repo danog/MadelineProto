@@ -31,7 +31,7 @@ trait CallHandler
         if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
             $aargs['datacenter'] = $args['id']['dc_id'];
         }
-        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && isset(self::DISALLOWED_METHODS[$method])) {
+        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && array_key_exists($method, self::DISALLOWED_METHODS)) {
             if ($method === 'channels.getParticipants' && isset($args['filter']) && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
                 \danog\MadelineProto\Logger::log([self::DISALLOWED_METHODS[$method]], \danog\MadelineProto\Logger::FATAL_ERROR);
             } else {
