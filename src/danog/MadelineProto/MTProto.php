@@ -43,9 +43,9 @@ class MTProto
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
-/*
-    const V = 71;
-*/
+    /*
+        const V = 71;
+    */
     const V = 72;
 
     const NOT_LOGGED_IN = 0;
