@@ -22,7 +22,7 @@ class Lua
     public function ___construct($script, $MadelineProto)
     {
         if (!file_exists($script)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang["script_not_exist"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
         $this->MadelineProto->settings['updates']['handle_updates'] = true;

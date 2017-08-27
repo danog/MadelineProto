@@ -85,7 +85,7 @@ trait BotAPIFiles
     {
         $file_id = $this->rle_decode($this->base64url_decode($file_id));
         if ($file_id[strlen($file_id) - 1] !== chr(2)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang["last_byte_invalid"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['last_byte_invalid']);
         }
         $deserialized = $this->deserialize($file_id);
         $res = ['type' => str_replace('bot_', '', $deserialized['_'])];
@@ -157,7 +157,7 @@ trait BotAPIFiles
             return $res;
 
             default:
-            throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang["file_type_invalid"], $type));
+            throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['file_type_invalid'], $type));
         }
     }
 }
