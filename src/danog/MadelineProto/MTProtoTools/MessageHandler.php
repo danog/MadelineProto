@@ -31,7 +31,7 @@ trait MessageHandler
         if (!is_string($message_id)) {
             throw new \danog\MadelineProto\Exception("Specified message id isn't a string");
         }
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id] = [];
+        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
             $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
@@ -42,12 +42,12 @@ trait MessageHandler
             $message_key = substr(sha1($data2enc, true), -16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key']);
             $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($data2enc.$padding, $aes_key, $aes_iv);
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['seq_no'] = $seq_no;
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['seq_no'] = $seq_no;
         }
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.$message_id]['response'] = -1;
+        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
 
-        return 'a'.$message_id;
+        return $message_id;
     }
 
     /**
@@ -61,7 +61,7 @@ trait MessageHandler
         }
         $auth_key_id = substr($payload, 0, 8);
         if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-            $message_id = 'a'.substr($payload, 8, 8);
+            $message_id = substr($payload, 8, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
             $message_length = unpack('V', substr($payload, 16, 4))[1];
             $message_data = substr($payload, 20, $message_length);
@@ -82,7 +82,7 @@ trait MessageHandler
                 throw new \danog\MadelineProto\Exception('Session id mismatch.');
             }
 
-            $message_id = 'a'.substr($decrypted_data, 16, 8);
+            $message_id = substr($decrypted_data, 16, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
 
             $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];

@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL;
 
-class TLConstructor extends \Volatile
+class TLConstructor
 {
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;
@@ -51,7 +51,7 @@ class TLConstructor extends \Volatile
         foreach ($this->by_id as $id => $constructor) {
             if ($constructor['type'] === $type) {
                 $constructor['id'] = $id;
-                $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+                $constructor['params'] = $constructor['params'];
 
                 return $constructor;
             }
@@ -77,14 +77,14 @@ class TLConstructor extends \Volatile
             }
             $constructor = $this->by_id[$chosenid];
             $constructor['id'] = $chosenid;
-            $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }
         if (isset($this->by_predicate_and_layer[$predicate])) {
             $constructor = $this->by_id[$this->by_predicate_and_layer[$predicate]];
             $constructor['id'] = $this->by_predicate_and_layer[$predicate];
-            $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }
@@ -97,7 +97,7 @@ class TLConstructor extends \Volatile
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];
             $constructor['id'] = $id;
-            $constructor['params'] = $this->array_cast_recursive($constructor['params']);
+            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }
