@@ -181,6 +181,7 @@ trait Files
 
             return $res;
             case 'decryptedMessageMediaExternalDocument':
+            case 'document':
             $message_media = ['document' => $message_media];
             case 'messageMediaDocument':
             foreach ($message_media['document']['attributes'] as $attribute) {
@@ -232,7 +233,7 @@ trait Files
 
     public function download_to_file($message_media, $file, $cb = null)
     {
-        $file = str_replace('//', '/', $file);
+        $file = realpath($file);
         $message_media = $this->get_download_info($message_media);
         if (!file_exists($file)) {
             touch($file);
