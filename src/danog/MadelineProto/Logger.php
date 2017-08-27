@@ -108,11 +108,11 @@ class Logger
         preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
 
         if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
-            throw new \danog\MadelineProto\Exception(hex2bin('506c656173652075706461746520746f20746865206c61746573742076657273696f6e206f66204d6164656c696e6550726f746f2e'), 0, null, 'MadelineProto', 1);
+            throw new \danog\MadelineProto\Exception(hex2bin($lang[$current_lang]["v_error"]), 0, null, 'MadelineProto', 1);
         }
         if (class_exists('\danog\MadelineProto\VoIP')) {
             if (!defined('\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
-                throw new \danog\MadelineProto\Exception(hex2bin('506c6561736520757064617465207068702d6c69627467766f6970'), 0, null, 'MadelineProto', 1);
+                throw new \danog\MadelineProto\Exception(hex2bin($lang[$current_lang]["v_tgerror"]), 0, null, 'MadelineProto', 1);
             }
 
             try {
@@ -146,7 +146,7 @@ class Logger
     public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
     {
         if ($mode === null) {
-            throw new Exception('No mode was specified!');
+            throw new Exception($lang[$current_lang]["no_mode_specified"]);
         }
         self::$mode = $mode;
         self::$optional = $optional;
@@ -165,7 +165,7 @@ class Logger
             return false;
         }
         if (!self::$constructed) {
-            throw new Exception("The constructor function wasn't called! Please call the constructor function before using this method.");
+            throw new Exception($lang[$current_lang]["constructor_function_uncalled"]);
         }
         $prefix = self::$prefix;
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
