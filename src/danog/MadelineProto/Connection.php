@@ -75,7 +75,7 @@ class Connection
         $this->extra = $extra;
 
         if (($has_proxy = $proxy !== '\Socket') && !isset(class_implements($proxy)['\danog\MadelineProto\Proxy'])) {
-            throw new \danog\MadelineProto\Exception($lang[$current_lang]["proxy_class_invalid"]);
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang["proxy_class_invalid"]);
         }
         switch ($this->protocol) {
             case 'tcp_abridged':
@@ -89,7 +89,7 @@ class Connection
                 }
                 $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
-                    throw new Exception($lang[$current_lang]["socket_con_error"]);
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang["socket_con_error"]);
                 }
                 $this->write(chr(239));
                 break;
@@ -101,7 +101,7 @@ class Connection
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
-                    throw new Exception($lang[$current_lang]["socket_con_error"]);
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang["socket_con_error"]);
                 }
                 if (!\danog\MadelineProto\Logger::$has_thread) {
                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
@@ -117,7 +117,7 @@ class Connection
                     $this->sock->setExtra($this->extra);
                 }
                 if (!$this->sock->connect($ip, $port)) {
-                    throw new Exception($lang[$current_lang]["socket_con_error"]);
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang["socket_con_error"]);
                 }
                 if (!\danog\MadelineProto\Logger::$has_thread) {
                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
@@ -134,7 +134,7 @@ class Connection
                     $this->sock->setExtra($this->extra);
                 }
                 if (!$this->sock->connect($ip, $port)) {
-                    throw new Exception($lang[$current_lang]["socket_con_error"]);
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang["socket_con_error"]);
                 }
                 if (!\danog\MadelineProto\Logger::$has_thread) {
                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
@@ -180,7 +180,7 @@ class Connection
                     $this->sock->setExtra($this->extra);
                 }
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
-                    throw new Exception($lang[$current_lang]["socket_con_error"]);
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang["socket_con_error"]);
                 }
                 if (!\danog\MadelineProto\Logger::$has_thread) {
                     $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
@@ -189,9 +189,9 @@ class Connection
                 $this->sock->setBlocking(true);
                 break;
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
             default:
-                throw new Exception($lang[$current_lang]["protocol_invalid"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_invalid"]);
                 break;
         }
     }
@@ -214,9 +214,9 @@ class Connection
                 }
                 break;
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
             default:
-                throw new Exception($lang[$current_lang]["protocol_invalid"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_invalid"]);
                 break;
         }
     }
@@ -269,10 +269,10 @@ class Connection
                 return $wrote;
                 break;
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
                 break;
             default:
-                throw new Exception($lang[$current_lang]["protocol_invalid"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_invalid"]);
                 break;
         }
     }
@@ -285,13 +285,13 @@ class Connection
                 while (strlen($packet) < $length) {
                     $packet .= $this->sock->read($length - strlen($packet));
                     if ($packet === false || strlen($packet) === 0) {
-                        throw new \danog\MadelineProto\NothingInTheSocketException($lang[$current_lang]["nothing_in_socket"]);
+                        throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang["nothing_in_socket"]);
                     }
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
 
-                    throw new Exception(sprintf($lang[$current_lang]["wrong_length_read"], $length, strlen($packet)));
+                    throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang["wrong_length_read"], $length, strlen($packet)));
                 }
 
                 return $this->obfuscated['decryption']->encrypt($packet);
@@ -305,20 +305,20 @@ class Connection
                 while (strlen($packet) < $length) {
                     $packet .= $this->sock->read($length - strlen($packet));
                     if ($packet === false || strlen($packet) === 0) {
-                        throw new \danog\MadelineProto\NothingInTheSocketException($lang[$current_lang]["nothing_in_socket"]);
+                        throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang["nothing_in_socket"]);
                     }
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
 
-                    throw new Exception(sprintf($lang[$current_lang]["wrong_length_read"], $length, strlen($packet)));
+                    throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang["wrong_length_read"], $length, strlen($packet)));
                 }
 
                 return $packet;
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
             default:
-                throw new Exception($lang[$current_lang]["protocol_invalid"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_invalid"]);
                 break;
         }
     }
@@ -364,7 +364,7 @@ class Connection
                         break;
                     }
                     if ($current_header === false) {
-                        throw new Exception($lang[$current_lang]["no_data_in_socket"]);
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang["no_data_in_socket"]);
                     }
                     if (preg_match('|^Content-Length: |i', $current_header)) {
                         $length = (int) preg_replace('|Content-Length: |i', '', $current_header);
@@ -384,7 +384,7 @@ class Connection
 
                 return $read;
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
         }
     }
 
@@ -416,7 +416,7 @@ class Connection
                 break;
 
             case 'udp':
-                throw new Exception($lang[$current_lang]["protocol_not_implemented"]);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang["protocol_not_implemented"]);
             default:
                 break;
         }

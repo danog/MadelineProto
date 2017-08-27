@@ -21,7 +21,7 @@ class API extends APIFactory
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         $this->API = new MTProto($params);
 
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["apifactory_start"]], Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["apifactory_start"]], Logger::VERBOSE);
         $this->APIFactory();
 
         \danog\MadelineProto\Logger::log(['Ping...'], Logger::ULTRA_VERBOSE);
@@ -29,7 +29,7 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
         //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["madelineproto_ready"]], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["madelineproto_ready"]], Logger::NOTICE);
     }
 
     public function __wakeup()

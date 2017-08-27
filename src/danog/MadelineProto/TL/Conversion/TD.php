@@ -53,7 +53,7 @@ trait TD
                         }
                         $newparams = array_merge($params[$td], $newparams);
                         break;
-                        default: throw new Exception($lang[$current_lang]["non_text_conversion"]);
+                        default: throw new Exception(\danog\MadelineProto\Lang::$current_lang["non_text_conversion"]);
                     }
                     break;
                     default:
@@ -137,7 +137,7 @@ trait TD
                             $newparams[$td]['entities'] = $params['entities'];
                         }
                     } else {
-                        throw new Exception($lang[$current_lang]["non_text_conversion"]);
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang["non_text_conversion"]);
                     }
                     break;
                     default:

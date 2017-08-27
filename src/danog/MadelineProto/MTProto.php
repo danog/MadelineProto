@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 72;
+    const V = 73;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -197,7 +197,7 @@ class MTProto
         $this->parse_settings($settings);
 		
         if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
-            throw new Exception($lang[$current_lang]["phpseclib_fork"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang["phpseclib_fork"]);
         }
         $this->emojis = json_decode(self::JSON_EMOJIS);
         \danog\MadelineProto\Logger::class_exists();
@@ -206,27 +206,27 @@ class MTProto
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
 
         // Connect to servers
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["inst_dc"]], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["inst_dc"]], Logger::ULTRA_VERBOSE);
         if (isset($this->datacenter)) {
             $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         } else {
             $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         }
         // Load rsa keys
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["load_rsa"]], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["load_rsa"]], Logger::ULTRA_VERBOSE);
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = new RSA($key);
             $this->rsa_keys[$key->fp] = $key;
         }
 
         // Istantiate TL class
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["TL_translation"]], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["TL_translation"]], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
         /*
          * ***********************************************************************
          * Define some needed numbers for BigInteger
          */
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["dh_prime_check_0"]], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["dh_prime_check_0"]], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         $this->zero = new \phpseclib\Math\BigInteger(0);
         $this->one = new \phpseclib\Math\BigInteger(1);
@@ -245,7 +245,7 @@ class MTProto
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
-                \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["nearest_dc"], $nearest_dc['country'], $nearest_dc['this_dc'], $nearest_dc['nearest_dc'])], Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["nearest_dc"], $nearest_dc['country'], $nearest_dc['this_dc'], $nearest_dc['nearest_dc'])], Logger::NOTICE);
 
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
@@ -275,8 +275,11 @@ class MTProto
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
+	Lang::$current_lang = &Lang::$lang['en'];
+        if (isset($this->settings['app_info']['lang_code']) && isset(Lang::$lang[$this->settings['app_info']['lang_code']])) Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
+
         if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
-            throw new Exception($lang[$current_lang]["phpseclib_fork"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang["phpseclib_fork"]);
         }
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
@@ -326,7 +329,7 @@ class MTProto
         $force = false;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== self::V) {
-            \danog\MadelineProto\Logger::log([$lang[$current_lang]["serialization_ofd"]], Logger::WARNING);
+            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["serialization_ofd"]], Logger::WARNING);
             $settings = $this->settings;
             if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
                 $settings['updates']['callback'] = 'get_updates_update_handler';
@@ -367,7 +370,7 @@ class MTProto
             $this->get_dialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
-            \danog\MadelineProto\Logger::log([$lang[$current_lang]["getupdates_deserialization"]], Logger::NOTICE);
+            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["getupdates_deserialization"]], Logger::NOTICE);
             $this->get_updates_difference();
         }
     }
@@ -380,7 +383,7 @@ class MTProto
         if (isset(Logger::$storage[spl_object_hash($this)])) {
             $this->run_workers = false;
             while ($number = Logger::$storage[spl_object_hash($this)]->collect()) {
-                \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["shutdown_reader_pool"], $number)], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["shutdown_reader_pool"], $number)], \danog\MadelineProto\Logger::NOTICE);
             }
             Logger::$storage[spl_object_hash($this)]->shutdown();
         }
@@ -389,7 +392,7 @@ class MTProto
     public function setup_threads()
     {
         if ($this->threads = $this->run_workers = class_exists('\Pool') && in_array(php_sapi_name(), ['cli', 'phpdbg']) && $this->settings['threading']['allow_threading'] && extension_loaded('pthreads')) {
-            \danog\MadelineProto\Logger::log([$lang[$current_lang]["threading_on"]], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["threading_on"]], \danog\MadelineProto\Logger::NOTICE);
             $this->start_threads();
         }
     }
@@ -406,18 +409,18 @@ class MTProto
             }
             foreach ($dcs as $dc) {
                 if (!isset($this->readers[$dc])) {
-                    Logger::log([sprintf($lang[$current_lang]["socket_reader"], $number).$lang[$current_lang]["socket_status_1"]], Logger::WARNING);
+                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["socket_reader"], $number).\danog\MadelineProto\Lang::$current_lang["socket_status_1"]], Logger::WARNING);
                     $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
                 }
                 if (!$this->readers[$dc]->isRunning()) {
-                    Logger::log([sprintf($lang[$current_lang]["socket_reader"], $number).$lang[$current_lang]["socket_status_2"]], Logger::WARNING);
+                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["socket_reader"], $number).\danog\MadelineProto\Lang::$current_lang["socket_status_2"]], Logger::WARNING);
                     $this->readers[$dc]->garbage = false;
                     Logger::$storage[spl_object_hash($this)]->submit($this->readers[$dc]);
-                    Logger::log([sprintf($lang[$current_lang]["socket_reader"], $number).$lang[$current_lang]["socket_status_3"]], Logger::WARNING);
+                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["socket_reader"], $number).\danog\MadelineProto\Lang::$current_lang["socket_status_3"]], Logger::WARNING);
                     while (!$this->readers[$dc]->ready);
-                    Logger::log([sprintf($lang[$current_lang]["socket_reader"], $number).$lang[$current_lang]["socket_status_4"]], Logger::WARNING);
+                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["socket_reader"], $number).\danog\MadelineProto\Lang::$current_lang["socket_status_4"]], Logger::WARNING);
                 } else {
-                    Logger::log([sprintf($lang[$current_lang]["socket_reader"], $number).$lang[$current_lang]["socket_status_5"]], Logger::ULTRA_VERBOSE);
+                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["socket_reader"], $number).\danog\MadelineProto\Lang::$current_lang["socket_status_5"]], Logger::ULTRA_VERBOSE);
                 }
             }
         }
@@ -443,12 +446,13 @@ class MTProto
 		
 		// Detect language
 		$lang_code = 'en';
+		Lang::$current_lang = &Lang::$lang[$lang_code];
 		if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 			$lang_code = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 		} else if (isset($_SERVER['LANG'])) {
 			$lang_code = explode('_', $_SERVER['LANG'])[0];
 		}
-		if (isset(Lang::$lang[$lang_code])) Lang::$current_lang = &Lang::$lang[$lang_code]; else Lang::$current_lang = &Lang::$lang['en'];
+		if (isset(Lang::$lang[$lang_code])) Lang::$current_lang = &Lang::$lang[$lang_code];
 		
         // Set default settings
         $default_settings = [
@@ -517,8 +521,8 @@ class MTProto
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
-                //'api_id'          => 6,
-                //'api_hash'        => 'eb06d4abfb49dc3eeb1aeb98ae0f581e',
+                //'api_id'          => you should put an API id in the settings array you provide
+                //'api_hash'        => you should put an API hash in the settings array you provide
                 'device_model'    => $device_model,
                 'system_version'  => $system_version,
                 'app_version'     => 'Unicorn', // ðŸŒš
@@ -589,7 +593,7 @@ class MTProto
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (!isset($settings['app_info']['api_id'])) {
-            throw new \danog\MadelineProto\Exception($lang[$current_lang]["api_not_set"], 0, null, 'MadelineProto', 1);
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang["api_not_set"], 0, null, 'MadelineProto', 1);
         }
 
         if ($settings['app_info']['api_id'] < 20) {
@@ -618,11 +622,11 @@ class MTProto
     public function reset_session($de = true, $auth_key = false)
     {
         if (!is_object($this->datacenter)) {
-            throw new Exception($lang[$current_lang]["session_corrupted"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang["session_corrupted"]);
         }
         foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
-                \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["reset_session_seqno"], $id)], Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["reset_session_seqno"], $id)], Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
@@ -671,10 +675,10 @@ class MTProto
             }
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                 if ($socket->auth_key === null && !$cdn) {
-                    \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["gen_perm_auth_key"], $id)], Logger::NOTICE);
+                    \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["gen_perm_auth_key"], $id)], Logger::NOTICE);
                     $socket->auth_key = $this->create_auth_key(-1, $id);
                 }
-                \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["gen_temp_auth_key"], $id)], Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["gen_temp_auth_key"], $id)], Logger::NOTICE);
                 $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                 if (!$cdn) {
                     $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
@@ -703,7 +707,7 @@ class MTProto
             if (strpos($new_dc, '_') !== false) {
                 continue;
             }
-            \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["copy_auth_dcs"], $authorized_dc, $new_dc)], Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["copy_auth_dcs"], $authorized_dc, $new_dc)], Logger::VERBOSE);
             $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
@@ -715,7 +719,7 @@ class MTProto
 
     public function write_client_info($method, $arguments = [], $options = [])
     {
-        \danog\MadelineProto\Logger::log([sprintf($lang[$current_lang]["write_client_info"], $method)], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang["write_client_info"], $method)], Logger::NOTICE);
 
         return $this->method_call(
             'invokeWithLayer',
@@ -770,7 +774,7 @@ class MTProto
             $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
-        \danog\MadelineProto\Logger::log([$lang[$current_lang]["config_updated"], $this->config], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang["config_updated"], $this->config], Logger::NOTICE);
     }
 
     public function parse_dc_options($dc_options)

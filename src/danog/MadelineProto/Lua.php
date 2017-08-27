@@ -22,7 +22,7 @@ class Lua
     public function ___construct($script, $MadelineProto)
     {
         if (!file_exists($script)) {
-            throw new Exception($lang[$current_lang]["script_not_exist"]);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang["script_not_exist"]);
         }
         $this->MadelineProto = $MadelineProto;
         $this->MadelineProto->settings['updates']['handle_updates'] = true;
@@ -46,14 +46,16 @@ class Lua
         }
         $methods = [];
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            list($namespace, $method) = $pair;
+            $namespace = key($pair);
+            $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
             }
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            list($namespace, $method) = $pair;
+            $namespace = key($pair);
+            $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
             }

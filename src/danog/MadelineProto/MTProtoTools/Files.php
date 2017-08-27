@@ -348,7 +348,7 @@ trait Files
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
-                $this->check_cdn_hash($msssage_media['file_token'], $offset, $res['bytes'], $datacenter);
+                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
             }
             if ($start_at) {
                 $res['bytes'] = substr($res['bytes'], $start_at);

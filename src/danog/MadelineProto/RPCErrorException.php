@@ -18,7 +18,7 @@ class RPCErrorException extends \Exception
 
     public function __toString()
     {
-        return sprintf($lang[$current_lang]["rpc_tg_error"], $this->message, $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        return sprintf(\danog\MadelineProto\Lang::$current_lang["rpc_tg_error"], $this->message, $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
     }
 
     public function __construct($message = null, $code = 0, Exception $previous = null)
