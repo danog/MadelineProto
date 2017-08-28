@@ -106,7 +106,7 @@ trait Tools
         return pack('V', $value);
     }
 
-    public function pack_signed_double($value)
+    public function pack_double($value)
     {
         $res = pack('d', $value);
         if (strlen($res) !== 8) {
