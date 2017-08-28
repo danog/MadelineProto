@@ -233,11 +233,11 @@ trait Files
 
     public function download_to_file($message_media, $file, $cb = null)
     {
-        $file = realpath($file);
-        $message_media = $this->get_download_info($message_media);
         if (!file_exists($file)) {
             touch($file);
         }
+        $file = realpath($file);
+        $message_media = $this->get_download_info($message_media);
         $stream = fopen($file, 'r+b');
         flock($stream, LOCK_EX);
         $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);

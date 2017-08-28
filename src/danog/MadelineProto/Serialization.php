@@ -73,6 +73,8 @@ class Serialization
 
             try {
                 $unserialized = unserialize($tounserialize);
+            } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($tounserialize);
             } catch (\danog\MadelineProto\Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
             }
