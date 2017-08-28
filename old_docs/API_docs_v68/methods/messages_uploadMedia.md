@@ -16,6 +16,15 @@ description: messages.uploadMedia parameters, return type and example
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot||PEER_ID_INVALID|The provided peer id is invalid|
+
 ### Example:
 
 

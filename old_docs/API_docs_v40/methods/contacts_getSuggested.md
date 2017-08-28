@@ -15,6 +15,9 @@ description: contacts.getSuggested parameters, return type and example
 
 ### Return type: [contacts\_Suggested](../types/contacts_Suggested.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

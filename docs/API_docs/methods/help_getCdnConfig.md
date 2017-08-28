@@ -10,6 +10,9 @@ description: help.getCdnConfig parameters, return type and example
 
 ### Return type: [CdnConfig](../types/CdnConfig.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

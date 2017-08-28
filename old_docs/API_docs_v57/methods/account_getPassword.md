@@ -10,14 +10,14 @@ description: account.getPassword parameters, return type and example
 
 ### Return type: [account\_Password](../types/account_Password.md)
 
+### Can bots use this method: **NO**
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -32,15 +32,6 @@ $account_Password = $MadelineProto->account->getPassword();
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - account.getPassword
-* params - `{}`
 
 
 

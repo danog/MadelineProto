@@ -17,6 +17,9 @@ description: channels.kickFromChannel parameters, return type and example
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

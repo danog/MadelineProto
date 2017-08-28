@@ -21,14 +21,20 @@ description: messages.sendInlineBotResult parameters, return type and example
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INLINE_RESULT_EXPIRED|The inline query expired||QUERY_ID_EMPTY|The query ID is empty|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -43,15 +49,6 @@ $Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, '
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.sendInlineBotResult
-* params - `{"broadcast": Bool, "silent": Bool, "background": Bool, "peer": InputPeer, "reply_to_msg_id": int, "query_id": long, "id": "string", }`
 
 
 

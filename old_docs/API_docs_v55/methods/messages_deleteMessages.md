@@ -15,6 +15,9 @@ description: messages.deleteMessages parameters, return type and example
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

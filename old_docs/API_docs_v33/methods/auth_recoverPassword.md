@@ -15,14 +15,20 @@ description: auth.recoverPassword parameters, return type and example
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CODE_EMPTY|The provided code is empty|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +43,6 @@ $auth_Authorization = $MadelineProto->auth->recoverPassword(['code' => 'string',
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - auth.recoverPassword
-* params - `{"code": "string", }`
 
 
 

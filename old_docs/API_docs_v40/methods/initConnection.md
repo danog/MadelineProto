@@ -20,6 +20,15 @@ description: initConnection parameters, return type and example
 
 ### Return type: [X](../types/X.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INPUT_FETCH_FAIL|Failed deserializing TL payload|
+
 ### Example:
 
 

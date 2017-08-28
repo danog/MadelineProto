@@ -18,6 +18,15 @@ description: photos.getUserPhotos parameters, return type and example
 
 ### Return type: [photos\_Photos](../types/photos_Photos.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MAX_ID_INVALID|The provided max ID is invalid||USER_ID_INVALID|The provided user ID is invalid|
+
 ### Example:
 
 

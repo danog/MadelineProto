@@ -17,6 +17,15 @@ description: messages.setBotShippingResults parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|QUERY_ID_INVALID|The query ID is invalid|
+
 ### Example:
 
 

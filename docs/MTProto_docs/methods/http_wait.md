@@ -17,6 +17,9 @@ description: http_wait parameters, return type and example
 
 ### Return type: [HttpWait](../types/HttpWait.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

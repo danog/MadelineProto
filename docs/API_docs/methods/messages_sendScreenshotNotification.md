@@ -16,14 +16,20 @@ description: messages.sendScreenshotNotification parameters, return type and exa
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -38,15 +44,6 @@ $Updates = $MadelineProto->messages->sendScreenshotNotification(['peer' => Input
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.sendScreenshotNotification
-* params - `{"peer": InputPeer, "reply_to_msg_id": int, }`
 
 
 

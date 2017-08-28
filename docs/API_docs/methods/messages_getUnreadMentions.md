@@ -20,6 +20,15 @@ description: messages.getUnreadMentions parameters, return type and example
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 ### Example:
 
 

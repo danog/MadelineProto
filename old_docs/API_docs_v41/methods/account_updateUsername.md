@@ -15,14 +15,20 @@ description: account.updateUsername parameters, return type and example
 
 ### Return type: [User](../types/User.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USERNAME_INVALID|The provided username is not valid||USERNAME_NOT_MODIFIED|The username was not modified||USERNAME_OCCUPIED|The provided username is already occupied|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +43,6 @@ $User = $MadelineProto->account->updateUsername(['username' => 'string', ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - account.updateUsername
-* params - `{"username": "string", }`
 
 
 

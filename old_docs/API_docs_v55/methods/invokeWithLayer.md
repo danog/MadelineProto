@@ -16,6 +16,15 @@ description: invokeWithLayer parameters, return type and example
 
 ### Return type: [X](../types/X.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INPUT_LAYER_INVALID|The provided layer is invalid|
+
 ### Example:
 
 

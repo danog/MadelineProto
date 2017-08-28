@@ -15,6 +15,9 @@ description: destroy_session parameters, return type and example
 
 ### Return type: [DestroySessionRes](../types/DestroySessionRes.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

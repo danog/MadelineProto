@@ -20,6 +20,9 @@ description: req_DH_params parameters, return type and example
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

@@ -15,14 +15,20 @@ description: auth.checkPhone parameters, return type and example
 
 ### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PHONE_NUMBER_BANNED|The provided phone number is banned from telegram||PHONE_NUMBER_INVALID|The phone number is invalid|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +43,6 @@ $auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => 'string
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - auth.checkPhone
-* params - `{"phone_number": "string", }`
 
 
 

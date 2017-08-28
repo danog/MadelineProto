@@ -17,6 +17,15 @@ description: messages.getGameHighScores parameters, return type and example
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid||USER_BOT_REQUIRED|This method can only be called by a bot|
+
 ### Example:
 
 

@@ -16,6 +16,15 @@ description: messages.faveSticker parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKER_ID_INVALID|The provided sticker ID is invalid|
+
 ### Example:
 
 

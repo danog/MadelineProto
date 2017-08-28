@@ -16,6 +16,15 @@ description: messages.sendEncrypted parameters, return type and example
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|DATA_INVALID|Encrypted data invalid||MSG_WAIT_FAILED|A waiting call returned an error|
+
 ### Example:
 
 

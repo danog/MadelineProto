@@ -16,6 +16,9 @@ description: messages.getStickers parameters, return type and example
 
 ### Return type: [messages\_Stickers](../types/messages_Stickers.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

@@ -18,6 +18,15 @@ description: messages.setInlineGameScore parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid||USER_BOT_REQUIRED|This method can only be called by a bot|
+
 ### Example:
 
 

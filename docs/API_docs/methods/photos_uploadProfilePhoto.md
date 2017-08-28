@@ -15,14 +15,20 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|FILE_PARTS_INVALID|The number of file parts is invalid|
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +43,6 @@ $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile,
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - photos.uploadProfilePhoto
-* params - `{"file": InputFile, }`
 
 
 

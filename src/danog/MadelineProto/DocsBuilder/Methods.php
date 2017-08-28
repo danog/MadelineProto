@@ -16,6 +16,8 @@ trait Methods
 {
     public function mk_methods()
     {
+        $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
+        $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
         foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);
         }
@@ -164,17 +166,28 @@ description: '.$description.'
             $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$php_type.'.md)
 
 ';
+            $bot = !in_array($data['method'], $bots);
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example = str_replace('[]', '', '### Example:
+                $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
+                if (isset($errors['result'][$data['method']])) {
+                $example .= '### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+';
+                foreach ($errors['result'][$data['method']] as $error) { $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'; }
+                $example .= "\n\n";
+                }
+                $example .= str_replace('[]', '', '### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
+'.($bot ? 'if (isset($token)) { // Login as a bot
     $MadelineProto->bot_login($token);
 }
-if (isset($number)) { // Login as a user
+' : '').'if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo \'Enter the code you received: \';
     $code = \'\';
@@ -189,7 +202,7 @@ $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 
 Or, if you\'re using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
-### As a bot:
+'.($bot ? '### As a bot:
 
 POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 
@@ -198,7 +211,7 @@ Parameters:
 * method - '.$data['method'].'
 * params - `{'.$json_params.'}`
 
-
+' : '').'
 
 ### As a user:
 
