@@ -233,6 +233,7 @@ trait Files
 
     public function download_to_file($message_media, $file, $cb = null)
     {
+        $file = preg_replace('|/+|', '/', $file);
         if (!file_exists($file)) {
             touch($file);
         }
