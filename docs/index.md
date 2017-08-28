@@ -715,5 +715,4 @@ src/danog/MadelineProto/
 ```
 
 Check out the [Contribution guide](https://github.com/danog/MadelineProto/blob/master/CONTRIBUTING.md) before contributing.
-Kiao by grizzly
 
