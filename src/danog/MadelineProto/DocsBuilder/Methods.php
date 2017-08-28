@@ -171,13 +171,15 @@ description: '.$description.'
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
                 if (isset($errors['result'][$data['method']])) {
-                $example .= '### Errors this method can return:
+                    $example .= '### Errors this method can return:
 
 | Error    | Description   |
 |----------|---------------|
 ';
-                foreach ($errors['result'][$data['method']] as $error) { $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'; }
-                $example .= "\n\n";
+                    foreach ($errors['result'][$data['method']] as $error) {
+                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|';
+                    }
+                    $example .= "\n\n";
                 }
                 $example .= str_replace('[]', '', '### Example:
 
