@@ -96,6 +96,7 @@ class API extends APIFactory
     public function serialize($filename)
     {
         Logger::log(['Serializing MadelineProto...']);
+
         return Serialization::serialize($filename, $this);
     }
 }
