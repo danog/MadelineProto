@@ -73,7 +73,6 @@ if ($MadelineProto === false) {
             \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
-
     } else {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
