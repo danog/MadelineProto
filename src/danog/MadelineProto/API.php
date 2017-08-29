@@ -15,6 +15,7 @@ namespace danog\MadelineProto;
 class API extends APIFactory
 {
     use \danog\Serializable;
+    public $session;
 
     public function ___construct($params = [])
     {
@@ -43,6 +44,9 @@ class API extends APIFactory
     {
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
+        }
+        if (!is_null($this->session)) {
+            $this->serialize($this->session);
         }
         restore_error_handler();
     }
@@ -91,6 +95,7 @@ class API extends APIFactory
 
     public function serialize($filename)
     {
+        Logger::log(['Serializing MadelineProto...']);
         return Serialization::serialize($filename, $this);
     }
 }
