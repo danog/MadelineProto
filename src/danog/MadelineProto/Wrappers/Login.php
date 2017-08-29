@@ -19,9 +19,6 @@ trait Login
 {
     public function logout()
     {
-        if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
-            throw new \danog\MadelineProto\Exception('An error occurred while logging out!');
-        }
         $this->authorized = self::NOT_LOGGED_IN;
         $this->authorization = null;
         $this->updates = [];
@@ -30,6 +27,9 @@ trait Login
         $this->users = [];
         $this->state = [];
 
+        if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
+            throw new \danog\MadelineProto\Exception('An error occurred while logging out!');
+        }
         \danog\MadelineProto\Logger::log(['Logged out successfully!'], \danog\MadelineProto\Logger::NOTICE);
 
         return true;
