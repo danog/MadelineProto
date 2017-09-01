@@ -25,6 +25,7 @@ description: account.setPrivacy parameters, return type and example
 |----------|---------------|
 |PRIVACY_KEY_INVALID|The privacy key is invalid|
 
+
 ### Example:
 
 

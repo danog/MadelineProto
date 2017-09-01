@@ -25,6 +25,7 @@ description: messages.saveGif parameters, return type and example
 |----------|---------------|
 |GIF_ID_INVALID|The provided GIF ID is invalid|
 
+
 ### Example:
 
 

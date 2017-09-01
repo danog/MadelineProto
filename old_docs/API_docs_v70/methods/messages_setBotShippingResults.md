@@ -26,6 +26,7 @@ description: messages.setBotShippingResults parameters, return type and example
 |----------|---------------|
 |QUERY_ID_INVALID|The query ID is invalid|
 
+
 ### Example:
 
 

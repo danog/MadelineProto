@@ -23,6 +23,8 @@ description: photos.uploadProfilePhoto parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |FILE_PARTS_INVALID|The number of file parts is invalid|
+|PHOTO_CROP_SIZE_SMALL|Photo is too small|
+
 
 ### Example:
 

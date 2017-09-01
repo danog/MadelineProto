@@ -23,7 +23,9 @@ description: bots.answerWebhookJSONQuery parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|QUERY_ID_INVALID|The query ID is invalid||USER_BOT_INVALID|This method can only be called by a bot|
+|QUERY_ID_INVALID|The query ID is invalid|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
 
 ### Example:
 

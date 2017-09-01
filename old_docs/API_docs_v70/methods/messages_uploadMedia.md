@@ -23,7 +23,9 @@ description: messages.uploadMedia parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|BOT_MISSING|This method can only be run by a bot||PEER_ID_INVALID|The provided peer id is invalid|
+|BOT_MISSING|This method can only be run by a bot|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

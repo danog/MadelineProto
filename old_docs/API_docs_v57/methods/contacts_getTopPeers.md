@@ -31,6 +31,7 @@ description: contacts.getTopPeers parameters, return type and example
 |----------|---------------|
 |TYPES_EMPTY|The types field is empty|
 
+
 ### Example:
 
 

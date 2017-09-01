@@ -26,6 +26,7 @@ description: channels.createChannel parameters, return type and example
 |----------|---------------|
 |USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
+
 ### Example:
 
 

@@ -26,6 +26,7 @@ description: messages.saveRecentSticker parameters, return type and example
 |----------|---------------|
 |STICKER_ID_INVALID|The provided sticker ID is invalid|
 
+
 ### Example:
 
 

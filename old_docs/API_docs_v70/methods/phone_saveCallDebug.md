@@ -23,7 +23,9 @@ description: phone.saveCallDebug parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CALL_PEER_INVALID|The provided call peer object is invalid||DATA_JSON_INVALID|The provided JSON data is invalid|
+|CALL_PEER_INVALID|The provided call peer object is invalid|
+|DATA_JSON_INVALID|The provided JSON data is invalid|
+
 
 ### Example:
 

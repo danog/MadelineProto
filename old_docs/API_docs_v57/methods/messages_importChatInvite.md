@@ -22,7 +22,12 @@ description: messages.importChatInvite parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|INVITE_HASH_EMPTY|The invite hash is empty||INVITE_HASH_EXPIRED|The invite link has expired||INVITE_HASH_INVALID|The invite hash is invalid||USER_ALREADY_PARTICIPANT|The user is already in the group||USERS_TOO_MUCH|The maximum number of users has been exceeded (to create a chat, for example)|
+|INVITE_HASH_EMPTY|The invite hash is empty|
+|INVITE_HASH_EXPIRED|The invite link has expired|
+|INVITE_HASH_INVALID|The invite hash is invalid|
+|USER_ALREADY_PARTICIPANT|The user is already in the group|
+|USERS_TOO_MUCH|The maximum number of users has been exceeded (to create a chat, for example)|
+
 
 ### Example:
 

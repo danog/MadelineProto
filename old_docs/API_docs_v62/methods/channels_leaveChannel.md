@@ -22,7 +22,11 @@ description: channels.leaveChannel parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid||CHANNEL_PRIVATE|You haven't joined this channel/supergroup||USER_CREATOR|You can't leave this channel, because you're its creator||USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|USER_CREATOR|You can't leave this channel, because you're its creator|
+|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+
 
 ### Example:
 

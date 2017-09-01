@@ -24,7 +24,22 @@ description: messages.sendMessage parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid||CHANNEL_PRIVATE|You haven't joined this channel/supergroup||CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this||CHAT_WRITE_FORBIDDEN|You can't write in this chat||MESSAGE_EMPTY|The provided message is empty||PEER_ID_INVALID|The provided peer id is invalid||USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels||USER_IS_BLOCKED|User is blocked||USER_IS_BOT|Bots can't send messages to other bots||YOU_BLOCKED_USER|You blocked this user|
+|BUTTON_DATA_INVALID|The provided button data is invalid|
+|BUTTON_TYPE_INVALID|The type of one of the buttons you provided is invalid|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
+|MESSAGE_EMPTY|The provided message is empty|
+|MESSAGE_TOO_LONG|The provided message is too long|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
+|USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
+|USER_IS_BLOCKED|User is blocked|
+|USER_IS_BOT|Bots can't send messages to other bots|
+|YOU_BLOCKED_USER|You blocked this user|
+
 
 ### Example:
 

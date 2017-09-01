@@ -25,6 +25,7 @@ description: account.getTmpPassword parameters, return type and example
 |----------|---------------|
 |TMP_PASSWORD_DISABLED|The temporary password is disabled|
 
+
 ### Example:
 
 

@@ -24,7 +24,10 @@ description: messages.startBot parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid||START_PARAM_EMPTY|The start parameter is empty||START_PARAM_INVALID|Start parameter invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|START_PARAM_EMPTY|The start parameter is empty|
+|START_PARAM_INVALID|Start parameter invalid|
+
 
 ### Example:
 

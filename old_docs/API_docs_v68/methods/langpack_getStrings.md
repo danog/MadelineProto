@@ -25,6 +25,7 @@ description: langpack.getStrings parameters, return type and example
 |----------|---------------|
 |LANG_PACK_INVALID|The provided language pack is invalid|
 
+
 ### Example:
 
 

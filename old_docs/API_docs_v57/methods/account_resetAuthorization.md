@@ -24,6 +24,7 @@ description: account.resetAuthorization parameters, return type and example
 |----------|---------------|
 |HASH_INVALID|The provided hash is invalid|
 
+
 ### Example:
 
 

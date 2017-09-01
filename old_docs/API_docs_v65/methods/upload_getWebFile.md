@@ -26,6 +26,7 @@ description: upload.getWebFile parameters, return type and example
 |----------|---------------|
 |LOCATION_INVALID|The provided location is invalid|
 
+
 ### Example:
 
 

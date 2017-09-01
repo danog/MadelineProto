@@ -22,7 +22,9 @@ description: messages.migrateChat parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid||PEER_ID_INVALID|The provided peer id is invalid|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

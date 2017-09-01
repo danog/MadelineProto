@@ -25,6 +25,7 @@ description: messages.searchGifs parameters, return type and example
 |----------|---------------|
 |SEARCH_QUERY_EMPTY|The search query is empty|
 
+
 ### Example:
 
 

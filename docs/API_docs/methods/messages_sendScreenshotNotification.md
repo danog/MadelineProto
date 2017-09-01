@@ -25,6 +25,7 @@ description: messages.sendScreenshotNotification parameters, return type and exa
 |----------|---------------|
 |PEER_ID_INVALID|The provided peer id is invalid|
 
+
 ### Example:
 
 

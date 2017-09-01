@@ -23,7 +23,9 @@ description: channels.checkUsername parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid||CHAT_ID_INVALID|The provided chat id is invalid|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+
 
 ### Example:
 

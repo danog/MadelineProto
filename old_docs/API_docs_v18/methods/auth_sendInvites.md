@@ -25,6 +25,7 @@ description: auth.sendInvites parameters, return type and example
 |----------|---------------|
 |MESSAGE_EMPTY|The provided message is empty|
 
+
 ### Example:
 
 

@@ -24,6 +24,7 @@ description: auth.exportAuthorization parameters, return type and example
 |----------|---------------|
 |DC_ID_INVALID|The provided DC ID is invalid|
 
+
 ### Example:
 
 

@@ -25,6 +25,7 @@ description: bots.sendCustomRequest parameters, return type and example
 |----------|---------------|
 |USER_BOT_INVALID|This method can only be called by a bot|
 
+
 ### Example:
 
 

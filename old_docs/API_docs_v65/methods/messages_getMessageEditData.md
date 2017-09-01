@@ -23,7 +23,9 @@ description: messages.getMessageEditData parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|MESSAGE_AUTHOR_REQUIRED|Message author required||PEER_ID_INVALID|The provided peer id is invalid|
+|MESSAGE_AUTHOR_REQUIRED|Message author required|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

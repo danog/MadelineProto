@@ -29,7 +29,9 @@ description: messages.search parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid||PEER_ID_INVALID|The provided peer id is invalid|
+|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

@@ -26,6 +26,7 @@ description: messages.getMessagesViews parameters, return type and example
 |----------|---------------|
 |PEER_ID_INVALID|The provided peer id is invalid|
 
+
 ### Example:
 
 

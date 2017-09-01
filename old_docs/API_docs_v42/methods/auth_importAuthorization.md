@@ -23,7 +23,9 @@ description: auth.importAuthorization parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|AUTH_BYTES_INVALID|The provided authorization is invalid||USER_ID_INVALID|The provided user ID is invalid|
+|AUTH_BYTES_INVALID|The provided authorization is invalid|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 
 ### Example:
 

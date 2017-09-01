@@ -26,6 +26,7 @@ description: channels.reportSpam parameters, return type and example
 |----------|---------------|
 |CHANNEL_INVALID|The provided channel is invalid|
 
+
 ### Example:
 
 

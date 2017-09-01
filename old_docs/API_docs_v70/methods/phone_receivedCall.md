@@ -24,6 +24,7 @@ description: phone.receivedCall parameters, return type and example
 |----------|---------------|
 |CALL_PEER_INVALID|The provided call peer object is invalid|
 
+
 ### Example:
 
 

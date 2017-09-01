@@ -23,7 +23,9 @@ description: channels.getParticipant parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid||USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+|CHANNEL_INVALID|The provided channel is invalid|
+|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+
 
 ### Example:
 

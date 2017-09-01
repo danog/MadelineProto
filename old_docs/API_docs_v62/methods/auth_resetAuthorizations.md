@@ -19,6 +19,7 @@ description: auth.resetAuthorizations parameters, return type and example
 |----------|---------------|
 |Timeout|A timeout occurred while fetching data from the bot|
 
+
 ### Example:
 
 

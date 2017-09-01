@@ -22,7 +22,11 @@ description: auth.checkPhone parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|PHONE_NUMBER_BANNED|The provided phone number is banned from telegram||PHONE_NUMBER_INVALID|The phone number is invalid|
+|NETWORK_MIGRATE_4|memes|
+|PHONE_MIGRATE_4|memes|
+|PHONE_NUMBER_BANNED|The provided phone number is banned from telegram|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+
 
 ### Example:
 

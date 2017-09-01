@@ -23,6 +23,9 @@ description: messages.checkChatInvite parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |INVITE_HASH_EMPTY|The invite hash is empty|
+|INVITE_HASH_EXPIRED|The invite link has expired|
+|INVITE_HASH_INVALID|The invite hash is invalid|
+
 
 ### Example:
 

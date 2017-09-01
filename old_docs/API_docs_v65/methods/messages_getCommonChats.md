@@ -26,6 +26,7 @@ description: messages.getCommonChats parameters, return type and example
 |----------|---------------|
 |USER_ID_INVALID|The provided user ID is invalid|
 
+
 ### Example:
 
 

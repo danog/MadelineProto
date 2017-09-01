@@ -28,7 +28,10 @@ description: messages.editMessage parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid||PEER_ID_INVALID|The provided peer id is invalid|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|MESSAGE_NOT_MODIFIED|The message text has not changed|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

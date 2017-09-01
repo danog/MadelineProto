@@ -24,6 +24,7 @@ description: contacts.importCard parameters, return type and example
 |----------|---------------|
 |NEED_MEMBER_INVALID|The provided member is invalid|
 
+
 ### Example:
 
 

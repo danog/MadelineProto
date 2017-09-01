@@ -25,7 +25,9 @@ description: auth.bindTempAuthKey parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|ENCRYPTED_MESSAGE_INVALID|Encrypted message invalid||INPUT_REQUEST_TOO_LONG|The request is too big|
+|ENCRYPTED_MESSAGE_INVALID|Encrypted message invalid|
+|INPUT_REQUEST_TOO_LONG|The request is too big|
+
 
 ### Example:
 

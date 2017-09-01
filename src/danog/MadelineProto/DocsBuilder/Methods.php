@@ -177,7 +177,7 @@ description: '.$description.'
 |----------|---------------|
 ';
                     foreach ($errors['result'][$data['method']] as $error) {
-                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|';
+                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
                     }
                     $example .= "\n\n";
                 }

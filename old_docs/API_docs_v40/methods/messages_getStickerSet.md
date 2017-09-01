@@ -24,6 +24,7 @@ description: messages.getStickerSet parameters, return type and example
 |----------|---------------|
 |STICKERSET_INVALID|The provided sticker set is invalid|
 
+
 ### Example:
 
 

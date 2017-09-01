@@ -25,7 +25,9 @@ description: photos.getUserPhotos parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|MAX_ID_INVALID|The provided max ID is invalid||USER_ID_INVALID|The provided user ID is invalid|
+|MAX_ID_INVALID|The provided max ID is invalid|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 
 ### Example:
 

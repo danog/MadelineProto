@@ -24,6 +24,7 @@ description: auth.recoverPassword parameters, return type and example
 |----------|---------------|
 |CODE_EMPTY|The provided code is empty|
 
+
 ### Example:
 
 

@@ -25,6 +25,7 @@ description: account.confirmPhone parameters, return type and example
 |----------|---------------|
 |PHONE_CODE_EMPTY|phone_code is missing|
 
+
 ### Example:
 
 

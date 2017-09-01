@@ -19,6 +19,7 @@ description: auth.requestPasswordRecovery parameters, return type and example
 |----------|---------------|
 |PASSWORD_EMPTY|The provided password is empty|
 
+
 ### Example:
 
 

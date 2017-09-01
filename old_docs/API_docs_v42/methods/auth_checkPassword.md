@@ -24,6 +24,7 @@ description: auth.checkPassword parameters, return type and example
 |----------|---------------|
 |PASSWORD_HASH_INVALID|The provided password hash is invalid|
 
+
 ### Example:
 
 

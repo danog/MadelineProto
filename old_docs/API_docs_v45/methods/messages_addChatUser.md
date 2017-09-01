@@ -24,7 +24,13 @@ description: messages.addChatUser parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid||USER_ALREADY_PARTICIPANT|The user is already in the group||USER_ID_INVALID|The provided user ID is invalid||USERS_TOO_MUCH|The maximum number of users has been exceeded (to create a chat, for example)|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|USER_ALREADY_PARTICIPANT|The user is already in the group|
+|USER_ID_INVALID|The provided user ID is invalid|
+|USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
+|USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
+|USERS_TOO_MUCH|The maximum number of users has been exceeded (to create a chat, for example)|
+
 
 ### Example:
 

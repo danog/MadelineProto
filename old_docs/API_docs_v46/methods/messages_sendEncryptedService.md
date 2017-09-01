@@ -25,6 +25,7 @@ description: messages.sendEncryptedService parameters, return type and example
 |----------|---------------|
 |MSG_WAIT_FAILED|A waiting call returned an error|
 
+
 ### Example:
 
 

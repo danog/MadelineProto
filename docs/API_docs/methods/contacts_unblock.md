@@ -24,6 +24,7 @@ description: contacts.unblock parameters, return type and example
 |----------|---------------|
 |CONTACT_ID_INVALID|The provided contact ID is invalid|
 
+
 ### Example:
 
 

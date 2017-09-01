@@ -25,6 +25,7 @@ description: messages.editChatTitle parameters, return type and example
 |----------|---------------|
 |NEED_CHAT_INVALID|The provided chat is invalid|
 
+
 ### Example:
 
 

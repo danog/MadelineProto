@@ -23,7 +23,9 @@ description: stickers.addStickerToSet parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|BOT_MISSING|This method can only be run by a bot||STICKERSET_INVALID|The provided sticker set is invalid|
+|BOT_MISSING|This method can only be run by a bot|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
 
 ### Example:
 

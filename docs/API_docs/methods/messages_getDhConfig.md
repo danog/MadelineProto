@@ -25,6 +25,7 @@ description: messages.getDhConfig parameters, return type and example
 |----------|---------------|
 |RANDOM_LENGTH_INVALID|Random length invalid|
 
+
 ### Example:
 
 

@@ -24,6 +24,7 @@ description: account.sendChangePhoneCode parameters, return type and example
 |----------|---------------|
 |PHONE_NUMBER_INVALID|The phone number is invalid|
 
+
 ### Example:
 
 

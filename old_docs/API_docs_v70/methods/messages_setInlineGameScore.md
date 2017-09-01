@@ -26,7 +26,9 @@ description: messages.setInlineGameScore parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid||USER_BOT_REQUIRED|This method can only be called by a bot|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|USER_BOT_REQUIRED|This method can only be called by a bot|
+
 
 ### Example:
 

@@ -24,7 +24,10 @@ description: messages.getInlineBotResults parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|BOT_INLINE_DISABLED|This bot can't be used in inline mode||BOT_INVALID|This is not a valid bot||Timeout|A timeout occurred while fetching data from the bot|
+|BOT_INLINE_DISABLED|This bot can't be used in inline mode|
+|BOT_INVALID|This is not a valid bot|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 
 ### Example:
 

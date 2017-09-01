@@ -28,7 +28,11 @@ description: messages.getHistory parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup||PEER_ID_INVALID|The provided peer id is invalid|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 
 ### Example:
 

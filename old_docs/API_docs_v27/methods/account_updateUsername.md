@@ -22,7 +22,10 @@ description: account.updateUsername parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|USERNAME_INVALID|The provided username is not valid||USERNAME_NOT_MODIFIED|The username was not modified||USERNAME_OCCUPIED|The provided username is already occupied|
+|USERNAME_INVALID|The provided username is not valid|
+|USERNAME_NOT_MODIFIED|The username was not modified|
+|USERNAME_OCCUPIED|The provided username is already occupied|
+
 
 ### Example:
 

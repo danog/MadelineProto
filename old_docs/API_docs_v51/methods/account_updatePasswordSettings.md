@@ -25,6 +25,7 @@ description: account.updatePasswordSettings parameters, return type and example
 |----------|---------------|
 |NEW_SETTINGS_INVALID|The new settings are invalid|
 
+
 ### Example:
 
 

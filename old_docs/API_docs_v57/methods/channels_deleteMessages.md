@@ -23,7 +23,9 @@ description: channels.deleteMessages parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid||MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
+|CHANNEL_INVALID|The provided channel is invalid|
+|MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
+
 
 ### Example:
 

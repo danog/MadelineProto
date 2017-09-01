@@ -28,7 +28,18 @@ description: messages.setInlineBotResults parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|ARTICLE_TITLE_EMPTY|The title of the article is empty||BUTTON_DATA_INVALID|The provided button data is invalid||BUTTON_TYPE_INVALID|The type of one of the buttons you provided is invalid||BUTTON_URL_INVALID|Button URL invalid||MESSAGE_EMPTY|The provided message is empty||QUERY_ID_INVALID|The query ID is invalid||REPLY_MARKUP_INVALID|The provided reply markup is invalid||RESULT_TYPE_INVALID|Result type invalid||SEND_MESSAGE_TYPE_INVALID|The message type is invalid||START_PARAM_INVALID|Start parameter invalid||USER_BOT_INVALID|This method can only be called by a bot|
+|ARTICLE_TITLE_EMPTY|The title of the article is empty|
+|BUTTON_DATA_INVALID|The provided button data is invalid|
+|BUTTON_TYPE_INVALID|The type of one of the buttons you provided is invalid|
+|BUTTON_URL_INVALID|Button URL invalid|
+|MESSAGE_EMPTY|The provided message is empty|
+|QUERY_ID_INVALID|The query ID is invalid|
+|REPLY_MARKUP_INVALID|The provided reply markup is invalid|
+|RESULT_TYPE_INVALID|Result type invalid|
+|SEND_MESSAGE_TYPE_INVALID|The message type is invalid|
+|START_PARAM_INVALID|Start parameter invalid|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
 
 ### Example:
 

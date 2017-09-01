@@ -26,7 +26,9 @@ description: messages.sendInlineBotResult parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|INLINE_RESULT_EXPIRED|The inline query expired||QUERY_ID_EMPTY|The query ID is empty|
+|INLINE_RESULT_EXPIRED|The inline query expired|
+|QUERY_ID_EMPTY|The query ID is empty|
+
 
 ### Example:
 

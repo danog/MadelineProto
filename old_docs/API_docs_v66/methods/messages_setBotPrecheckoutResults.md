@@ -26,6 +26,7 @@ description: messages.setBotPrecheckoutResults parameters, return type and examp
 |----------|---------------|
 |ERROR_TEXT_EMPTY|The provided error message is empty|
 
+
 ### Example:
 
 

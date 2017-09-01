@@ -26,6 +26,7 @@ description: payments.validateRequestedInfo parameters, return type and example
 |----------|---------------|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 
+
 ### Example:
 
 

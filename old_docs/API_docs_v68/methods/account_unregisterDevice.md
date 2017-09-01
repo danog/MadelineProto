@@ -25,6 +25,7 @@ description: account.unregisterDevice parameters, return type and example
 |----------|---------------|
 |TOKEN_INVALID|The provided token is invalid|
 
+
 ### Example:
 
 

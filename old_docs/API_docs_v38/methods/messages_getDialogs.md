@@ -23,7 +23,9 @@ description: messages.getDialogs parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|OFFSET_PEER_ID_INVALID|The provided offset peer is invalid|
 |SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
+
 
 ### Example:
 

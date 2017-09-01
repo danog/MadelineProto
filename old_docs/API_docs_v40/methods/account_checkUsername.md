@@ -24,6 +24,7 @@ description: account.checkUsername parameters, return type and example
 |----------|---------------|
 |USERNAME_INVALID|The provided username is not valid|
 
+
 ### Example:
 
 

@@ -23,7 +23,9 @@ description: account.updateProfile parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
-|ABOUT_TOO_LONG|The provided bio is too long||FIRSTNAME_INVALID|The first name is invalid|
+|ABOUT_TOO_LONG|The provided bio is too long|
+|FIRSTNAME_INVALID|The first name is invalid|
+
 
 ### Example:
 

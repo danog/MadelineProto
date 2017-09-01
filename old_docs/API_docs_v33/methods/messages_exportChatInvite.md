@@ -24,6 +24,7 @@ description: messages.exportChatInvite parameters, return type and example
 |----------|---------------|
 |CHAT_ID_INVALID|The provided chat id is invalid|
 
+
 ### Example:
 
 
