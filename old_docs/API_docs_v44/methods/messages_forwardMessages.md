@@ -25,6 +25,7 @@ description: messages.forwardMessages parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
