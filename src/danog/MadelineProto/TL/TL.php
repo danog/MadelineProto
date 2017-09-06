@@ -294,6 +294,10 @@ trait TL
             case 'double':
                 return $this->pack_double($object);
             case 'string':
+                if (!is_string($object)) {
+                    throw new Exception("You didn't provide a valid string");
+                }
+
                 $object = pack('C*', ...unpack('C*', $object));
                 $l = strlen($object);
                 $concat = '';
@@ -310,6 +314,9 @@ trait TL
 
                 return $concat;
             case 'bytes':
+                if (!is_string($object) && !($object instanceof \danog\MadelineProto\TL\Bytes)) {
+                    throw new Exception("You didn't provide a valid string");
+                }
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
