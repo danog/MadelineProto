@@ -314,7 +314,7 @@ trait TL
 
                 return $concat;
             case 'bytes':
-                if (!is_string($object) && !($object instanceof \danog\MadelineProto\TL\Bytes)) {
+                if (!is_string($object) && !($object instanceof \danog\MadelineProto\TL\Types\Bytes)) {
                     throw new Exception("You didn't provide a valid string");
                 }
                 $l = strlen($object);
