@@ -16,14 +16,21 @@ description: messages.getDhConfig parameters, return type and example
 
 ### Return type: [messages\_DhConfig](../types/messages_DhConfig.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|RANDOM_LENGTH_INVALID|Random length invalid|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -38,15 +45,6 @@ $messages_DhConfig = $MadelineProto->messages->getDhConfig(['version' => int, 'r
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.getDhConfig
-* params - `{"version": int, "random_length": int, }`
 
 
 

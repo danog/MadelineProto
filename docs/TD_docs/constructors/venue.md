@@ -24,25 +24,3 @@ Describes venue
 ### Type: [Venue](../types/Venue.md)
 
 
-### Example:
-
-```
-$venue = ['_' => 'venue', 'location' => location, 'title' => 'string', 'address' => 'string', 'provider' => 'string', 'id' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "venue", "location": location, "title": "string", "address": "string", "provider": "string", "id": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-venue={_='venue', location=location, title='string', address='string', provider='string', id='string'}
-
-```
-
-

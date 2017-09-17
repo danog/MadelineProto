@@ -22,25 +22,3 @@ Voice message
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageVoice = ['_' => 'messageVoice', 'voice' => voice, 'caption' => 'string', 'is_listened' => Bool];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageVoice", "voice": voice, "caption": "string", "is_listened": Bool}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageVoice={_='messageVoice', voice=voice, caption='string', is_listened=Bool}
-
-```
-
-

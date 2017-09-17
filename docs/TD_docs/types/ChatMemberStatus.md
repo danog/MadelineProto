@@ -13,15 +13,15 @@ Provides information about status of a member in the chat
 
 [chatMemberStatusCreator](../constructors/chatMemberStatusCreator.md)  
 
-[chatMemberStatusEditor](../constructors/chatMemberStatusEditor.md)  
-
-[chatMemberStatusModerator](../constructors/chatMemberStatusModerator.md)  
+[chatMemberStatusAdministrator](../constructors/chatMemberStatusAdministrator.md)  
 
 [chatMemberStatusMember](../constructors/chatMemberStatusMember.md)  
 
+[chatMemberStatusRestricted](../constructors/chatMemberStatusRestricted.md)  
+
 [chatMemberStatusLeft](../constructors/chatMemberStatusLeft.md)  
 
-[chatMemberStatusKicked](../constructors/chatMemberStatusKicked.md)  
+[chatMemberStatusBanned](../constructors/chatMemberStatusBanned.md)  
 
 
 

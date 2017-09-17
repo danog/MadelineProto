@@ -30,6 +30,7 @@ $docs = [
         'description' => 'MadelineProto API documentation (td-lib)',
         'output_dir'  => __DIR__.'/docs/TD_docs',
         'readme'      => false,
+        'td'          => true,
     ],
     [
         'tl_schema'   => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],

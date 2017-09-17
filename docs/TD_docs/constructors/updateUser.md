@@ -1,13 +1,13 @@
 ---
 title: updateUser
-description: Some data about a user has been changed
+description: Some data about a user has been changed. This update is guaranteed to come before user identifier is returned to the client, if library knows anything about the user
 ---
 ## Constructor: updateUser  
 [Back to constructors index](index.md)
 
 
 
-Some data about a user has been changed
+Some data about a user has been changed. This update is guaranteed to come before user identifier is returned to the client, if library knows anything about the user
 
 ### Attributes:
 
@@ -18,27 +18,5 @@ Some data about a user has been changed
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateUser = ['_' => 'updateUser', 'user' => user];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateUser", "user": user}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateUser={_='updateUser', user=user}
-
-```
 
 

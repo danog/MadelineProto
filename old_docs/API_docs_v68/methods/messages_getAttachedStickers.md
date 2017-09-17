@@ -15,14 +15,14 @@ description: messages.getAttachedStickers parameters, return type and example
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)
 
+### Can bots use this method: **NO**
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +37,6 @@ $Vector_of_StickerSetCovered = $MadelineProto->messages->getAttachedStickers(['m
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.getAttachedStickers
-* params - `{"media": InputStickeredMedia, }`
 
 
 

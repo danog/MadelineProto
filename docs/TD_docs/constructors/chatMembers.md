@@ -21,25 +21,3 @@ Contains list of chat members
 ### Type: [ChatMembers](../types/ChatMembers.md)
 
 
-### Example:
-
-```
-$chatMembers = ['_' => 'chatMembers', 'total_count' => int, 'members' => [chatMember]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chatMembers", "total_count": int, "members": [chatMember]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chatMembers={_='chatMembers', total_count=int, members={chatMember}}
-
-```
-
-

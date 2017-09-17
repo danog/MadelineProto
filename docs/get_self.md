@@ -5,12 +5,7 @@ description: get_self parameters, return type and example
 ## Method: get_self  
 
 
-### Parameters:
-
-| Name     |    Type       |
-|----------|---------------|
-
-### Return type: [User objects](API_docs/types/User.md)
+### Return type: [User object](API_docs/types/User.md)
 
 ### Example:
 

@@ -15,6 +15,9 @@ description: rpc_drop_answer parameters, return type and example
 
 ### Return type: [RpcDropAnswer](../types/RpcDropAnswer.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

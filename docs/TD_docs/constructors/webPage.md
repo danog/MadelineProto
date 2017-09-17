@@ -24,39 +24,19 @@ Describes web page preview
 |embed\_type|[string](../types/string.md) | Yes|MIME type of embedded preview, i.e. text/html or video/mp4|
 |embed\_width|[int](../types/int.md) | Yes|Width of embedded preview|
 |embed\_height|[int](../types/int.md) | Yes|Height of embedded preview|
-|duration|[int](../types/int.md) | Yes|Duration of the content|
+|duration|[int](../types/int.md) | Yes|Duration of the content in seconds|
 |author|[string](../types/string.md) | Yes|Author of the content|
-|animation|[animation](../types/animation.md) | Yes|Preview as Animation if available, nullable|
-|audio|[audio](../types/audio.md) | Yes|Preview as Audio if available, nullable|
-|document|[document](../types/document.md) | Yes|Preview as Document if available (currently only for small pdf files and zip archives), nullable|
-|sticker|[sticker](../types/sticker.md) | Yes|Preview as Sticker for small .webp files if available, nullable|
-|video|[video](../types/video.md) | Yes|Preview as Video if available, nullable|
-|voice|[voice](../types/voice.md) | Yes|Preview as Voice if available, nullable|
+|animation|[animation](../types/animation.md) | Yes|Preview as an Animation if available, nullable|
+|audio|[audio](../types/audio.md) | Yes|Preview as an Audio if available, nullable|
+|document|[document](../types/document.md) | Yes|Preview as a Document if available (currently only for small pdf files and zip archives), nullable|
+|sticker|[sticker](../types/sticker.md) | Yes|Preview as a Sticker for small .webp files if available, nullable|
+|video|[video](../types/video.md) | Yes|Preview as a Video if available, nullable|
+|video\_note|[videoNote](../types/videoNote.md) | Yes|Preview as a VideoNote if available, nullable|
+|voice|[voice](../types/voice.md) | Yes|Preview as a Voice if available, nullable|
+|has\_instant\_view|[Bool](../types/Bool.md) | Yes|True if web page has instant view|
 
 
 
 ### Type: [WebPage](../types/WebPage.md)
-
-
-### Example:
-
-```
-$webPage = ['_' => 'webPage', 'url' => 'string', 'display_url' => 'string', 'type' => 'string', 'site_name' => 'string', 'title' => 'string', 'description' => 'string', 'photo' => photo, 'embed_url' => 'string', 'embed_type' => 'string', 'embed_width' => int, 'embed_height' => int, 'duration' => int, 'author' => 'string', 'animation' => animation, 'audio' => audio, 'document' => document, 'sticker' => sticker, 'video' => video, 'voice' => voice];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "webPage", "url": "string", "display_url": "string", "type": "string", "site_name": "string", "title": "string", "description": "string", "photo": photo, "embed_url": "string", "embed_type": "string", "embed_width": int, "embed_height": int, "duration": int, "author": "string", "animation": animation, "audio": audio, "document": document, "sticker": sticker, "video": video, "voice": voice}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-webPage={_='webPage', url='string', display_url='string', type='string', site_name='string', title='string', description='string', photo=photo, embed_url='string', embed_type='string', embed_width=int, embed_height=int, duration=int, author='string', animation=animation, audio=audio, document=document, sticker=sticker, video=video, voice=voice}
-
-```
 
 

@@ -13,32 +13,10 @@ Chat members added
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|members|Array of [user](../constructors/user.md) | Yes|New chat member|
+|member\_user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers of new chat members|
 
 
 
 ### Type: [MessageContent](../types/MessageContent.md)
-
-
-### Example:
-
-```
-$messageChatAddMembers = ['_' => 'messageChatAddMembers', 'members' => [user]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageChatAddMembers", "members": [user]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageChatAddMembers={_='messageChatAddMembers', members={user}}
-
-```
 
 

@@ -1,13 +1,13 @@
 ---
 title: updateFileGenerationFinish
-description: File generation is finished
+description: DEPRECATED. Use updateFile instead. File generation is finished
 ---
 ## Constructor: updateFileGenerationFinish  
 [Back to constructors index](index.md)
 
 
 
-File generation is finished
+DEPRECATED. Use updateFile instead. File generation is finished
 
 ### Attributes:
 
@@ -18,27 +18,5 @@ File generation is finished
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateFileGenerationFinish = ['_' => 'updateFileGenerationFinish', 'file' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateFileGenerationFinish", "file": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateFileGenerationFinish={_='updateFileGenerationFinish', file=file}
-
-```
 
 

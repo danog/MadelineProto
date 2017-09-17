@@ -339,7 +339,7 @@ trait UpdateHandler
             $cur_state = &$this->load_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
         /*
-        if ($cur_state['sync_loading'] && $this->in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
+        if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
             \danog\MadelineProto\Logger::log(['Sync loading, not handling update'], \danog\MadelineProto\Logger::NOTICE);
 
             return false;
@@ -539,7 +539,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
-                if ($this->settings['secret_chats']['accept_chats'] === false || ($this->is_array($this->settings['secret_chats']['accept_chats']) && !$this->in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
+                if ($this->settings['secret_chats']['accept_chats'] === false || (is_array($this->settings['secret_chats']['accept_chats']) && !in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats']))) {
                     return;
                 }
                 \danog\MadelineProto\Logger::log(['Accepting secret chat '.$update['chat']['id']], \danog\MadelineProto\Logger::NOTICE);
@@ -611,7 +611,7 @@ trait UpdateHandler
         curl_close($ch);
         \danog\MadelineProto\Logger::log(['Result of webhook query is '.$result], \danog\MadelineProto\Logger::NOTICE);
         $result = json_decode($result, true);
-        if ($this->is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
+        if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
             try {
                 \danog\MadelineProto\Logger::log(['Reverse webhook command returned', $this->method_call($result['method'], $result, ['datacenter' => $this->datacenter->curdc])]);
             } catch (\danog\MadelineProto\Exception $e) {

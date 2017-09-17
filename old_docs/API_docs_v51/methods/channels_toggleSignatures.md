@@ -16,14 +16,21 @@ description: channels.toggleSignatures parameters, return type and example
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -38,15 +45,6 @@ $Updates = $MadelineProto->channels->toggleSignatures(['channel' => InputChannel
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - channels.toggleSignatures
-* params - `{"channel": InputChannel, "enabled": Bool, }`
 
 
 

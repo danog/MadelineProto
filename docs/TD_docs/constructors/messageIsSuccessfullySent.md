@@ -19,25 +19,3 @@ Message was synchronized with the server
 ### Type: [MessageSendState](../types/MessageSendState.md)
 
 
-### Example:
-
-```
-$messageIsSuccessfullySent = ['_' => 'messageIsSuccessfullySent'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageIsSuccessfullySent"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageIsSuccessfullySent={_='messageIsSuccessfullySent'}
-
-```
-
-

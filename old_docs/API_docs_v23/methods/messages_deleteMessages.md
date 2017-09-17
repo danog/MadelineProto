@@ -15,6 +15,9 @@ description: messages.deleteMessages parameters, return type and example
 
 ### Return type: [Vector\_of\_int](../types/int.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

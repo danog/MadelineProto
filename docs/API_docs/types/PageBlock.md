@@ -7,6 +7,8 @@ description: constructors and methods of type PageBlock
 
 
 
+Describes a block of web page instant view
+
 ### Possible values (constructors):
 
 [pageBlockUnsupported](../constructors/pageBlockUnsupported.md)  

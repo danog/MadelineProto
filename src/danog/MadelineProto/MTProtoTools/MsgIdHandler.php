@@ -20,7 +20,7 @@ trait MsgIdHandler
     public function check_message_id($new_message_id, $aargs)
     {
         if (!is_object($new_message_id)) {
-            $new_message_id = new \phpseclib\Math\BigInteger(strrev(substr($new_message_id, 1)), 256);
+            $new_message_id = new \phpseclib\Math\BigInteger(strrev($new_message_id), 256);
         }
         $min_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta - 300))->bitwise_leftShift(32);
         if ($min_message_id->compare($new_message_id) > 0) {
@@ -40,13 +40,10 @@ trait MsgIdHandler
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
                 $key = key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
-                if ($key[0] === "\0") {
-                    $key = 'a'.$key;
-                }
                 unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]);
             }
             $this->datacenter->sockets[$aargs['datacenter']]->max_outgoing_id = $new_message_id;
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages['a'.strrev($new_message_id->toBytes())] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[strrev($new_message_id->toBytes())] = [];
         } else {
             if (!$new_message_id->divide($this->four)[1]->equals($this->one) && !$new_message_id->divide($this->four)[1]->equals($this->three)) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
@@ -66,12 +63,12 @@ trait MsgIdHandler
                 reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                 $key = key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                 if ($key[0] === "\0") {
-                    $key = 'a'.$key;
+                    $key = $key;
                 }
                 unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]);
             }
             $this->datacenter->sockets[$aargs['datacenter']]->max_incoming_id = $new_message_id;
-            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages['a'.strrev($new_message_id->toBytes())] = [];
+            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[strrev($new_message_id->toBytes())] = [];
         }
     }
 
@@ -94,16 +91,5 @@ trait MsgIdHandler
         }
 
         return $this->zero;
-        /*
-        $keys = array_keys((array) $this->datacenter->sockets[$datacenter]->{$incoming.'_messages'});
-        if (empty($keys)) {
-            return $this->zero;
-        }
-        array_walk($keys, function (&$value, $key) {
-            $value = new \phpseclib\Math\BigInteger(strrev(substr($value, 1)), 256);
-        });
-
-        return \phpseclib\Math\BigInteger::max(...$keys);
-        */
     }
 }

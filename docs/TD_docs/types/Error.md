@@ -15,5 +15,7 @@ description: constructors and methods of type Error
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->testUseError](../methods/testUseError.md)  
+
 
 

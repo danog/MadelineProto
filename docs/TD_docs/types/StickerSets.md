@@ -15,7 +15,7 @@ description: constructors and methods of type StickerSets
 
 ### Methods that return an object of this type (methods):
 
-[$MadelineProto->getStickerSets](../methods/getStickerSets.md)  
+[$MadelineProto->getInstalledStickerSets](../methods/getInstalledStickerSets.md)  
 
 [$MadelineProto->getArchivedStickerSets](../methods/getArchivedStickerSets.md)  
 

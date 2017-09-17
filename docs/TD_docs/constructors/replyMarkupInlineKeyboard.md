@@ -20,25 +20,3 @@ Contains inline keyboard layout
 ### Type: [ReplyMarkup](../types/ReplyMarkup.md)
 
 
-### Example:
-
-```
-$replyMarkupInlineKeyboard = ['_' => 'replyMarkupInlineKeyboard', 'rows' => [inlineKeyboardButton>]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "replyMarkupInlineKeyboard", "rows": [inlineKeyboardButton>]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-replyMarkupInlineKeyboard={_='replyMarkupInlineKeyboard', rows={inlineKeyboardButton>}}
-
-```
-
-

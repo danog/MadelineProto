@@ -15,6 +15,16 @@ description: messages.receivedQueue parameters, return type and example
 
 ### Return type: [Vector\_of\_long](../types/long.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MSG_WAIT_FAILED|A waiting call returned an error|
+
+
 ### Example:
 
 

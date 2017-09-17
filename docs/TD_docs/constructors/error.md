@@ -13,33 +13,11 @@ Object of this type may be returned on every function call in case of the error
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|code|[int](../types/int.md) | Yes|Error code, maybe changed in the future|
+|code|[int](../types/int.md) | Yes|Error code, maybe changed in the future. If code == 406, error message should not be processed in any way and shouldn't be showed to the user|
 |message|[string](../types/string.md) | Yes|Error message, may be changed in the future|
 
 
 
 ### Type: [Error](../types/Error.md)
-
-
-### Example:
-
-```
-$error = ['_' => 'error', 'code' => int, 'message' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "error", "code": int, "message": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-error={_='error', code=int, message='string'}
-
-```
 
 

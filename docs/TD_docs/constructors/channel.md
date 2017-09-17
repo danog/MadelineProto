@@ -21,32 +21,10 @@ Represents a channel with zero or more subscribers. There two different kinds of
 |sign\_messages|[Bool](../types/Bool.md) | Yes|True, if messages sent to the channel should content information about the sender. If the channel is a supergroup, the field is meaningless|
 |is\_supergroup|[Bool](../types/Bool.md) | Yes|True, if channel is a supergroup and is not a broadcast|
 |is\_verified|[Bool](../types/Bool.md) | Yes|True, if the channel is verified|
-|restriction\_reason|[string](../types/string.md) | Yes|If non-empty, contains the reason, why access to this channel must be restricted. Format of the string is "{type}: {description}".-{type} contains type of the restriction and at least one of the suffixes "-all", "-ios", "-android", "-wp", which describes platforms on which access should be restricted. For example, "terms-ios-android". {description} contains human-readable description of the restriction, which can be showed to the user|
+|restriction\_reason|[string](../types/string.md) | Yes|If non-empty, contains the reason, why access to this channel must be restricted. Format of the string is "{type}: {description}". {type} contains type of the restriction and at least one of the suffixes "-all", "-ios", "-android", "-wp", which describes platforms on which access should be restricted. For example, "terms-ios-android". {description} contains human-readable description of the restriction, which can be showed to the user|
 
 
 
 ### Type: [Channel](../types/Channel.md)
-
-
-### Example:
-
-```
-$channel = ['_' => 'channel', 'id' => int, 'username' => 'string', 'date' => int, 'status' => ChatMemberStatus, 'anyone_can_invite' => Bool, 'sign_messages' => Bool, 'is_supergroup' => Bool, 'is_verified' => Bool, 'restriction_reason' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "channel", "id": int, "username": "string", "date": int, "status": ChatMemberStatus, "anyone_can_invite": Bool, "sign_messages": Bool, "is_supergroup": Bool, "is_verified": Bool, "restriction_reason": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-channel={_='channel', id=int, username='string', date=int, status=ChatMemberStatus, anyone_can_invite=Bool, sign_messages=Bool, is_supergroup=Bool, is_verified=Bool, restriction_reason='string'}
-
-```
 
 

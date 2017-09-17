@@ -16,6 +16,9 @@ description: invokeAfterMsg parameters, return type and example
 
 ### Return type: [X](../types/X.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

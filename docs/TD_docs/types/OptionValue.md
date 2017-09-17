@@ -11,13 +11,13 @@ Represents value of an option
 
 ### Possible values (constructors):
 
-[optionBoolean](../constructors/optionBoolean.md)  
+[optionValueBoolean](../constructors/optionValueBoolean.md)  
 
-[optionEmpty](../constructors/optionEmpty.md)  
+[optionValueEmpty](../constructors/optionValueEmpty.md)  
 
-[optionInteger](../constructors/optionInteger.md)  
+[optionValueInteger](../constructors/optionValueInteger.md)  
 
-[optionString](../constructors/optionString.md)  
+[optionValueString](../constructors/optionValueString.md)  
 
 
 

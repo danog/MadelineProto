@@ -1,44 +1,22 @@
 ---
 title: updateFile
-description: File is downloaded/uploaded
+description: Information about a file was updated
 ---
 ## Constructor: updateFile  
 [Back to constructors index](index.md)
 
 
 
-File is downloaded/uploaded
+Information about a file was updated
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file|[file](../types/file.md) | Yes|Synced file|
+|file|[file](../types/file.md) | Yes|New data about a file|
 
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateFile = ['_' => 'updateFile', 'file' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateFile", "file": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateFile={_='updateFile', file=file}
-
-```
 
 

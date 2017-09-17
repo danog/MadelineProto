@@ -17,14 +17,21 @@ description: account.sendChangePhoneCode parameters, return type and example
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -39,15 +46,6 @@ $auth_SentCode = $MadelineProto->account->sendChangePhoneCode(['allow_flashcall'
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - account.sendChangePhoneCode
-* params - `{"allow_flashcall": Bool, "phone_number": "string", "current_number": Bool, }`
 
 
 

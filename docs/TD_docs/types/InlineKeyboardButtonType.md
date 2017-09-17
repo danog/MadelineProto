@@ -19,6 +19,8 @@ Describes type of the inline keyboard button
 
 [inlineKeyboardButtonTypeSwitchInline](../constructors/inlineKeyboardButtonTypeSwitchInline.md)  
 
+[inlineKeyboardButtonTypeBuy](../constructors/inlineKeyboardButtonTypeBuy.md)  
+
 
 
 ### Methods that return an object of this type (methods):

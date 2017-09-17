@@ -21,25 +21,3 @@ Describes chat photo
 ### Type: [ChatPhoto](../types/ChatPhoto.md)
 
 
-### Example:
-
-```
-$chatPhoto = ['_' => 'chatPhoto', 'small' => file, 'big' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chatPhoto", "small": file, "big": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chatPhoto={_='chatPhoto', small=file, big=file}
-
-```
-
-

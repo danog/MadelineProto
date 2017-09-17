@@ -1,6 +1,6 @@
 ---
 title: setAuthPhoneNumber
-description: Sets user's phone number and sends authentication code to the user. Works only when authGetState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
+description: Sets user's phone number and sends authentication code to the user. Works only when getAuthState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
 ---
 ## Method: setAuthPhoneNumber  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sets user's phone number and sends authentication code to the user.
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sets user's phone number and sends authentication code to the user. Works only when authGetState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
+Sets user's phone number and sends authentication code to the user. Works only when getAuthState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode
 
 ### Params:
 
@@ -21,59 +21,4 @@ Sets user's phone number and sends authentication code to the user. Works only w
 
 
 ### Return type: [AuthState](../types/AuthState.md)
-
-### Example:
-
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
-if (isset($number)) { // Login as a user
-    $sentCode = $MadelineProto->phone_login($number);
-    echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
-    $MadelineProto->complete_phone_login($code);
-}
-
-$AuthState = $MadelineProto->setAuthPhoneNumber(['phone_number' => 'string', 'allow_flash_call' => Bool, 'is_current_phone_number' => Bool, ]);
-```
-
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - setAuthPhoneNumber
-* params - `{"phone_number": "string", "allow_flash_call": Bool, "is_current_phone_number": Bool, }`
-
-
-
-### As a user:
-
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/setAuthPhoneNumber`
-
-Parameters:
-
-phone_number - Json encoded string
-
-allow_flash_call - Json encoded Bool
-
-is_current_phone_number - Json encoded Bool
-
-
-
-
-Or, if you're into Lua:
-
-```
-AuthState = setAuthPhoneNumber({phone_number='string', allow_flash_call=Bool, is_current_phone_number=Bool, })
-```
 

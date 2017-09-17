@@ -15,6 +15,8 @@ description: constructors and methods of type ChatMembers
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->searchChatMembers](../methods/searchChatMembers.md)  
+
 [$MadelineProto->getChannelMembers](../methods/getChannelMembers.md)  
 
 

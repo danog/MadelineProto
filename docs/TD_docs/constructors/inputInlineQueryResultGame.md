@@ -22,31 +22,3 @@ Represents a game
 ### Type: [InputInlineQueryResult](../types/InputInlineQueryResult.md)
 
 
-### Example:
-
-```
-$inputInlineQueryResultGame = ['_' => 'inputInlineQueryResultGame', 'id' => 'string', 'game_short_name' => 'string', 'reply_markup' => ReplyMarkup];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputInlineQueryResultGame", "id": "string", "game_short_name": "string", "reply_markup": ReplyMarkup}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputInlineQueryResultGame={_='inputInlineQueryResultGame', id='string', game_short_name='string', reply_markup=ReplyMarkup}
-
-```
-
-
-
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-

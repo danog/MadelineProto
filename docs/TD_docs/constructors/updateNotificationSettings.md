@@ -21,25 +21,3 @@ Notification settings for some chats was updated
 ### Type: [Update](../types/Update.md)
 
 
-### Example:
-
-```
-$updateNotificationSettings = ['_' => 'updateNotificationSettings', 'scope' => NotificationSettingsScope, 'notification_settings' => notificationSettings];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateNotificationSettings", "scope": NotificationSettingsScope, "notification_settings": notificationSettings}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateNotificationSettings={_='updateNotificationSettings', scope=NotificationSettingsScope, notification_settings=notificationSettings}
-
-```
-
-

@@ -16,6 +16,9 @@ description: geochats.sendMedia parameters, return type and example
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

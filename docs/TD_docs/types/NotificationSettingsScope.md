@@ -11,13 +11,13 @@ Describes kinds of chat for which notification settings are applied
 
 ### Possible values (constructors):
 
-[notificationSettingsForChat](../constructors/notificationSettingsForChat.md)  
+[notificationSettingsScopeChat](../constructors/notificationSettingsScopeChat.md)  
 
-[notificationSettingsForPrivateChats](../constructors/notificationSettingsForPrivateChats.md)  
+[notificationSettingsScopePrivateChats](../constructors/notificationSettingsScopePrivateChats.md)  
 
-[notificationSettingsForGroupChats](../constructors/notificationSettingsForGroupChats.md)  
+[notificationSettingsScopeGroupChats](../constructors/notificationSettingsScopeGroupChats.md)  
 
-[notificationSettingsForAllChats](../constructors/notificationSettingsForAllChats.md)  
+[notificationSettingsScopeAllChats](../constructors/notificationSettingsScopeAllChats.md)  
 
 
 

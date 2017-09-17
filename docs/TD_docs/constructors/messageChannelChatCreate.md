@@ -20,25 +20,3 @@ New channel chat created
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageChannelChatCreate = ['_' => 'messageChannelChatCreate', 'title' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageChannelChatCreate", "title": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageChannelChatCreate={_='messageChannelChatCreate', title='string'}
-
-```
-
-

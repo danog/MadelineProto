@@ -15,6 +15,9 @@ description: messages.getUnusedStickers parameters, return type and example
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

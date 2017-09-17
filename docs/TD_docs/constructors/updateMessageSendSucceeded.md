@@ -13,33 +13,11 @@ Message is successfully sent
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message|[message](../types/message.md) | Yes|Information about sent message. Usually only message identifier, date and content are changed, but some other fields may also change|
-|old\_message\_id|[long](../types/long.md) | Yes|Previous temporary message identifier|
+|message|[message](../types/message.md) | Yes|Information about sent message. Usually only message identifier, date and content are changed, but almost any other fields can also change|
+|old\_message\_id|[int53](../types/int53.md) | Yes|Previous temporary message identifier|
 
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateMessageSendSucceeded = ['_' => 'updateMessageSendSucceeded', 'message' => message, 'old_message_id' => long];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateMessageSendSucceeded", "message": message, "old_message_id": long}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateMessageSendSucceeded={_='updateMessageSendSucceeded', message=message, old_message_id=long}
-
-```
 
 

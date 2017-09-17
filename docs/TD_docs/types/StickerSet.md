@@ -19,5 +19,9 @@ description: constructors and methods of type StickerSet
 
 [$MadelineProto->searchStickerSet](../methods/searchStickerSet.md)  
 
+[$MadelineProto->createNewStickerSet](../methods/createNewStickerSet.md)  
+
+[$MadelineProto->addStickerToSet](../methods/addStickerToSet.md)  
+
 
 

@@ -1,18 +1,12 @@
 ---
 title: sendMessageGeoLocationAction
-description: User sends geolocation
+description: sendMessageGeoLocationAction attributes, type and example
 ---
 ## Constructor: sendMessageGeoLocationAction  
 [Back to constructors index](index.md)
 
 
 
-User sends geolocation
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

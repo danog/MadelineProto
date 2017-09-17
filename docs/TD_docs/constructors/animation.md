@@ -13,6 +13,7 @@ Describes animation file. Animation should be encoded in gif or mp4 format
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
+|duration|[int](../types/int.md) | Yes|Duration of the animation in seconds as defined by sender|
 |width|[int](../types/int.md) | Yes|Width of the animation|
 |height|[int](../types/int.md) | Yes|Height of the animation|
 |file\_name|[string](../types/string.md) | Yes|Original name of a file as defined by sender|
@@ -23,27 +24,5 @@ Describes animation file. Animation should be encoded in gif or mp4 format
 
 
 ### Type: [Animation](../types/Animation.md)
-
-
-### Example:
-
-```
-$animation = ['_' => 'animation', 'width' => int, 'height' => int, 'file_name' => 'string', 'mime_type' => 'string', 'thumb' => photoSize, 'animation' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "animation", "width": int, "height": int, "file_name": "string", "mime_type": "string", "thumb": photoSize, "animation": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-animation={_='animation', width=int, height=int, file_name='string', mime_type='string', thumb=photoSize, animation=file}
-
-```
 
 

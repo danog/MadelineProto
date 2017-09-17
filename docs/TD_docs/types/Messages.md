@@ -23,6 +23,8 @@ description: constructors and methods of type Messages
 
 [$MadelineProto->searchMessages](../methods/searchMessages.md)  
 
+[$MadelineProto->searchCallMessages](../methods/searchCallMessages.md)  
+
 [$MadelineProto->forwardMessages](../methods/forwardMessages.md)  
 
 

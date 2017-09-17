@@ -19,25 +19,3 @@ Chat photo deleted
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageChatDeletePhoto = ['_' => 'messageChatDeletePhoto'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageChatDeletePhoto"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageChatDeletePhoto={_='messageChatDeletePhoto'}
-
-```
-
-

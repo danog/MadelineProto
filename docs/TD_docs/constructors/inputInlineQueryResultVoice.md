@@ -25,31 +25,3 @@ Represents link to a opus encoded audio file in ogg container
 ### Type: [InputInlineQueryResult](../types/InputInlineQueryResult.md)
 
 
-### Example:
-
-```
-$inputInlineQueryResultVoice = ['_' => 'inputInlineQueryResultVoice', 'id' => 'string', 'title' => 'string', 'voice_url' => 'string', 'voice_duration' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputInlineQueryResultVoice", "id": "string", "title": "string", "voice_url": "string", "voice_duration": int, "reply_markup": ReplyMarkup, "input_message_content": InputMessageContent}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputInlineQueryResultVoice={_='inputInlineQueryResultVoice', id='string', title='string', voice_url='string', voice_duration=int, reply_markup=ReplyMarkup, input_message_content=InputMessageContent}
-
-```
-
-
-
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-

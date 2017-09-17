@@ -1,6 +1,6 @@
 ---
 title: toggleChannelSignMessages
-description: Enables or disables sender signature on sent messages in the channel. Needs creator privileges in the channel. Not available for supergroups
+description: Enables or disables sender signature on sent messages in the channel. Needs appropriate rights in the channel. Not available for supergroups
 ---
 ## Method: toggleChannelSignMessages  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Enables or disables sender signature on sent messages in the channe
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Enables or disables sender signature on sent messages in the channel. Needs creator privileges in the channel. Not available for supergroups
+Enables or disables sender signature on sent messages in the channel. Needs appropriate rights in the channel. Not available for supergroups
 
 ### Params:
 
@@ -20,57 +20,4 @@ Enables or disables sender signature on sent messages in the channel. Needs crea
 
 
 ### Return type: [Ok](../types/Ok.md)
-
-### Example:
-
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
-if (isset($number)) { // Login as a user
-    $sentCode = $MadelineProto->phone_login($number);
-    echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
-    $MadelineProto->complete_phone_login($code);
-}
-
-$Ok = $MadelineProto->toggleChannelSignMessages(['channel_id' => int, 'sign_messages' => Bool, ]);
-```
-
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - toggleChannelSignMessages
-* params - `{"channel_id": int, "sign_messages": Bool, }`
-
-
-
-### As a user:
-
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/toggleChannelSignMessages`
-
-Parameters:
-
-channel_id - Json encoded int
-
-sign_messages - Json encoded Bool
-
-
-
-
-Or, if you're into Lua:
-
-```
-Ok = toggleChannelSignMessages({channel_id=int, sign_messages=Bool, })
-```
 

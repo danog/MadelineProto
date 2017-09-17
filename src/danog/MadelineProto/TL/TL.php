@@ -95,7 +95,7 @@ trait TL
                         continue;
                     }
                     $name = preg_replace(['/#.*/', '/\s.*/'], '', $line);
-                    if ($this->in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                    if (in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
                         continue;
                     }
                     $clean = preg_replace([
@@ -294,6 +294,10 @@ trait TL
             case 'double':
                 return $this->pack_double($object);
             case 'string':
+                if (!is_string($object)) {
+                    throw new Exception("You didn't provide a valid string");
+                }
+
                 $object = pack('C*', ...unpack('C*', $object));
                 $l = strlen($object);
                 $concat = '';
@@ -310,6 +314,9 @@ trait TL
 
                 return $concat;
             case 'bytes':
+                if (!is_string($object) && !($object instanceof \danog\MadelineProto\TL\Types\Bytes)) {
+                    throw new Exception("You didn't provide a valid string");
+                }
                 $l = strlen($object);
                 $concat = '';
                 if ($l <= 253) {
@@ -331,7 +338,7 @@ trait TL
             case '!X':
                 return $object;
             case 'Vector t':
-                if (!$this->is_array($object)) {
+                if (!is_array($object)) {
                     throw new Exception("You didn't provide a valid array");
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
@@ -344,7 +351,7 @@ trait TL
 
         }
         $auto = false;
-        if ((!$this->is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && $this->in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+        if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
@@ -427,7 +434,7 @@ trait TL
         $arguments['flags'] = $flags;
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
-                if (isset($current_argument['pow']) && ($this->in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
+                if (isset($current_argument['pow']) && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
                     //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
                     continue;
                 }
@@ -459,7 +466,7 @@ trait TL
 
                 throw new Exception('Missing required parameter', $current_argument['name']);
             }
-            if (!$this->is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
+            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
                 if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
                     throw new \danog\MadelineProto\Exception('This secret peer is not present in the internal peer database');
                 }
@@ -514,7 +521,7 @@ trait TL
                 return unpack('V', stream_get_contents($stream, 4))[1];
             case 'long':
                 if (isset($type['idstrlong'])) {
-                    return 'a'.stream_get_contents($stream, 8);
+                    return stream_get_contents($stream, 8);
                 }
 
                 return \danog\MadelineProto\Logger::$bigint || isset($type['strlong']) ? stream_get_contents($stream, 8) : $this->unpack_signed_long(stream_get_contents($stream, 8));
@@ -628,13 +635,13 @@ trait TL
                         }
                 }
             }
-            if ($this->in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
+            if (in_array($arg['name'], ['msg_ids', 'msg_id', 'bad_msg_id', 'req_msg_id', 'answer_msg_id', 'first_msg_id'])) {
                 $arg['idstrlong'] = true;
             }
-            if ($this->in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
+            if (in_array($arg['name'], ['key_fingerprint', 'server_salt', 'new_server_salt', 'server_public_key_fingerprints', 'ping_id', 'exchange_id'])) {
                 $arg['strlong'] = true;
             }
-            if ($this->in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
+            if (in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
 

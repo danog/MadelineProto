@@ -21,25 +21,3 @@ Animation message
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageAnimation = ['_' => 'messageAnimation', 'animation' => animation, 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageAnimation", "animation": animation, "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageAnimation={_='messageAnimation', animation=animation, caption='string'}
-
-```
-
-

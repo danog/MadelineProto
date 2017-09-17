@@ -19,31 +19,10 @@ Photo message
 |width|[int](../types/int.md) | Yes|Photo width|
 |height|[int](../types/int.md) | Yes|Photo height|
 |caption|[string](../types/string.md) | Yes|Photo caption, 0-200 characters|
+|ttl|[int](../types/int.md) | Yes|Photo TTL in seconds, 0-60. Non-zero TTL can be only specified in private chats|
 
 
 
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
-
-
-### Example:
-
-```
-$inputMessagePhoto = ['_' => 'inputMessagePhoto', 'photo' => InputFile, 'thumb' => InputThumb, 'added_sticker_file_ids' => [int], 'width' => int, 'height' => int, 'caption' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessagePhoto", "photo": InputFile, "thumb": InputThumb, "added_sticker_file_ids": [int], "width": int, "height": int, "caption": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessagePhoto={_='inputMessagePhoto', photo=InputFile, thumb=InputThumb, added_sticker_file_ids={int}, width=int, height=int, caption='string'}
-
-```
 
 

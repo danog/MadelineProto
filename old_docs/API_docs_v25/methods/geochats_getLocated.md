@@ -17,6 +17,9 @@ description: geochats.getLocated parameters, return type and example
 
 ### Return type: [geochats\_Located](../types/geochats_Located.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

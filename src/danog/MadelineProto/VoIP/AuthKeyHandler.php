@@ -139,7 +139,6 @@ trait AuthKeyHandler
 
         $this->calls[$params['id']]->configuration['shared_config'] = array_merge($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]), $this->calls[$params['id']]->configuration['shared_config']);
         $this->calls[$params['id']]->configuration['endpoints'] = array_merge([$res['connection']], $res['alternative_connections'], $this->calls[$params['id']]->configuration['endpoints']);
-
         $this->calls[$params['id']]->configuration = array_merge([
             'recv_timeout'         => $this->config['call_receive_timeout_ms'] / 1000,
             'init_timeout'         => $this->config['call_connect_timeout_ms'] / 1000,

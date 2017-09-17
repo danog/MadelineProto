@@ -18,6 +18,9 @@ description: geochats.getHistory parameters, return type and example
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

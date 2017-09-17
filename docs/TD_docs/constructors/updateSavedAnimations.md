@@ -1,43 +1,22 @@
 ---
 title: updateSavedAnimations
-description: List of saved animations was updated. Need to drop saved animations cache if have some
+description: List of saved animations was updated
 ---
 ## Constructor: updateSavedAnimations  
 [Back to constructors index](index.md)
 
 
 
-List of saved animations was updated. Need to drop saved animations cache if have some
+List of saved animations was updated
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
+|animation\_ids|Array of [int](../constructors/int.md) | Yes|New list of file identifiers of saved animations|
 
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateSavedAnimations = ['_' => 'updateSavedAnimations'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateSavedAnimations"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateSavedAnimations={_='updateSavedAnimations'}
-
-```
 
 

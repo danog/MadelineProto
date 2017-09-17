@@ -19,5 +19,9 @@ description: constructors and methods of type File
 
 [$MadelineProto->getFilePersistent](../methods/getFilePersistent.md)  
 
+[$MadelineProto->uploadFile](../methods/uploadFile.md)  
+
+[$MadelineProto->uploadStickerFile](../methods/uploadStickerFile.md)  
+
 
 

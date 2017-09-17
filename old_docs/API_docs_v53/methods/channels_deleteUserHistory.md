@@ -16,14 +16,22 @@ description: channels.deleteUserHistory parameters, return type and example
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -38,15 +46,6 @@ $messages_AffectedHistory = $MadelineProto->channels->deleteUserHistory(['channe
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - channels.deleteUserHistory
-* params - `{"channel": InputChannel, "user_id": InputUser, }`
 
 
 

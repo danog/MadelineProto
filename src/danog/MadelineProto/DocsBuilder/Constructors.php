@@ -155,7 +155,9 @@ description: '.$description.'
 
 
 ';
-            $example = '### Example:
+            $example = '';
+            if (!isset($this->settings['td'])) {
+                $example = '### Example:
 
 ```
 $'.$constructor.$layer.' = '.$params.';
@@ -179,17 +181,17 @@ Or, if you\'re into Lua:
 
 ';
 
-            if ($hasreplymarkup) {
-                $example .= '
+                if ($hasreplymarkup) {
+                    $example .= '
 ## Usage of reply_markup
 
 You can provide bot API reply_markup objects here.  
 
 
 ';
-            }
-            if ($hasentities) {
-                $example .= '
+                }
+                if ($hasentities) {
+                    $example .= '
 ## Usage of parse_mode:
 
 Set parse_mode to html to enable HTML parsing of the message.  
@@ -221,6 +223,7 @@ You can also use normal markdown, note that to create mentions you must use the 
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
+                }
             }
             file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }

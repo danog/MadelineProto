@@ -20,25 +20,3 @@ Message with location
 ### Type: [MessageContent](../types/MessageContent.md)
 
 
-### Example:
-
-```
-$messageLocation = ['_' => 'messageLocation', 'location' => location];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "messageLocation", "location": location}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-messageLocation={_='messageLocation', location=location}
-
-```
-
-

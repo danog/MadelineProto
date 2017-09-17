@@ -28,31 +28,3 @@ Represents link to a jpeg photo
 ### Type: [InputInlineQueryResult](../types/InputInlineQueryResult.md)
 
 
-### Example:
-
-```
-$inputInlineQueryResultPhoto = ['_' => 'inputInlineQueryResultPhoto', 'id' => 'string', 'title' => 'string', 'description' => 'string', 'thumb_url' => 'string', 'photo_url' => 'string', 'photo_width' => int, 'photo_height' => int, 'reply_markup' => ReplyMarkup, 'input_message_content' => InputMessageContent];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputInlineQueryResultPhoto", "id": "string", "title": "string", "description": "string", "thumb_url": "string", "photo_url": "string", "photo_width": int, "photo_height": int, "reply_markup": ReplyMarkup, "input_message_content": InputMessageContent}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputInlineQueryResultPhoto={_='inputInlineQueryResultPhoto', id='string', title='string', description='string', thumb_url='string', photo_url='string', photo_width=int, photo_height=int, reply_markup=ReplyMarkup, input_message_content=InputMessageContent}
-
-```
-
-
-
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-

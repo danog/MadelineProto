@@ -31,6 +31,14 @@ Represents filter for content of searched messages
 
 [searchMessagesFilterChatPhoto](../constructors/searchMessagesFilterChatPhoto.md)  
 
+[searchMessagesFilterCall](../constructors/searchMessagesFilterCall.md)  
+
+[searchMessagesFilterMissedCall](../constructors/searchMessagesFilterMissedCall.md)  
+
+[searchMessagesFilterVideoNote](../constructors/searchMessagesFilterVideoNote.md)  
+
+[searchMessagesFilterVoiceAndVideoNote](../constructors/searchMessagesFilterVoiceAndVideoNote.md)  
+
 
 
 ### Methods that return an object of this type (methods):

@@ -4,6 +4,8 @@ description: PHP implementation of telegram's MTProto protocol
 ---
 # MadelineProto, a PHP MTProto telegram client
 
+Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!
+
 This library can be used to create php telegram bots (like bot API bots, only better) and php telegram userbots (like tg-cli userbots, only better).
 
 This library can also be used to create lua telegram bots (like bot API bots, only better) and lua telegram userbots (like tg-cli userbots, only better).
@@ -156,6 +158,9 @@ Use `complete_signup` to signup, see [here for the parameters and the result](ht
 
 Use `bot_login` to login as a bot, see [here for the parameters and the result](https://daniil.it/MadelineProto/bot_login.html).  
 Note that when you login as a bot, MadelineProto also logins using the [PWRTelegram](https://pwrtelegram.xyz) API, to allow persistant storage of peers, even after a logout and another login.  
+
+
+Use `logout` to logout, see [here for the parameters and the result](https://daniil.it/MadelineProto/logout.html).  
 
 
 Use `get_pwr_chat` to get chat info, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_pwr_chat.html).  
@@ -622,9 +627,23 @@ An istance of MadelineProto can be safely serialized or unserialized. To seriali
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 // Do stuff
 \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
+// or
+$MadelineProto->serialize('session.madeline');
 ```  
 
-THe deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
+Or
+
+```  
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+$MadelineProto->session = 'session.madeline';
+```  
+
+This way, if the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
+
+It is still recommended to serialize the session at every update.
+
+
+The deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
 That class serializes using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
 The same should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 

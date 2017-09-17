@@ -20,25 +20,3 @@ Message with information about venue
 ### Type: [InputMessageContent](../types/InputMessageContent.md)
 
 
-### Example:
-
-```
-$inputMessageVenue = ['_' => 'inputMessageVenue', 'venue' => venue];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inputMessageVenue", "venue": venue}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inputMessageVenue={_='inputMessageVenue', venue=venue}
-
-```
-
-

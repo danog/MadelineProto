@@ -1,19 +1,17 @@
 ---
 title: sendMessageUploadDocumentAction
-description: User uploads a document
+description: sendMessageUploadDocumentAction attributes, type and example
 ---
 ## Constructor: sendMessageUploadDocumentAction  
 [Back to constructors index](index.md)
 
 
 
-User uploads a document
-
 ### Attributes:
 
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
-|progress|[int](../types/int.md) | Yes|Upload progress in percents|
+| Name     |    Type       | Required |
+|----------|---------------|----------|
+|progress|[int](../types/int.md) | Yes|
 
 
 

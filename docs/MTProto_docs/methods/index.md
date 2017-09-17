@@ -6,6 +6,27 @@ description: List of methods
 [Back to API documentation index](..)
 
 
+$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
+
+$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+
+$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+
+$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
+
+$MadelineProto->[bot_login](https://docs.madelineproto.xyz/complete_phone_login.html)($token);
+
+
+$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+
+$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+
+$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+
+$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
+
+$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
+
 
 ***
 <br><br>$MadelineProto->[destroy_session](destroy_session.md)(\['session_id' => [long](../types/long.md), \]) === [$DestroySessionRes](../types/DestroySessionRes.md)<a name="destroy_session"></a>  

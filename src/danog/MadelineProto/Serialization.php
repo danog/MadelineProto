@@ -32,9 +32,9 @@ class Serialization
             touch($lock);
             clearstatcache();
         }
-        $lock = fopen($lock, 'r');
+        $lock = fopen($lock, 'w');
         flock($lock, LOCK_EX);
-        $wrote = file_put_contents($filename.'.temp.session', \danog\Serialization::serialize($instance, true));
+        $wrote = file_put_contents($filename.'.temp.session', serialize($instance));
         rename($filename.'.temp.session', $filename);
         flock($lock, LOCK_UN);
         fclose($lock);
@@ -64,7 +64,7 @@ class Serialization
             $unserialized = file_get_contents($filename);
             flock($lock, LOCK_UN);
             fclose($lock);
-            $unserialized = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
+            $tounserialize = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
             foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\Types\Button', 'TL\Types\Bytes', 'APIFactory'] as $class) {
                 class_exists('\danog\MadelineProto\\'.$class);
             }
@@ -72,14 +72,14 @@ class Serialization
             \danog\MadelineProto\Logger::class_exists();
 
             try {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
-            } catch (Bug74586Exception $e) {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
-                /*} catch (Exception $e) {
-                    $unserialized = \danog\Serialization::unserialize($unserialized);
-                */
-            } catch (\Error $e) {
-                $unserialized = \danog\Serialization::unserialize($unserialized);
+                $unserialized = unserialize($tounserialize);
+            } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($tounserialize);
+            } catch (\danog\MadelineProto\Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($tounserialize);
+            }
+            if ($unserialized instanceof \danog\PlaceHolder) {
+                $unserialized = \danog\Serialization::unserialize($tounserialize);
             }
         } else {
             throw new Exception('File does not exist');

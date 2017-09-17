@@ -21,25 +21,3 @@ Represents information about a game
 ### Type: [InlineQueryResult](../types/InlineQueryResult.md)
 
 
-### Example:
-
-```
-$inlineQueryResultGame = ['_' => 'inlineQueryResultGame', 'id' => 'string', 'game' => game];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "inlineQueryResultGame", "id": "string", "game": game}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-inlineQueryResultGame={_='inlineQueryResultGame', id='string', game=game}
-
-```
-
-

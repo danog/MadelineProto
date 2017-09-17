@@ -1,44 +1,22 @@
 ---
 title: chats
-description: Contains list of chats
+description: Represents list of chats
 ---
 ## Constructor: chats  
 [Back to constructors index](index.md)
 
 
 
-Contains list of chats
+Represents list of chats
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chats|Array of [chat](../constructors/chat.md) | Yes|List of chats|
+|chat\_ids|Array of [int53](../constructors/int53.md) | Yes|List of chat identifiers|
 
 
 
 ### Type: [Chats](../types/Chats.md)
-
-
-### Example:
-
-```
-$chats = ['_' => 'chats', 'chats' => [chat]];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "chats", "chats": [chat]}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-chats={_='chats', chats={chat}}
-
-```
 
 

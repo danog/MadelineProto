@@ -10,6 +10,9 @@ description: help.getConfig parameters, return type and example
 
 ### Return type: [Config](../types/Config.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

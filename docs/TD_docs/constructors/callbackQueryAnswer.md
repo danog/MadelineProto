@@ -1,13 +1,13 @@
 ---
 title: callbackQueryAnswer
-description: Contains answer of the bot to the callback query
+description: Contains answer of a bot to a callback query
 ---
 ## Constructor: callbackQueryAnswer  
 [Back to constructors index](index.md)
 
 
 
-Contains answer of the bot to the callback query
+Contains answer of a bot to a callback query
 
 ### Attributes:
 
@@ -20,27 +20,5 @@ Contains answer of the bot to the callback query
 
 
 ### Type: [CallbackQueryAnswer](../types/CallbackQueryAnswer.md)
-
-
-### Example:
-
-```
-$callbackQueryAnswer = ['_' => 'callbackQueryAnswer', 'text' => 'string', 'show_alert' => Bool, 'url' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "callbackQueryAnswer", "text": "string", "show_alert": Bool, "url": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-callbackQueryAnswer={_='callbackQueryAnswer', text='string', show_alert=Bool, url='string'}
-
-```
 
 

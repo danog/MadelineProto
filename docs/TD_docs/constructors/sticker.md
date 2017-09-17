@@ -27,25 +27,3 @@ Describes sticker
 ### Type: [Sticker](../types/Sticker.md)
 
 
-### Example:
-
-```
-$sticker = ['_' => 'sticker', 'set_id' => long, 'width' => int, 'height' => int, 'emoji' => 'string', 'is_mask' => Bool, 'mask_position' => maskPosition, 'thumb' => photoSize, 'sticker' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "sticker", "set_id": long, "width": int, "height": int, "emoji": "string", "is_mask": Bool, "mask_position": maskPosition, "thumb": photoSize, "sticker": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-sticker={_='sticker', set_id=long, width=int, height=int, emoji='string', is_mask=Bool, mask_position=maskPosition, thumb=photoSize, sticker=file}
-
-```
-
-

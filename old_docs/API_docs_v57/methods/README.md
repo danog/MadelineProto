@@ -6,6 +6,27 @@ description: List of methods
 [Back to API documentation index](..)
 
 
+$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
+
+$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+
+$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+
+$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
+
+$MadelineProto->[bot_login](https://docs.madelineproto.xyz/complete_phone_login.html)($token);
+
+
+$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+
+$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+
+$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+
+$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
+
+$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
+
 
 ***
 <br><br>$MadelineProto->[account->changePhone](account_changePhone.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="account_changePhone"></a>  

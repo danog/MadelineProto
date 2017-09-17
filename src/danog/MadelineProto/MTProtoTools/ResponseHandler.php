@@ -23,7 +23,7 @@ trait ResponseHandler
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id])) {
-                $msg_id = new \phpseclib\Math\BigInteger(strrev(substr($msg_id, 1)), 256);
+                $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
                 if ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $cur_info |= 3;
                 } elseif ((new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
@@ -187,7 +187,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
-                        $msg_id = new \phpseclib\Math\BigInteger(strrev(substr($msg_id, 1)), 256);
+                        $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
                         $status = 'Status for message id '.$msg_id.': ';
                         if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & 4) !== 0) {
                             $this->ack_outgoing_message_id($msg_id, $datacenter);

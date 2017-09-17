@@ -17,6 +17,9 @@ description: set_client_DH_params parameters, return type and example
 
 ### Return type: [Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

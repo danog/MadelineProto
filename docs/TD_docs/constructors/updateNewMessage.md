@@ -15,31 +15,10 @@ New message received, maybe outcoming message sent from other device
 |----------|---------------|----------|-------------|
 |message|[message](../types/message.md) | Yes|New message|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|If true, notification about the message should be disabled|
+|contains\_mention|[Bool](../types/Bool.md) | Yes|True, if the message contains mention of the current user|
 
 
 
 ### Type: [Update](../types/Update.md)
-
-
-### Example:
-
-```
-$updateNewMessage = ['_' => 'updateNewMessage', 'message' => message, 'disable_notification' => Bool];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "updateNewMessage", "message": message, "disable_notification": Bool}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-updateNewMessage={_='updateNewMessage', message=message, disable_notification=Bool}
-
-```
 
 

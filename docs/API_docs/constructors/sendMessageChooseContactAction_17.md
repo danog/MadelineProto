@@ -1,18 +1,12 @@
 ---
 title: sendMessageChooseContactAction
-description: User chooses contact to send
+description: sendMessageChooseContactAction attributes, type and example
 ---
 ## Constructor: sendMessageChooseContactAction\_17  
 [Back to constructors index](index.md)
 
 
 
-User chooses contact to send
-
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

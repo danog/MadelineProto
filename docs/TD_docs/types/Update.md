@@ -15,6 +15,8 @@ Contains notifications about data changes
 
 [updateNewMessage](../constructors/updateNewMessage.md)  
 
+[updateMessageSendAcknowledged](../constructors/updateMessageSendAcknowledged.md)  
+
 [updateMessageSendSucceeded](../constructors/updateMessageSendSucceeded.md)  
 
 [updateMessageSendFailed](../constructors/updateMessageSendFailed.md)  
@@ -25,29 +27,33 @@ Contains notifications about data changes
 
 [updateMessageViews](../constructors/updateMessageViews.md)  
 
-[updateChat](../constructors/updateChat.md)  
+[updateOpenMessageContent](../constructors/updateOpenMessageContent.md)  
 
-[updateChatTopMessage](../constructors/updateChatTopMessage.md)  
-
-[updateChatOrder](../constructors/updateChatOrder.md)  
+[updateNewChat](../constructors/updateNewChat.md)  
 
 [updateChatTitle](../constructors/updateChatTitle.md)  
 
 [updateChatPhoto](../constructors/updateChatPhoto.md)  
 
+[updateChatTopMessage](../constructors/updateChatTopMessage.md)  
+
+[updateChatOrder](../constructors/updateChatOrder.md)  
+
+[updateChatIsPinned](../constructors/updateChatIsPinned.md)  
+
 [updateChatReadInbox](../constructors/updateChatReadInbox.md)  
 
 [updateChatReadOutbox](../constructors/updateChatReadOutbox.md)  
+
+[updateNotificationSettings](../constructors/updateNotificationSettings.md)  
 
 [updateChatReplyMarkup](../constructors/updateChatReplyMarkup.md)  
 
 [updateChatDraftMessage](../constructors/updateChatDraftMessage.md)  
 
-[updateNotificationSettings](../constructors/updateNotificationSettings.md)  
-
 [updateDeleteMessages](../constructors/updateDeleteMessages.md)  
 
-[updateUserAction](../constructors/updateUserAction.md)  
+[updateUserChatAction](../constructors/updateUserChatAction.md)  
 
 [updateUserStatus](../constructors/updateUserStatus.md)  
 
@@ -59,9 +65,11 @@ Contains notifications about data changes
 
 [updateSecretChat](../constructors/updateSecretChat.md)  
 
-[updateChannelFull](../constructors/updateChannelFull.md)  
+[updateUserFull](../constructors/updateUserFull.md)  
 
-[updateUserBlocked](../constructors/updateUserBlocked.md)  
+[updateGroupFull](../constructors/updateGroupFull.md)  
+
+[updateChannelFull](../constructors/updateChannelFull.md)  
 
 [updateServiceNotification](../constructors/updateServiceNotification.md)  
 
@@ -75,17 +83,21 @@ Contains notifications about data changes
 
 [updateFileGenerationFinish](../constructors/updateFileGenerationFinish.md)  
 
+[updateCall](../constructors/updateCall.md)  
+
 [updatePrivacy](../constructors/updatePrivacy.md)  
 
 [updateOption](../constructors/updateOption.md)  
 
-[updateStickerSets](../constructors/updateStickerSets.md)  
+[updateInstalledStickerSets](../constructors/updateInstalledStickerSets.md)  
 
 [updateTrendingStickerSets](../constructors/updateTrendingStickerSets.md)  
 
 [updateRecentStickers](../constructors/updateRecentStickers.md)  
 
 [updateSavedAnimations](../constructors/updateSavedAnimations.md)  
+
+[updateConnectionState](../constructors/updateConnectionState.md)  
 
 [updateNewInlineQuery](../constructors/updateNewInlineQuery.md)  
 
@@ -95,9 +107,19 @@ Contains notifications about data changes
 
 [updateNewInlineCallbackQuery](../constructors/updateNewInlineCallbackQuery.md)  
 
+[updateNewShippingQuery](../constructors/updateNewShippingQuery.md)  
+
+[updateNewPreCheckoutQuery](../constructors/updateNewPreCheckoutQuery.md)  
+
+[updateNewCustomEvent](../constructors/updateNewCustomEvent.md)  
+
+[updateNewCustomQuery](../constructors/updateNewCustomQuery.md)  
+
 
 
 ### Methods that return an object of this type (methods):
+
+[$MadelineProto->testUseUpdate](../methods/testUseUpdate.md)  
 
 
 

@@ -22,25 +22,3 @@ Describes user profile photo
 ### Type: [ProfilePhoto](../types/ProfilePhoto.md)
 
 
-### Example:
-
-```
-$profilePhoto = ['_' => 'profilePhoto', 'id' => long, 'small' => file, 'big' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "profilePhoto", "id": long, "small": file, "big": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-profilePhoto={_='profilePhoto', id=long, small=file, big=file}
-
-```
-
-

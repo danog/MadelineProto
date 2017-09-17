@@ -20,25 +20,3 @@ Contains information about set up recovery email
 ### Type: [RecoveryEmail](../types/RecoveryEmail.md)
 
 
-### Example:
-
-```
-$recoveryEmail = ['_' => 'recoveryEmail', 'recovery_email' => 'string'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "recoveryEmail", "recovery_email": "string"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-recoveryEmail={_='recoveryEmail', recovery_email='string'}
-
-```
-
-

@@ -21,9 +21,15 @@ Content of a message
 
 [messagePhoto](../constructors/messagePhoto.md)  
 
+[messageExpiredPhoto](../constructors/messageExpiredPhoto.md)  
+
 [messageSticker](../constructors/messageSticker.md)  
 
 [messageVideo](../constructors/messageVideo.md)  
+
+[messageExpiredVideo](../constructors/messageExpiredVideo.md)  
+
+[messageVideoNote](../constructors/messageVideoNote.md)  
 
 [messageVoice](../constructors/messageVoice.md)  
 
@@ -34,6 +40,10 @@ Content of a message
 [messageContact](../constructors/messageContact.md)  
 
 [messageGame](../constructors/messageGame.md)  
+
+[messageInvoice](../constructors/messageInvoice.md)  
+
+[messageCall](../constructors/messageCall.md)  
 
 [messageGroupChatCreate](../constructors/messageGroupChatCreate.md)  
 
@@ -62,6 +72,12 @@ Content of a message
 [messageChatSetTtl](../constructors/messageChatSetTtl.md)  
 
 [messageGameScore](../constructors/messageGameScore.md)  
+
+[messagePaymentSuccessful](../constructors/messagePaymentSuccessful.md)  
+
+[messagePaymentSuccessfulBot](../constructors/messagePaymentSuccessfulBot.md)  
+
+[messageContactRegistered](../constructors/messageContactRegistered.md)  
 
 [messageUnsupported](../constructors/messageUnsupported.md)  
 

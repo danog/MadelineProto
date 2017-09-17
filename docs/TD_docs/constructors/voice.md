@@ -1,13 +1,13 @@
 ---
 title: voice
-description: Describes voice record. Voice must be encoded with Opus codec and must be stored inside Ogg container
+description: Describes voice note. Voice must be encoded with Opus codec and must be stored inside Ogg container
 ---
 ## Constructor: voice  
 [Back to constructors index](index.md)
 
 
 
-Describes voice record. Voice must be encoded with Opus codec and must be stored inside Ogg container
+Describes voice note. Voice must be encoded with Opus codec and must be stored inside Ogg container
 
 ### Attributes:
 
@@ -21,27 +21,5 @@ Describes voice record. Voice must be encoded with Opus codec and must be stored
 
 
 ### Type: [Voice](../types/Voice.md)
-
-
-### Example:
-
-```
-$voice = ['_' => 'voice', 'duration' => int, 'waveform' => 'bytes', 'mime_type' => 'string', 'voice' => file];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "voice", "duration": int, "waveform": "bytes", "mime_type": "string", "voice": file}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-voice={_='voice', duration=int, waveform='bytes', mime_type='string', voice=file}
-
-```
 
 

@@ -19,25 +19,3 @@ Return only photo and video messages
 ### Type: [SearchMessagesFilter](../types/SearchMessagesFilter.md)
 
 
-### Example:
-
-```
-$searchMessagesFilterPhotoAndVideo = ['_' => 'searchMessagesFilterPhotoAndVideo'];
-```  
-
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-{"_": "searchMessagesFilterPhotoAndVideo"}
-```
-
-
-Or, if you're into Lua:  
-
-
-```
-searchMessagesFilterPhotoAndVideo={_='searchMessagesFilterPhotoAndVideo'}
-
-```
-
-

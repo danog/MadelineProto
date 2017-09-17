@@ -1,6 +1,6 @@
 ---
 title: getChannelMembers
-description: Returns information about channel members or kicked from channel users. Can be used only if channel_full->can_get_members == true
+description: Returns information about channel members or banned users. Can be used only if channel_full->can_get_members == true. Administrator privileges may be additionally needed for some filters
 ---
 ## Method: getChannelMembers  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns information about channel members or kicked from channel us
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns information about channel members or kicked from channel users. Can be used only if channel_full->can_get_members == true
+Returns information about channel members or banned users. Can be used only if channel_full->can_get_members == true. Administrator privileges may be additionally needed for some filters
 
 ### Params:
 
@@ -22,61 +22,4 @@ Returns information about channel members or kicked from channel users. Can be u
 
 
 ### Return type: [ChatMembers](../types/ChatMembers.md)
-
-### Example:
-
-
-```
-$MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
-if (isset($number)) { // Login as a user
-    $sentCode = $MadelineProto->phone_login($number);
-    echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
-    $MadelineProto->complete_phone_login($code);
-}
-
-$ChatMembers = $MadelineProto->getChannelMembers(['channel_id' => int, 'filter' => ChannelMembersFilter, 'offset' => int, 'limit' => int, ]);
-```
-
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - getChannelMembers
-* params - `{"channel_id": int, "filter": ChannelMembersFilter, "offset": int, "limit": int, }`
-
-
-
-### As a user:
-
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/getChannelMembers`
-
-Parameters:
-
-channel_id - Json encoded int
-
-filter - Json encoded ChannelMembersFilter
-
-offset - Json encoded int
-
-limit - Json encoded int
-
-
-
-
-Or, if you're into Lua:
-
-```
-ChatMembers = getChannelMembers({channel_id=int, filter=ChannelMembersFilter, offset=int, limit=int, })
-```
 

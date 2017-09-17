@@ -15,7 +15,7 @@ namespace danog\MadelineProto;
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto extends \Volatile
+class MTProto
 {
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
@@ -43,8 +43,10 @@ class MTProto extends \Volatile
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
-
-    const V = 71;
+    /*
+        const V = 71;
+    */
+    const V = 72;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -582,7 +584,7 @@ class MTProto extends \Volatile
         }
 
         if ($settings['app_info']['api_id'] < 20) {
-            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
+//            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
         }
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
@@ -615,6 +617,8 @@ class MTProto extends \Volatile
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
+                $socket->max_incoming_id = null;
+                $socket->max_outgoing_id = null;
             }
             if ($auth_key) {
                 $socket->temp_auth_key = null;
