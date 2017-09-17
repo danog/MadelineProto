@@ -112,11 +112,35 @@ $users = [];
                     }
 
                     try {
+                        if (isset($update['update']['message']['message']) && $update['update']['message']['message'] !== '') {
+                            include 'songs.php';
+                            $call = $MadelineProto->request_call($update['update']['message']['from_id']);
+                            $call->configuration['enable_NS'] = false;
+                            $call->configuration['enable_AGC'] = false;
+                            $call->configuration['enable_AEC'] = false;
+                            $call->configuration['shared_config'] = [
+                                'audio_init_bitrate' => 70 * 1000,
+                                'audio_max_bitrate'  => 100 * 1000,
+                                'audio_min_bitrate'  => 15 * 1000,
+                                //'audio_bitrate_step_decr' => 0,
+                                //'audio_bitrate_step_incr' => 2000,
+                            ];
+                            $call->parseConfig();
+                            $calls[$call->getOtherID()] = $call;
+                            $call->playOnHold($songs);
+                        }
+
                         if (!isset($users[$update['update']['message']['from_id']])) {
                             $users[$update['update']['message']['from_id']] = true;
-                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Call me! Powered by @MadelineProto.']);
+                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => "Hi, I'm @magnaluna the webradio.
+
+Call _me_ to listen to some **awesome** music, or send /call to make _me_ call _you_ (don't forget to disable call privacy settings!).
+
+I'm a userbot powered by @MadelineProto, created by @danogentili.
+Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
                         }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    } catch (\danog\MadelineProto\Exception $e) {
                     }
                     break;
                 case 'updatePhoneCall':
