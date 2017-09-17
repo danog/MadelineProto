@@ -89,7 +89,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already declined']);
-                $this->discard_cal($call['id']);
+                $this->discard_call($call['id']);
                 //$this->calls[$call['id']]->discard();
 
                 return false;
@@ -263,7 +263,7 @@ trait AuthKeyHandler
         try {
             $res = $this->method_call('phone.discardCall', ['peer' => $call, 'duration' => time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== 'CALL_ALREADY_DECLINED') {
+            if (!in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'])) {
                 throw $e;
             }
         }

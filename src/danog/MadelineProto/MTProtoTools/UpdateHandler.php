@@ -575,7 +575,7 @@ trait UpdateHandler
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log(['Saving an update of type '.$update['_'].'...'], \danog\MadelineProto\Logger::VERBOSE);
-        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
+        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
         } else {
             in_array($this->settings['updates']['callback'], [['danog\MadelineProto\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);

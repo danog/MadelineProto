@@ -37,7 +37,6 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-var_dump($settings);
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
