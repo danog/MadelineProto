@@ -34,7 +34,7 @@ trait DialogHandler
             $this->dialog_params['count'] += count($res['dialogs']);
             $this->dialog_params['offset_date'] = end($res['messages'])['date'];
             $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
-            $this->dialog_params['offset_id'] = end($res['messages'])['id'];
+            $this->dialog_params['offset_id'] = end($res['messages'])['id'] & 4294967296;
             if (!isset($res['count'])) {
                 break;
             }

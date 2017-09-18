@@ -89,7 +89,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already declined']);
-                $this->discard_call($call['id']);
+                $this->discard_call($call['id'], 'phoneCallDiscardReasonHangup');
                 //$this->calls[$call['id']]->discard();
 
                 return false;
