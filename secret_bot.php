@@ -37,14 +37,7 @@ if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
-        $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
-            [
-                'phone_number'     => getenv('MTPROTO_NUMBER'),
-           ]
-        );
-
-        \danog\MadelineProto\Logger::log([$checkedPhone], \danog\MadelineProto\Logger::NOTICE);
-        $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
+        $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
         \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
