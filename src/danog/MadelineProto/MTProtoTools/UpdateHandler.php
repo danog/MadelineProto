@@ -79,10 +79,13 @@ trait UpdateHandler
         });
 
         $time = microtime(true);
+
         try {
             $this->get_updates_difference();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== 'RPC_CALL_FAIL') throw $e;
+            if ($e->rpc !== 'RPC_CALL_FAIL') {
+                throw $e;
+            }
         }
 
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
