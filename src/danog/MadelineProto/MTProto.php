@@ -362,6 +362,7 @@ class MTProto
         if ($this->authorized === self::LOGGED_IN) {
             $this->get_self();
             $this->get_cdn_config($this->datacenter->curdc);
+            $this->setup_logger();
         }
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs($force);

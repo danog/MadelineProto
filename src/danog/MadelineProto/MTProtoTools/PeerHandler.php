@@ -21,6 +21,9 @@ trait PeerHandler
     {
         foreach ($users as $key => $user) {
             if (!isset($user['access_hash'])) {
+                if (isset($user['username']) && !isset($this->chats[$user['id']])) {
+                    $this->get_pwr_chat($user['username'], false, true);
+                }
                 continue;
             }
             switch ($user['_']) {
@@ -71,10 +74,13 @@ trait PeerHandler
                     break;
                 case 'channel':
                 case 'channelForbidden':
+                    $bot_api_id = $this->to_supergroup($chat['id']);
                     if (!isset($chat['access_hash'])) {
+                        if (isset($chat['username']) && !isset($this->chats[$bot_api_id])) {
+                            $this->get_pwr_chat($chat['username'], true, true);
+                        }
                         continue;
                     }
-                    $bot_api_id = $this->to_supergroup($chat['id']);
                     if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
                         $this->chats[$bot_api_id] = $chat;
 
@@ -130,7 +136,7 @@ trait PeerHandler
             if (isset($fwd['user_id']) && !$this->peer_isset($fwd['user_id'])) {
                 return false;
             }
-            if (isset($fwd['channel_id']) && !$this->peer_isset('channel#'.$fwd['channel_id'])) {
+            if (isset($fwd['channel_id']) && !$this->peer_isset($this->to_supergroup($fwd['channel_id']))) {
                 return false;
             }
         } catch (\danog\MadelineProto\Exception $e) {
@@ -161,19 +167,16 @@ trait PeerHandler
                     break;
 
                 case 'chat':
-                    $id = -$id['id'];
-                    break;
                 case 'chatFull':
                     $id = -$id['id'];
                     break;
-                case 'inputPeerChat':
+
+                    case 'inputPeerChat':
                 case 'peerChat':
                     $id = -$id['chat_id'];
                     break;
 
                 case 'channel':
-                    $id = $this->to_supergroup($id['id']);
-                    break;
                 case 'channelFull':
                     $id = $this->to_supergroup($id['id']);
                     break;
@@ -204,14 +207,11 @@ trait PeerHandler
             if (is_string($id)) {
                 $id = \danog\MadelineProto\Logger::$bigint ? ((float) $id) : ((int) $id);
             }
+            if (!isset($this->chats[$id]) && $id < 0 && !preg_match('/^-100/', $id)) {
+                $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+            }
             if (isset($this->chats[$id])) {
                 return $this->gen_all($this->chats[$id]);
-            }
-            if ($id < 0 && !preg_match('/^-100/', $id)) {
-                $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
-                if (isset($this->chats[$id])) {
-                    return $this->gen_all($this->chats[$id]);
-                }
             }
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
                 $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http'=> [
@@ -225,9 +225,9 @@ trait PeerHandler
 
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
-        $id = str_replace('@', '', $id);
+        $id = strtolower(str_replace('@', '', $id));
         foreach ($this->chats as $chat) {
-            if (isset($chat['username']) && strtolower($chat['username']) === strtolower($id)) {
+            if (isset($chat['username']) && strtolower($chat['username']) === $id) {
                 return $this->gen_all($chat);
             }
         }

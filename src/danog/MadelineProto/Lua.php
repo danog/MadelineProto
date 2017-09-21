@@ -42,7 +42,7 @@ class Lua
         $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
         $this->Lua->registerCallback('madeline_function', [$this, 'madeline_function']);
         foreach (get_class_methods($this->MadelineProto->API) as $method) {
-            $this->Lua->registerCallback($method, [$this->MadelineProto->API, $method]);
+            $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);
         }
         $methods = [];
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
