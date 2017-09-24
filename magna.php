@@ -119,7 +119,7 @@ $users = [];
         foreach ($calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 unset($calls[$key]);
-            } else if (isset($times[$call->getOtherID()])&&$times[$call->getOtherID()][0] < time()) {
+            } elseif (isset($times[$call->getOtherID()]) && $times[$call->getOtherID()][0] < time()) {
                 $times[$call->getOtherID()][0] += 10;
 
                 try {
@@ -177,7 +177,6 @@ Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
                             $call->playOnHold($songs);
                             $calls[$call->getOtherID()] = $call;
                             $times[$call->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
-
                         }
                         if (isset($update['update']['message']['message']) && strpos($update['update']['message']['message'], '/program') === 0) {
                             $time = strtotime(str_replace('/program ', '', $update['update']['message']['message']));
@@ -190,11 +189,12 @@ Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
                         }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         try {
-                            if ($e->rpc === 'USER_PRIVACY_RESTRICTED') { $e = 'Please disable call privacy settings to make me call you';
-                            } else if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                               $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
-                               $MadelineProto->programmed_call[]= [$update['update']['message']['from_id'], time()+1+$t];
-                               $e = "Too many people used the /call function. I'll call you back in $t seconds.\nYou can also call me right now.";
+                            if ($e->rpc === 'USER_PRIVACY_RESTRICTED') {
+                                $e = 'Please disable call privacy settings to make me call you';
+                            } elseif (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                                $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                                $MadelineProto->programmed_call[] = [$update['update']['message']['from_id'], time() + 1 + $t];
+                                $e = "Too many people used the /call function. I'll call you back in $t seconds.\nYou can also call me right now.";
                             }
                             $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => (string) $e]);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
