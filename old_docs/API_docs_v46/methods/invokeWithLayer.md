@@ -24,6 +24,7 @@ description: invokeWithLayer parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |AUTH_BYTES_INVALID|The provided authorization is invalid|
+|CONNECTION_API_ID_INVALID|The provided API id is invalid|
 |INPUT_LAYER_INVALID|The provided layer is invalid|
 
 

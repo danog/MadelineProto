@@ -24,6 +24,7 @@ description: channels.setStickers parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |CHANNEL_INVALID|The provided channel is invalid|
+|PARTICIPANTS_TOO_FEW|Not enough participants|
 
 
 ### Example:

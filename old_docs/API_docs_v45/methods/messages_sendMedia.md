@@ -26,13 +26,20 @@ description: messages.sendMedia parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|FILE_PART_0_MISSING|File part 0 missing|
+|FILE_PART_LENGTH_INVALID|The length of a file part is invalid|
 |FILE_PARTS_INVALID|The number of file parts is invalid|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
 |MEDIA_CAPTION_TOO_LONG|The caption is too long|
 |MEDIA_EMPTY|The provided media object is invalid|
 |PEER_ID_INVALID|The provided peer id is invalid|
 |PHOTO_EXT_INVALID|The extension of the photo is invalid|
 |STORAGE_CHECK_FAILED|Server storage check failed|
+|USER_IS_BLOCKED|User is blocked|
+|USER_IS_BOT|Bots can't send messages to other bots|
 |WEBPAGE_CURL_FAILED|Failure while fetching the webpage with cURL|
 
 

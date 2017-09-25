@@ -28,7 +28,9 @@ description: messages.editMessage parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|MESSAGE_AUTHOR_REQUIRED|Message author required|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 |MESSAGE_NOT_MODIFIED|The message text has not changed|
 |PEER_ID_INVALID|The provided peer id is invalid|

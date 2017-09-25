@@ -23,7 +23,9 @@ description: account.updatePasswordSettings parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|NEW_SALT_INVALID|The new salt is invalid|
 |NEW_SETTINGS_INVALID|The new settings are invalid|
+|PASSWORD_HASH_INVALID|The provided password hash is invalid|
 
 
 ### Example:

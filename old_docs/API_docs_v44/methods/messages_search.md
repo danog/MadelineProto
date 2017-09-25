@@ -32,6 +32,7 @@ description: messages.search parameters, return type and example
 |----------|---------------|
 |INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
 |PEER_ID_INVALID|The provided peer id is invalid|
+|SEARCH_QUERY_EMPTY|The search query is empty|
 
 
 ### Example:

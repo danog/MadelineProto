@@ -24,14 +24,22 @@ description: messages.forwardMessages parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_SEND_GIFS_FORBIDDEN|You can't send gifs in this chat|
+|CHAT_SEND_MEDIA_FORBIDDEN|You can't send media in this chat|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|MEDIA_EMPTY|The provided media object is invalid|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 |MESSAGE_IDS_EMPTY|No message ids were provided|
 |PEER_ID_INVALID|The provided peer id is invalid|
+|PTS_CHANGE_EMPTY|No PTS change|
 |RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
+|RANDOM_ID_INVALID|A provided random ID is invalid|
 |Timeout|A timeout occurred while fetching data from the bot|
+|USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
+|USER_IS_BOT|Bots can't send messages to other bots|
 
 
 ### Example:

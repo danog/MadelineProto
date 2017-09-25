@@ -27,6 +27,7 @@ description: initConnection parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CONNECTION_LAYER_INVALID|Layer invalid|
 |INPUT_FETCH_FAIL|Failed deserializing TL payload|
 
 

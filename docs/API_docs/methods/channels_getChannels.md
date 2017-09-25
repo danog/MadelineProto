@@ -22,6 +22,7 @@ description: channels.getChannels parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
 |NEED_CHAT_INVALID|The provided chat is invalid|
 
 

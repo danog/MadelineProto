@@ -23,6 +23,7 @@ description: messages.sendEncrypted parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
 |DATA_INVALID|Encrypted data invalid|
 |MSG_WAIT_FAILED|A waiting call returned an error|
 

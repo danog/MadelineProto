@@ -27,6 +27,9 @@ description: channels.editAdmin parameters, return type and example
 |CHANNEL_INVALID|The provided channel is invalid|
 |CHAT_ADMIN_INVITE_REQUIRED|You do not have the rights to do this|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|RIGHT_FORBIDDEN|Your admin rights do not allow you to do this|
+|USER_CREATOR|You can't leave this channel, because you're its creator|
+|USER_ID_INVALID|The provided user ID is invalid|
 |USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
 
 
