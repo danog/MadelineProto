@@ -359,8 +359,10 @@ class MTProto
         }
         $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        if ($this->get_self()) {
+            $this->authorized = self::LOGGED_IN;
+        }
         if ($this->authorized === self::LOGGED_IN) {
-            $this->get_self();
             $this->get_cdn_config($this->datacenter->curdc);
             $this->setup_logger();
         }
@@ -794,10 +796,9 @@ class MTProto
 
     public function get_self()
     {
-        if ($this->authorization === null) {
+        try {
             $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
-        }
-
+        } catch (RPCErrorException $e) { return false; }
         return $this->authorization['user'];
     }
 
