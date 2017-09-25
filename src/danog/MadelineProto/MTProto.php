@@ -798,7 +798,10 @@ class MTProto
     {
         try {
             $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
-        } catch (RPCErrorException $e) { return false; }
+        } catch (RPCErrorException $e) {
+            return false;
+        }
+
         return $this->authorization['user'];
     }
 
