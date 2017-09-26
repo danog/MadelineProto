@@ -74,7 +74,12 @@ trait CallHandler
         if (isset($queue)) {
             $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue], 'query' => $serialized]);
         }
-
+        $l = strlen($serialized);
+        $g = strlen($gzipped = gzencode($serialized));
+        if ($l > 500 && $g < $l) {
+            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l-$g).' bytes of data, reduced call size by '.($g*100/$l).'%'], \danog\MadelineProto\Logger::VERBOSE);
+            $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
+        }
         $last_recv = $this->last_recv;
         if ($canunset = !$this->updates_state['sync_loading'] && !$this->threads && !$this->run_workers) {
             $this->updates_state['sync_loading'] = true;
