@@ -119,7 +119,6 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->last_recv = time();
-
         return true;
     }
 }
