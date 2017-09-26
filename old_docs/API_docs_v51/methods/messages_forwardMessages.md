@@ -32,6 +32,7 @@ description: messages.forwardMessages parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |CHAT_SEND_GIFS_FORBIDDEN|You can't send gifs in this chat|
 |CHAT_SEND_MEDIA_FORBIDDEN|You can't send media in this chat|
+|CHAT_SEND_STICKERS_FORBIDDEN|You can't send stickers in this chat.|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 |MEDIA_EMPTY|The provided media object is invalid|
 |MESSAGE_ID_INVALID|The provided message id is invalid|

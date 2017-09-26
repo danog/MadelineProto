@@ -27,6 +27,7 @@ description: messages.getHistory parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|AUTH_KEY_PERM_EMPTY|The temporary auth key must be binded to the permanent auth key to use these methods.|
 |CHANNEL_INVALID|The provided channel is invalid|
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ID_INVALID|The provided chat id is invalid|

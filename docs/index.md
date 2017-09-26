@@ -107,7 +107,7 @@ git submodule add https://github.com/danog/MadelineProto
 cd MadelineProto
 composer update
 cp .env.example .env
-cp -a *php tests bots .env* ..
+cp -a *php tests userbots .env* ..
 ```
 
 Now open `.env` and edit its values as needed.
@@ -119,9 +119,9 @@ You can find examples for nearly every MadelineProto function in
 * [`tests/testing.php`](https://github.com/danog/MadelineProto/blob/master/tests/testing.php) - examples for making/receiving calls, making secret chats, sending secret chat messages, videos, audios, voice recordings, gifs, stickers, photos, sending normal messages, videos, audios, voice recordings, gifs, stickers, photos.
 * [`bot.php`](https://github.com/danog/MadelineProto/blob/master/bot.php) - examples for sending normal messages, downloading any media
 * [`magna.php`](https://github.com/danog/MadelineProto/blob/master/magna.php) - examples for receiving calls
-* [`bots/pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/bots/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
-* [`bots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/bots/MadelineProto_bot.php) - More fun shiz
-* [`bots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/bots/pwrtelegram_debug_bot.php) - More fun shiz
+* [`userbots/pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
+* [`userbots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/MadelineProto_bot.php) - More fun shiz
+* [`userbots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/userbots/pwrtelegram_debug_bot.php) - More fun shiz
 
 ## Methods
 
@@ -221,7 +221,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 
 If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili). 
 
-But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, bots/, tests/testing.php).
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, userbots/, tests/testing.php).
 
 If you don't understand something, read everything again.
 
@@ -239,7 +239,7 @@ If you're selling a MadelineProto base too, you really should consider donating 
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L405) for the default values for the settings arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L448) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
