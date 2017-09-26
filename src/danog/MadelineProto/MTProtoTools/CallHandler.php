@@ -77,7 +77,7 @@ trait CallHandler
         $l = strlen($serialized);
         $g = strlen($gzipped = gzencode($serialized));
         if ($l > 500 && $g < $l) {
-            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l-$g).' bytes of data, reduced call size by '.($g*100/$l).'%'], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.($g * 100 / $l).'%'], \danog\MadelineProto\Logger::VERBOSE);
             $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
         }
         $last_recv = $this->last_recv;
