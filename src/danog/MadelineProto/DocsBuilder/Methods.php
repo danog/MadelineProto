@@ -48,15 +48,15 @@ trait Methods
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
+                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption' && !isset($this->settings['td'])) {
                     $param['type'] = 'InputPeer';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512'])) ? 'types' : 'constructors';
+                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'])) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
 
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
@@ -93,11 +93,11 @@ trait Methods
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
+                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption' && !isset($this->settings['td'])) {
                     $param['type'] = 'InputPeer';
                 }
 
