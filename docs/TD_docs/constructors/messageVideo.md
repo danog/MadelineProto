@@ -13,7 +13,7 @@ Video message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|video|[video](../types/video.md) | Yes|Message content|
+|video|[video](../constructors/video.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Video caption|
 
 

@@ -15,7 +15,7 @@ Returns current chat report spam state
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 
 
 ### Return type: [ChatReportSpamState](../types/ChatReportSpamState.md)

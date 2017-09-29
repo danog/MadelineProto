@@ -13,7 +13,7 @@ Tests only. A simple object containing just a vector of numbers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|value|Array of [int](../constructors/int.md) | Yes|The vector of numbers|
+|value|Array of [int](../types/int.md) | Yes|The vector of numbers|
 
 
 

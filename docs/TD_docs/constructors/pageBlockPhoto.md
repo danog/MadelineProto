@@ -13,7 +13,7 @@ A photo
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|photo|[photo](../types/photo.md) | Yes|The photo, nullable|
+|photo|[photo](../constructors/photo.md) | Yes|The photo, nullable|
 |caption|[RichText](../types/RichText.md) | Yes|Photo caption|
 
 

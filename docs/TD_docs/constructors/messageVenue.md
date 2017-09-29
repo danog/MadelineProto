@@ -13,7 +13,7 @@ Message with information about venue
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|venue|[venue](../types/venue.md) | Yes|Message content|
+|venue|[venue](../constructors/venue.md) | Yes|Message content|
 
 
 

@@ -11,7 +11,7 @@ description: msg_container attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|messages|Array of [MTmessage](../constructors/MTmessage.md) | Yes|
+|messages|Array of [MTmessage](../types/MTmessage.md) | Yes|
 
 
 

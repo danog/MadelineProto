@@ -14,7 +14,7 @@ Top message of the chat has changed. If top_message is null then top message in 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|top\_message|[message](../types/message.md) | Yes|New top message of the chat, nullable|
+|top\_message|[message](../constructors/message.md) | Yes|New top message of the chat, nullable|
 
 
 

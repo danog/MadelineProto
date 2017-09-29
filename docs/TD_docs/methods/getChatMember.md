@@ -15,7 +15,7 @@ Returns information about one participant of the chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 
 

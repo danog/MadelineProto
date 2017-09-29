@@ -13,7 +13,7 @@ Animation message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|animation|[animation](../types/animation.md) | Yes|Message content|
+|animation|[animation](../constructors/animation.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Animation caption|
 
 

@@ -13,7 +13,7 @@ Message with location
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|location|[location](../types/location.md) | Yes|Location to send|
+|location|[location](../constructors/location.md) | Yes|Location to send|
 
 
 

@@ -15,7 +15,7 @@ Sends callback query to a bot and returns answer to it. Returns error with code 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat with a message|
+|chat\_id|[int53](../types/int53.md) | Yes|Identifier of the chat with a message|
 |message\_id|[int53](../types/int53.md) | Yes|Identifier of the message, from which the query is originated|
 |payload|[CallbackQueryPayload](../types/CallbackQueryPayload.md) | Yes|Query payload|
 

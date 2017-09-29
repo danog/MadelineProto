@@ -13,7 +13,7 @@ Information about a file was updated
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file|[file](../types/file.md) | Yes|New data about a file|
+|file|[file](../constructors/file.md) | Yes|New data about a file|
 
 
 

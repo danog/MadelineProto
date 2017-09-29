@@ -13,7 +13,7 @@ An audio
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|audio|[audio](../types/audio.md) | Yes|The audio, nullable|
+|audio|[audio](../constructors/audio.md) | Yes|The audio, nullable|
 |caption|[RichText](../types/RichText.md) | Yes|Audio caption|
 
 

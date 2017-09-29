@@ -13,7 +13,7 @@ Rule to disallow all specified users
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers|
+|user\_ids|Array of [int](../types/int.md) | Yes|User identifiers|
 
 
 

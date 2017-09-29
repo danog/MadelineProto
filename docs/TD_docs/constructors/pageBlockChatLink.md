@@ -14,7 +14,7 @@ A link to a chat
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |title|[string](../types/string.md) | Yes|Chat title|
-|photo|[chatPhoto](../types/chatPhoto.md) | Yes|Chat photo, nullable|
+|photo|[chatPhoto](../constructors/chatPhoto.md) | Yes|Chat photo, nullable|
 |username|[string](../types/string.md) | Yes|Chat username by which all other information about the chat should be resolved|
 
 

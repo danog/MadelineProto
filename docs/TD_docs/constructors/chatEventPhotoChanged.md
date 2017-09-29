@@ -13,8 +13,8 @@ Chat photo changed
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|old\_photo|[chatPhoto](../types/chatPhoto.md) | Yes|Old photo value|
-|new\_photo|[chatPhoto](../types/chatPhoto.md) | Yes|New photo value|
+|old\_photo|[chatPhoto](../constructors/chatPhoto.md) | Yes|Old photo value|
+|new\_photo|[chatPhoto](../constructors/chatPhoto.md) | Yes|New photo value|
 
 
 

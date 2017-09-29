@@ -14,7 +14,7 @@ New group chat created
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |title|[string](../types/string.md) | Yes|Title of created group chat|
-|member\_user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers of members of created group chat|
+|member\_user\_ids|Array of [int](../types/int.md) | Yes|User identifiers of members of created group chat|
 
 
 

@@ -15,7 +15,7 @@ Embedded web page
 |----------|---------------|----------|-------------|
 |url|[string](../types/string.md) | Yes|Web page URL, if available|
 |html|[string](../types/string.md) | Yes|HTML-markup of the embedded page|
-|poster\_photo|[photo](../types/photo.md) | Yes|Poster photo if available, nullable|
+|poster\_photo|[photo](../constructors/photo.md) | Yes|Poster photo if available, nullable|
 |width|[int](../types/int.md) | Yes|Block width|
 |height|[int](../types/int.md) | Yes|Block height|
 |caption|[RichText](../types/RichText.md) | Yes|Block caption|

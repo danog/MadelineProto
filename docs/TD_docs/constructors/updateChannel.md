@@ -13,7 +13,7 @@ Some data about a channel has been changed. This update is guaranteed to come be
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel|[channel](../types/channel.md) | Yes|New data about the channel|
+|channel|[channel](../constructors/channel.md) | Yes|New data about the channel|
 
 
 

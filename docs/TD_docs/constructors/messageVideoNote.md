@@ -13,7 +13,7 @@ Video note message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|video\_note|[videoNote](../types/videoNote.md) | Yes|Message content|
+|video\_note|[videoNote](../constructors/videoNote.md) | Yes|Message content|
 |is\_viewed|[Bool](../types/Bool.md) | Yes|True, if the video note message was viewed|
 
 

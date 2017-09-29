@@ -14,7 +14,7 @@ Represents a video cached on the telegram server
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|video|[video](../types/video.md) | Yes|The video|
+|video|[video](../constructors/video.md) | Yes|The video|
 |title|[string](../types/string.md) | Yes|Title of the video|
 |description|[string](../types/string.md) | Yes|Description of the video|
 

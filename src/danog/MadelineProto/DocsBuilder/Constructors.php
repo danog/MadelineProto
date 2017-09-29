@@ -66,6 +66,9 @@ trait Constructors
                 if (preg_match('/%/', $param[$type_or_subtype])) {
                     $param[$type_or_subtype] = $this->constructors->find_by_type(str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
+                if (substr($param[$type_or_subtype], -1) === '>') {
+                    $param[$type_or_subtype] = '\['.substr($param[$type_or_subtype], 0, -1).'\]';
+                }
                 $params .= "'".$param['name']."' => ";
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\['.$param[$type_or_subtype].'\]' : $param[$type_or_subtype]).', ';
@@ -100,15 +103,21 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
-                $type_or_bare_type = 'types';
-                if (isset($param['subtype'])) {
+                //$type_or_bare_type = 'types';
+                /*if (isset($param['subtype'])) {
                     if ($param['type'] === 'vector') {
                         $type_or_bare_type = 'constructors';
                     }
-                }
+                }*/
                 if (preg_match('/%/', $ptype)) {
                     $ptype = $this->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
                 }
+                $type_or_bare_type = (ctype_upper($this->end(explode('_', $ptype))[0]) || in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) ? 'types' : 'constructors';
+
+                if (substr($ptype, -1) === '>') {
+                    $ptype = 'Array of '.substr($ptype, 0, -1);
+                }
+
                 switch ($ptype) {
                     case 'true':
                     case 'false':

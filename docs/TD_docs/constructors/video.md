@@ -19,8 +19,8 @@ Describes video file
 |file\_name|[string](../types/string.md) | Yes|Original name of a file as defined by sender|
 |mime\_type|[string](../types/string.md) | Yes|MIME type of a file as defined by sender|
 |has\_stickers|[Bool](../types/Bool.md) | Yes|True, if some stickers was added to the photo|
-|thumb|[photoSize](../types/photoSize.md) | Yes|Video thumb as defined by sender, nullable|
-|video|[file](../types/file.md) | Yes|File with the video|
+|thumb|[photoSize](../constructors/photoSize.md) | Yes|Video thumb as defined by sender, nullable|
+|video|[file](../constructors/file.md) | Yes|File with the video|
 
 
 

@@ -13,7 +13,7 @@ Message with a game
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|game|[game](../types/game.md) | Yes|The game|
+|game|[game](../constructors/game.md) | Yes|The game|
 
 
 

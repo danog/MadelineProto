@@ -13,7 +13,7 @@ Represents list of chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_ids|Array of [int53](../constructors/int53.md) | Yes|List of chat identifiers|
+|chat\_ids|Array of [int53](../types/int53.md) | Yes|List of chat identifiers|
 
 
 

@@ -13,7 +13,7 @@ Document message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|document|[document](../types/document.md) | Yes|Message content|
+|document|[document](../constructors/document.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Document caption|
 
 

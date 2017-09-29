@@ -15,7 +15,7 @@ Changes status of the chat member, need appropriate privileges. This function is
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|Identifier of the user to edit status|
 |status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|New status of the member in the chat|
 

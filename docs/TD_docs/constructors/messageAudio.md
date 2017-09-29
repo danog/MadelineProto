@@ -13,7 +13,7 @@ Audio message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|audio|[audio](../types/audio.md) | Yes|Message content|
+|audio|[audio](../constructors/audio.md) | Yes|Message content|
 |caption|[string](../types/string.md) | Yes|Audio caption|
 
 

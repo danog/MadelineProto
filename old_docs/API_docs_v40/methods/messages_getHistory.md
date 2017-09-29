@@ -31,6 +31,7 @@ description: messages.getHistory parameters, return type and example
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ID_INVALID|The provided chat id is invalid|
 |PEER_ID_INVALID|The provided peer id is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### Example:

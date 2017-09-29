@@ -15,7 +15,7 @@ Deletes chat from the list of recently found chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat to delete|
+|chat\_id|[int53](../types/int53.md) | Yes|Identifier of the chat to delete|
 
 
 ### Return type: [Ok](../types/Ok.md)

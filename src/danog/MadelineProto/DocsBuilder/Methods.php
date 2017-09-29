@@ -101,13 +101,15 @@ trait Methods
                     $param['type'] = 'InputPeer';
                 }
 
-                $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
                 switch ($ptype) {
                     case 'true':
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
+                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'])) ? 'types' : 'constructors';
+
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
                     $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }

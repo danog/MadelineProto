@@ -13,7 +13,7 @@ Message fails to send. Be aware that some being sent messages can be irrecoverab
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message|[message](../types/message.md) | Yes|Information about failed to send message|
+|message|[message](../constructors/message.md) | Yes|Information about failed to send message|
 |old\_message\_id|[int53](../types/int53.md) | Yes|Previous temporary message identifier|
 |error\_code|[int](../types/int.md) | Yes|Error code|
 |error\_message|[string](../types/string.md) | Yes|Error message|

@@ -14,7 +14,7 @@ description: help_configSimple attributes, type and example
 |date|[int](../types/int.md) | Yes|
 |expires|[int](../types/int.md) | Yes|
 |dc\_id|[int](../types/int.md) | Yes|
-|ip\_port\_list|Array of [ipPort](../types/ipPort.md) | Yes|
+|ip\_port\_list|Array of [ipPort](../constructors/ipPort.md) | Yes|
 
 
 

@@ -19,7 +19,7 @@ Bots only. Creates new sticker set. Returns created sticker set
 |title|[string](../types/string.md) | Yes|Sticker set title, 1-64 characters|
 |name|[string](../types/string.md) | Yes|Sticker set name. Can contain only english letters, digits and underscores. Should end on *"_by_<bot username>"*. *<bot_username>* is case insensitive, 1-64 characters|
 |is\_masks|[Bool](../types/Bool.md) | Yes|True, is stickers are masks|
-|stickers|Array of [inputSticker](../types/inputSticker.md) | Yes|List of stickers to add to the set|
+|stickers|Array of [inputSticker](../constructors/inputSticker.md) | Yes|List of stickers to add to the set|
 
 
 ### Return type: [StickerSet](../types/StickerSet.md)

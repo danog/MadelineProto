@@ -13,7 +13,7 @@ Some data about a secret chat has been changed. This update is guaranteed to com
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|secret\_chat|[secretChat](../types/secretChat.md) | Yes|New data about the secret chat|
+|secret\_chat|[secretChat](../constructors/secretChat.md) | Yes|New data about the secret chat|
 
 
 

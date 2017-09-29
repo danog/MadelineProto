@@ -13,7 +13,7 @@ Some data about a user has been changed. This update is guaranteed to come befor
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user|[user](../types/user.md) | Yes|New data about the user|
+|user|[user](../constructors/user.md) | Yes|New data about the user|
 
 
 

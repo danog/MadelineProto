@@ -19,7 +19,7 @@ Represents user
 |username|[string](../types/string.md) | Yes|User username|
 |phone\_number|[string](../types/string.md) | Yes|User's phone number|
 |status|[UserStatus](../types/UserStatus.md) | Yes|User's online status|
-|profile\_photo|[profilePhoto](../types/profilePhoto.md) | Yes|User profile photo, nullable|
+|profile\_photo|[profilePhoto](../constructors/profilePhoto.md) | Yes|User profile photo, nullable|
 |my\_link|[LinkState](../types/LinkState.md) | Yes|Relationships from me to other user|
 |foreign\_link|[LinkState](../types/LinkState.md) | Yes|Relationships from other user to me|
 |is\_verified|[Bool](../types/Bool.md) | Yes|True, if user is verified|

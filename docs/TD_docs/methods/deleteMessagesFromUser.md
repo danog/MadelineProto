@@ -15,7 +15,7 @@ Deletes all messages in the chat sent by the specified user. Works only in super
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
 
 

@@ -13,7 +13,7 @@ User contact message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|contact|[contact](../types/contact.md) | Yes|Contact to send|
+|contact|[contact](../constructors/contact.md) | Yes|Contact to send|
 
 
 

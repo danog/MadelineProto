@@ -15,7 +15,7 @@ Changes period of inactivity, after which the account of currently logged in use
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|ttl|[accountTtl](../types/accountTtl.md) | Yes|New account TTL|
+|ttl|[accountTtl](../constructors/accountTtl.md) | Yes|New account TTL|
 
 
 ### Return type: [Ok](../types/Ok.md)

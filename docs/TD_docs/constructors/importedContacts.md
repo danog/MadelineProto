@@ -13,8 +13,8 @@ Represent result for ImportContacts request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers of imported contacts in the same order as they was specified in the request. 0 if contact is not yet registered|
-|importer\_count|Array of [int](../constructors/int.md) | Yes|Number of users which imported corresponding contact. 0 for already registered users or if unavailable|
+|user\_ids|Array of [int](../types/int.md) | Yes|User identifiers of imported contacts in the same order as they was specified in the request. 0 if contact is not yet registered|
+|importer\_count|Array of [int](../types/int.md) | Yes|Number of users which imported corresponding contact. 0 for already registered users or if unavailable|
 
 
 

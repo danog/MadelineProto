@@ -14,7 +14,7 @@ Full list of available network statistics entries
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |since\_date|[int](../types/int.md) | Yes|Date since which statistics are collected, unix time|
-|entries|Array of [NetworkStatisticsEntry](../constructors/NetworkStatisticsEntry.md) | Yes|Network statistics entries|
+|entries|Array of [NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md) | Yes|Network statistics entries|
 
 
 

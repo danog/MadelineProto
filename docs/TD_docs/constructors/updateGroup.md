@@ -13,7 +13,7 @@ Some data about a group has been changed. This update is guaranteed to come befo
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|group|[group](../types/group.md) | Yes|New data about the group|
+|group|[group](../constructors/group.md) | Yes|New data about the group|
 
 
 

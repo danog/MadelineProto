@@ -15,7 +15,7 @@ Chat is closed by the user. Many useful activities depends on chat being opened 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)
