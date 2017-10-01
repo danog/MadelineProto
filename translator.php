@@ -26,9 +26,9 @@ $lang_code = readline('Enter the language you whish to localize: ');
 
 if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code])) {
     \danog\MadelineProto\Lang::$lang[$lang_code] = \danog\MadelineProto\Lang::$lang['en'];
-    echo "New language detected!".PHP_EOL.PHP_EOL;
+    echo 'New language detected!'.PHP_EOL.PHP_EOL;
 } else {
-    echo "Completing localization of existing language".PHP_EOL.PHP_EOL;
+    echo 'Completing localization of existing language'.PHP_EOL.PHP_EOL;
 }
 $count = count(\danog\MadelineProto\Lang::$lang[$lang_code]);
 $curcount = 0;
@@ -42,7 +42,7 @@ foreach (\danog\MadelineProto\Lang::$lang[$lang_code] as $key => $value) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = bin2hex(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);
         }
         file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(\danog\MadelineProto\Lang::$lang, true)));
-        echo 'OK, '.($curcount*100/$count).'% done. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
+        echo 'OK, '.($curcount * 100 / $count).'% done. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
     }
     $curcount++;
 }
