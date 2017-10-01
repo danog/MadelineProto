@@ -18,21 +18,23 @@ namespace danog\MadelineProto;
 
 class Lang
 {
-    public static $current_lang = [];
     public static $lang = %s;
+
+    // THIS WILL BE OVERWRITTEN BY $lang["en"]
+    public static $current_lang = %s;
 }';
 
 $lang_code = readline('Enter the language you whish to localize: ');
 
 if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code])) {
-    \danog\MadelineProto\Lang::$lang[$lang_code] = \danog\MadelineProto\Lang::$lang['en'];
+    \danog\MadelineProto\Lang::$lang[$lang_code] = \danog\MadelineProto\Lang::$current_lang;
     echo 'New language detected!'.PHP_EOL.PHP_EOL;
 } else {
     echo 'Completing localization of existing language'.PHP_EOL.PHP_EOL;
 }
 $count = count(\danog\MadelineProto\Lang::$lang[$lang_code]);
 $curcount = 0;
-foreach (\danog\MadelineProto\Lang::$lang['en'] as $key => $value) {
+foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!Isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
     }
@@ -45,7 +47,7 @@ foreach (\danog\MadelineProto\Lang::$lang['en'] as $key => $value) {
         if (in_array($key, ['v_error', 'v_tgerror'])) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = bin2hex(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);
         }
-        file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(\danog\MadelineProto\Lang::$lang, true)));
+        file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         echo 'OK, '.($curcount * 100 / $count).'% done. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
     }
     $curcount++;
