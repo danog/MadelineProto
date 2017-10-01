@@ -16,6 +16,17 @@ description: channels.setStickers parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|PARTICIPANTS_TOO_FEW|Not enough participants|
+
+
 ### Example:
 
 

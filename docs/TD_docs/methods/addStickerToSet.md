@@ -17,7 +17,7 @@ Bots only. Adds new sticker to a set. Returns the sticker set
 |----------|---------------|----------|-------------|
 |user\_id|[int](../types/int.md) | Yes|Sticker set owner|
 |name|[string](../types/string.md) | Yes|Sticker set name|
-|sticker|[inputSticker](../types/inputSticker.md) | Yes|Sticker to add to the set|
+|sticker|[inputSticker](../constructors/inputSticker.md) | Yes|Sticker to add to the set|
 
 
 ### Return type: [StickerSet](../types/StickerSet.md)

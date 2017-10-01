@@ -13,7 +13,7 @@ A message was deleted
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message|[message](../types/message.md) | Yes|Deleted message|
+|message|[message](../constructors/message.md) | Yes|Deleted message|
 
 
 

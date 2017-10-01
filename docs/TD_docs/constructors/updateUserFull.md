@@ -14,7 +14,7 @@ Some data from userFull has been changed
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |user\_id|[int](../types/int.md) | Yes|User identifier|
-|user\_full|[userFull](../types/userFull.md) | Yes|New full information about the user|
+|user\_full|[userFull](../constructors/userFull.md) | Yes|New full information about the user|
 
 
 

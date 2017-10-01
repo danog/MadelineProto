@@ -15,14 +15,23 @@ description: channels.joinChannel parameters, return type and example
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHANNELS_TOO_MUCH|You have joined too many channels/supergroups|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +46,6 @@ $Updates = $MadelineProto->channels->joinChannel(['channel' => InputChannel, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - channels.joinChannel
-* params - `{"channel": InputChannel, }`
 
 
 

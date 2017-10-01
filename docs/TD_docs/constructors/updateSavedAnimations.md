@@ -13,7 +13,7 @@ List of saved animations was updated
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|animation\_ids|Array of [int](../constructors/int.md) | Yes|New list of file identifiers of saved animations|
+|animation\_ids|Array of [int](../types/int.md) | Yes|New list of file identifiers of saved animations|
 
 
 

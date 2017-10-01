@@ -73,7 +73,12 @@ class Serialization
 
             try {
                 $unserialized = unserialize($tounserialize);
+            } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                $unserialized = \danog\Serialization::unserialize($tounserialize);
             } catch (\danog\MadelineProto\Exception $e) {
+                if (Logger::$constructed) {
+                    Logger::log([(string) $e], Logger::ERROR);
+                }
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
             }
             if ($unserialized instanceof \danog\PlaceHolder) {

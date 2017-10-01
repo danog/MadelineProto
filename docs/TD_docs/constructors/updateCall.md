@@ -13,7 +13,7 @@ Information about a call was updated
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|call|[call](../types/call.md) | Yes|New data about a call|
+|call|[call](../constructors/call.md) | Yes|New data about a call|
 
 
 

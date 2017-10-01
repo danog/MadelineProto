@@ -13,7 +13,7 @@ Message with an invoice, can be used only by bots and in private chats only
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|invoice|[invoice](../types/invoice.md) | Yes|The invoice|
+|invoice|[invoice](../constructors/invoice.md) | Yes|The invoice|
 |title|[string](../types/string.md) | Yes|Product title, 1-32 characters|
 |description|[string](../types/string.md) | Yes|Product description, 0-255 characters|
 |photo\_url|[string](../types/string.md) | Yes|Goods photo URL, optional|

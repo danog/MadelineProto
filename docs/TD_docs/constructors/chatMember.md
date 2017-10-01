@@ -17,7 +17,7 @@ User with information about its chat joining/leaving
 |inviter\_user\_id|[int](../types/int.md) | Yes|Identifier of a user invited/promoted/banned this member in the chat, 0 if unknown|
 |join\_date|[int](../types/int.md) | Yes|Date the user has joined a chat, unix time|
 |status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|Status of the member in the chat|
-|bot\_info|[botInfo](../types/botInfo.md) | Yes|Information about bot if user is a bot, nullable. Can be null even for bot if bot is not a chat member|
+|bot\_info|[botInfo](../constructors/botInfo.md) | Yes|Information about bot if user is a bot, nullable. Can be null even for bot if bot is not a chat member|
 
 
 

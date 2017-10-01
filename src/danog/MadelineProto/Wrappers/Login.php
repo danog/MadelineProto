@@ -19,9 +19,6 @@ trait Login
 {
     public function logout()
     {
-        if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['logout_error']);
-        }
         $this->authorized = self::NOT_LOGGED_IN;
         $this->authorization = null;
         $this->updates = [];
@@ -30,6 +27,9 @@ trait Login
         $this->users = [];
         $this->state = [];
 
+        if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['logout_error']);
+        }
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['logout_ok']], \danog\MadelineProto\Logger::NOTICE);
 
         return true;

@@ -13,7 +13,7 @@ Contains inline keyboard layout
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|rows|Array of [inlineKeyboardButton>](../constructors/inlineKeyboardButton>.md) | Yes|List of rows of inline keyboard buttons|
+|rows|Array of [inlineKeyboardButton](../constructors/inlineKeyboardButton.md) | Yes|List of rows of inline keyboard buttons|
 
 
 

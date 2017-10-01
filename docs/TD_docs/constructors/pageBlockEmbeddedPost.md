@@ -15,9 +15,9 @@ Embedded post
 |----------|---------------|----------|-------------|
 |url|[string](../types/string.md) | Yes|Web page URL|
 |author|[string](../types/string.md) | Yes|Post author|
-|author\_photo|[photo](../types/photo.md) | Yes|Post author photo|
+|author\_photo|[photo](../constructors/photo.md) | Yes|Post author photo|
 |date|[int](../types/int.md) | Yes|Post date, unix time. 0 if unknown|
-|page\_blocks|Array of [PageBlock](../constructors/PageBlock.md) | Yes|Post content|
+|page\_blocks|Array of [PageBlock](../types/PageBlock.md) | Yes|Post content|
 |caption|[RichText](../types/RichText.md) | Yes|Post caption|
 
 

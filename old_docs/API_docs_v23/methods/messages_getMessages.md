@@ -15,6 +15,9 @@ description: messages.getMessages parameters, return type and example
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

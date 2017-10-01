@@ -18,7 +18,7 @@ Represents link to an article or web page
 |hide\_url|[Bool](../types/Bool.md) | Yes|True, if url must be not shown|
 |title|[string](../types/string.md) | Yes|Title of the result|
 |description|[string](../types/string.md) | Yes|Short description of the result|
-|thumb|[photoSize](../types/photoSize.md) | Yes|Result thumb, nullable|
+|thumb|[photoSize](../constructors/photoSize.md) | Yes|Result thumb, nullable|
 
 
 

@@ -14,7 +14,7 @@ Chat photo was changed
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|photo|[chatPhoto](../types/chatPhoto.md) | Yes|New chat photo, nullable|
+|photo|[chatPhoto](../constructors/chatPhoto.md) | Yes|New chat photo, nullable|
 
 
 

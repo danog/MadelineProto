@@ -14,7 +14,7 @@ Notification settings for some chats was updated
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |scope|[NotificationSettingsScope](../types/NotificationSettingsScope.md) | Yes|Kinds of chats for which notification settings was updated|
-|notification\_settings|[notificationSettings](../types/notificationSettings.md) | Yes|New notification settings|
+|notification\_settings|[notificationSettings](../constructors/notificationSettings.md) | Yes|New notification settings|
 
 
 

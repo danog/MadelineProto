@@ -15,6 +15,17 @@ description: messages.getChats parameters, return type and example
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
+
 ### Example:
 
 

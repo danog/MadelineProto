@@ -13,7 +13,7 @@ New chat has been loaded/created. This update is guaranteed to come before chat 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat|[chat](../types/chat.md) | Yes|The chat|
+|chat|[chat](../constructors/chat.md) | Yes|The chat|
 
 
 

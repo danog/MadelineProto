@@ -13,8 +13,8 @@ A message was edited
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|old\_message|[message](../types/message.md) | Yes|Message before edit|
-|new\_message|[message](../types/message.md) | Yes|Message after edit|
+|old\_message|[message](../constructors/message.md) | Yes|Message before edit|
+|new\_message|[message](../constructors/message.md) | Yes|Message after edit|
 
 
 

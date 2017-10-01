@@ -15,14 +15,21 @@ description: langpack.getLangPack parameters, return type and example
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -37,15 +44,6 @@ $LangPackDifference = $MadelineProto->langpack->getLangPack(['lang_code' => 'str
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - langpack.getLangPack
-* params - `{"lang_code": "string", }`
 
 
 

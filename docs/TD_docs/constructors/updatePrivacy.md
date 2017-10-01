@@ -14,7 +14,7 @@ Some privacy settings has changed
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |key|[PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
-|rules|[privacyRules](../types/privacyRules.md) | Yes|New privacy rules|
+|rules|[privacyRules](../constructors/privacyRules.md) | Yes|New privacy rules|
 
 
 

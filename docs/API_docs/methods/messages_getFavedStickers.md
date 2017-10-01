@@ -15,6 +15,9 @@ description: messages.getFavedStickers parameters, return type and example
 
 ### Return type: [messages\_FavedStickers](../types/messages_FavedStickers.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

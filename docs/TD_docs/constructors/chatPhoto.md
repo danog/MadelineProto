@@ -13,8 +13,8 @@ Describes chat photo
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|small|[file](../types/file.md) | Yes|Small (160x160) chat photo|
-|big|[file](../types/file.md) | Yes|Big (640x640) chat photo|
+|small|[file](../constructors/file.md) | Yes|Small (160x160) chat photo|
+|big|[file](../constructors/file.md) | Yes|Big (640x640) chat photo|
 
 
 

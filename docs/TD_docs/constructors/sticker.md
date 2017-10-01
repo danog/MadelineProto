@@ -18,9 +18,9 @@ Describes sticker
 |height|[int](../types/int.md) | Yes|Sticker height as defined by sender|
 |emoji|[string](../types/string.md) | Yes|Emoji corresponding to the sticker|
 |is\_mask|[Bool](../types/Bool.md) | Yes|True, if the sticker is a mask|
-|mask\_position|[maskPosition](../types/maskPosition.md) | Yes|Position where the mask should be placed, nullable|
-|thumb|[photoSize](../types/photoSize.md) | Yes|Sticker thumb in webp or jpeg format, nullable|
-|sticker|[file](../types/file.md) | Yes|File with sticker|
+|mask\_position|[maskPosition](../constructors/maskPosition.md) | Yes|Position where the mask should be placed, nullable|
+|thumb|[photoSize](../constructors/photoSize.md) | Yes|Sticker thumb in webp or jpeg format, nullable|
+|sticker|[file](../constructors/file.md) | Yes|File with sticker|
 
 
 

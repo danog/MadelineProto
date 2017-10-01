@@ -79,7 +79,15 @@ trait UpdateHandler
         });
 
         $time = microtime(true);
-        $this->get_updates_difference();
+
+        try {
+            $this->get_updates_difference();
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            if ($e->rpc !== 'RPC_CALL_FAIL') {
+                throw $e;
+            }
+        }
+
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
         foreach ($default_params as $key => $default) {
             if (!isset($params[$key])) {
@@ -575,7 +583,7 @@ trait UpdateHandler
             $update['message']['out'] = true;
         }
         \danog\MadelineProto\Logger::log(['Saving an update of type '.$update['_'].'...'], \danog\MadelineProto\Logger::VERBOSE);
-        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
+        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
         } else {
             in_array($this->settings['updates']['callback'], [['danog\MadelineProto\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);

@@ -13,7 +13,7 @@ Contatins list of hashtags
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hashtags|Array of [string](../constructors/string.md) | Yes|List of hashtags|
+|hashtags|Array of [string](../types/string.md) | Yes|List of hashtags|
 
 
 

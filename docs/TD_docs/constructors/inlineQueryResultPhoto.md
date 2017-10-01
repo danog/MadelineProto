@@ -14,7 +14,7 @@ Represents a photo cached on the telegram server
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|photo|[photo](../types/photo.md) | Yes|The photo|
+|photo|[photo](../constructors/photo.md) | Yes|The photo|
 |title|[string](../types/string.md) | Yes|Title of the result, if known|
 |description|[string](../types/string.md) | Yes|Short description of the result, if known|
 

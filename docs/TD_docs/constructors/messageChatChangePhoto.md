@@ -13,7 +13,7 @@ Chat photo changed
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|photo|[photo](../types/photo.md) | Yes|New chat photo|
+|photo|[photo](../constructors/photo.md) | Yes|New chat photo|
 
 
 

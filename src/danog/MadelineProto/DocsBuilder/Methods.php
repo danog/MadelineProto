@@ -16,6 +16,8 @@ trait Methods
 {
     public function mk_methods()
     {
+        $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
+        $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
         foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);
         }
@@ -46,15 +48,15 @@ trait Methods
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
+                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption' && !isset($this->settings['td'])) {
                     $param['type'] = 'InputPeer';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512'])) ? 'types' : 'constructors';
+                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'])) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
 
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
@@ -91,21 +93,23 @@ trait Methods
                 if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
-                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage') {
+                if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
                     $param['name'] = 'message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
+                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption' && !isset($this->settings['td'])) {
                     $param['type'] = 'InputPeer';
                 }
 
-                $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
                 switch ($ptype) {
                     case 'true':
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../types/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
+                $type_or_bare_type = (ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'])) ? 'types' : 'constructors';
+
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
                     $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }
@@ -164,17 +168,30 @@ description: '.$description.'
             $return = '### Return type: ['.str_replace('_', '\_', $type).'](../types/'.$php_type.'.md)
 
 ';
+            $bot = !in_array($data['method'], $bots);
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example = str_replace('[]', '', '### Example:
+                $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
+                if (isset($errors['result'][$data['method']])) {
+                    $example .= '### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+';
+                    foreach ($errors['result'][$data['method']] as $error) {
+                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
+                    }
+                    $example .= "\n\n";
+                }
+                $example .= str_replace('[]', '', '### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
+'.($bot ? 'if (isset($token)) { // Login as a bot
     $MadelineProto->bot_login($token);
 }
-if (isset($number)) { // Login as a user
+' : '').'if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo \'Enter the code you received: \';
     $code = \'\';
@@ -189,7 +206,7 @@ $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 
 Or, if you\'re using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
-### As a bot:
+'.($bot ? '### As a bot:
 
 POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 
@@ -198,7 +215,7 @@ Parameters:
 * method - '.$data['method'].'
 * params - `{'.$json_params.'}`
 
-
+' : '').'
 
 ### As a user:
 

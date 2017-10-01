@@ -15,7 +15,7 @@ Sends notification about screenshot taken in a chat. Works only in private and s
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)

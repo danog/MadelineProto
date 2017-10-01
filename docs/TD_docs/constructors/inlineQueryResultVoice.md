@@ -14,7 +14,7 @@ Represents a voice cached on the telegram server
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|voice|[voice](../types/voice.md) | Yes|The voice|
+|voice|[voice](../constructors/voice.md) | Yes|The voice|
 |title|[string](../types/string.md) | Yes|Title of the voice file|
 
 

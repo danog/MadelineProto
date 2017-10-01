@@ -424,6 +424,16 @@ description: A 32 bit signed integer ranging from -2147483648 to 2147483647
 A 32 bit signed integer ranging from `-2147483648` to `2147483647`.
 ');
 
+        file_put_contents('types/int53.md', '---
+title: integer
+description: A 53 bit signed integer
+---
+## Type: int53  
+[Back to constructor index](index.md)
+
+A 53 bit signed integer.
+');
+
         file_put_contents('types/long.md', '---
 title: long
 description: A 32 bit signed integer ranging from -9223372036854775808 to 9223372036854775807

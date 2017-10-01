@@ -14,7 +14,7 @@ Some data from channelFull has been changed
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel\_id|[int](../types/int.md) | Yes|Channel identifier|
-|channel\_full|[channelFull](../types/channelFull.md) | Yes|New full information about the channel|
+|channel\_full|[channelFull](../constructors/channelFull.md) | Yes|New full information about the channel|
 
 
 

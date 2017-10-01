@@ -15,7 +15,7 @@ Returns invoice payment form. The method should be called when user presses inli
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier of the Invoice message|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier of the Invoice message|
 |message\_id|[int53](../types/int53.md) | Yes|Message identifier|
 
 

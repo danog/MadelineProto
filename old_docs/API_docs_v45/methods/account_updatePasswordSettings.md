@@ -16,14 +16,23 @@ description: account.updatePasswordSettings parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|NEW_SALT_INVALID|The new salt is invalid|
+|NEW_SETTINGS_INVALID|The new settings are invalid|
+|PASSWORD_HASH_INVALID|The provided password hash is invalid|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -38,15 +47,6 @@ $Bool = $MadelineProto->account->updatePasswordSettings(['current_password_hash'
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - account.updatePasswordSettings
-* params - `{"current_password_hash": "bytes", "new_settings": account_PasswordInputSettings, }`
 
 
 

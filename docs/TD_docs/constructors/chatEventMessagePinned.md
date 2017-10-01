@@ -13,7 +13,7 @@ A message was pinned
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message|[message](../types/message.md) | Yes|Pinned message|
+|message|[message](../constructors/message.md) | Yes|Pinned message|
 
 
 

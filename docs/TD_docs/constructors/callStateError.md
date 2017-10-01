@@ -13,7 +13,7 @@ Call has ended with an error
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|error|[error](../types/error.md) | Yes|The error. Error with the code 4005000 returned if an outgoing call is missed because of expired timeout|
+|error|[error](../constructors/error.md) | Yes|The error. Error with the code 4005000 returned if an outgoing call is missed because of expired timeout|
 
 
 

@@ -13,7 +13,7 @@ Tests only. A simple object containing just a vector of strings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|value|Array of [string](../constructors/string.md) | Yes|The vector of strings|
+|value|Array of [string](../types/string.md) | Yes|The vector of strings|
 
 
 

@@ -13,7 +13,7 @@ Concatenation of rich texts
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|texts|Array of [RichText](../constructors/RichText.md) | Yes|The texts|
+|texts|Array of [RichText](../types/RichText.md) | Yes|The texts|
 
 
 

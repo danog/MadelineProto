@@ -15,6 +15,9 @@ description: get_future_salts parameters, return type and example
 
 ### Return type: [FutureSalts](../types/FutureSalts.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

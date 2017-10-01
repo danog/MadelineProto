@@ -74,7 +74,10 @@ trait CallHandler
         if (isset($queue)) {
             $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue], 'query' => $serialized]);
         }
-
+        if (($l = strlen($serialized)) > 500 && ($g = strlen($gzipped = gzencode($serialized))) < $l) {
+            $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
+            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.($g * 100 / $l).'%'], \danog\MadelineProto\Logger::VERBOSE);
+        }
         $last_recv = $this->last_recv;
         if ($canunset = !$this->updates_state['sync_loading'] && !$this->threads && !$this->run_workers) {
             $this->updates_state['sync_loading'] = true;
@@ -277,12 +280,14 @@ trait CallHandler
         if (!isset($aargs['datacenter'])) {
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
+        $serialized = $this->serialize_object(['type' => $object], $args, $object);
+
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             try {
                 if ($object !== 'msgs_ack') {
                     \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 }
-                $message_id = $this->send_message($this->serialize_object(['type' => $object], $args, $object), $this->content_related($object), $aargs);
+                $message_id = $this->send_message($serialized, $this->content_related($object), $aargs);
                 if ($object !== 'msgs_ack') {
                     $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];
                 }

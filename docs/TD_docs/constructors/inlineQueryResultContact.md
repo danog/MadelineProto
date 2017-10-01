@@ -14,8 +14,8 @@ Represents user contact
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|contact|[contact](../types/contact.md) | Yes|User contact|
-|thumb|[photoSize](../types/photoSize.md) | Yes|Result thumb, nullable|
+|contact|[contact](../constructors/contact.md) | Yes|User contact|
+|thumb|[photoSize](../constructors/photoSize.md) | Yes|Result thumb, nullable|
 
 
 

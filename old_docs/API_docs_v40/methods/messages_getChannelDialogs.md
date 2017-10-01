@@ -16,6 +16,9 @@ description: messages.getChannelDialogs parameters, return type and example
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

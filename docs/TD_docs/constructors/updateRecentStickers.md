@@ -14,7 +14,7 @@ List of recently used stickers was updated
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |is\_attached|[Bool](../types/Bool.md) | Yes|True, if the list of stickers attached to photo or video files was updated, otherwise the list of sent stickers is updated|
-|sticker\_ids|Array of [int](../constructors/int.md) | Yes|New list of file identifiers of recently used stickers|
+|sticker\_ids|Array of [int](../types/int.md) | Yes|New list of file identifiers of recently used stickers|
 
 
 

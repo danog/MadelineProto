@@ -13,7 +13,7 @@ DEPRECATED. Use updateFile instead. File generation is finished
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file|[file](../types/file.md) | Yes|Generated file|
+|file|[file](../constructors/file.md) | Yes|Generated file|
 
 
 

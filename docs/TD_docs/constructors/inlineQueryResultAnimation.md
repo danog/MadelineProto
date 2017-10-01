@@ -14,7 +14,7 @@ Represents an animation cached on the telegram server
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|animation|[animation](../types/animation.md) | Yes|The animation|
+|animation|[animation](../constructors/animation.md) | Yes|The animation|
 |title|[string](../types/string.md) | Yes|Animation title|
 
 

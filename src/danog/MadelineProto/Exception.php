@@ -18,7 +18,7 @@ class Exception extends \Exception
 
     public function __toString()
     {
-        return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
+        return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.$this->getTLTrace();
     }
 
     public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)

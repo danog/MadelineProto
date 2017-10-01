@@ -364,9 +364,12 @@ class MTProto
         }
         $this->setup_threads();
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        if ($this->get_self()) {
+            $this->authorized = self::LOGGED_IN;
+        }
         if ($this->authorized === self::LOGGED_IN) {
-            $this->get_self();
             $this->get_cdn_config($this->datacenter->curdc);
+            $this->setup_logger();
         }
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             $this->get_dialogs($force);
@@ -601,7 +604,7 @@ class MTProto
         }
 
         if ($settings['app_info']['api_id'] < 20) {
-            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
+//            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
         }
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
@@ -810,8 +813,10 @@ class MTProto
 
     public function get_self()
     {
-        if ($this->authorization === null) {
+        try {
             $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
+        } catch (RPCErrorException $e) {
+            return false;
         }
 
         return $this->authorization['user'];

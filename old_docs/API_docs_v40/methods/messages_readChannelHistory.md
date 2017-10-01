@@ -16,6 +16,9 @@ description: messages.readChannelHistory parameters, return type and example
 
 ### Return type: [Bool](../types/Bool.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

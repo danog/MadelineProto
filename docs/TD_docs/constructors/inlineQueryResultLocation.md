@@ -14,9 +14,9 @@ Represents a point on the map
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|location|[location](../types/location.md) | Yes|The result|
+|location|[location](../constructors/location.md) | Yes|The result|
 |title|[string](../types/string.md) | Yes|Title of the result|
-|thumb|[photoSize](../types/photoSize.md) | Yes|Result thumb, nullable|
+|thumb|[photoSize](../constructors/photoSize.md) | Yes|Result thumb, nullable|
 
 
 

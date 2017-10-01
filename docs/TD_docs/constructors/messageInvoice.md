@@ -15,7 +15,7 @@ Message with an invoice from a bot
 |----------|---------------|----------|-------------|
 |title|[string](../types/string.md) | Yes|Goods title|
 |description|[string](../types/string.md) | Yes|Goods description|
-|photo|[photo](../types/photo.md) | Yes|Goods photo, nullable|
+|photo|[photo](../constructors/photo.md) | Yes|Goods photo, nullable|
 |currency|[string](../types/string.md) | Yes|Currency for goods price|
 |total\_amount|[int53](../types/int53.md) | Yes|Goods total price in minimal quantity of the currency|
 |start\_parameter|[string](../types/string.md) | Yes|Unique invoice bot start_parameter. To share an invoice use a URL https: t.me/{bot_username}?start={start_parameter}|

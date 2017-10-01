@@ -15,6 +15,9 @@ description: geochats.getFullChat parameters, return type and example
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

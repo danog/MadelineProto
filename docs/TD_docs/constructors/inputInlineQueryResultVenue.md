@@ -14,7 +14,7 @@ Represents information about a venue
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[string](../types/string.md) | Yes|Unique identifier of this result|
-|venue|[venue](../types/venue.md) | Yes|Result|
+|venue|[venue](../constructors/venue.md) | Yes|Result|
 |thumb\_url|[string](../types/string.md) | Yes|Url of the result thumb, if exists|
 |thumb\_width|[int](../types/int.md) | Yes|Thumb width, if known|
 |thumb\_height|[int](../types/int.md) | Yes|Thumb height, if known|

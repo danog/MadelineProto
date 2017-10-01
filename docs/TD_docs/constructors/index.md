@@ -107,7 +107,7 @@ description: List of constructors
 <br><br>[$channel](../constructors/channel.md) = \['id' => [int](../types/int.md), 'username' => [string](../types/string.md), 'date' => [int](../types/int.md), 'status' => [ChatMemberStatus](../types/ChatMemberStatus.md), 'anyone_can_invite' => [Bool](../types/Bool.md), 'sign_messages' => [Bool](../types/Bool.md), 'is_supergroup' => [Bool](../types/Bool.md), 'is_verified' => [Bool](../types/Bool.md), 'restriction_reason' => [string](../types/string.md), \];<a name="channel"></a>  
 
 ***
-<br><br>[$channelFull](../constructors/channelFull.md) = \['description' => [string](../types/string.md), 'member_count' => [int](../types/int.md), 'administrator_count' => [int](../types/int.md), 'restricted_count' => [int](../types/int.md), 'banned_count' => [int](../types/int.md), 'can_get_members' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'invite_link' => [string](../types/string.md), 'pinned_message_id' => [int53](../constructors/int53.md), 'migrated_from_group_id' => [int](../types/int.md), 'migrated_from_max_message_id' => [int53](../constructors/int53.md), \];<a name="channelFull"></a>  
+<br><br>[$channelFull](../constructors/channelFull.md) = \['description' => [string](../types/string.md), 'member_count' => [int](../types/int.md), 'administrator_count' => [int](../types/int.md), 'restricted_count' => [int](../types/int.md), 'banned_count' => [int](../types/int.md), 'can_get_members' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'invite_link' => [string](../types/string.md), 'pinned_message_id' => [int53](../types/int53.md), 'migrated_from_group_id' => [int](../types/int.md), 'migrated_from_max_message_id' => [int53](../types/int53.md), \];<a name="channelFull"></a>  
 
 ***
 <br><br>[$channelMembersFilterAdministrators](../constructors/channelMembersFilterAdministrators.md) = \[\];<a name="channelMembersFilterAdministrators"></a>  
@@ -128,7 +128,7 @@ description: List of constructors
 <br><br>[$channelMembersFilterSearch](../constructors/channelMembersFilterSearch.md) = \['query' => [string](../types/string.md), \];<a name="channelMembersFilterSearch"></a>  
 
 ***
-<br><br>[$chat](../constructors/chat.md) = \['id' => [int53](../constructors/int53.md), 'type' => [ChatType](../types/ChatType.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'top_message' => [message](../constructors/message.md), 'order' => [long](../types/long.md), 'is_pinned' => [Bool](../types/Bool.md), 'unread_count' => [int](../types/int.md), 'last_read_inbox_message_id' => [int53](../constructors/int53.md), 'last_read_outbox_message_id' => [int53](../constructors/int53.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), 'reply_markup_message_id' => [int53](../constructors/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), 'client_data' => [string](../types/string.md), \];<a name="chat"></a>  
+<br><br>[$chat](../constructors/chat.md) = \['id' => [int53](../types/int53.md), 'type' => [ChatType](../types/ChatType.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'top_message' => [message](../constructors/message.md), 'order' => [long](../types/long.md), 'is_pinned' => [Bool](../types/Bool.md), 'unread_count' => [int](../types/int.md), 'last_read_inbox_message_id' => [int53](../types/int53.md), 'last_read_outbox_message_id' => [int53](../types/int53.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), 'reply_markup_message_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), 'client_data' => [string](../types/string.md), \];<a name="chat"></a>  
 
 ***
 <br><br>[$chatActionCancel](../constructors/chatActionCancel.md) = \[\];<a name="chatActionCancel"></a>  
@@ -227,7 +227,7 @@ description: List of constructors
 <br><br>[$chatInviteLink](../constructors/chatInviteLink.md) = \['invite_link' => [string](../types/string.md), \];<a name="chatInviteLink"></a>  
 
 ***
-<br><br>[$chatInviteLinkInfo](../constructors/chatInviteLinkInfo.md) = \['chat_id' => [int53](../constructors/int53.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'member_count' => [int](../types/int.md), 'member_user_ids' => \[[int](../types/int.md)\], 'is_group' => [Bool](../types/Bool.md), 'is_channel' => [Bool](../types/Bool.md), 'is_public_channel' => [Bool](../types/Bool.md), 'is_supergroup_channel' => [Bool](../types/Bool.md), \];<a name="chatInviteLinkInfo"></a>  
+<br><br>[$chatInviteLinkInfo](../constructors/chatInviteLinkInfo.md) = \['chat_id' => [int53](../types/int53.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'member_count' => [int](../types/int.md), 'member_user_ids' => \[[int](../types/int.md)\], 'is_group' => [Bool](../types/Bool.md), 'is_channel' => [Bool](../types/Bool.md), 'is_public_channel' => [Bool](../types/Bool.md), 'is_supergroup_channel' => [Bool](../types/Bool.md), \];<a name="chatInviteLinkInfo"></a>  
 
 ***
 <br><br>[$chatMember](../constructors/chatMember.md) = \['user_id' => [int](../types/int.md), 'inviter_user_id' => [int](../types/int.md), 'join_date' => [int](../types/int.md), 'status' => [ChatMemberStatus](../types/ChatMemberStatus.md), 'bot_info' => [botInfo](../constructors/botInfo.md), \];<a name="chatMember"></a>  
@@ -284,7 +284,7 @@ description: List of constructors
 <br><br>[$chatTypeSecret](../constructors/chatTypeSecret.md) = \['secret_chat_id' => [int](../types/int.md), \];<a name="chatTypeSecret"></a>  
 
 ***
-<br><br>[$chats](../constructors/chats.md) = \['chat_ids' => \[[int53](../constructors/int53.md)\], \];<a name="chats"></a>  
+<br><br>[$chats](../constructors/chats.md) = \['chat_ids' => \[[int53](../types/int53.md)\], \];<a name="chats"></a>  
 
 ***
 <br><br>[$connectionStateConnecting](../constructors/connectionStateConnecting.md) = \[\];<a name="connectionStateConnecting"></a>  
@@ -329,7 +329,7 @@ description: List of constructors
 <br><br>[$document](../constructors/document.md) = \['file_name' => [string](../types/string.md), 'mime_type' => [string](../types/string.md), 'thumb' => [photoSize](../constructors/photoSize.md), 'document' => [file](../constructors/file.md), \];<a name="document"></a>  
 
 ***
-<br><br>[$draftMessage](../constructors/draftMessage.md) = \['reply_to_message_id' => [int53](../constructors/int53.md), 'input_message_text' => [InputMessageContent](../types/InputMessageContent.md), \];<a name="draftMessage"></a>  
+<br><br>[$draftMessage](../constructors/draftMessage.md) = \['reply_to_message_id' => [int53](../types/int53.md), 'input_message_text' => [InputMessageContent](../types/InputMessageContent.md), \];<a name="draftMessage"></a>  
 
 ***
 <br><br>[$error](../constructors/error.md) = \['code' => [int](../types/int.md), 'message' => [string](../types/string.md), \];<a name="error"></a>  
@@ -533,7 +533,7 @@ description: List of constructors
 <br><br>[$inputMessageDocument](../constructors/inputMessageDocument.md) = \['document' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageDocument"></a>  
 
 ***
-<br><br>[$inputMessageForwarded](../constructors/inputMessageForwarded.md) = \['from_chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), 'in_game_share' => [Bool](../types/Bool.md), \];<a name="inputMessageForwarded"></a>  
+<br><br>[$inputMessageForwarded](../constructors/inputMessageForwarded.md) = \['from_chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'in_game_share' => [Bool](../types/Bool.md), \];<a name="inputMessageForwarded"></a>  
 
 ***
 <br><br>[$inputMessageGame](../constructors/inputMessageGame.md) = \['bot_user_id' => [int](../types/int.md), 'game_short_name' => [string](../types/string.md), \];<a name="inputMessageGame"></a>  
@@ -590,7 +590,7 @@ description: List of constructors
 <br><br>[$keyboardButtonTypeText](../constructors/keyboardButtonTypeText.md) = \[\];<a name="keyboardButtonTypeText"></a>  
 
 ***
-<br><br>[$labeledPrice](../constructors/labeledPrice.md) = \['label' => [string](../types/string.md), 'amount' => [int53](../constructors/int53.md), \];<a name="labeledPrice"></a>  
+<br><br>[$labeledPrice](../constructors/labeledPrice.md) = \['label' => [string](../types/string.md), 'amount' => [int53](../types/int53.md), \];<a name="labeledPrice"></a>  
 
 ***
 <br><br>[$linkStateContact](../constructors/linkStateContact.md) = \[\];<a name="linkStateContact"></a>  
@@ -608,7 +608,7 @@ description: List of constructors
 <br><br>[$maskPosition](../constructors/maskPosition.md) = \['point' => [int](../types/int.md), 'x_shift' => [double](../types/double.md), 'y_shift' => [double](../types/double.md), 'scale' => [double](../types/double.md), \];<a name="maskPosition"></a>  
 
 ***
-<br><br>[$message](../constructors/message.md) = \['id' => [int53](../constructors/int53.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../constructors/int53.md), 'send_state' => [MessageSendState](../types/MessageSendState.md), 'can_be_edited' => [Bool](../types/Bool.md), 'can_be_forwarded' => [Bool](../types/Bool.md), 'can_be_deleted_only_for_self' => [Bool](../types/Bool.md), 'can_be_deleted_for_everyone' => [Bool](../types/Bool.md), 'is_post' => [Bool](../types/Bool.md), 'date' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), 'forward_info' => [MessageForwardInfo](../types/MessageForwardInfo.md), 'reply_to_message_id' => [int53](../constructors/int53.md), 'ttl' => [int](../types/int.md), 'ttl_expires_in' => [double](../types/double.md), 'via_bot_user_id' => [int](../types/int.md), 'author_signature' => [string](../types/string.md), 'views' => [int](../types/int.md), 'content' => [MessageContent](../types/MessageContent.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="message"></a>  
+<br><br>[$message](../constructors/message.md) = \['id' => [int53](../types/int53.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'send_state' => [MessageSendState](../types/MessageSendState.md), 'can_be_edited' => [Bool](../types/Bool.md), 'can_be_forwarded' => [Bool](../types/Bool.md), 'can_be_deleted_only_for_self' => [Bool](../types/Bool.md), 'can_be_deleted_for_everyone' => [Bool](../types/Bool.md), 'is_post' => [Bool](../types/Bool.md), 'date' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), 'forward_info' => [MessageForwardInfo](../types/MessageForwardInfo.md), 'reply_to_message_id' => [int53](../types/int53.md), 'ttl' => [int](../types/int.md), 'ttl_expires_in' => [double](../types/double.md), 'via_bot_user_id' => [int](../types/int.md), 'author_signature' => [string](../types/string.md), 'views' => [int](../types/int.md), 'content' => [MessageContent](../types/MessageContent.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="message"></a>  
 
 ***
 <br><br>[$messageAnimation](../constructors/messageAnimation.md) = \['animation' => [animation](../constructors/animation.md), 'caption' => [string](../types/string.md), \];<a name="messageAnimation"></a>  
@@ -668,19 +668,19 @@ description: List of constructors
 <br><br>[$messageForwardedFromUser](../constructors/messageForwardedFromUser.md) = \['sender_user_id' => [int](../types/int.md), 'date' => [int](../types/int.md), \];<a name="messageForwardedFromUser"></a>  
 
 ***
-<br><br>[$messageForwardedPost](../constructors/messageForwardedPost.md) = \['chat_id' => [int53](../constructors/int53.md), 'author_signature' => [string](../types/string.md), 'date' => [int](../types/int.md), 'message_id' => [int53](../constructors/int53.md), \];<a name="messageForwardedPost"></a>  
+<br><br>[$messageForwardedPost](../constructors/messageForwardedPost.md) = \['chat_id' => [int53](../types/int53.md), 'author_signature' => [string](../types/string.md), 'date' => [int](../types/int.md), 'message_id' => [int53](../types/int53.md), \];<a name="messageForwardedPost"></a>  
 
 ***
 <br><br>[$messageGame](../constructors/messageGame.md) = \['game' => [game](../constructors/game.md), \];<a name="messageGame"></a>  
 
 ***
-<br><br>[$messageGameScore](../constructors/messageGameScore.md) = \['game_message_id' => [int53](../constructors/int53.md), 'game_id' => [long](../types/long.md), 'score' => [int](../types/int.md), \];<a name="messageGameScore"></a>  
+<br><br>[$messageGameScore](../constructors/messageGameScore.md) = \['game_message_id' => [int53](../types/int53.md), 'game_id' => [long](../types/long.md), 'score' => [int](../types/int.md), \];<a name="messageGameScore"></a>  
 
 ***
 <br><br>[$messageGroupChatCreate](../constructors/messageGroupChatCreate.md) = \['title' => [string](../types/string.md), 'member_user_ids' => \[[int](../types/int.md)\], \];<a name="messageGroupChatCreate"></a>  
 
 ***
-<br><br>[$messageInvoice](../constructors/messageInvoice.md) = \['title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [photo](../constructors/photo.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../constructors/int53.md), 'start_parameter' => [string](../types/string.md), 'is_test' => [Bool](../types/Bool.md), 'need_shipping_address' => [Bool](../types/Bool.md), 'receipt_message_id' => [int53](../constructors/int53.md), \];<a name="messageInvoice"></a>  
+<br><br>[$messageInvoice](../constructors/messageInvoice.md) = \['title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [photo](../constructors/photo.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), 'start_parameter' => [string](../types/string.md), 'is_test' => [Bool](../types/Bool.md), 'need_shipping_address' => [Bool](../types/Bool.md), 'receipt_message_id' => [int53](../types/int53.md), \];<a name="messageInvoice"></a>  
 
 ***
 <br><br>[$messageIsBeingSent](../constructors/messageIsBeingSent.md) = \[\];<a name="messageIsBeingSent"></a>  
@@ -698,16 +698,16 @@ description: List of constructors
 <br><br>[$messageLocation](../constructors/messageLocation.md) = \['location' => [location](../constructors/location.md), \];<a name="messageLocation"></a>  
 
 ***
-<br><br>[$messagePaymentSuccessful](../constructors/messagePaymentSuccessful.md) = \['currency' => [string](../types/string.md), 'total_amount' => [int53](../constructors/int53.md), \];<a name="messagePaymentSuccessful"></a>  
+<br><br>[$messagePaymentSuccessful](../constructors/messagePaymentSuccessful.md) = \['currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), \];<a name="messagePaymentSuccessful"></a>  
 
 ***
-<br><br>[$messagePaymentSuccessfulBot](../constructors/messagePaymentSuccessfulBot.md) = \['currency' => [string](../types/string.md), 'total_amount' => [int53](../constructors/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), 'telegram_payment_charge_id' => [string](../types/string.md), 'provider_payment_charge_id' => [string](../types/string.md), \];<a name="messagePaymentSuccessfulBot"></a>  
+<br><br>[$messagePaymentSuccessfulBot](../constructors/messagePaymentSuccessfulBot.md) = \['currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), 'telegram_payment_charge_id' => [string](../types/string.md), 'provider_payment_charge_id' => [string](../types/string.md), \];<a name="messagePaymentSuccessfulBot"></a>  
 
 ***
 <br><br>[$messagePhoto](../constructors/messagePhoto.md) = \['photo' => [photo](../constructors/photo.md), 'caption' => [string](../types/string.md), \];<a name="messagePhoto"></a>  
 
 ***
-<br><br>[$messagePinMessage](../constructors/messagePinMessage.md) = \['message_id' => [int53](../constructors/int53.md), \];<a name="messagePinMessage"></a>  
+<br><br>[$messagePinMessage](../constructors/messagePinMessage.md) = \['message_id' => [int53](../types/int53.md), \];<a name="messagePinMessage"></a>  
 
 ***
 <br><br>[$messageScreenshotTaken](../constructors/messageScreenshotTaken.md) = \[\];<a name="messageScreenshotTaken"></a>  
@@ -740,10 +740,10 @@ description: List of constructors
 <br><br>[$networkStatistics](../constructors/networkStatistics.md) = \['since_date' => [int](../types/int.md), 'entries' => \[[NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md)\], \];<a name="networkStatistics"></a>  
 
 ***
-<br><br>[$networkStatisticsEntryCall](../constructors/networkStatisticsEntryCall.md) = \['network_type' => [NetworkType](../types/NetworkType.md), 'sent_bytes' => [int53](../constructors/int53.md), 'received_bytes' => [int53](../constructors/int53.md), 'duration' => [double](../types/double.md), \];<a name="networkStatisticsEntryCall"></a>  
+<br><br>[$networkStatisticsEntryCall](../constructors/networkStatisticsEntryCall.md) = \['network_type' => [NetworkType](../types/NetworkType.md), 'sent_bytes' => [int53](../types/int53.md), 'received_bytes' => [int53](../types/int53.md), 'duration' => [double](../types/double.md), \];<a name="networkStatisticsEntryCall"></a>  
 
 ***
-<br><br>[$networkStatisticsEntryFile](../constructors/networkStatisticsEntryFile.md) = \['file_type' => [FileType](../types/FileType.md), 'network_type' => [NetworkType](../types/NetworkType.md), 'sent_bytes' => [int53](../constructors/int53.md), 'received_bytes' => [int53](../constructors/int53.md), \];<a name="networkStatisticsEntryFile"></a>  
+<br><br>[$networkStatisticsEntryFile](../constructors/networkStatisticsEntryFile.md) = \['file_type' => [FileType](../types/FileType.md), 'network_type' => [NetworkType](../types/NetworkType.md), 'sent_bytes' => [int53](../types/int53.md), 'received_bytes' => [int53](../types/int53.md), \];<a name="networkStatisticsEntryFile"></a>  
 
 ***
 <br><br>[$networkTypeMobile](../constructors/networkTypeMobile.md) = \[\];<a name="networkTypeMobile"></a>  
@@ -767,7 +767,7 @@ description: List of constructors
 <br><br>[$notificationSettingsScopeAllChats](../constructors/notificationSettingsScopeAllChats.md) = \[\];<a name="notificationSettingsScopeAllChats"></a>  
 
 ***
-<br><br>[$notificationSettingsScopeChat](../constructors/notificationSettingsScopeChat.md) = \['chat_id' => [int53](../constructors/int53.md), \];<a name="notificationSettingsScopeChat"></a>  
+<br><br>[$notificationSettingsScopeChat](../constructors/notificationSettingsScopeChat.md) = \['chat_id' => [int53](../types/int53.md), \];<a name="notificationSettingsScopeChat"></a>  
 
 ***
 <br><br>[$notificationSettingsScopeGroupChats](../constructors/notificationSettingsScopeGroupChats.md) = \[\];<a name="notificationSettingsScopeGroupChats"></a>  
@@ -935,13 +935,13 @@ description: List of constructors
 <br><br>[$replyMarkupForceReply](../constructors/replyMarkupForceReply.md) = \['personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupForceReply"></a>  
 
 ***
-<br><br>[$replyMarkupInlineKeyboard](../constructors/replyMarkupInlineKeyboard.md) = \['rows' => \[[inlineKeyboardButton>](../constructors/inlineKeyboardButton>.md)\], \];<a name="replyMarkupInlineKeyboard"></a>  
+<br><br>[$replyMarkupInlineKeyboard](../constructors/replyMarkupInlineKeyboard.md) = \['rows' => \[[inlineKeyboardButton](../constructors/inlineKeyboardButton.md)\], \];<a name="replyMarkupInlineKeyboard"></a>  
 
 ***
 <br><br>[$replyMarkupRemoveKeyboard](../constructors/replyMarkupRemoveKeyboard.md) = \['personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupRemoveKeyboard"></a>  
 
 ***
-<br><br>[$replyMarkupShowKeyboard](../constructors/replyMarkupShowKeyboard.md) = \['rows' => \[[keyboardButton>](../constructors/keyboardButton>.md)\], 'resize_keyboard' => [Bool](../types/Bool.md), 'one_time' => [Bool](../types/Bool.md), 'personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupShowKeyboard"></a>  
+<br><br>[$replyMarkupShowKeyboard](../constructors/replyMarkupShowKeyboard.md) = \['rows' => \[[keyboardButton](../constructors/keyboardButton.md)\], 'resize_keyboard' => [Bool](../types/Bool.md), 'one_time' => [Bool](../types/Bool.md), 'personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupShowKeyboard"></a>  
 
 ***
 <br><br>[$richTextBold](../constructors/richTextBold.md) = \['text' => [RichText](../types/RichText.md), \];<a name="richTextBold"></a>  
@@ -1049,16 +1049,16 @@ description: List of constructors
 <br><br>[$stickers](../constructors/stickers.md) = \['stickers' => \[[sticker](../constructors/sticker.md)\], \];<a name="stickers"></a>  
 
 ***
-<br><br>[$storageStatistics](../constructors/storageStatistics.md) = \['size' => [int53](../constructors/int53.md), 'count' => [int](../types/int.md), 'by_chat' => \[[storageStatisticsByChat](../constructors/storageStatisticsByChat.md)\], \];<a name="storageStatistics"></a>  
+<br><br>[$storageStatistics](../constructors/storageStatistics.md) = \['size' => [int53](../types/int53.md), 'count' => [int](../types/int.md), 'by_chat' => \[[storageStatisticsByChat](../constructors/storageStatisticsByChat.md)\], \];<a name="storageStatistics"></a>  
 
 ***
-<br><br>[$storageStatisticsByChat](../constructors/storageStatisticsByChat.md) = \['chat_id' => [int53](../constructors/int53.md), 'size' => [int53](../constructors/int53.md), 'count' => [int](../types/int.md), 'by_file_type' => \[[storageStatisticsByFileType](../constructors/storageStatisticsByFileType.md)\], \];<a name="storageStatisticsByChat"></a>  
+<br><br>[$storageStatisticsByChat](../constructors/storageStatisticsByChat.md) = \['chat_id' => [int53](../types/int53.md), 'size' => [int53](../types/int53.md), 'count' => [int](../types/int.md), 'by_file_type' => \[[storageStatisticsByFileType](../constructors/storageStatisticsByFileType.md)\], \];<a name="storageStatisticsByChat"></a>  
 
 ***
-<br><br>[$storageStatisticsByFileType](../constructors/storageStatisticsByFileType.md) = \['file_type' => [FileType](../types/FileType.md), 'size' => [int53](../constructors/int53.md), 'count' => [int](../types/int.md), \];<a name="storageStatisticsByFileType"></a>  
+<br><br>[$storageStatisticsByFileType](../constructors/storageStatisticsByFileType.md) = \['file_type' => [FileType](../types/FileType.md), 'size' => [int53](../types/int53.md), 'count' => [int](../types/int.md), \];<a name="storageStatisticsByFileType"></a>  
 
 ***
-<br><br>[$storageStatisticsFast](../constructors/storageStatisticsFast.md) = \['files_size' => [int53](../constructors/int53.md), 'files_count' => [int](../types/int.md), 'database_size' => [int53](../constructors/int53.md), \];<a name="storageStatisticsFast"></a>  
+<br><br>[$storageStatisticsFast](../constructors/storageStatisticsFast.md) = \['files_size' => [int53](../types/int53.md), 'files_count' => [int](../types/int.md), 'database_size' => [int53](../types/int53.md), \];<a name="storageStatisticsFast"></a>  
 
 ***
 <br><br>[$temporaryPasswordState](../constructors/temporaryPasswordState.md) = \['has_password' => [Bool](../types/Bool.md), 'valid_for' => [int](../types/int.md), \];<a name="temporaryPasswordState"></a>  
@@ -1163,37 +1163,37 @@ description: List of constructors
 <br><br>[$updateChannelFull](../constructors/updateChannelFull.md) = \['channel_id' => [int](../types/int.md), 'channel_full' => [channelFull](../constructors/channelFull.md), \];<a name="updateChannelFull"></a>  
 
 ***
-<br><br>[$updateChatDraftMessage](../constructors/updateChatDraftMessage.md) = \['chat_id' => [int53](../constructors/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), \];<a name="updateChatDraftMessage"></a>  
+<br><br>[$updateChatDraftMessage](../constructors/updateChatDraftMessage.md) = \['chat_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), \];<a name="updateChatDraftMessage"></a>  
 
 ***
-<br><br>[$updateChatIsPinned](../constructors/updateChatIsPinned.md) = \['chat_id' => [int53](../constructors/int53.md), 'is_pinned' => [Bool](../types/Bool.md), \];<a name="updateChatIsPinned"></a>  
+<br><br>[$updateChatIsPinned](../constructors/updateChatIsPinned.md) = \['chat_id' => [int53](../types/int53.md), 'is_pinned' => [Bool](../types/Bool.md), \];<a name="updateChatIsPinned"></a>  
 
 ***
-<br><br>[$updateChatOrder](../constructors/updateChatOrder.md) = \['chat_id' => [int53](../constructors/int53.md), 'order' => [long](../types/long.md), \];<a name="updateChatOrder"></a>  
+<br><br>[$updateChatOrder](../constructors/updateChatOrder.md) = \['chat_id' => [int53](../types/int53.md), 'order' => [long](../types/long.md), \];<a name="updateChatOrder"></a>  
 
 ***
-<br><br>[$updateChatPhoto](../constructors/updateChatPhoto.md) = \['chat_id' => [int53](../constructors/int53.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), \];<a name="updateChatPhoto"></a>  
+<br><br>[$updateChatPhoto](../constructors/updateChatPhoto.md) = \['chat_id' => [int53](../types/int53.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), \];<a name="updateChatPhoto"></a>  
 
 ***
-<br><br>[$updateChatReadInbox](../constructors/updateChatReadInbox.md) = \['chat_id' => [int53](../constructors/int53.md), 'last_read_inbox_message_id' => [int53](../constructors/int53.md), 'unread_count' => [int](../types/int.md), \];<a name="updateChatReadInbox"></a>  
+<br><br>[$updateChatReadInbox](../constructors/updateChatReadInbox.md) = \['chat_id' => [int53](../types/int53.md), 'last_read_inbox_message_id' => [int53](../types/int53.md), 'unread_count' => [int](../types/int.md), \];<a name="updateChatReadInbox"></a>  
 
 ***
-<br><br>[$updateChatReadOutbox](../constructors/updateChatReadOutbox.md) = \['chat_id' => [int53](../constructors/int53.md), 'last_read_outbox_message_id' => [int53](../constructors/int53.md), \];<a name="updateChatReadOutbox"></a>  
+<br><br>[$updateChatReadOutbox](../constructors/updateChatReadOutbox.md) = \['chat_id' => [int53](../types/int53.md), 'last_read_outbox_message_id' => [int53](../types/int53.md), \];<a name="updateChatReadOutbox"></a>  
 
 ***
-<br><br>[$updateChatReplyMarkup](../constructors/updateChatReplyMarkup.md) = \['chat_id' => [int53](../constructors/int53.md), 'reply_markup_message_id' => [int53](../constructors/int53.md), \];<a name="updateChatReplyMarkup"></a>  
+<br><br>[$updateChatReplyMarkup](../constructors/updateChatReplyMarkup.md) = \['chat_id' => [int53](../types/int53.md), 'reply_markup_message_id' => [int53](../types/int53.md), \];<a name="updateChatReplyMarkup"></a>  
 
 ***
-<br><br>[$updateChatTitle](../constructors/updateChatTitle.md) = \['chat_id' => [int53](../constructors/int53.md), 'title' => [string](../types/string.md), \];<a name="updateChatTitle"></a>  
+<br><br>[$updateChatTitle](../constructors/updateChatTitle.md) = \['chat_id' => [int53](../types/int53.md), 'title' => [string](../types/string.md), \];<a name="updateChatTitle"></a>  
 
 ***
-<br><br>[$updateChatTopMessage](../constructors/updateChatTopMessage.md) = \['chat_id' => [int53](../constructors/int53.md), 'top_message' => [message](../constructors/message.md), \];<a name="updateChatTopMessage"></a>  
+<br><br>[$updateChatTopMessage](../constructors/updateChatTopMessage.md) = \['chat_id' => [int53](../types/int53.md), 'top_message' => [message](../constructors/message.md), \];<a name="updateChatTopMessage"></a>  
 
 ***
 <br><br>[$updateConnectionState](../constructors/updateConnectionState.md) = \['state' => [ConnectionState](../types/ConnectionState.md), \];<a name="updateConnectionState"></a>  
 
 ***
-<br><br>[$updateDeleteMessages](../constructors/updateDeleteMessages.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_ids' => \[[int53](../constructors/int53.md)\], \];<a name="updateDeleteMessages"></a>  
+<br><br>[$updateDeleteMessages](../constructors/updateDeleteMessages.md) = \['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], \];<a name="updateDeleteMessages"></a>  
 
 ***
 <br><br>[$updateFile](../constructors/updateFile.md) = \['file' => [file](../constructors/file.md), \];<a name="updateFile"></a>  
@@ -1220,25 +1220,25 @@ description: List of constructors
 <br><br>[$updateInstalledStickerSets](../constructors/updateInstalledStickerSets.md) = \['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[long](../types/long.md)\], \];<a name="updateInstalledStickerSets"></a>  
 
 ***
-<br><br>[$updateMessageContent](../constructors/updateMessageContent.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), 'new_content' => [MessageContent](../types/MessageContent.md), \];<a name="updateMessageContent"></a>  
+<br><br>[$updateMessageContent](../constructors/updateMessageContent.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'new_content' => [MessageContent](../types/MessageContent.md), \];<a name="updateMessageContent"></a>  
 
 ***
-<br><br>[$updateMessageEdited](../constructors/updateMessageEdited.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), 'edit_date' => [int](../types/int.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="updateMessageEdited"></a>  
+<br><br>[$updateMessageEdited](../constructors/updateMessageEdited.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'edit_date' => [int](../types/int.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="updateMessageEdited"></a>  
 
 ***
-<br><br>[$updateMessageSendAcknowledged](../constructors/updateMessageSendAcknowledged.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), \];<a name="updateMessageSendAcknowledged"></a>  
+<br><br>[$updateMessageSendAcknowledged](../constructors/updateMessageSendAcknowledged.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \];<a name="updateMessageSendAcknowledged"></a>  
 
 ***
-<br><br>[$updateMessageSendFailed](../constructors/updateMessageSendFailed.md) = \['message' => [message](../constructors/message.md), 'old_message_id' => [int53](../constructors/int53.md), 'error_code' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \];<a name="updateMessageSendFailed"></a>  
+<br><br>[$updateMessageSendFailed](../constructors/updateMessageSendFailed.md) = \['message' => [message](../constructors/message.md), 'old_message_id' => [int53](../types/int53.md), 'error_code' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \];<a name="updateMessageSendFailed"></a>  
 
 ***
-<br><br>[$updateMessageSendSucceeded](../constructors/updateMessageSendSucceeded.md) = \['message' => [message](../constructors/message.md), 'old_message_id' => [int53](../constructors/int53.md), \];<a name="updateMessageSendSucceeded"></a>  
+<br><br>[$updateMessageSendSucceeded](../constructors/updateMessageSendSucceeded.md) = \['message' => [message](../constructors/message.md), 'old_message_id' => [int53](../types/int53.md), \];<a name="updateMessageSendSucceeded"></a>  
 
 ***
-<br><br>[$updateMessageViews](../constructors/updateMessageViews.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), 'views' => [int](../types/int.md), \];<a name="updateMessageViews"></a>  
+<br><br>[$updateMessageViews](../constructors/updateMessageViews.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'views' => [int](../types/int.md), \];<a name="updateMessageViews"></a>  
 
 ***
-<br><br>[$updateNewCallbackQuery](../constructors/updateNewCallbackQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), 'chat_instance' => [long](../types/long.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewCallbackQuery"></a>  
+<br><br>[$updateNewCallbackQuery](../constructors/updateNewCallbackQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'chat_instance' => [long](../types/long.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewCallbackQuery"></a>  
 
 ***
 <br><br>[$updateNewChat](../constructors/updateNewChat.md) = \['chat' => [chat](../constructors/chat.md), \];<a name="updateNewChat"></a>  
@@ -1262,7 +1262,7 @@ description: List of constructors
 <br><br>[$updateNewMessage](../constructors/updateNewMessage.md) = \['message' => [message](../constructors/message.md), 'disable_notification' => [Bool](../types/Bool.md), 'contains_mention' => [Bool](../types/Bool.md), \];<a name="updateNewMessage"></a>  
 
 ***
-<br><br>[$updateNewPreCheckoutQuery](../constructors/updateNewPreCheckoutQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../constructors/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), \];<a name="updateNewPreCheckoutQuery"></a>  
+<br><br>[$updateNewPreCheckoutQuery](../constructors/updateNewPreCheckoutQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), \];<a name="updateNewPreCheckoutQuery"></a>  
 
 ***
 <br><br>[$updateNewShippingQuery](../constructors/updateNewShippingQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'invoice_payload' => [string](../types/string.md), 'shipping_address' => [shippingAddress](../constructors/shippingAddress.md), \];<a name="updateNewShippingQuery"></a>  
@@ -1271,7 +1271,7 @@ description: List of constructors
 <br><br>[$updateNotificationSettings](../constructors/updateNotificationSettings.md) = \['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), \];<a name="updateNotificationSettings"></a>  
 
 ***
-<br><br>[$updateOpenMessageContent](../constructors/updateOpenMessageContent.md) = \['chat_id' => [int53](../constructors/int53.md), 'message_id' => [int53](../constructors/int53.md), \];<a name="updateOpenMessageContent"></a>  
+<br><br>[$updateOpenMessageContent](../constructors/updateOpenMessageContent.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \];<a name="updateOpenMessageContent"></a>  
 
 ***
 <br><br>[$updateOption](../constructors/updateOption.md) = \['name' => [string](../types/string.md), 'value' => [OptionValue](../types/OptionValue.md), \];<a name="updateOption"></a>  
@@ -1298,7 +1298,7 @@ description: List of constructors
 <br><br>[$updateUser](../constructors/updateUser.md) = \['user' => [user](../constructors/user.md), \];<a name="updateUser"></a>  
 
 ***
-<br><br>[$updateUserChatAction](../constructors/updateUserChatAction.md) = \['chat_id' => [int53](../constructors/int53.md), 'user_id' => [int](../types/int.md), 'action' => [ChatAction](../types/ChatAction.md), \];<a name="updateUserChatAction"></a>  
+<br><br>[$updateUserChatAction](../constructors/updateUserChatAction.md) = \['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), 'action' => [ChatAction](../types/ChatAction.md), \];<a name="updateUserChatAction"></a>  
 
 ***
 <br><br>[$updateUserFull](../constructors/updateUserFull.md) = \['user_id' => [int](../types/int.md), 'user_full' => [userFull](../constructors/userFull.md), \];<a name="updateUserFull"></a>  

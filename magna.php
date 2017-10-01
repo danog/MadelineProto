@@ -37,19 +37,11 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-var_dump($settings);
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
-        $checkedPhone = $MadelineProto->auth->checkPhone(// auth.checkPhone becomes auth->checkPhone
-            [
-                'phone_number'     => getenv('MTPROTO_NUMBER'),
-           ]
-        );
-
-        \danog\MadelineProto\Logger::log([$checkedPhone], \danog\MadelineProto\Logger::NOTICE);
-        $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
+        $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
         \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
@@ -81,24 +73,60 @@ if ($MadelineProto === false) {
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
+if (!isset($MadelineProto->programmed_call)) {
+    $MadelineProto->programmed_call = [];
+}
 
 echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 /*
 $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
 */
+$times = [];
 $calls = [];
 $users = [];
     $offset = 0;
     while (1) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        foreach ($MadelineProto->programmed_call as $key => $pair) {
+            list($user, $time) = $pair;
+            if ($time < time()) {
+                if (!isset($calls[$user])) {
+                    try {
+                        include 'songs.php';
+                        $call = $MadelineProto->request_call($user);
+                        $call->configuration['enable_NS'] = false;
+                        $call->configuration['enable_AGC'] = false;
+                        $call->configuration['enable_AEC'] = false;
+                        $call->configuration['shared_config'] = [
+                                'audio_init_bitrate' => 70 * 1000,
+                                'audio_max_bitrate'  => 100 * 1000,
+                                'audio_min_bitrate'  => 15 * 1000,
+                                //'audio_bitrate_step_decr' => 0,
+                                //'audio_bitrate_step_incr' => 2000,
+                            ];
+                        $call->parseConfig();
+                        $calls[$call->getOtherID()] = $call;
+                        $times[$call->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                        $call->playOnHold($songs);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        echo $e;
+                    }
+                }
+                unset($MadelineProto->programmed_call[$key]);
+            }
+        }
         foreach ($calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                try {
-                    //$MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Emojis: '.implode('', $call->getVisualization())]);
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                }
                 unset($calls[$key]);
+            } elseif (isset($times[$call->getOtherID()]) && $times[$call->getOtherID()][0] < time()) {
+                $times[$call->getOtherID()][0] += 10;
+
+                try {
+                    $MadelineProto->messages->editMessage(['id' => $times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    echo $e;
+                }
             }
         }
         foreach ($updates as $update) {
@@ -112,11 +140,68 @@ $users = [];
                     }
 
                     try {
-                        if (!isset($users[$update['update']['message']['from_id']])) {
+                        if (!isset($users[$update['update']['message']['from_id']]) || isset($update['update']['message']['message']) && $update['update']['message']['message'] === '/start') {
                             $users[$update['update']['message']['from_id']] = true;
-                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Call me! Powered by @MadelineProto.']);
+                            $update['update']['message']['message'] = '/call';
+                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => "Hi, I'm @magnaluna the webradio.
+
+Call _me_ to listen to some **awesome** music, or send /call to make _me_ call _you_ (don't forget to disable call privacy settings!).
+
+You can also program a phone call with /program:
+
+/program 29 August 2018 - call me the 29th of august 2018
+/program +1 hour 30 minutes - call me in one hour and thirty minutes
+/program next Thursday - call me next Thursday at midnight
+
+Send /start to see this message again.
+
+I also provide advanced stats during calls!
+
+I'm a userbot powered by @MadelineProto, created by @danogentili.
+Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
+                        }
+                        if (!isset($calls[$update['update']['message']['from_id']]) && isset($update['update']['message']['message']) && $update['update']['message']['message'] === '/call') {
+                            include 'songs.php';
+                            $call = $MadelineProto->request_call($update['update']['message']['from_id']);
+                            $call->configuration['enable_NS'] = false;
+                            $call->configuration['enable_AGC'] = false;
+                            $call->configuration['enable_AEC'] = false;
+                            $call->configuration['shared_config'] = [
+                                'audio_init_bitrate' => 70 * 1000,
+                                'audio_max_bitrate'  => 100 * 1000,
+                                'audio_min_bitrate'  => 15 * 1000,
+                                //'audio_bitrate_step_decr' => 0,
+                                //'audio_bitrate_step_incr' => 2000,
+                            ];
+                            $call->parseConfig();
+                            $call->playOnHold($songs);
+                            $calls[$call->getOtherID()] = $call;
+                            $times[$call->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                        }
+                        if (isset($update['update']['message']['message']) && strpos($update['update']['message']['message'], '/program') === 0) {
+                            $time = strtotime(str_replace('/program ', '', $update['update']['message']['message']));
+                            if ($time === false) {
+                                $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Invalid time provided']);
+                            } else {
+                                $MadelineProto->programmed_call[] = [$update['update']['message']['from_id'], $time];
+                                $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'OK']);
+                            }
                         }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        try {
+                            if ($e->rpc === 'USER_PRIVACY_RESTRICTED') {
+                                $e = 'Please disable call privacy settings to make me call you';
+                            } elseif (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                                $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                                $MadelineProto->programmed_call[] = [$update['update']['message']['from_id'], time() + 1 + $t];
+                                $e = "Too many people used the /call function. I'll call you back in $t seconds.\nYou can also call me right now.";
+                            }
+                            $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => (string) $e]);
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        }
+                        echo $e;
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        echo $e;
                     }
                     break;
                 case 'updatePhoneCall':
@@ -137,6 +222,11 @@ $users = [];
                         echo 'DID NOT ACCEPT A CALL';
                     }
                     $calls[$update['update']['phone_call']->getOtherID()] = $update['update']['phone_call'];
+
+                    try {
+                        $times[$update['update']['phone_call']->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$update['update']['phone_call']->getDebugString()])['id']];
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
                     $update['update']['phone_call']->playOnHold($songs);
                 }
 

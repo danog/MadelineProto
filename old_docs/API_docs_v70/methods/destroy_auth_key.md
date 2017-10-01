@@ -10,6 +10,9 @@ description: destroy_auth_key parameters, return type and example
 
 ### Return type: [DestroyAuthKeyRes](../types/DestroyAuthKeyRes.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

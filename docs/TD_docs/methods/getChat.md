@@ -15,7 +15,7 @@ Returns information about a chat by its identifier, offline request if current u
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)

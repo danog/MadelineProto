@@ -88,8 +88,8 @@ trait AuthKeyHandler
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_declined'], $call['id'])]);
-                $this->calls[$call['id']]->discard();
+                \danog\MadelineProto\Logger::log(['Call '.$call['id'].' already declined']);
+                $this->discard_call($call['id'], 'phoneCallDiscardReasonHangup');
 
                 return false;
             }
@@ -138,7 +138,6 @@ trait AuthKeyHandler
 
         $this->calls[$params['id']]->configuration['shared_config'] = array_merge($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]), $this->calls[$params['id']]->configuration['shared_config']);
         $this->calls[$params['id']]->configuration['endpoints'] = array_merge([$res['connection']], $res['alternative_connections'], $this->calls[$params['id']]->configuration['endpoints']);
-
         $this->calls[$params['id']]->configuration = array_merge([
             'recv_timeout'         => $this->config['call_receive_timeout_ms'] / 1000,
             'init_timeout'         => $this->config['call_connect_timeout_ms'] / 1000,
@@ -263,7 +262,7 @@ trait AuthKeyHandler
         try {
             $res = $this->method_call('phone.discardCall', ['peer' => $call, 'duration' => time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== 'CALL_ALREADY_DECLINED') {
+            if (!in_array($e->rpc, ['CALL_ALREADY_DECLINED', 'CALL_ALREADY_ACCEPTED'])) {
                 throw $e;
             }
         }

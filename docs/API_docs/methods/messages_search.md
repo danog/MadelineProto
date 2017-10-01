@@ -25,14 +25,23 @@ description: messages.search parameters, return type and example
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|SEARCH_QUERY_EMPTY|The search query is empty|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -47,15 +56,6 @@ $messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' 
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.search
-* params - `{"peer": InputPeer, "q": "string", "from_id": InputUser, "filter": MessagesFilter, "min_date": int, "max_date": int, "offset_id": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }`
 
 
 

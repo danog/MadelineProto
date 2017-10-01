@@ -15,6 +15,9 @@ description: req_pq parameters, return type and example
 
 ### Return type: [ResPQ](../types/ResPQ.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

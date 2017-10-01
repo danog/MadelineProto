@@ -17,6 +17,9 @@ description: messages.sendBroadcast parameters, return type and example
 
 ### Return type: [messages\_StatedMessages](../types/messages_StatedMessages.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

@@ -15,9 +15,9 @@ Contains information about chat invite link
 |----------|---------------|----------|-------------|
 |chat\_id|[int53](../types/int53.md) | Yes|Chat identifier of the invite link or 0 if user is not a member of this chat|
 |title|[string](../types/string.md) | Yes|Title of the chat|
-|photo|[chatPhoto](../types/chatPhoto.md) | Yes|Chat photo, nullable|
+|photo|[chatPhoto](../constructors/chatPhoto.md) | Yes|Chat photo, nullable|
 |member\_count|[int](../types/int.md) | Yes|Total member count|
-|member\_user\_ids|Array of [int](../constructors/int.md) | Yes|User identifiers of some chat members that may be known to the current user|
+|member\_user\_ids|Array of [int](../types/int.md) | Yes|User identifiers of some chat members that may be known to the current user|
 |is\_group|[Bool](../types/Bool.md) | Yes|True, if the chat is a group chat|
 |is\_channel|[Bool](../types/Bool.md) | Yes|True, if the chat is a channel chat|
 |is\_public\_channel|[Bool](../types/Bool.md) | Yes|True, if the chat is a channel chat with set up username|

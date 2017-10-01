@@ -20,14 +20,26 @@ description: messages.getHistory parameters, return type and example
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
+### Can bots use this method: **NO**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|AUTH_KEY_PERM_EMPTY|The temporary auth key must be binded to the permanent auth key to use these methods.|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
+
+
 ### Example:
 
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
-}
 if (isset($number)) { // Login as a user
     $sentCode = $MadelineProto->phone_login($number);
     echo 'Enter the code you received: ';
@@ -42,15 +54,6 @@ $messages_Messages = $MadelineProto->messages->getHistory(['peer' => InputPeer, 
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
-
-### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - messages.getHistory
-* params - `{"peer": InputPeer, "offset_id": int, "add_offset": int, "limit": int, "max_id": int, "min_id": int, }`
 
 
 

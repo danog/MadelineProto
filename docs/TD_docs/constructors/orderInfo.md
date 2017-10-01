@@ -16,7 +16,7 @@ Order information
 |name|[string](../types/string.md) | Yes|User name|
 |phone\_number|[string](../types/string.md) | Yes|User's phone number|
 |email|[string](../types/string.md) | Yes|User email|
-|shipping\_address|[shippingAddress](../types/shippingAddress.md) | Yes|User shipping address, nullable|
+|shipping\_address|[shippingAddress](../constructors/shippingAddress.md) | Yes|User shipping address, nullable|
 
 
 

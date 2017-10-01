@@ -16,6 +16,9 @@ description: ping_delay_disconnect parameters, return type and example
 
 ### Return type: [Pong](../types/Pong.md)
 
+### Can bots use this method: **YES**
+
+
 ### Example:
 
 

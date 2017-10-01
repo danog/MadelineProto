@@ -15,7 +15,7 @@ Returns information about successful payment
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier of the PaymentSuccessful message|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier of the PaymentSuccessful message|
 |message\_id|[int53](../types/int53.md) | Yes|Message identifier|
 
 

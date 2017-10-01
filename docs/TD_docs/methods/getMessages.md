@@ -15,7 +15,7 @@ Returns information about messages. If message is not found, returns null on the
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of the chat, messages belongs to|
+|chat\_id|[int53](../types/int53.md) | Yes|Identifier of the chat, messages belongs to|
 |message\_ids|Array of [int53](../types/int53.md) | Yes|Identifiers of the messages to get|
 
 

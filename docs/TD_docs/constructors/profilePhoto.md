@@ -14,8 +14,8 @@ Describes user profile photo
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[long](../types/long.md) | Yes|Photo identifier, 0 for empty photo. Can be used to find photo in list of userProfilePhotos|
-|small|[file](../types/file.md) | Yes|Small (160x160) user profile photo|
-|big|[file](../types/file.md) | Yes|Big (640x640) user profile photo|
+|small|[file](../constructors/file.md) | Yes|Small (160x160) user profile photo|
+|big|[file](../constructors/file.md) | Yes|Big (640x640) user profile photo|
 
 
 

@@ -15,7 +15,7 @@ Forwards previously sent messages. Returns forwarded messages in the same order 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Identifier of a chat to forward messages|
+|chat\_id|[int53](../types/int53.md) | Yes|Identifier of a chat to forward messages|
 |from\_chat\_id|[int53](../types/int53.md) | Yes|Identifier of a chat to forward from|
 |message\_ids|Array of [int53](../types/int53.md) | Yes|Identifiers of messages to forward|
 |disable\_notification|[Bool](../types/Bool.md) | Yes|Pass true, to disable notification about the message, doesn't works if messages are forwarded to secret chat|

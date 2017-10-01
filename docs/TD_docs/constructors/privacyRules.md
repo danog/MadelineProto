@@ -13,7 +13,7 @@ List of privacy rules. Rules are matched in the specified order. First matched r
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|rules|Array of [PrivacyRule](../constructors/PrivacyRule.md) | Yes|List of rules|
+|rules|Array of [PrivacyRule](../types/PrivacyRule.md) | Yes|List of rules|
 
 
 

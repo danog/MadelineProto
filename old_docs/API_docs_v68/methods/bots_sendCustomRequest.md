@@ -16,6 +16,16 @@ description: bots.sendCustomRequest parameters, return type and example
 
 ### Return type: [DataJSON](../types/DataJSON.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
+
 ### Example:
 
 

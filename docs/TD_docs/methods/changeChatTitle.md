@@ -15,7 +15,7 @@ Changes chat title. Works only for group and channel chats. Requires administrat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|Chat identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |title|[string](../types/string.md) | Yes|New title of the chat, 1-255 characters|
 
 

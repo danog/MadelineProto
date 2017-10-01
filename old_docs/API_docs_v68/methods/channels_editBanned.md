@@ -17,6 +17,20 @@ description: channels.editBanned parameters, return type and example
 
 ### Return type: [Updates](../types/Updates.md)
 
+### Can bots use this method: **YES**
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|USER_ADMIN_INVALID|You're not an admin|
+|USER_ID_INVALID|The provided user ID is invalid|
+
+
 ### Example:
 
 

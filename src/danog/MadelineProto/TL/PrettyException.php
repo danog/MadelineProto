@@ -27,7 +27,7 @@ trait PrettyException
         foreach (array_reverse($this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
-                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
+                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2].PHP_EOL;
                     $tl = true;
                 }
             } else {

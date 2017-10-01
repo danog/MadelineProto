@@ -13,7 +13,7 @@ List of trending sticker sets was updated or some of them was viewed
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker\_sets|[stickerSets](../types/stickerSets.md) | Yes|New list of trending sticker sets|
+|sticker\_sets|[stickerSets](../constructors/stickerSets.md) | Yes|New list of trending sticker sets|
 
 
 

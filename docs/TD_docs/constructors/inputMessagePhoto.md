@@ -15,7 +15,7 @@ Photo message
 |----------|---------------|----------|-------------|
 |photo|[InputFile](../types/InputFile.md) | Yes|Photo to send|
 |thumb|[InputThumb](../types/InputThumb.md) | Yes|Photo thumb to send, is sent to the other party in secret chats only|
-|added\_sticker\_file\_ids|Array of [int](../constructors/int.md) | Yes|File identifiers of stickers added onto the photo|
+|added\_sticker\_file\_ids|Array of [int](../types/int.md) | Yes|File identifiers of stickers added onto the photo|
 |width|[int](../types/int.md) | Yes|Photo width|
 |height|[int](../types/int.md) | Yes|Photo height|
 |caption|[string](../types/string.md) | Yes|Photo caption, 0-200 characters|

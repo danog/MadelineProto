@@ -42,7 +42,7 @@ class Lua
         $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
         $this->Lua->registerCallback('madeline_function', [$this, 'madeline_function']);
         foreach (get_class_methods($this->MadelineProto->API) as $method) {
-            $this->Lua->registerCallback($method, [$this->MadelineProto->API, $method]);
+            $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);
         }
         $methods = [];
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
@@ -158,7 +158,7 @@ class Lua
     public static function convert_objects(&$data)
     {
         array_walk_recursive($data, function (&$value, $key) {
-            if (is_object($value)) {
+            if (is_object($value) && !($value instanceof \phpseclib\Math\BigInteger)) {
                 $newval = [];
                 foreach (get_class_methods($value) as $name) {
                     $newval[$name] = [$value, $name];

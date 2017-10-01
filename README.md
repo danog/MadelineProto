@@ -1,5 +1,7 @@
 # MadelineProto, a PHP MTProto telegram client
 
+Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!
+
 This library can be used to create php telegram bots (like bot API bots, only better) and php telegram userbots (like tg-cli userbots, only better).
 
 This library can also be used to create lua telegram bots (like bot API bots, only better) and lua telegram userbots (like tg-cli userbots, only better).
@@ -101,7 +103,7 @@ git submodule add https://github.com/danog/MadelineProto
 cd MadelineProto
 composer update
 cp .env.example .env
-cp -a *php tests bots .env* ..
+cp -a *php tests userbots .env* ..
 ```
 
 Now open `.env` and edit its values as needed.
@@ -113,9 +115,9 @@ You can find examples for nearly every MadelineProto function in
 * [`tests/testing.php`](https://github.com/danog/MadelineProto/blob/master/tests/testing.php) - examples for making/receiving calls, making secret chats, sending secret chat messages, videos, audios, voice recordings, gifs, stickers, photos, sending normal messages, videos, audios, voice recordings, gifs, stickers, photos.
 * [`bot.php`](https://github.com/danog/MadelineProto/blob/master/bot.php) - examples for sending normal messages, downloading any media
 * [`magna.php`](https://github.com/danog/MadelineProto/blob/master/magna.php) - examples for receiving calls
-* [`bots/pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/bots/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
-* [`bots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/bots/MadelineProto_bot.php) - More fun shiz
-* [`bots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/bots/pwrtelegram_debug_bot.php) - More fun shiz
+* [`userbots/pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
+* [`userbots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/MadelineProto_bot.php) - More fun shiz
+* [`userbots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/userbots/pwrtelegram_debug_bot.php) - More fun shiz
 
 ## Methods
 
@@ -215,7 +217,7 @@ $MadelineProto = new \danog\MadelineProto\API();
 
 If you have some questions about the usage of the methods of this library, you can join the [support group](https://telegram.me/pwrtelegramgroup) or contact [@danogentili](https://telegram.me/danogentili). 
 
-But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, bots/, tests/testing.php).
+But first, please read this WHOLE page very carefully, follow all links to external documentation, and read all examples in the repo (bot.php, userbots/, tests/testing.php).
 
 If you don't understand something, read everything again.
 
@@ -233,7 +235,7 @@ If you're selling a MadelineProto base too, you really should consider donating 
 ### Settings
 
 The constructor accepts an optional parameter, which is the settings array. This array contains some other arrays, which are the settings for a specific MadelineProto function.  
-See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L405) for the default values for the settings arrays and explanations for every setting.
+See [here](https://github.com/danog/MadelineProto/blob/master/src/danog/MadelineProto/MTProto.php#L448) for the default values for the settings arrays and explanations for every setting.
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
@@ -621,9 +623,23 @@ An istance of MadelineProto can be safely serialized or unserialized. To seriali
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
 // Do stuff
 \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
+// or
+$MadelineProto->serialize('session.madeline');
 ```  
 
-THe deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
+Or
+
+```  
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+$MadelineProto->session = 'session.madeline';
+```  
+
+This way, if the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
+
+It is still recommended to serialize the session at every update.
+
+
+The deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
 That class serializes using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
 The same should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 

@@ -14,7 +14,7 @@ Some data from groupFull has been changed
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |group\_id|[int](../types/int.md) | Yes|Group identifier|
-|group\_full|[groupFull](../types/groupFull.md) | Yes|New full information about the group|
+|group\_full|[groupFull](../constructors/groupFull.md) | Yes|New full information about the group|
 
 
 
