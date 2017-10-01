@@ -52,4 +52,5 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     }
     $curcount++;
 }
+file_put_contents('src/danog/MadelineProto/Lang.php', sprintf($template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
 echo 'OK. edit src/danog/MadelineProto/Lang.php to fix mistakes.'.PHP_EOL;
