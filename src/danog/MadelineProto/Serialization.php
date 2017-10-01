@@ -85,10 +85,10 @@ class Serialization
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
             }
         } else {
-            throw new Exception('File does not exist');
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
         if ($unserialized === false) {
-            throw new Exception('An error occurred on deserialization');
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
         }
 
         return $unserialized;

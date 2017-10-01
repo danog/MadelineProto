@@ -32,7 +32,7 @@ class SocketReader extends \Threaded implements \Collectable
 
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log(['Shutting down reader pool '.$this->current], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['shutting_down_reader_pool'].$this->current], \danog\MadelineProto\Logger::NOTICE);
     }
 
     /**
@@ -60,7 +60,7 @@ class SocketReader extends \Threaded implements \Collectable
             }
         }
         while ($number = $handler_pool->collect()) {
-            \danog\MadelineProto\Logger::log(['Shutting down handler pool for dc '.$this->current.', '.$number.' jobs left'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['shutting_down_handler_pool'], $this->current, $number)], \danog\MadelineProto\Logger::NOTICE);
         }
         $this->setGarbage();
     }

@@ -332,7 +332,7 @@ trait BotAPI
 
             return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
-            throw new Exception("Can't convert ".$data['_'].' to a bot API object');
+            throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
 
@@ -410,7 +410,7 @@ trait BotAPI
             if (preg_match('|mention:|', $href)) {
                 $mention = $this->get_info(str_replace('mention:', '', $href));
                 if (!isset($mention['InputUser'])) {
-                    throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
+                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                 }
                 $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $mention['InputUser']];
             } elseif (preg_match('|buttonurl:|', $href)) {

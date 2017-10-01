@@ -20,7 +20,7 @@ trait ResponseHandler
     public function handle_decrypted_update($update)
     {
         if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
-            throw new \danog\MadelineProto\ResponseException('random_bytes is too short!');
+            throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_short']);
         }
         switch ($update['message']['decrypted_message']['_']) {
             case 'decryptedMessageService':
@@ -57,7 +57,7 @@ trait ResponseHandler
                 foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $message) {
                     $seq--;
                     if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
-                        throw new \danog\MadelineProto\ResponseException('Resending of messages is not yet supported');
+                        throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['resending_unsupported']);
                         //                        $this->send_encrypted_message($update['message']['chat_id'], $update['message']['decrypted_message']);
                     }
                 }
@@ -85,7 +85,7 @@ trait ResponseHandler
                 }
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized decrypted message received: '.var_export($update, true));
+                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'].var_export($update, true));
                 break;
         }
     }

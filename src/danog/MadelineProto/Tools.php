@@ -53,7 +53,7 @@ trait Tools
     public function unpack_signed_int($value)
     {
         if (strlen($value) !== 4) {
-            throw new TL\Exception('Length is not equal to 4');
+            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
         }
 
         return unpack('l', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
@@ -62,7 +62,7 @@ trait Tools
     public function unpack_signed_long($value)
     {
         if (strlen($value) !== 8) {
-            throw new TL\Exception('Length is not equal to 8');
+            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
         return unpack('q', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
@@ -71,10 +71,10 @@ trait Tools
     public function pack_signed_int($value)
     {
         if ($value > 2147483647) {
-            throw new TL\Exception('Provided value '.$value.' is bigger than 2147483647');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
         }
         if ($value < -2147483648) {
-            throw new TL\Exception('Provided value '.$value.' is smaller than -2147483648');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
         $res = pack('l', $value);
 
@@ -84,10 +84,10 @@ trait Tools
     public function pack_signed_long($value)
     {
         if ($value > 9223372036854775807) {
-            throw new TL\Exception('Provided value '.$value.' is bigger than 9223372036854775807');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
         }
         if ($value < -9223372036854775808) {
-            throw new TL\Exception('Provided value '.$value.' is smaller than -9223372036854775808');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
         $res = \danog\MadelineProto\Logger::$bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
 
@@ -97,10 +97,10 @@ trait Tools
     public function pack_unsigned_int($value)
     {
         if ($value > 4294967295) {
-            throw new TL\Exception('Provided value '.$value.' is bigger than 4294967296');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
         }
         if ($value < 0) {
-            throw new TL\Exception('Provided value '.$value.' is smaller than 0');
+            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
         }
 
         return pack('V', $value);
@@ -110,7 +110,7 @@ trait Tools
     {
         $res = pack('d', $value);
         if (strlen($res) !== 8) {
-            throw new TL\Exception('Could not properly encode double');
+            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
         }
 
         return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
@@ -119,7 +119,7 @@ trait Tools
     public function unpack_double($value)
     {
         if (strlen($value) !== 8) {
-            throw new TL\Exception('Length is not equal to 8');
+            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
         return unpack('d', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];

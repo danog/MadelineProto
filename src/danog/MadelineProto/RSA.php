@@ -25,15 +25,15 @@ class RSA
     public function ___construct($rsa_key)
     {
         //if ($this->unserialized($rsa_key)) return true;
-        \danog\MadelineProto\Logger::log(['Istantiating \phpseclib\Crypt\RSA...'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['rsa_init']], Logger::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
 
-        \danog\MadelineProto\Logger::log(['Loading key...'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['loading_key']], Logger::ULTRA_VERBOSE);
         $key->load($rsa_key);
         $this->n = \phpseclib\Common\Functions\Objects::getVar($key, 'modulus');
         $this->e = \phpseclib\Common\Functions\Objects::getVar($key, 'exponent');
 
-        \danog\MadelineProto\Logger::log(['Computing fingerprint...'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['computing_fingerprint']], Logger::ULTRA_VERBOSE);
         $this->fp = substr(
             sha1(
                 $this->serialize_object(
@@ -60,7 +60,7 @@ class RSA
 
     public function encrypt($data)
     {
-        \danog\MadelineProto\Logger::log(['Encrypting with rsa key...'], Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['rsa_encrypting']], Logger::VERBOSE);
 
         return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->e, $this->n)->toBytes();
     }

@@ -46,7 +46,7 @@ class DataCenter
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof Connection) {
-                \danog\MadelineProto\Logger::log(['Connecting to DC '.$key.'...'], \danog\MadelineProto\Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_start'], $key)], \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
                 $socket->close_and_reopen();
             } else {
@@ -61,7 +61,7 @@ class DataCenter
             $this->curdc = 0;
         }
         if (isset($this->sockets[$dc_number])) {
-            \danog\MadelineProto\Logger::log(['Disconnecting from DC '.$dc_number.'...'], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $dc_number)], \danog\MadelineProto\Logger::VERBOSE);
             unset($this->sockets[$dc_number]);
         }
     }
@@ -88,7 +88,7 @@ class DataCenter
             $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.'/api';
             $port = 80;
         }
-        \danog\MadelineProto\Logger::log(['Connecting to DC '.$dc_number.' ('.$test.' server, '.$ipv6.', '.$this->settings[$dc_config_number]['protocol'].')...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol'])], \danog\MadelineProto\Logger::VERBOSE);
 
         if (isset($this->sockets[$dc_number]->old)) {
             $this->sockets[$dc_number]->__construct($this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);

@@ -33,11 +33,11 @@ class SocketHandler extends \Threaded implements \Collectable
         if ($this->error !== true) {
             if ($this->error === -404) {
                 if ($this->API->datacenter->sockets[$this->current]->temp_auth_key !== null) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['resetting_auth_key']], \danog\MadelineProto\Logger::WARNING);
                     $this->API->datacenter->sockets[$this->current]->temp_auth_key = null;
                     $this->API->init_authorization();
 
-                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['recreate_temp_auth_key']);
                 }
             }
 

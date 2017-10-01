@@ -24,7 +24,7 @@ trait DialogHandler
         $datacenter = $this->datacenter->curdc;
         $peers = [];
         while ($this->dialog_params['count'] < $res['count']) {
-            \danog\MadelineProto\Logger::log(['Getting dialogs...']);
+            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
             $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             foreach ($res['dialogs'] as $dialog) {
                 if (!in_array($dialog['peer'], $peers)) {

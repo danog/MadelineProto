@@ -53,7 +53,7 @@ trait TD
                         }
                         $newparams = array_merge($params[$td], $newparams);
                         break;
-                        default: throw new Exception("Can't convert non text messages yet!");
+                        default: throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
                     }
                     break;
                     default:
@@ -137,7 +137,7 @@ trait TD
                             $newparams[$td]['entities'] = $params['entities'];
                         }
                     } else {
-                        throw new Exception("Can't convert non text messages yet!");
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
                     }
                     break;
                     default:

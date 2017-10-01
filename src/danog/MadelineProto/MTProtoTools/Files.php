@@ -20,7 +20,7 @@ trait Files
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
         if (!file_exists($file)) {
-            throw new \danog\MadelineProto\Exception('Given file does not exist!');
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
         if (empty($file_name)) {
             $file_name = basename($file);
@@ -312,11 +312,11 @@ trait Files
                     $this->config['expires'] = -1;
                     $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
                 }
-                \danog\MadelineProto\Logger::log(['File is stored on CDN!'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['stored_on_cdn']], \danog\MadelineProto\Logger::NOTICE);
                 continue;
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
-                \danog\MadelineProto\Logger::log(['File is not stored on CDN, requesting reupload!'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['cdn_reupload']], \danog\MadelineProto\Logger::NOTICE);
                 $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
 
                 try {
@@ -347,10 +347,10 @@ trait Files
             if (isset($message_media['cdn_key'])) {
                 $ivec = substr($message_media['cdn_iv'], 0, 12).pack('N', $offset >> 4);
                 $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
-                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
+                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
             }
             if ($start_at) {
                 $res['bytes'] = substr($res['bytes'], $start_at);
