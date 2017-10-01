@@ -24,7 +24,7 @@ trait AuthKeyHandler
     {
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
-                \danog\MadelineProto\Logger::log(['Requesting pq'], \danog\MadelineProto\Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['req_pq']], \danog\MadelineProto\Logger::VERBOSE);
 
                 /**
                  * ***********************************************************************

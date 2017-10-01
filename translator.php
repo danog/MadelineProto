@@ -32,8 +32,12 @@ if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code])) {
 }
 $count = count(\danog\MadelineProto\Lang::$lang[$lang_code]);
 $curcount = 0;
-foreach (\danog\MadelineProto\Lang::$lang[$lang_code] as $key => $value) {
-    if (\danog\MadelineProto\Lang::$lang['en'][$key] === $value) {
+foreach (\danog\MadelineProto\Lang::$lang['en'] as $key => $value) {
+    if (!Isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
+        \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
+    }
+    if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value) {
+        $value = \danog\MadelineProto\Lang::$lang[$lang_code][$key];
         if (in_array($key, ['v_error', 'v_tgerror'])) {
             $value = hex2bin($value);
         }

@@ -599,6 +599,9 @@ class MTProto
             ],
         ];
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
+        if (isset(Lang::$lang[$settings['app_info']['lang_code']])) {
+            Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
+        }
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
