@@ -224,7 +224,7 @@ Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
                     $calls[$update['update']['phone_call']->getOtherID()] = $update['update']['phone_call'];
 
                     try {
-                        $times[$update['update']['phone_call']->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$update['update']['phone_call']->getDebugString()])['id']];
+                        $times[$update['update']['phone_call']->getOtherID()] = [time(), $MadelineProto->messages->sendMessage(['peer' => $update['update']['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL])['id']];
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
                     $update['update']['phone_call']->playOnHold($songs);

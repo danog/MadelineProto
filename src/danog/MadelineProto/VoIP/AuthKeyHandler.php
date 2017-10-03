@@ -270,7 +270,7 @@ trait AuthKeyHandler
             \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_set_rating'], $call['id'])], \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']], ['datacenter' => $this->datacenter->curdc]);
         }
-        if ($need_debug && time() - $this->calls[$call['id']]->whenCreated() > 10) {//} && isset($this->calls[$call['id']]->storage['not_modified'])) {
+        if ($need_debug) {//} && isset($this->calls[$call['id']]->storage['not_modified'])) {
             \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_debug_saving'], $call['id'])], \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
