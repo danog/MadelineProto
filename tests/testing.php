@@ -14,7 +14,6 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/../').':'.r
 chdir(dirname(__FILE__).'/../');
 require_once 'vendor/autoload.php';
 
-
 if (!function_exists('readline')) {
     function readline($prompt = null)
     {
