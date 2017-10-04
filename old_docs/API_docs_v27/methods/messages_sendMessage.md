@@ -36,6 +36,7 @@ description: messages.sendMessage parameters, return type and example
 |MESSAGE_TOO_LONG|The provided message is too long|
 |PEER_ID_INVALID|The provided peer id is invalid|
 |RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
+|REPLY_MARKUP_INVALID|The provided reply markup is invalid|
 |USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
 |USER_IS_BLOCKED|User is blocked|
 |USER_IS_BOT|Bots can't send messages to other bots|

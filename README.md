@@ -108,6 +108,37 @@ cp -a *php tests userbots .env* ..
 
 Now open `.env` and edit its values as needed.
 
+OR
+
+### Composer installation
+
+Once you have all the requirements installed properly (on dev as well as production), add this to the ```composer.json``` file:
+
+```
+"repositories": [
+    {
+        "type": "git",
+        "url": "https://github.com/danog/phpseclib"
+    }, {
+        "type": "git",
+        "url": "https://github.com/danog/MadelineProto"
+    }
+],
+```
+
+Make sure you also have these set in the composer.json:
+
+```
+"minimum-stability": "dev",
+"prefer-stable": true,
+```
+
+Then you can require the package like this:
+
+```
+composer require "danog/madelineproto:dev-master"
+```
+
 
 ## Examples
 

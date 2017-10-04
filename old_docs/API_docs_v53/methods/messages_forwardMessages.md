@@ -43,6 +43,7 @@ description: messages.forwardMessages parameters, return type and example
 |Timeout|A timeout occurred while fetching data from the bot|
 |USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
 |USER_IS_BOT|Bots can't send messages to other bots|
+|YOU_BLOCKED_USER|You blocked this user|
 
 
 ### Example:
