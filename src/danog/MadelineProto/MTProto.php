@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 73;
+    const V = 74;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -579,6 +579,9 @@ class MTProto
             ],
             'peer'      => [
                 'full_info_cache_time' => 60,
+            ],
+            'requests' => [
+                'gzip_encode_if_gt' => 500  // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
             ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
