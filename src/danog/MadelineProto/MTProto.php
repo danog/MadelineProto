@@ -581,7 +581,7 @@ class MTProto
                 'full_info_cache_time' => 60,
             ],
             'requests' => [
-                'gzip_encode_if_gt' => 500  // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
+                'gzip_encode_if_gt' => 500,  // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
             ],
             'updates'   => [
                 'handle_updates'      => true, // Should I handle updates?
