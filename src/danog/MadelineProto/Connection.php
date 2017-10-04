@@ -73,8 +73,7 @@ class Connection
         $this->port = $port;
         $this->proxy = $proxy;
         $this->extra = $extra;
-
-        if (($has_proxy = $proxy !== '\Socket') && !isset(class_implements($proxy)['\danog\MadelineProto\Proxy'])) {
+        if (($has_proxy = $proxy !== '\Socket') && !isset(class_implements($proxy)['danog\MadelineProto\Proxy'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
         }
         switch ($this->protocol) {

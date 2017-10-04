@@ -14,6 +14,7 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/../').':'.r
 chdir(dirname(__FILE__).'/../');
 require_once 'vendor/autoload.php';
 
+
 if (!function_exists('readline')) {
     function readline($prompt = null)
     {
@@ -50,6 +51,8 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 }
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
+//$settings['connection_settings']['all']['proxy'] = '\SocksProxy';
+//$settings['connection_settings']['all']['proxy_extra'] = ['address' => '190.83.240.10', 'port' => 20057];
 
 var_dump($settings);
 if ($MadelineProto === false) {

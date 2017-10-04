@@ -607,7 +607,7 @@ class MTProto
         }
 
         if ($settings['app_info']['api_id'] < 20) {
-//            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
+            $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
         }
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
