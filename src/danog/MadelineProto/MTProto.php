@@ -676,6 +676,7 @@ class MTProto
     {
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
+        try {
         foreach ($this->datacenter->sockets as $id => $socket) {
             if (strpos($id, 'media')) {
                 continue;
@@ -702,13 +703,16 @@ class MTProto
                 }
             }
         }
-        $this->initing_authorization = false;
-        $this->updates_state['sync_loading'] = false;
+        } finally {
+            $this->initing_authorization = false;
+            $this->updates_state['sync_loading'] = false;
+        }
     }
 
     public function sync_authorization($authorized_dc)
     {
         $this->updates_state['sync_loading'] = true;
+        try {
         foreach ($this->datacenter->sockets as $new_dc => $socket) {
             if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
                 continue;
@@ -725,8 +729,9 @@ class MTProto
             $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
             $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
         }
+        } finally {
         $this->updates_state['sync_loading'] = false;
-
+        }
         return $authorization;
     }
 

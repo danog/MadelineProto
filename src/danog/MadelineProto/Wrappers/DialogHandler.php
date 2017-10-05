@@ -23,6 +23,7 @@ trait DialogHandler
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $peers = [];
+        try {
         while ($this->dialog_params['count'] < $res['count']) {
             \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
             $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
@@ -39,9 +40,9 @@ trait DialogHandler
                 break;
             }
         }
-
+        } finally {
         $this->updates_state['sync_loading'] = false;
-
+        }
         return $peers;
     }
 }
