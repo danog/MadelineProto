@@ -501,6 +501,7 @@ trait AuthKeyHandler
     public function get_dh_config()
     {
         $this->updates_state['sync_loading'] = true;
+
         try {
             $dh_config = $this->method_call('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         } finally {

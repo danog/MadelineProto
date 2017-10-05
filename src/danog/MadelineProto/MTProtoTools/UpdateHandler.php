@@ -193,11 +193,14 @@ trait UpdateHandler
                 break;
             case 'updates.channelDifference':
                 $this->load_channel_state($channel)['sync_loading'] = true;
+
                 try {
-                $this->set_channel_state($channel, $difference);
-                $this->handle_update_messages($difference['new_messages'], $channel);
-                $this->handle_multiple_update($difference['other_updates'], [], $channel);
-                } finally { $this->load_channel_state($channel)['sync_loading'] = false; }
+                    $this->set_channel_state($channel, $difference);
+                    $this->handle_update_messages($difference['new_messages'], $channel);
+                    $this->handle_multiple_update($difference['other_updates'], [], $channel);
+                } finally {
+                    $this->load_channel_state($channel)['sync_loading'] = false;
+                }
                 if (!$difference['final']) {
                     unset($difference);
                     $this->get_channel_difference($channel);
@@ -206,11 +209,14 @@ trait UpdateHandler
             case 'updates.channelDifferenceTooLong':
                 \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
                 $this->load_channel_state($channel)['sync_loading'] = true;
+
                 try {
-                $this->set_channel_state($channel, $difference);
-                $this->handle_update_messages($difference['messages'], $channel);
-                unset($difference);
-                } finally { $this->load_channel_state($channel)['sync_loading'] = false; }
+                    $this->set_channel_state($channel, $difference);
+                    $this->handle_update_messages($difference['messages'], $channel);
+                    unset($difference);
+                } finally {
+                    $this->load_channel_state($channel)['sync_loading'] = false;
+                }
                 $this->get_channel_difference($channel);
                 break;
             default:
@@ -274,8 +280,9 @@ trait UpdateHandler
         }
 
         \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
         try {
-        switch ($difference['_']) {
+            switch ($difference['_']) {
             case 'updates.differenceEmpty':
                 $this->set_update_state($difference);
                 break;
@@ -302,17 +309,22 @@ trait UpdateHandler
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
-        } finally { $this->updates_state['sync_loading'] = false; }
+        } finally {
+            $this->updates_state['sync_loading'] = false;
+        }
     }
 
     public function get_updates_state()
     {
         $last = $this->updates_state['sync_loading'];
         $this->updates_state['sync_loading'] = true;
+
         try {
-        $data = $this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]);
-        $this->get_cdn_config($this->datacenter->curdc);
-        } finally { $this->updates_state['sync_loading'] = $last; }
+            $data = $this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]);
+            $this->get_cdn_config($this->datacenter->curdc);
+        } finally {
+            $this->updates_state['sync_loading'] = $last;
+        }
 
         return $data;
     }

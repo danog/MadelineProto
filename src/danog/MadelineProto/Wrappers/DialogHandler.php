@@ -23,26 +23,28 @@ trait DialogHandler
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $peers = [];
+
         try {
-        while ($this->dialog_params['count'] < $res['count']) {
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
-            $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
-            foreach ($res['dialogs'] as $dialog) {
-                if (!in_array($dialog['peer'], $peers)) {
-                    $peers[] = $dialog['peer'];
+            while ($this->dialog_params['count'] < $res['count']) {
+                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
+                $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+                foreach ($res['dialogs'] as $dialog) {
+                    if (!in_array($dialog['peer'], $peers)) {
+                        $peers[] = $dialog['peer'];
+                    }
+                }
+                $this->dialog_params['count'] += count($res['dialogs']);
+                $this->dialog_params['offset_date'] = end($res['messages'])['date'];
+                $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
+                $this->dialog_params['offset_id'] = end($res['messages'])['id'] & 4294967296;
+                if (!isset($res['count'])) {
+                    break;
                 }
             }
-            $this->dialog_params['count'] += count($res['dialogs']);
-            $this->dialog_params['offset_date'] = end($res['messages'])['date'];
-            $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
-            $this->dialog_params['offset_id'] = end($res['messages'])['id'] & 4294967296;
-            if (!isset($res['count'])) {
-                break;
-            }
-        }
         } finally {
-        $this->updates_state['sync_loading'] = false;
+            $this->updates_state['sync_loading'] = false;
         }
+
         return $peers;
     }
 }

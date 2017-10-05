@@ -676,33 +676,34 @@ class MTProto
     {
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
+
         try {
-        foreach ($this->datacenter->sockets as $id => $socket) {
-            if (strpos($id, 'media')) {
-                continue;
-            }
-            $cdn = strpos($id, 'cdn');
-            if ($socket->session_id === null) {
-                $socket->session_id = $this->random(8);
-                $socket->session_in_seq_no = 0;
-                $socket->session_out_seq_no = 0;
-            }
-            if ($socket->temp_auth_key === null || $socket->auth_key === null) {
-                if ($socket->auth_key === null && !$cdn) {
-                    \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id)], Logger::NOTICE);
-                    $socket->auth_key = $this->create_auth_key(-1, $id);
+            foreach ($this->datacenter->sockets as $id => $socket) {
+                if (strpos($id, 'media')) {
+                    continue;
                 }
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], Logger::NOTICE);
-                $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                if (!$cdn) {
-                    $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                    $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
+                $cdn = strpos($id, 'cdn');
+                if ($socket->session_id === null) {
+                    $socket->session_id = $this->random(8);
+                    $socket->session_in_seq_no = 0;
+                    $socket->session_out_seq_no = 0;
                 }
-                if (in_array($socket->protocol, ['http', 'https'])) {
-                    $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
+                if ($socket->temp_auth_key === null || $socket->auth_key === null) {
+                    if ($socket->auth_key === null && !$cdn) {
+                        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id)], Logger::NOTICE);
+                        $socket->auth_key = $this->create_auth_key(-1, $id);
+                    }
+                    \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], Logger::NOTICE);
+                    $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                    if (!$cdn) {
+                        $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        $this->get_config($this->write_client_info('help.getConfig', [], ['datacenter' => $id]));
+                    }
+                    if (in_array($socket->protocol, ['http', 'https'])) {
+                        $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
+                    }
                 }
             }
-        }
         } finally {
             $this->initing_authorization = false;
             $this->updates_state['sync_loading'] = false;
@@ -712,26 +713,28 @@ class MTProto
     public function sync_authorization($authorized_dc)
     {
         $this->updates_state['sync_loading'] = true;
+
         try {
-        foreach ($this->datacenter->sockets as $new_dc => $socket) {
-            if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
-                continue;
+            foreach ($this->datacenter->sockets as $new_dc => $socket) {
+                if (($int_dc = preg_replace('|/D+|', '', $new_dc)) == $authorized_dc) {
+                    continue;
+                }
+                if ($int_dc != $new_dc) {
+                    continue;
+                }
+                \danog\MadelineProto\Logger::log([$int_dc, $new_dc]);
+                if (strpos($new_dc, '_') !== false) {
+                    continue;
+                }
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['copy_auth_dcs'], $authorized_dc, $new_dc)], Logger::VERBOSE);
+                $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
+                $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
+                $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
             }
-            if ($int_dc != $new_dc) {
-                continue;
-            }
-            \danog\MadelineProto\Logger::log([$int_dc, $new_dc]);
-            if (strpos($new_dc, '_') !== false) {
-                continue;
-            }
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['copy_auth_dcs'], $authorized_dc, $new_dc)], Logger::VERBOSE);
-            $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => $new_dc], ['datacenter' => $authorized_dc]);
-            $this->method_call('auth.logOut', [], ['datacenter' => $new_dc]);
-            $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
-        }
         } finally {
-        $this->updates_state['sync_loading'] = false;
+            $this->updates_state['sync_loading'] = false;
         }
+
         return $authorization;
     }
 
