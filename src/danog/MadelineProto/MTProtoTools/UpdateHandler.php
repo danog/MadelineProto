@@ -173,6 +173,7 @@ trait UpdateHandler
         } finally {
             $this->load_channel_state($channel)['sync_loading'] = false;
         }
+        $this->load_channel_state($channel)['sync_loading'] = true;
         \danog\MadelineProto\Logger::log(['Fetching '.$channel.' difference...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         try {
