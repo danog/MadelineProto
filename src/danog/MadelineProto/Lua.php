@@ -62,7 +62,8 @@ class Lua
             $this->{$namespace} = $methods[$namespace];
         }
         $this->MadelineProto->lua = true;
-        foreach ($this->MadelineProto->get_methods_namespaced() as $method => $namespace) {
+        foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
+            $namespace = key($pair);
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
