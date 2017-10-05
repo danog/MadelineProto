@@ -12,13 +12,12 @@
         "php": ">=5.6.0",
         "danog/primemodule": "dev-master",
         "danog/magicalserializer": "dev-master",
-        "phpseclib/phpseclib": "dev-master#200c2a9",
+        "phpseclib/phpseclib": "dev-master#52c068ac",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "~1.1",
         "ext-mbstring": "*",
         "ext-curl": "*",
-        "ext-sockets": "*",
         "ext-xml": "*"
     },
     "require-dev": {
@@ -44,7 +43,8 @@
             "src/Volatile.php",
             "src/Thread.php",
             "src/Worker.php",
-            "src/Pool.php"
+            "src/Pool.php",
+            "src/BigIntegor.php"
         ]
     }
 }

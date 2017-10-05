@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/../').':'.realpath(dirname(__FILE__).'/../MadelineProto/'));
 chdir(dirname(__FILE__).'/../');
 require_once 'vendor/autoload.php';
-
+//include 'SocksProxy.php';
 if (!function_exists('readline')) {
     function readline($prompt = null)
     {

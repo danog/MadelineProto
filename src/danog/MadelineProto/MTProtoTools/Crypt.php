@@ -29,28 +29,28 @@ trait Crypt
 
     public function ige_encrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
+        $cipher = new \phpseclib\Crypt\AES('ige');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 
-        return $cipher->encrypt($message);
+        return @$cipher->encrypt($message);
     }
 
     public function ctr_encrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_CTR);
+        $cipher = new \phpseclib\Crypt\AES('ctr');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 
-        return $cipher->encrypt($message);
+        return @$cipher->encrypt($message);
     }
 
     public function ige_decrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
+        $cipher = new \phpseclib\Crypt\AES('ige');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 
-        return $cipher->decrypt($message);
+        return @$cipher->decrypt($message);
     }
 }
