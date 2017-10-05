@@ -2,5 +2,6 @@
 
 namespace phpseclib\Math;
 
-class BigIntegor {
+class BigIntegor
+{
 }
