@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 75;
+    const V = 76;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -359,6 +359,7 @@ class MTProto
             }
             $this->reset_session(true, true);
             $this->config = ['expires' => -1];
+            $this->dh_config = ['version' => 0];
             $this->__construct($settings);
             $force = true;
         }
