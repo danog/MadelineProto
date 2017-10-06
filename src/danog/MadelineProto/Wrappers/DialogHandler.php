@@ -16,7 +16,11 @@ trait DialogHandler
 {
     public function get_dialogs($force = true)
     {
-        if (!isset($this->dialog_params['offset_date']) || $force || is_null($this->dialog_params['offset_date'])) {
+        if ($force || 
+            !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) ||
+            !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) ||
+            !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer'])
+        ) {
             $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];
         }
         $this->updates_state['sync_loading'] = true;
