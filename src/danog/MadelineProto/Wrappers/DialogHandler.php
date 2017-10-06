@@ -16,7 +16,7 @@ trait DialogHandler
 {
     public function get_dialogs($force = true)
     {
-        if ($force || 
+        if ($force ||
             !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) ||
             !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) ||
             !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer'])
