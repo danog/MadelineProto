@@ -28,6 +28,10 @@ class Serialization
      */
     public static function serialize($filename, $instance, $force = false)
     {
+        if (isset($instance->API->setdem) && $instance->API->setdem) {
+            $instance->API->setdem = false;
+            $instance->API->__construct($instance->API->settings);
+        }
         if (!file_exists($lock = $filename.'.lock')) {
             touch($lock);
             clearstatcache();
