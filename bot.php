@@ -25,6 +25,7 @@ try {
 }
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
+$MadelineProto->serialize = 'bot.madeline';
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 $offset = 0;
 while (true) {
