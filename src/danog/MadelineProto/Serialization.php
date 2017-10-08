@@ -85,7 +85,7 @@ class Serialization
                 if (Logger::$constructed) {
                     Logger::log([(string) $e], Logger::ERROR);
                 }
-                if ($e->getMessage() === "Erroneous data format for unserializing 'phpseclib\Math\BigInteger'") {
+                if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\Math\BigInteger'") === 0) {
                     $tounserialize = str_replace('phpseclib\Math\BigInteger', 'phpseclib\Math\BigIntegor', $unserialized);
                 }
                 $unserialized = \danog\Serialization::unserialize($tounserialize);

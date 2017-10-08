@@ -198,7 +198,7 @@ trait AuthKeyHandler
 
     public function complete_rekey($chat, $params)
     {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 2) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats['fingerprint'])) {
             return;
         }
         if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
