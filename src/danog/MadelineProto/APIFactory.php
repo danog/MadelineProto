@@ -131,10 +131,13 @@ class APIFactory
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
         $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
         $aargs['datacenter'] = $this->API->datacenter->curdc;
+        if ($name === 'get_updates' && isset($this->session) && !is_null($this->session) && time() - $this->serialized > 10) {
+            $this->serialize($this->session);
+            Logger::log(["Didn't serialize in a while, doing that now..."]);
+        }
         if ($this->lua === false) {
             return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
         }
-
         try {
             $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
             Lua::convert_objects($deserialized);

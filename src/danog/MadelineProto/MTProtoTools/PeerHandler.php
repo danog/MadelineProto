@@ -535,7 +535,7 @@ trait PeerHandler
 
     public function store_db($res, $force = false)
     {
-        if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false) {
+        if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false || (isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'])['test_mode']) {
             /*
             try {
                 if (isset($res['username'])) {

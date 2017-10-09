@@ -32,6 +32,7 @@ class Serialization
             $instance->API->setdem = false;
             $instance->API->__construct($instance->API->settings);
         }
+        $instance->serialized = time();
         if (!file_exists($lock = $filename.'.lock')) {
             touch($lock);
             clearstatcache();

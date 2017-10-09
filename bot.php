@@ -25,11 +25,11 @@ try {
 }
 //var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
 //var_dump($MadelineProto->API->settings['connection']);
-$MadelineProto->serialize = 'bot.madeline';
+$MadelineProto->session = 'bot.madeline';
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 $offset = 0;
 while (true) {
-    $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+    $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     \danog\MadelineProto\Logger::log([$updates]);
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
@@ -54,7 +54,7 @@ while (true) {
                     if (isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
                         $time = time();
                         $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
-                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+                        $MadelineProto->messages->sendMessage(['peer' => isset($update['update']['message']['from_id']) ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);

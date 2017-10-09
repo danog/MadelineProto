@@ -16,6 +16,7 @@ class API extends APIFactory
 {
     use \danog\Serializable;
     public $session;
+    public $serialized = 0;
 
     public function ___construct($params = [])
     {
@@ -96,7 +97,6 @@ class API extends APIFactory
     public function serialize($filename)
     {
         Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
-
         return Serialization::serialize($filename, $this);
     }
 }
