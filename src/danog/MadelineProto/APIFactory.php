@@ -138,6 +138,7 @@ class APIFactory
         if ($this->lua === false) {
             return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
         }
+
         try {
             $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
             Lua::convert_objects($deserialized);
