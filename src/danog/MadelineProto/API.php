@@ -97,6 +97,7 @@ class API extends APIFactory
     public function serialize($filename)
     {
         Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
+
         return Serialization::serialize($filename, $this);
     }
 }
