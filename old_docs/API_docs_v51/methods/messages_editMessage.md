@@ -32,6 +32,7 @@ description: messages.editMessage parameters, return type and example
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 |MESSAGE_AUTHOR_REQUIRED|Message author required|
 |MESSAGE_EDIT_TIME_EXPIRED|You can't edit this message anymore, too much time has passed since its creation.|
+|MESSAGE_EMPTY|The provided message is empty|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 |MESSAGE_NOT_MODIFIED|The message text has not changed|
 |PEER_ID_INVALID|The provided peer id is invalid|

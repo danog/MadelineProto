@@ -150,6 +150,36 @@ You can find examples for nearly every MadelineProto function in
 * [`userbots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/MadelineProto_bot.php) - More fun shiz
 * [`userbots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/userbots/pwrtelegram_debug_bot.php) - More fun shiz
 
+### Storing sessions
+
+VERY IMPORTANT: An istance of MadelineProto MUST be serialized every time an update is fetched, and on shutdown. To serialize MadelineProto to a file, you must use the `\danog\MadelineProto\Serialization` class:
+
+```  
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+// Do stuff
+\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
+// or
+$MadelineProto->serialize('session.madeline');
+```  
+
+Or, to serialize automatically every time and update is fetched and on shutdown:
+
+```  
+$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+$MadelineProto->session = 'session.madeline';
+```  
+
+This way, if the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will also be serialized automatically.
+
+It is still recommended to serialize the session at every update.
+
+
+The deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
+That class serializes using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
+The same should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
+
+
+
 ## Methods
 
 A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 71)](https://daniil.it/MadelineProto/API_docs/).
@@ -645,34 +675,6 @@ td-cli wrappers are also present: you can use the tdcli_function in lua and pass
 
 For examples, see `lua/*`.
 
-
-### Storing sessions
-
-An istance of MadelineProto can be safely serialized or unserialized. To serialize MadelineProto to a file, you must use the `\danog\MadelineProto\Serialization` class:
-
-```  
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-// Do stuff
-\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
-// or
-$MadelineProto->serialize('session.madeline');
-```  
-
-Or
-
-```  
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-$MadelineProto->session = 'session.madeline';
-```  
-
-This way, if the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
-
-It is still recommended to serialize the session at every update.
-
-
-The deserialize method accepts a second optional parameter, `$no_updates`, that can be set to true to avoid fetching updates on deserialization, and postpone parsing of updates received through the socket until the next deserialization.  
-That class serializes using [MagicalSerializer](https://github.com/danog/MagicalSerializer).
-The same should be done when serializing to another destination manually, to avoid conflicts with other PHP scripts that are trying to serialize another instance of the class.
 
 ### Exceptions
 

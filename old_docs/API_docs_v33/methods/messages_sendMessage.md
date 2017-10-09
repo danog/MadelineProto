@@ -32,6 +32,7 @@ description: messages.sendMessage parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |CHAT_ID_INVALID|The provided chat id is invalid|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|ENTITY_MENTION_USER_INVALID|You can't use this entity|
 |INPUT_USER_DEACTIVATED|The specified user was deleted|
 |MESSAGE_EMPTY|The provided message is empty|
 |MESSAGE_TOO_LONG|The provided message is too long|

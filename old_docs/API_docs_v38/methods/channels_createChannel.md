@@ -24,6 +24,7 @@ description: channels.createChannel parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHAT_TITLE_EMPTY|No chat title provided|
 |USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
 
