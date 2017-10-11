@@ -462,7 +462,7 @@ trait PeerHandler
                 $offset = -$limit;
 
                 try {
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => 0], ['datacenter' => $this->datacenter->curdc]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
                         continue;
@@ -517,7 +517,7 @@ trait PeerHandler
                         }
                         $res['participants'][$participant['user_id']] = $newres;
                     }
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit], ['datacenter' => $this->datacenter->curdc]);
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => 0], ['datacenter' => $this->datacenter->curdc]);
 
                     if (empty($gres['participants'])) {
                         break;
