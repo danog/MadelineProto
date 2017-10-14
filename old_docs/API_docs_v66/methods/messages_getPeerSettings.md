@@ -22,6 +22,7 @@ description: messages.getPeerSettings parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
 |PEER_ID_INVALID|The provided peer id is invalid|
 
 

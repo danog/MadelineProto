@@ -23,6 +23,7 @@ description: account.confirmPhone parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CODE_HASH_INVALID|Code hash invalid|
 |PHONE_CODE_EMPTY|phone_code is missing|
 
 

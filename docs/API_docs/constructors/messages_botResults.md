@@ -17,6 +17,7 @@ description: messages_botResults attributes, type and example
 |switch\_pm|[InlineBotSwitchPM](../types/InlineBotSwitchPM.md) | Optional|
 |results|Array of [BotInlineResult](../types/BotInlineResult.md) | Yes|
 |cache\_time|[int](../types/int.md) | Yes|
+|users|Array of [User](../types/User.md) | Yes|
 
 
 
@@ -26,13 +27,13 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => 'string', 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult], 'cache_time' => int];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => 'string', 'switch_pm' => InlineBotSwitchPM, 'results' => [BotInlineResult], 'cache_time' => int, 'users' => [User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "messages.botResults", "gallery": Bool, "query_id": long, "next_offset": "string", "switch_pm": InlineBotSwitchPM, "results": [BotInlineResult], "cache_time": int}
+{"_": "messages.botResults", "gallery": Bool, "query_id": long, "next_offset": "string", "switch_pm": InlineBotSwitchPM, "results": [BotInlineResult], "cache_time": int, "users": [User]}
 ```
 
 
@@ -40,7 +41,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_botResults={_='messages.botResults', gallery=Bool, query_id=long, next_offset='string', switch_pm=InlineBotSwitchPM, results={BotInlineResult}, cache_time=int}
+messages_botResults={_='messages.botResults', gallery=Bool, query_id=long, next_offset='string', switch_pm=InlineBotSwitchPM, results={BotInlineResult}, cache_time=int, users={User}}
 
 ```
 

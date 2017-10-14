@@ -141,6 +141,8 @@ Contains notifications about data changes
 
 [updateContactsReset](../constructors/updateContactsReset.md)  
 
+[updateChannelAvailableMessages](../constructors/updateChannelAvailableMessages.md)  
+
 
 
 ### Methods that return an object of this type (methods):

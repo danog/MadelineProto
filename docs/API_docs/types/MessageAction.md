@@ -45,6 +45,8 @@ description: constructors and methods of type MessageAction
 
 [messageActionScreenshotTaken](../constructors/messageActionScreenshotTaken.md)  
 
+[messageActionCustomAction](../constructors/messageActionCustomAction.md)  
+
 
 
 ### Methods that return an object of this type (methods):

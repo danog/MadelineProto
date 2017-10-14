@@ -17,6 +17,8 @@ description: constructors and methods of type messages_AffectedHistory
 
 [$MadelineProto->messages->deleteHistory](../methods/messages_deleteHistory.md)  
 
+[$MadelineProto->messages->readMentions](../methods/messages_readMentions.md)  
+
 [$MadelineProto->channels->deleteUserHistory](../methods/channels_deleteUserHistory.md)  
 
 

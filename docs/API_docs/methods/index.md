@@ -130,6 +130,8 @@ $MadelineProto->[channels->createChannel](channels_createChannel.md)(\['broadcas
 
 $MadelineProto->[channels->deleteChannel](channels_deleteChannel.md)(\['channel' => [InputChannel](../types/InputChannel.md), \]) === [$Updates](../types/Updates.md)<a name="channels_deleteChannel"></a>  
 
+$MadelineProto->[channels->deleteHistory](channels_deleteHistory.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'max_id' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="channels_deleteHistory"></a>  
+
 $MadelineProto->[channels->deleteMessages](channels_deleteMessages.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'id' => \[[int](../types/int.md)\], \]) === [$messages\_AffectedMessages](../types/messages_AffectedMessages.md)<a name="channels_deleteMessages"></a>  
 
 $MadelineProto->[channels->deleteUserHistory](channels_deleteUserHistory.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="channels_deleteUserHistory"></a>  
@@ -160,7 +162,7 @@ $MadelineProto->[channels->getMessages](channels_getMessages.md)(\['channel' => 
 
 $MadelineProto->[channels->getParticipant](channels_getParticipant.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)<a name="channels_getParticipant"></a>  
 
-$MadelineProto->[channels->getParticipants](channels_getParticipants.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'filter' => [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)<a name="channels_getParticipants"></a>  
+$MadelineProto->[channels->getParticipants](channels_getParticipants.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'filter' => [ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'hash' => [int](../types/int.md), \]) === [$channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)<a name="channels_getParticipants"></a>  
 
 $MadelineProto->[channels->inviteToChannel](channels_inviteToChannel.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'users' => \[[InputUser](../types/InputUser.md)\], \]) === [$Updates](../types/Updates.md)<a name="channels_inviteToChannel"></a>  
 
@@ -177,6 +179,8 @@ $MadelineProto->[channels->reportSpam](channels_reportSpam.md)(\['channel' => [I
 $MadelineProto->[channels->setStickers](channels_setStickers.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="channels_setStickers"></a>  
 
 $MadelineProto->[channels->toggleInvites](channels_toggleInvites.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="channels_toggleInvites"></a>  
+
+$MadelineProto->[channels->togglePreHistoryHidden](channels_togglePreHistoryHidden.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="channels_togglePreHistoryHidden"></a>  
 
 $MadelineProto->[channels->toggleSignatures](channels_toggleSignatures.md)(\['channel' => [InputChannel](../types/InputChannel.md), 'enabled' => [Bool](../types/Bool.md), \]) === [$Updates](../types/Updates.md)<a name="channels_toggleSignatures"></a>  
 
@@ -239,6 +243,8 @@ $MadelineProto->[help->getInviteText](help_getInviteText.md)(\[\]) === [$help\_I
 
 $MadelineProto->[help->getNearestDc](help_getNearestDc.md)(\[\]) === [$NearestDc](../types/NearestDc.md)<a name="help_getNearestDc"></a>  
 
+$MadelineProto->[help->getRecentMeUrls](help_getRecentMeUrls.md)(\['referer' => [string](../types/string.md), \]) === [$help\_RecentMeUrls](../types/help_RecentMeUrls.md)<a name="help_getRecentMeUrls"></a>  
+
 $MadelineProto->[help->getSupport](help_getSupport.md)(\[\]) === [$help\_Support](../types/help_Support.md)<a name="help_getSupport"></a>  
 
 $MadelineProto->[help->getTermsOfService](help_getTermsOfService.md)(\[\]) === [$help\_TermsOfService](../types/help_TermsOfService.md)<a name="help_getTermsOfService"></a>  
@@ -298,7 +304,7 @@ $MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id'
 
 $MadelineProto->[messages->editInlineBotMessage](messages_editInlineBotMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Bool](../types/Bool.md)<a name="messages_editInlineBotMessage"></a>  
 
-$MadelineProto->[messages->editMessage](messages_editMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Updates](../types/Updates.md)<a name="messages_editMessage"></a>  
+$MadelineProto->[messages->editMessage](messages_editMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'stop_geo_live' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editMessage"></a>  
 
 $MadelineProto->[messages->exportChatInvite](messages_exportChatInvite.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$ExportedChatInvite](../types/ExportedChatInvite.md)<a name="messages_exportChatInvite"></a>  
 
@@ -358,6 +364,8 @@ $MadelineProto->[messages->getPeerSettings](messages_getPeerSettings.md)(\['peer
 
 $MadelineProto->[messages->getPinnedDialogs](messages_getPinnedDialogs.md)(\[\]) === [$messages\_PeerDialogs](../types/messages_PeerDialogs.md)<a name="messages_getPinnedDialogs"></a>  
 
+$MadelineProto->[messages->getRecentLocations](messages_getRecentLocations.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getRecentLocations"></a>  
+
 $MadelineProto->[messages->getRecentStickers](messages_getRecentStickers.md)(\['attached' => [Bool](../types/Bool.md), 'hash' => [int](../types/int.md), \]) === [$messages\_RecentStickers](../types/messages_RecentStickers.md)<a name="messages_getRecentStickers"></a>  
 
 $MadelineProto->[messages->getSavedGifs](messages_getSavedGifs.md)(\['hash' => [int](../types/int.md), \]) === [$messages\_SavedGifs](../types/messages_SavedGifs.md)<a name="messages_getSavedGifs"></a>  
@@ -383,6 +391,8 @@ $MadelineProto->[messages->readEncryptedHistory](messages_readEncryptedHistory.m
 $MadelineProto->[messages->readFeaturedStickers](messages_readFeaturedStickers.md)(\['id' => \[[long](../types/long.md)\], \]) === [$Bool](../types/Bool.md)<a name="messages_readFeaturedStickers"></a>  
 
 $MadelineProto->[messages->readHistory](messages_readHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'max_id' => [int](../types/int.md), \]) === [$messages\_AffectedMessages](../types/messages_AffectedMessages.md)<a name="messages_readHistory"></a>  
+
+$MadelineProto->[messages->readMentions](messages_readMentions.md)(\['peer' => [InputPeer](../types/InputPeer.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="messages_readMentions"></a>  
 
 $MadelineProto->[messages->readMessageContents](messages_readMessageContents.md)(\['id' => \[[int](../types/int.md)\], \]) === [$messages\_AffectedMessages](../types/messages_AffectedMessages.md)<a name="messages_readMessageContents"></a>  
 

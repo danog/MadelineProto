@@ -35,6 +35,8 @@ description: constructors and methods of type InputMedia
 
 [inputMediaInvoice](../constructors/inputMediaInvoice.md)  
 
+[inputMediaGeoLive](../constructors/inputMediaGeoLive.md)  
+
 
 
 ### Methods that return an object of this type (methods):

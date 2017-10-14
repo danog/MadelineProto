@@ -29,6 +29,8 @@ description: constructors and methods of type MessageMedia
 
 [messageMediaInvoice](../constructors/messageMediaInvoice.md)  
 
+[messageMediaGeoLive](../constructors/messageMediaGeoLive.md)  
+
 
 
 ### Methods that return an object of this type (methods):
