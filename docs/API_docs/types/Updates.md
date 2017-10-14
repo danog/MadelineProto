@@ -89,6 +89,8 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->channels->editBanned](../methods/channels_editBanned.md)  
 
+[$MadelineProto->channels->togglePreHistoryHidden](../methods/channels_togglePreHistoryHidden.md)  
+
 [$MadelineProto->phone->discardCall](../methods/phone_discardCall.md)  
 
 [$MadelineProto->phone->setCallRating](../methods/phone_setCallRating.md)  

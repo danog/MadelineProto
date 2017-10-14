@@ -1208,11 +1208,13 @@ interface messages
     /**
      * @param array params [
      *               boolean no_webpage,
+     *               boolean stop_geo_live,
      *               InputPeer peer,
      *               int id,
      *               string message,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
+     *               InputGeoPoint geo_point,
      *              ]
      *
      * @return Updates
@@ -1538,6 +1540,25 @@ interface messages
      * @return messages_Messages
      */
     public function getUnreadMentions(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int limit,
+     *              ]
+     *
+     * @return messages_Messages
+     */
+    public function getRecentLocations(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *              ]
+     *
+     * @return messages_AffectedHistory
+     */
+    public function readMentions(array $params);
 }
 
 interface updates
@@ -1758,6 +1779,15 @@ interface help
      * @return CdnConfig
      */
     public function getCdnConfig();
+
+    /**
+     * @param array params [
+     *               string referer,
+     *              ]
+     *
+     * @return help_RecentMeUrls
+     */
+    public function getRecentMeUrls(array $params);
 }
 
 interface channels
@@ -1819,6 +1849,7 @@ interface channels
      *               ChannelParticipantsFilter filter,
      *               int offset,
      *               int limit,
+     *               int hash,
      *              ]
      *
      * @return channels_ChannelParticipants
@@ -2063,6 +2094,26 @@ interface channels
      * @return bool
      */
     public function readMessageContents(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               int max_id,
+     *              ]
+     *
+     * @return bool
+     */
+    public function deleteHistory(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               Bool enabled,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function togglePreHistoryHidden(array $params);
 }
 
 interface bots

@@ -27,6 +27,7 @@ description: messages.forwardMessages parameters, return type and example
 |CHANNEL_INVALID|The provided channel is invalid|
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_ID_INVALID|The provided chat id is invalid|
 |CHAT_SEND_GIFS_FORBIDDEN|You can't send gifs in this chat|
 |CHAT_SEND_MEDIA_FORBIDDEN|You can't send media in this chat|
 |CHAT_SEND_STICKERS_FORBIDDEN|You can't send stickers in this chat.|

@@ -284,6 +284,8 @@ description: List of types
 
 [ReceivedNotifyMessage](ReceivedNotifyMessage.md)<a name="ReceivedNotifyMessage"></a>  
 
+[RecentMeUrl](RecentMeUrl.md)<a name="RecentMeUrl"></a>  
+
 [ReplyMarkup](ReplyMarkup.md)<a name="ReplyMarkup"></a>  
 
 [ReportReason](ReportReason.md)<a name="ReportReason"></a>  
@@ -391,6 +393,8 @@ description: List of types
 [help\_ConfigSimple](help_ConfigSimple.md)<a name="help_ConfigSimple"></a>  
 
 [help\_InviteText](help_InviteText.md)<a name="help_InviteText"></a>  
+
+[help\_RecentMeUrls](help_RecentMeUrls.md)<a name="help_RecentMeUrls"></a>  
 
 [help\_Support](help_Support.md)<a name="help_Support"></a>  
 

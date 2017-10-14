@@ -39,7 +39,9 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterMyMentions](../constructors/inputMessagesFilterMyMentions.md)  
 
-[inputMessagesFilterMyMentionsUnread](../constructors/inputMessagesFilterMyMentionsUnread.md)  
+[inputMessagesFilterContacts](../constructors/inputMessagesFilterContacts.md)  
+
+[inputMessagesFilterGeo](../constructors/inputMessagesFilterGeo.md)  
 
 
 

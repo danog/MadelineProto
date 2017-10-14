@@ -11,6 +11,8 @@ description: constructors and methods of type channels_ChannelParticipants
 
 [channels\_channelParticipants](../constructors/channels_channelParticipants.md)  
 
+[channels\_channelParticipantsNotModified](../constructors/channels_channelParticipantsNotModified.md)  
+
 
 
 ### Methods that return an object of this type (methods):

@@ -14,6 +14,7 @@ description: channelFull attributes, type and example
 |can\_view\_participants|[Bool](../types/Bool.md) | Optional|
 |can\_set\_username|[Bool](../types/Bool.md) | Optional|
 |can\_set\_stickers|[Bool](../types/Bool.md) | Optional|
+|hidden\_prehistory|[Bool](../types/Bool.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 |about|[string](../types/string.md) | Yes|
 |participants\_count|[int](../types/int.md) | Optional|
@@ -31,6 +32,7 @@ description: channelFull attributes, type and example
 |migrated\_from\_max\_id|[int](../types/int.md) | Optional|
 |pinned\_msg\_id|[int](../types/int.md) | Optional|
 |stickerset|[StickerSet](../types/StickerSet.md) | Optional|
+|available\_min\_id|[int](../types/int.md) | Optional|
 
 
 
@@ -40,13 +42,13 @@ description: channelFull attributes, type and example
 ### Example:
 
 ```
-$channelFull = ['_' => 'channelFull', 'can_view_participants' => Bool, 'can_set_username' => Bool, 'can_set_stickers' => Bool, 'id' => int, 'about' => 'string', 'participants_count' => int, 'admins_count' => int, 'kicked_count' => int, 'banned_count' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [BotInfo], 'migrated_from_chat_id' => int, 'migrated_from_max_id' => int, 'pinned_msg_id' => int, 'stickerset' => StickerSet];
+$channelFull = ['_' => 'channelFull', 'can_view_participants' => Bool, 'can_set_username' => Bool, 'can_set_stickers' => Bool, 'hidden_prehistory' => Bool, 'id' => int, 'about' => 'string', 'participants_count' => int, 'admins_count' => int, 'kicked_count' => int, 'banned_count' => int, 'read_inbox_max_id' => int, 'read_outbox_max_id' => int, 'unread_count' => int, 'chat_photo' => Photo, 'notify_settings' => PeerNotifySettings, 'exported_invite' => ExportedChatInvite, 'bot_info' => [BotInfo], 'migrated_from_chat_id' => int, 'migrated_from_max_id' => int, 'pinned_msg_id' => int, 'stickerset' => StickerSet, 'available_min_id' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "channelFull", "can_view_participants": Bool, "can_set_username": Bool, "can_set_stickers": Bool, "id": int, "about": "string", "participants_count": int, "admins_count": int, "kicked_count": int, "banned_count": int, "read_inbox_max_id": int, "read_outbox_max_id": int, "unread_count": int, "chat_photo": Photo, "notify_settings": PeerNotifySettings, "exported_invite": ExportedChatInvite, "bot_info": [BotInfo], "migrated_from_chat_id": int, "migrated_from_max_id": int, "pinned_msg_id": int, "stickerset": StickerSet}
+{"_": "channelFull", "can_view_participants": Bool, "can_set_username": Bool, "can_set_stickers": Bool, "hidden_prehistory": Bool, "id": int, "about": "string", "participants_count": int, "admins_count": int, "kicked_count": int, "banned_count": int, "read_inbox_max_id": int, "read_outbox_max_id": int, "unread_count": int, "chat_photo": Photo, "notify_settings": PeerNotifySettings, "exported_invite": ExportedChatInvite, "bot_info": [BotInfo], "migrated_from_chat_id": int, "migrated_from_max_id": int, "pinned_msg_id": int, "stickerset": StickerSet, "available_min_id": int}
 ```
 
 
@@ -54,7 +56,7 @@ Or, if you're into Lua:
 
 
 ```
-channelFull={_='channelFull', can_view_participants=Bool, can_set_username=Bool, can_set_stickers=Bool, id=int, about='string', participants_count=int, admins_count=int, kicked_count=int, banned_count=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, chat_photo=Photo, notify_settings=PeerNotifySettings, exported_invite=ExportedChatInvite, bot_info={BotInfo}, migrated_from_chat_id=int, migrated_from_max_id=int, pinned_msg_id=int, stickerset=StickerSet}
+channelFull={_='channelFull', can_view_participants=Bool, can_set_username=Bool, can_set_stickers=Bool, hidden_prehistory=Bool, id=int, about='string', participants_count=int, admins_count=int, kicked_count=int, banned_count=int, read_inbox_max_id=int, read_outbox_max_id=int, unread_count=int, chat_photo=Photo, notify_settings=PeerNotifySettings, exported_invite=ExportedChatInvite, bot_info={BotInfo}, migrated_from_chat_id=int, migrated_from_max_id=int, pinned_msg_id=int, stickerset=StickerSet, available_min_id=int}
 
 ```
 

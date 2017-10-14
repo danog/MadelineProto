@@ -31,6 +31,7 @@ description: channels.editAdmin parameters, return type and example
 |USER_CREATOR|You can't leave this channel, because you're its creator|
 |USER_ID_INVALID|The provided user ID is invalid|
 |USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
+|USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
 
 
 ### Example:

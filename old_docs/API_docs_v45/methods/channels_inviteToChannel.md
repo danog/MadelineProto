@@ -31,6 +31,7 @@ description: channels.inviteToChannel parameters, return type and example
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 |INPUT_USER_DEACTIVATED|The specified user was deleted|
 |USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
+|USER_BLOCKED|User blocked|
 |USER_BOT|Bots can only be admins in channels.|
 |USER_CHANNELS_TOO_MUCH|One of the users you tried to add is already in too many channels/supergroups|
 |USER_ID_INVALID|The provided user ID is invalid|

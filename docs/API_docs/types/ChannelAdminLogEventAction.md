@@ -39,6 +39,8 @@ description: constructors and methods of type ChannelAdminLogEventAction
 
 [channelAdminLogEventActionChangeStickerSet](../constructors/channelAdminLogEventActionChangeStickerSet.md)  
 
+[channelAdminLogEventActionTogglePreHistoryHidden](../constructors/channelAdminLogEventActionTogglePreHistoryHidden.md)  
+
 
 
 ### Methods that return an object of this type (methods):

@@ -16,6 +16,7 @@ description: messageMediaVenue attributes, type and example
 |address|[string](../types/string.md) | Yes|
 |provider|[string](../types/string.md) | Yes|
 |venue\_id|[string](../types/string.md) | Yes|
+|venue\_type|[string](../types/string.md) | Yes|
 
 
 
@@ -25,13 +26,13 @@ description: messageMediaVenue attributes, type and example
 ### Example:
 
 ```
-$messageMediaVenue = ['_' => 'messageMediaVenue', 'geo' => GeoPoint, 'title' => 'string', 'address' => 'string', 'provider' => 'string', 'venue_id' => 'string'];
+$messageMediaVenue = ['_' => 'messageMediaVenue', 'geo' => GeoPoint, 'title' => 'string', 'address' => 'string', 'provider' => 'string', 'venue_id' => 'string', 'venue_type' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "messageMediaVenue", "geo": GeoPoint, "title": "string", "address": "string", "provider": "string", "venue_id": "string"}
+{"_": "messageMediaVenue", "geo": GeoPoint, "title": "string", "address": "string", "provider": "string", "venue_id": "string", "venue_type": "string"}
 ```
 
 
@@ -39,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-messageMediaVenue={_='messageMediaVenue', geo=GeoPoint, title='string', address='string', provider='string', venue_id='string'}
+messageMediaVenue={_='messageMediaVenue', geo=GeoPoint, title='string', address='string', provider='string', venue_id='string', venue_type='string'}
 
 ```
 

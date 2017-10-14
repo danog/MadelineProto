@@ -16,6 +16,7 @@ description: inputMediaVenue attributes, type and example
 |address|[string](../types/string.md) | Yes|
 |provider|[string](../types/string.md) | Yes|
 |venue\_id|[string](../types/string.md) | Yes|
+|venue\_type|[string](../types/string.md) | Yes|
 
 
 
@@ -25,13 +26,13 @@ description: inputMediaVenue attributes, type and example
 ### Example:
 
 ```
-$inputMediaVenue = ['_' => 'inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => 'string', 'address' => 'string', 'provider' => 'string', 'venue_id' => 'string'];
+$inputMediaVenue = ['_' => 'inputMediaVenue', 'geo_point' => InputGeoPoint, 'title' => 'string', 'address' => 'string', 'provider' => 'string', 'venue_id' => 'string', 'venue_type' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "inputMediaVenue", "geo_point": InputGeoPoint, "title": "string", "address": "string", "provider": "string", "venue_id": "string"}
+{"_": "inputMediaVenue", "geo_point": InputGeoPoint, "title": "string", "address": "string", "provider": "string", "venue_id": "string", "venue_type": "string"}
 ```
 
 
@@ -39,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaVenue={_='inputMediaVenue', geo_point=InputGeoPoint, title='string', address='string', provider='string', venue_id='string'}
+inputMediaVenue={_='inputMediaVenue', geo_point=InputGeoPoint, title='string', address='string', provider='string', venue_id='string', venue_type='string'}
 
 ```
 
