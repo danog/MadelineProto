@@ -187,6 +187,7 @@ trait UpdateHandler
         } catch (\danog\MadelineProto\PTSException $e) {
             unset($this->channels_state[$channel]);
             $this->load_channel_state($channel)['sync_loading'] = false;
+
             return $this->get_channel_difference($channel);
         } finally {
             $this->load_channel_state($channel)['sync_loading'] = false;
