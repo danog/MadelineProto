@@ -58,6 +58,6 @@ class Serialization
      */
     public static function deserialize($filename, $no_updates = false)
     {
-        throw new \danog\MadelineProto\Exception('You can\'t call \danog\MadelineProto\Serialization::deserialize($filename) anymore, use new \danog\MadelineProto\API($filename) instead'.PHP_EOL.PHP_EOL.'Protip: run the following command to fix all of your scripts:'.PHP_EOL.PHP_EOL."find . -type f -exec sed 's/\\\\danog\\\\MadelineProto\\\\Serialization::deserialize/new \\\\danog\\\\MadelineProto\\\\API/g' -i {} +".PHP_EOL.PHP_EOL, 0, null, 'MadelineProto', 0);
+        return new \danog\MadelineProto\API($filename);
     }
 }
