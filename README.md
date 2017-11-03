@@ -119,9 +119,6 @@ Once you have all the requirements installed properly (on dev as well as product
     {
         "type": "git",
         "url": "https://github.com/danog/phpseclib"
-    }, {
-        "type": "git",
-        "url": "https://github.com/danog/MadelineProto"
     }
 ],
 ```
@@ -130,13 +127,12 @@ Make sure you also have these set in the composer.json:
 
 ```
 "minimum-stability": "dev",
-"prefer-stable": true,
 ```
 
-Then you can require the package like this:
+Then you can require the package by addding the following line to the require section:
 
 ```
-composer require "danog/madelineproto:dev-master"
+"danog/madelineproto":" dev-master"
 ```
 
 
