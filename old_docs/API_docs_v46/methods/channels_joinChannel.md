@@ -18,15 +18,6 @@ description: channels.joinChannel parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHANNELS_TOO_MUCH|You have joined too many channels/supergroups|
-
-
 ### Example:
 
 

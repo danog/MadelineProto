@@ -19,14 +19,6 @@ description: contacts.search parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_TOO_SHORT|The query string is too short|
-|SEARCH_QUERY_EMPTY|The search query is empty|
-
-
 ### Example:
 
 

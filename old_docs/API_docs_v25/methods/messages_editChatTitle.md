@@ -19,13 +19,6 @@ description: messages.editChatTitle parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|NEED_CHAT_INVALID|The provided chat is invalid|
-
-
 ### Example:
 
 

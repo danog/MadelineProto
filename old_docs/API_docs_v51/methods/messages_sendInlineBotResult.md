@@ -24,15 +24,6 @@ description: messages.sendInlineBotResult parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|INLINE_RESULT_EXPIRED|The inline query expired|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|QUERY_ID_EMPTY|The query ID is empty|
-
-
 ### Example:
 
 

@@ -26,13 +26,6 @@ description: contacts.getTopPeers parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|TYPES_EMPTY|The types field is empty|
-
-
 ### Example:
 
 

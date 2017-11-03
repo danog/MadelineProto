@@ -19,15 +19,6 @@ description: channels.editAbout parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ABOUT_NOT_MODIFIED|About text has not changed|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-
-
 ### Example:
 
 

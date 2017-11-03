@@ -19,14 +19,6 @@ description: messages.editChatPhoto parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### Example:
 
 

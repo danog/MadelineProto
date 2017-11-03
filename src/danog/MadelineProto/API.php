@@ -21,6 +21,53 @@ class API extends APIFactory
     public function ___construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+        if (is_string($params)) {
+            if (file_exists($params)) {
+                if (!file_exists($lock = $params.'.lock')) {
+                    touch($lock);
+                    clearstatcache();
+                }
+                $lock = fopen($lock, 'r');
+                flock($lock, LOCK_SH);
+                $unserialized = file_get_contents($params);
+                flock($lock, LOCK_UN);
+                fclose($lock);
+    
+                $tounserialize = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
+                foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\Types\Button', 'TL\Types\Bytes', 'APIFactory'] as $class) {
+                    class_exists('\danog\MadelineProto\\'.$class);
+                }
+                class_exists('\Volatile');
+                \danog\MadelineProto\Logger::class_exists();
+    
+                try {
+    //                $unserialized = \danog\Serialization::unserialize($tounserialize);
+                    $unserialized = unserialize($tounserialize);
+                } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                } catch (\danog\MadelineProto\Exception $e) {
+                    if (Logger::$constructed) {
+                        Logger::log([(string) $e], Logger::ERROR);
+                    }
+                    if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\Math\BigInteger'") === 0) {
+                        $tounserialize = str_replace('phpseclib\Math\BigInteger', 'phpseclib\Math\BigIntegor', $unserialized);
+                    }
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                }
+                if ($unserialized instanceof \danog\PlaceHolder) {
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                }
+            } else {
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
+            }
+            if ($unserialized === false) {
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
+            }
+    
+            $this->APIFactory();
+            $this->API = $unserialized->API;
+            return;
+        }
         $this->API = new MTProto($params);
 
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['apifactory_start']], Logger::VERBOSE);
@@ -94,10 +141,10 @@ class API extends APIFactory
         }
     }
 
-    public function serialize($filename)
+    public function serialize($params)
     {
         Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
 
-        return Serialization::serialize($filename, $this);
+        return Serialization::serialize($params, $this);
     }
 }

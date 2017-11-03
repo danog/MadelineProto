@@ -19,13 +19,6 @@ description: auth.sendInvites parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_EMPTY|The provided message is empty|
-
-
 ### Example:
 
 

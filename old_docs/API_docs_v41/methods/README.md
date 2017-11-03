@@ -14,7 +14,7 @@ $MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_p
 
 $MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
 
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/complete_phone_login.html)($token);
+$MadelineProto->[bot_login](https://docs.madelineproto.xyz/bot_login.html)($token);
 
 
 $MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();

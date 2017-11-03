@@ -20,20 +20,6 @@ description: messages.addChatUser parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|USER_ALREADY_PARTICIPANT|The user is already in the group|
-|USER_ID_INVALID|The provided user ID is invalid|
-|USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
-|USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
-|USERS_TOO_MUCH|The maximum number of users has been exceeded (to create a chat, for example)|
-
-
 ### Example:
 
 

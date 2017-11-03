@@ -17,7 +17,7 @@ $settings = ['app_info'=>['api_id'=>6, 'api_hash'=>'eb06d4abfb49dc3eeb1aeb98ae0f
 $MadelineProto = false;
 
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('MadelineProto_bot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('MadelineProto_bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
 

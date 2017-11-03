@@ -19,14 +19,6 @@ description: messages.sendEncryptedService parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|DATA_INVALID|Encrypted data invalid|
-|MSG_WAIT_FAILED|A waiting call returned an error|
-
-
 ### Example:
 
 

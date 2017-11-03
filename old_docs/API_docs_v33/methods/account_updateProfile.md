@@ -19,14 +19,6 @@ description: account.updateProfile parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|ABOUT_TOO_LONG|The provided bio is too long|
-|FIRSTNAME_INVALID|The first name is invalid|
-
-
 ### Example:
 
 

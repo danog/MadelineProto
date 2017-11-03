@@ -20,13 +20,6 @@ description: messages.editChatAdmin parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-
-
 ### Example:
 
 

@@ -19,13 +19,6 @@ description: messages.readEncryptedHistory parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MSG_WAIT_FAILED|A waiting call returned an error|
-
-
 ### Example:
 
 

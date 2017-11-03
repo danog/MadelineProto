@@ -18,13 +18,6 @@ description: contacts.block parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CONTACT_ID_INVALID|The provided contact ID is invalid|
-
-
 ### Example:
 
 

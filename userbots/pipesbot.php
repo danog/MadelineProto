@@ -17,13 +17,13 @@ $MadelineProto = false;
 $uMadelineProto = false;
 
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('pipesbot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
 
 try {
-    $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('pwr.madeline');
+    $uMadelineProto = new \danog\MadelineProto\API('pwr.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }

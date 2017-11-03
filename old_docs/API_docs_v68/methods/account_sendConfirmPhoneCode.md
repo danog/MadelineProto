@@ -20,13 +20,6 @@ description: account.sendConfirmPhoneCode parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|HASH_INVALID|The provided hash is invalid|
-
-
 ### Example:
 
 

@@ -18,13 +18,6 @@ description: auth.exportAuthorization parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|DC_ID_INVALID|The provided DC ID is invalid|
-
-
 ### Example:
 
 

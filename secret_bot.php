@@ -20,7 +20,7 @@ echo 'Deserializing MadelineProto from s.madeline...'.PHP_EOL;
 $MadelineProto = false;
 
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('s.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('s.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }

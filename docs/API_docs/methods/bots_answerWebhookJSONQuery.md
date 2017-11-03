@@ -19,14 +19,6 @@ description: bots.answerWebhookJSONQuery parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_ID_INVALID|The query ID is invalid|
-|USER_BOT_INVALID|This method can only be called by a bot|
-
-
 ### Example:
 
 

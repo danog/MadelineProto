@@ -19,13 +19,6 @@ description: messages.faveSticker parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKER_ID_INVALID|The provided sticker ID is invalid|
-
-
 ### Example:
 
 

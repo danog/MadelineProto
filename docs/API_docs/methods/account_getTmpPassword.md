@@ -19,13 +19,6 @@ description: account.getTmpPassword parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|TMP_PASSWORD_DISABLED|The temporary password is disabled|
-
-
 ### Example:
 
 

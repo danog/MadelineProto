@@ -23,14 +23,6 @@ description: messages.editInlineBotMessage parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|MESSAGE_NOT_MODIFIED|The message text has not changed|
-
-
 ### Example:
 
 

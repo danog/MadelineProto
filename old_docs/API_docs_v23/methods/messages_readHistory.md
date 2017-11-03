@@ -21,13 +21,6 @@ description: messages.readHistory parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### Example:
 
 

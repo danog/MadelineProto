@@ -9,6 +9,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+if (PHP_MAJOR_VERSION < 7) {
+    throw new Exception('MadelineProto requires php 7 to run');
+}
 
 if (!extension_loaded('pthreads')) {
     if (extension_loaded('sockets')) {

@@ -25,17 +25,6 @@ description: messages.search parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
-|INPUT_USER_DEACTIVATED|The specified user was deleted|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|SEARCH_QUERY_EMPTY|The search query is empty|
-|USER_ID_INVALID|The provided user ID is invalid|
-
-
 ### Example:
 
 

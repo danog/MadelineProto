@@ -19,13 +19,6 @@ description: channels.readMessageContents parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-
-
 ### Example:
 
 

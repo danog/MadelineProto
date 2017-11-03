@@ -18,13 +18,6 @@ description: account.checkUsername parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USERNAME_INVALID|The provided username is not valid|
-
-
 ### Example:
 
 

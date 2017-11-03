@@ -21,7 +21,7 @@ echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = false;
 
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }

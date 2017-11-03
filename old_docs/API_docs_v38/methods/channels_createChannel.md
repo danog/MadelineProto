@@ -20,14 +20,6 @@ description: channels.createChannel parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_TITLE_EMPTY|No chat title provided|
-|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
-
-
 ### Example:
 
 

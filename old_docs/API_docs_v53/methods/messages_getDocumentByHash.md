@@ -20,13 +20,6 @@ description: messages.getDocumentByHash parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SHA256_HASH_INVALID|The provided SHA256 hash is invalid|
-
-
 ### Example:
 
 

@@ -18,15 +18,6 @@ description: account.updateUsername parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USERNAME_INVALID|The provided username is not valid|
-|USERNAME_NOT_MODIFIED|The username was not modified|
-|USERNAME_OCCUPIED|The provided username is already occupied|
-
-
 ### Example:
 
 

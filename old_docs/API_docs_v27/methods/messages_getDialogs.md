@@ -20,15 +20,6 @@ description: messages.getDialogs parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
-|OFFSET_PEER_ID_INVALID|The provided offset peer is invalid|
-|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
-
-
 ### Example:
 
 

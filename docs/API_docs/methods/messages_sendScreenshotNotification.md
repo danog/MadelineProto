@@ -19,13 +19,6 @@ description: messages.sendScreenshotNotification parameters, return type and exa
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### Example:
 
 

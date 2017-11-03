@@ -19,14 +19,6 @@ description: account.confirmPhone parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CODE_HASH_INVALID|Code hash invalid|
-|PHONE_CODE_EMPTY|phone_code is missing|
-
-
 ### Example:
 
 

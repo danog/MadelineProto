@@ -21,15 +21,6 @@ description: auth.bindTempAuthKey parameters, return type and example
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|ENCRYPTED_MESSAGE_INVALID|Encrypted message invalid|
-|INPUT_REQUEST_TOO_LONG|The request is too big|
-|TEMP_AUTH_KEY_EMPTY|No temporary auth key provided|
-
-
 ### Example:
 
 

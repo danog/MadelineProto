@@ -16,7 +16,7 @@ $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb
 $Lua = false;
 
 try {
-    $Lua = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
+    $Lua = new \danog\MadelineProto\API('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
 if (!is_object($Lua)) {

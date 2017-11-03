@@ -12,6 +12,9 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/../').':'.realpath(dirname(__FILE__).'/../MadelineProto/'));
 chdir(dirname(__FILE__).'/../');
+if (!file_exists('vendor/autoload.php')) {
+    die('You did not run composer update');
+}
 require_once 'vendor/autoload.php';
 //include 'SocksProxy.php';
 if (!function_exists('readline')) {
@@ -35,7 +38,7 @@ echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 $MadelineProto = false;
 
 try {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }

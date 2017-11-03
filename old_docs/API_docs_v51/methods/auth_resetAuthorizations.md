@@ -13,13 +13,6 @@ description: auth.resetAuthorizations parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|Timeout|A timeout occurred while fetching data from the bot|
-
-
 ### Example:
 
 

@@ -20,13 +20,6 @@ description: messages.getCommonChats parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USER_ID_INVALID|The provided user ID is invalid|
-
-
 ### Example:
 
 
