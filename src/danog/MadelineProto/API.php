@@ -64,8 +64,8 @@ class API extends APIFactory
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
             }
 
-            $this->APIFactory();
             $this->API = $unserialized->API;
+            $this->APIFactory();
 
             return;
         }
