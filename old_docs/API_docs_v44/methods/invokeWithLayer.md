@@ -19,6 +19,17 @@ description: invokeWithLayer parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|AUTH_BYTES_INVALID|The provided authorization is invalid|
+|CDN_METHOD_INVALID|You can't call this method in a CDN DC|
+|CONNECTION_API_ID_INVALID|The provided API id is invalid|
+|CONNECTION_LANG_PACK_INVALID|Language pack invalid|
+|INPUT_LAYER_INVALID|The provided layer is invalid|
+
+
 ### Example:
 
 

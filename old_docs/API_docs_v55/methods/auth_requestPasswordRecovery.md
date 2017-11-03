@@ -13,6 +13,13 @@ description: auth.requestPasswordRecovery parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PASSWORD_EMPTY|The provided password is empty|
+
+
 ### Example:
 
 

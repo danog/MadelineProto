@@ -18,6 +18,14 @@ description: stickers.removeStickerFromSet parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|STICKER_INVALID|The provided sticker is invalid|
+
+
 ### Example:
 
 

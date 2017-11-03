@@ -19,6 +19,14 @@ description: messages.createChat parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USERS_TOO_FEW|Not enough users (to create a chat, for example)|
+|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
+
+
 ### Example:
 
 

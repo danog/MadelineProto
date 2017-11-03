@@ -19,6 +19,13 @@ description: messages.getWebPage parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|WC_CONVERT_URL_INVALID|WC convert URL invalid|
+
+
 ### Example:
 
 

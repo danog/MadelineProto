@@ -18,6 +18,15 @@ description: channels.getChannels parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|NEED_CHAT_INVALID|The provided chat is invalid|
+
+
 ### Example:
 
 

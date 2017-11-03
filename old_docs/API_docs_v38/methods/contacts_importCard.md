@@ -18,6 +18,14 @@ description: contacts.importCard parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|EXPORT_CARD_INVALID|Provided card is invalid|
+|NEED_MEMBER_INVALID|The provided member is invalid|
+
+
 ### Example:
 
 

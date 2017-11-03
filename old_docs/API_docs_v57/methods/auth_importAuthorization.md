@@ -19,6 +19,14 @@ description: auth.importAuthorization parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|AUTH_BYTES_INVALID|The provided authorization is invalid|
+|USER_ID_INVALID|The provided user ID is invalid|
+
+
 ### Example:
 
 

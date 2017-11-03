@@ -18,6 +18,13 @@ description: messages.getStickerSet parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
+
 ### Example:
 
 

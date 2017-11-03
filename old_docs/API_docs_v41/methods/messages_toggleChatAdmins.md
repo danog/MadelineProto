@@ -19,6 +19,14 @@ description: messages.toggleChatAdmins parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
+
+
 ### Example:
 
 

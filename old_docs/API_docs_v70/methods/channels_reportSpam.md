@@ -20,6 +20,14 @@ description: channels.reportSpam parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
+
+
 ### Example:
 
 

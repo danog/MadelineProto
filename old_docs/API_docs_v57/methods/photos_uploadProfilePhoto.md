@@ -18,6 +18,17 @@ description: photos.uploadProfilePhoto parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|FILE_PART_0_MISSING|File part 0 missing|
+|FILE_PARTS_INVALID|The number of file parts is invalid|
+|IMAGE_PROCESS_FAILED|Failure while processing image|
+|PHOTO_CROP_SIZE_SMALL|Photo is too small|
+|PHOTO_EXT_INVALID|The extension of the photo is invalid|
+
+
 ### Example:
 
 

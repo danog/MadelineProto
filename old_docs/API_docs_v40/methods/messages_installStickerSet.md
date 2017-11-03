@@ -19,6 +19,13 @@ description: messages.installStickerSet parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
+
 ### Example:
 
 

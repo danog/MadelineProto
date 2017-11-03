@@ -19,6 +19,13 @@ description: messages.getDhConfig parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|RANDOM_LENGTH_INVALID|Random length invalid|
+
+
 ### Example:
 
 

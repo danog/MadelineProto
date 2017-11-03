@@ -148,19 +148,24 @@ You can find examples for nearly every MadelineProto function in
 
 ### Storing sessions
 
-VERY IMPORTANT: An istance of MadelineProto MUST be serialized every time an update is fetched, and on shutdown. To serialize MadelineProto to a file, you must use the `\danog\MadelineProto\Serialization` class:
+VERY IMPORTANT: An istance of MadelineProto MUST be serialized every time an update is fetched, and on shutdown. To serialize MadelineProto to a file, do the following:
 
+When loading an already logged in session:
 ```  
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-// Do stuff
-\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto);
-// or
-$MadelineProto->serialize('session.madeline');
+$MadelineProto->serialize();
 ```  
 
-This way, if the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will also be serialized automatically.
+When loading a new session:
+```
+$MadelineProto = new \danog\MadelineProto\API($settings);
+$MadelineProto->session = 'session.madeline';
+$MadelineProto->serialize();
+```
 
-It is still recommended to serialize the session at every update.
+If the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
+
+It is **strongly** recommended to serialize the session with `$MadelineProto->serialize()` after every `$MadelineProto->get_updates()`.
 
 
 ## Methods

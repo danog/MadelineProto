@@ -25,6 +25,14 @@ description: initConnection parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CONNECTION_LAYER_INVALID|Layer invalid|
+|INPUT_FETCH_FAIL|Failed deserializing TL payload|
+
+
 ### Example:
 
 

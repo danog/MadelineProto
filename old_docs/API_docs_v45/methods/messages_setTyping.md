@@ -19,6 +19,19 @@ description: messages.setTyping parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
+|USER_IS_BLOCKED|User is blocked|
+|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+
+
 ### Example:
 
 

@@ -20,6 +20,13 @@ description: messages.setBotPrecheckoutResults parameters, return type and examp
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|ERROR_TEXT_EMPTY|The provided error message is empty|
+
+
 ### Example:
 
 

@@ -19,6 +19,14 @@ description: channels.editPhoto parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|PHOTO_INVALID|Photo invalid|
+
+
 ### Example:
 
 

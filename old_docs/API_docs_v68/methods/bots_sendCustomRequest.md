@@ -19,6 +19,13 @@ description: bots.sendCustomRequest parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
+
 ### Example:
 
 

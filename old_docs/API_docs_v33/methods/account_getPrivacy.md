@@ -18,6 +18,13 @@ description: account.getPrivacy parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PRIVACY_KEY_INVALID|The privacy key is invalid|
+
+
 ### Example:
 
 

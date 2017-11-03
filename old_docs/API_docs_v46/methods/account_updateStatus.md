@@ -18,6 +18,13 @@ description: account.updateStatus parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
+
+
 ### Example:
 
 

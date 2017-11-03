@@ -22,6 +22,17 @@ description: stickers.createStickerSet parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|PACK_SHORT_NAME_INVALID|Short pack name invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|STICKERS_EMPTY|No sticker provided|
+|USER_ID_INVALID|The provided user ID is invalid|
+
+
 ### Example:
 
 

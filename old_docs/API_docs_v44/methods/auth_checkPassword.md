@@ -18,6 +18,13 @@ description: auth.checkPassword parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PASSWORD_HASH_INVALID|The provided password hash is invalid|
+
+
 ### Example:
 
 

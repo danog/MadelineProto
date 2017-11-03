@@ -19,6 +19,15 @@ description: messages.sendEncrypted parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|DATA_INVALID|Encrypted data invalid|
+|MSG_WAIT_FAILED|A waiting call returned an error|
+
+
 ### Example:
 
 

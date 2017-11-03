@@ -20,6 +20,14 @@ description: messages.getGameHighScores parameters, return type and example
 ### Can bots use this method: **YES**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|USER_BOT_REQUIRED|This method can only be called by a bot|
+
+
 ### Example:
 
 

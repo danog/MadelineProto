@@ -23,6 +23,7 @@ class API extends APIFactory
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         if (is_string($params)) {
             if (file_exists($params)) {
+                $this->session = $params;
                 if (!file_exists($lock = $params.'.lock')) {
                     touch($lock);
                     clearstatcache();
@@ -142,8 +143,11 @@ class API extends APIFactory
         }
     }
 
-    public function serialize($params)
+    public function serialize($params = '')
     {
+        if ($params === '') {
+            $params = $this->session;
+        }
         Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
 
         return Serialization::serialize($params, $this);

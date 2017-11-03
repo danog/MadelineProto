@@ -18,6 +18,13 @@ description: langpack.getLangPack parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
+
 ### Example:
 
 

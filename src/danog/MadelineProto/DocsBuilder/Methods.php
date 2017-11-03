@@ -18,6 +18,7 @@ trait Methods
     {
         $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
         $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
+        $errors['result'] = array_merge_recursive(...$errors['result']);
         foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);
         }

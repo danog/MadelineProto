@@ -19,6 +19,14 @@ description: channels.deleteUserHistory parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+
+
 ### Example:
 
 

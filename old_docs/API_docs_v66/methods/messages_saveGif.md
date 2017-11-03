@@ -19,6 +19,13 @@ description: messages.saveGif parameters, return type and example
 ### Can bots use this method: **NO**
 
 
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|GIF_ID_INVALID|The provided GIF ID is invalid|
+
+
 ### Example:
 
 
