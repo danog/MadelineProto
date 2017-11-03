@@ -108,7 +108,7 @@ trait TD
                     if (isset($params['fwd_from'])) {
                         $newparams[$td] = ['_' => 'messageForwardedFromUser'];
                         if (isset($params['fwd_from']['channel_id'])) {
-                            $newparams[$td] = ['_'=> 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
+                            $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
                         }
                         $newparams[$td]['date'] = $params['fwd_from']['date'];
                         if (isset($params['fwd_from']['channel_post'])) {

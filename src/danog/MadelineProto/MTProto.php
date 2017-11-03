@@ -78,12 +78,12 @@ class MTProto
         'updates.getDifference'        => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
         'updates.getState'             => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates',
 
-        'upload.getCdnFile'            => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.getCdnFileHashes'      => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.reuploadCdnFile'       => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.getFile'               => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.saveFilePart'          => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
-        'upload.saveBigFilePart'       => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getCdnFile'       => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.reuploadCdnFile'  => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.getFile'          => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.saveFilePart'     => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
+        'upload.saveBigFilePart'  => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info',
 
     ];
     const BAD_MSG_ERROR_CODES = [
@@ -153,7 +153,7 @@ class MTProto
 
     ];
     const TD_REVERSE = [
-        'sendMessage'=> 'messages.sendMessage',
+        'sendMessage' => 'messages.sendMessage',
     ];
     const TD_IGNORE = ['updateMessageID'];
 
@@ -174,7 +174,7 @@ class MTProto
     private $msg_ids = [];
     private $v = 0;
 
-    private $dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' =>  ['_' => 'inputPeerEmpty'], 'count' => 0];
+    private $dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
     private $zero;
     private $one;
     private $two;
@@ -520,35 +520,35 @@ class MTProto
             ],
             'connection_settings' => [ // connection settings
                 'all' => [ // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                    'protocol'     => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
-                    'test_mode'    => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                    'ipv6'         => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                    'timeout'      => 2, // timeout for sockets
-                    'proxy'        => '\Socket', // The proxy class to use
-                    'proxy_extra'  => [], // Extra parameters to pass to the proxy class using setExtra
+                    'protocol'    => 'tcp_full', // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
+                    'test_mode'   => false, // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
+                    'ipv6'        => $this->ipv6, // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
+                    'timeout'     => 2, // timeout for sockets
+                    'proxy'       => '\Socket', // The proxy class to use
+                    'proxy_extra' => [], // Extra parameters to pass to the proxy class using setExtra
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
                 //'api_id'          => you should put an API id in the settings array you provide
                 //'api_hash'        => you should put an API hash in the settings array you provide
-                'device_model'    => $device_model,
-                'system_version'  => $system_version,
-                'app_version'     => 'Unicorn', // ðŸŒš
+                'device_model'   => $device_model,
+                'system_version' => $system_version,
+                'app_version'    => 'Unicorn', // ðŸŒš
 //                'app_version'     => self::V,
-                'lang_code'       => $lang_code,
+                'lang_code' => $lang_code,
             ],
-            'tl_schema'     => [ // TL scheme files
-                'layer'         => 72, // layer version
-                'src'           => [
-                    'mtproto'      => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram'     => __DIR__.'/TL_telegram_v72.tl', // telegram TL scheme
-                    'secret'       => __DIR__.'/TL_secret.tl', // secret chats TL scheme
-                    'calls'        => __DIR__.'/TL_calls.tl', // calls TL scheme
+            'tl_schema' => [ // TL scheme files
+                'layer' => 72, // layer version
+                'src'   => [
+                    'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
+                    'telegram' => __DIR__.'/TL_telegram_v72.tl', // telegram TL scheme
+                    'secret'   => __DIR__.'/TL_secret.tl', // secret chats TL scheme
+                    'calls'    => __DIR__.'/TL_calls.tl', // calls TL scheme
                     //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
-                    'botAPI'       => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
+                    'botAPI' => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
                 ],
             ],
-            'logger'       => [ // Logger settings
+            'logger' => [ // Logger settings
                 /*
                  * logger modes:
                  * 0 - No logger
@@ -558,38 +558,38 @@ class MTProto
                  * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
                  *     $message is an array containing the messages the log, $level, is the logging level
                  */
-                'logger'             => 1, // write to
-                'logger_param'       => '/tmp/MadelineProto.log',
-                'logger'             => 3, // overwrite previous setting and echo logs
-                'logger_level'       => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
-                'rollbar_token'      => 'c07d9b2f73c2461297b0beaef6c1662f',
+                'logger'        => 1, // write to
+                'logger_param'  => '/tmp/MadelineProto.log',
+                'logger'        => 3, // overwrite previous setting and echo logs
+                'logger_level'  => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
+                'rollbar_token' => 'c07d9b2f73c2461297b0beaef6c1662f',
                 //'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
             ],
-            'max_tries'         => [
+            'max_tries' => [
                 'query'         => 5, // How many times should I try to call a method or send an object before throwing an exception
                 'authorization' => 5, // How many times should I try to generate an authorization key before throwing an exception
                 'response'      => 5, // How many times should I try to get a response of a query before throwing an exception
             ],
-            'flood_timeout'     => [
-                'wait_if_lt'    => 20, // Sleeps if flood block time is lower than this
+            'flood_timeout' => [
+                'wait_if_lt' => 20, // Sleeps if flood block time is lower than this
             ],
-            'msg_array_limit'        => [ // How big should be the arrays containing the incoming and outgoing messages?
+            'msg_array_limit' => [ // How big should be the arrays containing the incoming and outgoing messages?
                 'incoming'   => 200,
                 'outgoing'   => 200,
                 'call_queue' => 200,
             ],
-            'peer'      => [
+            'peer' => [
                 'full_info_cache_time' => 60,
             ],
             'requests' => [
                 'gzip_encode_if_gt' => 500,  // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
             ],
-            'updates'   => [
-                'handle_updates'      => true, // Should I handle updates?
-                'callback'            => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
+            'updates' => [
+                'handle_updates' => true, // Should I handle updates?
+                'callback'       => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
             'secret_chats' => [
-                'accept_chats'      => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
+                'accept_chats' => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?
@@ -749,15 +749,15 @@ class MTProto
                 'layer' => $this->settings['tl_schema']['layer'],
                 'query' => $this->serialize_method('initConnection',
                     [
-                        'api_id'                => $this->settings['app_info']['api_id'],
-                        'api_hash'              => $this->settings['app_info']['api_hash'],
-                        'device_model'          => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a',
-                        'system_version'        => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a',
-                        'app_version'           => $this->settings['app_info']['app_version'],
-                        'system_lang_code'      => $this->settings['app_info']['lang_code'],
-                        'lang_code'             => $this->settings['app_info']['lang_code'],
-                        'lang_pack'             => '',
-                        'query'                 => $this->serialize_method($method, $arguments),
+                        'api_id'           => $this->settings['app_info']['api_id'],
+                        'api_hash'         => $this->settings['app_info']['api_hash'],
+                        'device_model'     => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a',
+                        'system_version'   => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a',
+                        'app_version'      => $this->settings['app_info']['app_version'],
+                        'system_lang_code' => $this->settings['app_info']['lang_code'],
+                        'lang_code'        => $this->settings['app_info']['lang_code'],
+                        'lang_pack'        => '',
+                        'query'            => $this->serialize_method($method, $arguments),
                     ]
                 ),
             ],

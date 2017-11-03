@@ -66,7 +66,7 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 echo 'Serializing MadelineProto to s.madeline...'.PHP_EOL;
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 
-$sent = [-440592694=>true];
+$sent = [-440592694 => true];
 
 $offset = 0;
 while (true) {

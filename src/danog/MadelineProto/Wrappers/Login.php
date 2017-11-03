@@ -45,9 +45,9 @@ trait Login
         $this->authorization = $this->method_call(
             'auth.importBotAuthorization',
             [
-                'bot_auth_token'     => $token,
-                'api_id'             => $this->settings['app_info']['api_id'],
-                'api_hash'           => $this->settings['app_info']['api_hash'],
+                'bot_auth_token' => $token,
+                'api_id'         => $this->settings['app_info']['api_id'],
+                'api_hash'       => $this->settings['app_info']['api_hash'],
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;

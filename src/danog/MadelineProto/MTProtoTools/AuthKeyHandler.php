@@ -103,13 +103,13 @@ trait AuthKeyHandler
                 $new_nonce = $this->random(32);
 
                 $data_unserialized = [
-                    'pq'              => $pq_bytes,
-                    'p'               => $p_bytes,
-                    'q'               => $q_bytes,
-                    'nonce'           => $nonce,
-                    'server_nonce'    => $server_nonce,
-                    'new_nonce'       => $new_nonce,
-                    'expires_in'      => $expires_in,
+                    'pq'           => $pq_bytes,
+                    'p'            => $p_bytes,
+                    'q'            => $q_bytes,
+                    'nonce'        => $nonce,
+                    'server_nonce' => $server_nonce,
+                    'new_nonce'    => $new_nonce,
+                    'expires_in'   => $expires_in,
                 ];
                 $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
 
@@ -282,10 +282,10 @@ trait AuthKeyHandler
                     $data = $this->serialize_object(
                         ['type' => 'client_DH_inner_data'],
                         [
-                            'nonce'           => $nonce,
-                            'server_nonce'    => $server_nonce,
-                            'retry_id'        => $retry_id,
-                            'g_b'             => $g_b_str,
+                            'nonce'        => $nonce,
+                            'server_nonce' => $server_nonce,
+                            'retry_id'     => $retry_id,
+                            'g_b'          => $g_b_str,
                         ], 'client_DH_inner_data'
                     );
 
@@ -318,9 +318,9 @@ trait AuthKeyHandler
                     $Set_client_DH_params_answer = $this->method_call(
                         'set_client_DH_params',
                         [
-                            'nonce'               => $nonce,
-                            'server_nonce'        => $server_nonce,
-                            'encrypted_data'      => $encrypted_data,
+                            'nonce'          => $nonce,
+                            'server_nonce'   => $server_nonce,
+                            'encrypted_data' => $encrypted_data,
                         ],
                         ['datacenter' => $datacenter]
 
@@ -531,11 +531,11 @@ trait AuthKeyHandler
                 $temp_session_id = $this->datacenter->sockets[$datacenter]->session_id;
                 $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'],
                     [
-                        'nonce'                       => $nonce,
-                        'temp_auth_key_id'            => $temp_auth_key_id,
-                        'perm_auth_key_id'            => $perm_auth_key_id,
-                        'temp_session_id'             => $temp_session_id,
-                        'expires_at'                  => $expires_at,
+                        'nonce'            => $nonce,
+                        'temp_auth_key_id' => $temp_auth_key_id,
+                        'perm_auth_key_id' => $perm_auth_key_id,
+                        'temp_session_id'  => $temp_session_id,
+                        'expires_at'       => $expires_at,
                     ], 'bind_temp_auth_key_inner'
                 );
                 $message_id = $this->generate_message_id($datacenter);

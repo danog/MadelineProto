@@ -32,16 +32,16 @@ class API extends APIFactory
                 $unserialized = file_get_contents($params);
                 flock($lock, LOCK_UN);
                 fclose($lock);
-    
+
                 $tounserialize = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
                 foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\Types\Button', 'TL\Types\Bytes', 'APIFactory'] as $class) {
                     class_exists('\danog\MadelineProto\\'.$class);
                 }
                 class_exists('\Volatile');
                 \danog\MadelineProto\Logger::class_exists();
-    
+
                 try {
-    //                $unserialized = \danog\Serialization::unserialize($tounserialize);
+                    //                $unserialized = \danog\Serialization::unserialize($tounserialize);
                     $unserialized = unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
@@ -63,9 +63,10 @@ class API extends APIFactory
             if ($unserialized === false) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
             }
-    
+
             $this->APIFactory();
             $this->API = $unserialized->API;
+
             return;
         }
         $this->API = new MTProto($params);
