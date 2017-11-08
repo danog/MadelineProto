@@ -24,6 +24,7 @@ description: messages.readHistory parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |PEER_ID_INVALID|The provided peer id is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### Example:

@@ -64,10 +64,10 @@ class API extends APIFactory
             if ($unserialized === false) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
             }
-
-            $this->API = $unserialized->API;
-            $this->APIFactory();
-
+            if (isset($unserialized->API)) {
+                $this->API = $unserialized->API;
+                $this->APIFactory();
+            }
             return;
         }
         $this->API = new MTProto($params);

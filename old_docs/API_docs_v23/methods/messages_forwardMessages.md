@@ -27,6 +27,7 @@ description: messages.forwardMessages parameters, return type and example
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |CHAT_ID_INVALID|The provided chat id is invalid|
+|GROUPED_MEDIA_INVALID|Invalid grouped media|
 |INPUT_USER_DEACTIVATED|The specified user was deleted|
 |MEDIA_EMPTY|The provided media object is invalid|
 |MESSAGE_ID_INVALID|The provided message id is invalid|

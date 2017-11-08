@@ -25,6 +25,7 @@ description: messages.sendEncryptedService parameters, return type and example
 |----------|---------------|
 |DATA_INVALID|Encrypted data invalid|
 |MSG_WAIT_FAILED|A waiting call returned an error|
+|USER_IS_BLOCKED|User is blocked|
 
 
 ### Example:

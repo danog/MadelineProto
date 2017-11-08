@@ -29,6 +29,7 @@ description: messages.search parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
 |INPUT_USER_DEACTIVATED|The specified user was deleted|
 |PEER_ID_INVALID|The provided peer id is invalid|

@@ -16,7 +16,7 @@ $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb
 $Lua = false;
 
 try {
-    $Lua = new \danog\MadelineProto\API('bot.madeline');
+    $Lua = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
 if (!is_object($Lua)) {
@@ -53,7 +53,6 @@ if (!is_object($Lua)) {
             break;
     }
 }
-
 $offset = 0;
 while (true) {
     $updates = $Lua->MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout

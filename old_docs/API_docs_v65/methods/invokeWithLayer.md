@@ -28,6 +28,7 @@ description: invokeWithLayer parameters, return type and example
 |CONNECTION_API_ID_INVALID|The provided API id is invalid|
 |CONNECTION_LANG_PACK_INVALID|Language pack invalid|
 |INPUT_LAYER_INVALID|The provided layer is invalid|
+|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 
 ### Example:

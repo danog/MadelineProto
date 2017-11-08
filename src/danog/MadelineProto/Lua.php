@@ -41,6 +41,7 @@ class Lua
         $this->madelineproto_lua = 1;
         $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
         $this->Lua->registerCallback('madeline_function', [$this, 'madeline_function']);
+        $this->Lua->registerCallback('var_dump', 'var_dump');
         foreach (get_class_methods($this->MadelineProto->API) as $method) {
             $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);
         }

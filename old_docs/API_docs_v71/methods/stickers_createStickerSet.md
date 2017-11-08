@@ -28,7 +28,11 @@ description: stickers.createStickerSet parameters, return type and example
 |----------|---------------|
 |BOT_MISSING|This method can only be run by a bot|
 |PACK_SHORT_NAME_INVALID|Short pack name invalid|
+|PACK_SHORT_NAME_OCCUPIED|A stickerpack with this name already exists|
 |PEER_ID_INVALID|The provided peer id is invalid|
+|STICKER_EMOJI_INVALID|Sticker emoji invalid|
+|STICKER_FILE_INVALID|Sticker file invalid|
+|STICKER_PNG_DIMENSIONS|Sticker png dimensions invalid|
 |STICKERS_EMPTY|No sticker provided|
 |USER_ID_INVALID|The provided user ID is invalid|
 

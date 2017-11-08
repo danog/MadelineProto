@@ -16,7 +16,7 @@ $settings = [];
 $Lua = false;
 
 try {
-    $Lua = new \danog\MadelineProto\API('td.madeline');
+    $Lua = \danog\MadelineProto\Serialization::deserialize('td.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
 if (!is_object($Lua)) {
