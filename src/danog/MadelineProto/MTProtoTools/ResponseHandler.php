@@ -374,6 +374,7 @@ trait ResponseHandler
         if ($this->postpone_updates) {
             \danog\MadelineProto\Logger::log(['Postpone update handling'], \danog\MadelineProto\Logger::VERBOSE);
             $this->pending_updates[] = $updates;
+
             return false;
         }
         $this->handle_pending_updates();

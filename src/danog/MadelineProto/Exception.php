@@ -21,7 +21,7 @@ class Exception extends \Exception
         return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.$this->getTLTrace();
     }
 
-    public function __construct($message = null, $code = 0, Exception $previous = null, $file = null, $line = null)
+    public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
         $this->prettify_tl();
         if ($file !== null) {

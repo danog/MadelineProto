@@ -192,7 +192,6 @@ class MTProto
     private $emojis;
     private $postpone_updates = false;
 
-
     public function ___construct($settings = [])
     {
         // Parse settings
