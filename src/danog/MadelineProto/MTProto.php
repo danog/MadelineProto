@@ -190,6 +190,8 @@ class MTProto
     public $setdem = false;
     public $storage = [];
     private $emojis;
+    private $postpone_updates = false;
+
 
     public function ___construct($settings = [])
     {
@@ -295,7 +297,7 @@ class MTProto
         }
         // Detect ipv6
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-        preg_match('/const V = (\d+);/', file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
+        preg_match('/const V = (\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
@@ -714,6 +716,7 @@ class MTProto
     public function sync_authorization($authorized_dc)
     {
         $this->updates_state['sync_loading'] = true;
+        $this->postpone_updates = true;
 
         try {
             foreach ($this->datacenter->sockets as $new_dc => $socket) {
@@ -733,6 +736,7 @@ class MTProto
                 $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $new_dc]);
             }
         } finally {
+            $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
         }
 

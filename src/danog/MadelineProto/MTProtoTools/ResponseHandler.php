@@ -354,7 +354,7 @@ trait ResponseHandler
 
     public function handle_pending_updates()
     {
-        if ($this->updates_state['sync_loading']) {
+        if ($this->postpone_updates) {
             return false;
         }
         if (count($this->pending_updates)) {
@@ -370,14 +370,13 @@ trait ResponseHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
-        }/*
-        if ($this->updates_state["sync_loading"]) {
-            \danog\MadelineProto\Logger::log(['Getting state, handle later'], \danog\MadelineProto\Logger::VERBOSE);
-            var_dump($updates);
+        }
+        if ($this->postpone_updates) {
+            \danog\MadelineProto\Logger::log(['Postpone update handling'], \danog\MadelineProto\Logger::VERBOSE);
             $this->pending_updates[] = $updates;
-
             return false;
-        }*/
+        }
+        $this->handle_pending_updates();
         \danog\MadelineProto\Logger::log(['Parsing updates received via the socket...'], \danog\MadelineProto\Logger::VERBOSE);
         $opts = [];
         foreach (['date', 'seq', 'seq_start'] as $key) {

@@ -29,6 +29,7 @@ trait DialogHandler
         $datacenter = $this->datacenter->curdc;
         $peers = [];
 
+        $this->postpone_updates = true;
         try {
             while ($this->dialog_params['count'] < $res['count']) {
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
@@ -47,6 +48,7 @@ trait DialogHandler
                 }
             }
         } finally {
+            $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
         }
 
