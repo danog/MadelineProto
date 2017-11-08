@@ -30,6 +30,7 @@ trait DialogHandler
         $peers = [];
 
         $this->postpone_updates = true;
+
         try {
             while ($this->dialog_params['count'] < $res['count']) {
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
