@@ -132,7 +132,7 @@ Make sure you also have these set in the composer.json:
 Then you can require the package by addding the following line to the require section:
 
 ```
-"danog/madelineproto":" dev-master"
+"danog/madelineproto":"dev-master"
 ```
 
 
