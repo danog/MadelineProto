@@ -42,7 +42,6 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
-
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
@@ -89,6 +88,7 @@ $MadelineProto->session = 'session.madeline';
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
+//$MadelineProto->phone->createGroupCall(['channel' => -1001333587884
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 

@@ -85,6 +85,7 @@ trait UpdateHandler
             if ($e->rpc !== 'RPC_CALL_FAIL') {
                 throw $e;
             }
+        } catch (\danog\MadelineProto\Exception $e) {
         }
 
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
