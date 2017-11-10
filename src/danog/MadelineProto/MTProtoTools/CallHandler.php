@@ -80,7 +80,7 @@ trait CallHandler
         }
         $last_recv = $this->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
-            if ($canunset = !$this->updates_state['sync_loading'] && !$this->threads && !$this->run_workers) {
+            if ($canunset = !$this->updates_state['sync_loading']) {
                 $this->updates_state['sync_loading'] = true;
             }
 
@@ -111,8 +111,6 @@ trait CallHandler
                 while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) { // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log(['Getting response (try number '.$res_count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        //sleep(2);
-                        $this->start_threads();
                         if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'])) { // Checks if I have received the response to the called method, if not continue looping
                             if ($only_updates) {
                                 if ($update_count > 50) {
@@ -123,18 +121,10 @@ trait CallHandler
                                 }
                             }
                         } else {
-                            //var_dump(base64_encode($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]);
-                            /*
-                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']);
-                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
-                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]);
-                            var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content']);
-                            */
                             $server_answer = $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'];
                             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = '';
                             break;
                         }
-                        if (!$this->threads && !$this->run_workers) {
                             if (($error = $this->recv_message($aargs['datacenter'])) !== true) {
                                 if ($error === -404) {
                                     if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
@@ -149,11 +139,6 @@ trait CallHandler
                                 throw new \danog\MadelineProto\RPCErrorException($error, $error);
                             }
                             $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
-                        } else {
-                            $res_count--;
-                            //var_dump($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
-                            sleep(1);
-                        }
                     } catch (\danog\MadelineProto\Exception $e) {
                         if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
                             continue 2;

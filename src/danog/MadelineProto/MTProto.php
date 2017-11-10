@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 77;
+    const V = 78;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -186,7 +186,6 @@ class MTProto
 
     private $ipv6 = false;
     public $run_workers = false;
-    public $threads = false;
     public $setdem = false;
     public $storage = [];
     private $emojis;
@@ -238,7 +237,6 @@ class MTProto
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
-        $this->setup_threads();
 
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
@@ -302,15 +300,6 @@ class MTProto
             throw new Bug74586Exception();
         }
 
-        /*
-        if (method_exists($this->datacenter, 'wakeup')) $this->datacenter = $this->datacenter->wakeup();
-        foreach ($this->rsa_keys as $key => $elem) {
-            if (method_exists($elem, 'wakeup')) $this->rsa_keys[$key] = $elem->wakeup();
-        }
-        foreach ($this->datacenter->sockets as $key => $elem) {
-            if (method_exists($elem, 'wakeup')) $this->datacenter->sockets[$key] = $elem->wakeup();
-        }
-        */
         if (isset($this->data)) {
             foreach ($this->data as $k => $v) {
                 $this->{$k} = $v;
@@ -323,11 +312,6 @@ class MTProto
         $this->updates_state['sync_loading'] = false;
         foreach ($this->channels_state as $key => $state) {
             $this->channels_state[$key]['sync_loading'] = false;
-        }
-        foreach (debug_backtrace(0) as $trace) {
-            if (isset($trace['function']) && isset($trace['class']) && $trace['function'] === 'deserialize' && $trace['class'] === 'danog\MadelineProto\Serialization') {
-                $this->updates_state['sync_loading'] = isset($trace['args'][1]) && $trace['args'][1];
-            }
         }
         $force = false;
         $this->reset_session();
@@ -364,7 +348,10 @@ class MTProto
             $this->__construct($settings);
             $force = true;
         }
-        $this->setup_threads();
+        if (!$this->settings['updates']['handle_old_updates']) {
+            $this->channels_state = [];
+            $this->got_state = false;
+        }
         $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         if ($this->get_self()) {
             $this->authorized = self::LOGGED_IN;
@@ -373,7 +360,7 @@ class MTProto
             $this->get_cdn_config($this->datacenter->curdc);
             $this->setup_logger();
         }
-        if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
+        if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             $this->get_dialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
@@ -387,52 +374,6 @@ class MTProto
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
-        if (isset(Logger::$storage[spl_object_hash($this)])) {
-            $this->run_workers = false;
-            while ($number = Logger::$storage[spl_object_hash($this)]->collect()) {
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['shutdown_reader_pool'], $number)], \danog\MadelineProto\Logger::NOTICE);
-            }
-            Logger::$storage[spl_object_hash($this)]->shutdown();
-        }
-    }
-
-    public function setup_threads()
-    {
-        if ($this->threads = $this->run_workers = class_exists('\Pool') && in_array(php_sapi_name(), ['cli', 'phpdbg']) && $this->settings['threading']['allow_threading'] && extension_loaded('pthreads')) {
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['threading_on']], \danog\MadelineProto\Logger::NOTICE);
-            $this->start_threads();
-        }
-    }
-
-    public function start_threads()
-    {
-        if ($this->threads && !is_object(\Thread::getCurrentThread())) {
-            $dcs = $this->datacenter->get_dcs(false);
-            if (!isset(Logger::$storage[spl_object_hash($this)])) {
-                Logger::$storage[spl_object_hash($this)] = new \Pool(count($dcs));
-            }
-            if (!isset($this->readers)) {
-                $this->readers = [];
-            }
-            foreach ($dcs as $dc) {
-                if (!isset($this->readers[$dc])) {
-                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['socket_reader'], $number).\danog\MadelineProto\Lang::$current_lang['socket_status_1']], Logger::WARNING);
-                    $this->readers[$dc] = new \danog\MadelineProto\Threads\SocketReader($this, $dc);
-                }
-                if (!$this->readers[$dc]->isRunning()) {
-                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['socket_reader'], $number).\danog\MadelineProto\Lang::$current_lang['socket_status_2']], Logger::WARNING);
-                    $this->readers[$dc]->garbage = false;
-                    Logger::$storage[spl_object_hash($this)]->submit($this->readers[$dc]);
-                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['socket_reader'], $number).\danog\MadelineProto\Lang::$current_lang['socket_status_3']], Logger::WARNING);
-                    while (!$this->readers[$dc]->ready);
-                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['socket_reader'], $number).\danog\MadelineProto\Lang::$current_lang['socket_status_4']], Logger::WARNING);
-                } else {
-                    Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['socket_reader'], $number).\danog\MadelineProto\Lang::$current_lang['socket_status_5']], Logger::ULTRA_VERBOSE);
-                }
-            }
-        }
-
-        return true;
     }
 
     public function parse_settings($settings)
@@ -580,13 +521,16 @@ class MTProto
                 'call_queue' => 200,
             ],
             'peer' => [
-                'full_info_cache_time' => 60,
+                'full_info_cache_time' => 3600, // Full peer info cache validity
+                'full_fetch' => false, // Should madeline fetch the full member list of every group it meets?
+                'cache_all_peers_on_startup' => false, // Should madeline fetch the full chat list on startup?
             ],
             'requests' => [
                 'gzip_encode_if_gt' => 500,  // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
             ],
             'updates' => [
                 'handle_updates' => true, // Should I handle updates?
+                'handle_old_updates' => true, // Should I handle old updates on startup?
                 'callback'       => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
             'secret_chats' => [
@@ -664,7 +608,6 @@ class MTProto
         foreach ($old = $this->datacenter->get_dcs() as $new_dc) {
             $this->datacenter->dc_connect($new_dc);
         }
-        $this->setup_threads();
         $this->init_authorization();
         if ($old !== $this->datacenter->get_dcs()) {
             $this->connect_to_all_dcs();

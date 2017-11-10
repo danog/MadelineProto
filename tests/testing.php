@@ -51,6 +51,7 @@ if (getenv('TEST_SECRET_CHAT') == '') {
     die('TEST_SECRET_CHAT is not defined in .env, please define it.'.PHP_EOL);
 }
 echo 'Loading settings...'.PHP_EOL;
+var_dump(getenv('MTPROTO_SETTINGS'));
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 //$settings['connection_settings']['all']['proxy'] = '\SocksProxy';
 //$settings['connection_settings']['all']['proxy_extra'] = ['address' => '209.195.74.200', 'port' => 43545];
