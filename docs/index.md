@@ -1,7 +1,3 @@
----
-title: MadelineProto documentation
-description: PHP implementation of telegram's MTProto protocol
----
 # MadelineProto, a PHP MTProto telegram client
 
 Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!
@@ -404,13 +400,16 @@ Here are the default values for the settings arrays and explanations for every s
         'call_queue' => 200,
     ],
     'peer' => [
-        'full_info_cache_time' => 60,
+        'full_info_cache_time' => 3600, // Full peer info cache validity
+        'full_fetch' => false, // Should madeline fetch the full member list of every group it meets?
+        'cache_all_peers_on_startup' => false, // Should madeline fetch the full chat list on startup?
     ],
     'requests' => [
         'gzip_encode_if_gt' => 500, // Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
     ],
     'updates' => [
         'handle_updates' => true, // Should I handle updates?
+        'handle_old_updates' => true, // Should I handle old updates on startup?
         'callback' => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
     ],
     'secret_chats' => [
