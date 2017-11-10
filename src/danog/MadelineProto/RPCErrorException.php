@@ -16,15 +16,19 @@ class RPCErrorException extends \Exception
 {
     use TL\PrettyException;
     private $fetched = false;
-    public function getMess() {
+
+    public function getMess()
+    {
         if ($this->fetched === false) {
             $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$additional[0].'&code='.$code.'&error='.$this->rpc), true);
             if (isset($res['ok']) && $res['ok']) {
                 $this->message = $res['result'];
             }
         }
+
         return $this->message;
     }
+
     public function __toString()
     {
         return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;

@@ -115,6 +115,7 @@ trait UpdateHandler
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
+
         return $updates;
     }
 

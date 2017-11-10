@@ -30,6 +30,7 @@ trait PeerHandler
                 case 'user':
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                         $this->chats[$user['id']] = $user;
+
                         try {
                             $this->get_pwr_chat($user['id'], false, true);
                         } catch (\danog\MadelineProto\Exception $e) {
@@ -522,7 +523,9 @@ trait PeerHandler
             }
             $res['participants'] = array_values($res['participants']);
         }
-        if (!$fullfetch) unset($res['participants']);
+        if (!$fullfetch) {
+            unset($res['participants']);
+        }
         if ($fullfetch || $send) {
             $this->store_db($res);
         }

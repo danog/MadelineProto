@@ -125,20 +125,20 @@ trait CallHandler
                             $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = '';
                             break;
                         }
-                            if (($error = $this->recv_message($aargs['datacenter'])) !== true) {
-                                if ($error === -404) {
-                                    if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-                                        \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
-                                        $this->init_authorization();
+                        if (($error = $this->recv_message($aargs['datacenter'])) !== true) {
+                            if ($error === -404) {
+                                if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
+                                    \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                                    $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
+                                    $this->init_authorization();
 
-                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                                    }
+                                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                                 }
-
-                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
                             }
-                            $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
+
+                            throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                        }
+                        $only_updates = $this->handle_messages($aargs['datacenter']); // This method receives data from the socket, and parses stuff
                     } catch (\danog\MadelineProto\Exception $e) {
                         if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
                             continue 2;
