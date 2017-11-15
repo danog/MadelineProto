@@ -24,6 +24,7 @@ description: channels.updateUsername parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |CHANNEL_INVALID|The provided channel is invalid|
+|CHANNELS_ADMIN_PUBLIC_TOO_MUCH|You're admin of too many public channels, make some channels private to change the username of this channel|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |USERNAME_INVALID|The provided username is not valid|
 |USERNAME_OCCUPIED|The provided username is already occupied|

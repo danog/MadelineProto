@@ -24,6 +24,7 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 
 | Error    | Description   |
 |----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
 |DATA_INVALID|Encrypted data invalid|
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 |PEER_ID_INVALID|The provided peer id is invalid|

@@ -1,3 +1,7 @@
+---
+title: MadelineProto documentation
+description: PHP implementation of telegram's MTProto protocol
+---
 # MadelineProto, a PHP MTProto telegram client
 
 Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!

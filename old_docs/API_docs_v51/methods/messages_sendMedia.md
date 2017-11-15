@@ -33,6 +33,7 @@ description: messages.sendMedia parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |EXTERNAL_URL_INVALID|External URL invalid|
 |FILE_PART_0_MISSING|File part 0 missing|
+|FILE_PART_154_MISSING||
 |FILE_PART_6_MISSING|File part 6 missing|
 |FILE_PART_LENGTH_INVALID|The length of a file part is invalid|
 |FILE_PARTS_INVALID|The number of file parts is invalid|
@@ -48,7 +49,9 @@ description: messages.sendMedia parameters, return type and example
 |WEBPAGE_CURL_FAILED|Failure while fetching the webpage with cURL|
 |WEBPAGE_MEDIA_EMPTY|Webpage media empty|
 |STORAGE_CHECK_FAILED|Server storage check failed|
+|CHAT_SEND_MEDIA_FORBIDDEN|You can't send media in this chat|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### Example:

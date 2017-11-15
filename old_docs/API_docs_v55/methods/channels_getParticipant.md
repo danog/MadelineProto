@@ -24,6 +24,7 @@ description: channels.getParticipant parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |USER_ID_INVALID|The provided user ID is invalid|
 |USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
