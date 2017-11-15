@@ -170,7 +170,7 @@ It is **strongly** recommended to serialize the session with `$MadelineProto->se
 
 ## Methods
 
-A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 71)](https://daniil.it/MadelineProto/API_docs/).
+A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 73)](https://daniil.it/MadelineProto/API_docs/).
 
 If an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username (`@username`) or bot API id (`-1029449`, `1249421`, `-100412412901`).  
 
@@ -361,10 +361,10 @@ Here are the default values for the settings arrays and explanations for every s
         'lang_code' => $lang_code,
     ],
     'tl_schema' => [ // TL scheme files
-        'layer' => 72, // layer version
+        'layer' => 73, // layer version
         'src' => [
             'mtproto' => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-            'telegram' => __DIR__.'/TL_telegram_v72.tl', // telegram TL scheme
+            'telegram' => __DIR__.'/TL_telegram_v73.tl', // telegram TL scheme
             'secret' => __DIR__.'/TL_secret.tl', // secret chats TL scheme
             'calls' => __DIR__.'/TL_calls.tl', // calls TL scheme
             'botAPI' => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids

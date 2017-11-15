@@ -63,6 +63,8 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->messages->sendScreenshotNotification](../methods/messages_sendScreenshotNotification.md)  
 
+[$MadelineProto->messages->sendMultiMedia](../methods/messages_sendMultiMedia.md)  
+
 [$MadelineProto->help->getAppChangelog](../methods/help_getAppChangelog.md)  
 
 [$MadelineProto->channels->createChannel](../methods/channels_createChannel.md)  

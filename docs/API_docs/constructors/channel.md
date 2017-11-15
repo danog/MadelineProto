@@ -31,6 +31,7 @@ description: channel attributes, type and example
 |restriction\_reason|[string](../types/string.md) | Optional|
 |admin\_rights|[ChannelAdminRights](../types/ChannelAdminRights.md) | Optional|
 |banned\_rights|[ChannelBannedRights](../types/ChannelBannedRights.md) | Optional|
+|participants\_count|[int](../types/int.md) | Optional|
 
 
 
@@ -40,13 +41,13 @@ description: channel attributes, type and example
 ### Example:
 
 ```
-$channel = ['_' => 'channel', 'creator' => Bool, 'left' => Bool, 'editor' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => 'string', 'username' => 'string', 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => 'string', 'admin_rights' => ChannelAdminRights, 'banned_rights' => ChannelBannedRights];
+$channel = ['_' => 'channel', 'creator' => Bool, 'left' => Bool, 'editor' => Bool, 'broadcast' => Bool, 'verified' => Bool, 'megagroup' => Bool, 'restricted' => Bool, 'democracy' => Bool, 'signatures' => Bool, 'min' => Bool, 'id' => int, 'access_hash' => long, 'title' => 'string', 'username' => 'string', 'photo' => ChatPhoto, 'date' => int, 'version' => int, 'restriction_reason' => 'string', 'admin_rights' => ChannelAdminRights, 'banned_rights' => ChannelBannedRights, 'participants_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "channel", "creator": Bool, "left": Bool, "editor": Bool, "broadcast": Bool, "verified": Bool, "megagroup": Bool, "restricted": Bool, "democracy": Bool, "signatures": Bool, "min": Bool, "id": int, "access_hash": long, "title": "string", "username": "string", "photo": ChatPhoto, "date": int, "version": int, "restriction_reason": "string", "admin_rights": ChannelAdminRights, "banned_rights": ChannelBannedRights}
+{"_": "channel", "creator": Bool, "left": Bool, "editor": Bool, "broadcast": Bool, "verified": Bool, "megagroup": Bool, "restricted": Bool, "democracy": Bool, "signatures": Bool, "min": Bool, "id": int, "access_hash": long, "title": "string", "username": "string", "photo": ChatPhoto, "date": int, "version": int, "restriction_reason": "string", "admin_rights": ChannelAdminRights, "banned_rights": ChannelBannedRights, "participants_count": int}
 ```
 
 
@@ -54,7 +55,7 @@ Or, if you're into Lua:
 
 
 ```
-channel={_='channel', creator=Bool, left=Bool, editor=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, democracy=Bool, signatures=Bool, min=Bool, id=int, access_hash=long, title='string', username='string', photo=ChatPhoto, date=int, version=int, restriction_reason='string', admin_rights=ChannelAdminRights, banned_rights=ChannelBannedRights}
+channel={_='channel', creator=Bool, left=Bool, editor=Bool, broadcast=Bool, verified=Bool, megagroup=Bool, restricted=Bool, democracy=Bool, signatures=Bool, min=Bool, id=int, access_hash=long, title='string', username='string', photo=ChatPhoto, date=int, version=int, restriction_reason='string', admin_rights=ChannelAdminRights, banned_rights=ChannelBannedRights, participants_count=int}
 
 ```
 

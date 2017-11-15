@@ -1,8 +1,8 @@
 ---
-title: MadelineProto API documentation (layer 72)
-description: MadelineProto API documentation (layer 72)
+title: MadelineProto API documentation (layer 73)
+description: MadelineProto API documentation (layer 73)
 ---
-# MadelineProto API documentation (layer 72)  
+# MadelineProto API documentation (layer 73)  
 
 [Methods](methods/)
 

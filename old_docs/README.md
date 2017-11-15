@@ -4,4 +4,4 @@ description: Documentation of old mtproto layers
 ---
 # Documentation of old mtproto layers  
 
-[Layer v71](API_docs_v71/)  
+[Layer v72](API_docs_v72/)  

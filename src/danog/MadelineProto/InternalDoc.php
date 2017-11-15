@@ -7,22 +7,6 @@
 
 namespace danog\MadelineProto;
 
-interface contest
-{
-    /**
-     * @param array params [
-     *               int vk_id,
-     *               string name,
-     *               string phone_number,
-     *               int age,
-     *               string city,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveDeveloperInfo(array $params);
-}
-
 interface auth
 {
     /**
@@ -731,6 +715,7 @@ interface messages
      *               boolean silent,
      *               boolean background,
      *               boolean with_my_score,
+     *               boolean grouped,
      *               InputPeer from_peer,
      *               int id,
      *               InputPeer to_peer,
@@ -1559,6 +1544,20 @@ interface messages
      * @return messages_AffectedHistory
      */
     public function readMentions(array $params);
+
+    /**
+     * @param array params [
+     *               boolean silent,
+     *               boolean background,
+     *               boolean clear_draft,
+     *               InputPeer peer,
+     *               int reply_to_msg_id,
+     *               InputSingleMedia multi_media,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function sendMultiMedia(array $params);
 }
 
 interface updates
