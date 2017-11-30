@@ -297,7 +297,8 @@ class MTProto
 
         if ($oldipv6 !== $this->ipv6) {
             $this->settings['connection_settings']['all']['ipv6'] = $this->ipv6;
-            $this->parse_settings($this->settings);
+            $this->datacenter->settings = $this->settings['connection_settings'];
+            $this->connect_to_all_dcs();
         }
         preg_match('/const V = (\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
