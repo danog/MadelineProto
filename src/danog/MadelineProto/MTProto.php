@@ -292,7 +292,13 @@ class MTProto
             }
         }
         // Detect ipv6
+        $oldipv6 = $this->ipv6;
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        
+        if ($oldipv6 !== $this->ipv6) {
+            $this->settings['connection_settings']['all']['ipv6'] = $this->ipv6;
+            $this->parse_settings($this->settings);
+        }
         preg_match('/const V = (\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
