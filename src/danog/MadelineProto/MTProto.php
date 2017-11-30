@@ -294,7 +294,7 @@ class MTProto
         // Detect ipv6
         $oldipv6 = $this->ipv6;
         $this->ipv6 = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-        
+
         if ($oldipv6 !== $this->ipv6) {
             $this->settings['connection_settings']['all']['ipv6'] = $this->ipv6;
             $this->parse_settings($this->settings);
