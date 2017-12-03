@@ -82,14 +82,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                if (!\danog\MadelineProto\Logger::$has_thread) {
-                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                }
-                $this->sock->setBlocking(true);
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
@@ -97,16 +95,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                if (!\danog\MadelineProto\Logger::$has_thread) {
-                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                }
-                $this->sock->setBlocking(true);
                 $this->write(str_repeat(chr(238), 4));
                 break;
 
@@ -115,14 +109,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                if (!\danog\MadelineProto\Logger::$has_thread) {
-                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                }
-                $this->sock->setBlocking(true);
 
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
@@ -132,14 +124,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                if (!\danog\MadelineProto\Logger::$has_thread) {
-                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                }
-                $this->sock->setBlocking(true);
                 do {
                     $random = $this->random(64);
                 } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
