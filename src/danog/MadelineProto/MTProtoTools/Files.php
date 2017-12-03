@@ -48,7 +48,7 @@ trait Files
             $iv = $this->random(32);
             $digest = hash('md5', $key.$iv, true);
             $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
-            $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
+            $ige = new \phpseclib\Crypt\AES('ige');
             $ige->setIV($iv);
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
@@ -73,7 +73,7 @@ trait Files
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
-            //            $constructor['md5_checksum'] = '';
+            $constructor['md5_checksum'] = '';
         }
 
         return $constructor;
@@ -274,7 +274,7 @@ trait Files
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
-            $ige = new \phpseclib\Crypt\AES(\phpseclib\Crypt\AES::MODE_IGE);
+            $ige = new \phpseclib\Crypt\AES('ige');
             $ige->setIV($message_media['iv']);
             $ige->setKey($message_media['key']);
             $ige->enableContinuousBuffer();

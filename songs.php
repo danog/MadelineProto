@@ -7,6 +7,7 @@ $songs = [
     'Caravan Palace - Lone Digger'     => 'inputb.raw',
     'Postmodern Jukebox - Thrift Shop' => 'inputd.raw',
 ];
+$songs = glob('*raw');
 for ($x = 0; $x < count($songs); $x++) {
     shuffle($songs);
 }

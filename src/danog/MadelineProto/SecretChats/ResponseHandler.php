@@ -19,9 +19,10 @@ trait ResponseHandler
 {
     public function handle_decrypted_update($update)
     {
-        if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
+        /*if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
             throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_short']);
-        }
+        }*/ // already checked in TL.php
+//var_dump($update);
         switch ($update['message']['decrypted_message']['_']) {
             case 'decryptedMessageService':
             switch ($update['message']['decrypted_message']['action']['_']) {
