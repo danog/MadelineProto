@@ -143,6 +143,6 @@ $secret = $update['update']['message']['chat_id'];
     } catch (\danog\MadelineProto\Exception $e) {
         var_dump($e->getMessage());
     }
-//sleep(1);
+    //sleep(1);
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
