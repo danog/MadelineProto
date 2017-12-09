@@ -17,12 +17,24 @@ trait Crypt
     public function aes_calculate($msg_key, $auth_key, $direction = 'to server')
     {
         $x = ($direction === 'to server') ? 0 : 8;
-        $sha1_a = sha1($msg_key.substr($auth_key, $x, ($x + 32) - $x), true);
-        $sha1_b = sha1(substr($auth_key, ($x + 32), ($x + 48) - ($x + 32)).$msg_key.substr($auth_key, (48 + $x), (64 + $x) - (48 + $x)), true);
-        $sha1_c = sha1(substr($auth_key, ($x + 64), ($x + 96) - ($x + 64)).$msg_key, true);
-        $sha1_d = sha1($msg_key.substr($auth_key, ($x + 96), ($x + 128) - ($x + 96)), true);
-        $aes_key = substr($sha1_a, 0, 8 - 0).substr($sha1_b, 8, 20 - 8).substr($sha1_c, 4, 16 - 4);
-        $aes_iv = substr($sha1_a, 8, 20 - 8).substr($sha1_b, 0, 8 - 0).substr($sha1_c, 16, 20 - 16).substr($sha1_d, 0, 8 - 0);
+        $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
+        $sha256_b = hash('sha256', substr($auth_key, 40+$x, 36).$msg_key, true);
+        $aes_key = substr($sha256_a, 0, 8).substr($sha256_b, 8, 16).substr($sha256_a, 24, 8);
+        $aes_iv = substr($sha256_b, 0, 8).substr($sha256_a, 8, 16).substr($sha256_b, 24, 8);
+
+        return [$aes_key, $aes_iv];
+    }
+
+    public function old_aes_calculate($msg_key, $auth_key, $direction = 'to server')
+    {
+        $x = ($direction === 'to server') ? 0 : 8;
+        $sha1_a = sha1($msg_key.substr($auth_key, $x, 32), true);
+        $sha1_b = sha1(substr($auth_key, 32 + $x, 16).$msg_key.substr($auth_key, 48 + $x, 16), true);
+        $sha1_c = sha1(substr($auth_key, 64 + $x, 32).$msg_key, true);
+        $sha1_d = sha1($msg_key.substr($auth_key, 96 + $x, 32), true);
+        $aes_key = substr($sha1_a, 0, 8).substr($sha1_b, 8, 12).substr($sha1_c, 4, 12);
+        $aes_iv = substr($sha1_a, 8, 12).substr($sha1_b, 0, 8).substr($sha1_c, 16, 4).substr($sha1_d, 0, 8);
+
 
         return [$aes_key, $aes_iv];
     }

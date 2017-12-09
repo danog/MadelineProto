@@ -19,6 +19,9 @@ $MadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('MadelineProto_bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 
 if (file_exists('token.php') && $MadelineProto === false) {
@@ -58,6 +61,8 @@ Row 3 c1 | Row 3 c2 | Row 3 c3
 This will create a keyboard exactly like the one used in this message (click the buttons ;D) with the phrase "Text to show in message" instead of this help message.
 
 Created by [Daniil Gentili](mention:@danogentili) (@daniilgentili) using the [MadelineProto PHP MTProto client](daniil.it/MadelineProto).';
+echo 'Bot started.'.PHP_EOL;
+
 while (true) {
     $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {
@@ -106,10 +111,10 @@ while (true) {
                             array_walk($rows, function (&$value, $key) {
                                 $value = explode('|', $value);
                                 array_walk($value, function (&$value, $key) {
-                                    $value = ['text' => trim($value)];
+                                    $value = ['text' => trim($value), 'url' => 'https://yayponies.eu'];
                                 });
                             });
-                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => rand(0, pow(2, 31) - 1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
+                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => (string) random_int(0, pow(2, 31) - 1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
                             $MadelineProto->messages->setInlineBotResults($toset);
                         }
                     }

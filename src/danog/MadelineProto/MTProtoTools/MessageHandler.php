@@ -37,11 +37,14 @@ trait MessageHandler
             $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         } else {
             $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
-            $data2enc = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
-            $padding = $this->random($this->posmod(-strlen($data2enc), 16));
-            $message_key = substr(sha1($data2enc, true), -16);
+            $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
+            $padding = $this->posmod(-strlen($plaintext), 16);
+            if ($padding < 12) $padding += 16;
+            $padding = $this->random($padding);
+
+            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key']);
-            $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($data2enc.$padding, $aes_key, $aes_iv);
+            $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['seq_no'] = $seq_no;
         }
         $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
@@ -94,8 +97,12 @@ trait MessageHandler
                 throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
             }
 
-            if ((strlen($decrypted_data) - 32) - $message_data_length > 15) {
-                throw new \danog\MadelineProto\SecurityException('difference between message_data_length and the length of the remaining decrypted buffer is too big');
+            if ((strlen($decrypted_data) - 32) - $message_data_length < 12) {
+                throw new \danog\MadelineProto\SecurityException('padding is too small');
+            }
+
+            if ((strlen($decrypted_data) - 32) - $message_data_length > 1024) {
+                throw new \danog\MadelineProto\SecurityException('padding is too big');
             }
 
             if ($message_data_length < 0) {
@@ -107,7 +114,7 @@ trait MessageHandler
             }
 
             $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(sha1(substr($decrypted_data, 0, 32 + $message_data_length), true), -16)) {
+            if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
             $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
