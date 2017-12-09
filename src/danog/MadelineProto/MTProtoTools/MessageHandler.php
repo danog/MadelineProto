@@ -39,7 +39,9 @@ trait MessageHandler
             $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
             $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
             $padding = $this->posmod(-strlen($plaintext), 16);
-            if ($padding < 12) $padding += 16;
+            if ($padding < 12) {
+                $padding += 16;
+            }
             $padding = $this->random($padding);
 
             $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
