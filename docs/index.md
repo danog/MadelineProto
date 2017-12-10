@@ -63,6 +63,8 @@ This library can also be used to create lua telegram bots (like bot API bots, on
 
 * Secret chats
 
+* MTProto 2.0
+
 * PFS
 
 * PFS in secret chats

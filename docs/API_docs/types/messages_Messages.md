@@ -15,6 +15,8 @@ description: constructors and methods of type messages_Messages
 
 [messages\_channelMessages](../constructors/messages_channelMessages.md)  
 
+[messages\_messagesNotModified](../constructors/messages_messagesNotModified.md)  
+
 
 
 ### Methods that return an object of this type (methods):

@@ -28,9 +28,11 @@ description: invokeWithLayer parameters, return type and example
 |CONNECTION_API_ID_INVALID|The provided API id is invalid|
 |CONNECTION_DEVICE_MODEL_EMPTY|Device model empty|
 |CONNECTION_LANG_PACK_INVALID|Language pack invalid|
+|CONNECTION_NOT_INITED|Connection not initialized|
 |CONNECTION_SYSTEM_EMPTY|Connection system empty|
 |INPUT_LAYER_INVALID|The provided layer is invalid|
 |INVITE_HASH_EXPIRED|The invite link has expired|
+|NEED_MEMBER_INVALID|The provided member is invalid|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 

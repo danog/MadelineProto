@@ -17,5 +17,7 @@ description: constructors and methods of type EncryptedFile
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->messages->uploadEncryptedFile](../methods/messages_uploadEncryptedFile.md)  
+
 
 

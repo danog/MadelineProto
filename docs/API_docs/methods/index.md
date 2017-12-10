@@ -291,7 +291,7 @@ $MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id'
 
 $MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatTitle"></a>  
 
-$MadelineProto->[messages->editInlineBotMessage](messages_editInlineBotMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \]) === [$Bool](../types/Bool.md)<a name="messages_editInlineBotMessage"></a>  
+$MadelineProto->[messages->editInlineBotMessage](messages_editInlineBotMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'stop_geo_live' => [Bool](../types/Bool.md), 'id' => [InputBotInlineMessageID](../types/InputBotInlineMessageID.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), \]) === [$Bool](../types/Bool.md)<a name="messages_editInlineBotMessage"></a>  
 
 $MadelineProto->[messages->editMessage](messages_editMessage.md)(\['no_webpage' => [Bool](../types/Bool.md), 'stop_geo_live' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editMessage"></a>  
 
@@ -333,7 +333,7 @@ $MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => 
 
 $MadelineProto->[messages->getGameHighScores](messages_getGameHighScores.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$messages\_HighScores](../types/messages_HighScores.md)<a name="messages_getGameHighScores"></a>  
 
-$MadelineProto->[messages->getHistory](messages_getHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset_id' => [int](../types/int.md), 'offset_date' => [int](../types/int.md), 'add_offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'min_id' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getHistory"></a>  
+$MadelineProto->[messages->getHistory](messages_getHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset_id' => [int](../types/int.md), 'offset_date' => [int](../types/int.md), 'add_offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'min_id' => [int](../types/int.md), 'hash' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getHistory"></a>  
 
 $MadelineProto->[messages->getInlineBotResults](messages_getInlineBotResults.md)(\['bot' => [InputUser](../types/InputUser.md), 'peer' => [InputPeer](../types/InputPeer.md), 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \]) === [$messages\_BotResults](../types/messages_BotResults.md)<a name="messages_getInlineBotResults"></a>  
 
@@ -450,6 +450,8 @@ $MadelineProto->[messages->toggleChatAdmins](messages_toggleChatAdmins.md)(\['ch
 $MadelineProto->[messages->toggleDialogPin](messages_toggleDialogPin.md)(\['pinned' => [Bool](../types/Bool.md), 'peer' => [InputPeer](../types/InputPeer.md), \]) === [$Bool](../types/Bool.md)<a name="messages_toggleDialogPin"></a>  
 
 $MadelineProto->[messages->uninstallStickerSet](messages_uninstallStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="messages_uninstallStickerSet"></a>  
+
+$MadelineProto->[messages->uploadEncryptedFile](messages_uploadEncryptedFile.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'file' => [InputEncryptedFile](../types/InputEncryptedFile.md), \]) === [$EncryptedFile](../types/EncryptedFile.md)<a name="messages_uploadEncryptedFile"></a>  
 
 $MadelineProto->[messages->uploadMedia](messages_uploadMedia.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'media' => [InputMedia](../types/InputMedia.md), \]) === [$MessageMedia](../types/MessageMedia.md)<a name="messages_uploadMedia"></a>  
 

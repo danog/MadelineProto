@@ -24,6 +24,7 @@ description: messages.sendEncryptedService parameters, return type and example
 | Error    | Description   |
 |----------|---------------|
 |DATA_INVALID|Encrypted data invalid|
+|ENCRYPTION_DECLINED|The secret chat was declined|
 |MSG_WAIT_FAILED|A waiting call returned an error|
 |USER_IS_BLOCKED|User is blocked|
 

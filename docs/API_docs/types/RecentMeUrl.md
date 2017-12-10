@@ -9,15 +9,15 @@ description: constructors and methods of type RecentMeUrl
 
 ### Possible values (constructors):
 
+[recentMeUrlUnknown](../constructors/recentMeUrlUnknown.md)  
+
 [recentMeUrlUser](../constructors/recentMeUrlUser.md)  
 
 [recentMeUrlChat](../constructors/recentMeUrlChat.md)  
 
-[recentMeUrlStickerSet](../constructors/recentMeUrlStickerSet.md)  
-
 [recentMeUrlChatInvite](../constructors/recentMeUrlChatInvite.md)  
 
-[recentMeUrlUnknown](../constructors/recentMeUrlUnknown.md)  
+[recentMeUrlStickerSet](../constructors/recentMeUrlStickerSet.md)  
 
 
 

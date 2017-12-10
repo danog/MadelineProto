@@ -17,8 +17,6 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterPhotoVideo](../constructors/inputMessagesFilterPhotoVideo.md)  
 
-[inputMessagesFilterPhotoVideoDocuments](../constructors/inputMessagesFilterPhotoVideoDocuments.md)  
-
 [inputMessagesFilterDocument](../constructors/inputMessagesFilterDocument.md)  
 
 [inputMessagesFilterUrl](../constructors/inputMessagesFilterUrl.md)  
@@ -39,9 +37,9 @@ description: constructors and methods of type MessagesFilter
 
 [inputMessagesFilterMyMentions](../constructors/inputMessagesFilterMyMentions.md)  
 
-[inputMessagesFilterContacts](../constructors/inputMessagesFilterContacts.md)  
-
 [inputMessagesFilterGeo](../constructors/inputMessagesFilterGeo.md)  
+
+[inputMessagesFilterContacts](../constructors/inputMessagesFilterContacts.md)  
 
 
 

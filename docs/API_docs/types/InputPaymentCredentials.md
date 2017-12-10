@@ -13,6 +13,10 @@ description: constructors and methods of type InputPaymentCredentials
 
 [inputPaymentCredentials](../constructors/inputPaymentCredentials.md)  
 
+[inputPaymentCredentialsApplePay](../constructors/inputPaymentCredentialsApplePay.md)  
+
+[inputPaymentCredentialsAndroidPay](../constructors/inputPaymentCredentialsAndroidPay.md)  
+
 
 
 ### Methods that return an object of this type (methods):

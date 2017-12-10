@@ -603,6 +603,7 @@ interface messages
      *               int limit,
      *               int max_id,
      *               int min_id,
+     *               int hash,
      *              ]
      *
      * @return messages_Messages
@@ -1209,10 +1210,12 @@ interface messages
     /**
      * @param array params [
      *               boolean no_webpage,
+     *               boolean stop_geo_live,
      *               InputBotInlineMessageID id,
      *               string message,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
+     *               InputGeoPoint geo_point,
      *              ]
      *
      * @return bool
@@ -1529,21 +1532,21 @@ interface messages
     /**
      * @param array params [
      *               InputPeer peer,
+     *              ]
+     *
+     * @return messages_AffectedHistory
+     */
+    public function readMentions(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
      *               int limit,
      *              ]
      *
      * @return messages_Messages
      */
     public function getRecentLocations(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return messages_AffectedHistory
-     */
-    public function readMentions(array $params);
 
     /**
      * @param array params [
@@ -1558,6 +1561,16 @@ interface messages
      * @return Updates
      */
     public function sendMultiMedia(array $params);
+
+    /**
+     * @param array params [
+     *               InputEncryptedChat peer,
+     *               InputEncryptedFile file,
+     *              ]
+     *
+     * @return EncryptedFile
+     */
+    public function uploadEncryptedFile(array $params);
 }
 
 interface updates

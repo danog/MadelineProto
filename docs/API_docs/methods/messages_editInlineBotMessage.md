@@ -11,11 +11,13 @@ description: messages.editInlineBotMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
+|stop\_geo\_live|[Bool](../types/Bool.md) | Optional|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
 |message|[string](../types/string.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -49,7 +51,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'id' => InputBotInlineMessageID, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', ]);
+$Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'stop_geo_live' => Bool, 'id' => InputBotInlineMessageID, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity], 'parse_mode' => 'string', 'geo_point' => InputGeoPoint, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -61,7 +63,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - messages.editInlineBotMessage
-* params - `{"no_webpage": Bool, "id": InputBotInlineMessageID, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string"}`
+* params - `{"no_webpage": Bool, "stop_geo_live": Bool, "id": InputBotInlineMessageID, "message": "string", "reply_markup": ReplyMarkup, "entities": [MessageEntity], "parse_mode": "string""geo_point": InputGeoPoint, }`
 
 
 
@@ -72,13 +74,15 @@ POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/messages.editInlineBotMessage
 Parameters:
 
 parse_mode - string
+geo_point - Json encoded InputGeoPoint
+
 
 
 
 Or, if you're into Lua:
 
 ```
-Bool = messages.editInlineBotMessage({no_webpage=Bool, id=InputBotInlineMessageID, message='string', reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', })
+Bool = messages.editInlineBotMessage({no_webpage=Bool, stop_geo_live=Bool, id=InputBotInlineMessageID, message='string', reply_markup=ReplyMarkup, entities={MessageEntity}, parse_mode='string', geo_point=InputGeoPoint, })
 ```
 
 

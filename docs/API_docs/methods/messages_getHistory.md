@@ -17,6 +17,7 @@ description: messages.getHistory parameters, return type and example
 |limit|[int](../types/int.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 |min\_id|[int](../types/int.md) | Yes|
+|hash|[int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -51,7 +52,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->messages->getHistory(['peer' => InputPeer, 'offset_id' => int, 'offset_date' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
+$messages_Messages = $MadelineProto->messages->getHistory(['peer' => InputPeer, 'offset_id' => int, 'offset_date' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, 'hash' => int, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -78,12 +79,14 @@ max_id - Json encoded int
 
 min_id - Json encoded int
 
+hash - Json encoded int
+
 
 
 
 Or, if you're into Lua:
 
 ```
-messages_Messages = messages.getHistory({peer=InputPeer, offset_id=int, offset_date=int, add_offset=int, limit=int, max_id=int, min_id=int, })
+messages_Messages = messages.getHistory({peer=InputPeer, offset_id=int, offset_date=int, add_offset=int, limit=int, max_id=int, min_id=int, hash=int, })
 ```
 

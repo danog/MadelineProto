@@ -13,6 +13,7 @@ description: messages_botCallbackAnswer attributes, type and example
 |----------|---------------|----------|
 |alert|[Bool](../types/Bool.md) | Optional|
 |has\_url|[Bool](../types/Bool.md) | Optional|
+|native\_ui|[Bool](../types/Bool.md) | Optional|
 |message|[string](../types/string.md) | Optional|
 |url|[string](../types/string.md) | Optional|
 |cache\_time|[int](../types/int.md) | Yes|
@@ -25,13 +26,13 @@ description: messages_botCallbackAnswer attributes, type and example
 ### Example:
 
 ```
-$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => Bool, 'has_url' => Bool, 'message' => 'string', 'url' => 'string', 'cache_time' => int];
+$messages_botCallbackAnswer = ['_' => 'messages.botCallbackAnswer', 'alert' => Bool, 'has_url' => Bool, 'native_ui' => Bool, 'message' => 'string', 'url' => 'string', 'cache_time' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "messages.botCallbackAnswer", "alert": Bool, "has_url": Bool, "message": "string", "url": "string", "cache_time": int}
+{"_": "messages.botCallbackAnswer", "alert": Bool, "has_url": Bool, "native_ui": Bool, "message": "string", "url": "string", "cache_time": int}
 ```
 
 
@@ -39,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-messages_botCallbackAnswer={_='messages.botCallbackAnswer', alert=Bool, has_url=Bool, message='string', url='string', cache_time=int}
+messages_botCallbackAnswer={_='messages.botCallbackAnswer', alert=Bool, has_url=Bool, native_ui=Bool, message='string', url='string', cache_time=int}
 
 ```
 
