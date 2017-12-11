@@ -24,13 +24,10 @@ description: messages.reorderStickerSets parameters, return type and example
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
+$MadelineProto->session = 'mySession.madeline';
 if (isset($number)) { // Login as a user
-    $sentCode = $MadelineProto->phone_login($number);
-    echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
+    $MadelineProto->phone_login($number);
+    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
     $MadelineProto->complete_phone_login($code);
 }
 
