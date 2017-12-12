@@ -38,7 +38,7 @@ trait MessageHandler
         $message = $this->pack_unsigned_int(strlen($message)).$message;
 
         $message_key = substr(sha1($message, true), -16);
-        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
+        list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], 'to server');
 
         $message .= $this->random($this->posmod(-strlen($message), 16));
 
@@ -73,7 +73,7 @@ trait MessageHandler
         }
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
-        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']][$old ? 'old_key' : 'key']['auth_key'], 'to server');
+        list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$message['message']['chat_id']][$old ? 'old_key' : 'key']['auth_key'], 'to server');
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
         $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
         if ($message_data_length > strlen($decrypted_data)) {

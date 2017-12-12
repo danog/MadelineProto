@@ -66,9 +66,14 @@ trait CallHandler
             }
             unset($aargs['queue']);
         }
+        if (isset($aargs['serialized'])) {
+            $serialized = $args;
+        } else {
+            $serialized = $this->serialize_method($method, $args);
+        }
 
-        $serialized = $this->serialize_method($method, $args);
         $content_related = $this->content_related($method);
+
         $type = $this->methods->find_by_method($method)['type'];
 
         if (isset($queue)) {
