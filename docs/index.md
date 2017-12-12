@@ -83,7 +83,7 @@ curl https://daniil.it/php.sh | sudo bash -e
 
 On other platforms, use [Google](https://google.com) to find out how to install the following dependencies:
 
-You *must* install the `php-mbstring`, `php-curl`, `php-sockets`, `php-xml` extensions.
+You *must* install the `php-mbstring`, `php-curl`, `php-sockets`, `php-xml`, `php-zip` extensions.
 
 You *must* install the `php-lua` extension if you want to use MadelineProto in lua, see [HERE](#lua-binding) for info on how use MadelineProto in lua.  
 
