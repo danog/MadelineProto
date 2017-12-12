@@ -16,6 +16,7 @@ class RPCErrorException extends \Exception
 {
     use TL\PrettyException;
     private $fetched = false;
+    public static $rollbar = true;
 
     public function getMess()
     {
@@ -97,7 +98,8 @@ class RPCErrorException extends \Exception
         if ($this->rpc !== $message) {
             $this->fetched = true;
         }
-        /*
+        if (!self::$rollbar) return;
+
         if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
             return;
         }
@@ -105,6 +107,5 @@ class RPCErrorException extends \Exception
             return;
         }
         $message === 'Telegram is having internal issues, please try again later.' ? \Rollbar\Rollbar::log(\Rollbar\Payload\Level::critical(), $message) : \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, $additional);
-        */
     }
 }

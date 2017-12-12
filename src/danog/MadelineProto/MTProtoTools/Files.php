@@ -291,7 +291,7 @@ trait Files
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 switch ($e->rpc) {
                     case 'OFFSET_INVALID':
-                    \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);
+                    //\Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);
                     break;
                     case 'FILE_TOKEN_INVALID':
                     $cdn = false;

@@ -576,7 +576,6 @@ trait PeerHandler
 
     public function resolve_username($username)
     {
-        //\Rollbar\Rollbar::log($username);
         $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;

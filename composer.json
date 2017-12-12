@@ -15,7 +15,7 @@
         "phpseclib/phpseclib": "dev-master#273ad17",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
-        "rollbar/rollbar": "~1.1",
+        "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
         "ext-curl": "*",
         "ext-xml": "*"
