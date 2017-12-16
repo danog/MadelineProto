@@ -80,12 +80,12 @@ while (true) {
                 /*case 'updateNewChannelMessage':
                     if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') continue;
                     $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $update['update']['message']['message']]);
-                    break;*/
+                    break;
                 case 'updateNewMessage':
                     if ($update['update']['message']['out'] || $update['update']['message']['message'] === '') {
                         continue;
                     }
-                    break;
+                    break;*/
                 case 'updateNewEncryptedMessage':
                     //var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
                     if (isset($sent[$update['update']['message']['chat_id']])) {

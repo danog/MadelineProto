@@ -14,9 +14,9 @@ namespace danog\MadelineProto\MTProtoTools;
 
 trait Crypt
 {
-    public function aes_calculate($msg_key, $auth_key, $direction = 'to server')
+    public function aes_calculate($msg_key, $auth_key, $to_server = true)
     {
-        $x = ($direction === 'to server') ? 0 : 8;
+        $x = $to_server ? 0 : 8;
         $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
         $sha256_b = hash('sha256', substr($auth_key, 40 + $x, 36).$msg_key, true);
         $aes_key = substr($sha256_a, 0, 8).substr($sha256_b, 8, 16).substr($sha256_a, 24, 8);
@@ -25,9 +25,9 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public function old_aes_calculate($msg_key, $auth_key, $direction = 'to server')
+    public function old_aes_calculate($msg_key, $auth_key, $to_server = true)
     {
-        $x = ($direction === 'to server') ? 0 : 8;
+        $x = $to_server ? 0 : 8;
         $sha1_a = sha1($msg_key.substr($auth_key, $x, 32), true);
         $sha1_b = sha1(substr($auth_key, 32 + $x, 16).$msg_key.substr($auth_key, 48 + $x, 16), true);
         $sha1_c = sha1(substr($auth_key, 64 + $x, 32).$msg_key, true);

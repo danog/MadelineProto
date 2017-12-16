@@ -21,6 +21,7 @@ class API extends APIFactory
     public function ___construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+        set_exception_handler(['\danog\MadelineProto\Serialization', 'serialize_all']);
         if (is_string($params)) {
             if (file_exists($params)) {
                 $this->session = $params;
@@ -68,6 +69,7 @@ class API extends APIFactory
                 $this->API = $unserialized->API;
                 $this->APIFactory();
             }
+            Serialization::$instances[spl_object_hash($unserialized)] = $unserialized;
 
             return;
         }
@@ -82,11 +84,16 @@ class API extends APIFactory
         //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['madelineproto_ready']], Logger::NOTICE);
+
+        Serialization::$instances[spl_object_hash($this)] = $this;
+
+
     }
 
     public function __wakeup()
     {
         //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
+        Serialization::$instances[spl_object_hash($this)] = $this;
 
         $this->APIFactory();
     }

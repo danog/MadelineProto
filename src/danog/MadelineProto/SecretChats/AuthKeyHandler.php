@@ -41,7 +41,7 @@ trait AuthKeyHandler
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0]];
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'from server', 'mtproto' => 1];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
         $this->method_call('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
@@ -96,7 +96,7 @@ trait AuthKeyHandler
         }
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0]];
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
         \danog\MadelineProto\Logger::log(['Secret chat '.$params['id'].' completed successfully!'], \danog\MadelineProto\Logger::NOTICE);
@@ -168,7 +168,8 @@ trait AuthKeyHandler
 
     public function commit_rekey($chat, $params)
     {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 1) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 1 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']])) {
+            $this->secret_chats[$chat]['rekeying'] = [0];
             return;
         }
         \danog\MadelineProto\Logger::log(['Committing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);

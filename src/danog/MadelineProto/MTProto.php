@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 80;
+    const V = 82;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -219,9 +219,6 @@ class MTProto
             $this->rsa_keys[$key->fp] = $key;
         }
 
-        // Istantiate TL class
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_translation']], Logger::ULTRA_VERBOSE);
-        $this->construct_TL($this->settings['tl_schema']['src']);
         /*
          * ***********************************************************************
          * Define some needed numbers for BigInteger
@@ -237,8 +234,14 @@ class MTProto
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
 
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_translation']], Logger::ULTRA_VERBOSE);
+        $this->construct_TL($this->settings['tl_schema']['src']);
+
+        // Istantiate TL class
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
+
+
 
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
             try {
@@ -269,6 +272,8 @@ class MTProto
     public function __wakeup()
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+        set_exception_handler(['\danog\MadelineProto\Serialization', 'serialize_all']);
+
         $this->setup_logger();
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
@@ -319,7 +324,9 @@ class MTProto
         foreach ($this->channels_state as $key => $state) {
             $this->channels_state[$key]['sync_loading'] = false;
         }
+
         $force = false;
+
         $this->reset_session();
         if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['serialization_ofd']], Logger::WARNING);
@@ -333,6 +340,13 @@ class MTProto
             }
             foreach ($this->full_chats as $id => $full) {
                 $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+            }
+            foreach ($this->secret_chats as $key => &$chat) {
+                if ($chat['layer'] >= 73) {
+                    $chat['mtproto'] = 2;
+                } else {
+                    $chat['mtproto'] = 1;
+                }
             }
             foreach ($settings['connection_settings'] as $key => &$connection) {
                 if (!is_array($connection)) {
@@ -353,6 +367,11 @@ class MTProto
             $this->dh_config = ['version' => 0];
             $this->__construct($settings);
             $force = true;
+            foreach ($this->secret_chats as $chat => $data) {
+                try {
+                    if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== NULL) $this->notify_layer($chat);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {}
+            }
         }
         if (!$this->settings['updates']['handle_old_updates']) {
             $this->channels_state = [];

@@ -76,12 +76,20 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 if (!isset($MadelineProto->programmed_call)) {
     $MadelineProto->programmed_call = [];
 }
+$MadelineProto->session = 'session.madeline';
+                    $inputEncryptedFilePhoto = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
+                    $inputEncryptedFileGif = $MadelineProto->upload_encrypted('tests/pony.mp4');
+                    $inputEncryptedFileSticker = $MadelineProto->upload_encrypted('tests/lel.webp');
+                    $inputEncryptedFileDocument = $MadelineProto->upload_encrypted('tests/60', 'magic'); // This gets an inputFile object with file name magic
+                    $inputEncryptedFileVideo = $MadelineProto->upload_encrypted('tests/swing.mp4');
+                    $inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
 
-echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
 /*
 $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
 */
+
+$MadelineProto->serialize();
 $times = [];
 $calls = [];
 $users = [];
@@ -133,6 +141,37 @@ $users = [];
             \danog\MadelineProto\Logger::log([$update]);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
+                case 'updateNewEncryptedMessage':
+                    $secret = $update['update']['message']['chat_id'];
+                    $secret_media = [];
+
+                    // Photo uploaded as document, secret chat
+                    $secret_media['document_photo'] = ['peer' => $secret, 'file' => $inputEncryptedFilePhoto, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'key' => $inputEncryptedFilePhoto['key'], 'iv' => $inputEncryptedFilePhoto['iv'], 'file_name' => 'faust.jpg', 'size' => filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]]]];
+
+                    // Photo, secret chat
+                    $secret_media['photo'] = ['peer' => $secret, 'file' => $inputEncryptedFilePhoto, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaPhoto', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'caption' => 'This file was uploaded using MadelineProto', 'key' => $inputEncryptedFilePhoto['key'], 'iv' => $inputEncryptedFilePhoto['iv'], 'size' => filesize('tests/faust.jpg'), 'w' => 1280, 'h' => 914]]];
+
+                    // GIF, secret chat
+                    $secret_media['gif'] = ['peer' => $secret, 'file' => $inputEncryptedFileGif, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'key' => $inputEncryptedFileGif['key'], 'iv' => $inputEncryptedFileGif['iv'], 'file_name' => 'pony.mp4', 'size' => filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
+
+                    // Sticker, secret chat
+                    $secret_media['sticker'] = ['peer' => $secret, 'file' => $inputEncryptedFileSticker, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/lel.webp'), 'caption' => 'test', 'key' => $inputEncryptedFileSticker['key'], 'iv' => $inputEncryptedFileSticker['iv'], 'file_name' => 'lel.webp', 'size' => filesize('tests/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
+
+                    // Document, secrey chat
+                    $secret_media['document'] = ['peer' => $secret, 'file' => $inputEncryptedFileDocument, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'key' => $inputEncryptedFileDocument['key'], 'iv' => $inputEncryptedFileDocument['iv'], 'file_name' => 'magic.magic', 'size' => filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
+
+                    // Video, secret chat
+                    $secret_media['video'] = ['peer' => $secret, 'file' => $inputEncryptedFileVideo, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'key' => $inputEncryptedFileVideo['key'], 'iv' => $inputEncryptedFileVideo['iv'], 'file_name' => 'swing.mp4', 'size' => filesize('tests/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo', 'duration' => 5, 'w' => 1280, 'h' => 720]]]]];
+
+                    // audio, secret chat
+                    $secret_media['audio'] = ['peer' => $secret, 'file' => $inputEncryptedFileAudio, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'key' => $inputEncryptedFileAudio['key'], 'iv' => $inputEncryptedFileAudio['iv'], 'file_name' => 'mosconi.mp3', 'size' => filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'duration' => 1, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+
+                    $secret_media['voice'] = ['peer' => $secret, 'file' => $inputEncryptedFileAudio, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'key' => $inputEncryptedFileAudio['key'], 'iv' => $inputEncryptedFileAudio['iv'], 'file_name' => 'mosconi.mp3', 'size' => filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+
+                    foreach ($secret_media as $type => $smessage) {
+                        $type = $MadelineProto->messages->sendEncryptedFile($smessage);
+                    }
+                    break;
                 case 'updateNewMessage':
                     include 'songs.php';
                     if ($update['update']['message']['out'] || $update['update']['message']['to_id']['_'] !== 'peerUser' || !isset($update['update']['message']['from_id'])) {
@@ -232,5 +271,4 @@ Propic art by @magnaluna on deviantart.", 'parse_mode' => 'Markdown']);
 
            }
         }
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
     }

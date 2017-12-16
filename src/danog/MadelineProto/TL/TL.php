@@ -183,11 +183,6 @@ trait TL
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
             }
-            if ($this->encrypted_layer != $orig && isset($this->secret_chats)) {
-                foreach ($this->secret_chats as $chat => $data) {
-                    $this->notify_layer($chat);
-                }
-            }
         }
         if (isset($files['td']) && isset($files['telegram'])) {
             foreach ($this->td_constructors->by_id as $id => $data) {

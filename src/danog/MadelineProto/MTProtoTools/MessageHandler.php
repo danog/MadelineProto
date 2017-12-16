@@ -74,7 +74,7 @@ trait MessageHandler
         } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
             $message_key = substr($payload, 8, 16);
             $encrypted_data = substr($payload, 24);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 'from server');
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], false);
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             /*
             $server_salt = substr($decrypted_data, 0, 8);
