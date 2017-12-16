@@ -134,8 +134,12 @@ if (!extension_loaded('pthreads')) {
             {
                 $this->protocol = getprotobynumber($protocol);
             }
-            public function __destruct() {
-                if ($this->sock !== NULL) fclose($this->sock);
+
+            public function __destruct()
+            {
+                if ($this->sock !== null) {
+                    fclose($this->sock);
+                }
             }
 
             public function setOption(int $level, int $name, $value)
