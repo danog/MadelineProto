@@ -45,7 +45,9 @@ trait ResponseHandler
                 if ($update['message']['decrypted_message']['action']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
                     $this->notify_layer($update['message']['chat_id']);
                 }
-                if ($update['message']['decrypted_message']['action']['layer'] >= 73) $this->secret_chats[$update['message']['chat_id']]['mtproto'] = 2;
+                if ($update['message']['decrypted_message']['action']['layer'] >= 73) {
+                    $this->secret_chats[$update['message']['chat_id']]['mtproto'] = 2;
+                }
 
                 return;
 

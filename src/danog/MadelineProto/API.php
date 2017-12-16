@@ -86,8 +86,6 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['madelineproto_ready']], Logger::NOTICE);
 
         Serialization::$instances[spl_object_hash($this)] = $this;
-
-
     }
 
     public function __wakeup()

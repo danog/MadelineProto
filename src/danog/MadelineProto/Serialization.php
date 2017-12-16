@@ -17,11 +17,18 @@ namespace danog\MadelineProto;
  */
 class Serialization
 {
-    static public $instances = [];
-    static public function serialize_all($exception) {
+    public static $instances = [];
+
+    public static function serialize_all($exception)
+    {
         echo $exception.PHP_EOL;
-        foreach (self::$instances as $instance) { if (isset($instance->session)) $instance->serialize(); }
+        foreach (self::$instances as $instance) {
+            if (isset($instance->session)) {
+                $instance->serialize();
+            }
+        }
     }
+
     /**
      * Serialize API class.
      *
@@ -31,7 +38,7 @@ class Serialization
      *
      * @return number
      */
-    static public function serialize($filename, $instance, $force = false)
+    public static function serialize($filename, $instance, $force = false)
     {
         if (isset($instance->API->setdem) && $instance->API->setdem) {
             $instance->API->setdem = false;
@@ -61,7 +68,7 @@ class Serialization
      *
      * @return API
      */
-    static public function deserialize($filename, $no_updates = false)
+    public static function deserialize($filename, $no_updates = false)
     {
         if (file_exists($filename)) {
             if (!file_exists($lock = $filename.'.lock')) {

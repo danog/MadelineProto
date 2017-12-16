@@ -87,6 +87,7 @@ trait MessageHandler
 
         if ($this->secret_chats[$message['message']['chat_id']]['mtproto'] === 2) {
             \danog\MadelineProto\Logger::log(['Trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
+
             try {
                 $message_data = $this->try_mtproto_v2_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
                 \danog\MadelineProto\Logger::log(['MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
@@ -98,6 +99,7 @@ trait MessageHandler
             }
         } else {
             \danog\MadelineProto\Logger::log(['Trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
+
             try {
                 $message_data = $this->try_mtproto_v1_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
                 \danog\MadelineProto\Logger::log(['MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
@@ -121,7 +123,9 @@ trait MessageHandler
 
         $this->handle_decrypted_update($message);
     }
-    public function try_mtproto_v1_decrypt($message_key, $chat_id, $old, $encrypted_data) {
+
+    public function try_mtproto_v1_decrypt($message_key, $chat_id, $old, $encrypted_data)
+    {
         list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
@@ -143,7 +147,9 @@ trait MessageHandler
 
         return $message_data;
     }
-    public function try_mtproto_v2_decrypt($message_key, $chat_id, $old, $encrypted_data) {
+
+    public function try_mtproto_v2_decrypt($message_key, $chat_id, $old, $encrypted_data)
+    {
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
 
@@ -170,5 +176,4 @@ trait MessageHandler
 
         return $message_data;
     }
-
 }

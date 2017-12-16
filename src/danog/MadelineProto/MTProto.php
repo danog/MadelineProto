@@ -241,8 +241,6 @@ class MTProto
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
-
-
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
@@ -369,8 +367,11 @@ class MTProto
             $force = true;
             foreach ($this->secret_chats as $chat => $data) {
                 try {
-                    if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== NULL) $this->notify_layer($chat);
-                } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                    if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
+                        $this->notify_layer($chat);
+                    }
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                }
             }
         }
         if (!$this->settings['updates']['handle_old_updates']) {
