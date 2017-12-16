@@ -24,6 +24,11 @@ if (!extension_loaded('pthreads')) {
                 $this->sock = socket_create($domain, $type, $protocol);
             }
 
+            public function __destruct()
+            {
+                socket_close($this->sock);
+            }
+
             public function setOption(int $level, int $name, $value)
             {
                 if (in_array($name, [\SO_RCVTIMEO, \SO_SNDTIMEO])) {
@@ -128,6 +133,9 @@ if (!extension_loaded('pthreads')) {
             public function __construct(int $domain, int $type, int $protocol)
             {
                 $this->protocol = getprotobynumber($protocol);
+            }
+            public function __destruct() {
+                if ($this->sock !== NULL) fclose($this->sock);
             }
 
             public function setOption(int $level, int $name, $value)
