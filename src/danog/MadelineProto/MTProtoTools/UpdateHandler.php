@@ -80,7 +80,26 @@ trait UpdateHandler
         $time = microtime(true);
 
         try {
-            $this->get_updates_difference();
+            try {
+                if (($error = $this->recv_message($this->datacenter->curdc)) !== true) {
+                    if ($error === -404) {
+                        if ($this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
+                            \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                            $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key = null;
+                            $this->init_authorization();
+
+                            throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                        }
+                    }
+
+                    throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                }
+                $only_updates = $this->handle_messages($this->datacenter->curdc);
+            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            }
+            if (time() - $this->last_recv > 30) {
+                $this->get_updates_difference();
+            }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc !== 'RPC_CALL_FAIL') {
                 throw $e;
