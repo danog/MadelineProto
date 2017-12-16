@@ -65,6 +65,7 @@ trait UpdateHandler
         $this->updates[$this->updates_key++] = $update;
         //\danog\MadelineProto\Logger::log(['Stored ', $update);
     }
+
     public function get_updates($params = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
@@ -80,21 +81,24 @@ trait UpdateHandler
 
         try {
             try {
-            if (($error = $this->recv_message($this->datacenter->curdc)) !== true) {
-                if ($error === -404) {
-                    if ($this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                        \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
-                        $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key = null;
-                        $this->init_authorization();
-                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                if (($error = $this->recv_message($this->datacenter->curdc)) !== true) {
+                    if ($error === -404) {
+                        if ($this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
+                            \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
+                            $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key = null;
+                            $this->init_authorization();
+
+                            throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                        }
                     }
+
+                    throw new \danog\MadelineProto\RPCErrorException($error, $error);
                 }
-                throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                $only_updates = $this->handle_messages($this->datacenter->curdc);
+            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
             }
-            $only_updates = $this->handle_messages($this->datacenter->curdc);
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {}
             if (time() - $this->last_recv > 30) {
-var_dump("Getting difference");
+                var_dump('Getting difference');
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
