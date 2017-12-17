@@ -65,7 +65,6 @@ trait SeqNoHandler
             $this->discard_secret_chat($chat_id);
 
             throw new \danog\MadelineProto\SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C.')!');
-            return false;
         }
 
         return true;
