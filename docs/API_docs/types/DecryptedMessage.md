@@ -19,6 +19,8 @@ description: constructors and methods of type DecryptedMessage
 
 [decryptedMessage\_45](../constructors/decryptedMessage_45.md)  
 
+[decryptedMessage\_73](../constructors/decryptedMessage_73.md)  
+
 
 
 ### Methods that return an object of this type (methods):

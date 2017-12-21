@@ -29,6 +29,8 @@ description: messages.sendInlineBotResult parameters, return type and example
 |INLINE_RESULT_EXPIRED|The inline query expired|
 |PEER_ID_INVALID|The provided peer id is invalid|
 |QUERY_ID_EMPTY|The query ID is empty|
+|WEBPAGE_CURL_FAILED|Failure while fetching the webpage with cURL|
+|WEBPAGE_MEDIA_EMPTY|Webpage media empty|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 

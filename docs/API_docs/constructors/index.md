@@ -309,7 +309,7 @@ description: List of constructors
 <br><br>[$decryptedDataBlock](../constructors/decryptedDataBlock.md) = \['voice_call_id' => [int128](../types/int128.md), 'in_seq_no' => [int](../types/int.md), 'out_seq_no' => [int](../types/int.md), 'recent_received_mask' => [int](../types/int.md), 'proto' => [int](../types/int.md), 'extra' => [string](../types/string.md), 'raw_data' => [string](../types/string.md), \];<a name="decryptedDataBlock"></a>  
 
 ***
-<br><br>[$decryptedMessage\_45](../constructors/decryptedMessage_45.md) = \['ttl' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'via_bot_name' => [string](../types/string.md), 'reply_to_random_id' => [long](../types/long.md), \];<a name="decryptedMessage_45"></a>  
+<br><br>[$decryptedMessage\_73](../constructors/decryptedMessage_73.md) = \['ttl' => [int](../types/int.md), 'message' => [string](../types/string.md), 'media' => [DecryptedMessageMedia](../types/DecryptedMessageMedia.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'via_bot_name' => [string](../types/string.md), 'reply_to_random_id' => [long](../types/long.md), 'grouped_id' => [long](../types/long.md), \];<a name="decryptedMessage_73"></a>  
 
 ***
 <br><br>[$decryptedMessageActionAbortKey\_20](../constructors/decryptedMessageActionAbortKey_20.md) = \['exchange_id' => [long](../types/long.md), \];<a name="decryptedMessageActionAbortKey_20"></a>  

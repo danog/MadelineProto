@@ -68,7 +68,10 @@ This library can also be used to create lua telegram bots (like bot API bots, on
 
 ## Requirements
 
-This project can only run on *PHP 7* and *HHVM*, both 32 bit and 64 bit systems are supported. 
+This project can only run on *PHP 7* and *HHVM*, both 32 bit and 64 bit systems are supported (x86, x86_64, armel, armhf, arm64, mipsel, mips64, powerpc and so on). 
+
+You can also run it on PHP 5 using [7to5](https://github.com/spatie/7to5).
+
 
 To install *all of the requirements* on `Ubuntu`, `Debian`, `Devuan`, or any other `Debian-based` distro, run the following command in your command line:
 
@@ -77,7 +80,9 @@ curl https://daniil.it/php.sh | sudo bash -e
 ```
 
 
-On other platforms, use [Google](https://google.com) to find out how to install the following dependencies:
+On other platforms, use [Google](https://google.com) to find out how to install the following dependencies.
+
+**NOTE**: Usually most of these extensions are already installed by default when you download PHP from your package manager (ie apt-get), so you can skip this step. When installing MadelineProto, composer will inform you if anything is missing.
 
 You *must* install the `php-mbstring`, `php-curl`, `php-sockets`, `php-xml`, `php-zip` extensions.
 
@@ -111,7 +116,7 @@ cp -a *php tests userbots .env* ..
 Now open `.env` and edit its values as needed.
 
 OR
-
+/
 ### Composer installation
 
 Once you have all the requirements installed properly (on dev as well as production), add this to the ```composer.json``` file:
