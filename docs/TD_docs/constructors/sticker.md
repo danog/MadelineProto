@@ -13,7 +13,7 @@ Describes sticker
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|set\_id|[long](../types/long.md) | Yes|Identifier of sticker set to which the sticker belongs or 0 if none|
+|set\_id|[int64](../constructors/int64.md) | Yes|Identifier of sticker set to which the sticker belongs or 0 if none|
 |width|[int](../types/int.md) | Yes|Sticker width as defined by sender|
 |height|[int](../types/int.md) | Yes|Sticker height as defined by sender|
 |emoji|[string](../types/string.md) | Yes|Emoji corresponding to the sticker|

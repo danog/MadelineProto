@@ -7,13 +7,9 @@ description: constructors and methods of type InputThumb
 
 
 
-Thumb to send along with a file, should be in jpeg format or webp format for stickers
-
 ### Possible values (constructors):
 
-[inputThumbLocal](../constructors/inputThumbLocal.md)  
-
-[inputThumbGenerated](../constructors/inputThumbGenerated.md)  
+[inputThumb](../constructors/inputThumb.md)  
 
 
 

@@ -13,7 +13,7 @@ Bots only. New incoming pre-checkout query. Contains full information about chec
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Unique query identifier|
+|id|[int64](../constructors/int64.md) | Yes|Unique query identifier|
 |sender\_user\_id|[int](../types/int.md) | Yes|Identifier of the user who sent the query|
 |currency|[string](../types/string.md) | Yes|Currency for goods price|
 |total\_amount|[int53](../types/int53.md) | Yes|Goods total price in minimal quantity of the currency|

@@ -1,6 +1,6 @@
 ---
 title: addRecentSticker
-description: Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list
+description: Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list. Only stickers belonging to a sticker set can be added to the list
 ---
 ## Method: addRecentSticker  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Manually adds new sticker to the list of recently used stickers. Ne
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list
+Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list. Only stickers belonging to a sticker set can be added to the list
 
 ### Params:
 

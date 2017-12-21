@@ -13,7 +13,7 @@ Bots only. New incoming query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Query identifier|
+|id|[int64](../constructors/int64.md) | Yes|Query identifier|
 |data|[string](../types/string.md) | Yes|JSON-serialized query data|
 |timeout|[int](../types/int.md) | Yes|Query timeout|
 

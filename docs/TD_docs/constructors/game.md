@@ -13,7 +13,7 @@ Describes a game
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Game id|
+|id|[int64](../constructors/int64.md) | Yes|Game id|
 |short\_name|[string](../types/string.md) | Yes|Game short name, to share a game use a URL https: t.me/{bot_username}?game={game_short_name}|
 |title|[string](../types/string.md) | Yes|Game title|
 |text|[string](../types/string.md) | Yes|Game text, usually containing game scoreboards|

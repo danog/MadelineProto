@@ -107,6 +107,8 @@ description: constructors and methods of type Ok
 
 [$MadelineProto->deleteContacts](../methods/deleteContacts.md)  
 
+[$MadelineProto->deleteImportedContacts](../methods/deleteImportedContacts.md)  
+
 [$MadelineProto->changeStickerSet](../methods/changeStickerSet.md)  
 
 [$MadelineProto->viewTrendingStickerSets](../methods/viewTrendingStickerSets.md)  
@@ -116,6 +118,10 @@ description: constructors and methods of type Ok
 [$MadelineProto->deleteRecentSticker](../methods/deleteRecentSticker.md)  
 
 [$MadelineProto->clearRecentStickers](../methods/clearRecentStickers.md)  
+
+[$MadelineProto->addFavoriteSticker](../methods/addFavoriteSticker.md)  
+
+[$MadelineProto->deleteFavoriteSticker](../methods/deleteFavoriteSticker.md)  
 
 [$MadelineProto->addSavedAnimation](../methods/addSavedAnimation.md)  
 
@@ -144,6 +150,8 @@ description: constructors and methods of type Ok
 [$MadelineProto->toggleGroupAdministrators](../methods/toggleGroupAdministrators.md)  
 
 [$MadelineProto->changeChannelUsername](../methods/changeChannelUsername.md)  
+
+[$MadelineProto->setChannelStickerSet](../methods/setChannelStickerSet.md)  
 
 [$MadelineProto->toggleChannelInvites](../methods/toggleChannelInvites.md)  
 

@@ -29,6 +29,8 @@ Contains notifications about data changes
 
 [updateOpenMessageContent](../constructors/updateOpenMessageContent.md)  
 
+[updateMessageMentionRead](../constructors/updateMessageMentionRead.md)  
+
 [updateNewChat](../constructors/updateNewChat.md)  
 
 [updateChatTitle](../constructors/updateChatTitle.md)  
@@ -44,6 +46,8 @@ Contains notifications about data changes
 [updateChatReadInbox](../constructors/updateChatReadInbox.md)  
 
 [updateChatReadOutbox](../constructors/updateChatReadOutbox.md)  
+
+[updateChatUnreadMentionCount](../constructors/updateChatUnreadMentionCount.md)  
 
 [updateNotificationSettings](../constructors/updateNotificationSettings.md)  
 
@@ -94,6 +98,8 @@ Contains notifications about data changes
 [updateTrendingStickerSets](../constructors/updateTrendingStickerSets.md)  
 
 [updateRecentStickers](../constructors/updateRecentStickers.md)  
+
+[updateFavoriteStickers](../constructors/updateFavoriteStickers.md)  
 
 [updateSavedAnimations](../constructors/updateSavedAnimations.md)  
 

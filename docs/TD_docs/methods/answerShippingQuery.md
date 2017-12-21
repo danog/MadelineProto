@@ -15,7 +15,7 @@ Bots only. Sets result of a shipping query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|shipping\_query\_id|[long](../types/long.md) | Yes|Identifier of the shipping query|
+|shipping\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of the shipping query|
 |shipping\_options|Array of [shippingOption](../constructors/shippingOption.md) | Yes|Available shipping options|
 |error\_message|[string](../types/string.md) | Yes|Error message, empty on success|
 

@@ -80,6 +80,8 @@ description: List of types
 
 [Contact](Contact.md)<a name="Contact"></a>  
 
+[Count](Count.md)<a name="Count"></a>  
+
 [CustomRequestResult](CustomRequestResult.md)<a name="CustomRequestResult"></a>  
 
 [DeviceToken](DeviceToken.md)<a name="DeviceToken"></a>  
@@ -257,6 +259,8 @@ description: List of types
 [TestVectorStringObject](TestVectorStringObject.md)<a name="TestVectorStringObject"></a>  
 
 [Text](Text.md)<a name="Text"></a>  
+
+[TextEntities](TextEntities.md)<a name="TextEntities"></a>  
 
 [TextEntity](TextEntity.md)<a name="TextEntity"></a>  
 

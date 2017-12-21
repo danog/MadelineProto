@@ -42,7 +42,7 @@ trait TL
                 $e = null;
                 $class = null;
                 $dparams = [];
-                foreach ($tl_file as $line) {
+                foreach ($tl_file as $line_number => $line) {
                     $line = rtrim($line);
                     if (preg_match('|^//@|', $line)) {
                         $list = explode(' @', str_replace('//', ' ', $line));

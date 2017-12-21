@@ -15,7 +15,7 @@ Returns information about sticker set by its identifier
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|set\_id|[long](../types/long.md) | Yes|Identifier of the sticker set|
+|set\_id|[int64](../constructors/int64.md) | Yes|Identifier of the sticker set|
 
 
 ### Return type: [StickerSet](../types/StickerSet.md)

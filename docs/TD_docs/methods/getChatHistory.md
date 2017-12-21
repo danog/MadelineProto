@@ -1,6 +1,6 @@
 ---
 title: getChatHistory
-description: Returns messages in a chat. Automatically calls openChat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id. Offline request if only_local is true
+description: Returns messages in a chat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id. Offline request if only_local is true
 ---
 ## Method: getChatHistory  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns messages in a chat. Automatically calls openChat. Returns r
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns messages in a chat. Automatically calls openChat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id. Offline request if only_local is true
+Returns messages in a chat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id. Offline request if only_local is true
 
 ### Params:
 

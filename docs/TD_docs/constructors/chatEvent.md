@@ -13,7 +13,7 @@ Represents a chat event
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Chat event identifier|
+|id|[int64](../constructors/int64.md) | Yes|Chat event identifier|
 |date|[int](../types/int.md) | Yes|Date of the event, unix time|
 |user\_id|[int](../types/int.md) | Yes|Identifier of a user who made the action|
 |action|[ChatEventAction](../types/ChatEventAction.md) | Yes|Action done by the user|

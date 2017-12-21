@@ -41,6 +41,8 @@ Represents a chat event
 
 [chatEventSignMessagesToggled](../constructors/chatEventSignMessagesToggled.md)  
 
+[chatEventStickerSetChanged](../constructors/chatEventStickerSetChanged.md)  
+
 
 
 ### Methods that return an object of this type (methods):

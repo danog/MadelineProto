@@ -13,7 +13,7 @@ Bots only. New incoming inline query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Unique query identifier|
+|id|[int64](../constructors/int64.md) | Yes|Unique query identifier|
 |sender\_user\_id|[int](../types/int.md) | Yes|Identifier of the user who sent the query|
 |user\_location|[location](../constructors/location.md) | Yes|User location, provided by the client, nullable|
 |query|[string](../types/string.md) | Yes|Text of the query|

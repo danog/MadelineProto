@@ -14,6 +14,7 @@ Secret chat with a user
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |secret\_chat\_id|[int](../types/int.md) | Yes|Secret chat identifier|
+|user\_id|[int](../types/int.md) | Yes|User identifier of the peer|
 
 
 

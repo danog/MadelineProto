@@ -13,7 +13,7 @@ Describes address of UDP reflectors
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Reflector identifier|
+|id|[int64](../constructors/int64.md) | Yes|Reflector identifier|
 |ip|[string](../types/string.md) | Yes|IPv4 reflector address|
 |ipv6|[string](../types/string.md) | Yes|IPv6 reflector address|
 |port|[int](../types/int.md) | Yes|Reflector port|

@@ -1,13 +1,13 @@
 ---
 title: chatEventTitleChanged
-description: Chat title changed
+description: Chat title was changed
 ---
 ## Constructor: chatEventTitleChanged  
 [Back to constructors index](index.md)
 
 
 
-Chat title changed
+Chat title was changed
 
 ### Attributes:
 

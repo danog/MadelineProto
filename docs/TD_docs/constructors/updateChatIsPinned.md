@@ -15,6 +15,7 @@ Chat was pinned or unpinned
 |----------|---------------|----------|-------------|
 |chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
 |is\_pinned|[Bool](../types/Bool.md) | Yes|New value of is_pinned|
+|order|[int64](../constructors/int64.md) | Yes|New value of the chat order|
 
 
 

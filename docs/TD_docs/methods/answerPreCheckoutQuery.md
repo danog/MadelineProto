@@ -15,7 +15,7 @@ Bots only. Sets result of a pre checkout query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|pre\_checkout\_query\_id|[long](../types/long.md) | Yes|Identifier of the pre-checkout query|
+|pre\_checkout\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of the pre-checkout query|
 |error\_message|[string](../types/string.md) | Yes|Error message, empty on success|
 
 

@@ -38,6 +38,9 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[addChatMembers](addChatMembers.md)(\['chat_id' => [int53](../types/int53.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="addChatMembers"></a>  
 
 ***
+<br><br>$MadelineProto->[addFavoriteSticker](addFavoriteSticker.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="addFavoriteSticker"></a>  
+
+***
 <br><br>$MadelineProto->[addNetworkStatistics](addNetworkStatistics.md)(\['entry' => [NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md), \]) === [$Ok](../types/Ok.md)<a name="addNetworkStatistics"></a>  
 
 ***
@@ -53,19 +56,19 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[addStickerToSet](addStickerToSet.md)(\['user_id' => [int](../types/int.md), 'name' => [string](../types/string.md), 'sticker' => [inputSticker](../constructors/inputSticker.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="addStickerToSet"></a>  
 
 ***
-<br><br>$MadelineProto->[answerCallbackQuery](answerCallbackQuery.md)(\['callback_query_id' => [long](../types/long.md), 'text' => [string](../types/string.md), 'show_alert' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="answerCallbackQuery"></a>  
+<br><br>$MadelineProto->[answerCallbackQuery](answerCallbackQuery.md)(\['callback_query_id' => [int64](../constructors/int64.md), 'text' => [string](../types/string.md), 'show_alert' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="answerCallbackQuery"></a>  
 
 ***
-<br><br>$MadelineProto->[answerCustomQuery](answerCustomQuery.md)(\['custom_query_id' => [long](../types/long.md), 'data' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerCustomQuery"></a>  
+<br><br>$MadelineProto->[answerCustomQuery](answerCustomQuery.md)(\['custom_query_id' => [int64](../constructors/int64.md), 'data' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerCustomQuery"></a>  
 
 ***
-<br><br>$MadelineProto->[answerInlineQuery](answerInlineQuery.md)(\['inline_query_id' => [long](../types/long.md), 'is_personal' => [Bool](../types/Bool.md), 'results' => \[[InputInlineQueryResult](../types/InputInlineQueryResult.md)\], 'cache_time' => [int](../types/int.md), 'next_offset' => [string](../types/string.md), 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerInlineQuery"></a>  
+<br><br>$MadelineProto->[answerInlineQuery](answerInlineQuery.md)(\['inline_query_id' => [int64](../constructors/int64.md), 'is_personal' => [Bool](../types/Bool.md), 'results' => \[[InputInlineQueryResult](../types/InputInlineQueryResult.md)\], 'cache_time' => [int](../types/int.md), 'next_offset' => [string](../types/string.md), 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerInlineQuery"></a>  
 
 ***
-<br><br>$MadelineProto->[answerPreCheckoutQuery](answerPreCheckoutQuery.md)(\['pre_checkout_query_id' => [long](../types/long.md), 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerPreCheckoutQuery"></a>  
+<br><br>$MadelineProto->[answerPreCheckoutQuery](answerPreCheckoutQuery.md)(\['pre_checkout_query_id' => [int64](../constructors/int64.md), 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerPreCheckoutQuery"></a>  
 
 ***
-<br><br>$MadelineProto->[answerShippingQuery](answerShippingQuery.md)(\['shipping_query_id' => [long](../types/long.md), 'shipping_options' => \[[shippingOption](../constructors/shippingOption.md)\], 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerShippingQuery"></a>  
+<br><br>$MadelineProto->[answerShippingQuery](answerShippingQuery.md)(\['shipping_query_id' => [int64](../constructors/int64.md), 'shipping_options' => \[[shippingOption](../constructors/shippingOption.md)\], 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerShippingQuery"></a>  
 
 ***
 <br><br>$MadelineProto->[blockUser](blockUser.md)(\['user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="blockUser"></a>  
@@ -110,7 +113,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[changePhoneNumber](changePhoneNumber.md)(\['phone_number' => [string](../types/string.md), 'allow_flash_call' => [Bool](../types/Bool.md), 'is_current_phone_number' => [Bool](../types/Bool.md), \]) === [$AuthState](../types/AuthState.md)<a name="changePhoneNumber"></a>  
 
 ***
-<br><br>$MadelineProto->[changeStickerSet](changeStickerSet.md)(\['set_id' => [long](../types/long.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="changeStickerSet"></a>  
+<br><br>$MadelineProto->[changeStickerSet](changeStickerSet.md)(\['set_id' => [int64](../constructors/int64.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="changeStickerSet"></a>  
 
 ***
 <br><br>$MadelineProto->[changeUsername](changeUsername.md)(\['username' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeUsername"></a>  
@@ -188,7 +191,13 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[deleteContacts](deleteContacts.md)(\['user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteContacts"></a>  
 
 ***
+<br><br>$MadelineProto->[deleteFavoriteSticker](deleteFavoriteSticker.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="deleteFavoriteSticker"></a>  
+
+***
 <br><br>$MadelineProto->[deleteFile](deleteFile.md)(\['file_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteFile"></a>  
+
+***
+<br><br>$MadelineProto->[deleteImportedContacts](deleteImportedContacts.md)(\[\]) === [$Ok](../types/Ok.md)<a name="deleteImportedContacts"></a>  
 
 ***
 <br><br>$MadelineProto->[deleteMessages](deleteMessages.md)(\['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], 'revoke' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="deleteMessages"></a>  
@@ -197,7 +206,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[deleteMessagesFromUser](deleteMessagesFromUser.md)(\['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteMessagesFromUser"></a>  
 
 ***
-<br><br>$MadelineProto->[deleteProfilePhoto](deleteProfilePhoto.md)(\['profile_photo_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="deleteProfilePhoto"></a>  
+<br><br>$MadelineProto->[deleteProfilePhoto](deleteProfilePhoto.md)(\['profile_photo_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="deleteProfilePhoto"></a>  
 
 ***
 <br><br>$MadelineProto->[deleteRecentHashtag](deleteRecentHashtag.md)(\['hashtag' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="deleteRecentHashtag"></a>  
@@ -227,7 +236,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[deleteTopChat](deleteTopChat.md)(\['category' => [TopChatCategory](../types/TopChatCategory.md), 'chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="deleteTopChat"></a>  
 
 ***
-<br><br>$MadelineProto->[discardCall](discardCall.md)(\['call_id' => [int](../types/int.md), 'is_disconnected' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'connection_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="discardCall"></a>  
+<br><br>$MadelineProto->[discardCall](discardCall.md)(\['call_id' => [int](../types/int.md), 'is_disconnected' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'connection_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="discardCall"></a>  
 
 ***
 <br><br>$MadelineProto->[downloadFile](downloadFile.md)(\['file_id' => [int](../types/int.md), 'priority' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="downloadFile"></a>  
@@ -254,7 +263,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[exportChatInviteLink](exportChatInviteLink.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$ChatInviteLink](../types/ChatInviteLink.md)<a name="exportChatInviteLink"></a>  
 
 ***
-<br><br>$MadelineProto->[finishFileGeneration](finishFileGeneration.md)(\['generation_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="finishFileGeneration"></a>  
+<br><br>$MadelineProto->[finishFileGeneration](finishFileGeneration.md)(\['generation_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="finishFileGeneration"></a>  
 
 ***
 <br><br>$MadelineProto->[forwardMessages](forwardMessages.md)(\['chat_id' => [int53](../types/int53.md), 'from_chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="forwardMessages"></a>  
@@ -266,7 +275,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[getActiveSessions](getActiveSessions.md)(\[\]) === [$Sessions](../types/Sessions.md)<a name="getActiveSessions"></a>  
 
 ***
-<br><br>$MadelineProto->[getArchivedStickerSets](getArchivedStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'offset_sticker_set_id' => [long](../types/long.md), 'limit' => [int](../types/int.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getArchivedStickerSets"></a>  
+<br><br>$MadelineProto->[getArchivedStickerSets](getArchivedStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'offset_sticker_set_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getArchivedStickerSets"></a>  
 
 ***
 <br><br>$MadelineProto->[getAttachedStickerSets](getAttachedStickerSets.md)(\['file_id' => [int](../types/int.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getAttachedStickerSets"></a>  
@@ -293,7 +302,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[getChat](getChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Chat](../types/Chat.md)<a name="getChat"></a>  
 
 ***
-<br><br>$MadelineProto->[getChatEventLog](getChatEventLog.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_event_id' => [long](../types/long.md), 'limit' => [int](../types/int.md), 'filters' => [chatEventLogFilters](../constructors/chatEventLogFilters.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$ChatEvents](../types/ChatEvents.md)<a name="getChatEventLog"></a>  
+<br><br>$MadelineProto->[getChatEventLog](getChatEventLog.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_event_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), 'filters' => [chatEventLogFilters](../constructors/chatEventLogFilters.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$ChatEvents](../types/ChatEvents.md)<a name="getChatEventLog"></a>  
 
 ***
 <br><br>$MadelineProto->[getChatHistory](getChatHistory.md)(\['chat_id' => [int53](../types/int53.md), 'from_message_id' => [int53](../types/int53.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'only_local' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="getChatHistory"></a>  
@@ -305,7 +314,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[getChatReportSpamState](getChatReportSpamState.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$ChatReportSpamState](../types/ChatReportSpamState.md)<a name="getChatReportSpamState"></a>  
 
 ***
-<br><br>$MadelineProto->[getChats](getChats.md)(\['offset_order' => [long](../types/long.md), 'offset_chat_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getChats"></a>  
+<br><br>$MadelineProto->[getChats](getChats.md)(\['offset_order' => [int64](../constructors/int64.md), 'offset_chat_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getChats"></a>  
 
 ***
 <br><br>$MadelineProto->[getCommonChats](getCommonChats.md)(\['user_id' => [int](../types/int.md), 'offset_chat_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getCommonChats"></a>  
@@ -314,7 +323,16 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[getCreatedPublicChats](getCreatedPublicChats.md)(\[\]) === [$Chats](../types/Chats.md)<a name="getCreatedPublicChats"></a>  
 
 ***
+<br><br>$MadelineProto->[getFavoriteStickers](getFavoriteStickers.md)(\[\]) === [$Stickers](../types/Stickers.md)<a name="getFavoriteStickers"></a>  
+
+***
 <br><br>$MadelineProto->[getFile](getFile.md)(\['file_id' => [int](../types/int.md), \]) === [$File](../types/File.md)<a name="getFile"></a>  
+
+***
+<br><br>$MadelineProto->[getFileExtension](getFileExtension.md)(\['mime_type' => [string](../types/string.md), \]) === [$Text](../types/Text.md)<a name="getFileExtension"></a>  
+
+***
+<br><br>$MadelineProto->[getFileMimeType](getFileMimeType.md)(\['file_name' => [string](../types/string.md), \]) === [$Text](../types/Text.md)<a name="getFileMimeType"></a>  
 
 ***
 <br><br>$MadelineProto->[getFilePersistent](getFilePersistent.md)(\['persistent_file_id' => [string](../types/string.md), 'file_type' => [FileType](../types/FileType.md), \]) === [$File](../types/File.md)<a name="getFilePersistent"></a>  
@@ -327,6 +345,9 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 ***
 <br><br>$MadelineProto->[getGroupFull](getGroupFull.md)(\['group_id' => [int](../types/int.md), \]) === [$GroupFull](../types/GroupFull.md)<a name="getGroupFull"></a>  
+
+***
+<br><br>$MadelineProto->[getImportedContactCount](getImportedContactCount.md)(\[\]) === [$Count](../types/Count.md)<a name="getImportedContactCount"></a>  
 
 ***
 <br><br>$MadelineProto->[getInlineGameHighScores](getInlineGameHighScores.md)(\['inline_message_id' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \]) === [$GameHighScores](../types/GameHighScores.md)<a name="getInlineGameHighScores"></a>  
@@ -398,7 +419,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[getStickerEmojis](getStickerEmojis.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$StickerEmojis](../types/StickerEmojis.md)<a name="getStickerEmojis"></a>  
 
 ***
-<br><br>$MadelineProto->[getStickerSet](getStickerSet.md)(\['set_id' => [long](../types/long.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="getStickerSet"></a>  
+<br><br>$MadelineProto->[getStickerSet](getStickerSet.md)(\['set_id' => [int64](../constructors/int64.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="getStickerSet"></a>  
 
 ***
 <br><br>$MadelineProto->[getStickers](getStickers.md)(\['emoji' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Stickers](../types/Stickers.md)<a name="getStickers"></a>  
@@ -417,6 +438,9 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 ***
 <br><br>$MadelineProto->[getTermsOfService](getTermsOfService.md)(\[\]) === [$Text](../types/Text.md)<a name="getTermsOfService"></a>  
+
+***
+<br><br>$MadelineProto->[getTextEntities](getTextEntities.md)(\['text' => [string](../types/string.md), \]) === [$TextEntities](../types/TextEntities.md)<a name="getTextEntities"></a>  
 
 ***
 <br><br>$MadelineProto->[getTopChats](getTopChats.md)(\['category' => [TopChatCategory](../types/TopChatCategory.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getTopChats"></a>  
@@ -479,7 +503,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[registerDevice](registerDevice.md)(\['device_token' => [DeviceToken](../types/DeviceToken.md), \]) === [$Ok](../types/Ok.md)<a name="registerDevice"></a>  
 
 ***
-<br><br>$MadelineProto->[reorderInstalledStickerSets](reorderInstalledStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="reorderInstalledStickerSets"></a>  
+<br><br>$MadelineProto->[reorderInstalledStickerSets](reorderInstalledStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[int64](../constructors/int64.md)\], \]) === [$Ok](../types/Ok.md)<a name="reorderInstalledStickerSets"></a>  
 
 ***
 <br><br>$MadelineProto->[reportChannelSpam](reportChannelSpam.md)(\['channel_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message_ids' => \[[int53](../types/int53.md)\], \]) === [$Ok](../types/Ok.md)<a name="reportChannelSpam"></a>  
@@ -515,7 +539,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[searchChatMembers](searchChatMembers.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$ChatMembers](../types/ChatMembers.md)<a name="searchChatMembers"></a>  
 
 ***
-<br><br>$MadelineProto->[searchChatMessages](searchChatMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'sender_user_id' => [int](../types/int.md), 'from_message_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$Messages](../types/Messages.md)<a name="searchChatMessages"></a>  
+<br><br>$MadelineProto->[searchChatMessages](searchChatMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'sender_user_id' => [int](../types/int.md), 'from_message_id' => [int53](../types/int53.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$Messages](../types/Messages.md)<a name="searchChatMessages"></a>  
 
 ***
 <br><br>$MadelineProto->[searchChats](searchChats.md)(\['query' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="searchChats"></a>  
@@ -536,7 +560,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[searchPublicChats](searchPublicChats.md)(\['username_prefix' => [string](../types/string.md), \]) === [$Chats](../types/Chats.md)<a name="searchPublicChats"></a>  
 
 ***
-<br><br>$MadelineProto->[searchSecretMessages](searchSecretMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_search_id' => [long](../types/long.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$FoundMessages](../types/FoundMessages.md)<a name="searchSecretMessages"></a>  
+<br><br>$MadelineProto->[searchSecretMessages](searchSecretMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_search_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$FoundMessages](../types/FoundMessages.md)<a name="searchSecretMessages"></a>  
 
 ***
 <br><br>$MadelineProto->[searchStickerSet](searchStickerSet.md)(\['name' => [string](../types/string.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="searchStickerSet"></a>  
@@ -557,7 +581,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[sendCustomRequest](sendCustomRequest.md)(\['method' => [string](../types/string.md), 'parameters' => [string](../types/string.md), \]) === [$CustomRequestResult](../types/CustomRequestResult.md)<a name="sendCustomRequest"></a>  
 
 ***
-<br><br>$MadelineProto->[sendInlineQueryResultMessage](sendInlineQueryResultMessage.md)(\['chat_id' => [int53](../types/int53.md), 'reply_to_message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), 'query_id' => [long](../types/long.md), 'result_id' => [string](../types/string.md), \]) === [$Message](../types/Message.md)<a name="sendInlineQueryResultMessage"></a>  
+<br><br>$MadelineProto->[sendInlineQueryResultMessage](sendInlineQueryResultMessage.md)(\['chat_id' => [int53](../types/int53.md), 'reply_to_message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), 'query_id' => [int64](../constructors/int64.md), 'result_id' => [string](../types/string.md), \]) === [$Message](../types/Message.md)<a name="sendInlineQueryResultMessage"></a>  
 
 ***
 <br><br>$MadelineProto->[sendMessage](sendMessage.md)(\['chat_id' => [int53](../types/int53.md), 'reply_to_message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'input_message_content' => [InputMessageContent](../types/InputMessageContent.md), \]) === [$Message](../types/Message.md)<a name="sendMessage"></a>  
@@ -575,10 +599,13 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[setBotUpdatesStatus](setBotUpdatesStatus.md)(\['pending_update_count' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="setBotUpdatesStatus"></a>  
 
 ***
+<br><br>$MadelineProto->[setChannelStickerSet](setChannelStickerSet.md)(\['channel_id' => [int](../types/int.md), 'sticker_set_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="setChannelStickerSet"></a>  
+
+***
 <br><br>$MadelineProto->[setChatClientData](setChatClientData.md)(\['chat_id' => [int53](../types/int53.md), 'client_data' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="setChatClientData"></a>  
 
 ***
-<br><br>$MadelineProto->[setFileGenerationProgress](setFileGenerationProgress.md)(\['generation_id' => [long](../types/long.md), 'size' => [int](../types/int.md), 'local_size' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="setFileGenerationProgress"></a>  
+<br><br>$MadelineProto->[setFileGenerationProgress](setFileGenerationProgress.md)(\['generation_id' => [int64](../constructors/int64.md), 'size' => [int](../types/int.md), 'local_size' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="setFileGenerationProgress"></a>  
 
 ***
 <br><br>$MadelineProto->[setGameScore](setGameScore.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'edit_message' => [Bool](../types/Bool.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), 'force' => [Bool](../types/Bool.md), \]) === [$Message](../types/Message.md)<a name="setGameScore"></a>  
@@ -620,7 +647,7 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[terminateAllOtherSessions](terminateAllOtherSessions.md)(\[\]) === [$Ok](../types/Ok.md)<a name="terminateAllOtherSessions"></a>  
 
 ***
-<br><br>$MadelineProto->[terminateSession](terminateSession.md)(\['session_id' => [long](../types/long.md), \]) === [$Ok](../types/Ok.md)<a name="terminateSession"></a>  
+<br><br>$MadelineProto->[terminateSession](terminateSession.md)(\['session_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="terminateSession"></a>  
 
 ***
 <br><br>$MadelineProto->[testCallBytes](testCallBytes.md)(\['x' => [bytes](../types/bytes.md), \]) === [$TestBytes](../types/TestBytes.md)<a name="testCallBytes"></a>  
@@ -689,5 +716,5 @@ $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 <br><br>$MadelineProto->[viewMessages](viewMessages.md)(\['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewMessages"></a>  
 
 ***
-<br><br>$MadelineProto->[viewTrendingStickerSets](viewTrendingStickerSets.md)(\['sticker_set_ids' => \[[long](../types/long.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewTrendingStickerSets"></a>  
+<br><br>$MadelineProto->[viewTrendingStickerSets](viewTrendingStickerSets.md)(\['sticker_set_ids' => \[[int64](../constructors/int64.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewTrendingStickerSets"></a>  
 

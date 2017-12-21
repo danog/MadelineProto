@@ -28,9 +28,6 @@ description: messages.sendMedia parameters, return type and example
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 |EXTERNAL_URL_INVALID|External URL invalid|
-|FILE_PART_0_MISSING|File part 0 missing|
-|FILE_PART_154_MISSING||
-|FILE_PART_6_MISSING|File part 6 missing|
 |FILE_PART_LENGTH_INVALID|The length of a file part is invalid|
 |FILE_PARTS_INVALID|The number of file parts is invalid|
 |INPUT_USER_DEACTIVATED|The specified user was deleted|

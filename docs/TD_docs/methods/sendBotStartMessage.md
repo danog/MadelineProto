@@ -1,6 +1,6 @@
 ---
 title: sendBotStartMessage
-description: Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can't be invited to a private chat other than chat with the bot. Bots can't be invited to broadcast channel chats and secret chats. Returns sent message. UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
+description: Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can't be invited to a private chat other than chat with the bot. Bots can't be invited to broadcast channel chats and secret chats. Returns sent message
 ---
 ## Method: sendBotStartMessage  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Invites bot to a chat (if it is not in the chat) and send /start to
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can't be invited to a private chat other than chat with the bot. Bots can't be invited to broadcast channel chats and secret chats. Returns sent message. UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
+Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can't be invited to a private chat other than chat with the bot. Bots can't be invited to broadcast channel chats and secret chats. Returns sent message
 
 ### Params:
 

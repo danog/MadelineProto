@@ -53,7 +53,7 @@ description: List of constructors
 <br><br>[$call](../constructors/call.md) = \['id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'is_outgoing' => [Bool](../types/Bool.md), 'state' => [CallState](../types/CallState.md), \];<a name="call"></a>  
 
 ***
-<br><br>[$callConnection](../constructors/callConnection.md) = \['id' => [long](../types/long.md), 'ip' => [string](../types/string.md), 'ipv6' => [string](../types/string.md), 'port' => [int](../types/int.md), 'peer_tag' => [bytes](../types/bytes.md), \];<a name="callConnection"></a>  
+<br><br>[$callConnection](../constructors/callConnection.md) = \['id' => [int64](../constructors/int64.md), 'ip' => [string](../types/string.md), 'ipv6' => [string](../types/string.md), 'port' => [int](../types/int.md), 'peer_tag' => [bytes](../types/bytes.md), \];<a name="callConnection"></a>  
 
 ***
 <br><br>[$callDiscardReasonDeclined](../constructors/callDiscardReasonDeclined.md) = \[\];<a name="callDiscardReasonDeclined"></a>  
@@ -107,7 +107,7 @@ description: List of constructors
 <br><br>[$channel](../constructors/channel.md) = \['id' => [int](../types/int.md), 'username' => [string](../types/string.md), 'date' => [int](../types/int.md), 'status' => [ChatMemberStatus](../types/ChatMemberStatus.md), 'anyone_can_invite' => [Bool](../types/Bool.md), 'sign_messages' => [Bool](../types/Bool.md), 'is_supergroup' => [Bool](../types/Bool.md), 'is_verified' => [Bool](../types/Bool.md), 'restriction_reason' => [string](../types/string.md), \];<a name="channel"></a>  
 
 ***
-<br><br>[$channelFull](../constructors/channelFull.md) = \['description' => [string](../types/string.md), 'member_count' => [int](../types/int.md), 'administrator_count' => [int](../types/int.md), 'restricted_count' => [int](../types/int.md), 'banned_count' => [int](../types/int.md), 'can_get_members' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'invite_link' => [string](../types/string.md), 'pinned_message_id' => [int53](../types/int53.md), 'migrated_from_group_id' => [int](../types/int.md), 'migrated_from_max_message_id' => [int53](../types/int53.md), \];<a name="channelFull"></a>  
+<br><br>[$channelFull](../constructors/channelFull.md) = \['description' => [string](../types/string.md), 'member_count' => [int](../types/int.md), 'administrator_count' => [int](../types/int.md), 'restricted_count' => [int](../types/int.md), 'banned_count' => [int](../types/int.md), 'can_get_members' => [Bool](../types/Bool.md), 'can_set_username' => [Bool](../types/Bool.md), 'can_set_sticker_set' => [Bool](../types/Bool.md), 'sticker_set_id' => [int64](../constructors/int64.md), 'invite_link' => [string](../types/string.md), 'pinned_message_id' => [int53](../types/int53.md), 'migrated_from_group_id' => [int](../types/int.md), 'migrated_from_max_message_id' => [int53](../types/int53.md), \];<a name="channelFull"></a>  
 
 ***
 <br><br>[$channelMembersFilterAdministrators](../constructors/channelMembersFilterAdministrators.md) = \[\];<a name="channelMembersFilterAdministrators"></a>  
@@ -128,7 +128,7 @@ description: List of constructors
 <br><br>[$channelMembersFilterSearch](../constructors/channelMembersFilterSearch.md) = \['query' => [string](../types/string.md), \];<a name="channelMembersFilterSearch"></a>  
 
 ***
-<br><br>[$chat](../constructors/chat.md) = \['id' => [int53](../types/int53.md), 'type' => [ChatType](../types/ChatType.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'top_message' => [message](../constructors/message.md), 'order' => [long](../types/long.md), 'is_pinned' => [Bool](../types/Bool.md), 'unread_count' => [int](../types/int.md), 'last_read_inbox_message_id' => [int53](../types/int53.md), 'last_read_outbox_message_id' => [int53](../types/int53.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), 'reply_markup_message_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), 'client_data' => [string](../types/string.md), \];<a name="chat"></a>  
+<br><br>[$chat](../constructors/chat.md) = \['id' => [int53](../types/int53.md), 'type' => [ChatType](../types/ChatType.md), 'title' => [string](../types/string.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), 'top_message' => [message](../constructors/message.md), 'order' => [int64](../constructors/int64.md), 'is_pinned' => [Bool](../types/Bool.md), 'unread_count' => [int](../types/int.md), 'last_read_inbox_message_id' => [int53](../types/int53.md), 'last_read_outbox_message_id' => [int53](../types/int53.md), 'unread_mention_count' => [int](../types/int.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), 'reply_markup_message_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), 'client_data' => [string](../types/string.md), \];<a name="chat"></a>  
 
 ***
 <br><br>[$chatActionCancel](../constructors/chatActionCancel.md) = \[\];<a name="chatActionCancel"></a>  
@@ -170,7 +170,7 @@ description: List of constructors
 <br><br>[$chatActionUploadingVoice](../constructors/chatActionUploadingVoice.md) = \['progress' => [int](../types/int.md), \];<a name="chatActionUploadingVoice"></a>  
 
 ***
-<br><br>[$chatEvent](../constructors/chatEvent.md) = \['id' => [long](../types/long.md), 'date' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'action' => [ChatEventAction](../types/ChatEventAction.md), \];<a name="chatEvent"></a>  
+<br><br>[$chatEvent](../constructors/chatEvent.md) = \['id' => [int64](../constructors/int64.md), 'date' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'action' => [ChatEventAction](../types/ChatEventAction.md), \];<a name="chatEvent"></a>  
 
 ***
 <br><br>[$chatEventDescriptionChanged](../constructors/chatEventDescriptionChanged.md) = \['old_description' => [string](../types/string.md), 'new_description' => [string](../types/string.md), \];<a name="chatEventDescriptionChanged"></a>  
@@ -213,6 +213,9 @@ description: List of constructors
 
 ***
 <br><br>[$chatEventSignMessagesToggled](../constructors/chatEventSignMessagesToggled.md) = \['sign_messages' => [Bool](../types/Bool.md), \];<a name="chatEventSignMessagesToggled"></a>  
+
+***
+<br><br>[$chatEventStickerSetChanged](../constructors/chatEventStickerSetChanged.md) = \['old_sticker_set_id' => [int64](../constructors/int64.md), 'new_sticker_set_id' => [int64](../constructors/int64.md), \];<a name="chatEventStickerSetChanged"></a>  
 
 ***
 <br><br>[$chatEventTitleChanged](../constructors/chatEventTitleChanged.md) = \['old_title' => [string](../types/string.md), 'new_title' => [string](../types/string.md), \];<a name="chatEventTitleChanged"></a>  
@@ -272,7 +275,7 @@ description: List of constructors
 <br><br>[$chatReportSpamState](../constructors/chatReportSpamState.md) = \['can_report_spam' => [Bool](../types/Bool.md), \];<a name="chatReportSpamState"></a>  
 
 ***
-<br><br>[$chatTypeChannel](../constructors/chatTypeChannel.md) = \['channel_id' => [int](../types/int.md), \];<a name="chatTypeChannel"></a>  
+<br><br>[$chatTypeChannel](../constructors/chatTypeChannel.md) = \['channel_id' => [int](../types/int.md), 'is_supergroup' => [Bool](../types/Bool.md), \];<a name="chatTypeChannel"></a>  
 
 ***
 <br><br>[$chatTypeGroup](../constructors/chatTypeGroup.md) = \['group_id' => [int](../types/int.md), \];<a name="chatTypeGroup"></a>  
@@ -281,7 +284,7 @@ description: List of constructors
 <br><br>[$chatTypePrivate](../constructors/chatTypePrivate.md) = \['user_id' => [int](../types/int.md), \];<a name="chatTypePrivate"></a>  
 
 ***
-<br><br>[$chatTypeSecret](../constructors/chatTypeSecret.md) = \['secret_chat_id' => [int](../types/int.md), \];<a name="chatTypeSecret"></a>  
+<br><br>[$chatTypeSecret](../constructors/chatTypeSecret.md) = \['secret_chat_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), \];<a name="chatTypeSecret"></a>  
 
 ***
 <br><br>[$chats](../constructors/chats.md) = \['chat_ids' => \[[int53](../types/int53.md)\], \];<a name="chats"></a>  
@@ -303,6 +306,9 @@ description: List of constructors
 
 ***
 <br><br>[$contact](../constructors/contact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];<a name="contact"></a>  
+
+***
+<br><br>[$count](../constructors/count.md) = \['count' => [int](../types/int.md), \];<a name="count"></a>  
 
 ***
 <br><br>[$customRequestResult](../constructors/customRequestResult.md) = \['result' => [string](../types/string.md), \];<a name="customRequestResult"></a>  
@@ -383,10 +389,10 @@ description: List of constructors
 <br><br>[$fileTypeWallpaper](../constructors/fileTypeWallpaper.md) = \[\];<a name="fileTypeWallpaper"></a>  
 
 ***
-<br><br>[$foundMessages](../constructors/foundMessages.md) = \['messages' => \[[message](../constructors/message.md)\], 'next_from_search_id' => [long](../types/long.md), \];<a name="foundMessages"></a>  
+<br><br>[$foundMessages](../constructors/foundMessages.md) = \['messages' => \[[message](../constructors/message.md)\], 'next_from_search_id' => [int64](../constructors/int64.md), \];<a name="foundMessages"></a>  
 
 ***
-<br><br>[$game](../constructors/game.md) = \['id' => [long](../types/long.md), 'short_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'text' => [string](../types/string.md), 'text_entities' => \[[textEntity](../constructors/textEntity.md)\], 'description' => [string](../types/string.md), 'photo' => [photo](../constructors/photo.md), 'animation' => [animation](../constructors/animation.md), \];<a name="game"></a>  
+<br><br>[$game](../constructors/game.md) = \['id' => [int64](../constructors/int64.md), 'short_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'text' => [string](../types/string.md), 'text_entities' => \[[textEntity](../constructors/textEntity.md)\], 'description' => [string](../types/string.md), 'photo' => [photo](../constructors/photo.md), 'animation' => [animation](../constructors/animation.md), \];<a name="game"></a>  
 
 ***
 <br><br>[$gameHighScore](../constructors/gameHighScore.md) = \['position' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), \];<a name="gameHighScore"></a>  
@@ -461,7 +467,7 @@ description: List of constructors
 <br><br>[$inlineQueryResultVoice](../constructors/inlineQueryResultVoice.md) = \['id' => [string](../types/string.md), 'voice' => [voice](../constructors/voice.md), 'title' => [string](../types/string.md), \];<a name="inlineQueryResultVoice"></a>  
 
 ***
-<br><br>[$inlineQueryResults](../constructors/inlineQueryResults.md) = \['inline_query_id' => [long](../types/long.md), 'next_offset' => [string](../types/string.md), 'results' => \[[InlineQueryResult](../types/InlineQueryResult.md)\], 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \];<a name="inlineQueryResults"></a>  
+<br><br>[$inlineQueryResults](../constructors/inlineQueryResults.md) = \['inline_query_id' => [int64](../constructors/int64.md), 'next_offset' => [string](../types/string.md), 'results' => \[[InlineQueryResult](../types/InlineQueryResult.md)\], 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \];<a name="inlineQueryResults"></a>  
 
 ***
 <br><br>[$inputCredentialsNew](../constructors/inputCredentialsNew.md) = \['data' => [string](../types/string.md), 'allow_save' => [Bool](../types/Bool.md), \];<a name="inputCredentialsNew"></a>  
@@ -521,16 +527,16 @@ description: List of constructors
 <br><br>[$inputInlineQueryResultVoice](../constructors/inputInlineQueryResultVoice.md) = \['id' => [string](../types/string.md), 'title' => [string](../types/string.md), 'voice_url' => [string](../types/string.md), 'voice_duration' => [int](../types/int.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'input_message_content' => [InputMessageContent](../types/InputMessageContent.md), \];<a name="inputInlineQueryResultVoice"></a>  
 
 ***
-<br><br>[$inputMessageAnimation](../constructors/inputMessageAnimation.md) = \['animation' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'duration' => [int](../types/int.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageAnimation"></a>  
+<br><br>[$inputMessageAnimation](../constructors/inputMessageAnimation.md) = \['animation' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'duration' => [int](../types/int.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageAnimation"></a>  
 
 ***
-<br><br>[$inputMessageAudio](../constructors/inputMessageAudio.md) = \['audio' => [InputFile](../types/InputFile.md), 'album_cover_thumb' => [InputThumb](../types/InputThumb.md), 'duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageAudio"></a>  
+<br><br>[$inputMessageAudio](../constructors/inputMessageAudio.md) = \['audio' => [InputFile](../types/InputFile.md), 'album_cover_thumb' => [inputThumb](../constructors/inputThumb.md), 'duration' => [int](../types/int.md), 'title' => [string](../types/string.md), 'performer' => [string](../types/string.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageAudio"></a>  
 
 ***
 <br><br>[$inputMessageContact](../constructors/inputMessageContact.md) = \['contact' => [contact](../constructors/contact.md), \];<a name="inputMessageContact"></a>  
 
 ***
-<br><br>[$inputMessageDocument](../constructors/inputMessageDocument.md) = \['document' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageDocument"></a>  
+<br><br>[$inputMessageDocument](../constructors/inputMessageDocument.md) = \['document' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageDocument"></a>  
 
 ***
 <br><br>[$inputMessageForwarded](../constructors/inputMessageForwarded.md) = \['from_chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'in_game_share' => [Bool](../types/Bool.md), \];<a name="inputMessageForwarded"></a>  
@@ -545,10 +551,10 @@ description: List of constructors
 <br><br>[$inputMessageLocation](../constructors/inputMessageLocation.md) = \['location' => [location](../constructors/location.md), \];<a name="inputMessageLocation"></a>  
 
 ***
-<br><br>[$inputMessagePhoto](../constructors/inputMessagePhoto.md) = \['photo' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'added_sticker_file_ids' => \[[int](../types/int.md)\], 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), 'ttl' => [int](../types/int.md), \];<a name="inputMessagePhoto"></a>  
+<br><br>[$inputMessagePhoto](../constructors/inputMessagePhoto.md) = \['photo' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'added_sticker_file_ids' => \[[int](../types/int.md)\], 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), 'ttl' => [int](../types/int.md), \];<a name="inputMessagePhoto"></a>  
 
 ***
-<br><br>[$inputMessageSticker](../constructors/inputMessageSticker.md) = \['sticker' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="inputMessageSticker"></a>  
+<br><br>[$inputMessageSticker](../constructors/inputMessageSticker.md) = \['sticker' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="inputMessageSticker"></a>  
 
 ***
 <br><br>[$inputMessageText](../constructors/inputMessageText.md) = \['text' => [string](../types/string.md), 'disable_web_page_preview' => [Bool](../types/Bool.md), 'clear_draft' => [Bool](../types/Bool.md), 'entities' => \[[textEntity](../constructors/textEntity.md)\], 'parse_mode' => [TextParseMode](../types/TextParseMode.md), \];<a name="inputMessageText"></a>  
@@ -557,10 +563,10 @@ description: List of constructors
 <br><br>[$inputMessageVenue](../constructors/inputMessageVenue.md) = \['venue' => [venue](../constructors/venue.md), \];<a name="inputMessageVenue"></a>  
 
 ***
-<br><br>[$inputMessageVideo](../constructors/inputMessageVideo.md) = \['video' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'added_sticker_file_ids' => \[[int](../types/int.md)\], 'duration' => [int](../types/int.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), 'ttl' => [int](../types/int.md), \];<a name="inputMessageVideo"></a>  
+<br><br>[$inputMessageVideo](../constructors/inputMessageVideo.md) = \['video' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'added_sticker_file_ids' => \[[int](../types/int.md)\], 'duration' => [int](../types/int.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'caption' => [string](../types/string.md), 'ttl' => [int](../types/int.md), \];<a name="inputMessageVideo"></a>  
 
 ***
-<br><br>[$inputMessageVideoNote](../constructors/inputMessageVideoNote.md) = \['video_note' => [InputFile](../types/InputFile.md), 'thumb' => [InputThumb](../types/InputThumb.md), 'duration' => [int](../types/int.md), 'length' => [int](../types/int.md), \];<a name="inputMessageVideoNote"></a>  
+<br><br>[$inputMessageVideoNote](../constructors/inputMessageVideoNote.md) = \['video_note' => [InputFile](../types/InputFile.md), 'thumb' => [inputThumb](../constructors/inputThumb.md), 'duration' => [int](../types/int.md), 'length' => [int](../types/int.md), \];<a name="inputMessageVideoNote"></a>  
 
 ***
 <br><br>[$inputMessageVoice](../constructors/inputMessageVoice.md) = \['voice' => [InputFile](../types/InputFile.md), 'duration' => [int](../types/int.md), 'waveform' => [bytes](../types/bytes.md), 'caption' => [string](../types/string.md), \];<a name="inputMessageVoice"></a>  
@@ -569,10 +575,7 @@ description: List of constructors
 <br><br>[$inputSticker](../constructors/inputSticker.md) = \['png_sticker' => [InputFile](../types/InputFile.md), 'emojis' => [string](../types/string.md), 'mask_position' => [maskPosition](../constructors/maskPosition.md), \];<a name="inputSticker"></a>  
 
 ***
-<br><br>[$inputThumbGenerated](../constructors/inputThumbGenerated.md) = \['original_path' => [string](../types/string.md), 'conversion' => [string](../types/string.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="inputThumbGenerated"></a>  
-
-***
-<br><br>[$inputThumbLocal](../constructors/inputThumbLocal.md) = \['path' => [string](../types/string.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="inputThumbLocal"></a>  
+<br><br>[$inputThumb](../constructors/inputThumb.md) = \['thumb' => [InputFile](../types/InputFile.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="inputThumb"></a>  
 
 ***
 <br><br>[$invoice](../constructors/invoice.md) = \['currency' => [string](../types/string.md), 'prices' => \[[labeledPrice](../constructors/labeledPrice.md)\], 'is_test' => [Bool](../types/Bool.md), 'need_name' => [Bool](../types/Bool.md), 'need_phone_number' => [Bool](../types/Bool.md), 'need_email' => [Bool](../types/Bool.md), 'need_shipping_address' => [Bool](../types/Bool.md), 'is_flexible' => [Bool](../types/Bool.md), \];<a name="invoice"></a>  
@@ -608,7 +611,7 @@ description: List of constructors
 <br><br>[$maskPosition](../constructors/maskPosition.md) = \['point' => [int](../types/int.md), 'x_shift' => [double](../types/double.md), 'y_shift' => [double](../types/double.md), 'scale' => [double](../types/double.md), \];<a name="maskPosition"></a>  
 
 ***
-<br><br>[$message](../constructors/message.md) = \['id' => [int53](../types/int53.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'send_state' => [MessageSendState](../types/MessageSendState.md), 'can_be_edited' => [Bool](../types/Bool.md), 'can_be_forwarded' => [Bool](../types/Bool.md), 'can_be_deleted_only_for_self' => [Bool](../types/Bool.md), 'can_be_deleted_for_everyone' => [Bool](../types/Bool.md), 'is_post' => [Bool](../types/Bool.md), 'date' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), 'forward_info' => [MessageForwardInfo](../types/MessageForwardInfo.md), 'reply_to_message_id' => [int53](../types/int53.md), 'ttl' => [int](../types/int.md), 'ttl_expires_in' => [double](../types/double.md), 'via_bot_user_id' => [int](../types/int.md), 'author_signature' => [string](../types/string.md), 'views' => [int](../types/int.md), 'content' => [MessageContent](../types/MessageContent.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="message"></a>  
+<br><br>[$message](../constructors/message.md) = \['id' => [int53](../types/int53.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'send_state' => [MessageSendState](../types/MessageSendState.md), 'can_be_edited' => [Bool](../types/Bool.md), 'can_be_forwarded' => [Bool](../types/Bool.md), 'can_be_deleted_only_for_self' => [Bool](../types/Bool.md), 'can_be_deleted_for_everyone' => [Bool](../types/Bool.md), 'is_post' => [Bool](../types/Bool.md), 'contains_unread_mention' => [Bool](../types/Bool.md), 'date' => [int](../types/int.md), 'edit_date' => [int](../types/int.md), 'forward_info' => [MessageForwardInfo](../types/MessageForwardInfo.md), 'reply_to_message_id' => [int53](../types/int53.md), 'ttl' => [int](../types/int.md), 'ttl_expires_in' => [double](../types/double.md), 'via_bot_user_id' => [int](../types/int.md), 'author_signature' => [string](../types/string.md), 'views' => [int](../types/int.md), 'content' => [MessageContent](../types/MessageContent.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="message"></a>  
 
 ***
 <br><br>[$messageAnimation](../constructors/messageAnimation.md) = \['animation' => [animation](../constructors/animation.md), 'caption' => [string](../types/string.md), \];<a name="messageAnimation"></a>  
@@ -674,7 +677,7 @@ description: List of constructors
 <br><br>[$messageGame](../constructors/messageGame.md) = \['game' => [game](../constructors/game.md), \];<a name="messageGame"></a>  
 
 ***
-<br><br>[$messageGameScore](../constructors/messageGameScore.md) = \['game_message_id' => [int53](../types/int53.md), 'game_id' => [long](../types/long.md), 'score' => [int](../types/int.md), \];<a name="messageGameScore"></a>  
+<br><br>[$messageGameScore](../constructors/messageGameScore.md) = \['game_message_id' => [int53](../types/int53.md), 'game_id' => [int64](../constructors/int64.md), 'score' => [int](../types/int.md), \];<a name="messageGameScore"></a>  
 
 ***
 <br><br>[$messageGroupChatCreate](../constructors/messageGroupChatCreate.md) = \['title' => [string](../types/string.md), 'member_user_ids' => \[[int](../types/int.md)\], \];<a name="messageGroupChatCreate"></a>  
@@ -881,7 +884,7 @@ description: List of constructors
 <br><br>[$paymentsProviderStripe](../constructors/paymentsProviderStripe.md) = \['publishable_key' => [string](../types/string.md), 'need_country' => [Bool](../types/Bool.md), 'need_zip' => [Bool](../types/Bool.md), 'need_cardholder_name' => [Bool](../types/Bool.md), \];<a name="paymentsProviderStripe"></a>  
 
 ***
-<br><br>[$photo](../constructors/photo.md) = \['id' => [long](../types/long.md), 'has_stickers' => [Bool](../types/Bool.md), 'sizes' => \[[photoSize](../constructors/photoSize.md)\], \];<a name="photo"></a>  
+<br><br>[$photo](../constructors/photo.md) = \['id' => [int64](../constructors/int64.md), 'has_stickers' => [Bool](../types/Bool.md), 'sizes' => \[[photoSize](../constructors/photoSize.md)\], \];<a name="photo"></a>  
 
 ***
 <br><br>[$photoSize](../constructors/photoSize.md) = \['type' => [string](../types/string.md), 'photo' => [file](../constructors/file.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), \];<a name="photoSize"></a>  
@@ -917,7 +920,7 @@ description: List of constructors
 <br><br>[$privacyRules](../constructors/privacyRules.md) = \['rules' => \[[PrivacyRule](../types/PrivacyRule.md)\], \];<a name="privacyRules"></a>  
 
 ***
-<br><br>[$profilePhoto](../constructors/profilePhoto.md) = \['id' => [long](../types/long.md), 'small' => [file](../constructors/file.md), 'big' => [file](../constructors/file.md), \];<a name="profilePhoto"></a>  
+<br><br>[$profilePhoto](../constructors/profilePhoto.md) = \['id' => [int64](../constructors/int64.md), 'small' => [file](../constructors/file.md), 'big' => [file](../constructors/file.md), \];<a name="profilePhoto"></a>  
 
 ***
 <br><br>[$proxyEmpty](../constructors/proxyEmpty.md) = \[\];<a name="proxyEmpty"></a>  
@@ -992,6 +995,9 @@ description: List of constructors
 <br><br>[$searchMessagesFilterEmpty](../constructors/searchMessagesFilterEmpty.md) = \[\];<a name="searchMessagesFilterEmpty"></a>  
 
 ***
+<br><br>[$searchMessagesFilterMention](../constructors/searchMessagesFilterMention.md) = \[\];<a name="searchMessagesFilterMention"></a>  
+
+***
 <br><br>[$searchMessagesFilterMissedCall](../constructors/searchMessagesFilterMissedCall.md) = \[\];<a name="searchMessagesFilterMissedCall"></a>  
 
 ***
@@ -999,6 +1005,9 @@ description: List of constructors
 
 ***
 <br><br>[$searchMessagesFilterPhotoAndVideo](../constructors/searchMessagesFilterPhotoAndVideo.md) = \[\];<a name="searchMessagesFilterPhotoAndVideo"></a>  
+
+***
+<br><br>[$searchMessagesFilterUnreadMention](../constructors/searchMessagesFilterUnreadMention.md) = \[\];<a name="searchMessagesFilterUnreadMention"></a>  
 
 ***
 <br><br>[$searchMessagesFilterUrl](../constructors/searchMessagesFilterUrl.md) = \[\];<a name="searchMessagesFilterUrl"></a>  
@@ -1019,7 +1028,7 @@ description: List of constructors
 <br><br>[$secretChat](../constructors/secretChat.md) = \['id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'state' => [int](../types/int.md), 'is_outbound' => [Bool](../types/Bool.md), 'ttl' => [int](../types/int.md), 'key_hash' => [bytes](../types/bytes.md), 'layer' => [int](../types/int.md), \];<a name="secretChat"></a>  
 
 ***
-<br><br>[$session](../constructors/session.md) = \['id' => [long](../types/long.md), 'is_current' => [Bool](../types/Bool.md), 'app_id' => [int](../types/int.md), 'app_name' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'is_official_app' => [Bool](../types/Bool.md), 'device_model' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'log_in_date' => [int](../types/int.md), 'last_active_date' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'country' => [string](../types/string.md), 'region' => [string](../types/string.md), \];<a name="session"></a>  
+<br><br>[$session](../constructors/session.md) = \['id' => [int64](../constructors/int64.md), 'is_current' => [Bool](../types/Bool.md), 'app_id' => [int](../types/int.md), 'app_name' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'is_official_app' => [Bool](../types/Bool.md), 'device_model' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'log_in_date' => [int](../types/int.md), 'last_active_date' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'country' => [string](../types/string.md), 'region' => [string](../types/string.md), \];<a name="session"></a>  
 
 ***
 <br><br>[$sessions](../constructors/sessions.md) = \['sessions' => \[[session](../constructors/session.md)\], \];<a name="sessions"></a>  
@@ -1031,16 +1040,16 @@ description: List of constructors
 <br><br>[$shippingOption](../constructors/shippingOption.md) = \['id' => [string](../types/string.md), 'title' => [string](../types/string.md), 'prices' => \[[labeledPrice](../constructors/labeledPrice.md)\], \];<a name="shippingOption"></a>  
 
 ***
-<br><br>[$sticker](../constructors/sticker.md) = \['set_id' => [long](../types/long.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'emoji' => [string](../types/string.md), 'is_mask' => [Bool](../types/Bool.md), 'mask_position' => [maskPosition](../constructors/maskPosition.md), 'thumb' => [photoSize](../constructors/photoSize.md), 'sticker' => [file](../constructors/file.md), \];<a name="sticker"></a>  
+<br><br>[$sticker](../constructors/sticker.md) = \['set_id' => [int64](../constructors/int64.md), 'width' => [int](../types/int.md), 'height' => [int](../types/int.md), 'emoji' => [string](../types/string.md), 'is_mask' => [Bool](../types/Bool.md), 'mask_position' => [maskPosition](../constructors/maskPosition.md), 'thumb' => [photoSize](../constructors/photoSize.md), 'sticker' => [file](../constructors/file.md), \];<a name="sticker"></a>  
 
 ***
 <br><br>[$stickerEmojis](../constructors/stickerEmojis.md) = \['emojis' => \[[string](../types/string.md)\], \];<a name="stickerEmojis"></a>  
 
 ***
-<br><br>[$stickerSet](../constructors/stickerSet.md) = \['id' => [long](../types/long.md), 'title' => [string](../types/string.md), 'name' => [string](../types/string.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), 'is_official' => [Bool](../types/Bool.md), 'is_masks' => [Bool](../types/Bool.md), 'is_viewed' => [Bool](../types/Bool.md), 'stickers' => \[[sticker](../constructors/sticker.md)\], 'emojis' => \[[stickerEmojis](../constructors/stickerEmojis.md)\], \];<a name="stickerSet"></a>  
+<br><br>[$stickerSet](../constructors/stickerSet.md) = \['id' => [int64](../constructors/int64.md), 'title' => [string](../types/string.md), 'name' => [string](../types/string.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), 'is_official' => [Bool](../types/Bool.md), 'is_masks' => [Bool](../types/Bool.md), 'is_viewed' => [Bool](../types/Bool.md), 'stickers' => \[[sticker](../constructors/sticker.md)\], 'emojis' => \[[stickerEmojis](../constructors/stickerEmojis.md)\], \];<a name="stickerSet"></a>  
 
 ***
-<br><br>[$stickerSetInfo](../constructors/stickerSetInfo.md) = \['id' => [long](../types/long.md), 'title' => [string](../types/string.md), 'name' => [string](../types/string.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), 'is_official' => [Bool](../types/Bool.md), 'is_masks' => [Bool](../types/Bool.md), 'is_viewed' => [Bool](../types/Bool.md), 'size' => [int](../types/int.md), 'covers' => \[[sticker](../constructors/sticker.md)\], \];<a name="stickerSetInfo"></a>  
+<br><br>[$stickerSetInfo](../constructors/stickerSetInfo.md) = \['id' => [int64](../constructors/int64.md), 'title' => [string](../types/string.md), 'name' => [string](../types/string.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), 'is_official' => [Bool](../types/Bool.md), 'is_masks' => [Bool](../types/Bool.md), 'is_viewed' => [Bool](../types/Bool.md), 'size' => [int](../types/int.md), 'covers' => \[[sticker](../constructors/sticker.md)\], \];<a name="stickerSetInfo"></a>  
 
 ***
 <br><br>[$stickerSets](../constructors/stickerSets.md) = \['total_count' => [int](../types/int.md), 'sets' => \[[stickerSetInfo](../constructors/stickerSetInfo.md)\], \];<a name="stickerSets"></a>  
@@ -1086,6 +1095,9 @@ description: List of constructors
 
 ***
 <br><br>[$text](../constructors/text.md) = \['text' => [string](../types/string.md), \];<a name="text"></a>  
+
+***
+<br><br>[$textEntities](../constructors/textEntities.md) = \['entities' => \[[textEntity](../constructors/textEntity.md)\], \];<a name="textEntities"></a>  
 
 ***
 <br><br>[$textEntity](../constructors/textEntity.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'type' => [TextEntityType](../types/TextEntityType.md), \];<a name="textEntity"></a>  
@@ -1163,13 +1175,13 @@ description: List of constructors
 <br><br>[$updateChannelFull](../constructors/updateChannelFull.md) = \['channel_id' => [int](../types/int.md), 'channel_full' => [channelFull](../constructors/channelFull.md), \];<a name="updateChannelFull"></a>  
 
 ***
-<br><br>[$updateChatDraftMessage](../constructors/updateChatDraftMessage.md) = \['chat_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), \];<a name="updateChatDraftMessage"></a>  
+<br><br>[$updateChatDraftMessage](../constructors/updateChatDraftMessage.md) = \['chat_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), 'order' => [int64](../constructors/int64.md), \];<a name="updateChatDraftMessage"></a>  
 
 ***
-<br><br>[$updateChatIsPinned](../constructors/updateChatIsPinned.md) = \['chat_id' => [int53](../types/int53.md), 'is_pinned' => [Bool](../types/Bool.md), \];<a name="updateChatIsPinned"></a>  
+<br><br>[$updateChatIsPinned](../constructors/updateChatIsPinned.md) = \['chat_id' => [int53](../types/int53.md), 'is_pinned' => [Bool](../types/Bool.md), 'order' => [int64](../constructors/int64.md), \];<a name="updateChatIsPinned"></a>  
 
 ***
-<br><br>[$updateChatOrder](../constructors/updateChatOrder.md) = \['chat_id' => [int53](../types/int53.md), 'order' => [long](../types/long.md), \];<a name="updateChatOrder"></a>  
+<br><br>[$updateChatOrder](../constructors/updateChatOrder.md) = \['chat_id' => [int53](../types/int53.md), 'order' => [int64](../constructors/int64.md), \];<a name="updateChatOrder"></a>  
 
 ***
 <br><br>[$updateChatPhoto](../constructors/updateChatPhoto.md) = \['chat_id' => [int53](../types/int53.md), 'photo' => [chatPhoto](../constructors/chatPhoto.md), \];<a name="updateChatPhoto"></a>  
@@ -1187,13 +1199,19 @@ description: List of constructors
 <br><br>[$updateChatTitle](../constructors/updateChatTitle.md) = \['chat_id' => [int53](../types/int53.md), 'title' => [string](../types/string.md), \];<a name="updateChatTitle"></a>  
 
 ***
-<br><br>[$updateChatTopMessage](../constructors/updateChatTopMessage.md) = \['chat_id' => [int53](../types/int53.md), 'top_message' => [message](../constructors/message.md), \];<a name="updateChatTopMessage"></a>  
+<br><br>[$updateChatTopMessage](../constructors/updateChatTopMessage.md) = \['chat_id' => [int53](../types/int53.md), 'top_message' => [message](../constructors/message.md), 'order' => [int64](../constructors/int64.md), \];<a name="updateChatTopMessage"></a>  
+
+***
+<br><br>[$updateChatUnreadMentionCount](../constructors/updateChatUnreadMentionCount.md) = \['chat_id' => [int53](../types/int53.md), 'unread_mention_count' => [int](../types/int.md), \];<a name="updateChatUnreadMentionCount"></a>  
 
 ***
 <br><br>[$updateConnectionState](../constructors/updateConnectionState.md) = \['state' => [ConnectionState](../types/ConnectionState.md), \];<a name="updateConnectionState"></a>  
 
 ***
 <br><br>[$updateDeleteMessages](../constructors/updateDeleteMessages.md) = \['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], \];<a name="updateDeleteMessages"></a>  
+
+***
+<br><br>[$updateFavoriteStickers](../constructors/updateFavoriteStickers.md) = \['sticker_ids' => \[[int](../types/int.md)\], \];<a name="updateFavoriteStickers"></a>  
 
 ***
 <br><br>[$updateFile](../constructors/updateFile.md) = \['file' => [file](../constructors/file.md), \];<a name="updateFile"></a>  
@@ -1205,7 +1223,7 @@ description: List of constructors
 <br><br>[$updateFileGenerationProgress](../constructors/updateFileGenerationProgress.md) = \['file_id' => [int](../types/int.md), 'size' => [int](../types/int.md), 'ready' => [int](../types/int.md), \];<a name="updateFileGenerationProgress"></a>  
 
 ***
-<br><br>[$updateFileGenerationStart](../constructors/updateFileGenerationStart.md) = \['generation_id' => [long](../types/long.md), 'original_path' => [string](../types/string.md), 'destination_path' => [string](../types/string.md), 'conversion' => [string](../types/string.md), \];<a name="updateFileGenerationStart"></a>  
+<br><br>[$updateFileGenerationStart](../constructors/updateFileGenerationStart.md) = \['generation_id' => [int64](../constructors/int64.md), 'original_path' => [string](../types/string.md), 'destination_path' => [string](../types/string.md), 'conversion' => [string](../types/string.md), \];<a name="updateFileGenerationStart"></a>  
 
 ***
 <br><br>[$updateFileProgress](../constructors/updateFileProgress.md) = \['file_id' => [int](../types/int.md), 'size' => [int](../types/int.md), 'ready' => [int](../types/int.md), \];<a name="updateFileProgress"></a>  
@@ -1217,13 +1235,16 @@ description: List of constructors
 <br><br>[$updateGroupFull](../constructors/updateGroupFull.md) = \['group_id' => [int](../types/int.md), 'group_full' => [groupFull](../constructors/groupFull.md), \];<a name="updateGroupFull"></a>  
 
 ***
-<br><br>[$updateInstalledStickerSets](../constructors/updateInstalledStickerSets.md) = \['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[long](../types/long.md)\], \];<a name="updateInstalledStickerSets"></a>  
+<br><br>[$updateInstalledStickerSets](../constructors/updateInstalledStickerSets.md) = \['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[int64](../constructors/int64.md)\], \];<a name="updateInstalledStickerSets"></a>  
 
 ***
 <br><br>[$updateMessageContent](../constructors/updateMessageContent.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'new_content' => [MessageContent](../types/MessageContent.md), \];<a name="updateMessageContent"></a>  
 
 ***
 <br><br>[$updateMessageEdited](../constructors/updateMessageEdited.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'edit_date' => [int](../types/int.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="updateMessageEdited"></a>  
+
+***
+<br><br>[$updateMessageMentionRead](../constructors/updateMessageMentionRead.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'unread_mention_count' => [int](../types/int.md), \];<a name="updateMessageMentionRead"></a>  
 
 ***
 <br><br>[$updateMessageSendAcknowledged](../constructors/updateMessageSendAcknowledged.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \];<a name="updateMessageSendAcknowledged"></a>  
@@ -1238,7 +1259,7 @@ description: List of constructors
 <br><br>[$updateMessageViews](../constructors/updateMessageViews.md) = \['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'views' => [int](../types/int.md), \];<a name="updateMessageViews"></a>  
 
 ***
-<br><br>[$updateNewCallbackQuery](../constructors/updateNewCallbackQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'chat_instance' => [long](../types/long.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewCallbackQuery"></a>  
+<br><br>[$updateNewCallbackQuery](../constructors/updateNewCallbackQuery.md) = \['id' => [int64](../constructors/int64.md), 'sender_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'chat_instance' => [int64](../constructors/int64.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewCallbackQuery"></a>  
 
 ***
 <br><br>[$updateNewChat](../constructors/updateNewChat.md) = \['chat' => [chat](../constructors/chat.md), \];<a name="updateNewChat"></a>  
@@ -1250,22 +1271,22 @@ description: List of constructors
 <br><br>[$updateNewCustomEvent](../constructors/updateNewCustomEvent.md) = \['event' => [string](../types/string.md), \];<a name="updateNewCustomEvent"></a>  
 
 ***
-<br><br>[$updateNewCustomQuery](../constructors/updateNewCustomQuery.md) = \['id' => [long](../types/long.md), 'data' => [string](../types/string.md), 'timeout' => [int](../types/int.md), \];<a name="updateNewCustomQuery"></a>  
+<br><br>[$updateNewCustomQuery](../constructors/updateNewCustomQuery.md) = \['id' => [int64](../constructors/int64.md), 'data' => [string](../types/string.md), 'timeout' => [int](../types/int.md), \];<a name="updateNewCustomQuery"></a>  
 
 ***
-<br><br>[$updateNewInlineCallbackQuery](../constructors/updateNewInlineCallbackQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'inline_message_id' => [string](../types/string.md), 'chat_instance' => [long](../types/long.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewInlineCallbackQuery"></a>  
+<br><br>[$updateNewInlineCallbackQuery](../constructors/updateNewInlineCallbackQuery.md) = \['id' => [int64](../constructors/int64.md), 'sender_user_id' => [int](../types/int.md), 'inline_message_id' => [string](../types/string.md), 'chat_instance' => [int64](../constructors/int64.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \];<a name="updateNewInlineCallbackQuery"></a>  
 
 ***
-<br><br>[$updateNewInlineQuery](../constructors/updateNewInlineQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'user_location' => [location](../constructors/location.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \];<a name="updateNewInlineQuery"></a>  
+<br><br>[$updateNewInlineQuery](../constructors/updateNewInlineQuery.md) = \['id' => [int64](../constructors/int64.md), 'sender_user_id' => [int](../types/int.md), 'user_location' => [location](../constructors/location.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \];<a name="updateNewInlineQuery"></a>  
 
 ***
 <br><br>[$updateNewMessage](../constructors/updateNewMessage.md) = \['message' => [message](../constructors/message.md), 'disable_notification' => [Bool](../types/Bool.md), 'contains_mention' => [Bool](../types/Bool.md), \];<a name="updateNewMessage"></a>  
 
 ***
-<br><br>[$updateNewPreCheckoutQuery](../constructors/updateNewPreCheckoutQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), \];<a name="updateNewPreCheckoutQuery"></a>  
+<br><br>[$updateNewPreCheckoutQuery](../constructors/updateNewPreCheckoutQuery.md) = \['id' => [int64](../constructors/int64.md), 'sender_user_id' => [int](../types/int.md), 'currency' => [string](../types/string.md), 'total_amount' => [int53](../types/int53.md), 'invoice_payload' => [bytes](../types/bytes.md), 'shipping_option_id' => [string](../types/string.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), \];<a name="updateNewPreCheckoutQuery"></a>  
 
 ***
-<br><br>[$updateNewShippingQuery](../constructors/updateNewShippingQuery.md) = \['id' => [long](../types/long.md), 'sender_user_id' => [int](../types/int.md), 'invoice_payload' => [string](../types/string.md), 'shipping_address' => [shippingAddress](../constructors/shippingAddress.md), \];<a name="updateNewShippingQuery"></a>  
+<br><br>[$updateNewShippingQuery](../constructors/updateNewShippingQuery.md) = \['id' => [int64](../constructors/int64.md), 'sender_user_id' => [int](../types/int.md), 'invoice_payload' => [string](../types/string.md), 'shipping_address' => [shippingAddress](../constructors/shippingAddress.md), \];<a name="updateNewShippingQuery"></a>  
 
 ***
 <br><br>[$updateNotificationSettings](../constructors/updateNotificationSettings.md) = \['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), \];<a name="updateNotificationSettings"></a>  

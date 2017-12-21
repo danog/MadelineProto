@@ -15,7 +15,7 @@ Bots only. Sets result of an inline query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|inline\_query\_id|[long](../types/long.md) | Yes|Identifier of the inline query|
+|inline\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of the inline query|
 |is\_personal|[Bool](../types/Bool.md) | Yes|Does result of the query can be cached only for specified user|
 |results|Array of [InputInlineQueryResult](../types/InputInlineQueryResult.md) | Yes|Results of the query|
 |cache\_time|[int](../types/int.md) | Yes|Allowed time to cache results of the query in seconds|

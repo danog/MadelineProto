@@ -39,6 +39,10 @@ Represents filter for content of searched messages
 
 [searchMessagesFilterVoiceAndVideoNote](../constructors/searchMessagesFilterVoiceAndVideoNote.md)  
 
+[searchMessagesFilterMention](../constructors/searchMessagesFilterMention.md)  
+
+[searchMessagesFilterUnreadMention](../constructors/searchMessagesFilterUnreadMention.md)  
+
 
 
 ### Methods that return an object of this type (methods):

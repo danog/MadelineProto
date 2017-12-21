@@ -15,7 +15,7 @@ Bots only. Answers a custom query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|custom\_query\_id|[long](../types/long.md) | Yes|Identifier of a custom query|
+|custom\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of a custom query|
 |data|[string](../types/string.md) | Yes|JSON-serialized answer to the query|
 
 

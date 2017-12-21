@@ -1,6 +1,6 @@
 ---
 title: getStickers
-description: Returns stickers from installed ordinary sticker sets corresponding to the given emoji
+description: Returns stickers from installed ordinary sticker sets corresponding to the given emoji. If emoji is not empty, elso favorite and recently used stickers may be returned
 ---
 ## Method: getStickers  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Returns stickers from installed ordinary sticker sets corresponding
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Returns stickers from installed ordinary sticker sets corresponding to the given emoji
+Returns stickers from installed ordinary sticker sets corresponding to the given emoji. If emoji is not empty, elso favorite and recently used stickers may be returned
 
 ### Params:
 

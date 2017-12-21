@@ -1,19 +1,19 @@
 ---
-title: inputThumbLocal
-description: Local file with the thumb
+title: inputThumb
+description: Thumb to send along with a file, should be in jpeg format or webp format for stickers and less than 200KB in size
 ---
-## Constructor: inputThumbLocal  
+## Constructor: inputThumb  
 [Back to constructors index](index.md)
 
 
 
-Local file with the thumb
+Thumb to send along with a file, should be in jpeg format or webp format for stickers and less than 200KB in size
 
 ### Attributes:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|path|[string](../types/string.md) | Yes|Path to the file with the thumb, file should be less than 200KB|
+|thumb|[InputFile](../types/InputFile.md) | Yes|Thumb file to send, sending thumbs by file_id is currently not supported|
 |width|[int](../types/int.md) | Yes|Thumb width, usually shouldn't excceed 90. Use 0 if unknown|
 |height|[int](../types/int.md) | Yes|Thumb height, usually shouldn't excceed 90. Use 0 if unknown|
 

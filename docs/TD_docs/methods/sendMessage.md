@@ -1,6 +1,6 @@
 ---
 title: sendMessage
-description: Sends a message. Returns sent message. UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
+description: Sends a message. Returns sent message
 ---
 ## Method: sendMessage  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Sends a message. Returns sent message. UpdateChatTopMessage will no
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Sends a message. Returns sent message. UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
+Sends a message. Returns sent message
 
 ### Params:
 

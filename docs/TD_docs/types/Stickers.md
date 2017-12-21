@@ -21,5 +21,7 @@ description: constructors and methods of type Stickers
 
 [$MadelineProto->addRecentSticker](../methods/addRecentSticker.md)  
 
+[$MadelineProto->getFavoriteStickers](../methods/getFavoriteStickers.md)  
+
 
 

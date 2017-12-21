@@ -1,6 +1,6 @@
 ---
 title: changeChatMemberStatus
-description: Changes status of the chat member, need appropriate privileges. This function is currently not suitable for adding new members to the chat, use addChatMember instead. Status will not be changed until chat state will be synchronized with the server. Status will not be changed if application is killed before it can send request to the server
+description: Changes status of the chat member, need appropriate privileges. This function is currently not suitable for adding new members to the chat, use addChatMember instead. Status will not be changed until chat state will be synchronized with the server
 ---
 ## Method: changeChatMemberStatus  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Changes status of the chat member, need appropriate privileges. Thi
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Changes status of the chat member, need appropriate privileges. This function is currently not suitable for adding new members to the chat, use addChatMember instead. Status will not be changed until chat state will be synchronized with the server. Status will not be changed if application is killed before it can send request to the server
+Changes status of the chat member, need appropriate privileges. This function is currently not suitable for adding new members to the chat, use addChatMember instead. Status will not be changed until chat state will be synchronized with the server
 
 ### Params:
 

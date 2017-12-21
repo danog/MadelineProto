@@ -13,7 +13,7 @@ Represents short information about sticker set
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[long](../types/long.md) | Yes|Sticker set identifier|
+|id|[int64](../constructors/int64.md) | Yes|Sticker set identifier|
 |title|[string](../types/string.md) | Yes|Title of the sticker set|
 |name|[string](../types/string.md) | Yes|Name of the sticker set|
 |is\_installed|[Bool](../types/Bool.md) | Yes|True if sticker set is installed by logged in user|

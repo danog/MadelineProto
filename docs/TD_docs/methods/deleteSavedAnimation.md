@@ -1,6 +1,6 @@
 ---
 title: deleteSavedAnimation
-description: Removes animation from the list of saved animations
+description: Removes an animation from the list of saved animations
 ---
 ## Method: deleteSavedAnimation  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Removes animation from the list of saved animations
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Removes animation from the list of saved animations
+Removes an animation from the list of saved animations
 
 ### Params:
 

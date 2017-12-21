@@ -18,7 +18,7 @@ Discards a call
 |call\_id|[int](../types/int.md) | Yes|Call identifier|
 |is\_disconnected|[Bool](../types/Bool.md) | Yes|True, if users was disconnected|
 |duration|[int](../types/int.md) | Yes|Call duration in seconds|
-|connection\_id|[long](../types/long.md) | Yes|Identifier of a connection used during the call|
+|connection\_id|[int64](../constructors/int64.md) | Yes|Identifier of a connection used during the call|
 
 
 ### Return type: [Ok](../types/Ok.md)

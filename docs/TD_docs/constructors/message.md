@@ -22,6 +22,7 @@ Describes message
 |can\_be\_deleted\_only\_for\_self|[Bool](../types/Bool.md) | Yes|True, if message can be deleted only for self, other users will continue to see it|
 |can\_be\_deleted\_for\_everyone|[Bool](../types/Bool.md) | Yes|True, if message can be deleted for everyone|
 |is\_post|[Bool](../types/Bool.md) | Yes|True, if message is channel post. All messages to broadcast channels are posts, all other messages are not posts|
+|contains\_unread\_mention|[Bool](../types/Bool.md) | Yes|True, if message contains unread mention of the current user|
 |date|[int](../types/int.md) | Yes|Date when message was sent, unix time|
 |edit\_date|[int](../types/int.md) | Yes|Date when message was edited last time, unix time|
 |forward\_info|[MessageForwardInfo](../types/MessageForwardInfo.md) | Yes|Information about initial message sender, nullable|

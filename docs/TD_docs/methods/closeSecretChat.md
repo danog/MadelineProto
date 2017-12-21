@@ -1,6 +1,6 @@
 ---
 title: closeSecretChat
-description: Closes secret chat
+description: Closes secret chat, effectively transfering its state to "Closed"
 ---
 ## Method: closeSecretChat  
 [Back to methods index](index.md)
@@ -9,7 +9,7 @@ description: Closes secret chat
 YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 
-Closes secret chat
+Closes secret chat, effectively transfering its state to "Closed"
 
 ### Params:
 

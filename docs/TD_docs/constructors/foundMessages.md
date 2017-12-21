@@ -14,7 +14,7 @@ Contains list of found by search messages
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |messages|Array of [message](../constructors/message.md) | Yes|List of messages|
-|next\_from\_search\_id|[long](../types/long.md) | Yes|Value to pass as from_search_id to get more results|
+|next\_from\_search\_id|[int64](../constructors/int64.md) | Yes|Value to pass as from_search_id to get more results|
 
 
 
