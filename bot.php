@@ -61,5 +61,4 @@ while (true) {
                 }
         }
     }
-    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }
