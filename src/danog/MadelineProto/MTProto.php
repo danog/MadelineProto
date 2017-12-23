@@ -671,7 +671,21 @@ class MTProto
                     if (!$cdn) {
                         $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
-
+                        $this->sync_authorization($id);
+                        $this->get_config($config);
+                    }
+                    if (in_array($socket->protocol, ['http', 'https'])) {
+                        $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
+                    }
+                } else if (!$cdn) $this->sync_authorization($id);
+            }
+        } finally {
+            $this->initing_authorization = false;
+            $this->updates_state['sync_loading'] = false;
+        }
+    }
+    public function sync_authorization($id) {
+        $socket = $this->datacenter->sockets[$id];
                         if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
                             foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
                                 if ($authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
@@ -686,19 +700,7 @@ class MTProto
                                 }
                             }
                         }
-                        $this->get_config($config);
-                    }
-                    if (in_array($socket->protocol, ['http', 'https'])) {
-                        $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
-                    }
-                }
-            }
-        } finally {
-            $this->initing_authorization = false;
-            $this->updates_state['sync_loading'] = false;
-        }
     }
-
     public function write_client_info($method, $arguments = [], $options = [])
     {
         \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $method)], Logger::NOTICE);
