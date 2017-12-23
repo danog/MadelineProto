@@ -326,17 +326,23 @@ trait ResponseHandler
                     case 'USER_DEACTIVATED':
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
-                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
-                        $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
+                        foreach ($this->datacenter->sockets as $socket) {
+                            $socket->temp_auth_key = null;
+                            $socket->auth_key = null;
+                            $socket->authorized = false;
+                        }
                         $this->authorized = self::NOT_LOGGED_IN;
                         $this->authorization = null;
                         $this->init_authorization(); // idk
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
+                        if ($this->authorized !== self::LOGGED_IN) throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                         $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
+                        $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
+                        $this->datacenter->sockets[$aargs['datacenter']]->authorized = false;
                         $this->init_authorization(); // idk
-                        throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                 }
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);

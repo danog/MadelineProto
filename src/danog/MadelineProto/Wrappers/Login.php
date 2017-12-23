@@ -19,6 +19,7 @@ trait Login
 {
     public function logout()
     {
+        foreach ($this->datacenter->sockets as $socket) { $socket->authorized = false; }
         $this->authorized = self::NOT_LOGGED_IN;
         $this->authorization = null;
         $this->updates = [];
@@ -51,12 +52,14 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;
-        $this->sync_authorization($this->datacenter->curdc);
+        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+
         $this->updates = [];
         $this->updates_key = 0;
         if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
             @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
         }
+        $this->init_authorization();
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
@@ -128,7 +131,9 @@ trait Login
         }
         $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
-        $this->sync_authorization($this->datacenter->curdc);
+        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->init_authorization();
+
 
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
 
@@ -152,11 +157,13 @@ trait Login
         $this->datacenter->sockets[$dc_id]->outgoing_messages = [];
         $this->datacenter->sockets[$dc_id]->new_outgoing = [];
         $this->datacenter->sockets[$dc_id]->new_incoming = [];
+        $this->datacenter->sockets[$dc_id]->authorized = true;
 
         $this->authorized = self::LOGGED_IN;
         $this->init_authorization();
 
-        return $this->authorization = $this->sync_authorization($dc_id);
+
+        return $this->get_self();
     }
 
     public function export_authorization()
@@ -186,7 +193,8 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;
-        $this->sync_authorization($this->datacenter->curdc);
+        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->init_authorization();
 
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['signup_ok']], \danog\MadelineProto\Logger::NOTICE);
 
@@ -207,7 +215,9 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;
-        $this->sync_authorization($this->datacenter->curdc);
+        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->init_authorization();
+
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;

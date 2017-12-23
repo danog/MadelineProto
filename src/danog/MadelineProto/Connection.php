@@ -42,7 +42,7 @@ class Connection
     public $proxy = '\Socket';
     public $extra = [];
     public $obfuscated = [];
-
+    public $authorized = false;
     public $call_queue = [];
 
     public $i = [];
@@ -218,7 +218,7 @@ class Connection
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized'];
     }
 
     public function __wakeup()

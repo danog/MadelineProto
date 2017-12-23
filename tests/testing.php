@@ -54,7 +54,7 @@ echo 'Loading settings...'.PHP_EOL;
 var_dump(getenv('MTPROTO_SETTINGS'));
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 //$settings['connection_settings']['all']['proxy'] = '\SocksProxy';
-//$settings['connection_settings']['all']['proxy_extra'] = ['address' => '209.195.74.200', 'port' => 43545];
+//$settings['connection_settings']['all']['proxy_extra'] = ['address' => '127.0.0.1', 'port' => 1080];
 
 var_dump($settings);
 if ($MadelineProto === false) {

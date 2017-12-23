@@ -92,7 +92,6 @@ class API extends APIFactory
     {
         //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
         Serialization::$instances[spl_object_hash($this)] = $this;
-
         $this->APIFactory();
     }
 

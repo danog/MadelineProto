@@ -67,7 +67,7 @@ trait CallHandler
             unset($aargs['queue']);
         }
         if (isset($aargs['serialized'])) {
-            $serialized = $args;
+            $serialized = $args['serialized'];
         } else {
             $serialized = $this->serialize_method($method, $args);
         }
@@ -135,6 +135,7 @@ trait CallHandler
                                 if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
                                     \danog\MadelineProto\Logger::log(['WARNING: Resetting auth key...'], \danog\MadelineProto\Logger::WARNING);
                                     $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
+                                    $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
                                     $this->init_authorization();
 
                                     throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');

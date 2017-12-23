@@ -22,6 +22,7 @@ class Serialization
     public static function serialize_all($exception)
     {
         echo $exception.PHP_EOL;
+        return;
         foreach (self::$instances as $instance) {
             if (isset($instance->session)) {
                 $instance->serialize();

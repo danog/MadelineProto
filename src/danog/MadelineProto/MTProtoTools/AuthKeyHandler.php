@@ -551,7 +551,7 @@ trait AuthKeyHandler
                 $encrypted_message = $this->datacenter->sockets[$datacenter]->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['message_id' => $message_id, 'datacenter' => $datacenter]);
                 if ($res === true) {
-                    \danog\MadelineProto\Logger::log(['Successfully binded temporary and permanent authorization keys.'], \danog\MadelineProto\Logger::NOTICE);
+                    \danog\MadelineProto\Logger::log(['Successfully binded temporary and permanent authorization keys, DC '.$datacenter], \danog\MadelineProto\Logger::NOTICE);
 
                     return true;
                 }
