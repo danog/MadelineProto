@@ -83,6 +83,15 @@ To install *all of the requirements* on `Ubuntu`, `Debian`, `Devuan`, or any oth
 curl https://daniil.it/php.sh | sudo bash -e
 ```
 
+Or you can install PHP 7 from a PPA:
+
+```
+sudo apt-get install python-software-properties software-properties-common
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+sudo apt-get update
+sudo apt-get install php7.1 php7.1-dev php7.1-fpm php7.1-curl php7.1-xml php7.1-mbstring php7.1-zip -y
+```
+
 
 On other platforms, use [Google](https://google.com) to find out how to install the following dependencies.
 
@@ -159,24 +168,25 @@ You can find examples for nearly every MadelineProto function in
 
 ### Storing sessions
 
-VERY IMPORTANT: An istance of MadelineProto MUST be serialized every time an update is fetched, and on shutdown. To serialize MadelineProto to a file, do the following:
+To store information about an account session, serialization must be done.
 
-When loading an already logged in session:
-```  
-$MadelineProto = new \danog\MadelineProto\API('session.madeline');
-$MadelineProto->serialize();
-```  
+An istance of MadelineProto is automatically serialized every `$settings['serialization']['serialization_interval']` seconds (by default 30 seconds), and on shutdown. 
 
-When loading a new session:
+To set the serialization destination file, do the following:
+
+When creating a new session:
 ```
 $MadelineProto = new \danog\MadelineProto\API($settings);
-$MadelineProto->session = 'session.madeline';
-$MadelineProto->serialize();
+$MadelineProto->session = 'session.madeline'; // The session will be serialized to session.madeline
+$MadelineProto->serialize(); // Force first serialization
 ```
 
-If the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
+To load a serialized session:
+```  
+$MadelineProto = new \danog\MadelineProto\API('session.madeline');
+```  
 
-It is **strongly** recommended to serialize the session with `$MadelineProto->serialize()` after every `$MadelineProto->get_updates()`.
+If the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
 
 
 ## Methods
@@ -421,10 +431,14 @@ Here are the default values for the settings arrays and explanations for every s
     'updates' => [
         'handle_updates' => true, // Should I handle updates?
         'handle_old_updates' => true, // Should I handle old updates on startup?
+        'getdifference_interval' => 30, // Manual difference polling interval
         'callback' => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
     ],
     'secret_chats' => [
         'accept_chats' => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
+    ],
+    'serialization' => [
+        'serialization_interval' => 30, // Automatic serialization interval
     ],
     'threading' => [
         'allow_threading' => false, // Should I use threading, if it is enabled?

@@ -97,7 +97,7 @@ trait UpdateHandler
                 $only_updates = $this->handle_messages($this->datacenter->curdc);
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
             }
-            if (time() - $this->last_recv > 30) {
+            if (time() - $this->last_recv > $this->settings['updates']['getdifference_interval']) {
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {

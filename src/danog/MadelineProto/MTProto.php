@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 83;
+    const V = 85;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -551,10 +551,14 @@ class MTProto
             'updates' => [
                 'handle_updates'     => true, // Should I handle updates?
                 'handle_old_updates' => true, // Should I handle old updates on startup?
+                'getdifference_interval' => 30, // Getdifference manual polling interval
                 'callback'           => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
             'secret_chats' => [
                 'accept_chats' => true, // Should I accept secret chats? Can be true, false or on array of user ids from which to accept chats
+            ],
+            'serialization' => [
+                'serialization_interval' => 30, // Automatic serialization interval
             ],
             'threading' => [
                 'allow_threading' => false, // Should I use threading, if it is enabled?
@@ -700,6 +704,8 @@ class MTProto
                         $socket->authorized = true;
                         break;
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        if ($e->rpc === 'DC_ID_INVALID') break;
+                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
                     } // Turns out this DC isn't authorized after all
                 }
             }
