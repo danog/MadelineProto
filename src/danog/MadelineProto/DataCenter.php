@@ -77,14 +77,19 @@ class DataCenter
 
         if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
             unset($this->sockets[$dc_number]);
+
             return false;
         }
         $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
         $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
 
         if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) {
-            if ($dc_config_number === 'all') $dc_config_number = $dc_number;
-            if (!isset($this->settings[$dc_config_number])) $this->settings[$dc_config_number] = $this->settings['all'];
+            if ($dc_config_number === 'all') {
+                $dc_config_number = $dc_number;
+            }
+            if (!isset($this->settings[$dc_config_number])) {
+                $this->settings[$dc_config_number] = $this->settings['all'];
+            }
             $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
         }
 
@@ -110,9 +115,11 @@ class DataCenter
                     $this->sockets[$dc_number] = new Connection($this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
                 }
                 \danog\MadelineProto\Logger::log(['OK!'], \danog\MadelineProto\Logger::WARNING);
+
                 return true;
             } catch (\danog\MadelineProto\Exception $e) {
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) { ; }
+            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            }
 
             switch ($x) {
                case 0:
@@ -146,6 +153,7 @@ class DataCenter
                    return false;
             }
         } while (++$x);
+
         return false;
     }
 

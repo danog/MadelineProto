@@ -205,7 +205,7 @@ class MTProto
         // Connect to servers
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['inst_dc']], Logger::ULTRA_VERBOSE);
         if (isset($this->datacenter)) {
-            $this->connect_to_all_dcs();//datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+            $this->connect_to_all_dcs(); //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         } else {
             $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         }
@@ -307,7 +307,11 @@ class MTProto
         $this->reset_session();
         if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['serialization_ofd']], Logger::WARNING);
-            foreach ($this->datacenter->sockets as $dc_id => $socket) { if ($this->authorized === self::LOGGED_IN && strpos($dc_id, '_') === false) $socket->authorized = true; } //$this->authorized === self::LOGGED_IN; }
+            foreach ($this->datacenter->sockets as $dc_id => $socket) {
+                if ($this->authorized === self::LOGGED_IN && strpos($dc_id, '_') === false) {
+                    $socket->authorized = true;
+                }
+            } //$this->authorized === self::LOGGED_IN; }
             $settings = $this->settings;
             if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
                 $settings['updates']['callback'] = 'get_updates_update_handler';
@@ -358,7 +362,7 @@ class MTProto
             $this->channels_state = [];
             $this->got_state = false;
         }
-        $this->connect_to_all_dcs();//datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $this->connect_to_all_dcs(); //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
                 unset($this->calls[$id]);
@@ -638,15 +642,19 @@ class MTProto
     }
 
     private $initing_authorization = false;
+
     // Creates authorization keys
     public function init_authorization()
     {
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
+
         try {
             foreach ($this->datacenter->sockets as $id => $socket) {
                 $cdn = strpos($id, 'cdn');
-                if (strpos($id, 'media') !== false && !$cdn) continue;
+                if (strpos($id, 'media') !== false && !$cdn) {
+                    continue;
+                }
                 if ($socket->session_id === null) {
                     $socket->session_id = $this->random(8);
                     $socket->session_in_seq_no = 0;
@@ -673,7 +681,8 @@ class MTProto
                                         $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
                                         $socket->authorized = true;
                                         break;
-                                    } catch (\danog\MadelineProto\RPCErrorException $e) {} // Turns out this DC isn't authorized after all
+                                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                    } // Turns out this DC isn't authorized after all
                                 }
                             }
                         }
@@ -683,12 +692,10 @@ class MTProto
                         $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
                     }
                 }
-
             }
         } finally {
             $this->initing_authorization = false;
             $this->updates_state['sync_loading'] = false;
-
         }
     }
 

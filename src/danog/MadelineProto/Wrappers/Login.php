@@ -19,7 +19,9 @@ trait Login
 {
     public function logout()
     {
-        foreach ($this->datacenter->sockets as $socket) { $socket->authorized = false; }
+        foreach ($this->datacenter->sockets as $socket) {
+            $socket->authorized = false;
+        }
         $this->authorized = self::NOT_LOGGED_IN;
         $this->authorization = null;
         $this->updates = [];
@@ -134,7 +136,6 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
 
-
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
@@ -161,7 +162,6 @@ trait Login
 
         $this->authorized = self::LOGGED_IN;
         $this->init_authorization();
-
 
         return $this->get_self();
     }
