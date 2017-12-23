@@ -169,7 +169,10 @@ $users = [];
                     $secret_media['voice'] = ['peer' => $secret, 'file' => $inputEncryptedFileAudio, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'key' => $inputEncryptedFileAudio['key'], 'iv' => $inputEncryptedFileAudio['iv'], 'file_name' => 'mosconi.mp3', 'size' => filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
                     foreach ($secret_media as $type => $smessage) {
-                        $type = $MadelineProto->messages->sendEncryptedFile($smessage);
+                        try {
+                            $type = $MadelineProto->messages->sendEncryptedFile($smessage);
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        } catch (\danog\MadelineProto\Exception $e) {}
                     }
                     break;
                 case 'updateNewMessage':

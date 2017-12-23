@@ -324,6 +324,10 @@ class MTProto
                 $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
             }
             foreach ($this->secret_chats as $key => &$chat) {
+                if (!is_array($chat)) {
+                    unset($this->secret_chats[$key]);
+                    continue;
+                }
                 if ($chat['layer'] >= 73) {
                     $chat['mtproto'] = 2;
                 } else {
