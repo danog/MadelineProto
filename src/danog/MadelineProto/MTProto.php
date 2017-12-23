@@ -677,30 +677,35 @@ class MTProto
                     if (in_array($socket->protocol, ['http', 'https'])) {
                         $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
                     }
-                } else if (!$cdn) $this->sync_authorization($id);
+                } elseif (!$cdn) {
+                    $this->sync_authorization($id);
+                }
             }
         } finally {
             $this->initing_authorization = false;
             $this->updates_state['sync_loading'] = false;
         }
     }
-    public function sync_authorization($id) {
+
+    public function sync_authorization($id)
+    {
         $socket = $this->datacenter->sockets[$id];
-                        if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
-                            foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
-                                if ($authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
-                                    try {
-                                        \danog\MadelineProto\Logger::log(['Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id]);
-                                        $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
-                                        $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
-                                        $socket->authorized = true;
-                                        break;
-                                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                    } // Turns out this DC isn't authorized after all
-                                }
-                            }
-                        }
+        if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
+            foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
+                if ($authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
+                    try {
+                        \danog\MadelineProto\Logger::log(['Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id]);
+                        $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
+                        $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
+                        $socket->authorized = true;
+                        break;
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    } // Turns out this DC isn't authorized after all
+                }
+            }
+        }
     }
+
     public function write_client_info($method, $arguments = [], $options = [])
     {
         \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $method)], Logger::NOTICE);
