@@ -172,7 +172,8 @@ $users = [];
                         try {
                             $type = $MadelineProto->messages->sendEncryptedFile($smessage);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        } catch (\danog\MadelineProto\Exception $e) {}
+                        } catch (\danog\MadelineProto\Exception $e) {
+                        }
                     }
                     break;
                 case 'updateNewMessage':
