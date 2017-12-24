@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 85;
+    const V = 86;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -553,7 +553,7 @@ class MTProto
             'updates' => [
                 'handle_updates'         => true, // Should I handle updates?
                 'handle_old_updates'     => true, // Should I handle old updates on startup?
-                'getdifference_interval' => 30, // Getdifference manual polling interval
+                'getdifference_interval' => -1, // Getdifference manual polling interval
                 'callback'               => 'get_updates_update_handler', // A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter
             ],
             'secret_chats' => [
