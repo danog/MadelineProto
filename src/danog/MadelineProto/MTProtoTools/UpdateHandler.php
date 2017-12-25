@@ -158,7 +158,9 @@ trait UpdateHandler
     {
         try {
             $peer_id = $this->get_info($message['to_id'])['bot_api_id'];
-        } catch (\danog\MadelineProto\Exception $e) { return true; }
+        } catch (\danog\MadelineProto\Exception $e) {
+            return true;
+        }
         $message_id = $message['id'];
 
         if (!isset($this->msg_ids[$peer_id]) || $message_id > $this->msg_ids[$peer_id]) {
