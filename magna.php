@@ -95,7 +95,7 @@ $calls = [];
 $users = [];
     $offset = 0;
     while (1) {
-        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 500, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 5000, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($MadelineProto->programmed_call as $key => $pair) {
             list($user, $time) = $pair;
             if ($time < time()) {
