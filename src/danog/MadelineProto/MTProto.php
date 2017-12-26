@@ -705,11 +705,13 @@ class MTProto
                         $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
                         $socket->authorized = true;
                         break;
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
                         if ($e->rpc === 'DC_ID_INVALID') {
                             break;
                         }
-                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
                     } // Turns out this DC isn't authorized after all
                 }
             }
