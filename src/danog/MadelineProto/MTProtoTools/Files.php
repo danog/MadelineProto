@@ -265,7 +265,7 @@ trait Files
             $end = $message_media['size'];
         }
         $size = $end - $offset;
-        $part_size = 128 * 1024;
+        $part_size = 1024 * 1024;
         $percent = 0;
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
