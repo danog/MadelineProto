@@ -306,7 +306,7 @@ class MTProto
         if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['serialization_ofd']], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
-                if ($this->authorized === self::LOGGED_IN && strpos($dc_id, '_') === false && $socket->auth_key !== NULL && $socket->temp_auth_key !== NULL) {
+                if ($this->authorized === self::LOGGED_IN && strpos($dc_id, '_') === false && $socket->auth_key !== null && $socket->temp_auth_key !== null) {
                     $socket->authorized = true;
                 }
             } //$this->authorized === self::LOGGED_IN; }
