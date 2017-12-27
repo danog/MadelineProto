@@ -698,7 +698,7 @@ class MTProto
         $socket = $this->datacenter->sockets[$id];
         if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
             foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
-                if ($authorized_socket->temp_auth_key !== NULL && $authorized_socket->auth_key !== NULL && $authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
+                if ($authorized_socket->temp_auth_key !== null && $authorized_socket->auth_key !== null && $authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
                     try {
                         \danog\MadelineProto\Logger::log(['Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id]);
                         $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
