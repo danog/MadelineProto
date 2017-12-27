@@ -345,6 +345,13 @@ trait ResponseHandler
                         $this->datacenter->sockets[$aargs['datacenter']]->authorized = false;
                         $this->init_authorization(); // idk
                         throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                    case 'AUTH_KEY_PERM_EMPTY':
+                        if ($this->authorized !== self::LOGGED_IN) {
+                            throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                        }
+                        $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
+                        $this->init_authorization(); // idk
+                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                 }
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
