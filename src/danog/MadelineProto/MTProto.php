@@ -704,6 +704,7 @@ class MTProto
 
     public function sync_authorization($id)
     {
+        if (!isset($this->datacenter->sockets[$id])) return false;
         $socket = $this->datacenter->sockets[$id];
         if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
             foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
