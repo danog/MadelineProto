@@ -157,7 +157,9 @@ class Connection
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
-                if ($this->parsed['host'][0] === '[') $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
+                if ($this->parsed['host'][0] === '[') {
+                    $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
+                }
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
