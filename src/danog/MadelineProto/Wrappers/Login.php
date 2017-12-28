@@ -149,6 +149,9 @@ trait Login
         }
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_auth_key']], \danog\MadelineProto\Logger::NOTICE);
         list($dc_id, $auth_key) = $authorization;
+        if (!is_array($auth_key)) {
+            $auth_key = ['auth_key' => $auth_key, 'id' => substr(sha1($auth_key, true), -8), 'server_salt' => ''];
+        }
         $this->datacenter->sockets[$dc_id]->session_id = $this->random(8);
         $this->datacenter->sockets[$dc_id]->session_in_seq_no = 0;
         $this->datacenter->sockets[$dc_id]->session_out_seq_no = 0;
@@ -171,8 +174,8 @@ trait Login
         if ($this->authorized !== self::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_logged_in']);
         }
-
-        return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key];
+        $this->get_self();
+        return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key['auth_key']];
     }
 
     public function complete_signup($first_name, $last_name)
