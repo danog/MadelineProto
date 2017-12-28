@@ -175,6 +175,7 @@ trait Login
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_logged_in']);
         }
         $this->get_self();
+
         return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key['auth_key']];
     }
 
