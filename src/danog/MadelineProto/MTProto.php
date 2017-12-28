@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 86;
+    const V = 87;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -642,9 +642,10 @@ class MTProto
             $this->datacenter->dc_connect($new_dc);
         }
         $this->init_authorization();
-        /*if ($old !== $this->datacenter->get_dcs()) {
-            $this->connect_to_all_dcs();
-        }*/
+        foreach ($this->datacenter->get_dcs(false) as $new_dc) {
+            $this->datacenter->dc_connect($new_dc);
+        }
+        $this->init_authorization();
     }
 
     private $initing_authorization = false;
@@ -780,6 +781,7 @@ class MTProto
 
     public function parse_dc_options($dc_options)
     {
+        unset($this->settings[$this->config['test_mode']]);
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
@@ -802,8 +804,6 @@ class MTProto
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $curdc = $this->datacenter->curdc;
-        //$this->datacenter->dclist = $this->settings['connection'];
-        //$this->datacenter->settings = $this->settings['connection_settings'];
         \danog\MadelineProto\Logger::log(['Got new DC options, reconnecting']);
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = $curdc;
