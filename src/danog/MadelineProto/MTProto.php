@@ -630,11 +630,14 @@ class MTProto
             $socket->new_incoming = [];
         }
     }
-    public function is_http($datacenter) {
+
+    public function is_http($datacenter)
+    {
         return in_array($this->datacenter->sockets[$datacenter]->protocol, ['http', 'https']);
     }
 
-    public function close_and_reopen($datacenter) {
+    public function close_and_reopen($datacenter)
+    {
         $this->datacenter->sockets[$datacenter]->close_and_reopen();
         if ($this->is_http($datacenter)) {
             $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $datacenter]);
