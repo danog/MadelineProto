@@ -203,7 +203,7 @@ trait CallHandler
                 //if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
                 //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
                 //} else {
-                $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
+                $this->close_and_reopen($aargs['datacenter']);
                 //}
                 continue;
             } catch (\RuntimeException $e) {
@@ -212,7 +212,7 @@ trait CallHandler
                 //if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
                 //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
                 //} else {
-                $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
+                $this->close_and_reopen($aargs['datacenter']);
                 //}
                 continue;
             } finally {
@@ -282,7 +282,7 @@ trait CallHandler
                 }
             } catch (Exception $e) {
                 \danog\MadelineProto\Logger::log(['An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...'], \danog\MadelineProto\Logger::WARNING);
-                $this->datacenter->sockets[$aargs['datacenter']]->close_and_reopen();
+                $this->close_and_reopen($aargs['datacenter']);
                 continue;
             }
 

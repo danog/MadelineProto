@@ -351,7 +351,7 @@ trait PeerHandler
                 if (isset($full['full']['profile_photo']['sizes'])) {
                     $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), []);
                 }
-                $bio = '';
+                /*$bio = '';
                 if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
                     if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
                         $bio = html_entity_decode(preg_replace_callback('/(&#[0-9]+;)/', function ($m) {
@@ -361,7 +361,7 @@ trait PeerHandler
                     if ($bio != '' && $bio != 'You can contact @'.$res['username'].' right away.') {
                         $res['about'] = $bio;
                     }
-                }
+                }*/
                 break;
             case 'chat':
                 foreach (['title', 'participants_count', 'admin', 'admins_enabled'] as $key) {

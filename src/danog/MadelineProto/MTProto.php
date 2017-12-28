@@ -195,7 +195,6 @@ class MTProto
     {
         // Parse settings
         $this->parse_settings($settings);
-
         if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
@@ -274,7 +273,6 @@ class MTProto
         if (isset($this->settings['app_info']['lang_code']) && isset(Lang::$lang[$this->settings['app_info']['lang_code']])) {
             Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
         }
-
         if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
@@ -581,9 +579,9 @@ class MTProto
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
 
-        if ($settings['app_info']['api_id'] < 20) {
+        /*if ($settings['app_info']['api_id'] < 20) {
             $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
-        }
+        }*/
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE': $settings['logger']['logger_level'] = 5; break;
             case 'VERBOSE': $settings['logger']['logger_level'] = 4; break;
@@ -630,6 +628,16 @@ class MTProto
             $socket->outgoing_messages = [];
             $socket->new_outgoing = [];
             $socket->new_incoming = [];
+        }
+    }
+    public function is_http($datacenter) {
+        return in_array($this->datacenter->sockets[$datacenter]->protocol, ['http', 'https']);
+    }
+
+    public function close_and_reopen($datacenter) {
+        $this->datacenter->sockets[$datacenter]->close_and_reopen();
+        if ($this->is_http($datacenter)) {
+            $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $datacenter]);
         }
     }
 
@@ -680,9 +688,6 @@ class MTProto
                         $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
                         $this->sync_authorization($id);
                         $this->get_config($config);
-                    }
-                    if (in_array($socket->protocol, ['http', 'https'])) {
-                        $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $id]);
                     }
                 } elseif (!$cdn) {
                     $this->sync_authorization($id);

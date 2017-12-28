@@ -46,13 +46,6 @@ class Connection
     public $call_queue = [];
 
     public $i = [];
-    /*    public function __get($name) {
-            echo "GETTING $name\n";
-            if (isset($this->i[$name]) && $this->{$name} === null) var_dump($this->i[$name]);
-            if ($this->{$name} instanceof \Volatile) $this->i[$name] = debug_backtrace(0);
-    var_dump(is_null($this->{$name}));
-            return $this->{$name};
-        }*/
 
     public function ___construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
@@ -164,6 +157,7 @@ class Connection
             case 'http':
             case 'https':
                 $this->parsed = parse_url($ip);
+                if ($this->parsed['host'][0] === '[') $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);

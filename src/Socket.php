@@ -129,9 +129,13 @@ if (!extension_loaded('pthreads')) {
             private $protocol;
             private $timeout = ['sec' => 0, 'usec' => 0];
             private $blocking = false;
+            private $domain;
+            private $type;
 
             public function __construct(int $domain, int $type, int $protocol)
             {
+                $this->domain = $domain;
+                $this->type = $type;
                 $this->protocol = getprotobynumber($protocol);
             }
 
@@ -179,8 +183,12 @@ if (!extension_loaded('pthreads')) {
                 throw new \danog\MadelineProto\Exception('Not supported');
             }
 
-            public function connect(string $address, int $port = 0)
+            public function connect(string $address, int $port = -1)
             {
+                if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
+                    $address = '['.$address.']';
+                }
+
                 $this->sock = fsockopen($this->protocol.'://'.$address, $port);
 
                 return true;

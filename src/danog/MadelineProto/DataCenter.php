@@ -100,8 +100,8 @@ class DataCenter
         }
 
         if ($this->settings[$dc_config_number]['protocol'] === 'http') {
+            if ($ipv6) $address = '['.$address.']';
             $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.'/api';
-            $port = 80;
         }
         \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol'])], \danog\MadelineProto\Logger::VERBOSE);
 
