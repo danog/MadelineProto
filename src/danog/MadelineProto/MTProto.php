@@ -234,7 +234,6 @@ class MTProto
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_translation']], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
 
-
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
@@ -490,7 +489,7 @@ class MTProto
                     'timeout'     => 2, // timeout for sockets
                     'proxy'       => '\Socket', // The proxy class to use
                     'proxy_extra' => [], // Extra parameters to pass to the proxy class using setExtra
-                    'pfs'         => true
+                    'pfs'         => true,
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -664,8 +663,6 @@ class MTProto
         }
         $this->init_authorization();
     }
-
-
 
     public function write_client_info($method, $arguments = [], $options = [])
     {

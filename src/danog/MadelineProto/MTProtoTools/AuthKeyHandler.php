@@ -548,7 +548,6 @@ trait AuthKeyHandler
                 if ($res === true) {
                     \danog\MadelineProto\Logger::log(['Successfully binded temporary and permanent authorization keys, DC '.$datacenter], \danog\MadelineProto\Logger::NOTICE);
 
-
                     return true;
                 }
             } catch (\danog\MadelineProto\SecurityException $e) {
