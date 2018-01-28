@@ -35,9 +35,32 @@ trait MessageHandler
 
         if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
             $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
+
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
+            $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
         } else {
-            $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
-            $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
+            if (!empty($this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
+                $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'content' => 'ack'];
+            }
+            if (count($this->datacenter->sockets[$aargs['datacenter']]->object_queue)) {
+                $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $message_data, 'content_related' => $content_related];
+                $messages = [];
+                foreach ($this->datacenter->sockets[$aargs['datacenter']]->object_queue as $message) {
+                    $message['msg_id'] = $this->generate_message_id($aargs['datacenter']);
+                    $message['seqno'] = $this->generate_out_seq_no($aargs['datacenter'], $message['content_related']);
+                    $message['bytes'] = strlen($message['body']);
+                    $message['_'] = 'MTmessage';
+                    $messages[] = $message;
+                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno']]; //, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $aargs['datacenter']])];
+                }
+                $message_content = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
+                $seq_no = $this->generate_out_seq_no($aargs['datacenter'], true);
+                $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
+            } else {
+                $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
+                $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
+            }
+
             $padding = $this->posmod(-strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
@@ -48,9 +71,15 @@ trait MessageHandler
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key']);
             $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['seq_no'] = $seq_no;
+            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
+            $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
+
+            $this->datacenter->sockets[$aargs['datacenter']]->object_queue = [];
+            foreach ($this->datacenter->sockets[$aargs['datacenter']]->ack_queue as $msg_id) {
+                $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$msg_id]['ack'] = true;
+            }
+            $this->datacenter->sockets[$aargs['datacenter']]->ack_queue = [];
         }
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
-        $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
 
         return $message_id;
     }
@@ -124,6 +153,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
+        var_dump($deserialized);
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;

@@ -30,7 +30,6 @@ trait Constructors
             $data = $this->constructors->by_id[$id];
             if (isset($got[$id])) {
                 $data['layer'] = '';
-                var_dump($data);
             }
             $got[$id] = '';
 

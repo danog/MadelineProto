@@ -23,6 +23,7 @@ trait Login
             $socket->authorized = false;
         }
         $this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized_dc = -1;
         $this->authorization = null;
         $this->updates = [];
         $this->secret_chats = [];
@@ -54,6 +55,7 @@ trait Login
             ], ['datacenter' => $this->datacenter->curdc]
         );
         $this->authorized = self::LOGGED_IN;
+        $this->authorized_dc = $this->datacenter->curdc;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
 
         $this->updates = [];
@@ -84,6 +86,8 @@ trait Login
                 'lang_code'    => $this->settings['app_info']['lang_code'],
             ], ['datacenter' => $this->datacenter->curdc]
         );
+        $this->authorized_dc = $this->datacenter->curdc;
+
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
         $this->authorized = self::WAITING_CODE;
@@ -148,10 +152,13 @@ trait Login
             $this->logout();
         }
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_auth_key']], \danog\MadelineProto\Logger::NOTICE);
+
         list($dc_id, $auth_key) = $authorization;
         if (!is_array($auth_key)) {
             $auth_key = ['auth_key' => $auth_key, 'id' => substr(sha1($auth_key, true), -8), 'server_salt' => ''];
         }
+
+        $this->authorized_dc = $dc_id;
         $this->datacenter->sockets[$dc_id]->session_id = $this->random(8);
         $this->datacenter->sockets[$dc_id]->session_in_seq_no = 0;
         $this->datacenter->sockets[$dc_id]->session_out_seq_no = 0;
@@ -175,6 +182,7 @@ trait Login
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_logged_in']);
         }
         $this->get_self();
+        $this->authorized_dc = $this->datacenter->curdc;
 
         return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key['auth_key']];
     }

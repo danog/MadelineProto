@@ -42,7 +42,7 @@ class TLConstructor
         } else {
             $json_dict['layer'] = '';
         }
-        $this->by_predicate_and_layer[$json_dict['predicate'].$json_dict['layer']] = $json_dict['id'];
+        $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
         $this->parse_params($json_dict['id'], $scheme_type === 'mtproto');
     }
 

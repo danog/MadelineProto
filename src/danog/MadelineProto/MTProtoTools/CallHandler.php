@@ -83,6 +83,9 @@ trait CallHandler
             $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
             \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.($g * 100 / $l).'%'], \danog\MadelineProto\Logger::VERBOSE);
         }
+        if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null && $this->is_http($aargs['datacenter']) && $method !== 'http_wait') {
+            $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $this->serialize_method('http_wait', ['max_wait' => 3000, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false];
+        }
         $last_recv = $this->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             if ($canunset = !$this->updates_state['sync_loading']) {
@@ -93,6 +96,9 @@ trait CallHandler
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $this->send_message($serialized, $content_related, $aargs);
+                if ($method === 'auth.bindTempAuthKey' && $this->is_http($aargs['datacenter'])) {
+                    $this->close_and_reopen($aargs['datacenter']);
+                }
                 if (isset($queue)) {
                     $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][] = $message_id;
                     if (count($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]) > $this->settings['msg_array_limit']['call_queue']) {
@@ -107,7 +113,7 @@ trait CallHandler
                 if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
                     return true;
                 }
-                $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $method, 'args' => $args];
+                //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $method, 'args' => $args];
                 $this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id] = ['msg_id' => $message_id, 'method' => $method, 'type' => $type];
                 $res_count = 0;
                 $server_answer = null;
@@ -200,20 +206,12 @@ trait CallHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
-                //if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
-                //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
-                //} else {
                 $this->close_and_reopen($aargs['datacenter']);
-                //}
                 continue;
             } catch (\RuntimeException $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
-                //if (in_array($this->datacenter->sockets[$aargs['datacenter']]->protocol, ['http', 'https']) && $method !== 'http_wait') {
-                //$this->method_call('http_wait', ['max_wait' => $this->datacenter->sockets[$aargs['datacenter']]->timeout, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $aargs['datacenter']]);
-                //} else {
                 $this->close_and_reopen($aargs['datacenter']);
-                //}
                 continue;
             } finally {
                 if (isset($aargs['heavy']) && $aargs['heavy'] && isset($message_id)) {
@@ -270,25 +268,6 @@ trait CallHandler
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
         $serialized = $this->serialize_object(['type' => $object], $args, $object);
-
-        for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
-            try {
-                if ($object !== 'msgs_ack') {
-                    \danog\MadelineProto\Logger::log(['Sending object (try number '.$count.' for '.$object.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                }
-                $message_id = $this->send_message($serialized, $this->content_related($object), $aargs);
-                if ($object !== 'msgs_ack') {
-                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $object, 'args' => $args];
-                }
-            } catch (Exception $e) {
-                \danog\MadelineProto\Logger::log(['An error occurred while calling object '.$object.': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().'. Recreating connection and retrying to call object...'], \danog\MadelineProto\Logger::WARNING);
-                $this->close_and_reopen($aargs['datacenter']);
-                continue;
-            }
-
-            return $message_id;
-        }
-
-        throw new \danog\MadelineProto\Exception('An error occurred while sending object '.$object.'.');
+        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $serialized, 'content_related' => $this->content_related($object)];
     }
 }
