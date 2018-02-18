@@ -11,7 +11,7 @@ description: geochats.sendMedia parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|media|[InputMedia](../types/InputMedia.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Optional|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

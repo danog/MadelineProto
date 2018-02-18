@@ -10,7 +10,7 @@ description: channels.deleteChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

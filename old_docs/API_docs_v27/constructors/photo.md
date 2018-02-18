@@ -16,7 +16,7 @@ description: photo attributes, type and example
 |user\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
-|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |sizes|Array of [PhotoSize](../types/PhotoSize.md) | Yes|
 
 

@@ -11,7 +11,7 @@ description: channelAdminLogEventActionUpdatePinned attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[Message](../types/Message.md) | Yes|
+|message|[Message](../types/Message.md) | Optional|
 
 
 

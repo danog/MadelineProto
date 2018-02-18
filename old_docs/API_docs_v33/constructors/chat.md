@@ -13,7 +13,7 @@ description: chat attributes, type and example
 |----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Optional|
 |participants\_count|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |left|[Bool](../types/Bool.md) | Yes|

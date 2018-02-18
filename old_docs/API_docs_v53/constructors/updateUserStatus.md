@@ -12,7 +12,7 @@ description: updateUserStatus attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
-|status|[UserStatus](../types/UserStatus.md) | Yes|
+|status|[UserStatus](../types/UserStatus.md) | Optional|
 
 
 

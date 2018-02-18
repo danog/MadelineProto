@@ -10,7 +10,7 @@ description: contacts.block parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputUser](../types/InputUser.md) | Yes|
+|id|[InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

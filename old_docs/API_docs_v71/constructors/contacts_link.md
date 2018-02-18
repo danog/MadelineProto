@@ -13,7 +13,7 @@ description: contacts_link attributes, type and example
 |----------|---------------|----------|
 |my\_link|[ContactLink](../types/ContactLink.md) | Yes|
 |foreign\_link|[ContactLink](../types/ContactLink.md) | Yes|
-|user|[User](../types/User.md) | Yes|
+|user|[User](../types/User.md) | Optional|
 
 
 

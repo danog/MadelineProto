@@ -24,8 +24,8 @@ description: channelFull attributes, type and example
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|
 |read\_outbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
-|chat\_photo|[Photo](../types/Photo.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|chat\_photo|[Photo](../types/Photo.md) | Optional|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |exported\_invite|[ExportedChatInvite](../types/ExportedChatInvite.md) | Yes|
 |bot\_info|Array of [BotInfo](../types/BotInfo.md) | Yes|
 |migrated\_from\_chat\_id|[int](../types/int.md) | Optional|

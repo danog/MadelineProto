@@ -10,9 +10,9 @@ description: messages.getGameHighScores parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |id|[int](../types/int.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)

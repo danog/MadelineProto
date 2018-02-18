@@ -209,7 +209,6 @@ trait AuthKeyHandler
             'auth_key'     => $key,
             'network_type' => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET,
         ], $this->calls[$params['id']]->configuration);
-        var_dump($this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
 
         return $this->calls[$params['id']]->startTheMagic();

@@ -11,7 +11,7 @@ description: pageBlockChannel attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[Chat](../types/Chat.md) | Yes|
+|channel|[Chat](../types/Chat.md) | Optional|
 
 
 

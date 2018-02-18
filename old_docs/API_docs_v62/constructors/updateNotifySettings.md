@@ -12,7 +12,7 @@ description: updateNotifySettings attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[NotifyPeer](../types/NotifyPeer.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 
 
 

@@ -16,8 +16,8 @@ description: userForeign attributes, type and example
 |last\_name|[string](../types/string.md) | Yes|
 |username|[string](../types/string.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
-|status|[UserStatus](../types/UserStatus.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Optional|
+|status|[UserStatus](../types/UserStatus.md) | Optional|
 
 
 

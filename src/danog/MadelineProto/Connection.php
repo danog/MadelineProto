@@ -44,10 +44,12 @@ class Connection
     public $obfuscated = [];
     public $authorized = false;
     public $call_queue = [];
+    public $object_queue = [];
+    public $ack_queue = [];
 
     public $i = [];
 
-    public function ___construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
+    public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
 
         // Can use:
@@ -75,12 +77,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
@@ -88,12 +90,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 $this->write(str_repeat(chr(238), 4));
                 break;
 
@@ -102,12 +104,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
 
                 $this->out_seq_no = -1;
                 $this->in_seq_no = -1;
@@ -117,12 +119,12 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-                $this->sock->setBlocking(true);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+                $this->sock->setBlocking(true);
                 do {
                     $random = $this->random(64);
                 } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
@@ -160,7 +162,7 @@ class Connection
                 if ($this->parsed['host'][0] === '[') {
                     $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
                 }
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname($this->protocol === 'https' ? 'tls' : 'tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol === 'https' ? PHP_INT_MAX : getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -214,7 +216,7 @@ class Connection
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'object_queue', 'ack_queue'];
     }
 
     public function __wakeup()
@@ -227,7 +229,7 @@ class Connection
             throw new Bug74586Exception();
         }
         $this->time_delta = 0;
-        //$this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+        //$this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
     public function write($what, $length = null)

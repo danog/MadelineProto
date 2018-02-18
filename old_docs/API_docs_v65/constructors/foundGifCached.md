@@ -12,8 +12,8 @@ description: foundGifCached attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
-|photo|[Photo](../types/Photo.md) | Yes|
-|document|[Document](../types/Document.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Optional|
+|document|[Document](../types/Document.md) | Optional|
 
 
 

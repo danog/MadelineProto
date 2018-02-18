@@ -10,8 +10,8 @@ description: messages.startBot parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|bot|[InputUser](../types/InputUser.md) | Yes|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|bot|[InputUser](../types/InputUser.md) | Optional|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |start\_param|[string](../types/string.md) | Yes|
 
 

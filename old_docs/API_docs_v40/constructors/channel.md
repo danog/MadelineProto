@@ -14,7 +14,7 @@ description: channel attributes, type and example
 |id|[int](../types/int.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
 |title|[string](../types/string.md) | Yes|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Optional|
 |date|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|
 

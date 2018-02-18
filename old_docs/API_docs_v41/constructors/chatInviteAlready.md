@@ -11,7 +11,7 @@ description: chatInviteAlready attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat|[Chat](../types/Chat.md) | Yes|
+|chat|[Chat](../types/Chat.md) | Optional|
 
 
 

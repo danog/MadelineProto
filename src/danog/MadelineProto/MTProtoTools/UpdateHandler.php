@@ -105,6 +105,7 @@ trait UpdateHandler
                 throw $e;
             }
         } catch (\danog\MadelineProto\Exception $e) {
+            $this->connect_to_all_dcs();
         }
 
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];

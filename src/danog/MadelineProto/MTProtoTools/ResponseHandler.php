@@ -91,14 +91,6 @@ trait ResponseHandler
                     $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $datacenter); // Acknowledge that the server received my request
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id']]['response'] = $current_msg_id;
                     break;
-                /*
-                case 'rpc_error':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
-                    $only_updates = false;
-                    $aargs = ['datacenter' => &$datacenter];
-                    $this->handle_rpc_error($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], $aargs);
-                    unset($aargs);
-                    break;*/
 
                 case 'bad_server_salt':
                 case 'bad_msg_notification':

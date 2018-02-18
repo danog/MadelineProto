@@ -187,7 +187,7 @@ If the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), t
 
 ## Methods
 
-A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 73)](https://daniil.it/MadelineProto/API_docs/).
+A list of all of the methods that can be called with MadelineProto can be found here: [here (layer 75)](https://daniil.it/MadelineProto/API_docs/).
 
 If an object of type User, InputUser, Chat, InputChannel, Peer or InputPeer must be provided as a parameter to a method, you can substitute it with the user/group/channel's username (`@username`) or bot API id (`-1029449`, `1249421`, `-100412412901`).  
 
@@ -378,10 +378,10 @@ Here are the default values for the settings arrays and explanations for every s
         'lang_code' => $lang_code,
     ],
     'tl_schema' => [ // TL scheme files
-        'layer' => 73, // layer version
+        'layer' => 75, // layer version
         'src' => [
             'mtproto' => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-            'telegram' => __DIR__.'/TL_telegram_v73.tl', // telegram TL scheme
+            'telegram' => __DIR__.'/TL_telegram_v75.tl', // telegram TL scheme
             'secret' => __DIR__.'/TL_secret.tl', // secret chats TL scheme
             'calls' => __DIR__.'/TL_calls.tl', // calls TL scheme
             'botAPI' => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
@@ -401,7 +401,7 @@ Here are the default values for the settings arrays and explanations for every s
         'logger_param' => '/tmp/MadelineProto.log',
         'logger' => 3, // overwrite previous setting and echo logs
         'logger_level' => Logger::VERBOSE, // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
-        'rollbar_token'      => 'f9fff6689aea4905b58eec73f66c791d' // You can provide a token for the rollbar log management system
+        'rollbar_token'      => 'f9fff6689aea4905b58eec75f66c791d' // You can provide a token for the rollbar log management system
     ],
     'max_tries' => [
         'query' => 5, // How many times should I try to call a method or send an object before throwing an exception
@@ -787,7 +787,7 @@ $secret_chat = $MadelineProto->get_secret_chat($chat);
 [
     'key' => [ // The authorization key
         'auth_key' => 'string', // 256 bytes long
-        'fingerprint' => 10387374747492, // a 64 bit signed integer
+        'fingerprint' => 10387574747492, // a 64 bit signed integer
         'visualization_orig' => 'string', // 16 bytes long
         'visualization_46' => 'string', // 20 bytes long
          // The two visualization strings must be concatenated to generate a visual fingerprint

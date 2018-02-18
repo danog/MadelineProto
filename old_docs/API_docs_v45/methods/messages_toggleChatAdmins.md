@@ -10,7 +10,7 @@ description: messages.toggleChatAdmins parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Optional|
 |enabled|[Bool](../types/Bool.md) | Yes|
 
 

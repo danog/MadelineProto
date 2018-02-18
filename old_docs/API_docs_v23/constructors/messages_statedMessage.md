@@ -11,7 +11,7 @@ description: messages_statedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[Message](../types/Message.md) | Yes|
+|message|[Message](../types/Message.md) | Optional|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 |pts|[int](../types/int.md) | Yes|

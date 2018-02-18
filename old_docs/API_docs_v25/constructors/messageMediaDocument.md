@@ -11,7 +11,7 @@ description: messageMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|document|[Document](../types/Document.md) | Yes|
+|document|[Document](../types/Document.md) | Optional|
 
 
 

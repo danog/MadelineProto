@@ -11,7 +11,7 @@ description: updateNewGeoChatMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[GeoChatMessage](../types/GeoChatMessage.md) | Yes|
+|message|[GeoChatMessage](../types/GeoChatMessage.md) | Optional|
 
 
 

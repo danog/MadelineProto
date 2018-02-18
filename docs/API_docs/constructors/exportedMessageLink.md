@@ -12,6 +12,7 @@ description: exportedMessageLink attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |link|[string](../types/string.md) | Yes|
+|html|[string](../types/string.md) | Yes|
 
 
 
@@ -21,13 +22,13 @@ description: exportedMessageLink attributes, type and example
 ### Example:
 
 ```
-$exportedMessageLink = ['_' => 'exportedMessageLink', 'link' => 'string'];
+$exportedMessageLink = ['_' => 'exportedMessageLink', 'link' => 'string', 'html' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "exportedMessageLink", "link": "string"}
+{"_": "exportedMessageLink", "link": "string", "html": "string"}
 ```
 
 
@@ -35,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-exportedMessageLink={_='exportedMessageLink', link='string'}
+exportedMessageLink={_='exportedMessageLink', link='string', html='string'}
 
 ```
 

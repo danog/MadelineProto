@@ -12,7 +12,7 @@ description: recentMeUrlChatInvite attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |url|[string](../types/string.md) | Yes|
-|chat\_invite|[ChatInvite](../types/ChatInvite.md) | Yes|
+|chat\_invite|[ChatInvite](../types/ChatInvite.md) | Optional|
 
 
 

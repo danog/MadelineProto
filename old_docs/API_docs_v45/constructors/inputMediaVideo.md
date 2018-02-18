@@ -11,7 +11,7 @@ description: inputMediaVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputVideo](../types/InputVideo.md) | Yes|
+|id|[InputVideo](../types/InputVideo.md) | Optional|
 |caption|[string](../types/string.md) | Yes|
 
 

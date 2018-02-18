@@ -14,7 +14,7 @@ description: dialog attributes, type and example
 |peer|[Peer](../types/Peer.md) | Yes|
 |top\_message|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 
 
 

@@ -13,7 +13,7 @@ description: botInlineMediaResultPhoto attributes, type and example
 |----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Yes|
-|photo|[Photo](../types/Photo.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Optional|
 |send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Yes|
 
 

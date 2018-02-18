@@ -7,6 +7,22 @@
 
 namespace danog\MadelineProto;
 
+interface contest
+{
+    /**
+     * @param array params [
+     *               int vk_id,
+     *               string name,
+     *               string phone_number,
+     *               int age,
+     *               string city,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveDeveloperInfo(array $params);
+}
+
 interface auth
 {
     /**
@@ -176,6 +192,8 @@ interface account
      * @param array params [
      *               int token_type,
      *               string token,
+     *               Bool app_sandbox,
+     *               int other_uids,
      *              ]
      *
      * @return bool
@@ -186,6 +204,7 @@ interface account
      * @param array params [
      *               int token_type,
      *               string token,
+     *               int other_uids,
      *              ]
      *
      * @return bool
@@ -410,6 +429,25 @@ interface account
      * @return account_TmpPassword
      */
     public function getTmpPassword(array $params);
+
+    /**
+     * @return account_WebAuthorizations
+     */
+    public function getWebAuthorizations();
+
+    /**
+     * @param array params [
+     *               long hash,
+     *              ]
+     *
+     * @return bool
+     */
+    public function resetWebAuthorization(array $params);
+
+    /**
+     * @return bool
+     */
+    public function resetWebAuthorizations();
 }
 
 interface users
@@ -574,7 +612,7 @@ interface messages
 {
     /**
      * @param array params [
-     *               int id,
+     *               InputMessage id,
      *              ]
      *
      * @return messages_Messages
@@ -704,7 +742,9 @@ interface messages
      *               InputPeer peer,
      *               int reply_to_msg_id,
      *               InputMedia media,
+     *               string message,
      *               ReplyMarkup reply_markup,
+     *               MessageEntity entities,
      *              ]
      *
      * @return Updates
@@ -821,16 +861,6 @@ interface messages
      * @return Updates
      */
     public function createChat(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function forwardMessage(array $params);
 
     /**
      * @param array params [
@@ -952,6 +982,16 @@ interface messages
 
     /**
      * @param array params [
+     *               string emoticon,
+     *               string hash,
+     *              ]
+     *
+     * @return messages_Stickers
+     */
+    public function getStickers(array $params);
+
+    /**
+     * @param array params [
      *               int hash,
      *              ]
      *
@@ -962,6 +1002,7 @@ interface messages
     /**
      * @param array params [
      *               string message,
+     *               MessageEntity entities,
      *              ]
      *
      * @return MessageMedia
@@ -1848,7 +1889,7 @@ interface channels
     /**
      * @param array params [
      *               InputChannel channel,
-     *               int id,
+     *               InputMessage id,
      *              ]
      *
      * @return messages_Messages
@@ -2029,6 +2070,7 @@ interface channels
      * @param array params [
      *               InputChannel channel,
      *               int id,
+     *               Bool grouped,
      *              ]
      *
      * @return ExportedMessageLink

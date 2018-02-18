@@ -12,7 +12,7 @@ description: updateDraftMessage attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Peer](../types/Peer.md) | Yes|
-|draft|[DraftMessage](../types/DraftMessage.md) | Yes|
+|draft|[DraftMessage](../types/DraftMessage.md) | Optional|
 
 
 

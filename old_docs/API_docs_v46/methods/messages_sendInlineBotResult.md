@@ -11,7 +11,7 @@ description: messages.sendInlineBotResult parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |broadcast|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |query\_id|[long](../types/long.md) | Yes|
 |id|[string](../types/string.md) | Yes|

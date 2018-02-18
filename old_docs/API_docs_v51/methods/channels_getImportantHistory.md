@@ -10,7 +10,7 @@ description: channels.getImportantHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |offset\_id|[int](../types/int.md) | Yes|
 |offset\_date|[int](../types/int.md) | Yes|
 |add\_offset|[int](../types/int.md) | Yes|

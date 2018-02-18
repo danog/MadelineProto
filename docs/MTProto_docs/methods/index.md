@@ -47,6 +47,8 @@ $MadelineProto->[ping_delay_disconnect](ping_delay_disconnect.md)(\['ping_id' =>
 
 $MadelineProto->[req_pq](req_pq.md)(\['nonce' => [int128](../types/int128.md), \]) === [$ResPQ](../types/ResPQ.md)<a name="req_pq"></a>  
 
+$MadelineProto->[req_pq_multi](req_pq_multi.md)(\['nonce' => [int128](../types/int128.md), \]) === [$ResPQ](../types/ResPQ.md)<a name="req_pq_multi"></a>  
+
 ***
 <br><br>$MadelineProto->[rpc_drop_answer](rpc_drop_answer.md)(\['req_msg_id' => [long](../types/long.md), \]) === [$RpcDropAnswer](../types/RpcDropAnswer.md)<a name="rpc_drop_answer"></a>  
 

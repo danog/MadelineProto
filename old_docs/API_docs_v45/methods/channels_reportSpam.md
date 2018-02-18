@@ -10,8 +10,8 @@ description: channels.reportSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
 
 

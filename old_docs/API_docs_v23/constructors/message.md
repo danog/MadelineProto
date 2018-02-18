@@ -16,7 +16,7 @@ description: message attributes, type and example
 |to\_id|[Peer](../types/Peer.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 
 
 

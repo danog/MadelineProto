@@ -14,7 +14,7 @@ Some option changed its value
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |name|[string](../types/string.md) | Yes|Option name|
-|value|[OptionValue](../types/OptionValue.md) | Yes|New option value|
+|value|[OptionValue](../types/OptionValue.md) | Optional|New option value|
 
 
 

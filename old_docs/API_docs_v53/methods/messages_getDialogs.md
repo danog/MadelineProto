@@ -12,7 +12,7 @@ description: messages.getDialogs parameters, return type and example
 |----------|---------------|----------|
 |offset\_date|[int](../types/int.md) | Yes|
 |offset\_id|[int](../types/int.md) | Yes|
-|offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|offset\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 |limit|[int](../types/int.md) | Yes|
 
 

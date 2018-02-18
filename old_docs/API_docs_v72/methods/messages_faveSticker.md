@@ -10,7 +10,7 @@ description: messages.faveSticker parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputDocument](../types/InputDocument.md) | Yes|
+|id|[InputDocument](../types/InputDocument.md) | Optional|
 |unfave|[Bool](../types/Bool.md) | Yes|
 
 

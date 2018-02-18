@@ -17,7 +17,7 @@ class Bytes extends \Volatile implements \JsonSerializable
     use \danog\Serializable;
     private $bytes = [];
 
-    public function ___construct($bytes)
+    public function __magic_construct($bytes)
     {
         $this->bytes = $bytes;
     }

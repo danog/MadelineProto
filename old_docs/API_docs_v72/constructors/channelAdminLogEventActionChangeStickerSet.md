@@ -11,8 +11,8 @@ description: channelAdminLogEventActionChangeStickerSet attributes, type and exa
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|prev\_stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
-|new\_stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|prev\_stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
+|new\_stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 
 

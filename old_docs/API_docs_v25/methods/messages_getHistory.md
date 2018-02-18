@@ -10,7 +10,7 @@ description: messages.getHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |offset|[int](../types/int.md) | Yes|
 |max\_id|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

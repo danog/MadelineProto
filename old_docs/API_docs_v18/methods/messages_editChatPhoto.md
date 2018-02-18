@@ -10,8 +10,8 @@ description: messages.editChatPhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
-|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Optional|
+|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Optional|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

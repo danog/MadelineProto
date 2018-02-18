@@ -26,10 +26,10 @@ trait MessageHandler
         }
 
         $this->secret_chats[$chat_id]['ttr']--;
-        if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
-            $this->rekey($chat_id);
-        }
         if ($this->secret_chats[$chat_id]['layer'] > 8) {
+            if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
+                $this->rekey($chat_id);
+            }
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->secret_chats[$chat_id]['layer'], 'in_seq_no' => $this->generate_secret_in_seq_no($chat_id), 'out_seq_no' => $this->generate_secret_out_seq_no($chat_id), 'message' => $message];
             $this->secret_chats[$chat_id]['out_seq_no']++;
         }

@@ -12,7 +12,7 @@ description: help_support attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |phone\_number|[string](../types/string.md) | Yes|
-|user|[User](../types/User.md) | Yes|
+|user|[User](../types/User.md) | Optional|
 
 
 

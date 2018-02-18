@@ -13,7 +13,7 @@ description: updateServiceNotification attributes, type and example
 |----------|---------------|----------|
 |type|[string](../types/string.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |popup|[Bool](../types/Bool.md) | Yes|
 
 

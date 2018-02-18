@@ -10,7 +10,7 @@ description: channels.getAdminLog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |q|[string](../types/string.md) | Yes|
 |events\_filter|[ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
 |admins|Array of [InputUser](../types/InputUser.md) | Optional|

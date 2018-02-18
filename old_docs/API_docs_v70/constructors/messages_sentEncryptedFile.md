@@ -12,7 +12,7 @@ description: messages_sentEncryptedFile attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |date|[int](../types/int.md) | Yes|
-|file|[EncryptedFile](../types/EncryptedFile.md) | Yes|
+|file|[EncryptedFile](../types/EncryptedFile.md) | Optional|
 
 
 

@@ -17,7 +17,7 @@ description: dialogChannel attributes, type and example
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
 |unread\_important\_count|[int](../types/int.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |pts|[int](../types/int.md) | Yes|
 
 

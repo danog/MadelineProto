@@ -343,7 +343,21 @@ trait TL
                 }
 
                 return $concat;
+            case 'vector':
+                if (!is_array($object)) {
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
+                }
+                $concat = $this->pack_unsigned_int(count($object));
+                foreach ($object as $k => $current_object) {
+                    $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object, $k);
+                }
 
+                return $concat;
+
+            case 'Object':
+                if (is_string($object)) {
+                    return $object;
+                }
         }
         $auto = false;
         if ((!is_array($object) || (isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
@@ -379,12 +393,12 @@ trait TL
             $bare = true;
         }
 
-        $concat = '';
-        if ($constructorData['predicate'] === 'messageEntityMentionName') {
+        if ($predicate === 'messageEntityMentionName') {
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
+        $concat = '';
         if (!$bare) {
-            $concat .= $constructorData['id'];
+            $concat = $constructorData['id'];
         }
 
         return $concat.$this->serialize_params($constructorData, $object, '', $layer);
@@ -457,6 +471,10 @@ trait TL
                                 continue 2;
                             }
                     }
+                }
+                if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty')) {
+                    $serialized .= $id['id'];
+                    continue;
                 }
 
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
@@ -556,6 +574,12 @@ trait TL
             case 'Vector t':
                 $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
+
+                if ($constructorData === false) {
+                    $constructorData = $this->methods->find_by_id($id);
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
+                }
+
                 if ($constructorData === false) {
                     throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                 }
@@ -590,7 +614,11 @@ trait TL
                 $id = stream_get_contents($stream, 4);
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
-                    throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
+                    $constructorData = $this->methods->find_by_id($id);
+                    if ($constructorData === false) {
+                        throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
+                    }
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
             }
         }
@@ -608,8 +636,11 @@ trait TL
 
             return $this->deserialize($stream, $constructorData);
         }
-        if ($constructorData['type'] === 'Bool') {
-            return $constructorData['predicate'] === 'boolTrue';
+        if ($constructorData['predicate'] === 'boolTrue') {
+            return true;
+        }
+        if ($constructorData['predicate'] === 'boolFalse') {
+            return false;
         }
         $x = ['_' => $constructorData['predicate']];
         foreach ($constructorData['params'] as $arg) {
@@ -647,7 +678,6 @@ trait TL
                 $arg['datacenter'] = $type['datacenter'];
             }
             $x[$arg['name']] = $this->deserialize($stream, $arg);
-
             if ($arg['name'] === 'random_bytes') {
                 if (strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_small']);

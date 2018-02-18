@@ -16,7 +16,7 @@ description: document attributes, type and example
 |date|[int](../types/int.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|
 |size|[int](../types/int.md) | Yes|
-|thumb|[PhotoSize](../types/PhotoSize.md) | Yes|
+|thumb|[PhotoSize](../types/PhotoSize.md) | Optional|
 |dc\_id|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|

@@ -14,7 +14,7 @@ description: encryptedMessage attributes, type and example
 |chat\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |decrypted\_message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
-|file|[EncryptedFile](../types/EncryptedFile.md) | Yes|
+|file|[EncryptedFile](../types/EncryptedFile.md) | Optional|
 
 
 

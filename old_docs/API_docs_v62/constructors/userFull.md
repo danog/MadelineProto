@@ -13,11 +13,11 @@ description: userFull attributes, type and example
 |----------|---------------|----------|
 |blocked|[Bool](../types/Bool.md) | Optional|
 |phone\_calls\_available|[Bool](../types/Bool.md) | Optional|
-|user|[User](../types/User.md) | Yes|
+|user|[User](../types/User.md) | Optional|
 |about|[string](../types/string.md) | Optional|
 |link|[contacts\_Link](../types/contacts_Link.md) | Yes|
 |profile\_photo|[Photo](../types/Photo.md) | Optional|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |bot\_info|[BotInfo](../types/BotInfo.md) | Optional|
 |common\_chats\_count|[int](../types/int.md) | Yes|
 

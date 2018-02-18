@@ -13,7 +13,7 @@ description: inputMessageEntityMentionName attributes, type and example
 |----------|---------------|----------|
 |offset|[int](../types/int.md) | Yes|
 |length|[int](../types/int.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 
 
 

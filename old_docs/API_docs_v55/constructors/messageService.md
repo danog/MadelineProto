@@ -21,7 +21,7 @@ description: messageService attributes, type and example
 |to\_id|[Peer](../types/Peer.md) | Yes|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Yes|
-|action|[MessageAction](../types/MessageAction.md) | Yes|
+|action|[MessageAction](../types/MessageAction.md) | Optional|
 
 
 

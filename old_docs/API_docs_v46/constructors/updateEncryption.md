@@ -11,7 +11,7 @@ description: updateEncryption attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|encr\_chat|[EncryptedChat](../types/EncryptedChat.md) | Yes|
+|encr\_chat|[EncryptedChat](../types/EncryptedChat.md) | Optional|
 |date|[int](../types/int.md) | Yes|
 
 

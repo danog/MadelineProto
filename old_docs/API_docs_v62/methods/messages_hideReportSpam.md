@@ -10,7 +10,7 @@ description: messages.hideReportSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

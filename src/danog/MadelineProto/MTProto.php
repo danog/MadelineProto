@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 87;
+    const V = 89;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -160,8 +160,10 @@ class MTProto
     public $hook_url = false;
     public $settings = [];
     private $config = ['expires' => -1];
+    private $initing_authorization = false;
     public $authorization = null;
     public $authorized = 0;
+    public $authorized_dc = -1;
 
     private $rsa_keys = [];
     private $last_recv = 0;
@@ -191,11 +193,11 @@ class MTProto
     private $emojis;
     private $postpone_updates = false;
 
-    public function ___construct($settings = [])
+    public function __magic_construct($settings = [])
     {
         // Parse settings
         $this->parse_settings($settings);
-        if (!defined('\phpseclib\Crypt\AES::MODE_IGE')) {
+        if (!defined('\phpseclib\Crypt\Common\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
         $this->emojis = json_decode(self::JSON_EMOJIS);
@@ -206,6 +208,7 @@ class MTProto
         if (!isset($this->datacenter)) {
             $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         }
+
         // Load rsa keys
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['load_rsa']], Logger::ULTRA_VERBOSE);
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
@@ -231,18 +234,16 @@ class MTProto
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_translation']], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
 
-        // Istantiate TL class
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
 
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['this_dc'], $nearest_dc['nearest_dc'])], Logger::NOTICE);
+                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc'])], Logger::NOTICE);
 
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
-                    $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
-                    $this->settings['connection_settings']['default_dc'] = (int) $nearest_dc['nearest_dc'];
+                    $this->settings['connection_settings']['default_dc'] = $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
                 }
             } catch (RPCErrorException $e) {
                 if ($e->rpc !== 'BOT_METHOD_INVALID') {
@@ -258,7 +259,7 @@ class MTProto
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis'];
+        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc'];
     }
 
     public function __wakeup()
@@ -488,6 +489,7 @@ class MTProto
                     'timeout'     => 2, // timeout for sockets
                     'proxy'       => '\Socket', // The proxy class to use
                     'proxy_extra' => [], // Extra parameters to pass to the proxy class using setExtra
+                    'pfs'         => true,
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
@@ -500,10 +502,10 @@ class MTProto
                 'lang_code' => $lang_code,
             ],
             'tl_schema' => [ // TL scheme files
-                'layer' => 73, // layer version
+                'layer' => 75, // layer version
                 'src'   => [
                     'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram' => __DIR__.'/TL_telegram_v73.tl', // telegram TL scheme
+                    'telegram' => __DIR__.'/TL_telegram_v75.tl', // telegram TL scheme
                     'secret'   => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'    => __DIR__.'/TL_calls.tl', // calls TL scheme
                     //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
@@ -571,6 +573,9 @@ class MTProto
                 'requests' => true,  // Should I get info about unknown peers from PWRTelegram?
             ],
         ];
+        if ($settings === false) {
+            $settings = [];
+        }
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (isset(Lang::$lang[$settings['app_info']['lang_code']])) {
             Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
@@ -640,7 +645,7 @@ class MTProto
     {
         $this->datacenter->sockets[$datacenter]->close_and_reopen();
         if ($this->is_http($datacenter)) {
-            $this->method_call('http_wait', ['max_wait' => 0, 'wait_after' => 0, 'max_delay' => 0], ['datacenter' => $datacenter]);
+            $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
         }
     }
 
@@ -657,77 +662,6 @@ class MTProto
             $this->datacenter->dc_connect($new_dc);
         }
         $this->init_authorization();
-    }
-
-    private $initing_authorization = false;
-
-    // Creates authorization keys
-    public function init_authorization()
-    {
-        $this->initing_authorization = true;
-        $this->updates_state['sync_loading'] = true;
-
-        try {
-            foreach ($this->datacenter->sockets as $id => $socket) {
-                $cdn = strpos($id, 'cdn');
-                if (strpos($id, 'media') !== false && !$cdn) {
-                    continue;
-                }
-                if ($socket->session_id === null) {
-                    $socket->session_id = $this->random(8);
-                    $socket->session_in_seq_no = 0;
-                    $socket->session_out_seq_no = 0;
-                }
-                if ($socket->temp_auth_key === null || $socket->auth_key === null) {
-                    if ($socket->auth_key === null && !$cdn) {
-                        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id)], Logger::NOTICE);
-                        $socket->auth_key = $this->create_auth_key(-1, $id);
-                        $socket->authorized = false;
-                    }
-                    \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], Logger::NOTICE);
-                    $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                    if (!$cdn) {
-                        $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                        $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
-                        $this->sync_authorization($id);
-                        $this->get_config($config);
-                    }
-                } elseif (!$cdn) {
-                    $this->sync_authorization($id);
-                }
-            }
-        } finally {
-            $this->initing_authorization = false;
-            $this->updates_state['sync_loading'] = false;
-        }
-    }
-
-    public function sync_authorization($id)
-    {
-        if (!isset($this->datacenter->sockets[$id])) {
-            return false;
-        }
-        $socket = $this->datacenter->sockets[$id];
-        if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
-            foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
-                if ($authorized_socket->temp_auth_key !== null && $authorized_socket->auth_key !== null && $authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
-                    try {
-                        \danog\MadelineProto\Logger::log(['Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id]);
-                        $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
-                        $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
-                        $socket->authorized = true;
-                        break;
-                    } catch (\danog\MadelineProto\Exception $e) {
-                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
-                        if ($e->rpc === 'DC_ID_INVALID') {
-                            break;
-                        }
-                    } // Turns out this DC isn't authorized after all
-                }
-            }
-        }
     }
 
     public function write_client_info($method, $arguments = [], $options = [])

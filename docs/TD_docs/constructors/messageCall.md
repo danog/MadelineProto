@@ -13,7 +13,7 @@ Message with an information about ended call
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|discard\_reason|[CallDiscardReason](../types/CallDiscardReason.md) | Yes|Call discard reason|
+|discard\_reason|[CallDiscardReason](../types/CallDiscardReason.md) | Optional|Call discard reason|
 |duration|[int](../types/int.md) | Yes|Call duration in seconds|
 
 

@@ -16,8 +16,8 @@ description: userSelf attributes, type and example
 |last\_name|[string](../types/string.md) | Yes|
 |username|[string](../types/string.md) | Yes|
 |phone|[string](../types/string.md) | Yes|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
-|status|[UserStatus](../types/UserStatus.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Optional|
+|status|[UserStatus](../types/UserStatus.md) | Optional|
 |inactive|[Bool](../types/Bool.md) | Yes|
 
 

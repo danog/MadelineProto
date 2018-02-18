@@ -19,7 +19,7 @@ description: message attributes, type and example
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |date|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 

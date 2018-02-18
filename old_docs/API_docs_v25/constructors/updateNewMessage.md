@@ -11,7 +11,7 @@ description: updateNewMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[Message](../types/Message.md) | Yes|
+|message|[Message](../types/Message.md) | Optional|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|
 

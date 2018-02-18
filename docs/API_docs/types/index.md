@@ -10,6 +10,8 @@ description: List of types
 
 [Authorization](Authorization.md)<a name="Authorization"></a>  
 
+[BadMsgNotification](BadMsgNotification.md)<a name="BadMsgNotification"></a>  
+
 [Bool](Bool.md)<a name="Bool"></a>  
 
 [BotCommand](BotCommand.md)<a name="BotCommand"></a>  
@@ -54,6 +56,8 @@ description: List of types
 
 [ChatPhoto](ChatPhoto.md)<a name="ChatPhoto"></a>  
 
+[Client\_DH\_Inner\_Data](Client_DH_Inner_Data.md)<a name="Client_DH_Inner_Data"></a>  
+
 [Config](Config.md)<a name="Config"></a>  
 
 [Contact](Contact.md)<a name="Contact"></a>  
@@ -77,6 +81,10 @@ description: List of types
 [DecryptedMessageLayer](DecryptedMessageLayer.md)<a name="DecryptedMessageLayer"></a>  
 
 [DecryptedMessageMedia](DecryptedMessageMedia.md)<a name="DecryptedMessageMedia"></a>  
+
+[DestroyAuthKeyRes](DestroyAuthKeyRes.md)<a name="DestroyAuthKeyRes"></a>  
+
+[DestroySessionRes](DestroySessionRes.md)<a name="DestroySessionRes"></a>  
 
 [Dialog](Dialog.md)<a name="Dialog"></a>  
 
@@ -104,11 +112,17 @@ description: List of types
 
 [FoundGif](FoundGif.md)<a name="FoundGif"></a>  
 
+[FutureSalt](FutureSalt.md)<a name="FutureSalt"></a>  
+
+[FutureSalts](FutureSalts.md)<a name="FutureSalts"></a>  
+
 [Game](Game.md)<a name="Game"></a>  
 
 [GeoPoint](GeoPoint.md)<a name="GeoPoint"></a>  
 
 [HighScore](HighScore.md)<a name="HighScore"></a>  
+
+[HttpWait](HttpWait.md)<a name="HttpWait"></a>  
 
 [ImportedContact](ImportedContact.md)<a name="ImportedContact"></a>  
 
@@ -144,6 +158,8 @@ description: List of types
 
 [InputMedia](InputMedia.md)<a name="InputMedia"></a>  
 
+[InputMessage](InputMessage.md)<a name="InputMessage"></a>  
+
 [InputNotifyPeer](InputNotifyPeer.md)<a name="InputNotifyPeer"></a>  
 
 [InputPaymentCredentials](InputPaymentCredentials.md)<a name="InputPaymentCredentials"></a>  
@@ -178,6 +194,8 @@ description: List of types
 
 [Invoice](Invoice.md)<a name="Invoice"></a>  
 
+[IpPort](IpPort.md)<a name="IpPort"></a>  
+
 [KeyboardButton](KeyboardButton.md)<a name="KeyboardButton"></a>  
 
 [KeyboardButtonRow](KeyboardButtonRow.md)<a name="KeyboardButtonRow"></a>  
@@ -206,11 +224,27 @@ description: List of types
 
 [MessagesFilter](MessagesFilter.md)<a name="MessagesFilter"></a>  
 
+[MsgDetailedInfo](MsgDetailedInfo.md)<a name="MsgDetailedInfo"></a>  
+
+[MsgResendReq](MsgResendReq.md)<a name="MsgResendReq"></a>  
+
+[MsgsAck](MsgsAck.md)<a name="MsgsAck"></a>  
+
+[MsgsAllInfo](MsgsAllInfo.md)<a name="MsgsAllInfo"></a>  
+
+[MsgsStateInfo](MsgsStateInfo.md)<a name="MsgsStateInfo"></a>  
+
+[MsgsStateReq](MsgsStateReq.md)<a name="MsgsStateReq"></a>  
+
 [NearestDc](NearestDc.md)<a name="NearestDc"></a>  
+
+[NewSession](NewSession.md)<a name="NewSession"></a>  
 
 [NotifyPeer](NotifyPeer.md)<a name="NotifyPeer"></a>  
 
 [Null](Null.md)<a name="Null"></a>  
+
+[P\_Q\_inner\_data](P_Q_inner_data.md)<a name="P_Q_inner_data"></a>  
 
 [Page](Page.md)<a name="Page"></a>  
 
@@ -242,6 +276,8 @@ description: List of types
 
 [PhotoSize](PhotoSize.md)<a name="PhotoSize"></a>  
 
+[Pong](Pong.md)<a name="Pong"></a>  
+
 [PopularContact](PopularContact.md)<a name="PopularContact"></a>  
 
 [PostAddress](PostAddress.md)<a name="PostAddress"></a>  
@@ -258,9 +294,21 @@ description: List of types
 
 [ReportReason](ReportReason.md)<a name="ReportReason"></a>  
 
+[ResPQ](ResPQ.md)<a name="ResPQ"></a>  
+
 [RichText](RichText.md)<a name="RichText"></a>  
 
+[RpcDropAnswer](RpcDropAnswer.md)<a name="RpcDropAnswer"></a>  
+
+[RpcError](RpcError.md)<a name="RpcError"></a>  
+
 [SendMessageAction](SendMessageAction.md)<a name="SendMessageAction"></a>  
+
+[Server\_DH\_Params](Server_DH_Params.md)<a name="Server_DH_Params"></a>  
+
+[Server\_DH\_inner\_data](Server_DH_inner_data.md)<a name="Server_DH_inner_data"></a>  
+
+[Set\_client\_DH\_params\_answer](Set_client_DH_params_answer.md)<a name="Set_client_DH_params_answer"></a>  
 
 [ShippingOption](ShippingOption.md)<a name="ShippingOption"></a>  
 
@@ -292,6 +340,8 @@ description: List of types
 
 [WallPaper](WallPaper.md)<a name="WallPaper"></a>  
 
+[WebAuthorization](WebAuthorization.md)<a name="WebAuthorization"></a>  
+
 [WebDocument](WebDocument.md)<a name="WebDocument"></a>  
 
 [WebPage](WebPage.md)<a name="WebPage"></a>  
@@ -309,6 +359,8 @@ description: List of types
 [account\_PrivacyRules](account_PrivacyRules.md)<a name="account_PrivacyRules"></a>  
 
 [account\_TmpPassword](account_TmpPassword.md)<a name="account_TmpPassword"></a>  
+
+[account\_WebAuthorizations](account_WebAuthorizations.md)<a name="account_WebAuthorizations"></a>  
 
 [auth\_Authorization](auth_Authorization.md)<a name="auth_Authorization"></a>  
 
@@ -345,6 +397,8 @@ description: List of types
 [contacts\_TopPeers](contacts_TopPeers.md)<a name="contacts_TopPeers"></a>  
 
 [help\_AppUpdate](help_AppUpdate.md)<a name="help_AppUpdate"></a>  
+
+[help\_ConfigSimple](help_ConfigSimple.md)<a name="help_ConfigSimple"></a>  
 
 [help\_InviteText](help_InviteText.md)<a name="help_InviteText"></a>  
 

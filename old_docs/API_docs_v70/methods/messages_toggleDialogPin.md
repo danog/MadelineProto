@@ -11,7 +11,7 @@ description: messages.toggleDialogPin parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |pinned|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

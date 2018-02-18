@@ -10,8 +10,9 @@ description: channels.exportMessageLink parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |id|[int](../types/int.md) | Yes|
+|grouped|[Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [ExportedMessageLink](../types/ExportedMessageLink.md)
@@ -38,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$ExportedMessageLink = $MadelineProto->channels->exportMessageLink(['channel' => InputChannel, 'id' => int, ]);
+$ExportedMessageLink = $MadelineProto->channels->exportMessageLink(['channel' => InputChannel, 'id' => int, 'grouped' => Bool, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -55,12 +56,14 @@ channel - Json encoded InputChannel
 
 id - Json encoded int
 
+grouped - Json encoded Bool
+
 
 
 
 Or, if you're into Lua:
 
 ```
-ExportedMessageLink = channels.exportMessageLink({channel=InputChannel, id=int, })
+ExportedMessageLink = channels.exportMessageLink({channel=InputChannel, id=int, grouped=Bool, })
 ```
 

@@ -12,7 +12,7 @@ description: auth_authorization attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |expires|[int](../types/int.md) | Yes|
-|user|[User](../types/User.md) | Yes|
+|user|[User](../types/User.md) | Optional|
 
 
 

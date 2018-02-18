@@ -16,7 +16,7 @@ description: game attributes, type and example
 |short\_name|[string](../types/string.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 |description|[string](../types/string.md) | Yes|
-|photo|[Photo](../types/Photo.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Optional|
 |document|[Document](../types/Document.md) | Optional|
 
 

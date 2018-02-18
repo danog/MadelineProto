@@ -17,8 +17,8 @@ description: userContact attributes, type and example
 |username|[string](../types/string.md) | Yes|
 |access\_hash|[long](../types/long.md) | Yes|
 |phone|[string](../types/string.md) | Yes|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
-|status|[UserStatus](../types/UserStatus.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Optional|
+|status|[UserStatus](../types/UserStatus.md) | Optional|
 
 
 

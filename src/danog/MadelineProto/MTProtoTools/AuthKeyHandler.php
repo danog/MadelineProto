@@ -44,7 +44,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = $this->random(16);
-                $ResPQ = $this->method_call('req_pq',
+                $ResPQ = $this->method_call('req_pq_multi',
                     [
                         'nonce' => $nonce,
                     ],
@@ -370,11 +370,6 @@ trait AuthKeyHandler
                             $res_authorization['server_salt'] = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
                             $res_authorization['auth_key'] = $auth_key_str;
                             $res_authorization['id'] = substr($auth_key_sha, -8);
-                            /*
-                            if ($expires_in >= 0) { //check if permanent authorization
-                                $res_authorization['expires_in'] = $expires_in;
-                                $res_authorization['p_q_inner_data_temp'] = $p_q_inner_data;
-                            }*/
 
                             \danog\MadelineProto\Logger::log(['Auth key generated'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -553,10 +548,6 @@ trait AuthKeyHandler
                 if ($res === true) {
                     \danog\MadelineProto\Logger::log(['Successfully binded temporary and permanent authorization keys, DC '.$datacenter], \danog\MadelineProto\Logger::NOTICE);
 
-                    if ($this->is_http($datacenter)) {
-                        $this->close_and_reopen($datacenter);
-                    }
-
                     return true;
                 }
             } catch (\danog\MadelineProto\SecurityException $e) {
@@ -572,5 +563,87 @@ trait AuthKeyHandler
         }
 
         throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
+    }
+
+    // Creates authorization keys
+    public function init_authorization()
+    {
+        $this->initing_authorization = true;
+        $this->updates_state['sync_loading'] = true;
+        $this->postpone_updates = true;
+
+        try {
+            foreach ($this->datacenter->sockets as $id => $socket) {
+                $cdn = strpos($id, 'cdn');
+                if (strpos($id, 'media') !== false && !$cdn) {
+                    continue;
+                }
+                if ($socket->session_id === null) {
+                    $socket->session_id = $this->random(8);
+                    $socket->session_in_seq_no = 0;
+                    $socket->session_out_seq_no = 0;
+                }
+                if ($socket->temp_auth_key === null || $socket->auth_key === null) {
+                    $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
+                    if ($socket->auth_key === null && !$cdn) {
+                        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id)], \danog\MadelineProto\Logger::NOTICE);
+                        $socket->auth_key = $this->create_auth_key(-1, $id);
+                        $socket->authorized = false;
+                    }
+                    \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], \danog\MadelineProto\Logger::NOTICE);
+                    if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
+                        $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        if (!$cdn) {
+                            $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                            $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
+                            $this->sync_authorization($id);
+                            $this->get_config($config);
+                        }
+                    } else {
+                        $socket->temp_auth_key = $socket->auth_key;
+                        $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
+                        $this->sync_authorization($id);
+                        $this->get_config($config);
+                    }
+                } elseif (!$cdn) {
+                    $this->sync_authorization($id);
+                }
+            }
+        } finally {
+            $this->postpone_updates = false;
+            $this->initing_authorization = false;
+            $this->updates_state['sync_loading'] = false;
+        }
+    }
+
+    public function sync_authorization($id)
+    {
+        if (!isset($this->datacenter->sockets[$id])) {
+            return false;
+        }
+        $socket = $this->datacenter->sockets[$id];
+        if ($this->authorized === self::LOGGED_IN && $socket->authorized === false) {
+            foreach ($this->datacenter->sockets as $authorized_dc_id => $authorized_socket) {
+                if ($this->authorized_dc !== -1 && $authorized_dc_id !== $this->authorized_dc) {
+                    continue;
+                }
+                if ($authorized_socket->temp_auth_key !== null && $authorized_socket->auth_key !== null && $authorized_socket->authorized === true && $this->authorized === self::LOGGED_IN && $socket->authorized === false) {
+                    try {
+                        \danog\MadelineProto\Logger::log(['Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id]);
+                        $exported_authorization = $this->method_call('auth.exportAuthorization', ['dc_id' => preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
+                        $authorization = $this->method_call('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
+                        $socket->authorized = true;
+                        break;
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        \danog\MadelineProto\Logger::log(['Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage()], \danog\MadelineProto\Logger::ERROR);
+                        if ($e->rpc === 'DC_ID_INVALID') {
+                            break;
+                        }
+                    } // Turns out this DC isn't authorized after all
+                }
+            }
+        }
     }
 }
