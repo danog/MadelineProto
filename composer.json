@@ -37,14 +37,14 @@
             "danog\\MadelineProto\\": "src/"
         },
         "files": [
-            "src/BigIntegor.php"
+            "src/BigIntegor.php",
             "src/Socket.php",
             "src/Collectable.php",
             "src/Threaded.php",
             "src/Volatile.php",
             "src/Thread.php",
             "src/Worker.php",
-            "src/Pool.php",
+            "src/Pool.php"
         ]
     }
 }
