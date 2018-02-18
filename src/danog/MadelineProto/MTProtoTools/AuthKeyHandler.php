@@ -44,7 +44,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = $this->random(16);
-                $ResPQ = $this->method_call('req_pq',
+                $ResPQ = $this->method_call('req_pq_multi',
                     [
                         'nonce' => $nonce,
                     ],
@@ -571,7 +571,6 @@ trait AuthKeyHandler
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
         $this->postpone_updates = true;
-
         try {
             foreach ($this->datacenter->sockets as $id => $socket) {
                 $cdn = strpos($id, 'cdn');
@@ -605,8 +604,6 @@ trait AuthKeyHandler
                         $this->sync_authorization($id);
                         $this->get_config($config);
                     }
-                    $this->method_call('ping', ['ping_id' => 0], ['datacenter' => 2]);
-                    $this->method_call('ping', ['ping_id' => 1], ['datacenter' => 2]);
                 } elseif (!$cdn) {
                     $this->sync_authorization($id);
                 }

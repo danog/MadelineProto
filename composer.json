@@ -2,7 +2,7 @@
     "name": "danog/madelineproto",
     "description": "PHP implementation of telegram's MTProto protocol.",
     "type": "project",
-    "license": "AGPL-3.0",
+    "license": "AGPL-3.0-only",
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "conflict": {
@@ -37,6 +37,7 @@
             "danog\\MadelineProto\\": "src/"
         },
         "files": [
+            "src/BigIntegor.php"
             "src/Socket.php",
             "src/Collectable.php",
             "src/Threaded.php",
@@ -44,7 +45,6 @@
             "src/Thread.php",
             "src/Worker.php",
             "src/Pool.php",
-            "src/BigIntegor.php"
         ]
     }
 }

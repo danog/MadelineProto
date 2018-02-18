@@ -17,71 +17,52 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait MessageHandler
 {
-    /**
-     * Forming the message frame and sending message to server
-     * :param message: byte string to send.
-     */
-    public function send_message($message_data, $content_related, $aargs = [])
+    public function send_unencrypted_message($message_data, $message_id, $datacenter) {
+        $message_data = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
+        $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['response' => -1];
+        $this->datacenter->sockets[$datacenter]->send_message($message_data);
+    }
+    public function send_messages($datacenter)
     {
-        if (!isset($aargs['message_id']) || $aargs['message_id'] === null) {
-            $message_id = $this->generate_message_id($aargs['datacenter']);
+        if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
+            $messages = [];
+            foreach ($this->datacenter->sockets[$datacenter]->object_queue as $message) {
+                $message['seqno'] = $this->generate_out_seq_no($datacenter, $message['content_related']);
+                $message['bytes'] = strlen($message['body']);
+                $message['_'] = 'MTmessage';
+                $messages[] = $message;
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
+            }
+            $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
+            $message_id = $this->generate_message_id($datacenter);
+            $seq_no = $this->generate_out_seq_no($datacenter, false);
+        } else if (count($this->datacenter->sockets[$datacenter]->object_queue)) {
+            $message = array_shift($this->datacenter->sockets[$datacenter]->object_queue);
+            $message_data = $message['body'];
+            $message_id = $message['msg_id'];
+            $seq_no = $this->generate_out_seq_no($datacenter, $message['content_related']);
         } else {
-            $message_id = $aargs['message_id'];
-        }
-        if (!is_string($message_id)) {
-            throw new \danog\MadelineProto\Exception("Specified message id isn't a string");
-        }
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
-
-        if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'] === null || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] === null) {
-            $message = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
-
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
-            $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
-        } else {
-            if (!empty($this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
-                $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'content' => 'ack'];
-            }
-            if (count($this->datacenter->sockets[$aargs['datacenter']]->object_queue)) {
-                $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $message_data, 'content_related' => $content_related];
-                $messages = [];
-                foreach ($this->datacenter->sockets[$aargs['datacenter']]->object_queue as $message) {
-                    $message['msg_id'] = $this->generate_message_id($aargs['datacenter']);
-                    $message['seqno'] = $this->generate_out_seq_no($aargs['datacenter'], $message['content_related']);
-                    $message['bytes'] = strlen($message['body']);
-                    $message['_'] = 'MTmessage';
-                    $messages[] = $message;
-                    $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno']]; //, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $aargs['datacenter']])];
-                }
-                $message_content = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
-                $seq_no = $this->generate_out_seq_no($aargs['datacenter'], true);
-                $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
-            } else {
-                $seq_no = $this->generate_out_seq_no($aargs['datacenter'], $content_related);
-                $plaintext = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'].$this->datacenter->sockets[$aargs['datacenter']]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
-            }
-
-            $padding = $this->posmod(-strlen($plaintext), 16);
-            if ($padding < 12) {
-                $padding += 16;
-            }
-            $padding = $this->random($padding);
-
-            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['auth_key']);
-            $message = $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['seq_no'] = $seq_no;
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response'] = -1;
-            $this->datacenter->sockets[$aargs['datacenter']]->send_message($message);
-
-            $this->datacenter->sockets[$aargs['datacenter']]->object_queue = [];
-            foreach ($this->datacenter->sockets[$aargs['datacenter']]->ack_queue as $msg_id) {
-                $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$msg_id]['ack'] = true;
-            }
-            $this->datacenter->sockets[$aargs['datacenter']]->ack_queue = [];
+            return;
         }
 
-        return $message_id;
+        $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].$this->datacenter->sockets[$datacenter]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
+        $padding = $this->posmod(-strlen($plaintext), 16);
+        if ($padding < 12) {
+            $padding += 16;
+        }
+        $padding = $this->random($padding);
+
+        $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
+        list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key']);
+        $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
+        $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['seq_no' => $seq_no, 'response' => -1];
+        $this->datacenter->sockets[$datacenter]->send_message($message);
+
+        $this->datacenter->sockets[$datacenter]->object_queue = [];
+        foreach ($this->datacenter->sockets[$datacenter]->ack_queue as $msg_id) {
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['ack'] = true;
+        }
+        $this->datacenter->sockets[$datacenter]->ack_queue = [];
     }
 
     /**
@@ -153,7 +134,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-        var_dump($deserialized);
+//var_dump($deserialized);
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;

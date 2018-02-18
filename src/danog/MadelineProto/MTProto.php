@@ -645,7 +645,7 @@ class MTProto
     {
         $this->datacenter->sockets[$datacenter]->close_and_reopen();
         if ($this->is_http($datacenter)) {
-            $this->method_call('http_wait', ['max_wait' => 3000, 'wait_after' => 150, 'max_delay' => 500], ['datacenter' => $datacenter]);
+            $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
         }
     }
 

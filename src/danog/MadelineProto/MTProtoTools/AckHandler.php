@@ -43,6 +43,6 @@ trait AckHandler
         $this->datacenter->sockets[$datacenter]->ack_queue[] = $message_id;
         //$this->object_call('msgs_ack', ['msg_ids' => [$message_id]], ['datacenter' => $datacenter]);
 
-        return $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'] = true;
+        return true;//$this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'] = true;
     }
 }
