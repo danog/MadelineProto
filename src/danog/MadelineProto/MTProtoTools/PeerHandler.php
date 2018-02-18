@@ -576,12 +576,13 @@ trait PeerHandler
 
     public function resolve_username($username)
     {
-        $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
+        try {
+            $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
+        } catch (\danog\MadelineProto\RPCErrorException $e) { return false; }
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }
-
-        throw new \danog\MadelineProto\Exception('resolve_username returned an unexpected constructor: '.var_export($res, true));
+        return false;
     }
 
     public function to_supergroup($id)

@@ -34,11 +34,11 @@ if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
 
-echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
+echo 'Deserializing MadelineProto from testing.madeline...'.PHP_EOL;
 $MadelineProto = false;
 
 try {
-    $MadelineProto = new \danog\MadelineProto\API('session.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('testing.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     var_dump($e->getMessage());
 }
@@ -82,7 +82,7 @@ if ($MadelineProto === false) {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
-$MadelineProto->session = 'session.madeline';
+$MadelineProto->session = 'testing.madeline';
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
 \danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
@@ -93,7 +93,7 @@ $MadelineProto->session = 'session.madeline';
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL; echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+echo 'Serializing MadelineProto to testing.madeline...'.PHP_EOL; echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
 /*
 $m = new \danog\MadelineProto\API($settings);
 $m->import_authorization($MadelineProto->export_authorization());
@@ -125,7 +125,7 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
                 }
            }
         }
-        //echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+        //echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
     }
 }
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
@@ -149,7 +149,7 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
                 case 'updateNewEncryptedMessage':
                 var_dump($update);
            }
-           echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto).' bytes'.PHP_EOL;
+           echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
         }
     }*/
 

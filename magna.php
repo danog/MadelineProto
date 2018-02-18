@@ -93,9 +93,10 @@ $MadelineProto->serialize();
 $times = [];
 $calls = [];
 $users = [];
+$MadelineProto->get_updates(['offset' => -1]);
     $offset = 0;
     while (1) {
-        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 5000, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 5000, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($MadelineProto->programmed_call as $key => $pair) {
             list($user, $time) = $pair;
             if ($time < time()) {
@@ -128,7 +129,7 @@ $users = [];
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 unset($calls[$key]);
             } elseif (isset($times[$call->getOtherID()]) && $times[$call->getOtherID()][0] < time()) {
-                $times[$call->getOtherID()][0] += 10;
+                $times[$call->getOtherID()][0] += 30+count($calls);
 
                 try {
                     $MadelineProto->messages->editMessage(['id' => $times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);

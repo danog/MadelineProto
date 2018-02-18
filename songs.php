@@ -1,6 +1,6 @@
 <?php
 
-$songs = glob('xmas/*raw');
+$songs = glob('*raw');
 for ($x = 0; $x < count($songs); $x++) {
     shuffle($songs);
 }
