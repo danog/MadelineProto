@@ -49,7 +49,7 @@ class Connection
 
     public $i = [];
 
-    public function ___construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
+    public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
 
         // Can use:
@@ -229,7 +229,7 @@ class Connection
             throw new Bug74586Exception();
         }
         $this->time_delta = 0;
-        $this->__construct($this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+        //$this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
     public function write($what, $length = null)

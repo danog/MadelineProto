@@ -30,7 +30,7 @@ class DataCenter
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
-    public function ___construct($dclist, $settings)
+    public function __magic_construct($dclist, $settings)
     {
         $this->dclist = $dclist;
         $this->settings = $settings;

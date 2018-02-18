@@ -10,7 +10,7 @@ description: messages.setTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 
@@ -29,6 +29,7 @@ description: messages.setTyping parameters, return type and example
 |PEER_ID_INVALID|The provided peer id is invalid|
 |USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
 |USER_IS_BLOCKED|User is blocked|
+|USER_IS_BOT|Bots can't send messages to other bots|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 

@@ -11,7 +11,7 @@ description: messages.saveRecentSticker parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |attached|[Bool](../types/Bool.md) | Optional|
-|id|[InputDocument](../types/InputDocument.md) | Yes|
+|id|[InputDocument](../types/InputDocument.md) | Optional|
 |unsave|[Bool](../types/Bool.md) | Yes|
 
 

@@ -10,8 +10,8 @@ description: channels.editAdmin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 |role|[ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes|
 
 

@@ -19,7 +19,7 @@ description: chat attributes, type and example
 |deactivated|[Bool](../types/Bool.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 |title|[string](../types/string.md) | Yes|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Optional|
 |participants\_count|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |version|[int](../types/int.md) | Yes|

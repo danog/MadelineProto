@@ -11,7 +11,7 @@ description: messageActionChatEditPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|photo|[Photo](../types/Photo.md) | Yes|
+|photo|[Photo](../types/Photo.md) | Optional|
 
 
 

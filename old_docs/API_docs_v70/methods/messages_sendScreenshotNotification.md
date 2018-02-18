@@ -10,7 +10,7 @@ description: messages.sendScreenshotNotification parameters, return type and exa
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Yes|
 
 

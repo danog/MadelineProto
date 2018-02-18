@@ -13,7 +13,7 @@ description: botInlineMediaResultDocument attributes, type and example
 |----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Yes|
-|document|[Document](../types/Document.md) | Yes|
+|document|[Document](../types/Document.md) | Optional|
 |send\_message|[BotInlineMessage](../types/BotInlineMessage.md) | Yes|
 
 

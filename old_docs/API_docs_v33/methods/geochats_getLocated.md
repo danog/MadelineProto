@@ -10,7 +10,7 @@ description: geochats.getLocated parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |radius|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 

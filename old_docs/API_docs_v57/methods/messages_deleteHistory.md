@@ -11,7 +11,7 @@ description: messages.deleteHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |just\_clear|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |max\_id|[int](../types/int.md) | Yes|
 
 

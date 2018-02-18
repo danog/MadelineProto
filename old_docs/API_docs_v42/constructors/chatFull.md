@@ -13,8 +13,8 @@ description: chatFull attributes, type and example
 |----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |participants|[ChatParticipants](../types/ChatParticipants.md) | Yes|
-|chat\_photo|[Photo](../types/Photo.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|chat\_photo|[Photo](../types/Photo.md) | Optional|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |exported\_invite|[ExportedChatInvite](../types/ExportedChatInvite.md) | Yes|
 |bot\_info|Array of [BotInfo](../types/BotInfo.md) | Yes|
 

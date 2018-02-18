@@ -10,7 +10,7 @@ description: messages.getStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

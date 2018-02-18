@@ -10,8 +10,8 @@ description: channels.setStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

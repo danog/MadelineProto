@@ -18,7 +18,7 @@ description: dialog attributes, type and example
 |read\_outbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
 |unread\_mentions\_count|[int](../types/int.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |pts|[int](../types/int.md) | Optional|
 |draft|[DraftMessage](../types/DraftMessage.md) | Optional|
 

@@ -15,7 +15,7 @@ description: dialog attributes, type and example
 |top\_message|[int](../types/int.md) | Yes|
 |read\_inbox\_max\_id|[int](../types/int.md) | Yes|
 |unread\_count|[int](../types/int.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 
 
 

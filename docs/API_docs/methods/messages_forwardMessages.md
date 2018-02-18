@@ -14,9 +14,9 @@ description: messages.forwardMessages parameters, return type and example
 |background|[Bool](../types/Bool.md) | Optional|
 |with\_my\_score|[Bool](../types/Bool.md) | Optional|
 |grouped|[Bool](../types/Bool.md) | Optional|
-|from\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|from\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
-|to\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|to\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

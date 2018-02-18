@@ -10,8 +10,8 @@ description: channels.editPhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

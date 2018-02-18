@@ -13,7 +13,7 @@ description: updateUserPhoto attributes, type and example
 |----------|---------------|----------|
 |user\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
-|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Yes|
+|photo|[UserProfilePhoto](../types/UserProfilePhoto.md) | Optional|
 |previous|[Bool](../types/Bool.md) | Yes|
 
 

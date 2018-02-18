@@ -11,7 +11,7 @@ description: inputMediaVenue attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|
 |provider|[string](../types/string.md) | Yes|

@@ -13,7 +13,7 @@ description: documentAttributeSticker attributes, type and example
 |----------|---------------|----------|
 |mask|[Bool](../types/Bool.md) | Optional|
 |alt|[string](../types/string.md) | Yes|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 |mask\_coords|[MaskCoords](../types/MaskCoords.md) | Optional|
 
 

@@ -15,7 +15,7 @@ description: geoChatMessageService attributes, type and example
 |id|[int](../types/int.md) | Yes|
 |from\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
-|action|[MessageAction](../types/MessageAction.md) | Yes|
+|action|[MessageAction](../types/MessageAction.md) | Optional|
 
 
 

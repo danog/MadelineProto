@@ -122,7 +122,7 @@ trait Constructors
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }
@@ -251,6 +251,7 @@ description: List of constructors
 ---
 # Constructors  
 [Back to API documentation index](..)
+
 '.implode('', $this->docs_constructors));
     }
 }

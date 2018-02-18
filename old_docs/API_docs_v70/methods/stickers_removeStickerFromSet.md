@@ -10,7 +10,7 @@ description: stickers.removeStickerFromSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|sticker|[InputDocument](../types/InputDocument.md) | Yes|
+|sticker|[InputDocument](../types/InputDocument.md) | Optional|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

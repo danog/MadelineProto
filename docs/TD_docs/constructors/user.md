@@ -18,7 +18,7 @@ Represents user
 |last\_name|[string](../types/string.md) | Yes|User last name|
 |username|[string](../types/string.md) | Yes|User username|
 |phone\_number|[string](../types/string.md) | Yes|User's phone number|
-|status|[UserStatus](../types/UserStatus.md) | Yes|User's online status|
+|status|[UserStatus](../types/UserStatus.md) | Optional|User's online status|
 |profile\_photo|[profilePhoto](../constructors/profilePhoto.md) | Yes|User profile photo, nullable|
 |my\_link|[LinkState](../types/LinkState.md) | Yes|Relationships from me to other user|
 |foreign\_link|[LinkState](../types/LinkState.md) | Yes|Relationships from other user to me|

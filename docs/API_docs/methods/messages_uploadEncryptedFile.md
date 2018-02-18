@@ -11,7 +11,7 @@ description: messages.uploadEncryptedFile parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Yes|
+|file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|
 
 
 ### Return type: [EncryptedFile](../types/EncryptedFile.md)

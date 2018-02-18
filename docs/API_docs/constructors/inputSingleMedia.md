@@ -11,7 +11,7 @@ description: inputSingleMedia attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|media|[InputMedia](../types/InputMedia.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Optional|
 
 
 

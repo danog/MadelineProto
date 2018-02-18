@@ -16,8 +16,8 @@ description: geoChat attributes, type and example
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|
 |venue|[string](../types/string.md) | Yes|
-|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Optional|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Optional|
 |participants\_count|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |checked\_in|[Bool](../types/Bool.md) | Yes|

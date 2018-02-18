@@ -11,7 +11,7 @@ description: inputMediaAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|audio|[InputAudio](../types/InputAudio.md) | Yes|
+|audio|[InputAudio](../types/InputAudio.md) | Optional|
 
 
 

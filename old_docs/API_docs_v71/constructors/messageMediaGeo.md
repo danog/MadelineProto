@@ -11,7 +11,7 @@ description: messageMediaGeo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 
 
 

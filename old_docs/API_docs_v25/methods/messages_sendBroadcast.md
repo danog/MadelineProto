@@ -12,7 +12,7 @@ description: messages.sendBroadcast parameters, return type and example
 |----------|---------------|----------|
 |contacts|Array of [InputUser](../types/InputUser.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[InputMedia](../types/InputMedia.md) | Yes|
+|media|[InputMedia](../types/InputMedia.md) | Optional|
 
 
 ### Return type: [messages\_StatedMessages](../types/messages_StatedMessages.md)

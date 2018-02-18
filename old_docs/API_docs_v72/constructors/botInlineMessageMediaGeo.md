@@ -11,7 +11,7 @@ description: botInlineMessageMediaGeo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |period|[int](../types/int.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 

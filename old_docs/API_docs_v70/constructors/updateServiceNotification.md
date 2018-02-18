@@ -15,7 +15,7 @@ description: updateServiceNotification attributes, type and example
 |inbox\_date|[int](../types/int.md) | Optional|
 |type|[string](../types/string.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Yes|
 
 

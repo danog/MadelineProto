@@ -11,7 +11,7 @@ description: messageMediaVideo attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|video|[Video](../types/Video.md) | Yes|
+|video|[Video](../types/Video.md) | Optional|
 
 
 

@@ -11,7 +11,7 @@ description: messageMediaVenue attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo|[GeoPoint](../types/GeoPoint.md) | Yes|
+|geo|[GeoPoint](../types/GeoPoint.md) | Optional|
 |title|[string](../types/string.md) | Yes|
 |address|[string](../types/string.md) | Yes|
 |provider|[string](../types/string.md) | Yes|

@@ -15,7 +15,7 @@ description: inputBotInlineResultDocument attributes, type and example
 |type|[string](../types/string.md) | Yes|
 |title|[string](../types/string.md) | Optional|
 |description|[string](../types/string.md) | Optional|
-|document|[InputDocument](../types/InputDocument.md) | Yes|
+|document|[InputDocument](../types/InputDocument.md) | Optional|
 |send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Yes|
 
 

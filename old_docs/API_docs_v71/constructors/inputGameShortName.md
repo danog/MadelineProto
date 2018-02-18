@@ -11,7 +11,7 @@ description: inputGameShortName attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|bot\_id|[InputUser](../types/InputUser.md) | Yes|
+|bot\_id|[InputUser](../types/InputUser.md) | Optional|
 |short\_name|[string](../types/string.md) | Yes|
 
 

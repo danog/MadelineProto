@@ -13,7 +13,7 @@ description: messages_sentMessage attributes, type and example
 |----------|---------------|----------|
 |id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|
 

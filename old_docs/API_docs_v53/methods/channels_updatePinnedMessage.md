@@ -11,7 +11,7 @@ description: channels.updatePinnedMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |silent|[Bool](../types/Bool.md) | Optional|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 
 

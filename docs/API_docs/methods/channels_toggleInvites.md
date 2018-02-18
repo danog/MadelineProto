@@ -10,7 +10,7 @@ description: channels.toggleInvites parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |enabled|[Bool](../types/Bool.md) | Yes|
 
 

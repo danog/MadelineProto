@@ -11,9 +11,9 @@ description: messages.forwardMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |broadcast|[Bool](../types/Bool.md) | Optional|
-|from\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|from\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
-|to\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|to\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

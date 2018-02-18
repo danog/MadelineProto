@@ -17,5 +17,7 @@ description: constructors and methods of type ResPQ
 
 [$MadelineProto->req->pq](../methods/req_pq.md)  
 
+[$MadelineProto->req->pq->multi](../methods/req_pq_multi.md)  
+
 
 

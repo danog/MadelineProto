@@ -10,7 +10,7 @@ description: channels.getMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
 
 

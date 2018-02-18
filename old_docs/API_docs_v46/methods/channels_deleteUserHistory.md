@@ -10,8 +10,8 @@ description: channels.deleteUserHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

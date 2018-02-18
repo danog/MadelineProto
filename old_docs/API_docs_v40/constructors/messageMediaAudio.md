@@ -11,7 +11,7 @@ description: messageMediaAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|audio|[Audio](../types/Audio.md) | Yes|
+|audio|[Audio](../types/Audio.md) | Optional|
 
 
 

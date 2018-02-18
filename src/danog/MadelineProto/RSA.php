@@ -22,7 +22,7 @@ class RSA
     public $n;
     public $fp;
 
-    public function ___construct($rsa_key)
+    public function __magic_construct($rsa_key)
     {
         //if ($this->unserialized($rsa_key)) return true;
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['rsa_init']], Logger::ULTRA_VERBOSE);

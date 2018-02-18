@@ -16,7 +16,7 @@ description: geoChatMessage attributes, type and example
 |from\_id|[int](../types/int.md) | Yes|
 |date|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[MessageMedia](../types/MessageMedia.md) | Yes|
+|media|[MessageMedia](../types/MessageMedia.md) | Optional|
 
 
 

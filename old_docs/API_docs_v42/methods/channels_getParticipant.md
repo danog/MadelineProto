@@ -10,8 +10,8 @@ description: channels.getParticipant parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)

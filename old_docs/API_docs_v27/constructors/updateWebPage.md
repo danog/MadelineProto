@@ -11,7 +11,7 @@ description: updateWebPage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|webpage|[WebPage](../types/WebPage.md) | Yes|
+|webpage|[WebPage](../types/WebPage.md) | Optional|
 
 
 

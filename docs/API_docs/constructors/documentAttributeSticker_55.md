@@ -12,7 +12,7 @@ description: documentAttributeSticker attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |alt|[string](../types/string.md) | Yes|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Yes|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 
 

@@ -10,7 +10,7 @@ description: messages.forwardMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 
 

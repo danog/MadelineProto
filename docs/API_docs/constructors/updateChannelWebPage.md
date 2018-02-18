@@ -12,7 +12,7 @@ description: updateChannelWebPage attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel\_id|[int](../types/int.md) | Yes|
-|webpage|[WebPage](../types/WebPage.md) | Yes|
+|webpage|[WebPage](../types/WebPage.md) | Optional|
 |pts|[int](../types/int.md) | Yes|
 |pts\_count|[int](../types/int.md) | Yes|
 

@@ -10,7 +10,7 @@ description: channels.inviteToChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 |users|Array of [InputUser](../types/InputUser.md) | Yes|
 
 

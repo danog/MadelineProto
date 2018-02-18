@@ -10,7 +10,7 @@ description: channels.exportInvite parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Yes|
+|channel|[InputChannel](../types/InputChannel.md) | Optional|
 
 
 ### Return type: [ExportedChatInvite](../types/ExportedChatInvite.md)

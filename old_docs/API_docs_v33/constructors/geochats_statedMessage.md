@@ -11,7 +11,7 @@ description: geochats_statedMessage attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[GeoChatMessage](../types/GeoChatMessage.md) | Yes|
+|message|[GeoChatMessage](../types/GeoChatMessage.md) | Optional|
 |chats|Array of [Chat](../types/Chat.md) | Yes|
 |users|Array of [User](../types/User.md) | Yes|
 |seq|[int](../types/int.md) | Yes|

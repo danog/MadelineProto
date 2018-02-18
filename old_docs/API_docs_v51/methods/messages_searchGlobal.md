@@ -12,7 +12,7 @@ description: messages.searchGlobal parameters, return type and example
 |----------|---------------|----------|
 |q|[string](../types/string.md) | Yes|
 |offset\_date|[int](../types/int.md) | Yes|
-|offset\_peer|[InputPeer](../types/InputPeer.md) | Yes|
+|offset\_peer|[InputPeer](../types/InputPeer.md) | Optional|
 |offset\_id|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
 

@@ -10,8 +10,8 @@ description: messages.deleteChatUser parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Yes|
+|chat\_id|[InputPeer](../types/InputPeer.md) | Optional|
+|user\_id|[InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

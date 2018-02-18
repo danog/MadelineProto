@@ -11,7 +11,7 @@ description: inputMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputDocument](../types/InputDocument.md) | Yes|
+|id|[InputDocument](../types/InputDocument.md) | Optional|
 
 
 

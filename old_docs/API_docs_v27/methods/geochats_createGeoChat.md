@@ -11,7 +11,7 @@ description: geochats.createGeoChat parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Yes|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |address|[string](../types/string.md) | Yes|
 |venue|[string](../types/string.md) | Yes|
 

@@ -13,7 +13,7 @@ Call has ended successfully
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|reason|[CallDiscardReason](../types/CallDiscardReason.md) | Yes|A reason, why call has ended|
+|reason|[CallDiscardReason](../types/CallDiscardReason.md) | Optional|A reason, why call has ended|
 |need\_rating|[Bool](../types/Bool.md) | Yes|If true, call rating should be sent to the server|
 |need\_debug|[Bool](../types/Bool.md) | Yes|If true, call debug should be sent to the server|
 

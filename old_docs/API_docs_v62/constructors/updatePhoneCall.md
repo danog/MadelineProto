@@ -11,7 +11,7 @@ description: updatePhoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
+|phone\_call|[PhoneCall](../types/PhoneCall.md) | Optional|
 
 
 

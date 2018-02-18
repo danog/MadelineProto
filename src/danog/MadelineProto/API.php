@@ -18,7 +18,7 @@ class API extends APIFactory
     public $session;
     public $serialized = 0;
 
-    public function ___construct($params = [])
+    public function __magic_construct($params = [])
     {
         set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
         set_exception_handler(['\danog\MadelineProto\Serialization', 'serialize_all']);

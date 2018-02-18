@@ -13,7 +13,7 @@ description: messages.sendMultiMedia parameters, return type and example
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
 |clear\_draft|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Yes|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |multi\_media|Array of [InputSingleMedia](../types/InputSingleMedia.md) | Yes|
 

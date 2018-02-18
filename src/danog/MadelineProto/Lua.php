@@ -19,7 +19,7 @@ class Lua
     protected $Lua;
     protected $script;
 
-    public function ___construct($script, $MadelineProto)
+    public function __magic_construct($script, $MadelineProto)
     {
         if (!file_exists($script)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);

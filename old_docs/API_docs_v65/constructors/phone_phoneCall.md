@@ -11,7 +11,7 @@ description: phone_phoneCall attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|phone\_call|[PhoneCall](../types/PhoneCall.md) | Yes|
+|phone\_call|[PhoneCall](../types/PhoneCall.md) | Optional|
 |users|Array of [User](../types/User.md) | Yes|
 
 

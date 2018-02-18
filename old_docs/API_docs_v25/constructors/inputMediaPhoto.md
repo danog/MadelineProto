@@ -11,7 +11,7 @@ description: inputMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputPhoto](../types/InputPhoto.md) | Yes|
+|id|[InputPhoto](../types/InputPhoto.md) | Optional|
 
 
 

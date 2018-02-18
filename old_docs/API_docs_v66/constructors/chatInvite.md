@@ -16,7 +16,7 @@ description: chatInvite attributes, type and example
 |public|[Bool](../types/Bool.md) | Optional|
 |megagroup|[Bool](../types/Bool.md) | Optional|
 |title|[string](../types/string.md) | Yes|
-|photo|[ChatPhoto](../types/ChatPhoto.md) | Yes|
+|photo|[ChatPhoto](../types/ChatPhoto.md) | Optional|
 |participants\_count|[int](../types/int.md) | Yes|
 |participants|Array of [User](../types/User.md) | Optional|
 

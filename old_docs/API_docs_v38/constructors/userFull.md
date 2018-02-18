@@ -11,12 +11,12 @@ description: userFull attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|user|[User](../types/User.md) | Yes|
+|user|[User](../types/User.md) | Optional|
 |link|[contacts\_Link](../types/contacts_Link.md) | Yes|
-|profile\_photo|[Photo](../types/Photo.md) | Yes|
-|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Yes|
+|profile\_photo|[Photo](../types/Photo.md) | Optional|
+|notify\_settings|[PeerNotifySettings](../types/PeerNotifySettings.md) | Optional|
 |blocked|[Bool](../types/Bool.md) | Yes|
-|bot\_info|[BotInfo](../types/BotInfo.md) | Yes|
+|bot\_info|[BotInfo](../types/BotInfo.md) | Optional|
 
 
 
