@@ -32,7 +32,7 @@ class RPCErrorException extends \Exception
 
     public function __toString()
     {
-        return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.'Revision: '.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.$this->getTLTrace().PHP_EOL;
     }
 
     public function __construct($message = null, $code = 0, Exception $previous = null)
