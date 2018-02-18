@@ -476,6 +476,7 @@ trait TL
                     $serialized .= $id['id'];
                     continue;
                 }
+
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
             }
             if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
