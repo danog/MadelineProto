@@ -571,6 +571,7 @@ trait AuthKeyHandler
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
         $this->postpone_updates = true;
+
         try {
             foreach ($this->datacenter->sockets as $id => $socket) {
                 $cdn = strpos($id, 'cdn');

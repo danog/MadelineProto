@@ -17,11 +17,13 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait MessageHandler
 {
-    public function send_unencrypted_message($message_data, $message_id, $datacenter) {
+    public function send_unencrypted_message($message_data, $message_id, $datacenter)
+    {
         $message_data = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['response' => -1];
         $this->datacenter->sockets[$datacenter]->send_message($message_data);
     }
+
     public function send_messages($datacenter)
     {
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
@@ -36,7 +38,7 @@ trait MessageHandler
             $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
             $message_id = $this->generate_message_id($datacenter);
             $seq_no = $this->generate_out_seq_no($datacenter, false);
-        } else if (count($this->datacenter->sockets[$datacenter]->object_queue)) {
+        } elseif (count($this->datacenter->sockets[$datacenter]->object_queue)) {
             $message = array_shift($this->datacenter->sockets[$datacenter]->object_queue);
             $message_data = $message['body'];
             $message_id = $message['msg_id'];
@@ -134,7 +136,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-//var_dump($deserialized);
+        //var_dump($deserialized);
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;

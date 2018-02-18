@@ -46,6 +46,7 @@ if (!extension_loaded('pthreads')) {
             if (in_array($name, [\SO_RCVTIMEO, \SO_SNDTIMEO])) {
                 $this->timeout = ['sec' => (int) $value, 'usec' => (int) (($value - (int) $value) * 1000000)];
                 stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
+
                 return true;
             }
 
@@ -57,70 +58,70 @@ if (!extension_loaded('pthreads')) {
             throw new \danog\MadelineProto\Exception('Not supported');
         }
 
-            public function setBlocking(bool $blocking)
-            {
-                return stream_set_blocking($this->sock, $blocking);
+        public function setBlocking(bool $blocking)
+        {
+            return stream_set_blocking($this->sock, $blocking);
+        }
+
+        public function bind(string $address, int $port = 0)
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
+
+        public function listen(int $backlog = 0)
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
+
+        public function accept()
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
+
+        public function connect(string $address, int $port = -1)
+        {
+            if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
+                $address = '['.$address.']';
             }
 
-            public function bind(string $address, int $port = 0)
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
+            $this->sock = fsockopen($this->protocol.'://'.$address, $port);
 
-            public function listen(int $backlog = 0)
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
+            return true;
+        }
 
-            public function accept()
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
+        public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
+        {
+            return stream_select($read, $write, $except, $tv_sec, $tv_usec);
+        }
 
-            public function connect(string $address, int $port = -1)
-            {
-                if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
-                    $address = '['.$address.']';
-                }
+        public function read(int $length, int $flags = 0)
+        {
+            return stream_get_contents($this->sock, $length);
+        }
 
-                $this->sock = fsockopen($this->protocol.'://'.$address, $port);
+        public function write(string $buffer, int $length = -1)
+        {
+            return $length === -1 ? fwrite($this->sock, $buffer) : fwrite($this->sock, $buffer, $length);
+        }
 
-                return true;
-            }
+        public function send(string $data, int $length, int $flags)
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
 
-            public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
-            {
-                return stream_select($read, $write, $except, $tv_sec, $tv_usec);
-            }
+        public function close()
+        {
+            return fclose($this->sock);
+        }
 
-            public function read(int $length, int $flags = 0)
-            {
-                return stream_get_contents($this->sock, $length);
-            }
+        public function getPeerName(bool $port = true)
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
 
-            public function write(string $buffer, int $length = -1)
-            {
-                return $length === -1 ? fwrite($this->sock, $buffer) : fwrite($this->sock, $buffer, $length);
-            }
-
-            public function send(string $data, int $length, int $flags)
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
-
-            public function close()
-            {
-                return fclose($this->sock);
-            }
-
-            public function getPeerName(bool $port = true)
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
-
-            public function getSockName(bool $port = true)
-            {
-                throw new \danog\MadelineProto\Exception('Not supported');
-            }
+        public function getSockName(bool $port = true)
+        {
+            throw new \danog\MadelineProto\Exception('Not supported');
+        }
     }
 }
