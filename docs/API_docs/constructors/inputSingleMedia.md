@@ -12,6 +12,8 @@ description: inputSingleMedia attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |media|[InputMedia](../types/InputMedia.md) | Optional|
+|message|[string](../types/string.md) | Yes|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 
 
 
@@ -21,13 +23,13 @@ description: inputSingleMedia attributes, type and example
 ### Example:
 
 ```
-$inputSingleMedia = ['_' => 'inputSingleMedia', 'media' => InputMedia];
+$inputSingleMedia = ['_' => 'inputSingleMedia', 'media' => InputMedia, 'message' => 'string', 'entities' => [MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "inputSingleMedia", "media": InputMedia}
+{"_": "inputSingleMedia", "media": InputMedia, "message": "string", "entities": [MessageEntity]}
 ```
 
 
@@ -35,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputSingleMedia={_='inputSingleMedia', media=InputMedia}
+inputSingleMedia={_='inputSingleMedia', media=InputMedia, message='string', entities={MessageEntity}}
 
 ```
 

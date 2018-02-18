@@ -23,6 +23,8 @@ description: List of constructors
 
 [$account\_tmpPassword](../constructors/account_tmpPassword.md) = \['tmp_password' => [bytes](../types/bytes.md), 'valid_until' => [int](../types/int.md), \];<a name="account_tmpPassword"></a>  
 
+[$account\_webAuthorizations](../constructors/account_webAuthorizations.md) = \['authorizations' => \[[WebAuthorization](../types/WebAuthorization.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="account_webAuthorizations"></a>  
+
 ***
 <br><br>[$auth\_authorization](../constructors/auth_authorization.md) = \['tmp_sessions' => [int](../types/int.md), 'user' => [User](../types/User.md), \];<a name="auth_authorization"></a>  
 
@@ -52,6 +54,11 @@ description: List of constructors
 <br><br>[$authorization](../constructors/authorization.md) = \['hash' => [long](../types/long.md), 'device_model' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'api_id' => [int](../types/int.md), 'app_name' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'date_created' => [int](../types/int.md), 'date_active' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'country' => [string](../types/string.md), 'region' => [string](../types/string.md), \];<a name="authorization"></a>  
 
 ***
+<br><br>[$bad\_msg\_notification](../constructors/bad_msg_notification.md) = \['bad_msg_id' => [long](../types/long.md), 'bad_msg_seqno' => [int](../types/int.md), 'error_code' => [int](../types/int.md), \];<a name="bad_msg_notification"></a>  
+
+[$bad\_server\_salt](../constructors/bad_server_salt.md) = \['bad_msg_id' => [long](../types/long.md), 'bad_msg_seqno' => [int](../types/int.md), 'error_code' => [int](../types/int.md), 'new_server_salt' => [long](../types/long.md), \];<a name="bad_server_salt"></a>  
+
+***
 <br><br>[$boolFalse](../constructors/boolFalse.md) = \[\];<a name="boolFalse"></a>  
 
 ***
@@ -67,7 +74,7 @@ description: List of constructors
 <br><br>[$botInlineMediaResult](../constructors/botInlineMediaResult.md) = \['id' => [string](../types/string.md), 'type' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'send_message' => [BotInlineMessage](../types/BotInlineMessage.md), \];<a name="botInlineMediaResult"></a>  
 
 ***
-<br><br>[$botInlineMessageMediaAuto](../constructors/botInlineMessageMediaAuto.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="botInlineMessageMediaAuto"></a>  
+<br><br>[$botInlineMessageMediaAuto](../constructors/botInlineMessageMediaAuto.md) = \['message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="botInlineMessageMediaAuto"></a>  
 
 ***
 <br><br>[$botInlineMessageMediaContact](../constructors/botInlineMessageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="botInlineMessageMediaContact"></a>  
@@ -256,6 +263,9 @@ description: List of constructors
 <br><br>[$chatPhotoEmpty](../constructors/chatPhotoEmpty.md) = \[\];<a name="chatPhotoEmpty"></a>  
 
 ***
+<br><br>[$client\_DH\_inner\_data](../constructors/client_DH_inner_data.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'retry_id' => [long](../types/long.md), 'g_b' => [string](../types/string.md), \];<a name="client_DH_inner_data"></a>  
+
+***
 <br><br>[$config](../constructors/config.md) = \['phonecalls_enabled' => [Bool](../types/Bool.md), 'default_p2p_contacts' => [Bool](../types/Bool.md), 'date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'test_mode' => [Bool](../types/Bool.md), 'this_dc' => [int](../types/int.md), 'dc_options' => \[[DcOption](../types/DcOption.md)\], 'chat_size_max' => [int](../types/int.md), 'megagroup_size_max' => [int](../types/int.md), 'forwarded_count_max' => [int](../types/int.md), 'online_update_period_ms' => [int](../types/int.md), 'offline_blur_timeout_ms' => [int](../types/int.md), 'offline_idle_timeout_ms' => [int](../types/int.md), 'online_cloud_timeout_ms' => [int](../types/int.md), 'notify_cloud_delay_ms' => [int](../types/int.md), 'notify_default_delay_ms' => [int](../types/int.md), 'chat_big_size' => [int](../types/int.md), 'push_chat_period_ms' => [int](../types/int.md), 'push_chat_limit' => [int](../types/int.md), 'saved_gifs_limit' => [int](../types/int.md), 'edit_time_limit' => [int](../types/int.md), 'rating_e_decay' => [int](../types/int.md), 'stickers_recent_limit' => [int](../types/int.md), 'stickers_faved_limit' => [int](../types/int.md), 'channels_read_media_period' => [int](../types/int.md), 'tmp_sessions' => [int](../types/int.md), 'pinned_dialogs_count_max' => [int](../types/int.md), 'call_receive_timeout_ms' => [int](../types/int.md), 'call_ring_timeout_ms' => [int](../types/int.md), 'call_connect_timeout_ms' => [int](../types/int.md), 'call_packet_timeout_ms' => [int](../types/int.md), 'me_url_prefix' => [string](../types/string.md), 'suggested_lang_code' => [string](../types/string.md), 'lang_pack_version' => [int](../types/int.md), 'disabled_features' => \[[DisabledFeature](../types/DisabledFeature.md)\], \];<a name="config"></a>  
 
 ***
@@ -288,7 +298,7 @@ description: List of constructors
 
 [$contacts\_contactsNotModified](../constructors/contacts_contactsNotModified.md) = \[\];<a name="contacts_contactsNotModified"></a>  
 
-[$contacts\_found](../constructors/contacts_found.md) = \['results' => \[[Peer](../types/Peer.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="contacts_found"></a>  
+[$contacts\_found](../constructors/contacts_found.md) = \['my_results' => \[[Peer](../types/Peer.md)\], 'results' => \[[Peer](../types/Peer.md)\], 'chats' => \[[Chat](../types/Chat.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="contacts_found"></a>  
 
 [$contacts\_importedContacts](../constructors/contacts_importedContacts.md) = \['imported' => \[[ImportedContact](../types/ImportedContact.md)\], 'popular_invites' => \[[PopularContact](../types/PopularContact.md)\], 'retry_contacts' => \[[long](../types/long.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="contacts_importedContacts"></a>  
 
@@ -388,6 +398,24 @@ description: List of constructors
 <br><br>[$decryptedMessageService\_17](../constructors/decryptedMessageService_17.md) = \['action' => [DecryptedMessageAction](../types/DecryptedMessageAction.md), \];<a name="decryptedMessageService_17"></a>  
 
 ***
+<br><br>[$destroy\_auth\_key\_fail](../constructors/destroy_auth_key_fail.md) = \[\];<a name="destroy_auth_key_fail"></a>  
+
+[$destroy\_auth\_key\_none](../constructors/destroy_auth_key_none.md) = \[\];<a name="destroy_auth_key_none"></a>  
+
+[$destroy\_auth\_key\_ok](../constructors/destroy_auth_key_ok.md) = \[\];<a name="destroy_auth_key_ok"></a>  
+
+[$destroy\_session\_none](../constructors/destroy_session_none.md) = \['session_id' => [long](../types/long.md), \];<a name="destroy_session_none"></a>  
+
+[$destroy\_session\_ok](../constructors/destroy_session_ok.md) = \['session_id' => [long](../types/long.md), \];<a name="destroy_session_ok"></a>  
+
+***
+<br><br>[$dh\_gen\_fail](../constructors/dh_gen_fail.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'new_nonce_hash3' => [int128](../types/int128.md), \];<a name="dh_gen_fail"></a>  
+
+[$dh\_gen\_ok](../constructors/dh_gen_ok.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'new_nonce_hash1' => [int128](../types/int128.md), \];<a name="dh_gen_ok"></a>  
+
+[$dh\_gen\_retry](../constructors/dh_gen_retry.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'new_nonce_hash2' => [int128](../types/int128.md), \];<a name="dh_gen_retry"></a>  
+
+***
 <br><br>[$dialog](../constructors/dialog.md) = \['pinned' => [Bool](../types/Bool.md), 'peer' => [Peer](../types/Peer.md), 'top_message' => [int](../types/int.md), 'read_inbox_max_id' => [int](../types/int.md), 'read_outbox_max_id' => [int](../types/int.md), 'unread_count' => [int](../types/int.md), 'unread_mentions_count' => [int](../types/int.md), 'notify_settings' => [PeerNotifySettings](../types/PeerNotifySettings.md), 'pts' => [int](../types/int.md), 'draft' => [DraftMessage](../types/DraftMessage.md), \];<a name="dialog"></a>  
 
 ***
@@ -457,7 +485,7 @@ description: List of constructors
 <br><br>[$error](../constructors/error.md) = \['code' => [int](../types/int.md), 'text' => [string](../types/string.md), \];<a name="error"></a>  
 
 ***
-<br><br>[$exportedMessageLink](../constructors/exportedMessageLink.md) = \['link' => [string](../types/string.md), \];<a name="exportedMessageLink"></a>  
+<br><br>[$exportedMessageLink](../constructors/exportedMessageLink.md) = \['link' => [string](../types/string.md), 'html' => [string](../types/string.md), \];<a name="exportedMessageLink"></a>  
 
 ***
 <br><br>[$fileLocation](../constructors/fileLocation.md) = \['dc_id' => [int](../types/int.md), 'volume_id' => [long](../types/long.md), 'local_id' => [int](../types/int.md), 'secret' => [long](../types/long.md), \];<a name="fileLocation"></a>  
@@ -472,6 +500,11 @@ description: List of constructors
 <br><br>[$foundGifCached](../constructors/foundGifCached.md) = \['url' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];<a name="foundGifCached"></a>  
 
 ***
+<br><br>[$future\_salt](../constructors/future_salt.md) = \['valid_since' => [int](../types/int.md), 'valid_until' => [int](../types/int.md), 'salt' => [long](../types/long.md), \];<a name="future_salt"></a>  
+
+[$future\_salts](../constructors/future_salts.md) = \['req_msg_id' => [long](../types/long.md), 'now' => [int](../types/int.md), 'salts' => \[[future\_salt](../constructors/future_salt.md)\], \];<a name="future_salts"></a>  
+
+***
 <br><br>[$game](../constructors/game.md) = \['id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), 'short_name' => [string](../types/string.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [Photo](../types/Photo.md), 'document' => [Document](../types/Document.md), \];<a name="game"></a>  
 
 ***
@@ -482,6 +515,8 @@ description: List of constructors
 
 ***
 <br><br>[$help\_appUpdate](../constructors/help_appUpdate.md) = \['id' => [int](../types/int.md), 'critical' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'text' => [string](../types/string.md), \];<a name="help_appUpdate"></a>  
+
+[$help\_configSimple](../constructors/help_configSimple.md) = \['date' => [int](../types/int.md), 'expires' => [int](../types/int.md), 'dc_id' => [int](../types/int.md), 'ip_port_list' => \[[ipPort](../constructors/ipPort.md)\], \];<a name="help_configSimple"></a>  
 
 [$help\_inviteText](../constructors/help_inviteText.md) = \['message' => [string](../types/string.md), \];<a name="help_inviteText"></a>  
 
@@ -495,6 +530,9 @@ description: List of constructors
 
 ***
 <br><br>[$highScore](../constructors/highScore.md) = \['pos' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), \];<a name="highScore"></a>  
+
+***
+<br><br>[$http\_wait](../constructors/http_wait.md) = \['max_delay' => [int](../types/int.md), 'wait_after' => [int](../types/int.md), 'max_wait' => [int](../types/int.md), \];<a name="http_wait"></a>  
 
 ***
 <br><br>[$importedContact](../constructors/importedContact.md) = \['user_id' => [int](../types/int.md), 'client_id' => [long](../types/long.md), \];<a name="importedContact"></a>  
@@ -512,7 +550,7 @@ description: List of constructors
 <br><br>[$inputBotInlineMessageID](../constructors/inputBotInlineMessageID.md) = \['dc_id' => [int](../types/int.md), 'id' => [long](../types/long.md), 'access_hash' => [long](../types/long.md), \];<a name="inputBotInlineMessageID"></a>  
 
 ***
-<br><br>[$inputBotInlineMessageMediaAuto](../constructors/inputBotInlineMessageMediaAuto.md) = \['caption' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="inputBotInlineMessageMediaAuto"></a>  
+<br><br>[$inputBotInlineMessageMediaAuto](../constructors/inputBotInlineMessageMediaAuto.md) = \['message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="inputBotInlineMessageMediaAuto"></a>  
 
 ***
 <br><br>[$inputBotInlineMessageMediaContact](../constructors/inputBotInlineMessageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \];<a name="inputBotInlineMessageMediaContact"></a>  
@@ -605,10 +643,10 @@ description: List of constructors
 <br><br>[$inputMediaContact](../constructors/inputMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \];<a name="inputMediaContact"></a>  
 
 ***
-<br><br>[$inputMediaDocument](../constructors/inputMediaDocument.md) = \['id' => [InputDocument](../types/InputDocument.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaDocument"></a>  
+<br><br>[$inputMediaDocument](../constructors/inputMediaDocument.md) = \['id' => [InputDocument](../types/InputDocument.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaDocument"></a>  
 
 ***
-<br><br>[$inputMediaDocumentExternal](../constructors/inputMediaDocumentExternal.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaDocumentExternal"></a>  
+<br><br>[$inputMediaDocumentExternal](../constructors/inputMediaDocumentExternal.md) = \['url' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaDocumentExternal"></a>  
 
 ***
 <br><br>[$inputMediaEmpty](../constructors/inputMediaEmpty.md) = \[\];<a name="inputMediaEmpty"></a>  
@@ -629,22 +667,31 @@ description: List of constructors
 <br><br>[$inputMediaInvoice](../constructors/inputMediaInvoice.md) = \['title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [InputWebDocument](../types/InputWebDocument.md), 'invoice' => [Invoice](../types/Invoice.md), 'payload' => [bytes](../types/bytes.md), 'provider' => [string](../types/string.md), 'provider_data' => [DataJSON](../types/DataJSON.md), 'start_param' => [string](../types/string.md), \];<a name="inputMediaInvoice"></a>  
 
 ***
-<br><br>[$inputMediaPhoto](../constructors/inputMediaPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaPhoto"></a>  
+<br><br>[$inputMediaPhoto](../constructors/inputMediaPhoto.md) = \['id' => [InputPhoto](../types/InputPhoto.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaPhoto"></a>  
 
 ***
-<br><br>[$inputMediaPhotoExternal](../constructors/inputMediaPhotoExternal.md) = \['url' => [string](../types/string.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaPhotoExternal"></a>  
+<br><br>[$inputMediaPhotoExternal](../constructors/inputMediaPhotoExternal.md) = \['url' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaPhotoExternal"></a>  
 
 ***
-<br><br>[$inputMediaUploadedDocument](../constructors/inputMediaUploadedDocument.md) = \['nosound_video' => [Bool](../types/Bool.md), 'file' => [InputFile](../types/InputFile.md), 'thumb' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaUploadedDocument"></a>  
+<br><br>[$inputMediaUploadedDocument](../constructors/inputMediaUploadedDocument.md) = \['nosound_video' => [Bool](../types/Bool.md), 'file' => [InputFile](../types/InputFile.md), 'thumb' => [InputFile](../types/InputFile.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'stickers' => \[[InputDocument](../types/InputDocument.md)\], 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaUploadedDocument"></a>  
 
 ***
-<br><br>[$inputMediaUploadedPhoto](../constructors/inputMediaUploadedPhoto.md) = \['file' => [InputFile](../types/InputFile.md), 'caption' => [string](../types/string.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaUploadedPhoto"></a>  
+<br><br>[$inputMediaUploadedPhoto](../constructors/inputMediaUploadedPhoto.md) = \['file' => [InputFile](../types/InputFile.md), 'stickers' => \[[InputDocument](../types/InputDocument.md)\], 'ttl_seconds' => [int](../types/int.md), \];<a name="inputMediaUploadedPhoto"></a>  
 
 ***
 <br><br>[$inputMediaVenue](../constructors/inputMediaVenue.md) = \['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), 'provider' => [string](../types/string.md), 'venue_id' => [string](../types/string.md), 'venue_type' => [string](../types/string.md), \];<a name="inputMediaVenue"></a>  
 
 ***
 <br><br>[$inputMessageEntityMentionName](../constructors/inputMessageEntityMentionName.md) = \['offset' => [int](../types/int.md), 'length' => [int](../types/int.md), 'user_id' => [InputUser](../types/InputUser.md), \];<a name="inputMessageEntityMentionName"></a>  
+
+***
+<br><br>[$inputMessageID](../constructors/inputMessageID.md) = \['id' => [int](../types/int.md), \];<a name="inputMessageID"></a>  
+
+***
+<br><br>[$inputMessagePinned](../constructors/inputMessagePinned.md) = \[\];<a name="inputMessagePinned"></a>  
+
+***
+<br><br>[$inputMessageReplyTo](../constructors/inputMessageReplyTo.md) = \['id' => [int](../types/int.md), \];<a name="inputMessageReplyTo"></a>  
 
 ***
 <br><br>[$inputMessagesFilterChatPhotos](../constructors/inputMessagesFilterChatPhotos.md) = \[\];<a name="inputMessagesFilterChatPhotos"></a>  
@@ -710,7 +757,7 @@ description: List of constructors
 <br><br>[$inputPaymentCredentials](../constructors/inputPaymentCredentials.md) = \['save' => [Bool](../types/Bool.md), 'data' => [DataJSON](../types/DataJSON.md), \];<a name="inputPaymentCredentials"></a>  
 
 ***
-<br><br>[$inputPaymentCredentialsAndroidPay](../constructors/inputPaymentCredentialsAndroidPay.md) = \['payment_token' => [DataJSON](../types/DataJSON.md), \];<a name="inputPaymentCredentialsAndroidPay"></a>  
+<br><br>[$inputPaymentCredentialsAndroidPay](../constructors/inputPaymentCredentialsAndroidPay.md) = \['payment_token' => [DataJSON](../types/DataJSON.md), 'google_transaction_id' => [string](../types/string.md), \];<a name="inputPaymentCredentialsAndroidPay"></a>  
 
 ***
 <br><br>[$inputPaymentCredentialsApplePay](../constructors/inputPaymentCredentialsApplePay.md) = \['payment_data' => [DataJSON](../types/DataJSON.md), \];<a name="inputPaymentCredentialsApplePay"></a>  
@@ -794,7 +841,7 @@ description: List of constructors
 <br><br>[$inputReportReasonViolence](../constructors/inputReportReasonViolence.md) = \[\];<a name="inputReportReasonViolence"></a>  
 
 ***
-<br><br>[$inputSingleMedia](../constructors/inputSingleMedia.md) = \['media' => [InputMedia](../types/InputMedia.md), \];<a name="inputSingleMedia"></a>  
+<br><br>[$inputSingleMedia](../constructors/inputSingleMedia.md) = \['media' => [InputMedia](../types/InputMedia.md), 'message' => [string](../types/string.md), 'entities' => \[[MessageEntity](../types/MessageEntity.md)\], \];<a name="inputSingleMedia"></a>  
 
 ***
 <br><br>[$inputStickerSetEmpty](../constructors/inputStickerSetEmpty.md) = \[\];<a name="inputStickerSetEmpty"></a>  
@@ -831,6 +878,9 @@ description: List of constructors
 
 ***
 <br><br>[$invoice](../constructors/invoice.md) = \['test' => [Bool](../types/Bool.md), 'name_requested' => [Bool](../types/Bool.md), 'phone_requested' => [Bool](../types/Bool.md), 'email_requested' => [Bool](../types/Bool.md), 'shipping_address_requested' => [Bool](../types/Bool.md), 'flexible' => [Bool](../types/Bool.md), 'phone_to_provider' => [Bool](../types/Bool.md), 'email_to_provider' => [Bool](../types/Bool.md), 'currency' => [string](../types/string.md), 'prices' => \[[LabeledPrice](../types/LabeledPrice.md)\], \];<a name="invoice"></a>  
+
+***
+<br><br>[$ipPort](../constructors/ipPort.md) = \['ipv4' => [int](../types/int.md), 'port' => [int](../types/int.md), \];<a name="ipPort"></a>  
 
 ***
 <br><br>[$keyboardButton](../constructors/keyboardButton.md) = \['text' => [string](../types/string.md), \];<a name="keyboardButton"></a>  
@@ -986,7 +1036,7 @@ description: List of constructors
 <br><br>[$messageMediaContact](../constructors/messageMediaContact.md) = \['phone_number' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \];<a name="messageMediaContact"></a>  
 
 ***
-<br><br>[$messageMediaDocument](../constructors/messageMediaDocument.md) = \['document' => [Document](../types/Document.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="messageMediaDocument"></a>  
+<br><br>[$messageMediaDocument](../constructors/messageMediaDocument.md) = \['document' => [Document](../types/Document.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="messageMediaDocument"></a>  
 
 ***
 <br><br>[$messageMediaEmpty](../constructors/messageMediaEmpty.md) = \[\];<a name="messageMediaEmpty"></a>  
@@ -1004,7 +1054,7 @@ description: List of constructors
 <br><br>[$messageMediaInvoice](../constructors/messageMediaInvoice.md) = \['shipping_address_requested' => [Bool](../types/Bool.md), 'test' => [Bool](../types/Bool.md), 'title' => [string](../types/string.md), 'description' => [string](../types/string.md), 'photo' => [WebDocument](../types/WebDocument.md), 'receipt_msg_id' => [int](../types/int.md), 'currency' => [string](../types/string.md), 'total_amount' => [long](../types/long.md), 'start_param' => [string](../types/string.md), \];<a name="messageMediaInvoice"></a>  
 
 ***
-<br><br>[$messageMediaPhoto](../constructors/messageMediaPhoto.md) = \['photo' => [Photo](../types/Photo.md), 'caption' => [string](../types/string.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="messageMediaPhoto"></a>  
+<br><br>[$messageMediaPhoto](../constructors/messageMediaPhoto.md) = \['photo' => [Photo](../types/Photo.md), 'ttl_seconds' => [int](../types/int.md), \];<a name="messageMediaPhoto"></a>  
 
 ***
 <br><br>[$messageMediaUnsupported](../constructors/messageMediaUnsupported.md) = \[\];<a name="messageMediaUnsupported"></a>  
@@ -1097,7 +1147,26 @@ description: List of constructors
 [$messages\_stickersNotModified](../constructors/messages_stickersNotModified.md) = \[\];<a name="messages_stickersNotModified"></a>  
 
 ***
+<br><br>[$msg\_detailed\_info](../constructors/msg_detailed_info.md) = \['msg_id' => [long](../types/long.md), 'answer_msg_id' => [long](../types/long.md), 'bytes' => [int](../types/int.md), 'status' => [int](../types/int.md), \];<a name="msg_detailed_info"></a>  
+
+[$msg\_new\_detailed\_info](../constructors/msg_new_detailed_info.md) = \['answer_msg_id' => [long](../types/long.md), 'bytes' => [int](../types/int.md), 'status' => [int](../types/int.md), \];<a name="msg_new_detailed_info"></a>  
+
+[$msg\_resend\_req](../constructors/msg_resend_req.md) = \['msg_ids' => \[[long](../types/long.md)\], \];<a name="msg_resend_req"></a>  
+
+***
+<br><br>[$msgs\_ack](../constructors/msgs_ack.md) = \['msg_ids' => \[[long](../types/long.md)\], \];<a name="msgs_ack"></a>  
+
+[$msgs\_all\_info](../constructors/msgs_all_info.md) = \['msg_ids' => \[[long](../types/long.md)\], 'info' => [string](../types/string.md), \];<a name="msgs_all_info"></a>  
+
+[$msgs\_state\_info](../constructors/msgs_state_info.md) = \['req_msg_id' => [long](../types/long.md), 'info' => [string](../types/string.md), \];<a name="msgs_state_info"></a>  
+
+[$msgs\_state\_req](../constructors/msgs_state_req.md) = \['msg_ids' => \[[long](../types/long.md)\], \];<a name="msgs_state_req"></a>  
+
+***
 <br><br>[$nearestDc](../constructors/nearestDc.md) = \['country' => [string](../types/string.md), 'this_dc' => [int](../types/int.md), 'nearest_dc' => [int](../types/int.md), \];<a name="nearestDc"></a>  
+
+***
+<br><br>[$new\_session\_created](../constructors/new_session_created.md) = \['first_msg_id' => [long](../types/long.md), 'unique_id' => [long](../types/long.md), 'server_salt' => [long](../types/long.md), \];<a name="new_session_created"></a>  
 
 ***
 <br><br>[$notifyAll](../constructors/notifyAll.md) = \[\];<a name="notifyAll"></a>  
@@ -1113,6 +1182,9 @@ description: List of constructors
 
 ***
 <br><br>[$null](../constructors/null.md) = \[\];<a name="null"></a>  
+
+***
+<br><br>[$p\_q\_inner\_data](../constructors/p_q_inner_data.md) = \['pq' => [string](../types/string.md), 'p' => [string](../types/string.md), 'q' => [string](../types/string.md), 'nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'new_nonce' => [int256](../types/int256.md), \];<a name="p_q_inner_data"></a>  
 
 ***
 <br><br>[$pageBlockAnchor](../constructors/pageBlockAnchor.md) = \['name' => [string](../types/string.md), \];<a name="pageBlockAnchor"></a>  
@@ -1297,6 +1369,9 @@ description: List of constructors
 [$photos\_photosSlice](../constructors/photos_photosSlice.md) = \['count' => [int](../types/int.md), 'photos' => \[[Photo](../types/Photo.md)\], 'users' => \[[User](../types/User.md)\], \];<a name="photos_photosSlice"></a>  
 
 ***
+<br><br>[$pong](../constructors/pong.md) = \['msg_id' => [long](../types/long.md), 'ping_id' => [long](../types/long.md), \];<a name="pong"></a>  
+
+***
 <br><br>[$popularContact](../constructors/popularContact.md) = \['client_id' => [long](../types/long.md), 'importers' => [int](../types/int.md), \];<a name="popularContact"></a>  
 
 ***
@@ -1360,6 +1435,18 @@ description: List of constructors
 <br><br>[$replyKeyboardMarkup](../constructors/replyKeyboardMarkup.md) = \['resize' => [Bool](../types/Bool.md), 'single_use' => [Bool](../types/Bool.md), 'selective' => [Bool](../types/Bool.md), 'rows' => \[[KeyboardButtonRow](../types/KeyboardButtonRow.md)\], \];<a name="replyKeyboardMarkup"></a>  
 
 ***
+<br><br>[$resPQ](../constructors/resPQ.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'pq' => [string](../types/string.md), 'server_public_key_fingerprints' => \[[long](../types/long.md)\], \];<a name="resPQ"></a>  
+
+***
+<br><br>[$rpc\_answer\_dropped](../constructors/rpc_answer_dropped.md) = \['msg_id' => [long](../types/long.md), 'seq_no' => [int](../types/int.md), 'bytes' => [int](../types/int.md), \];<a name="rpc_answer_dropped"></a>  
+
+[$rpc\_answer\_dropped\_running](../constructors/rpc_answer_dropped_running.md) = \[\];<a name="rpc_answer_dropped_running"></a>  
+
+[$rpc\_answer\_unknown](../constructors/rpc_answer_unknown.md) = \[\];<a name="rpc_answer_unknown"></a>  
+
+[$rpc\_error](../constructors/rpc_error.md) = \['error_code' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \];<a name="rpc_error"></a>  
+
+***
 <br><br>[$sendMessageCancelAction](../constructors/sendMessageCancelAction.md) = \[\];<a name="sendMessageCancelAction"></a>  
 
 ***
@@ -1397,6 +1484,13 @@ description: List of constructors
 
 ***
 <br><br>[$sendMessageUploadVideoAction\_17](../constructors/sendMessageUploadVideoAction_17.md) = \[\];<a name="sendMessageUploadVideoAction_17"></a>  
+
+***
+<br><br>[$server\_DH\_inner\_data](../constructors/server_DH_inner_data.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'g' => [int](../types/int.md), 'dh_prime' => [string](../types/string.md), 'g_a' => [string](../types/string.md), 'server_time' => [int](../types/int.md), \];<a name="server_DH_inner_data"></a>  
+
+[$server\_DH\_params\_fail](../constructors/server_DH_params_fail.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'new_nonce_hash' => [int128](../types/int128.md), \];<a name="server_DH_params_fail"></a>  
+
+[$server\_DH\_params\_ok](../constructors/server_DH_params_ok.md) = \['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'encrypted_answer' => [string](../types/string.md), \];<a name="server_DH_params_ok"></a>  
 
 ***
 <br><br>[$shippingOption](../constructors/shippingOption.md) = \['id' => [string](../types/string.md), 'title' => [string](../types/string.md), 'prices' => \[[LabeledPrice](../types/LabeledPrice.md)\], \];<a name="shippingOption"></a>  
@@ -1779,6 +1873,9 @@ description: List of constructors
 
 ***
 <br><br>[$wallPaperSolid](../constructors/wallPaperSolid.md) = \['id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'bg_color' => [int](../types/int.md), 'color' => [int](../types/int.md), \];<a name="wallPaperSolid"></a>  
+
+***
+<br><br>[$webAuthorization](../constructors/webAuthorization.md) = \['hash' => [long](../types/long.md), 'bot_id' => [int](../types/int.md), 'domain' => [string](../types/string.md), 'browser' => [string](../types/string.md), 'platform' => [string](../types/string.md), 'date_created' => [int](../types/int.md), 'date_active' => [int](../types/int.md), 'ip' => [string](../types/string.md), 'region' => [string](../types/string.md), \];<a name="webAuthorization"></a>  
 
 ***
 <br><br>[$webDocument](../constructors/webDocument.md) = \['url' => [string](../types/string.md), 'access_hash' => [long](../types/long.md), 'size' => [int](../types/int.md), 'mime_type' => [string](../types/string.md), 'attributes' => \[[DocumentAttribute](../types/DocumentAttribute.md)\], 'dc_id' => [int](../types/int.md), \];<a name="webDocument"></a>  

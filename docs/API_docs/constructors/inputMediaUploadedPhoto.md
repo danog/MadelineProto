@@ -12,7 +12,6 @@ description: inputMediaUploadedPhoto attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |file|[InputFile](../types/InputFile.md) | Yes|
-|caption|[string](../types/string.md) | Yes|
 |stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
 |ttl\_seconds|[int](../types/int.md) | Optional|
 
@@ -24,13 +23,13 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => 'string', 'stickers' => [InputDocument], 'ttl_seconds' => int];
+$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'stickers' => [InputDocument], 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "inputMediaUploadedPhoto", "file": InputFile, "caption": "string", "stickers": [InputDocument], "ttl_seconds": int}
+{"_": "inputMediaUploadedPhoto", "file": InputFile, "stickers": [InputDocument], "ttl_seconds": int}
 ```
 
 
@@ -38,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaUploadedPhoto={_='inputMediaUploadedPhoto', file=InputFile, caption='string', stickers={InputDocument}, ttl_seconds=int}
+inputMediaUploadedPhoto={_='inputMediaUploadedPhoto', file=InputFile, stickers={InputDocument}, ttl_seconds=int}
 
 ```
 

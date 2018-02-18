@@ -12,7 +12,6 @@ description: inputMediaDocument attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |id|[InputDocument](../types/InputDocument.md) | Optional|
-|caption|[string](../types/string.md) | Yes|
 |ttl\_seconds|[int](../types/int.md) | Optional|
 
 
@@ -23,13 +22,13 @@ description: inputMediaDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument, 'caption' => 'string', 'ttl_seconds' => int];
+$inputMediaDocument = ['_' => 'inputMediaDocument', 'id' => InputDocument, 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "inputMediaDocument", "id": InputDocument, "caption": "string", "ttl_seconds": int}
+{"_": "inputMediaDocument", "id": InputDocument, "ttl_seconds": int}
 ```
 
 
@@ -37,7 +36,7 @@ Or, if you're into Lua:
 
 
 ```
-inputMediaDocument={_='inputMediaDocument', id=InputDocument, caption='string', ttl_seconds=int}
+inputMediaDocument={_='inputMediaDocument', id=InputDocument, ttl_seconds=int}
 
 ```
 

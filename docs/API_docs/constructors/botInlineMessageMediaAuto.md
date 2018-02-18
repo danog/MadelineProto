@@ -11,7 +11,8 @@ description: botInlineMessageMediaAuto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|caption|[string](../types/string.md) | Yes|
+|message|[string](../types/string.md) | Yes|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
@@ -22,13 +23,13 @@ description: botInlineMessageMediaAuto attributes, type and example
 ### Example:
 
 ```
-$botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'caption' => 'string', 'reply_markup' => ReplyMarkup];
+$botInlineMessageMediaAuto = ['_' => 'botInlineMessageMediaAuto', 'message' => 'string', 'entities' => [MessageEntity], 'reply_markup' => ReplyMarkup];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "botInlineMessageMediaAuto", "caption": "string", "reply_markup": ReplyMarkup}
+{"_": "botInlineMessageMediaAuto", "message": "string", "entities": [MessageEntity], "reply_markup": ReplyMarkup}
 ```
 
 
@@ -36,7 +37,7 @@ Or, if you're into Lua:
 
 
 ```
-botInlineMessageMediaAuto={_='botInlineMessageMediaAuto', caption='string', reply_markup=ReplyMarkup}
+botInlineMessageMediaAuto={_='botInlineMessageMediaAuto', message='string', entities={MessageEntity}, reply_markup=ReplyMarkup}
 
 ```
 

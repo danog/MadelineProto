@@ -11,7 +11,7 @@ description: channels.getMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [InputMessage](../types/InputMessage.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
@@ -43,7 +43,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$messages_Messages = $MadelineProto->channels->getMessages(['channel' => InputChannel, 'id' => [int], ]);
+$messages_Messages = $MadelineProto->channels->getMessages(['channel' => InputChannel, 'id' => [InputMessage], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -55,7 +55,7 @@ POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 Parameters:
 
 * method - channels.getMessages
-* params - `{"channel": InputChannel, "id": [int], }`
+* params - `{"channel": InputChannel, "id": [InputMessage], }`
 
 
 
@@ -67,7 +67,7 @@ Parameters:
 
 channel - Json encoded InputChannel
 
-id - Json encoded  array of int
+id - Json encoded  array of InputMessage
 
 
 
@@ -75,6 +75,6 @@ id - Json encoded  array of int
 Or, if you're into Lua:
 
 ```
-messages_Messages = channels.getMessages({channel=InputChannel, id={int}, })
+messages_Messages = channels.getMessages({channel=InputChannel, id={InputMessage}, })
 ```
 

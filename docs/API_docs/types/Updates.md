@@ -43,8 +43,6 @@ description: constructors and methods of type Updates
 
 [$MadelineProto->messages->createChat](../methods/messages_createChat.md)  
 
-[$MadelineProto->messages->forwardMessage](../methods/messages_forwardMessage.md)  
-
 [$MadelineProto->messages->importChatInvite](../methods/messages_importChatInvite.md)  
 
 [$MadelineProto->messages->startBot](../methods/messages_startBot.md)  

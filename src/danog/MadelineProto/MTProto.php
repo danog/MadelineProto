@@ -46,7 +46,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 88;
+    const V = 89;
 
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -502,10 +502,10 @@ class MTProto
                 'lang_code' => $lang_code,
             ],
             'tl_schema' => [ // TL scheme files
-                'layer' => 73, // layer version
+                'layer' => 75, // layer version
                 'src'   => [
                     'mtproto'  => __DIR__.'/TL_mtproto_v1.json', // mtproto TL scheme
-                    'telegram' => __DIR__.'/TL_telegram_v73.tl', // telegram TL scheme
+                    'telegram' => __DIR__.'/TL_telegram_v75.tl', // telegram TL scheme
                     'secret'   => __DIR__.'/TL_secret.tl', // secret chats TL scheme
                     'calls'    => __DIR__.'/TL_calls.tl', // calls TL scheme
                     //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme

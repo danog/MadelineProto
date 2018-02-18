@@ -12,6 +12,7 @@ description: account.unregisterDevice parameters, return type and example
 |----------|---------------|----------|
 |token\_type|[int](../types/int.md) | Yes|
 |token|[string](../types/string.md) | Yes|
+|other\_uids|Array of [int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -38,7 +39,7 @@ if (isset($number)) { // Login as a user
     $MadelineProto->complete_phone_login($code);
 }
 
-$Bool = $MadelineProto->account->unregisterDevice(['token_type' => int, 'token' => 'string', ]);
+$Bool = $MadelineProto->account->unregisterDevice(['token_type' => int, 'token' => 'string', 'other_uids' => [int], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
@@ -55,12 +56,14 @@ token_type - Json encoded int
 
 token - Json encoded string
 
+other_uids - Json encoded  array of int
+
 
 
 
 Or, if you're into Lua:
 
 ```
-Bool = account.unregisterDevice({token_type=int, token='string', })
+Bool = account.unregisterDevice({token_type=int, token='string', other_uids={int}, })
 ```
 

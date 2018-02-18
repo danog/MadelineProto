@@ -17,5 +17,7 @@ description: constructors and methods of type messages_Stickers
 
 ### Methods that return an object of this type (methods):
 
+[$MadelineProto->messages->getStickers](../methods/messages_getStickers.md)  
+
 
 
