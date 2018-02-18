@@ -242,6 +242,7 @@ trait Files
         $stream = fopen($file, 'r+b');
         \danog\MadelineProto\Logger::log(['Waiting for lock of file to download...']);
         flock($stream, LOCK_EX);
+
         try {
             $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);
         } finally {

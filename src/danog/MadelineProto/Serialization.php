@@ -54,6 +54,7 @@ class Serialization
         $lock = fopen($lock, 'w');
         \danog\MadelineProto\Logger::log(['Waiting for exclusive lock of serialization lockfile...']);
         flock($lock, LOCK_EX);
+
         try {
             $wrote = file_put_contents($filename.'.temp.session', serialize($instance));
             rename($filename.'.temp.session', $filename);
