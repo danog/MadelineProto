@@ -52,11 +52,15 @@ class Serialization
             clearstatcache();
         }
         $lock = fopen($lock, 'w');
+        \danog\MadelineProto\Logger::log(['Waiting for exclusive lock of serialization lockfile...']);
         flock($lock, LOCK_EX);
-        $wrote = file_put_contents($filename.'.temp.session', serialize($instance));
-        rename($filename.'.temp.session', $filename);
-        flock($lock, LOCK_UN);
-        fclose($lock);
+        try {
+            $wrote = file_put_contents($filename.'.temp.session', serialize($instance));
+            rename($filename.'.temp.session', $filename);
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
 
         return $wrote;
     }
@@ -78,6 +82,8 @@ class Serialization
                 clearstatcache();
             }
             $lock = fopen($lock, 'r');
+
+            \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
             flock($lock, LOCK_SH);
             $unserialized = file_get_contents($filename);
             flock($lock, LOCK_UN);

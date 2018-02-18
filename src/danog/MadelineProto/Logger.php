@@ -81,7 +81,7 @@ class Logger
     ];
 
     public static $storage = [];
-    public static $mode = null;
+    public static $mode = 1;
     public static $optional = null;
     public static $constructed = false;
     public static $prefix = '';
@@ -165,7 +165,7 @@ class Logger
             return false;
         }
         if (!self::$constructed) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_function_uncalled']);
+//            throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_function_uncalled']);
         }
         $prefix = self::$prefix;
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {

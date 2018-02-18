@@ -30,6 +30,7 @@ class API extends APIFactory
                     clearstatcache();
                 }
                 $lock = fopen($lock, 'r');
+                \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
                 flock($lock, LOCK_SH);
                 $unserialized = file_get_contents($params);
                 flock($lock, LOCK_UN);

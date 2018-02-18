@@ -240,11 +240,15 @@ trait Files
         $file = realpath($file);
         $message_media = $this->get_download_info($message_media);
         $stream = fopen($file, 'r+b');
+        \danog\MadelineProto\Logger::log(['Waiting for lock of file to download...']);
         flock($stream, LOCK_EX);
-        $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);
-        flock($stream, LOCK_UN);
-        fclose($stream);
-        clearstatcache();
+        try {
+            $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);
+        } finally {
+            flock($stream, LOCK_UN);
+            fclose($stream);
+            clearstatcache();
+        }
 
         return $file;
     }
@@ -265,7 +269,7 @@ trait Files
             $end = $message_media['size'];
         }
         $size = $end - $offset;
-        $part_size = 128 * 1024;
+        $part_size = 1024 * 1024;
         $percent = 0;
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
@@ -290,9 +294,6 @@ trait Files
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 switch ($e->rpc) {
-                    case 'OFFSET_INVALID':
-                    //\Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $e->rpc, ['info' => $message_media, 'offset' => $offset]);
-                    break;
                     case 'FILE_TOKEN_INVALID':
                     $cdn = false;
                     continue 2;
