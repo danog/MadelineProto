@@ -103,9 +103,7 @@ class Serialization
             } catch (\danog\MadelineProto\Bug74586Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
             } catch (\danog\MadelineProto\Exception $e) {
-                if (Logger::$constructed) {
-                    Logger::log([(string) $e], Logger::ERROR);
-                }
+                Logger::log([(string) $e], Logger::ERROR);
                 if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\Math\BigInteger'") === 0) {
                     $tounserialize = str_replace('phpseclib\Math\BigInteger', 'phpseclib\Math\BigIntegor', $unserialized);
                 }

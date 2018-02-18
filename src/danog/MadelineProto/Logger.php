@@ -83,7 +83,6 @@ class Logger
     public static $storage = [];
     public static $mode = 1;
     public static $optional = null;
-    public static $constructed = false;
     public static $prefix = '';
     public static $level = 3;
     public static $has_thread = false;
@@ -150,7 +149,6 @@ class Logger
         }
         self::$mode = $mode;
         self::$optional = $optional;
-        self::$constructed = true;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;
         self::class_exists();
@@ -164,9 +162,7 @@ class Logger
         if ($level > self::$level) {
             return false;
         }
-        if (!self::$constructed) {
-//            throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_function_uncalled']);
-        }
+
         $prefix = self::$prefix;
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
