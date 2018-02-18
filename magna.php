@@ -129,7 +129,7 @@ $MadelineProto->get_updates(['offset' => -1]);
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 unset($calls[$key]);
             } elseif (isset($times[$call->getOtherID()]) && $times[$call->getOtherID()][0] < time()) {
-                $times[$call->getOtherID()][0] += 30+count($calls);
+                $times[$call->getOtherID()][0] += 30 + count($calls);
 
                 try {
                     $MadelineProto->messages->editMessage(['id' => $times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);

@@ -578,10 +578,13 @@ trait PeerHandler
     {
         try {
             $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
-        } catch (\danog\MadelineProto\RPCErrorException $e) { return false; }
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            return false;
+        }
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;
         }
+
         return false;
     }
 
