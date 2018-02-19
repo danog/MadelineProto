@@ -473,11 +473,11 @@ trait BotAPI
 
     public function split_to_chunks($text)
     {
-        $total_length = 4096;
+        $max_length = 4096;
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $text) as $word) {
-            if (strlen($word) > 4096) {
-                foreach (str_split($word, 4096) as $vv) {
+            if (strlen($word) > $max_length) {
+                foreach (str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
@@ -485,21 +485,13 @@ trait BotAPI
             }
         }
         $i = 0;
-        $message[0] = '';
+        $message = [''];
         foreach ($text_arr as $word) {
-            if (strlen($message[$i].$word.' ') <= $total_length) {
-                if ($text_arr[count($text_arr) - 1] == $word) {
-                    $message[$i] .= $word;
-                } else {
-                    $message[$i] .= $word.' ';
-                }
+            if (strlen($message[$i].$word) <= $max_length) {
+                $message[$i] .= $word;
             } else {
                 $i++;
-                if ($text_arr[count($text_arr) - 1] == $word) {
-                    $message[$i] = $word;
-                } else {
-                    $message[$i] = $word.' ';
-                }
+                $message[$i] = $word;
             }
         }
 
@@ -510,10 +502,13 @@ trait BotAPI
     {
         $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
         $finalArray = [];
+        $delimOffset = 0;
         foreach ($initialArray as $item) {
+            $delimOffset += strlen($item);
             if (strlen($item) > 0) {
-                $finalArray[] = $item.$string[strpos($string, $item) + strlen($item)];
+                $finalArray[] = $item.($delimOffset < strlen($string) ? $string[$delimOffset] : '');
             }
+            $delimOffset++;
         }
 
         return $finalArray;

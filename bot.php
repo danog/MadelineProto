@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
 require 'vendor/autoload.php';
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
+$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];//, 'connection_settings' => ['all' => ['test_mode' => true]]];
 
 try {
     $MadelineProto = new \danog\MadelineProto\API('bot.madeline');
@@ -37,7 +37,7 @@ while (true) {
             case 'updateNewMessage':
             case 'updateNewChannelMessage':
                 if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
-                    continue;
+//                    continue;
                 }
                 $res = json_encode($update, JSON_PRETTY_PRINT);
                 if ($res == '') {
@@ -45,16 +45,16 @@ while (true) {
                 }
 
                 try {
-                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['_'] === 'updateNewMessage' ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+//                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['_'] === 'updateNewMessage' ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                 }
 
                 try {
                     if (isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
-                        $time = time();
+                        $time = microtime(true);
                         $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
-                        $MadelineProto->messages->sendMessage(['peer' => isset($update['update']['message']['from_id']) ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+                        $MadelineProto->messages->sendMessage(['peer' => isset($update['update']['message']['from_id']) ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => 'Downloaded to '.$file.' in '.(microtime(true) - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);

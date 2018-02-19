@@ -54,27 +54,22 @@ if ($MadelineProto === false) {
             \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
-
-        echo 'Serializing MadelineProto to s.madeline...'.PHP_EOL;
-        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
     } else {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-echo 'Serializing MadelineProto to s.madeline...'.PHP_EOL;
-echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
+$MadelineProto->session = 's.madeline';
 
 $sent = [-440592694 => true];
 
 $offset = 0;
 while (true) {
     try {
-        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         //\danog\MadelineProto\Logger::log([$updates]);
         foreach ($updates as $update) {
-            echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 /*case 'updateNewChannelMessage':
@@ -87,11 +82,11 @@ while (true) {
                     }
                     break;*/
                 case 'updateNewEncryptedMessage':
-                    //var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
+                    var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
                     if (isset($sent[$update['update']['message']['chat_id']])) {
                         continue;
                     }
-$secret = $update['update']['message']['chat_id'];
+    $secret = $update['update']['message']['chat_id'];
     $secret_media = [];
 
     // Photo uploaded as document, secret chat
@@ -133,7 +128,6 @@ $secret = $update['update']['message']['chat_id'];
                     while ($i < $argv[1]) {
                         echo "SENDING MESSAGE $i TO ".$update['update']['message']['chat_id'].PHP_EOL;
                         $MadelineProto->messages->sendEncrypted(['peer' => $update['update']['message']['chat_id'], 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => (string) ($i++)]]);
-                        \danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto);
                     }
                     $sent[$update['update']['message']['chat_id']] = true;
            }
@@ -144,5 +138,4 @@ $secret = $update['update']['message']['chat_id'];
         var_dump($e->getMessage());
     }
     //sleep(1);
-    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('s.madeline', $MadelineProto).' bytes'.PHP_EOL;
 }

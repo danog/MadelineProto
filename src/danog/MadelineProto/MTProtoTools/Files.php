@@ -349,10 +349,10 @@ trait Files
             if (isset($message_media['cdn_key'])) {
                 $ivec = substr($message_media['cdn_iv'], 0, 12).pack('N', $offset >> 4);
                 $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
+                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
-                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
             }
             if ($start_at) {
                 $res['bytes'] = substr($res['bytes'], $start_at);
@@ -399,17 +399,19 @@ trait Files
 
     private function check_cdn_hash($file, $offset, $data, &$datacenter)
     {
-        if (!isset($this->cdn_hashes[$file][$offset])) {
-            $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
+        while (strlen($data)) {
+            if (!isset($this->cdn_hashes[$file][$offset])) {
+                $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
+            }
+            if (!isset($this->cdn_hashes[$file][$offset])) {
+                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
+            }
+            if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
+                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset '.$offset);
+            }
+            $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
+            $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
-        if (!isset($this->cdn_hashes[$file][$offset])) {
-            throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
-        }
-        if (hash('sha256', $data, true) !== $this->cdn_hashes[$file][$offset]['hash']) {
-            throw new \danog\MadelineProto\SecurityException('CDN hashe mismatch for offset '.$offset);
-        }
-        unset($this->cdn_hashes[$file][$offset]);
-
         return true;
     }
 

@@ -22,6 +22,7 @@ trait AuthKeyHandler
 {
     public function create_auth_key($expires_in, $datacenter)
     {
+        $req_pq = strpos($datacenter, 'cdn') ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['req_pq']], \danog\MadelineProto\Logger::VERBOSE);
@@ -44,7 +45,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = $this->random(16);
-                $ResPQ = $this->method_call('req_pq_multi',
+                $ResPQ = $this->method_call($req_pq,
                     [
                         'nonce' => $nonce,
                     ],
@@ -370,6 +371,7 @@ trait AuthKeyHandler
                             $res_authorization['server_salt'] = substr($new_nonce, 0, 8 - 0) ^ substr($server_nonce, 0, 8 - 0);
                             $res_authorization['auth_key'] = $auth_key_str;
                             $res_authorization['id'] = substr($auth_key_sha, -8);
+                            $res_authorization['connection_inited'] = false;
 
                             \danog\MadelineProto\Logger::log(['Auth key generated'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -398,6 +400,7 @@ trait AuthKeyHandler
                 \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
                 \danog\MadelineProto\Logger::log(['An exception occurred while generating the authorization key: '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
+                $req_pq = $req_pq === 'req_pq_multi' ? 'req_pq' : 'req_pq_multi';
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'RPC_CALL_FAIL') {
                     throw $e;
@@ -595,15 +598,17 @@ trait AuthKeyHandler
                         $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         if (!$cdn) {
                             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                            $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
+                            $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
                             $this->sync_authorization($id);
                             $this->get_config($config);
                         }
                     } else {
                         $socket->temp_auth_key = $socket->auth_key;
-                        $config = $this->write_client_info('help.getConfig', [], ['datacenter' => $id]);
-                        $this->sync_authorization($id);
-                        $this->get_config($config);
+                        if (!$cdn) {
+                            $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
+                            $this->sync_authorization($id);
+                            $this->get_config($config);
+                        }
                     }
                 } elseif (!$cdn) {
                     $this->sync_authorization($id);

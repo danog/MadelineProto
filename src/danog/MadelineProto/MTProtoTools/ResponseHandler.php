@@ -246,7 +246,7 @@ trait ResponseHandler
                         case 'Updates':
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                             $unset = true;
-                            $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
+                            if (strpos($datacenter, 'cdn') === false) $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                             $only_updates = true && $only_updates;
                             break;
                         default:

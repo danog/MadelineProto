@@ -45,7 +45,6 @@ if (!extension_loaded('pthreads')) {
         {
             if (in_array($name, [\SO_RCVTIMEO, \SO_SNDTIMEO])) {
                 $this->timeout = ['sec' => (int) $value, 'usec' => (int) (($value - (int) $value) * 1000000)];
-                stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
 
                 return true;
             }
@@ -83,8 +82,10 @@ if (!extension_loaded('pthreads')) {
             if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
                 $address = '['.$address.']';
             }
-
-            $this->sock = fsockopen($this->protocol.'://'.$address, $port);
+            $errno = 0;
+            $errstr = '';
+            $this->sock = fsockopen($this->protocol.'://'.$address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec']/1000000));
+            stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
 
             return true;
         }

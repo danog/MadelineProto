@@ -51,7 +51,6 @@ class Connection
 
     public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
-
         // Can use:
         /*
         - tcp_full
@@ -77,11 +76,11 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 $this->sock->setBlocking(true);
                 $this->write(chr(239));
                 break;
@@ -90,11 +89,11 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 $this->sock->setBlocking(true);
                 $this->write(str_repeat(chr(238), 4));
                 break;
@@ -104,11 +103,11 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 $this->sock->setBlocking(true);
 
                 $this->out_seq_no = -1;
@@ -119,11 +118,11 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($ip, $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
-                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 $this->sock->setBlocking(true);
                 do {
                     $random = $this->random(64);
@@ -166,12 +165,10 @@ class Connection
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
+                $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+                $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 if (!$this->sock->connect($this->parsed['host'], $port)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
-                }
-                if (!\danog\MadelineProto\Logger::$has_thread) {
-                    $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-                    $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
                 }
                 $this->sock->setBlocking(true);
                 break;
