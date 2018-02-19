@@ -66,43 +66,42 @@ class DataCenter
         $x = 0;
 
         do {
+            $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
 
-        $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
+            if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
+                unset($this->sockets[$dc_number]);
 
-
-        if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
-            unset($this->sockets[$dc_number]);
-
-            return false;
-        }
-        $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
-        $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
-
-        if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) {
-            if ($dc_config_number === 'all') {
-                $dc_config_number = $dc_number;
+                return false;
             }
-            if (!isset($this->settings[$dc_config_number])) {
-                $this->settings[$dc_config_number] = $this->settings['all'];
-            }
-            $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
-        }
+            $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+            $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
 
-        if ($this->settings[$dc_config_number]['protocol'] === 'https') {
-            $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
-            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
-            $address = $this->settings[$dc_config_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
-        }
-
-        if ($this->settings[$dc_config_number]['protocol'] === 'http') {
-            if ($ipv6) {
-                $address = '['.$address.']';
+            if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) {
+                if ($dc_config_number === 'all') {
+                    $dc_config_number = $dc_number;
+                }
+                if (!isset($this->settings[$dc_config_number])) {
+                    $this->settings[$dc_config_number] = $this->settings['all'];
+                }
+                $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
             }
-            $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.'/api';
-        }
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol'])], \danog\MadelineProto\Logger::VERBOSE);
+
+            if ($this->settings[$dc_config_number]['protocol'] === 'https') {
+                $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
+                $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
+                $address = $this->settings[$dc_config_number]['protocol'].'://'.$subdomain.'.web.telegram.org/'.$path;
+            }
+
+            if ($this->settings[$dc_config_number]['protocol'] === 'http') {
+                if ($ipv6) {
+                    $address = '['.$address.']';
+                }
+                $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.'/api';
+            }
+            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol'])], \danog\MadelineProto\Logger::VERBOSE);
             foreach (array_unique([$port, 443, 80, 88]) as $port) {
                 \danog\MadelineProto\Logger::log(['Trying connection on port '.$port.'...'], \danog\MadelineProto\Logger::WARNING);
+
                 try {
                     if (isset($this->sockets[$dc_number]->old)) {
                         $this->sockets[$dc_number]->__construct($this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
@@ -111,6 +110,7 @@ class DataCenter
                         $this->sockets[$dc_number] = new Connection($this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
                     }
                     \danog\MadelineProto\Logger::log(['OK!'], \danog\MadelineProto\Logger::WARNING);
+
                     return true;
                 } catch (\danog\MadelineProto\Exception $e) {
                 } catch (\danog\MadelineProto\NothingInTheSocketException $e) {

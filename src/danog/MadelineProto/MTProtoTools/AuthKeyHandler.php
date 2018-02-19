@@ -601,7 +601,7 @@ trait AuthKeyHandler
                             $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
                             $this->sync_authorization($id);
                             $this->get_config($config);
-                        } else if ($socket->temp_auth_key === null) {
+                        } elseif ($socket->temp_auth_key === null) {
                             \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], \danog\MadelineProto\Logger::NOTICE);
                             $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         }
@@ -611,7 +611,7 @@ trait AuthKeyHandler
                             $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
                             $this->sync_authorization($id);
                             $this->get_config($config);
-                        } else if ($socket->temp_auth_key === null) {
+                        } elseif ($socket->temp_auth_key === null) {
                             \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id)], \danog\MadelineProto\Logger::NOTICE);
                             $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         }

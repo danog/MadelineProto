@@ -84,7 +84,7 @@ if (!extension_loaded('pthreads')) {
             }
             $errno = 0;
             $errstr = '';
-            $this->sock = fsockopen($this->protocol.'://'.$address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec']/1000000));
+            $this->sock = fsockopen($this->protocol.'://'.$address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
             stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
 
             return true;

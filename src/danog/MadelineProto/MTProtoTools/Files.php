@@ -413,6 +413,7 @@ trait Files
             $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
+
         return true;
     }
 
