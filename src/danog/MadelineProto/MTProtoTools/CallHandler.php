@@ -71,6 +71,27 @@ trait CallHandler
         } else {
             $serialized = $this->serialize_method($method, $args);
         }
+        if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] === false)) {
+            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $method)], \danog\MadelineProto\Logger::NOTICE);
+            $serialized = $this->serialize_method(
+            'invokeWithLayer',
+            [
+                'layer' => $this->settings['tl_schema']['layer'],
+                'query' => $this->serialize_method('initConnection',
+                    [
+                        'api_id'           => $this->settings['app_info']['api_id'],
+                        'api_hash'         => $this->settings['app_info']['api_hash'],
+                        'device_model'     => strpos($aargs['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a',
+                        'system_version'   => strpos($aargs['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a',
+                        'app_version'      => $this->settings['app_info']['app_version'],
+                        'system_lang_code' => $this->settings['app_info']['lang_code'],
+                        'lang_code'        => $this->settings['app_info']['lang_code'],
+                        'lang_pack'        => '',
+                        'query'            => $serialized
+                    ]
+                ),
+            ]);
+        }
 
         $content_related = $this->content_related($method);
 
@@ -250,6 +271,8 @@ trait CallHandler
                 throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
             }
             \danog\MadelineProto\Logger::log(['Got response for method '.$method.' @ try '.$count.' (response try '.$res_count.')'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] === false)) $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] = true;
+
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
             if (isset($message_chunks) && count($message_chunks)) {
                 $server_answer = [$server_answer];

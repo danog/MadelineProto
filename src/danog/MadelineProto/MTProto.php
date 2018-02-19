@@ -664,32 +664,6 @@ class MTProto
         $this->init_authorization();
     }
 
-    public function write_client_info($method, $arguments = [], $options = [])
-    {
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $method)], Logger::NOTICE);
-
-        return $this->method_call(
-            'invokeWithLayer',
-            [
-                'layer' => $this->settings['tl_schema']['layer'],
-                'query' => $this->serialize_method('initConnection',
-                    [
-                        'api_id'           => $this->settings['app_info']['api_id'],
-                        'api_hash'         => $this->settings['app_info']['api_hash'],
-                        'device_model'     => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a',
-                        'system_version'   => strpos($options['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a',
-                        'app_version'      => $this->settings['app_info']['app_version'],
-                        'system_lang_code' => $this->settings['app_info']['lang_code'],
-                        'lang_code'        => $this->settings['app_info']['lang_code'],
-                        'lang_pack'        => '',
-                        'query'            => $this->serialize_method($method, $arguments),
-                    ]
-                ),
-            ],
-            $options
-        );
-    }
-
     public function get_config($config = [], $options = [])
     {
         if ($this->config['expires'] > time()) {

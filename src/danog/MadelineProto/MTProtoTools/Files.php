@@ -349,7 +349,7 @@ trait Files
             if (isset($message_media['cdn_key'])) {
                 $ivec = substr($message_media['cdn_iv'], 0, 12).pack('N', $offset >> 4);
                 $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
-                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $datacenter);
+                $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $old_dc);
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
@@ -393,7 +393,7 @@ trait Files
             $this->cdn_hashes = [];
         }
         foreach ($hashes as $hash) {
-            $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => $hash['hash']];
+            $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
 
@@ -401,11 +401,12 @@ trait Files
     {
         while (strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->add_cdn_hashes($this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => &$datacenter]));
+                $this->add_cdn_hashes($file, $this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
             }
+
             if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
                 throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset '.$offset);
             }
