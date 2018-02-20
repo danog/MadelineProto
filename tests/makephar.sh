@@ -1,5 +1,5 @@
 #!/bin/sh -e
-
+composer update
 php makephar.php
 
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
