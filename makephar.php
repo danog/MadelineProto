@@ -14,6 +14,10 @@ If not, see <http://www.gnu.org/licenses/>.
 require 'vendor/autoload.php';
 use Spatie\Php7to5\DirectoryConverter;
 
+if (!isset($argv[1])) {
+    die('This script requires a parameter with the commit number to turn into a phar');
+}
+
 function rimraf($dir)
 {
     if (is_dir($dir)) {
@@ -41,7 +45,7 @@ file_put_contents('composer.json', '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-master"
+        "danog/madelineproto": "dev-master#'.$argv[1].'"
     },
     "repositories": [
         {
