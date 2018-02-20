@@ -103,7 +103,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
         public function close()
         {
-            return fclose($this->sock);
+            fclose($this->sock);
+            $this->sock = null;
         }
 
         public function getPeerName(bool $port = true)
@@ -198,7 +199,8 @@ if (!extension_loaded('pthreads')) {
 
             public function close()
             {
-                return socket_close($this->sock);
+                socket_close($this->sock);
+                $this->sock = null;
             }
 
             public function getPeerName(bool $port = true)
