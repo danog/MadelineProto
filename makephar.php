@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 if (!isset($argv[3])) {
-    echo('Usage: '.$argv[0].' inputDir output.phar ref'.PHP_EOL);
+    echo 'Usage: '.$argv[0].' inputDir output.phar ref'.PHP_EOL;
     die(1);
 }
 
