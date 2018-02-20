@@ -104,3 +104,6 @@ tests/500mb
 *.save
 *.save.1
 *.save.*
+composer
+phar
+madeline.phar

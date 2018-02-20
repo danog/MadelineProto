@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2016-2017 Daniil Gentili
+Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -15,6 +15,7 @@ namespace danog\MadelineProto;
 class API extends APIFactory
 {
     use \danog\Serializable;
+
     public $session;
     public $serialized = 0;
 
@@ -25,16 +26,20 @@ class API extends APIFactory
         if (is_string($params)) {
             if (file_exists($params)) {
                 $this->session = $params;
-                if (!file_exists($lock = $params.'.lock')) {
-                    touch($lock);
+                $realpaths = Serialization::realpaths($params);
+                if (!file_exists($realpaths['lockfile'])) {
+                    touch($realpaths['lockfile']);
                     clearstatcache();
                 }
-                $lock = fopen($lock, 'r');
+                $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
                 \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
-                flock($lock, LOCK_SH);
-                $unserialized = file_get_contents($params);
-                flock($lock, LOCK_UN);
-                fclose($lock);
+                flock($realpaths['lockfile'], LOCK_SH);
+                try {
+                    $unserialized = file_get_contents($realpaths['file']);
+                } finally {
+                    flock($realpaths['lockfile'], LOCK_UN);
+                    fclose($realpaths['lockfile']);
+                }
 
                 $tounserialize = str_replace('O:26:"danog\MadelineProto\Button":', 'O:35:"danog\MadelineProto\TL\Types\Button":', $unserialized);
                 foreach (['RSA', 'TL\TLMethod', 'TL\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\Types\Button', 'TL\Types\Bytes', 'APIFactory'] as $class) {
@@ -44,7 +49,6 @@ class API extends APIFactory
                 \danog\MadelineProto\Logger::class_exists();
 
                 try {
-                    //                $unserialized = \danog\Serialization::unserialize($tounserialize);
                     $unserialized = unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
