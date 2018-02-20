@@ -367,11 +367,12 @@ Here are the default values for the settings arrays and explanations for every s
             'timeout' => 2, // timeout for sockets
             'proxy' => '\Socket', // The proxy class to use
             'proxy_extra' => [], // Extra parameters to pass to the proxy class using setExtra
+            'pfs'         => true, // Should we use PFS for this socket?
         ],
     ],
     'app_info' => [ // obtained in https://my.telegram.org
-        //'api_id'          => you should put an API id in the settings array you provide
-        //'api_hash'        => you should put an API hash in the settings array you provide
+        'api_id'          => you should put an API id in the settings array you provide
+        'api_hash'        => you should put an API hash in the settings array you provide
         'device_model' => $device_model,
         'system_version' => $system_version,
         'app_version' => 'Unicorn',

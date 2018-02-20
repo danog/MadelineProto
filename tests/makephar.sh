@@ -1,11 +1,13 @@
 #!/bin/sh -e
-composer global require spatie/7to5
+echo "$TRAVIS_COMMIT_MESSAGE" | grep -q phar && {
 
-rm -rf phar7 phar5
+	composer global require spatie/7to5
 
-mkdir phar7
-cd phar7
-echo '{
+	rm -rf phar7 phar5
+
+	mkdir phar7
+	cd phar7
+	echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
@@ -24,21 +26,21 @@ echo '{
         }
     ]
 }' > composer.json
-composer update
-cd ..
+	composer update
+	cd ..
 
-$HOME/.composer/vendor/bin/php7to5 convert --copy-all phar7 phar5
+	$HOME/.composer/vendor/bin/php7to5 convert --copy-all phar7 phar5
 
-php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
-
+	php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
+}
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 
 for chat_id in $destinations;do
-	ID=$(curl -s https://api.telegram.org/bot$token/sendMessage -F text=" <b>Recent Commits to MadelineProto:master</b>
+	ID=$(curl -s https://api.telegram.org/bot$token/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:master</b>
 <a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE</a>
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
-	curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
+	echo "$TRAVIS_COMMIT_MESSAGE" | grep -q phar && curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
 commit: $TRAVIS_COMMIT" -F chat_id=$chat_id -F document=@madeline.phar -F reply_to_message_id=$ID
 done

@@ -489,7 +489,7 @@ class MTProto
                     'timeout'     => 2, // timeout for sockets
                     'proxy'       => '\Socket', // The proxy class to use
                     'proxy_extra' => [], // Extra parameters to pass to the proxy class using setExtra
-                    'pfs'         => true,
+                    'pfs'         => true, // Should we use PFS for this socket?
                 ],
             ],
             'app_info' => [ // obtained in https://my.telegram.org
