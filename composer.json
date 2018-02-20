@@ -12,7 +12,7 @@
         "php": ">=5.6.0",
         "danog/primemodule": "dev-master",
         "danog/magicalserializer": "dev-master",
-        "phpseclib/phpseclib": "dev-master#0d9dc46",
+        "phpseclib/phpseclib": "dev-master#27370df",
         "vlucas/phpdotenv": "^2.4",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
@@ -21,12 +21,11 @@
         "ext-xml": "*"
     },
     "require-dev": {
-        "spatie/7to5": "^1.2",
         "phpdocumentor/reflection-docblock": "^3.1"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https:/github.com/danog/php-libtgvoip)",
-        "ext-socket": "Install the socket extension to speed up MadelineProto"
+        "ext-sockets": "Install the socket extension to speed up MadelineProto"
     },
     "authors": [
         {

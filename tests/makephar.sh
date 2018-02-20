@@ -1,6 +1,35 @@
 #!/bin/sh -e
+composer global require spatie/7to5
+
+rm -rf phar7 phar5
+
+mkdir phar7
+cd phar7
+echo '{
+    "name": "danog/madelineprototests",
+    "minimum-stability":"dev",
+    "require": {
+        "danog/madelineproto": "dev-master#'$TRAVIS_COMMIT'"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/danog/phpseclib"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        }
+    ]
+}' > composer.json
 composer update
-php makephar.php $TRAVIS_COMMIT
+cd ..
+
+$HOME/.composer/vendor/bin/php7to5 convert --copy-all phar7 phar5
+
+php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
 
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 

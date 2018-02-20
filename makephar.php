@@ -11,61 +11,15 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-require 'vendor/autoload.php';
-use Spatie\Php7to5\DirectoryConverter;
-
-if (!isset($argv[1])) {
-    die('This script requires a parameter with the commit number to turn into a phar');
+if (!isset($argv[3])) {
+    echo('Usage: '.$argv[0].' inputDir output.phar ref'.PHP_EOL);
+    die(1);
 }
 
-function rimraf($dir)
-{
-    if (is_dir($dir)) {
-        $objects = scandir($dir);
-        foreach ($objects as $object) {
-            if ($object != '.' && $object != '..') {
-                if (is_dir($dir.'/'.$object)) {
-                    rimraf($dir.'/'.$object);
-                } else {
-                    unlink($dir.'/'.$object);
-                }
-            }
-        }
-        rmdir($dir);
-    }
-}
+@unlink($argv[2]);
 
-@unlink('madeline.phar');
-rimraf('phar');
-rimraf('composer');
-mkdir('phar');
-mkdir('composer');
-chdir('composer');
-file_put_contents('composer.json', '{
-    "name": "danog/madelineprototests",
-    "minimum-stability":"dev",
-    "require": {
-        "danog/madelineproto": "dev-master#'.$argv[1].'"
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/danog/phpseclib"
-        }
-    ],
-    "authors": [
-        {
-            "name": "Daniil Gentili",
-            "email": "daniil@daniil.it"
-        }
-    ]
-}');
-shell_exec('composer update');
+$p = new Phar(__DIR__.'/'.$argv[2], 0, $argv[2]);
+$p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.tl|\.json)$/i');
+$p->addFromString('.git/refs/heads/master', $argv[3]);
 
-(new DirectoryConverter(__DIR__.'/composer', ['.php']))->alsoCopyNonPhpFiles()->savePhp5FilesTo(__DIR__.'/phar');
-
-$p = new Phar(__DIR__.'/madeline.phar', 0, 'madeline.phar');
-$p->buildFromDirectory(__DIR__.'/phar', '/^((?!tests).)*(\.php|\.py|\.tl|\.json)$/i');
-$p->addFromString('.git/refs/heads/master', file_get_contents(__DIR__.'/.git/refs/heads/master'));
-
-$p->setStub('<?php Phar::interceptFileFuncs(); Phar::mapPhar("madeline.phar"); require_once "phar://madeline.phar/vendor/autoload.php"; __HALT_COMPILER(); ?>');
+$p->setStub('<?php Phar::interceptFileFuncs(); Phar::mapPhar("'.$argv[2].'"); require_once "phar://'.$argv[2].'/vendor/autoload.php"; __HALT_COMPILER(); ?>');
