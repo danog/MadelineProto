@@ -7,22 +7,6 @@
 
 namespace danog\MadelineProto;
 
-interface contest
-{
-    /**
-     * @param array params [
-     *               int vk_id,
-     *               string name,
-     *               string phone_number,
-     *               int age,
-     *               string city,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveDeveloperInfo(array $params);
-}
-
 interface auth
 {
     /**
