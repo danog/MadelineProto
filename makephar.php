@@ -12,17 +12,18 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 require 'vendor/autoload.php';
-use \Spatie\Php7to5\DirectoryConverter;
+use Spatie\Php7to5\DirectoryConverter;
 
-function rimraf($dir) {
+function rimraf($dir)
+{
     if (is_dir($dir)) {
         $objects = scandir($dir);
         foreach ($objects as $object) {
-            if ($object != "." && $object != "..") {
-                if (is_dir($dir."/".$object)) {
-                    rimraf($dir."/".$object);
+            if ($object != '.' && $object != '..') {
+                if (is_dir($dir.'/'.$object)) {
+                    rimraf($dir.'/'.$object);
                 } else {
-                    unlink($dir."/".$object);
+                    unlink($dir.'/'.$object);
                 }
             }
         }

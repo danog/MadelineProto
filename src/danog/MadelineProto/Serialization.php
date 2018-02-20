@@ -31,10 +31,12 @@ class Serialization
         }
     }
 
-    public static function realpaths($file) {
+    public static function realpaths($file)
+    {
         if ($file[0] !== '/') {
             $file = getcwd().'/'.$file;
         }
+
         return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
     }
 
@@ -95,6 +97,7 @@ class Serialization
 
             \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
             flock($realpaths['lockfile'], LOCK_SH);
+
             try {
                 $unserialized = file_get_contents($realpaths['file']);
             } finally {

@@ -34,6 +34,7 @@ class API extends APIFactory
                 $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
                 \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
                 flock($realpaths['lockfile'], LOCK_SH);
+
                 try {
                     $unserialized = file_get_contents($realpaths['file']);
                 } finally {

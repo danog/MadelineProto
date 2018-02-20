@@ -161,7 +161,9 @@ class Connection
                 if ($this->parsed['host'][0] === '[') {
                     $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
                 }
-                if ($this->protocol === 'https' && $proxy === '\Socket') $proxy = '\FSocket';
+                if ($this->protocol === 'https' && $proxy === '\Socket') {
+                    $proxy = '\FSocket';
+                }
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol === 'https' ? PHP_INT_MAX : getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
