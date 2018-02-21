@@ -1,13 +1,14 @@
 #!/bin/sh -e
-echo "$TRAVIS_COMMIT_MESSAGE" | grep -q phar && {
 
-	composer global require spatie/7to5
+composer global require spatie/7to5
+[ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
+[ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
-	rm -rf phar7 phar5
+rm -rf phar7 phar5 MadelineProtoPhar
 
-	mkdir phar7
-	cd phar7
-	echo '{
+mkdir phar7
+cd phar7
+echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
@@ -26,13 +27,22 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep -q phar && {
         }
     ]
 }' > composer.json
-	composer update
-	cd ..
+composer update
+cd ..
 
-	$HOME/.composer/vendor/bin/php7to5 convert --copy-all phar7 phar5
+$php7to5 convert --copy-all phar7 phar5
 
-	php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
-}
+php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
+
+git clone git@github.com:danog/MadelineProtoPhar
+cd MadelineProtoPhar
+cp ../madeline.phar .
+echo "$TRAVIS_COMMIT_MESSAGE" | grep -q release_phar && echo -n $TRAVIS_COMMIT > release
+git add -A
+git commit -am "Release $TRAVIS_COMMIT"
+git push origin master
+cd ..
+
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 
 for chat_id in $destinations;do
@@ -41,6 +51,6 @@ for chat_id in $destinations;do
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
-	echo "$TRAVIS_COMMIT_MESSAGE" | grep -q phar && curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
+	echo "$TRAVIS_COMMIT_MESSAGE" | grep -q release_phar && curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
 commit: $TRAVIS_COMMIT" -F chat_id=$chat_id -F document=@madeline.phar -F reply_to_message_id=$ID
 done

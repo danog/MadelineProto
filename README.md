@@ -66,11 +66,13 @@ This library can also be used to create lua telegram bots (like bot API bots, on
 * PFS in secret chats
 
 
-## Requirements
+## PHP Requirements
 
 This project can only run on *PHP 7* and *HHVM*, both 32 bit and 64 bit systems are supported (x86, x86_64, armel, armhf, arm64, mipsel, mips64, powerpc and so on). 
 
-You can also run it on PHP 5 using [7to5](https://github.com/spatie/7to5).
+To run it on *PHP 5*, use [MadelineProtoPhar](https://phar.madelineproto.xyz).
+
+MadelineProto needs the curl, xml, mbstring extensions to function properly (most webhosts already have these extensions).
 
 
 To install *all of the requirements* on `Ubuntu`, `Debian`, `Devuan`, or any other `Debian-based` distro, run the following command in your command line:
@@ -108,6 +110,16 @@ Also note that MadelineProto will perform better if [php-primemodule](https://pr
 
 
 ### Installation
+
+Download [phar.php](https://phar.madelineproto.xyz/phar.php), and include it in your script:
+```
+include 'phar.php';
+```
+
+It will automatically download the latest version of MadelineProto and import it.
+
+
+OR
 
 Run the following commands in a console:
 

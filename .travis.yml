@@ -1,8 +1,12 @@
 language: php
 php:
-  - '7.1'
-
-before_install: echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- '7.1'
+before_install:
+- openssl aes-256-cbc -K $encrypted_5699a01b7a5f_key -iv $encrypted_5699a01b7a5f_iv
+  -in madeline_rsa.enc -out madeline_rsa -d
+- echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- eval "$(ssh-agent -s)"
+- ssh-add madeline_rsa
 
 script:
 - tests/makephar.sh
