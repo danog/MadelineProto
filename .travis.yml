@@ -6,6 +6,7 @@ before_install:
   -in madeline_rsa.enc -out madeline_rsa -d
 - echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - eval "$(ssh-agent -s)"
+- chmod 600 madeline_rsa
 - ssh-add madeline_rsa
 
 script:
