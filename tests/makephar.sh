@@ -34,6 +34,8 @@ $php7to5 convert --copy-all phar7 phar5
 
 php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
 
+eval "$(ssh-agent -s)"
+ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp ../madeline.phar .
