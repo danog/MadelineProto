@@ -341,6 +341,7 @@ class Connection
             case 'https':
                 $headers = [];
                 $close = false;
+                $length = 0;
                 while (true) {
                     $current_header = '';
                     while (($curchar = $this->read(1)) !== "\n") {
@@ -362,8 +363,9 @@ class Connection
                     $headers[] = $current_header;
                 }
                 $read = $this->read($length);
-                if ($headers[0] !== 'HTTP/1.1 200 OK') {
-                    throw new Exception($headers[0]);
+                $headers[0] = explode(" ", $headers[0], 3);
+                if ($headers[0][1] !== '200') {
+                    throw new Exception($headers[0][2]);
                 }
                 if ($close) {
                     $this->close_and_reopen();
