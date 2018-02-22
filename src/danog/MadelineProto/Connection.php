@@ -363,7 +363,7 @@ class Connection
                     $headers[] = $current_header;
                 }
                 $read = $this->read($length);
-                $headers[0] = explode(" ", $headers[0], 3);
+                $headers[0] = explode(' ', $headers[0], 3);
                 if ($headers[0][1] !== '200') {
                     throw new Exception($headers[0][2]);
                 }
