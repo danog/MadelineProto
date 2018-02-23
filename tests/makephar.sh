@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 composer global require spatie/7to5
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
