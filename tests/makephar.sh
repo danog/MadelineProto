@@ -56,5 +56,5 @@ for chat_id in $destinations;do
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
 	#echo "$TRAVIS_COMMIT_MESSAGE" | grep -q release_phar && curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
-commit: $TRAVIS_COMMIT" -F chat_id=$chat_id -F document=@madeline.phar -F reply_to_message_id=$ID
+#commit: $TRAVIS_COMMIT" -F chat_id=$chat_id -F document=@madeline.phar -F reply_to_message_id=$ID
 done
