@@ -411,9 +411,9 @@ class Connection
             $read = $this->read((int) $headers['content-length']);
         } elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
             do {
-                $length = hexdec($this->read_http_line($res));
+                $length = hexdec($this->read_http_line());
                 $read .= $this->read($length);
-                $this->read_http_line($res);
+                $this->read_http_line();
             } while ($length);
         }
 
