@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\SecretChats;
 
 /**
@@ -28,12 +29,15 @@ trait ResponseHandler
                 switch ($update['message']['decrypted_message']['action']['_']) {
                     case 'decryptedMessageActionRequestKey':
                         $this->accept_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                         return;
                     case 'decryptedMessageActionAcceptKey':
                         $this->commit_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                         return;
                     case 'decryptedMessageActionCommitKey':
                         $this->complete_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+
                         return;
                     case 'decryptedMessageActionNotifyLayer':
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['action']['layer'];
@@ -43,9 +47,11 @@ trait ResponseHandler
                         if ($update['message']['decrypted_message']['action']['layer'] >= 73) {
                             $this->secret_chats[$update['message']['chat_id']]['mtproto'] = 2;
                         }
+
                         return;
                     case 'decryptedMessageActionSetMessageTTL':
                         $this->secret_chats[$update['message']['chat_id']]['ttl'] = $update['message']['decrypted_message']['action']['ttl_seconds'];
+
                         return;
                     case 'decryptedMessageActionNoop':
                         return;
@@ -54,13 +60,14 @@ trait ResponseHandler
                         $update['message']['decrypted_message']['action']['end_seq_no'] -= $this->secret_chats[$update['message']['chat_id']]['out_seq_no_x'];
                         $update['message']['decrypted_message']['action']['start_seq_no'] /= 2;
                         $update['message']['decrypted_message']['action']['end_seq_no'] /= 2;
-                        \danog\MadelineProto\Logger::log(['Resending messages for secret chat ' . $update['message']['chat_id']], \danog\MadelineProto\Logger::WARNING);
+                        \danog\MadelineProto\Logger::log(['Resending messages for secret chat '.$update['message']['chat_id']], \danog\MadelineProto\Logger::WARNING);
                         foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $message) {
                             if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
                                 //throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['resending_unsupported']);
                                 $this->method_call('messages.sendEncrypted', ['peer' => $update['message']['chat_id'], 'message' => $update['message']['decrypted_message']], ['datacenter' => $this->datacenter->curdc]);
                             }
                         }
+
                         return;
                     default:
                         //                $this->save_update(['_' => 'updateNewDecryptedMessage', 'peer' => $this->secret_chats[$update['message']['chat_id']]['InputEncryptedChat'], 'in_seq_no' => $this->get_in_seq_no($update['message']['chat_id']), 'out_seq_no' => $this->get_out_seq_no($update['message']['chat_id']), 'message' => $update['message']['decrypted_message']]);
@@ -84,7 +91,7 @@ trait ResponseHandler
                 }
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'] . var_export($update, true));
+                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'].var_export($update, true));
                 break;
         }
     }

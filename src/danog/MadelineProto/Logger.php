@@ -13,6 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 /*
  * Logger class
  */
+
 namespace danog\MadelineProto;
 
 class Logger
@@ -37,6 +38,7 @@ class Logger
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
+
     public static function class_exists()
     {
         self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
@@ -50,6 +52,7 @@ class Logger
             if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
                 throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
             }
+
             try {
                 \Threaded::extend('\\danog\\MadelineProto\\VoIP');
             } catch (\RuntimeException $e) {
@@ -61,11 +64,13 @@ class Logger
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+
         try {
             self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
         } catch (\danog\MadelineProto\Exception $e) {
         }
     }
+
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -83,10 +88,11 @@ class Logger
         }
         self::$mode = $mode;
         self::$optional = $optional;
-        self::$prefix = $prefix === '' ? '' : ', ' . $prefix;
+        self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;
         self::class_exists();
     }
+
     public static function log($params, $level = self::NOTICE)
     {
         if (self::$mode === 4) {
@@ -103,16 +109,16 @@ class Logger
             if (!is_string($param)) {
                 $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
-            $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php') . $prefix . ': ', 16 + strlen($prefix)) . "\t" . $param;
+            $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
             switch (self::$mode) {
                 case 1:
                     error_log($param);
                     break;
                 case 2:
-                    error_log($param . PHP_EOL, 3, self::$optional);
+                    error_log($param.PHP_EOL, 3, self::$optional);
                     break;
                 case 3:
-                    echo self::$isatty ? "\33[" . self::$colors[$level] . 'm' . $param . "\33[0m" . PHP_EOL : $param . PHP_EOL;
+                    echo self::$isatty ? "\33[".self::$colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
                     break;
                 default:
                     break;

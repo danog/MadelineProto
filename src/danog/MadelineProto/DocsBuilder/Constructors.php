@@ -10,13 +10,14 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\DocsBuilder;
 
 trait Constructors
 {
     public function mk_constructors()
     {
-        foreach (glob('constructors/' . $this->any) as $unlink) {
+        foreach (glob('constructors/'.$this->any) as $unlink) {
             unlink($unlink);
         }
         if (file_exists('constructors')) {
@@ -36,7 +37,7 @@ trait Constructors
                         if (preg_match('/%/', $type)) {
                             $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
                         }*/
-            $layer = isset($data['layer']) && $data['layer'] !== '' ? '_' . $data['layer'] : '';
+            $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
             $php_type = preg_replace('/.*_of_/', '', $type);
             $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['predicate']);
@@ -65,12 +66,12 @@ trait Constructors
                 if (substr($param[$type_or_subtype], -1) === '>') {
                     $param[$type_or_subtype] = substr($param[$type_or_subtype], 0, -1);
                 }
-                $params .= "'" . $param['name'] . "' => ";
-                $param[$type_or_subtype] = '[' . $this->escape($param[$type_or_subtype]) . '](../' . $type_or_bare_type . '/' . $param[$type_or_subtype] . '.md)';
-                $params .= (isset($param['subtype']) ? '\\[' . $param[$type_or_subtype] . '\\]' : $param[$type_or_subtype]) . ', ';
+                $params .= "'".$param['name']."' => ";
+                $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            $md_constructor = str_replace('_', '\\_', $constructor . $layer);
-            $this->docs_constructors[$constructor] = '[$' . $md_constructor . '](../constructors/' . $php_constructor . $layer . '.md) = \\[' . $params . '\\];<a name="' . $constructor . $layer . '"></a>  
+            $md_constructor = str_replace('_', '\\_', $constructor.$layer);
+            $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
             $table = empty($data['params']) ? '' : '### Attributes:
@@ -117,31 +118,31 @@ trait Constructors
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|' . str_replace('_', '\\_', $param['name']) . '|' . (isset($param['subtype']) ? 'Array of ' : '') . '[' . str_replace('_', '\\_', $ptype) . '](../' . $type_or_bare_type . '/' . $ptype . '.md) | ' . (isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']) . 'Empty') ? 'Optional' : 'Yes') . '|';
+                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
-                    $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']] . '|';
+                    $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'" . $ptype . "'" : $ptype;
-                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"' . $ptype . '"' : $ptype;
-                $params .= ", '" . $param['name'] . "' => ";
-                $params .= isset($param['subtype']) ? '[' . $pptype . ']' : $pptype;
-                $lua_params .= ', ' . $param['name'] . '=';
-                $lua_params .= isset($param['subtype']) ? '{' . $pptype . '}' : $pptype;
-                $pwr_params .= ', "' . $param['name'] . '": ' . (isset($param['subtype']) ? '[' . $ppptype . ']' : $ppptype);
+                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
+                $params .= ", '".$param['name']."' => ";
+                $params .= isset($param['subtype']) ? '['.$pptype.']' : $pptype;
+                $lua_params .= ', '.$param['name'].'=';
+                $lua_params .= isset($param['subtype']) ? '{'.$pptype.'}' : $pptype;
+                $pwr_params .= ', "'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype);
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
             }
-            $params = "['_' => '" . $data['predicate'] . "'" . $params . ']';
-            $lua_params = "{_='" . $data['predicate'] . "'" . $lua_params . '}';
-            $pwr_params = '{"_": "' . $data['predicate'] . '"' . $pwr_params . '}';
-            $description = isset($this->td_descriptions['constructors'][$data['predicate']]) ? $this->td_descriptions['constructors'][$data['predicate']]['description'] : $constructor . ' attributes, type and example';
+            $params = "['_' => '".$data['predicate']."'".$params.']';
+            $lua_params = "{_='".$data['predicate']."'".$lua_params.'}';
+            $pwr_params = '{"_": "'.$data['predicate'].'"'.$pwr_params.'}';
+            $description = isset($this->td_descriptions['constructors'][$data['predicate']]) ? $this->td_descriptions['constructors'][$data['predicate']]['description'] : $constructor.' attributes, type and example';
             $header = '---
-title: ' . $data['predicate'] . '
-description: ' . $description . '
+title: '.$data['predicate'].'
+description: '.$description.'
 ---
-## Constructor: ' . str_replace('_', '\\_', $data['predicate'] . $layer) . '  
+## Constructor: '.str_replace('_', '\\_', $data['predicate'].$layer).'  
 [Back to constructors index](index.md)
 
 
@@ -152,9 +153,9 @@ description: ' . $description . '
 
 ';
             if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
-                $header .= $this->td_descriptions['constructors'][$data['predicate']]['description'] . PHP_EOL . PHP_EOL;
+                $header .= $this->td_descriptions['constructors'][$data['predicate']]['description'].PHP_EOL.PHP_EOL;
             }
-            $type = '### Type: [' . str_replace('_', '\\_', $php_type) . '](../types/' . $php_type . '.md)
+            $type = '### Type: ['.str_replace('_', '\\_', $php_type).'](../types/'.$php_type.'.md)
 
 
 ';
@@ -163,13 +164,13 @@ description: ' . $description . '
                 $example = '### Example:
 
 ```
-$' . $constructor . $layer . ' = ' . $params . ';
+$'.$constructor.$layer.' = '.$params.';
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-' . $pwr_params . '
+'.$pwr_params.'
 ```
 
 
@@ -177,7 +178,7 @@ Or, if you\'re into Lua:
 
 
 ```
-' . $constructor . $layer . '=' . $lua_params . '
+'.$constructor.$layer.'='.$lua_params.'
 
 ```
 
@@ -227,7 +228,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
 ';
                 }
             }
-            file_put_contents('constructors/' . $constructor . $layer . '.md', $header . $table . $type . $example);
+            file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
         \danog\MadelineProto\Logger::log(['Generating constructors index...'], \danog\MadelineProto\Logger::NOTICE);
         ksort($this->docs_constructors);
@@ -236,16 +237,16 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
             $new_namespace = preg_replace('/_.*/', '', $constructor);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
-            $value = $br . $value;
+            $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('constructors/' . $this->index, '---
+        file_put_contents('constructors/'.$this->index, '---
 title: Constructors
 description: List of constructors
 ---
 # Constructors  
 [Back to API documentation index](..)
 
-' . implode('', $this->docs_constructors));
+'.implode('', $this->docs_constructors));
     }
 }

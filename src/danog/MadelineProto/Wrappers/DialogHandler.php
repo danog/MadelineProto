@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
@@ -24,6 +25,7 @@ trait DialogHandler
         $datacenter = $this->datacenter->curdc;
         $peers = [];
         $this->postpone_updates = true;
+
         try {
             while ($this->dialog_params['count'] < $res['count']) {
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
@@ -45,6 +47,7 @@ trait DialogHandler
             $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
         }
+
         return $peers;
     }
 }

@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
@@ -19,10 +20,11 @@ trait MessageHandler
 {
     public function send_unencrypted_message($message_data, $message_id, $datacenter)
     {
-        $message_data = "\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($message_data)) . $message_data;
+        $message_data = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['response' => -1];
         $this->datacenter->sockets[$datacenter]->send_message($message_data);
     }
+
     public function send_messages($datacenter)
     {
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
@@ -45,15 +47,15 @@ trait MessageHandler
         } else {
             return;
         }
-        $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] . $this->datacenter->sockets[$datacenter]->session_id . $message_id . pack('VV', $seq_no, strlen($message_data)) . $message_data;
+        $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].$this->datacenter->sockets[$datacenter]->session_id.$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
         $padding = $this->posmod(-strlen($plaintext), 16);
         if ($padding < 12) {
             $padding += 16;
         }
         $padding = $this->random($padding);
-        $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32) . $plaintext . $padding, true), 8, 16);
+        $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key']);
-        $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
+        $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['seq_no' => $seq_no, 'response' => -1];
         $this->datacenter->sockets[$datacenter]->send_message($message);
         $this->datacenter->sockets[$datacenter]->object_queue = [];
@@ -62,6 +64,7 @@ trait MessageHandler
         }
         $this->datacenter->sockets[$datacenter]->ack_queue = [];
     }
+
     /**
      * Reading connection and receiving message from server.
      */
@@ -114,7 +117,7 @@ trait MessageHandler
                 throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
             }
             $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32) . $decrypted_data, true), 8, 16)) {
+            if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
             $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
@@ -127,6 +130,7 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->last_recv = time();
+
         return true;
     }
 }

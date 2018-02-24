@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 class API extends APIFactory
@@ -17,6 +18,7 @@ class API extends APIFactory
     use \danog\Serializable;
     public $session;
     public $serialized = 0;
+
     public function __magic_construct($params = [])
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
@@ -32,6 +34,7 @@ class API extends APIFactory
                 $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
                 \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
                 flock($realpaths['lockfile'], LOCK_SH);
+
                 try {
                     $unserialized = file_get_contents($realpaths['file']);
                 } finally {
@@ -40,10 +43,11 @@ class API extends APIFactory
                 }
                 $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $unserialized);
                 foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                    class_exists('\\danog\\MadelineProto\\' . $class);
+                    class_exists('\\danog\\MadelineProto\\'.$class);
                 }
                 class_exists('\\Volatile');
                 \danog\MadelineProto\Logger::class_exists();
+
                 try {
                     $unserialized = unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
@@ -69,6 +73,7 @@ class API extends APIFactory
                 $this->APIFactory();
             }
             Serialization::$instances[spl_object_hash($unserialized)] = $unserialized;
+
             return;
         }
         $this->API = new MTProto($params);
@@ -76,18 +81,20 @@ class API extends APIFactory
         $this->APIFactory();
         \danog\MadelineProto\Logger::log(['Ping...'], Logger::ULTRA_VERBOSE);
         $pong = $this->ping(['ping_id' => 3]);
-        \danog\MadelineProto\Logger::log(['Pong: ' . $pong['ping_id']], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
         //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['madelineproto_ready']], Logger::NOTICE);
         Serialization::$instances[spl_object_hash($this)] = $this;
     }
+
     public function __wakeup()
     {
         //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
         Serialization::$instances[spl_object_hash($this)] = $this;
         $this->APIFactory();
     }
+
     public function __destruct()
     {
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
@@ -98,45 +105,56 @@ class API extends APIFactory
         }
         restore_error_handler();
     }
+
     public function __sleep()
     {
         return ['API'];
     }
+
     public function &__get($name)
     {
         if ($name === 'settings') {
             $this->API->setdem = true;
+
             return $this->API->settings;
         }
+
         return $this->API->storage[$name];
     }
+
     public function __set($name, $value)
     {
         if ($name === 'settings') {
             return $this->API->__construct($value);
         }
+
         return $this->API->storage[$name] = $value;
     }
+
     public function __isset($name)
     {
         return isset($this->API->storage[$name]);
     }
+
     public function __unset($name)
     {
         unset($this->API->storage[$name]);
     }
+
     public function APIFactory()
     {
         foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }
+
     public function serialize($params = '')
     {
         if ($params === '') {
             $params = $this->session;
         }
         Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
+
         return Serialization::serialize($params, $this);
     }
 }

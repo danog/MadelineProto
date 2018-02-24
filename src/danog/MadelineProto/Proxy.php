@@ -10,23 +10,38 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 interface Proxy
 {
     public function __construct($domain, $type, $protocol);
+
     public function setOption($level, $name, $value);
+
     public function getOption($level, $name);
+
     public function setBlocking($blocking);
+
     public function bind($address, $port = 0);
+
     public function listen($backlog = 0);
+
     public function accept();
+
     public function connect($address, $port = 0);
+
     public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0);
+
     public function read($length, $flags = 0);
+
     public function write($buffer, $length = -1);
+
     public function send($data, $length, $flags);
+
     public function close();
+
     public function getPeerName($port = true);
+
     public function getSockName($port = true);
 }

@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 class DocsBuilder
@@ -19,6 +20,7 @@ class DocsBuilder
     use \danog\MadelineProto\DocsBuilder\Constructors;
     use Tools;
     public $td = false;
+
     public function __construct($settings)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
@@ -35,24 +37,28 @@ class DocsBuilder
         chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
+
     public $types = [];
     public $any = '*';
+
     public function end($what)
     {
         return end($what);
     }
+
     public function escape($hwat)
     {
         return str_replace('_', '\\_', $hwat);
     }
+
     public function mk_docs()
     {
         \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
         file_put_contents($this->index, '---
-title: ' . $this->settings['title'] . '
-description: ' . $this->settings['description'] . '
+title: '.$this->settings['title'].'
+description: '.$this->settings['description'].'
 ---
-# ' . $this->settings['description'] . '  
+# '.$this->settings['description'].'  
 
 [Methods](methods/)
 
@@ -81,14 +87,14 @@ description: ' . $this->settings['description'] . '
             //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
             $type = preg_replace('/.*_of_/', '', $type);
-            $index .= '[' . str_replace('_', '\\_', $type) . '](' . $type . '.md)<a name="' . $type . '"></a>  
+            $index .= '['.str_replace('_', '\\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
-                $predicate = str_replace('.', '_', $data['predicate']) . (isset($data['layer']) && $data['layer'] !== '' ? '_' . $data['layer'] : '');
+                $predicate = str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
                 $md_predicate = str_replace('_', '\\_', $predicate);
-                $constructors .= '[' . $md_predicate . '](../constructors/' . $predicate . '.md)  
+                $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
             }
@@ -96,38 +102,38 @@ description: ' . $this->settings['description'] . '
             foreach ($keys['methods'] as $data) {
                 $name = str_replace('.', '_', $data['method']);
                 $md_name = str_replace('_', '->', $name);
-                $methods .= '[$MadelineProto->' . $md_name . '](../methods/' . $name . '.md)  
+                $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
 
 ';
             }
-            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of typr ' . $type;
+            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of typr '.$type;
             $header = '---
-title: ' . $type . '
-description: constructors and methods of type ' . $type . '
+title: '.$type.'
+description: constructors and methods of type '.$type.'
 ---
-## Type: ' . str_replace('_', '\\_', $type) . '  
+## Type: '.str_replace('_', '\\_', $type).'  
 [Back to types index](index.md)
 
 
 
 ';
-            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] . PHP_EOL . PHP_EOL : '';
+            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
                     $header .= 'The following syntaxes can also be used:
 
 ```
-$' . $type . " = '@username'; // Username\n\n\$" . $type . ' = 44700; // bot API id (users)
-$' . $type . ' = -492772765; // bot API id (chats)
-$' . $type . ' = -10038575794; // bot API id (channels)
+$'.$type." = '@username'; // Username\n\n\$".$type.' = 44700; // bot API id (users)
+$'.$type.' = -492772765; // bot API id (chats)
+$'.$type.' = -10038575794; // bot API id (channels)
 
-$' . $type . " = 'user#44700'; // tg-cli style id (users)\n\$" . $type . " = 'chat#492772765'; // tg-cli style id (chats)\n\$" . $type . " = 'channel#38575794'; // tg-cli style id (channels)\n```\n\nA [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
+$'.$type." = 'user#44700'; // tg-cli style id (users)\n\$".$type." = 'chat#492772765'; // tg-cli style id (chats)\n\$".$type." = 'channel#38575794'; // tg-cli style id (channels)\n```\n\nA [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
-$' . $type . ' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
 ```
 
 
@@ -139,7 +145,7 @@ $' . $type . ' = -147286699; // Numeric chat id returned by request_secret_chat,
 To click these buttons simply run the `click` method:  
 
 ```
-$result = $' . $type . '->click();
+$result = $'.$type.'->click();
 ```
 
 `$result` can be one of the following:
@@ -159,12 +165,12 @@ $result = $' . $type . '->click();
             }
             $constructors = '### Possible values (constructors):
 
-' . $constructors . '
+'.$constructors.'
 
 ';
             $methods = '### Methods that return an object of this type (methods):
 
-' . $methods . '
+'.$methods.'
 
 ';
             if (!isset($this->settings['td'])) {
@@ -351,14 +357,14 @@ After modifying it, you must always parse the new configuration with a call to `
 ';
                 }
             }
-            if (file_exists('types/' . $type . '.md')) {
+            if (file_exists('types/'.$type.'.md')) {
                 \danog\MadelineProto\Logger::log([$type]);
             }
-            file_put_contents('types/' . $type . '.md', $header . $constructors . $methods);
+            file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }
         \danog\MadelineProto\Logger::log(['Generating types index...'], \danog\MadelineProto\Logger::NOTICE);
-        file_put_contents('types/' . $this->index, '---
+        file_put_contents('types/'.$this->index, '---
 title: Types
 description: List of types
 ---
@@ -366,7 +372,7 @@ description: List of types
 [Back to API documentation index](..)
 
 
-' . $index);
+'.$index);
         \danog\MadelineProto\Logger::log(['Generating additional types...'], \danog\MadelineProto\Logger::NOTICE);
         file_put_contents('types/string.md', '---
 title: string

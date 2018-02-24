@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\TL\Conversion;
 
 trait TD
@@ -21,6 +22,7 @@ trait TD
         }
         if (!isset($params['ID'])) {
             array_walk($params, [$this, 'tdcli_to_td']);
+
             return $params;
         }
         foreach ($params as $key => $value) {
@@ -32,8 +34,10 @@ trait TD
         }
         $params['_'] = lcfirst($params['ID']);
         unset($params['ID']);
+
         return $params;
     }
+
     public function td_to_mtproto($params)
     {
         $newparams = ['_' => self::REVERSE[$params['_']]];
@@ -61,12 +65,15 @@ trait TD
                 }
             }
         }
+
         return $newparams;
     }
+
     public function mtproto_to_tdcli($params)
     {
         return $this->td_to_tdcli($this->mtproto_to_td($params));
     }
+
     public function mtproto_to_td(&$params)
     {
         if (!is_array($params)) {
@@ -74,6 +81,7 @@ trait TD
         }
         if (!isset($params['_'])) {
             array_walk($params, [$this, 'mtproto_to_td']);
+
             return $params;
         }
         $newparams = ['_' => $params['_']];
@@ -101,7 +109,7 @@ trait TD
                         if (isset($params['fwd_from'])) {
                             $newparams[$td] = ['_' => 'messageForwardedFromUser'];
                             if (isset($params['fwd_from']['channel_id'])) {
-                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100' . $params['fwd_from']['channel_id']];
+                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
                             }
                             $newparams[$td]['date'] = $params['fwd_from']['date'];
                             if (isset($params['fwd_from']['channel_post'])) {
@@ -145,8 +153,10 @@ trait TD
                 }
             }
         }
+
         return $newparams;
     }
+
     public function td_to_tdcli($params)
     {
         if (!is_array($params)) {
@@ -158,11 +168,12 @@ trait TD
                 $newparams['ID'] = ucfirst($value);
             } else {
                 if (!is_numeric($key) && !preg_match('/_^/', $key)) {
-                    $key = $key . '_';
+                    $key = $key.'_';
                 }
                 $newparams[$key] = $this->td_to_tdcli($value);
             }
         }
+
         return $newparams;
     }
 }

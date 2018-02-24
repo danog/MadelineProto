@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 /**
@@ -94,6 +95,7 @@ class MTProto
     public $storage = [];
     private $emojis;
     private $postpone_updates = false;
+
     public function __magic_construct($settings = [])
     {
         // Parse settings
@@ -146,12 +148,15 @@ class MTProto
         }
         $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = self::V;
+
         return $this->settings;
     }
+
     public function __sleep()
     {
         return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc'];
     }
+
     public function __wakeup()
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
@@ -160,9 +165,9 @@ class MTProto
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
-        Lang::$current_lang =& Lang::$lang['en'];
+        Lang::$current_lang = &Lang::$lang['en'];
         if (isset($this->settings['app_info']['lang_code']) && isset(Lang::$lang[$this->settings['app_info']['lang_code']])) {
-            Lang::$current_lang =& Lang::$lang[$this->settings['app_info']['lang_code']];
+            Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
         }
         if (!defined('\\phpseclib\\Crypt\\AES::MODE_IGE')) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
@@ -278,12 +283,14 @@ class MTProto
             $this->get_updates_difference();
         }
     }
+
     public function __destruct()
     {
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
     }
+
     public function parse_settings($settings)
     {
         // Detect device model
@@ -300,14 +307,14 @@ class MTProto
         }
         // Detect language
         $lang_code = 'en';
-        Lang::$current_lang =& Lang::$lang[$lang_code];
+        Lang::$current_lang = &Lang::$lang[$lang_code];
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $lang_code = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
         } elseif (isset($_SERVER['LANG'])) {
             $lang_code = explode('_', $_SERVER['LANG'])[0];
         }
         if (isset(Lang::$lang[$lang_code])) {
-            Lang::$current_lang =& Lang::$lang[$lang_code];
+            Lang::$current_lang = &Lang::$lang[$lang_code];
         }
         // Set default settings
         $default_settings = ['authorization' => [
@@ -332,9 +339,9 @@ class MTProto
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.40',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
                 'ipv6' => [
@@ -342,9 +349,9 @@ class MTProto
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
             ],
@@ -355,9 +362,9 @@ class MTProto
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.51',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
                 'ipv6' => [
@@ -365,9 +372,9 @@ class MTProto
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
             ],
@@ -393,9 +400,9 @@ class MTProto
             // obtained in https://my.telegram.org
             //'api_id'          => you should put an API id in the settings array you provide
             //'api_hash'        => you should put an API hash in the settings array you provide
-            'device_model' => $device_model,
+            'device_model'   => $device_model,
             'system_version' => $system_version,
-            'app_version' => 'Unicorn',
+            'app_version'    => 'Unicorn',
             // ðŸŒš
             //                'app_version'     => self::V,
             'lang_code' => $lang_code,
@@ -404,16 +411,16 @@ class MTProto
             'layer' => 75,
             // layer version
             'src' => [
-                'mtproto' => __DIR__ . '/TL_mtproto_v1.json',
+                'mtproto' => __DIR__.'/TL_mtproto_v1.json',
                 // mtproto TL scheme
-                'telegram' => __DIR__ . '/TL_telegram_v75.tl',
+                'telegram' => __DIR__.'/TL_telegram_v75.tl',
                 // telegram TL scheme
-                'secret' => __DIR__ . '/TL_secret.tl',
+                'secret' => __DIR__.'/TL_secret.tl',
                 // secret chats TL scheme
-                'calls' => __DIR__ . '/TL_calls.tl',
+                'calls' => __DIR__.'/TL_calls.tl',
                 // calls TL scheme
                 //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
-                'botAPI' => __DIR__ . '/TL_botAPI.tl',
+                'botAPI' => __DIR__.'/TL_botAPI.tl',
             ],
         ], 'logger' => [
             // Logger settings
@@ -429,7 +436,7 @@ class MTProto
             'logger' => 1,
             // write to
             'logger_param' => '/tmp/MadelineProto.log',
-            'logger' => 3,
+            'logger'       => 3,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
@@ -442,8 +449,8 @@ class MTProto
             'response' => 5,
         ], 'flood_timeout' => ['wait_if_lt' => 20], 'msg_array_limit' => [
             // How big should be the arrays containing the incoming and outgoing messages?
-            'incoming' => 200,
-            'outgoing' => 200,
+            'incoming'   => 200,
+            'outgoing'   => 200,
             'call_queue' => 200,
         ], 'peer' => [
             'full_info_cache_time' => 3600,
@@ -477,7 +484,7 @@ class MTProto
         }
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
         if (isset(Lang::$lang[$settings['app_info']['lang_code']])) {
-            Lang::$current_lang =& Lang::$lang[$settings['app_info']['lang_code']];
+            Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
         }
         if (!isset($settings['app_info']['api_id'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
@@ -509,6 +516,7 @@ class MTProto
         // Setup logger
         $this->setup_logger();
     }
+
     public function setup_logger()
     {
         if (isset($this->settings['logger']['rollbar_token']) && $this->settings['logger']['rollbar_token'] !== '') {
@@ -519,6 +527,7 @@ class MTProto
         }
         \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
     }
+
     public function reset_session($de = true, $auth_key = false)
     {
         if (!is_object($this->datacenter)) {
@@ -542,10 +551,12 @@ class MTProto
             $socket->new_incoming = [];
         }
     }
+
     public function is_http($datacenter)
     {
         return in_array($this->datacenter->sockets[$datacenter]->protocol, ['http', 'https', 'https_proxied']);
     }
+
     public function close_and_reopen($datacenter)
     {
         $this->datacenter->sockets[$datacenter]->close_and_reopen();
@@ -553,6 +564,7 @@ class MTProto
             $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
         }
     }
+
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs()
     {
@@ -566,6 +578,7 @@ class MTProto
         }
         $this->init_authorization();
     }
+
     public function get_config($config = [], $options = [])
     {
         if ($this->config['expires'] > time()) {
@@ -574,6 +587,7 @@ class MTProto
         $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
         $this->parse_config();
     }
+
     public function get_cdn_config($datacenter)
     {
         /*
@@ -589,6 +603,7 @@ class MTProto
             \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::FATAL_ERROR);
         }
     }
+
     public function parse_config()
     {
         if (isset($this->config['dc_options'])) {
@@ -597,6 +612,7 @@ class MTProto
         }
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['config_updated'], $this->config], Logger::NOTICE);
     }
+
     public function parse_dc_options($dc_options)
     {
         unset($this->settings[$this->config['test_mode']]);
@@ -626,6 +642,7 @@ class MTProto
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = $curdc;
     }
+
     public function get_self()
     {
         try {
@@ -633,7 +650,9 @@ class MTProto
         } catch (RPCErrorException $e) {
             return false;
         }
+
         return $this->authorization['user'];
     }
+
     const ALL_MIMES = ['png' => [0 => 'image/png', 1 => 'image/x-png'], 'bmp' => [0 => 'image/bmp', 1 => 'image/x-bmp', 2 => 'image/x-bitmap', 3 => 'image/x-xbitmap', 4 => 'image/x-win-bitmap', 5 => 'image/x-windows-bmp', 6 => 'image/ms-bmp', 7 => 'image/x-ms-bmp', 8 => 'application/bmp', 9 => 'application/x-bmp', 10 => 'application/x-win-bitmap'], 'gif' => [0 => 'image/gif'], 'jpeg' => [0 => 'image/jpeg', 1 => 'image/pjpeg'], 'xspf' => [0 => 'application/xspf+xml'], 'vlc' => [0 => 'application/videolan'], 'wmv' => [0 => 'video/x-ms-wmv', 1 => 'video/x-ms-asf'], 'au' => [0 => 'audio/x-au'], 'ac3' => [0 => 'audio/ac3'], 'flac' => [0 => 'audio/x-flac'], 'ogg' => [0 => 'audio/ogg', 1 => 'video/ogg', 2 => 'application/ogg'], 'kmz' => [0 => 'application/vnd.google-earth.kmz'], 'kml' => [0 => 'application/vnd.google-earth.kml+xml'], 'rtx' => [0 => 'text/richtext'], 'rtf' => [0 => 'text/rtf'], 'jar' => [0 => 'application/java-archive', 1 => 'application/x-java-application', 2 => 'application/x-jar'], 'zip' => [0 => 'application/x-zip', 1 => 'application/zip', 2 => 'application/x-zip-compressed', 3 => 'application/s-compressed', 4 => 'multipart/x-zip'], '7zip' => [0 => 'application/x-compressed'], 'xml' => [0 => 'application/xml', 1 => 'text/xml'], 'svg' => [0 => 'image/svg+xml'], '3g2' => [0 => 'video/3gpp2'], '3gp' => [0 => 'video/3gp', 1 => 'video/3gpp'], 'mp4' => [0 => 'video/mp4'], 'm4a' => [0 => 'audio/x-m4a'], 'f4v' => [0 => 'video/x-f4v'], 'flv' => [0 => 'video/x-flv'], 'webm' => [0 => 'video/webm'], 'aac' => [0 => 'audio/x-acc'], 'm4u' => [0 => 'application/vnd.mpegurl'], 'pdf' => [0 => 'application/pdf', 1 => 'application/octet-stream'], 'pptx' => [0 => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'], 'ppt' => [0 => 'application/powerpoint', 1 => 'application/vnd.ms-powerpoint', 2 => 'application/vnd.ms-office', 3 => 'application/msword'], 'docx' => [0 => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'], 'xlsx' => [0 => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 1 => 'application/vnd.ms-excel'], 'xl' => [0 => 'application/excel'], 'xls' => [0 => 'application/msexcel', 1 => 'application/x-msexcel', 2 => 'application/x-ms-excel', 3 => 'application/x-excel', 4 => 'application/x-dos_ms_excel', 5 => 'application/xls', 6 => 'application/x-xls'], 'xsl' => [0 => 'text/xsl'], 'mpeg' => [0 => 'video/mpeg'], 'mov' => [0 => 'video/quicktime'], 'avi' => [0 => 'video/x-msvideo', 1 => 'video/msvideo', 2 => 'video/avi', 3 => 'application/x-troff-msvideo'], 'movie' => [0 => 'video/x-sgi-movie'], 'log' => [0 => 'text/x-log'], 'txt' => [0 => 'text/plain'], 'css' => [0 => 'text/css'], 'html' => [0 => 'text/html'], 'wav' => [0 => 'audio/x-wav', 1 => 'audio/wave', 2 => 'audio/wav'], 'xhtml' => [0 => 'application/xhtml+xml'], 'tar' => [0 => 'application/x-tar'], 'tgz' => [0 => 'application/x-gzip-compressed'], 'psd' => [0 => 'application/x-photoshop', 1 => 'image/vnd.adobe.photoshop'], 'exe' => [0 => 'application/x-msdownload'], 'js' => [0 => 'application/x-javascript'], 'mp3' => [0 => 'audio/mpeg', 1 => 'audio/mpg', 2 => 'audio/mpeg3', 3 => 'audio/mp3'], 'rar' => [0 => 'application/x-rar', 1 => 'application/rar', 2 => 'application/x-rar-compressed'], 'gzip' => [0 => 'application/x-gzip'], 'hqx' => [0 => 'application/mac-binhex40', 1 => 'application/mac-binhex', 2 => 'application/x-binhex40', 3 => 'application/x-mac-binhex40'], 'cpt' => [0 => 'application/mac-compactpro'], 'bin' => [0 => 'application/macbinary', 1 => 'application/mac-binary', 2 => 'application/x-binary', 3 => 'application/x-macbinary'], 'oda' => [0 => 'application/oda'], 'ai' => [0 => 'application/postscript'], 'smil' => [0 => 'application/smil'], 'mif' => [0 => 'application/vnd.mif'], 'wbxml' => [0 => 'application/wbxml'], 'wmlc' => [0 => 'application/wmlc'], 'dcr' => [0 => 'application/x-director'], 'dvi' => [0 => 'application/x-dvi'], 'gtar' => [0 => 'application/x-gtar'], 'php' => [0 => 'application/x-httpd-php', 1 => 'application/php', 2 => 'application/x-php', 3 => 'text/php', 4 => 'text/x-php', 5 => 'application/x-httpd-php-source'], 'swf' => [0 => 'application/x-shockwave-flash'], 'sit' => [0 => 'application/x-stuffit'], 'z' => [0 => 'application/x-compress'], 'mid' => [0 => 'audio/midi'], 'aif' => [0 => 'audio/x-aiff', 1 => 'audio/aiff'], 'ram' => [0 => 'audio/x-pn-realaudio'], 'rpm' => [0 => 'audio/x-pn-realaudio-plugin'], 'ra' => [0 => 'audio/x-realaudio'], 'rv' => [0 => 'video/vnd.rn-realvideo'], 'jp2' => [0 => 'image/jp2', 1 => 'video/mj2', 2 => 'image/jpx', 3 => 'image/jpm'], 'tiff' => [0 => 'image/tiff'], 'eml' => [0 => 'message/rfc822'], 'pem' => [0 => 'application/x-x509-user-cert', 1 => 'application/x-pem-file'], 'p10' => [0 => 'application/x-pkcs10', 1 => 'application/pkcs10'], 'p12' => [0 => 'application/x-pkcs12'], 'p7a' => [0 => 'application/x-pkcs7-signature'], 'p7c' => [0 => 'application/pkcs7-mime', 1 => 'application/x-pkcs7-mime'], 'p7r' => [0 => 'application/x-pkcs7-certreqresp'], 'p7s' => [0 => 'application/pkcs7-signature'], 'crt' => [0 => 'application/x-x509-ca-cert', 1 => 'application/pkix-cert'], 'crl' => [0 => 'application/pkix-crl', 1 => 'application/pkcs-crl'], 'pgp' => [0 => 'application/pgp'], 'gpg' => [0 => 'application/gpg-keys'], 'rsa' => [0 => 'application/x-pkcs7'], 'ics' => [0 => 'text/calendar'], 'zsh' => [0 => 'text/x-scriptzsh'], 'cdr' => [0 => 'application/cdr', 1 => 'application/coreldraw', 2 => 'application/x-cdr', 3 => 'application/x-coreldraw', 4 => 'image/cdr', 5 => 'image/x-cdr', 6 => 'zz-application/zz-winassoc-cdr'], 'wma' => [0 => 'audio/x-ms-wma'], 'vcf' => [0 => 'text/x-vcard'], 'srt' => [0 => 'text/srt'], 'vtt' => [0 => 'text/vtt'], 'ico' => [0 => 'image/x-icon', 1 => 'image/x-ico', 2 => 'image/vnd.microsoft.icon'], 'csv' => [0 => 'text/x-comma-separated-values', 1 => 'text/comma-separated-values', 2 => 'application/vnd.msexcel'], 'json' => [0 => 'application/json', 1 => 'text/json']];
 }

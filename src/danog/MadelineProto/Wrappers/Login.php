@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\Wrappers;
 
 /**
@@ -34,8 +35,10 @@ trait Login
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['logout_error']);
         }
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['logout_ok']], \danog\MadelineProto\Logger::NOTICE);
+
         return true;
     }
+
     public function bot_login($token)
     {
         if ($this->authorized === self::LOGGED_IN) {
@@ -50,12 +53,14 @@ trait Login
         $this->updates = [];
         $this->updates_key = 0;
         if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
-            @file_get_contents('https://api.pwrtelegram.xyz/bot' . $token . '/getme');
+            @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
         }
         $this->init_authorization();
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->authorization;
     }
+
     public function phone_login($number, $sms_type = 5)
     {
         if ($this->authorized === self::LOGGED_IN) {
@@ -71,8 +76,10 @@ trait Login
         $this->updates = [];
         $this->updates_key = 0;
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_code_sent']], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->authorization;
     }
+
     public function complete_phone_login($code)
     {
         if ($this->authorized !== self::WAITING_CODE) {
@@ -80,6 +87,7 @@ trait Login
         }
         $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_user']], \danog\MadelineProto\Logger::NOTICE);
+
         try {
             $authorization = $this->method_call('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $code], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -94,8 +102,10 @@ trait Login
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_need_signup']], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorized = self::WAITING_SIGNUP;
                 $this->authorization['phone_code'] = $code;
+
                 return ['_' => 'account.needSignup'];
             }
+
             throw $e;
         }
         $this->authorized = self::LOGGED_IN;
@@ -103,8 +113,10 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->authorization;
     }
+
     public function import_authorization($authorization)
     {
         if ($this->authorized === self::LOGGED_IN) {
@@ -129,8 +141,10 @@ trait Login
         $this->datacenter->sockets[$dc_id]->authorized = true;
         $this->authorized = self::LOGGED_IN;
         $this->init_authorization();
+
         return $this->get_self();
     }
+
     public function export_authorization()
     {
         if ($this->authorized !== self::LOGGED_IN) {
@@ -138,8 +152,10 @@ trait Login
         }
         $this->get_self();
         $this->authorized_dc = $this->datacenter->curdc;
+
         return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key['auth_key']];
     }
+
     public function complete_signup($first_name, $last_name)
     {
         if ($this->authorized !== self::WAITING_SIGNUP) {
@@ -152,8 +168,10 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['signup_ok']], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->authorization;
     }
+
     public function complete_2fa_login($password)
     {
         if ($this->authorized !== self::WAITING_PASSWORD) {
@@ -161,11 +179,12 @@ trait Login
         }
         $this->authorized = self::NOT_LOGGED_IN;
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_user']], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => hash('sha256', $this->authorization['current_salt'] . $password . $this->authorization['current_salt'], true)], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => hash('sha256', $this->authorization['current_salt'].$password.$this->authorization['current_salt'], true)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['login_ok']], \danog\MadelineProto\Logger::NOTICE);
+
         return $this->authorization;
     }
 }

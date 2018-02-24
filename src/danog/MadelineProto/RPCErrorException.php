@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 class RPCErrorException extends \Exception
@@ -17,20 +18,24 @@ class RPCErrorException extends \Exception
     use TL\PrettyException;
     private $fetched = false;
     public static $rollbar = true;
+
     public function getMess()
     {
         if ($this->fetched === false) {
-            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method=' . $additional[0] . '&code=' . $code . '&error=' . $this->rpc), true);
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$additional[0].'&code='.$code.'&error='.$this->rpc), true);
             if (isset($res['ok']) && $res['ok']) {
                 $this->message = $res['result'];
             }
         }
+
         return $this->message;
     }
+
     public function __toString()
     {
-        return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line . PHP_EOL . PHP_EOL) . PHP_EOL . 'Revision: ' . @file_get_contents(__DIR__ . '/../../../.git/refs/heads/master') . PHP_EOL . $this->getTLTrace() . PHP_EOL;
+        return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.'Revision: '.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.$this->getTLTrace().PHP_EOL;
     }
+
     public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         $this->rpc = $message;

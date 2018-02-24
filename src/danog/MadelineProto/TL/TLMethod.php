@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\TL;
 
 class TLMethod
@@ -20,10 +21,12 @@ class TLMethod
     public $by_id = [];
     public $by_method = [];
     public $method_namespace = [];
+
     public function __sleep()
     {
         return ['by_id', 'by_method', 'method_namespace'];
     }
+
     public function add($json_dict)
     {
         $this->by_id[$json_dict['id']] = ['method' => $json_dict['method'], 'type' => $json_dict['type'], 'params' => $json_dict['params']];
@@ -34,24 +37,30 @@ class TLMethod
         }
         $this->parse_params($json_dict['id']);
     }
+
     public function find_by_id($id)
     {
         if (isset($this->by_id[$id])) {
             $method = $this->by_id[$id];
             $method['id'] = $id;
             $method['params'] = $method['params'];
+
             return $method;
         }
+
         return false;
     }
+
     public function find_by_method($method_name)
     {
         if (isset($this->by_method[$method_name])) {
             $method = $this->by_id[$this->by_method[$method_name]];
             $method['id'] = $this->by_method[$method_name];
             $method['params'] = $method['params'];
+
             return $method;
         }
+
         return false;
     }
 }

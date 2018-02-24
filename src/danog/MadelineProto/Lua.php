@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 class Lua
@@ -18,6 +19,7 @@ class Lua
     public $MadelineProto;
     protected $Lua;
     protected $script;
+
     public function __magic_construct($script, $MadelineProto)
     {
         if (!file_exists($script)) {
@@ -28,10 +30,12 @@ class Lua
         $this->script = $script;
         $this->__wakeup();
     }
+
     public function __sleep()
     {
         return ['MadelineProto', 'script'];
     }
+
     public function __wakeup()
     {
         $this->Lua = new \Lua($this->script);
@@ -65,6 +69,7 @@ class Lua
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
+
     public function tdcli_function($params, $cb = null, $cb_extra = null)
     {
         $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcli_to_td($params));
@@ -75,8 +80,10 @@ class Lua
         if (is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
+
         return $result;
     }
+
     public function madeline_function($params, $cb = null, $cb_extra = null)
     {
         $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
@@ -84,12 +91,15 @@ class Lua
             $cb($result, $cb_extra);
         }
         self::convert_objects($result);
+
         return $result;
     }
+
     public function tdcli_update_callback($update)
     {
         $this->Lua->tdcli_update_callback($this->MadelineProto->mtproto_to_tdcli($update));
     }
+
     private function convert_array($array)
     {
         if (!is_array($value)) {
@@ -101,23 +111,29 @@ class Lua
             }, array_flip($array)));
         }
     }
+
     private function is_sequential(array $arr)
     {
         if ([] === $arr) {
             return false;
         }
+
         return isset($arr[0]) && array_keys($arr) === range(0, count($arr) - 1);
     }
+
     public function __get($name)
     {
         if ($name === 'API') {
             return $this->MadelineProto->API;
         }
+
         return $this->Lua->{$name};
     }
+
     public function __call($name, $params)
     {
         self::convert_objects($params);
+
         try {
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -136,10 +152,12 @@ class Lua
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
+
     public function __set($name, $value)
     {
         return $this->Lua->{$name} = $value;
     }
+
     public static function convert_objects(&$data)
     {
         array_walk_recursive($data, function (&$value, $key) {

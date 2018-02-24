@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 /**
@@ -172,6 +173,7 @@ class Connection
                 break;
         }
     }
+
     public function __destruct()
     {
         switch ($this->protocol) {
@@ -194,15 +196,18 @@ class Connection
                 break;
         }
     }
+
     public function close_and_reopen()
     {
         $this->__destruct();
         $this->must_open = true;
     }
+
     public function __sleep()
     {
         return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'object_queue', 'ack_queue'];
     }
+
     public function __wakeup()
     {
         $keys = array_keys((array) get_object_vars($this));
@@ -212,6 +217,7 @@ class Connection
         $this->time_delta = 0;
         //$this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
+
     public function write($what, $length = null)
     {
         if ($this->must_open) {
@@ -237,6 +243,7 @@ class Connection
                     while (($wrote += $this->sock->write(substr($what, $wrote))) !== $length) {
                     }
                 }
+
                 return $wrote;
                 break;
             case 'udp':
@@ -247,6 +254,7 @@ class Connection
                 break;
         }
     }
+
     public function read($length)
     {
         if ($this->must_open) {
@@ -264,8 +272,10 @@ class Connection
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
+
                     throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['wrong_length_read'], $length, strlen($packet)));
                 }
+
                 return @$this->obfuscated['decryption']->encrypt($packet);
             case 'tcp_abridged':
             case 'tcp_intermediate':
@@ -282,8 +292,10 @@ class Connection
                 }
                 if (strlen($packet) !== $length) {
                     $this->close_and_reopen();
+
                     throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['wrong_length_read'], $length, strlen($packet)));
                 }
+
                 return $packet;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
@@ -292,6 +304,7 @@ class Connection
                 break;
         }
     }
+
     public function read_message()
     {
         switch ($this->protocol) {
@@ -299,7 +312,7 @@ class Connection
                 $packet_length_data = $this->read(4);
                 $packet_length = unpack('V', $packet_length_data)[1];
                 $packet = $this->read($packet_length - 4);
-                if (strrev(hash('crc32b', $packet_length_data . substr($packet, 0, -4), true)) !== substr($packet, -4)) {
+                if (strrev(hash('crc32b', $packet_length_data.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
@@ -307,13 +320,15 @@ class Connection
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
+
                 return substr($packet, 4, $packet_length - 12);
             case 'tcp_intermediate':
                 return $this->read(unpack('V', $this->read(4))[1]);
             case 'obfuscated2':
             case 'tcp_abridged':
                 $packet_length = ord($this->read(1));
-                return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3) . "\0")[1] << 2);
+
+                return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3)."\0")[1] << 2);
             case 'http':
             case 'https':
             case 'https_proxied':
@@ -328,37 +343,39 @@ class Connection
                 if ($close) {
                     $this->close_and_reopen();
                 }
+
                 return $response['body'];
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
         }
     }
+
     public function send_message($message)
     {
         switch ($this->protocol) {
             case 'tcp_full':
                 $this->out_seq_no++;
-                $step1 = pack('VV', strlen($message) + 12, $this->out_seq_no) . $message;
-                $step2 = $step1 . strrev(hash('crc32b', $step1, true));
+                $step1 = pack('VV', strlen($message) + 12, $this->out_seq_no).$message;
+                $step2 = $step1.strrev(hash('crc32b', $step1, true));
                 $this->write($step2);
                 break;
             case 'tcp_intermediate':
-                $this->write(pack('V', strlen($message)) . $message);
+                $this->write(pack('V', strlen($message)).$message);
                 break;
             case 'obfuscated2':
             case 'tcp_abridged':
                 $len = strlen($message) / 4;
                 if ($len < 127) {
-                    $message = chr($len) . $message;
+                    $message = chr($len).$message;
                 } else {
-                    $message = chr(127) . substr(pack('V', $len), 0, 3) . $message;
+                    $message = chr(127).substr(pack('V', $len), 0, 3).$message;
                 }
                 $this->write($message);
                 break;
             case 'http':
             case 'https':
             case 'https_proxied':
-                $this->write('POST ' . $this->parsed['path'] . " HTTP/1.1\r\nHost: " . $this->parsed['host'] . "\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . strlen($message) . "\r\n\r\n" . $message);
+                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host']."\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
                 break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
@@ -370,35 +387,32 @@ class Connection
     public function read_http_line()
     {
         $line = '';
-        while (($curchar = $this->read(1)) !== "\n")
-        {
-            $line.= $curchar;
+        while (($curchar = $this->read(1)) !== "\n") {
+            $line .= $curchar;
         }
 
         return rtrim($line);
     }
 
-    function read_http_payload()
+    public function read_http_payload()
     {
-        $header = explode(' ', $this->read_http_line() , 3);
+        $header = explode(' ', $this->read_http_line(), 3);
         $protocol = $header[0];
-        $code = (int)$header[1];
+        $code = (int) $header[1];
         $description = $header[2];
         $headers = [];
         while (strlen($current_header = $this->read_http_line())) {
             $current_header = explode(':', $current_header, 2);
-            $headers[strtolower($current_header[0]) ] = trim($current_header[1]);
+            $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
 
         $read = '';
-        if (isset($headers['content-length']))
-        {
-            $read = $this->read((int)$headers['content-length']);
+        if (isset($headers['content-length'])) {
+            $read = $this->read((int) $headers['content-length']);
         } elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
-            do
-            {
+            do {
                 $length = hexdec($this->read_http_line($res));
-                $read.= $this->read($length);
+                $read .= $this->read($length);
                 $this->read_http_line($res);
             } while ($length);
         }

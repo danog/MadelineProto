@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
@@ -25,12 +26,14 @@ trait SeqNoHandler
         //var_dump("OUT $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_out_seq_no);
         return $value * 2 + $in;
     }
+
     public function check_in_seq_no($datacenter, $current_msg_id)
     {
         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
             //\danog\MadelineProto\Logger::log(['SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
         }
     }
+
     public function generate_in_seq_no($datacenter, $content_related)
     {
         $in = $content_related ? 1 : 0;
@@ -39,6 +42,7 @@ trait SeqNoHandler
         //var_dump("IN $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_in_seq_no);
         return $value * 2 + $in;
     }
+
     public function content_related($method)
     {
         return isset($method['_']) ? !in_array($method['_'], [

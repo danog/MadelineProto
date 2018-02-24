@@ -11,6 +11,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\TL\Conversion;
 
 /**
@@ -22,11 +23,13 @@ trait Extension
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (array_search($mime, (array) $value) !== false) {
-                return '.' . $key;
+                return '.'.$key;
             }
         }
+
         return '';
     }
+
     public function get_extension_from_location($location, $default)
     {
         return $default;

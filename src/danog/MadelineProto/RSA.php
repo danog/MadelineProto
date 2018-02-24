@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 class RSA
@@ -20,6 +21,7 @@ class RSA
     public $e;
     public $n;
     public $fp;
+
     public function __magic_construct($rsa_key)
     {
         //if ($this->unserialized($rsa_key)) return true;
@@ -30,16 +32,20 @@ class RSA
         $this->n = \phpseclib\Common\Functions\Objects::getVar($key, 'modulus');
         $this->e = \phpseclib\Common\Functions\Objects::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['computing_fingerprint']], Logger::ULTRA_VERBOSE);
-        $this->fp = substr(sha1($this->serialize_object(['type' => 'bytes'], $this->n->toBytes(), 'key') . $this->serialize_object(['type' => 'bytes'], $this->e->toBytes(), 'key'), true), -8);
+        $this->fp = substr(sha1($this->serialize_object(['type' => 'bytes'], $this->n->toBytes(), 'key').$this->serialize_object(['type' => 'bytes'], $this->e->toBytes(), 'key'), true), -8);
+
         return true;
     }
+
     public function __sleep()
     {
         return ['e', 'n', 'fp'];
     }
+
     public function encrypt($data)
     {
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['rsa_encrypting']], Logger::VERBOSE);
+
         return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

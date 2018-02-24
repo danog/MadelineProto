@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\TL\Conversion;
 
 trait BotAPI
@@ -18,6 +19,7 @@ trait BotAPI
     {
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
+
     public function parse_buttons($rows)
     {
         $newrows = [];
@@ -53,8 +55,10 @@ trait BotAPI
             }
             $key++;
         }
+
         return $newrows;
     }
+
     public function parse_reply_markup($markup)
     {
         if (isset($markup['force_reply']) && $markup['force_reply']) {
@@ -83,8 +87,10 @@ trait BotAPI
             $markup['rows'] = $this->parse_buttons($markup['inline_keyboard']);
             unset($markup['inline_keyboard']);
         }
+
         return $markup;
     }
+
     public function MTProto_to_botAPI($data, $sent_arguments = [])
     {
         $newd = [];
@@ -92,6 +98,7 @@ trait BotAPI
             foreach ($data as $key => $element) {
                 $newd[$key] = $this->MTProto_to_botAPI($element, $sent_arguments);
             }
+
             return $newd;
         }
         switch ($data['_']) {
@@ -109,6 +116,7 @@ trait BotAPI
                 if (isset($data['media'])) {
                     $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
                 }
+
                 return $newd;
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
@@ -150,52 +158,64 @@ trait BotAPI
                 if (isset($data['media'])) {
                     $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
                 }
+
                 return $newd;
             case 'messageEntityMention':
                 unset($data['_']);
                 $data['type'] = 'mention';
+
                 return $data;
             case 'messageEntityHashtag':
                 unset($data['_']);
                 $data['type'] = 'hashtag';
+
                 return $data;
             case 'messageEntityBotCommand':
                 unset($data['_']);
                 $data['type'] = 'bot_command';
+
                 return $data;
             case 'messageEntityUrl':
                 unset($data['_']);
                 $data['type'] = 'url';
+
                 return $data;
             case 'messageEntityEmail':
                 unset($data['_']);
                 $data['type'] = 'email';
+
                 return $data;
             case 'messageEntityBold':
                 unset($data['_']);
                 $data['type'] = 'bold';
+
                 return $data;
             case 'messageEntityItalic':
                 unset($data['_']);
                 $data['type'] = 'italic';
+
                 return $data;
             case 'messageEntityCode':
                 unset($data['_']);
                 $data['type'] = 'code';
+
                 return $data;
             case 'messageEntityPre':
                 unset($data['_']);
                 $data['type'] = 'pre';
+
                 return $data;
             case 'messageEntityTextUrl':
                 unset($data['_']);
                 $data['type'] = 'text_url';
+
                 return $data;
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
                 $data['user'] = $this->get_pwr_chat($data['user_id']);
                 unset($data['user_id']);
+
                 return $data;
             case 'messageMediaPhoto':
                 if (isset($data['caption'])) {
@@ -205,6 +225,7 @@ trait BotAPI
                 foreach ($data['photo']['sizes'] as $key => $photo) {
                     $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
                 }
+
                 return $res;
             case 'messageMediaEmpty':
                 return [];
@@ -218,7 +239,7 @@ trait BotAPI
                     switch ($attribute['_']) {
                         case 'documentAttributeFilename':
                             $pathinfo = pathinfo($attribute['file_name']);
-                            $res['ext'] = isset($pathinfo['extension']) ? '.' . $pathinfo['extension'] : '';
+                            $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
                             $res['file_name'] = $pathinfo['filename'];
                             break;
                         case 'documentAttributeAudio':
@@ -269,29 +290,32 @@ trait BotAPI
                 if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
                     $res['file_name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['file_name'] .= ' - ' . $audio['performer'];
+                        $res['file_name'] .= ' - '.$audio['performer'];
                     }
                 }
                 if (!isset($res['file_name'])) {
                     $res['file_name'] = $data['document']['access_hash'];
                 }
-                $res['file_name'] .= '_' . $data['document']['id'];
+                $res['file_name'] .= '_'.$data['document']['id'];
                 if (isset($res['ext'])) {
                     $res['file_name'] .= $res['ext'];
                     unset($res['ext']);
                 } else {
                     $res['file_name'] .= $this->get_extension_from_mime($data['document']['mime_type']);
                 }
-                $data['document']['_'] = 'bot_' . $type_name;
+                $data['document']['_'] = 'bot_'.$type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document'], 'File') . chr(2)));
+                $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document'], 'File').chr(2)));
+
                 return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
                 throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
+
     public $botapi_params = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
+
     public function botAPI_to_MTProto($arguments)
     {
         foreach ($this->botapi_params as $bot => $mtproto) {
@@ -306,8 +330,10 @@ trait BotAPI
         if (isset($arguments['parse_mode'])) {
             $arguments = $this->parse_mode($arguments);
         }
+
         return $arguments;
     }
+
     public function parse_node($node, &$entities, &$nmessage, $recursive = true)
     {
         switch ($node->nodeName) {
@@ -374,6 +400,7 @@ trait BotAPI
                 break;
         }
     }
+
     public function parse_mode($arguments)
     {
         if (isset($arguments['parse_mode']['_'])) {
@@ -385,6 +412,7 @@ trait BotAPI
         }
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
+
             try {
                 $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();
@@ -405,8 +433,10 @@ trait BotAPI
             }
             $arguments['message'] = $nmessage;
         }
+
         return $arguments;
     }
+
     public function split_to_chunks($text)
     {
         $max_length = 4096;
@@ -423,15 +453,17 @@ trait BotAPI
         $i = 0;
         $message = [''];
         foreach ($text_arr as $word) {
-            if (strlen($message[$i] . $word) <= $max_length) {
+            if (strlen($message[$i].$word) <= $max_length) {
                 $message[$i] .= $word;
             } else {
                 $i++;
                 $message[$i] = $word;
             }
         }
+
         return $message;
     }
+
     public function multipleExplodeKeepDelimiters($delimiters, $string)
     {
         $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
@@ -440,15 +472,17 @@ trait BotAPI
         foreach ($initialArray as $item) {
             $delimOffset += strlen($item);
             if (strlen($item) > 0) {
-                $finalArray[] = $item . ($delimOffset < strlen($string) ? $string[$delimOffset] : '');
+                $finalArray[] = $item.($delimOffset < strlen($string) ? $string[$delimOffset] : '');
             }
             $delimOffset++;
         }
+
         return $finalArray;
     }
+
     public function html_fixtags($text)
     {
-        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
+        preg_match_all('#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is', $text, $matches, PREG_SET_ORDER);
         if ($matches) {
             $last = count($matches) - 1;
             foreach ($matches as $val) {
@@ -460,15 +494,17 @@ trait BotAPI
                     $text = str_replace($val[6], $this->html_fixtags($val[6]), $text);
                 }
             }
-            preg_match_all("#<a href=\"(.+?)\">#is", $text, $matches);
+            preg_match_all('#<a href="(.+?)">#is', $text, $matches);
             foreach ($matches[1] as $match) {
                 $text = str_replace($match, htmlentities($match), $text);
             }
+
             return $text;
         } else {
             return htmlentities($text);
         }
     }
+
     public function build_rows($button_list)
     {
         $end = false;
@@ -493,6 +529,7 @@ trait BotAPI
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
             $rows[] = $row;
         }
+
         return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

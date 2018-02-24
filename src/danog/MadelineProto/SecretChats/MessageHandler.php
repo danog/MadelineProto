@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\SecretChats;
 
 /**
@@ -21,6 +22,7 @@ trait MessageHandler
     {
         if (!isset($this->secret_chats[$chat_id])) {
             \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
+
             return false;
         }
         $this->secret_chats[$chat_id]['ttr']--;
@@ -33,27 +35,30 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = $this->serialize_object(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
-        $message = $this->pack_unsigned_int(strlen($message)) . $message;
+        $message = $this->pack_unsigned_int(strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
             $padding = $this->posmod(-strlen($message), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $message .= $this->random($padding);
-            $message_key = substr(hash('sha256', substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32) . $message, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32).$message, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], $this->secret_chats[$chat_id]['admin']);
         } else {
             $message_key = substr(sha1($message, true), -16);
             list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], true);
             $message .= $this->random($this->posmod(-strlen($message), 16));
         }
-        $message = $this->secret_chats[$chat_id]['key']['fingerprint'] . $message_key . $this->ige_encrypt($message, $aes_key, $aes_iv);
+        $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message, $aes_key, $aes_iv);
+
         return $message;
     }
+
     public function handle_encrypted_update($message, $test = false)
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
+
             return false;
         }
         $auth_key_id = substr($message['message']['bytes'], 0, 8);
@@ -62,36 +67,40 @@ trait MessageHandler
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
                 if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint']) {
                     $this->discard_secret_chat($message['message']['chat_id']);
+
                     throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['fingerprint_mismatch']);
                 }
                 $old = true;
             } else {
                 $this->discard_secret_chat($message['message']['chat_id']);
+
                 throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['fingerprint_mismatch']);
             }
         }
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
         if ($this->secret_chats[$message['message']['chat_id']]['mtproto'] === 2) {
-            \danog\MadelineProto\Logger::log(['Trying MTProto v2 decryption for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(['Trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
+
             try {
                 $message_data = $this->try_mtproto_v2_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log(['MTProto v2 decryption OK for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
             } catch (\danog\MadelineProto\SecurityException $e) {
-                \danog\MadelineProto\Logger::log(['MTProto v2 decryption failed with message ' . $e->getMessage() . ', trying MTProto v1 decryption for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
                 $message_data = $this->try_mtproto_v1_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log(['MTProto v1 decryption OK for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 1;
             }
         } else {
-            \danog\MadelineProto\Logger::log(['Trying MTProto v1 decryption for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(['Trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
+
             try {
                 $message_data = $this->try_mtproto_v1_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log(['MTProto v1 decryption OK for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
             } catch (\danog\MadelineProto\SecurityException $e) {
-                \danog\MadelineProto\Logger::log(['MTProto v1 decryption failed with message ' . $e->getMessage() . ', trying MTProto v2 decryption for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v1 decryption failed with message '.$e->getMessage().', trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
                 $message_data = $this->try_mtproto_v2_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log(['MTProto v2 decryption OK for chat ' . $message['message']['chat_id'] . '...'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(['MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...'], \danog\MadelineProto\Logger::NOTICE);
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 2;
             }
         }
@@ -105,6 +114,7 @@ trait MessageHandler
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']] = $message['message'];
         $this->handle_decrypted_update($message);
     }
+
     public function try_mtproto_v1_decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
@@ -123,8 +133,10 @@ trait MessageHandler
         if (strlen($decrypted_data) % 16 != 0) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['length_not_divisible_16']);
         }
+
         return $message_data;
     }
+
     public function try_mtproto_v2_decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
@@ -134,7 +146,7 @@ trait MessageHandler
         if ($message_data_length > strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
         }
-        if ($message_key != substr(hash('sha256', substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32) . $decrypted_data, true), 8, 16)) {
+        if ($message_key != substr(hash('sha256', substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_key_mismatch']);
         }
         if (strlen($decrypted_data) - 4 - $message_data_length < 12) {
@@ -146,6 +158,7 @@ trait MessageHandler
         if (strlen($decrypted_data) % 16 != 0) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['length_not_divisible_16']);
         }
+
         return $message_data;
     }
 }

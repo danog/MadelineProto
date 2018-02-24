@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\Threads;
 
 /**
@@ -18,25 +19,29 @@ namespace danog\MadelineProto\Threads;
 class SocketReader extends \Threaded implements \Collectable
 {
     public $ready = false;
+
     public function __construct($me, $current)
     {
         $this->API = $me;
         $this->current = $current;
     }
+
     public function __sleep()
     {
         return ['current', 'API', 'garbage'];
     }
+
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['shutting_down_reader_pool'] . $this->current], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['shutting_down_reader_pool'].$this->current], \danog\MadelineProto\Logger::NOTICE);
     }
+
     /**
      * Reading connection and receiving message from server. Check the CRC32.
      */
     public function run()
     {
-        require __DIR__ . '/../../../../vendor/autoload.php';
+        require __DIR__.'/../../../../vendor/autoload.php';
         $handler_pool = new \Pool($this->API->settings['threading']['handler_workers']);
         $this->ready = true;
         while ($this->API->run_workers) {
@@ -57,11 +62,14 @@ class SocketReader extends \Threaded implements \Collectable
         }
         $this->setGarbage();
     }
+
     public $garbage = false;
+
     public function setGarbage()
     {
         $this->garbage = true;
     }
+
     public function isGarbage()
     {
         return $this->garbage;

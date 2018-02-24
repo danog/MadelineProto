@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\DocsBuilder;
 
 trait Methods
@@ -19,7 +20,7 @@ trait Methods
         $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
         $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
         $errors['result'] = array_merge_recursive(...$errors['result']);
-        foreach (glob('methods/' . $this->any) as $unlink) {
+        foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);
         }
         if (file_exists('methods')) {
@@ -54,11 +55,11 @@ trait Methods
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
                 $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
-                $param[$type_or_subtype] = '[' . $this->escape($param[$type_or_subtype]) . '](../' . $type_or_bare_type . '/' . $param[$type_or_subtype] . '.md)';
-                $params .= "'" . $param['name'] . "' => " . (isset($param['subtype']) ? '\\[' . $param[$type_or_subtype] . '\\]' : $param[$type_or_subtype]) . ', ';
+                $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            $md_method = '[' . $php_method . '](' . $method . '.md)';
-            $this->docs_methods[$method] = '$MadelineProto->' . $md_method . '(\\[' . $params . '\\]) === [$' . str_replace('_', '\\_', $type) . '](../types/' . $php_type . '.md)<a name="' . $method . '"></a>  
+            $md_method = '['.$php_method.']('.$method.'.md)';
+            $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
             $params = '';
@@ -98,19 +99,19 @@ trait Methods
                         $ptype = 'Bool';
                 }
                 $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                $table .= '|' . str_replace('_', '\\_', $param['name']) . '|' . (isset($param['subtype']) ? 'Array of ' : '') . '[' . str_replace('_', '\\_', $ptype) . '](../' . $type_or_bare_type . '/' . $ptype . '.md) | ' . (isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']) . 'Empty') ? 'Optional' : 'Yes') . '|';
+                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
-                    $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']] . '|';
+                    $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'" . $ptype . "'" : $ptype;
-                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"' . $ptype . '"' : $ptype;
-                $params .= "'" . $param['name'] . "' => ";
-                $params .= (isset($param['subtype']) ? '[' . $pptype . ']' : $pptype) . ', ';
-                $json_params .= '"' . $param['name'] . '": ' . (isset($param['subtype']) ? '[' . $ppptype . ']' : $ppptype) . ', ';
-                $pwr_params .= $param['name'] . ' - Json encoded ' . (isset($param['subtype']) ? ' array of ' . $ptype : $ptype) . "\n\n";
-                $lua_params .= $param['name'] . '=';
-                $lua_params .= (isset($param['subtype']) ? '{' . $pptype . '}' : $pptype) . ', ';
+                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
+                $params .= "'".$param['name']."' => ";
+                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
+                $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
+                $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";
+                $lua_params .= $param['name'].'=';
+                $lua_params .= (isset($param['subtype']) ? '{'.$pptype.'}' : $pptype).', ';
                 if ($param['name'] === 'reply_markup') {
                     $hasreplymarkup = true;
                 }
@@ -127,19 +128,19 @@ trait Methods
                     $pwr_params = "parse_mode - string\n";
                 }
             }
-            $description = isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'] : $data['method'] . ' parameters, return type and example';
+            $description = isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'] : $data['method'].' parameters, return type and example';
             $header = '---
-title: ' . $data['method'] . '
-description: ' . $description . '
+title: '.$data['method'].'
+description: '.$description.'
 ---
-## Method: ' . str_replace('_', '\\_', $data['method']) . '  
+## Method: '.str_replace('_', '\\_', $data['method']).'  
 [Back to methods index](index.md)
 
 
 ';
             if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
-                $header .= '**' . \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']] . "**\n\n\n\n\n";
-                file_put_contents('methods/' . $method . '.md', $header);
+                $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
+                file_put_contents('methods/'.$method.'.md', $header);
                 continue;
             }
             if ($this->td) {
@@ -148,17 +149,17 @@ description: ' . $description . '
 
 ';
             }
-            $header .= isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'] . PHP_EOL . PHP_EOL : '';
+            $header .= isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
 
 ';
-            $return = '### Return type: [' . str_replace('_', '\\_', $type) . '](../types/' . $php_type . '.md)
+            $return = '### Return type: ['.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)
 
 ';
             $bot = !in_array($data['method'], $bots);
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example .= '### Can bots use this method: **' . ($bot ? 'YES' : 'NO') . "**\n\n\n";
+                $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
                 if (isset($errors['result'][$data['method']])) {
                     $example .= '### Errors this method can return:
 
@@ -166,7 +167,7 @@ description: ' . $description . '
 |----------|---------------|
 ';
                     foreach ($errors['result'][$data['method']] as $error) {
-                        $example .= '|' . $error . '|' . $errors['human_result'][$error][0] . '|' . "\n";
+                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
                     }
                     $example .= "\n\n";
                 }
@@ -176,44 +177,44 @@ description: ' . $description . '
 ```
 $MadelineProto = new \\danog\\MadelineProto\\API();
 $MadelineProto->session = \'mySession.madeline\';
-' . ($bot ? 'if (isset($token)) { // Login as a bot
+'.($bot ? 'if (isset($token)) { // Login as a bot
     $MadelineProto->bot_login($token);
 }
-' : '') . 'if (isset($number)) { // Login as a user
+' : '').'if (isset($number)) { // Login as a user
     $MadelineProto->phone_login($number);
     $code = readline(\'Enter the code you received: \'); // Or do this in two separate steps in an HTTP API
     $MadelineProto->complete_phone_login($code);
 }
 
-$' . $type . ' = $MadelineProto->' . $php_method . '([' . $params . ']);
+$'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 ```
 
 Or, if you\'re using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
 
-' . ($bot ? '### As a bot:
+'.($bot ? '### As a bot:
 
 POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
 
 Parameters:
 
-* method - ' . $data['method'] . '
-* params - `{' . $json_params . '}`
+* method - '.$data['method'].'
+* params - `{'.$json_params.'}`
 
-' : '') . '
+' : '').'
 
 ### As a user:
 
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/' . $data['method'] . '`
+POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$data['method'].'`
 
 Parameters:
 
-' . $pwr_params . '
+'.$pwr_params.'
 
 
 Or, if you\'re into Lua:
 
 ```
-' . $type . ' = ' . $data['method'] . '({' . $lua_params . '})
+'.$type.' = '.$data['method'].'({'.$lua_params.'})
 ```
 
 ');
@@ -230,7 +231,7 @@ You can provide bot API reply_markup objects here.
                     $example .= '
 ## Return value 
 
-If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [' . str_replace('_', '\\_', $type) . '](../types/' . $php_type . '.md) will be returned instead.
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md) will be returned instead.
 
 
 ';
@@ -270,7 +271,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
 ';
                 }
             }
-            file_put_contents('methods/' . $method . '.md', $header . $table . $return . $example);
+            file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
         \danog\MadelineProto\Logger::log(['Generating methods index...'], \danog\MadelineProto\Logger::NOTICE);
         ksort($this->docs_methods);
@@ -279,10 +280,10 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
-            $value = $br . $value;
+            $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('methods/' . $this->index, '---
+        file_put_contents('methods/'.$this->index, '---
 title: Methods
 description: List of methods
 ---
@@ -312,6 +313,6 @@ $MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.htm
 $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 
-' . implode('', $this->docs_methods));
+'.implode('', $this->docs_methods));
     }
 }

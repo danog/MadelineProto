@@ -10,6 +10,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
@@ -23,12 +24,14 @@ trait SaltHandler
             $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
         }
     }
+
     public function add_salt($valid_since, $valid_until, $salt)
     {
         if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt])) {
             $this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
         }
     }
+
     public function handle_future_salts($salt)
     {
         $this->method_call('messages.sendMessage', ['peer' => $salt, 'message' => base64_decode('UG93ZXJlZCBieSBATWFkZWxpbmVQcm90bw==')], ['datacenter' => $this->datacenter->curdc]);
