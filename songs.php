@@ -1,6 +1,8 @@
 <?php
 
 $songs = glob('*raw');
-for ($x = 0; $x < count($songs); $x++) {
+$songs_length = count($songs);
+
+for ($x = 0; $x < $songs_length; $x++) {
     shuffle($songs);
 }
