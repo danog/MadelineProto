@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 class DocsBuilder
@@ -18,12 +18,10 @@ class DocsBuilder
     use \danog\MadelineProto\DocsBuilder\Methods;
     use \danog\MadelineProto\DocsBuilder\Constructors;
     use Tools;
-
     public $td = false;
-
     public function __construct($settings)
     {
-        set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->constructors = $this->td_constructors;
@@ -37,29 +35,24 @@ class DocsBuilder
         chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
-
     public $types = [];
     public $any = '*';
-
     public function end($what)
     {
         return end($what);
     }
-
     public function escape($hwat)
     {
-        return str_replace('_', '\_', $hwat);
+        return str_replace('_', '\\_', $hwat);
     }
-
     public function mk_docs()
     {
         \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
-
         file_put_contents($this->index, '---
-title: '.$this->settings['title'].'
-description: '.$this->settings['description'].'
+title: ' . $this->settings['title'] . '
+description: ' . $this->settings['description'] . '
 ---
-# '.$this->settings['description'].'  
+# ' . $this->settings['description'] . '  
 
 [Methods](methods/)
 
@@ -72,19 +65,15 @@ description: '.$this->settings['description'].'
 ');
         $this->mk_methodS();
         $this->mk_constructors();
-
         foreach (glob('types/*') as $unlink) {
             unlink($unlink);
         }
-
         if (file_exists('types')) {
             rmdir('types');
         }
         mkdir('types');
-
         ksort($this->types);
         $index = '';
-
         \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
         $last_namespace = '';
         foreach ($this->types as $otype => $keys) {
@@ -92,14 +81,14 @@ description: '.$this->settings['description'].'
             //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
             $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
             $type = preg_replace('/.*_of_/', '', $type);
-            $index .= '['.str_replace('_', '\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
+            $index .= '[' . str_replace('_', '\\_', $type) . '](' . $type . '.md)<a name="' . $type . '"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
-                $predicate = str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
-                $md_predicate = str_replace('_', '\_', $predicate);
-                $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
+                $predicate = str_replace('.', '_', $data['predicate']) . (isset($data['layer']) && $data['layer'] !== '' ? '_' . $data['layer'] : '');
+                $md_predicate = str_replace('_', '\\_', $predicate);
+                $constructors .= '[' . $md_predicate . '](../constructors/' . $predicate . '.md)  
 
 ';
             }
@@ -107,50 +96,38 @@ description: '.$this->settings['description'].'
             foreach ($keys['methods'] as $data) {
                 $name = str_replace('.', '_', $data['method']);
                 $md_name = str_replace('_', '->', $name);
-                $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
+                $methods .= '[$MadelineProto->' . $md_name . '](../methods/' . $name . '.md)  
 
 ';
             }
-            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : ('constructors and methods of typr '.$type);
-
+            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of typr ' . $type;
             $header = '---
-title: '.$type.'
-description: constructors and methods of type '.$type.'
+title: ' . $type . '
+description: constructors and methods of type ' . $type . '
 ---
-## Type: '.str_replace('_', '\_', $type).'  
+## Type: ' . str_replace('_', '\\_', $type) . '  
 [Back to types index](index.md)
 
 
 
 ';
-            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
-
+            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] . PHP_EOL . PHP_EOL : '';
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
                     $header .= 'The following syntaxes can also be used:
 
 ```
-$'.$type." = '@username'; // Username
+$' . $type . " = '@username'; // Username\n\n\$" . $type . ' = 44700; // bot API id (users)
+$' . $type . ' = -492772765; // bot API id (chats)
+$' . $type . ' = -10038575794; // bot API id (channels)
 
-$".$type.' = 44700; // bot API id (users)
-$'.$type.' = -492772765; // bot API id (chats)
-$'.$type.' = -10038575794; // bot API id (channels)
-
-$'.$type." = 'user#44700'; // tg-cli style id (users)
-$".$type." = 'chat#492772765'; // tg-cli style id (chats)
-$".$type." = 'channel#38575794'; // tg-cli style id (channels)
-```
-
-A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.
-
-
-";
+$' . $type . " = 'user#44700'; // tg-cli style id (users)\n\$" . $type . " = 'chat#492772765'; // tg-cli style id (chats)\n\$" . $type . " = 'channel#38575794'; // tg-cli style id (channels)\n```\n\nA [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
-$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+$' . $type . ' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
 ```
 
 
@@ -162,7 +139,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 To click these buttons simply run the `click` method:  
 
 ```
-$result = $'.$type.'->click();
+$result = $' . $type . '->click();
 ```
 
 `$result` can be one of the following:
@@ -182,19 +159,19 @@ $result = $'.$type.'->click();
             }
             $constructors = '### Possible values (constructors):
 
-'.$constructors.'
+' . $constructors . '
 
 ';
             $methods = '### Methods that return an object of this type (methods):
 
-'.$methods.'
+' . $methods . '
 
 ';
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['PhoneCall'])) {
                     $methods = '';
                     $constructors = '';
-                    $header .= 'This is an object of type `\danog\MadelineProto\VoIP`.
+                    $header .= 'This is an object of type `\\danog\\MadelineProto\\VoIP`.
 
 It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
 
@@ -362,8 +339,8 @@ Example:
 ```
 $call->configuration["log_file_path"] = "logs".$call->getOtherID().".log"; // Default is /dev/null
 $call->configuration["stats_dump_file_path"] = "stats".$call->getOtherID().".log"; // Default is /dev/null
-$call->configuration["network_type"] = \danog\MadelineProto\VoIP::NET_TYPE_WIFI; // Default is NET_TYPE_ETHERNET
-$call->configuration["data_saving"] = \danog\MadelineProto\VoIP::DATA_SAVING_MOBILE; // Default is DATA_SAVING_NEVER
+$call->configuration["network_type"] = \\danog\\MadelineProto\\VoIP::NET_TYPE_WIFI; // Default is NET_TYPE_ETHERNET
+$call->configuration["data_saving"] = \\danog\\MadelineProto\\VoIP::DATA_SAVING_MOBILE; // Default is DATA_SAVING_NEVER
 $call->parseConfig(); // Always call this after changing settings
 ```
 
@@ -374,16 +351,14 @@ After modifying it, you must always parse the new configuration with a call to `
 ';
                 }
             }
-            if (file_exists('types/'.$type.'.md')) {
+            if (file_exists('types/' . $type . '.md')) {
                 \danog\MadelineProto\Logger::log([$type]);
             }
-            file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
+            file_put_contents('types/' . $type . '.md', $header . $constructors . $methods);
             $last_namespace = $new_namespace;
         }
-
         \danog\MadelineProto\Logger::log(['Generating types index...'], \danog\MadelineProto\Logger::NOTICE);
-
-        file_put_contents('types/'.$this->index, '---
+        file_put_contents('types/' . $this->index, '---
 title: Types
 description: List of types
 ---
@@ -391,10 +366,8 @@ description: List of types
 [Back to API documentation index](..)
 
 
-'.$index);
-
+' . $index);
         \danog\MadelineProto\Logger::log(['Generating additional types...'], \danog\MadelineProto\Logger::NOTICE);
-
         file_put_contents('types/string.md', '---
 title: string
 description: A UTF8 string of variable length
@@ -413,7 +386,6 @@ description: A string of variable length
 
 A string of bytes of variable length, with length smaller than or equal to 16777215.
 ');
-
         file_put_contents('types/int.md', '---
 title: integer
 description: A 32 bit signed integer ranging from -2147483648 to 2147483647
@@ -423,7 +395,6 @@ description: A 32 bit signed integer ranging from -2147483648 to 2147483647
 
 A 32 bit signed integer ranging from `-2147483648` to `2147483647`.
 ');
-
         file_put_contents('types/int53.md', '---
 title: integer
 description: A 53 bit signed integer
@@ -433,7 +404,6 @@ description: A 53 bit signed integer
 
 A 53 bit signed integer.
 ');
-
         file_put_contents('types/long.md', '---
 title: long
 description: A 32 bit signed integer ranging from -9223372036854775808 to 9223372036854775807
@@ -443,7 +413,6 @@ description: A 32 bit signed integer ranging from -9223372036854775808 to 922337
 
 A 64 bit signed integer ranging from `-9223372036854775808` to `9223372036854775807`.
 ');
-
         file_put_contents('types/int128.md', '---
 title: int128
 description: A 128 bit signed integer
@@ -453,7 +422,6 @@ description: A 128 bit signed integer
 
 A 128 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-
         file_put_contents('types/int256.md', '---
 title: int256
 description: A 256 bit signed integer
@@ -463,7 +431,6 @@ description: A 256 bit signed integer
 
 A 256 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-
         file_put_contents('types/int512.md', '---
 title: int512
 description: A 512 bit signed integer
@@ -473,7 +440,6 @@ description: A 512 bit signed integer
 
 A 512 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-
         file_put_contents('types/double.md', '---
 title: double
 description: A double precision floating point number
@@ -483,7 +449,6 @@ description: A double precision floating point number
 
 A double precision floating point number, single precision can also be used (float).
 ');
-
         file_put_contents('types/!X.md', '---
 title: !X
 description: Represents a TL serialized payload
@@ -493,7 +458,6 @@ description: Represents a TL serialized payload
 
 Represents a TL serialized payload.
 ');
-
         file_put_contents('types/X.md', '---
 title: X
 description: Represents a TL serialized payload
@@ -503,7 +467,6 @@ description: Represents a TL serialized payload
 
 Represents a TL serialized payload.
 ');
-
         file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
 description: Represents a boolean with value equal to false
@@ -513,7 +476,6 @@ description: Represents a boolean with value equal to false
 
         Represents a boolean with value equal to `false`.
 ');
-
         file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
 description: Represents a boolean with value equal to true
@@ -523,7 +485,6 @@ description: Represents a boolean with value equal to true
 
 Represents a boolean with value equal to `true`.
 ');
-
         file_put_contents('constructors/null.md', '---
 title: null
 description: Represents a null value
@@ -533,7 +494,6 @@ description: Represents a null value
 
 Represents a `null` value.
 ');
-
         file_put_contents('types/Bool.md', '---
 title: Bool
 description: Represents a boolean.
@@ -543,7 +503,6 @@ description: Represents a boolean.
 
 Represents a boolean.
 ');
-
         file_put_contents('types/DataJSON.md', '---
 title: DataJSON
 description: Any json-encodable data
@@ -553,7 +512,6 @@ description: Any json-encodable data
 
 Any json-encodable data.
 ');
-
         \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
     }
 }

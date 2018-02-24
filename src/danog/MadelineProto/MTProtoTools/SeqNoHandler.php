@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
@@ -23,61 +23,55 @@ trait SeqNoHandler
         $value = $this->datacenter->sockets[$datacenter]->session_out_seq_no;
         $this->datacenter->sockets[$datacenter]->session_out_seq_no += $in;
         //var_dump("OUT $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_out_seq_no);
-        return ($value * 2) + $in;
+        return $value * 2 + $in;
     }
-
     public function check_in_seq_no($datacenter, $current_msg_id)
     {
         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
             //\danog\MadelineProto\Logger::log(['SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
         }
     }
-
     public function generate_in_seq_no($datacenter, $content_related)
     {
         $in = $content_related ? 1 : 0;
         $value = $this->datacenter->sockets[$datacenter]->session_in_seq_no;
         $this->datacenter->sockets[$datacenter]->session_in_seq_no += $in;
         //var_dump("IN $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_in_seq_no);
-        return ($value * 2) + $in;
+        return $value * 2 + $in;
     }
-
     public function content_related($method)
     {
-        return isset($method['_']) ? !in_array(
-            $method['_'],
-            [
-                'rpc_result',
-//                'rpc_error',
-                'rpc_drop_answer',
-                'rpc_answer_unknown',
-                'rpc_answer_dropped_running',
-                'rpc_answer_dropped',
-                'get_future_salts',
-                'future_salt',
-                'future_salts',
-                'ping',
-                'pong',
-                'ping_delay_disconnect',
-                'destroy_session',
-                'destroy_session_ok',
-                'destroy_session_none',
-//                'new_session_created',
-                'msg_container',
-                'msg_copy',
-                'gzip_packed',
-                'http_wait',
-                'msgs_ack',
-                'bad_msg_notification',
-                'bad_server_salt',
-                'msgs_state_req',
-                'msgs_state_info',
-                'msgs_all_info',
-                'msg_detailed_info',
-                'msg_new_detailed_info',
-                'msg_resend_req',
-                'msg_resend_ans_req',
-            ]
-        ) : true;
+        return isset($method['_']) ? !in_array($method['_'], [
+            'rpc_result',
+            //                'rpc_error',
+            'rpc_drop_answer',
+            'rpc_answer_unknown',
+            'rpc_answer_dropped_running',
+            'rpc_answer_dropped',
+            'get_future_salts',
+            'future_salt',
+            'future_salts',
+            'ping',
+            'pong',
+            'ping_delay_disconnect',
+            'destroy_session',
+            'destroy_session_ok',
+            'destroy_session_none',
+            //                'new_session_created',
+            'msg_container',
+            'msg_copy',
+            'gzip_packed',
+            'http_wait',
+            'msgs_ack',
+            'bad_msg_notification',
+            'bad_server_salt',
+            'msgs_state_req',
+            'msgs_state_info',
+            'msgs_all_info',
+            'msg_detailed_info',
+            'msg_new_detailed_info',
+            'msg_resend_req',
+            'msg_resend_ans_req',
+        ]) : true;
     }
 }

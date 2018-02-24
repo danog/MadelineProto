@@ -11,7 +11,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\TL\Conversion;
 
 /**
@@ -23,13 +22,11 @@ trait Extension
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (array_search($mime, (array) $value) !== false) {
-                return '.'.$key;
+                return '.' . $key;
             }
         }
-
         return '';
     }
-
     public function get_extension_from_location($location, $default)
     {
         return $default;
@@ -38,15 +35,24 @@ trait Extension
             return $default;
         }
         switch ($res['type']['_']) {
-            case 'storage.fileJpeg': return '.jpg';
-            case 'storage.fileGif': return '.gif';
-            case 'storage.filePng': return '.png';
-            case 'storage.filePdf': return '.pdf';
-            case 'storage.fileMp3': return '.mp3';
-            case 'storage.fileMov': return '.mov';
-            case 'storage.fileMp4': return '.mp4';
-            case 'storage.fileWebp': return '.webp';
-            default: return $default;
+            case 'storage.fileJpeg':
+                return '.jpg';
+            case 'storage.fileGif':
+                return '.gif';
+            case 'storage.filePng':
+                return '.png';
+            case 'storage.filePdf':
+                return '.pdf';
+            case 'storage.fileMp3':
+                return '.mp3';
+            case 'storage.fileMov':
+                return '.mov';
+            case 'storage.fileMp4':
+                return '.mp4';
+            case 'storage.fileWebp':
+                return '.webp';
+            default:
+                return $default;
         }
     }
 }

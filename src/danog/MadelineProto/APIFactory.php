@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 class APIFactory
@@ -105,17 +105,14 @@ class APIFactory
      */
     public $auth;
     use Tools;
-
     public $namespace = '';
     public $API;
     public $lua = false;
-
     public function __construct($namespace, $API)
     {
-        $this->namespace = $namespace.'.';
+        $this->namespace = $namespace . '.';
         $this->API = $API;
     }
-
     public function __call($name, $arguments)
     {
         if ($this->API->setdem) {
@@ -130,13 +127,11 @@ class APIFactory
             $this->serialize($this->session);
         }
         if ($this->lua === false) {
-            return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+            return method_exists($this->API, $this->namespace . $name) ? $this->API->{$this->namespace . $name}(...$arguments) : $this->API->method_call($this->namespace . $name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
         }
-
         try {
-            $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, (isset($arguments[0]) && is_array($arguments[0])) ? $arguments[0] : [], $aargs);
+            $deserialized = method_exists($this->API, $this->namespace . $name) ? $this->API->{$this->namespace . $name}(...$arguments) : $this->API->method_call($this->namespace . $name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
             Lua::convert_objects($deserialized);
-
             return $deserialized;
         } catch (\danog\MadelineProto\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];

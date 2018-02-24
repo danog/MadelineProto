@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,28 +10,20 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
 {
     public function get_dialogs($force = true)
     {
-        if ($force ||
-            !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) ||
-            !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) ||
-            !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) ||
-            !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])
-        ) {
+        if ($force || !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
         }
         $this->updates_state['sync_loading'] = true;
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $peers = [];
-
         $this->postpone_updates = true;
-
         try {
             while ($this->dialog_params['count'] < $res['count']) {
                 \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getting_dialogs']]);
@@ -52,7 +45,6 @@ trait DialogHandler
             $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
         }
-
         return $peers;
     }
 }

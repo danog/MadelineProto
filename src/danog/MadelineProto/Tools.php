@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with the MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 /**
@@ -21,7 +21,6 @@ trait Tools
     {
         return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
     }
-
     /**
      * posmod(numeric,numeric) : numeric
      * Works just like the % (modulus) operator, only returns always a postive number.
@@ -29,10 +28,8 @@ trait Tools
     public function posmod($a, $b)
     {
         $resto = $a % $b;
-
-        return $resto < 0 ? ($resto + abs($b)) : $resto;
+        return $resto < 0 ? $resto + abs($b) : $resto;
     }
-
     public function array_cast_recursive($array, $force = false)
     {
         if (!\danog\MadelineProto\Logger::$has_thread && !$force) {
@@ -46,28 +43,22 @@ trait Tools
                 $array[$key] = $this->array_cast_recursive($value, $force);
             }
         }
-
         return $array;
     }
-
     public function unpack_signed_int($value)
     {
         if (strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
         }
-
         return unpack('l', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-
     public function unpack_signed_long($value)
     {
         if (strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-
         return unpack('q', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-
     public function pack_signed_int($value)
     {
         if ($value > 2147483647) {
@@ -77,23 +68,19 @@ trait Tools
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
         $res = pack('l', $value);
-
         return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
     }
-
     public function pack_signed_long($value)
     {
         if ($value > 9223372036854775807) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
         }
-        if ($value < -9223372036854775808) {
+        if ($value < -9.223372036854776E+18) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Logger::$bigint ? ($this->pack_signed_int($value)."\0\0\0\0") : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
-
+        $res = \danog\MadelineProto\Logger::$bigint ? $this->pack_signed_int($value) . "\0\0\0\0" : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
         return $res;
     }
-
     public function pack_unsigned_int($value)
     {
         if ($value > 4294967295) {
@@ -102,26 +89,21 @@ trait Tools
         if ($value < 0) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
         }
-
         return pack('V', $value);
     }
-
     public function pack_double($value)
     {
         $res = pack('d', $value);
         if (strlen($res) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
         }
-
         return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
     }
-
     public function unpack_double($value)
     {
         if (strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-
         return unpack('d', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 }

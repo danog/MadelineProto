@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -12,74 +13,14 @@ If not, see <http://www.gnu.org/licenses/>.
 /*
  * Logger class
  */
-
 namespace danog\MadelineProto;
 
 class Logger
 {
-    const foreground = [
-        'default' => 39,
-
-        'black'      => 30,
-        'red'        => 31,
-        'green'      => 32,
-        'yellow'     => 33,
-        'blue'       => 34,
-        'magenta'    => 35,
-        'cyan'       => 36,
-        'light_gray' => 37,
-
-        'dark_gray'     => 90,
-        'light_red'     => 91,
-        'light_green'   => 92,
-        'light_yellow'  => 93,
-        'light_blue'    => 94,
-        'light_magenta' => 95,
-        'light_cyan'    => 96,
-        'white'         => 97,
-    ];
-
-    const background = [
-        'default' => 49,
-
-        'black'      => 40,
-        'red'        => 41,
-        'magenta'    => 45,
-        'yellow'     => 43,
-        'green'      => 42,
-        'blue'       => 44,
-        'cyan'       => 46,
-        'light_gray' => 47,
-
-        'dark_gray'     => 100,
-        'light_red'     => 101,
-        'light_green'   => 102,
-        'light_yellow'  => 103,
-        'light_blue'    => 104,
-        'light_magenta' => 105,
-        'light_cyan'    => 106,
-        'white'         => 107,
-    ];
-
-    const set = [
-        'bold'       => 1,
-        'dim'        => 2,
-        'underlined' => 3,
-        'blink'      => 4,
-        'reverse'    => 5,
-        'hidden'     => 6,
-    ];
-
-    const reset = [
-        'all'        => 0,
-        'bold'       => 21,
-        'dim'        => 22,
-        'underlined' => 24,
-        'blink'      => 25,
-        'reverse'    => 26,
-        'hidden'     => 28,
-    ];
-
+    const foreground = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
+    const background = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
+    const set = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
+    const reset = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
     public static $storage = [];
     public static $mode = 1;
     public static $optional = null;
@@ -90,32 +31,27 @@ class Logger
     public static $bigint = true;
     public static $colors = [];
     public static $isatty = false;
-
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
-
     public static function class_exists()
     {
-        self::$has_thread = class_exists('\Thread') && method_exists('\Thread', 'getCurrentThread');
-        self::$BIG_ENDIAN = (pack('L', 1) === pack('N', 1));
+        self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
+        self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
         self::$bigint = PHP_INT_SIZE < 8;
-
-        preg_match('/const V = (\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-
+        preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
             throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
         }
-        if (class_exists('\danog\MadelineProto\VoIP')) {
-            if (!defined('\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
+        if (class_exists('\\danog\\MadelineProto\\VoIP')) {
+            if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
                 throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
             }
-
             try {
-                \Threaded::extend('\danog\MadelineProto\VoIP');
+                \Threaded::extend('\\danog\\MadelineProto\\VoIP');
             } catch (\RuntimeException $e) {
             }
         }
@@ -125,13 +61,11 @@ class Logger
         self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
-
         try {
             self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
         } catch (\danog\MadelineProto\Exception $e) {
         }
     }
-
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -149,11 +83,10 @@ class Logger
         }
         self::$mode = $mode;
         self::$optional = $optional;
-        self::$prefix = $prefix === '' ? '' : ', '.$prefix;
+        self::$prefix = $prefix === '' ? '' : ', ' . $prefix;
         self::$level = $level;
         self::class_exists();
     }
-
     public static function log($params, $level = self::NOTICE)
     {
         if (self::$mode === 4) {
@@ -162,7 +95,6 @@ class Logger
         if ($level > self::$level) {
             return false;
         }
-
         $prefix = self::$prefix;
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
@@ -171,16 +103,16 @@ class Logger
             if (!is_string($param)) {
                 $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
-            $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
+            $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php') . $prefix . ': ', 16 + strlen($prefix)) . "\t" . $param;
             switch (self::$mode) {
                 case 1:
                     error_log($param);
                     break;
                 case 2:
-                    error_log($param.PHP_EOL, 3, self::$optional);
+                    error_log($param . PHP_EOL, 3, self::$optional);
                     break;
                 case 3:
-                    echo self::$isatty ? "\033[".self::$colors[$level].'m'.$param."\033[0m".PHP_EOL : $param.PHP_EOL;
+                    echo self::$isatty ? "\33[" . self::$colors[$level] . 'm' . $param . "\33[0m" . PHP_EOL : $param . PHP_EOL;
                     break;
                 default:
                     break;

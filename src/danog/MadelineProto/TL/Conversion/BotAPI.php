@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\TL\Conversion;
 
 trait BotAPI
@@ -18,7 +18,6 @@ trait BotAPI
     {
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
-
     public function parse_buttons($rows)
     {
         $newrows = [];
@@ -54,10 +53,8 @@ trait BotAPI
             }
             $key++;
         }
-
         return $newrows;
     }
-
     public function parse_reply_markup($markup)
     {
         if (isset($markup['force_reply']) && $markup['force_reply']) {
@@ -86,10 +83,8 @@ trait BotAPI
             $markup['rows'] = $this->parse_buttons($markup['inline_keyboard']);
             unset($markup['inline_keyboard']);
         }
-
         return $markup;
     }
-
     public function MTProto_to_botAPI($data, $sent_arguments = [])
     {
         $newd = [];
@@ -97,253 +92,206 @@ trait BotAPI
             foreach ($data as $key => $element) {
                 $newd[$key] = $this->MTProto_to_botAPI($element, $sent_arguments);
             }
-
             return $newd;
         }
         switch ($data['_']) {
             case 'updateShortSentMessage':
-            $newd['message_id'] = $data['id'];
-            $newd['date'] = $data['date'];
-            $newd['text'] = $sent_arguments['message'];
-            if ($data['out']) {
-                $newd['from'] = $this->get_pwr_chat($this->authorization['user']);
-            }
-            $newd['chat'] = $this->get_pwr_chat($sent_arguments['peer']);
-            if (isset($data['entities'])) {
-                $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
-            }
-            if (isset($data['media'])) {
-                $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
-            }
-
-            return $newd;
-
+                $newd['message_id'] = $data['id'];
+                $newd['date'] = $data['date'];
+                $newd['text'] = $sent_arguments['message'];
+                if ($data['out']) {
+                    $newd['from'] = $this->get_pwr_chat($this->authorization['user']);
+                }
+                $newd['chat'] = $this->get_pwr_chat($sent_arguments['peer']);
+                if (isset($data['entities'])) {
+                    $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
+                }
+                if (isset($data['media'])) {
+                    $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
+                }
+                return $newd;
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
-            return $this->MTProto_to_botAPI($data['message']);
-
+                return $this->MTProto_to_botAPI($data['message']);
             case 'message':
-            $newd['message_id'] = $data['id'];
-            $newd['date'] = $data['date'];
-            $newd['text'] = $data['message'];
-            $newd['post'] = $data['post'];
-            $newd['silent'] = $data['silent'];
-            if (isset($data['from_id'])) {
-                $newd['from'] = $this->get_pwr_chat($data['from_id']);
-            }
-            $newd['chat'] = $this->get_pwr_chat($data['to_id']);
-            if (isset($data['entities'])) {
-                $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
-            }
-            if (isset($data['views'])) {
-                $newd['views'] = $data['views'];
-            }
-            if (isset($data['edit_date'])) {
-                $newd['edit_date'] = $data['edit_date'];
-            }
-            if (isset($data['via_bot_id'])) {
-                $newd['via_bot'] = $this->get_pwr_chat($data['via_bot_id']);
-            }
-            if (isset($data['fwd_from']['from_id'])) {
-                $newd['froward_from'] = $this->get_pwr_chat($data['fwd_from']['from_id']);
-            }
-            if (isset($data['fwd_from']['channel_id'])) {
-                $newd['forward_from_chat'] = $this->get_pwr_chat($data['fwd_from']['channel_id']);
-            }
-            if (isset($data['fwd_from']['date'])) {
-                $newd['forward_date'] = $data['fwd_from']['date'];
-            }
-            if (isset($data['fwd_from']['channel_post'])) {
-                $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
-            }
-
-            if (isset($data['media'])) {
-                $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
-            }
-
-            return $newd;
-
+                $newd['message_id'] = $data['id'];
+                $newd['date'] = $data['date'];
+                $newd['text'] = $data['message'];
+                $newd['post'] = $data['post'];
+                $newd['silent'] = $data['silent'];
+                if (isset($data['from_id'])) {
+                    $newd['from'] = $this->get_pwr_chat($data['from_id']);
+                }
+                $newd['chat'] = $this->get_pwr_chat($data['to_id']);
+                if (isset($data['entities'])) {
+                    $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
+                }
+                if (isset($data['views'])) {
+                    $newd['views'] = $data['views'];
+                }
+                if (isset($data['edit_date'])) {
+                    $newd['edit_date'] = $data['edit_date'];
+                }
+                if (isset($data['via_bot_id'])) {
+                    $newd['via_bot'] = $this->get_pwr_chat($data['via_bot_id']);
+                }
+                if (isset($data['fwd_from']['from_id'])) {
+                    $newd['froward_from'] = $this->get_pwr_chat($data['fwd_from']['from_id']);
+                }
+                if (isset($data['fwd_from']['channel_id'])) {
+                    $newd['forward_from_chat'] = $this->get_pwr_chat($data['fwd_from']['channel_id']);
+                }
+                if (isset($data['fwd_from']['date'])) {
+                    $newd['forward_date'] = $data['fwd_from']['date'];
+                }
+                if (isset($data['fwd_from']['channel_post'])) {
+                    $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
+                }
+                if (isset($data['media'])) {
+                    $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
+                }
+                return $newd;
             case 'messageEntityMention':
-            unset($data['_']);
-            $data['type'] = 'mention';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'mention';
+                return $data;
             case 'messageEntityHashtag':
-            unset($data['_']);
-            $data['type'] = 'hashtag';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'hashtag';
+                return $data;
             case 'messageEntityBotCommand':
-            unset($data['_']);
-            $data['type'] = 'bot_command';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'bot_command';
+                return $data;
             case 'messageEntityUrl':
-            unset($data['_']);
-            $data['type'] = 'url';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'url';
+                return $data;
             case 'messageEntityEmail':
-            unset($data['_']);
-            $data['type'] = 'email';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'email';
+                return $data;
             case 'messageEntityBold':
-            unset($data['_']);
-            $data['type'] = 'bold';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'bold';
+                return $data;
             case 'messageEntityItalic':
-            unset($data['_']);
-            $data['type'] = 'italic';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'italic';
+                return $data;
             case 'messageEntityCode':
-            unset($data['_']);
-            $data['type'] = 'code';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'code';
+                return $data;
             case 'messageEntityPre':
-            unset($data['_']);
-            $data['type'] = 'pre';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'pre';
+                return $data;
             case 'messageEntityTextUrl':
-            unset($data['_']);
-            $data['type'] = 'text_url';
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'text_url';
+                return $data;
             case 'messageEntityMentionName':
-            unset($data['_']);
-            $data['type'] = 'text_mention';
-            $data['user'] = $this->get_pwr_chat($data['user_id']);
-            unset($data['user_id']);
-
-            return $data;
-
+                unset($data['_']);
+                $data['type'] = 'text_mention';
+                $data['user'] = $this->get_pwr_chat($data['user_id']);
+                unset($data['user_id']);
+                return $data;
             case 'messageMediaPhoto':
-            if (isset($data['caption'])) {
-                $res['caption'] = $data['caption'];
-            }
-            $res['photo'] = [];
-            foreach ($data['photo']['sizes'] as $key => $photo) {
-                $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
-            }
-
-            return $res;
+                if (isset($data['caption'])) {
+                    $res['caption'] = $data['caption'];
+                }
+                $res['photo'] = [];
+                foreach ($data['photo']['sizes'] as $key => $photo) {
+                    $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
+                }
+                return $res;
             case 'messageMediaEmpty':
-            return [];
-
+                return [];
             case 'messageMediaDocument':
-            $type_name = 'document';
-            $res = [];
-            if ($data['document']['thumb']['_'] === 'photoSize') {
-                $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], [], true);
-            }
-            foreach ($data['document']['attributes'] as $attribute) {
-                switch ($attribute['_']) {
-                    case 'documentAttributeFilename':
-                    $pathinfo = pathinfo($attribute['file_name']);
-                    $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
-                    $res['file_name'] = $pathinfo['filename'];
-                    break;
-
-                    case 'documentAttributeAudio':
-                    $audio = $attribute;
-                    $type_name = 'audio';
-                    if ($attribute['voice']) {
-                        $type_name = 'voice';
-                    }
-                    $res['duration'] = $attribute['duration'];
-                    if (isset($attribute['performer'])) {
-                        $res['performer'] = $attribute['performer'];
-                    }
-                    if (isset($attribute['title'])) {
-                        $res['title'] = $attribute['title'];
-                    }
-                    if (isset($attribute['waveform'])) {
-                        $res['title'] = $attribute['waveform'];
-                    }
-                    break;
-
-                    case 'documentAttributeVideo':
-                    $type_name = $attribute['round_message'] ? 'video_note' : 'video';
-                    $res['width'] = $attribute['w'];
-                    $res['height'] = $attribute['h'];
-                    $res['duration'] = $attribute['duration'];
-                    break;
-
-                    case 'documentAttributeImageSize':
-                    $res['width'] = $attribute['w'];
-                    $res['height'] = $attribute['h'];
-                    break;
-
-                    case 'documentAttributeAnimated':
-                    $type_name = 'gif';
-                    $res['animated'] = true;
-                    break;
-
-                    case 'documentAttributeHasStickers':
-                    $res['has_stickers'] = true;
-                    break;
-
-                    case 'documentAttributeSticker':
-                    $type_name = 'sticker';
-                    $res['mask'] = $attribute['mask'];
-                    $res['emoji'] = $attribute['alt'];
-                    $res['sticker_set'] = $attribute['stickerset'];
-                    if (isset($attribute['mask_coords'])) {
-                        $res['mask_coords'] = $attribute['mask_coords'];
-                    }
-                    break;
-
+                $type_name = 'document';
+                $res = [];
+                if ($data['document']['thumb']['_'] === 'photoSize') {
+                    $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], [], true);
                 }
-            }
-            if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
-                $res['file_name'] = $audio['title'];
-                if (isset($audio['performer'])) {
-                    $res['file_name'] .= ' - '.$audio['performer'];
+                foreach ($data['document']['attributes'] as $attribute) {
+                    switch ($attribute['_']) {
+                        case 'documentAttributeFilename':
+                            $pathinfo = pathinfo($attribute['file_name']);
+                            $res['ext'] = isset($pathinfo['extension']) ? '.' . $pathinfo['extension'] : '';
+                            $res['file_name'] = $pathinfo['filename'];
+                            break;
+                        case 'documentAttributeAudio':
+                            $audio = $attribute;
+                            $type_name = 'audio';
+                            if ($attribute['voice']) {
+                                $type_name = 'voice';
+                            }
+                            $res['duration'] = $attribute['duration'];
+                            if (isset($attribute['performer'])) {
+                                $res['performer'] = $attribute['performer'];
+                            }
+                            if (isset($attribute['title'])) {
+                                $res['title'] = $attribute['title'];
+                            }
+                            if (isset($attribute['waveform'])) {
+                                $res['title'] = $attribute['waveform'];
+                            }
+                            break;
+                        case 'documentAttributeVideo':
+                            $type_name = $attribute['round_message'] ? 'video_note' : 'video';
+                            $res['width'] = $attribute['w'];
+                            $res['height'] = $attribute['h'];
+                            $res['duration'] = $attribute['duration'];
+                            break;
+                        case 'documentAttributeImageSize':
+                            $res['width'] = $attribute['w'];
+                            $res['height'] = $attribute['h'];
+                            break;
+                        case 'documentAttributeAnimated':
+                            $type_name = 'gif';
+                            $res['animated'] = true;
+                            break;
+                        case 'documentAttributeHasStickers':
+                            $res['has_stickers'] = true;
+                            break;
+                        case 'documentAttributeSticker':
+                            $type_name = 'sticker';
+                            $res['mask'] = $attribute['mask'];
+                            $res['emoji'] = $attribute['alt'];
+                            $res['sticker_set'] = $attribute['stickerset'];
+                            if (isset($attribute['mask_coords'])) {
+                                $res['mask_coords'] = $attribute['mask_coords'];
+                            }
+                            break;
+                    }
                 }
-            }
-            if (!isset($res['file_name'])) {
-                $res['file_name'] = $data['document']['access_hash'];
-            }
-            $res['file_name'] .= '_'.$data['document']['id'];
-            if (isset($res['ext'])) {
-                $res['file_name'] .= $res['ext'];
-                unset($res['ext']);
-            } else {
-                $res['file_name'] .= $this->get_extension_from_mime($data['document']['mime_type']);
-            }
-            $data['document']['_'] = 'bot_'.$type_name;
-            $res['file_size'] = $data['document']['size'];
-            $res['mime_type'] = $data['document']['mime_type'];
-            $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document'], 'File').chr(2)));
-
-            return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
+                if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
+                    $res['file_name'] = $audio['title'];
+                    if (isset($audio['performer'])) {
+                        $res['file_name'] .= ' - ' . $audio['performer'];
+                    }
+                }
+                if (!isset($res['file_name'])) {
+                    $res['file_name'] = $data['document']['access_hash'];
+                }
+                $res['file_name'] .= '_' . $data['document']['id'];
+                if (isset($res['ext'])) {
+                    $res['file_name'] .= $res['ext'];
+                    unset($res['ext']);
+                } else {
+                    $res['file_name'] .= $this->get_extension_from_mime($data['document']['mime_type']);
+                }
+                $data['document']['_'] = 'bot_' . $type_name;
+                $res['file_size'] = $data['document']['size'];
+                $res['mime_type'] = $data['document']['mime_type'];
+                $res['file_id'] = $this->base64url_encode($this->rle_encode($this->serialize_object(['type' => 'File'], $data['document'], 'File') . chr(2)));
+                return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
-            throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
+                throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
-
-    public $botapi_params = [
-        'disable_web_page_preview' => 'no_webpage',
-        'disable_notification'     => 'silent',
-        'reply_to_message_id'      => 'reply_to_msg_id',
-        'chat_id'                  => 'peer',
-        'text'                     => 'message',
-    ];
-
+    public $botapi_params = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
     public function botAPI_to_MTProto($arguments)
     {
         foreach ($this->botapi_params as $bot => $mtproto) {
@@ -358,83 +306,74 @@ trait BotAPI
         if (isset($arguments['parse_mode'])) {
             $arguments = $this->parse_mode($arguments);
         }
-
         return $arguments;
     }
-
     public function parse_node($node, &$entities, &$nmessage, $recursive = true)
     {
         switch ($node->nodeName) {
             case 'br':
-            $nmessage .= "\n";
-            break;
+                $nmessage .= "\n";
+                break;
             case 'b':
             case 'strong':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
+                $text = $this->html_entity_decode($node->textContent);
+                $entities[] = ['_' => 'messageEntityBold', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                $nmessage .= $text;
+                break;
             case 'i':
             case 'em':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
+                $text = $this->html_entity_decode($node->textContent);
+                $entities[] = ['_' => 'messageEntityItalic', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                $nmessage .= $text;
+                break;
             case 'code':
-            $text = $this->html_entity_decode($node->textContent);
-            $entities[] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
-            $nmessage .= $text;
-            break;
-
+                $text = $this->html_entity_decode($node->textContent);
+                $entities[] = ['_' => 'messageEntityCode', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text)];
+                $nmessage .= $text;
+                break;
             case 'pre':
-            $text = $this->html_entity_decode($node->textContent);
-            $language = $node->getAttribute('language');
-            if ($language === null) {
-                $language = '';
-            }
-            $entities[] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
-            $nmessage .= $text;
-            break;
-
+                $text = $this->html_entity_decode($node->textContent);
+                $language = $node->getAttribute('language');
+                if ($language === null) {
+                    $language = '';
+                }
+                $entities[] = ['_' => 'messageEntityPre', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'language' => $language];
+                $nmessage .= $text;
+                break;
             case 'p':
-            foreach ($node->childNodes as $node) {
-                $this->parse_node($node, $entities, $nmessage);
-            }
-            break;
-
-            case 'a':
-            $text = $this->html_entity_decode($node->textContent);
-            $href = $node->getAttribute('href');
-            if (preg_match('|mention:|', $href)) {
-                $mention = $this->get_info(str_replace('mention:', '', $href));
-                if (!isset($mention['InputUser'])) {
-                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
-                }
-                $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $mention['InputUser']];
-            } elseif (preg_match('|buttonurl:|', $href)) {
-                if (!isset($entities['buttons'])) {
-                    $entities['buttons'] = [];
-                }
-                if (preg_match('|:new|', substr($href, -4))) {
-                    $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', str_replace(':new', '', $href)), 'new' => true];
-                } else {
-                    $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', $href)];
+                foreach ($node->childNodes as $node) {
+                    $this->parse_node($node, $entities, $nmessage);
                 }
                 break;
-            } else {
-                $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
-            }
-            $nmessage .= $text;
-            break;
-
+            case 'a':
+                $text = $this->html_entity_decode($node->textContent);
+                $href = $node->getAttribute('href');
+                if (preg_match('|mention:|', $href)) {
+                    $mention = $this->get_info(str_replace('mention:', '', $href));
+                    if (!isset($mention['InputUser'])) {
+                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
+                    }
+                    $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'user_id' => $mention['InputUser']];
+                } elseif (preg_match('|buttonurl:|', $href)) {
+                    if (!isset($entities['buttons'])) {
+                        $entities['buttons'] = [];
+                    }
+                    if (preg_match('|:new|', substr($href, -4))) {
+                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', str_replace(':new', '', $href)), 'new' => true];
+                    } else {
+                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', $href)];
+                    }
+                    break;
+                } else {
+                    $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($nmessage), 'length' => mb_strlen($text), 'url' => $href];
+                }
+                $nmessage .= $text;
+                break;
             default:
-            $nmessage .= $this->html_entity_decode($node->nodeValue);
-            break;
+                $nmessage .= $this->html_entity_decode($node->nodeValue);
+                break;
         }
     }
-
     public function parse_mode($arguments)
     {
         if (isset($arguments['parse_mode']['_'])) {
@@ -446,7 +385,6 @@ trait BotAPI
         }
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $nmessage = '';
-
             try {
                 $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();
@@ -467,10 +405,8 @@ trait BotAPI
             }
             $arguments['message'] = $nmessage;
         }
-
         return $arguments;
     }
-
     public function split_to_chunks($text)
     {
         $max_length = 4096;
@@ -487,17 +423,15 @@ trait BotAPI
         $i = 0;
         $message = [''];
         foreach ($text_arr as $word) {
-            if (strlen($message[$i].$word) <= $max_length) {
+            if (strlen($message[$i] . $word) <= $max_length) {
                 $message[$i] .= $word;
             } else {
                 $i++;
                 $message[$i] = $word;
             }
         }
-
         return $message;
     }
-
     public function multipleExplodeKeepDelimiters($delimiters, $string)
     {
         $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
@@ -506,17 +440,15 @@ trait BotAPI
         foreach ($initialArray as $item) {
             $delimOffset += strlen($item);
             if (strlen($item) > 0) {
-                $finalArray[] = $item.($delimOffset < strlen($string) ? $string[$delimOffset] : '');
+                $finalArray[] = $item . ($delimOffset < strlen($string) ? $string[$delimOffset] : '');
             }
             $delimOffset++;
         }
-
         return $finalArray;
     }
-
     public function html_fixtags($text)
     {
-        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
+        preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
         if ($matches) {
             $last = count($matches) - 1;
             foreach ($matches as $val) {
@@ -528,17 +460,15 @@ trait BotAPI
                     $text = str_replace($val[6], $this->html_fixtags($val[6]), $text);
                 }
             }
-            preg_match_all("#<a href=\x22(.+?)\x22>#is", $text, $matches);
+            preg_match_all("#<a href=\"(.+?)\">#is", $text, $matches);
             foreach ($matches[1] as $match) {
                 $text = str_replace($match, htmlentities($match), $text);
             }
-
             return $text;
         } else {
             return htmlentities($text);
         }
     }
-
     public function build_rows($button_list)
     {
         $end = false;
@@ -559,12 +489,10 @@ trait BotAPI
                 $end = true;
             }
         }
-
         if ($end) {
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
             $rows[] = $row;
         }
-
         return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\Threads;
 
 /**
@@ -23,38 +23,32 @@ class SocketHandler extends \Threaded implements \Collectable
         $this->current = $current;
         $this->error = $error;
     }
-
     /**
      * Reading connection and receiving message from server. Check the CRC32.
      */
     public function run()
     {
-        require __DIR__.'/../../../../vendor/autoload.php';
+        require __DIR__ . '/../../../../vendor/autoload.php';
         if ($this->error !== true) {
             if ($this->error === -404) {
                 if ($this->API->datacenter->sockets[$this->current]->temp_auth_key !== null) {
                     \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['resetting_auth_key']], \danog\MadelineProto\Logger::WARNING);
                     $this->API->datacenter->sockets[$this->current]->temp_auth_key = null;
                     $this->API->init_authorization();
-
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['recreate_temp_auth_key']);
                 }
             }
-
             throw new \danog\MadelineProto\RPCErrorException($this->error, $this->error);
         }
         $this->API->handle_messages($this->current);
         $this->setGarbage();
     }
-
     protected $garbage = false;
-
-    public function setGarbage():void
+    public function setGarbage()
     {
         $this->garbage = true;
     }
-
-    public function isGarbage():bool
+    public function isGarbage()
     {
         return $this->garbage;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,18 +10,15 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto\TL;
 
 class Exception extends \Exception
 {
     use PrettyException;
-
     public function __toString()
     {
-        return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        return get_class($this) . ($this->message !== '' ? ': ' : '') . $this->message . PHP_EOL . @file_get_contents(__DIR__ . '/../../../.git/refs/heads/master') . PHP_EOL . 'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):' . PHP_EOL . PHP_EOL . $this->getTLTrace() . PHP_EOL;
     }
-
     public function __construct($message, $file = '')
     {
         parent::__construct($message);

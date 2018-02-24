@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,38 +10,23 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 interface Proxy
 {
-    public function __construct(int $domain, int $type, int $protocol);
-
-    public function setOption(int $level, int $name, $value);
-
-    public function getOption(int $level, int $name);
-
-    public function setBlocking(bool $blocking);
-
-    public function bind(string $address, int $port = 0);
-
-    public function listen(int $backlog = 0);
-
+    public function __construct($domain, $type, $protocol);
+    public function setOption($level, $name, $value);
+    public function getOption($level, $name);
+    public function setBlocking($blocking);
+    public function bind($address, $port = 0);
+    public function listen($backlog = 0);
     public function accept();
-
-    public function connect(string $address, int $port = 0);
-
-    public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);
-
-    public function read(int $length, int $flags = 0);
-
-    public function write(string $buffer, int $length = -1);
-
-    public function send(string $data, int $length, int $flags);
-
+    public function connect($address, $port = 0);
+    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0);
+    public function read($length, $flags = 0);
+    public function write($buffer, $length = -1);
+    public function send($data, $length, $flags);
     public function close();
-
-    public function getPeerName(bool $port = true);
-
-    public function getSockName(bool $port = true);
+    public function getPeerName($port = true);
+    public function getSockName($port = true);
 }

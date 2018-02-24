@@ -1,4 +1,5 @@
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -9,19 +10,16 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 class Exception extends \Exception
 {
     use TL\PrettyException;
     public static $rollbar = true;
-
     public function __toString()
     {
-        return $this->file === 'MadelineProto' ? $this->message : '\danog\MadelineProto\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'Revision: '.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.$this->getTLTrace();
+        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception' . ($this->message !== '' ? ': ' : '') . $this->message . ' in ' . $this->file . ':' . $this->line . PHP_EOL . 'Revision: ' . @file_get_contents(__DIR__ . '/../../../.git/refs/heads/master') . PHP_EOL . 'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):' . PHP_EOL . $this->getTLTrace();
     }
-
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
         $this->prettify_tl();
@@ -36,8 +34,7 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-
-        \danog\MadelineProto\Logger::log([$message.' in '.basename($this->file).':'.$this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
+        \danog\MadelineProto\Logger::log([$message . ' in ' . basename($this->file) . ':' . $this->line], \danog\MadelineProto\Logger::FATAL_ERROR);
         if (in_array($message, ['The session is corrupted!', 'Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', 'File does not exist', 'Please install this fork of phpseclib: https://github.com/danog/phpseclib'])) {
             return;
         }
@@ -48,7 +45,6 @@ class Exception extends \Exception
             \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
         }
     }
-
     /**
      * ExceptionErrorHandler.
      *
@@ -58,9 +54,9 @@ class Exception extends \Exception
     {
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0) {
-            return true; // return true to continue through the others error handlers
+            return true;
+            // return true to continue through the others error handlers
         }
-
         throw new self($errstr, $errno, null, $errfile, $errline);
     }
 }
