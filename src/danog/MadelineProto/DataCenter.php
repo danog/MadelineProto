@@ -68,7 +68,6 @@ class DataCenter
             $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
             if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                 unset($this->sockets[$dc_number]);
-
                 return false;
             }
             $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
@@ -83,7 +82,7 @@ class DataCenter
                 $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
             }
             if (strpos($this->settings[$dc_config_number]['protocol'], 'https') === 0) {
-                $subdomain = $this->dclist['ssl_subdomains'][$dc_number];
+                $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                 $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
                 $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
                 $port = 443;

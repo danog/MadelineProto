@@ -165,7 +165,7 @@ trait CallHandler
                         $only_updates = $this->handle_messages($aargs['datacenter']);
                         // This method receives data from the socket, and parses stuff
                     } catch (\danog\MadelineProto\Exception $e) {
-                        if ($e->getMessage() === 'I had to recreate the temporary authorization key') {
+                        if ($e->getMessage() === 'I had to recreate the temporary authorization key' || $e->getCode() === 404) {
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
