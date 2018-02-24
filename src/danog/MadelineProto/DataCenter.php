@@ -68,6 +68,7 @@ class DataCenter
             $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
             if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                 unset($this->sockets[$dc_number]);
+
                 return false;
             }
             $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
