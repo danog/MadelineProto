@@ -35,7 +35,6 @@ class Serialization
         if ($file[0] !== '/') {
             $file = getcwd().'/'.$file;
         }
-        var_dump(getcwd());
 
         return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
     }

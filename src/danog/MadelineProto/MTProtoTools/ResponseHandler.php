@@ -102,6 +102,21 @@ trait ResponseHandler
                     $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id'], $datacenter);
                     // Acknowledge that the server received my request
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]['response'] = $current_msg_id;
+
+                    switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['error_code']) {
+                            case 48:
+                                $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['new_server_salt'];
+                                break;
+                            case 16:
+                            case 17:
+                                \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['error_code']]], \danog\MadelineProto\Logger::WARNING);
+                                $this->datacenter->sockets[$datacenter]->time_delta = (int) (new \phpseclib\Math\BigInteger(strrev($current_message_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString();
+                                \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$datacenter]->time_delta], \danog\MadelineProto\Logger::WARNING);
+                                $this->reset_session();
+                                $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                                $this->init_authorization();
+                                break;
+                    }
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]);
                     break;

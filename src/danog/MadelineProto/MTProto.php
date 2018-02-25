@@ -560,9 +560,9 @@ class MTProto
     public function close_and_reopen($datacenter)
     {
         $this->datacenter->sockets[$datacenter]->close_and_reopen();
-        if ($this->is_http($datacenter) && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === true) {
+        /*if ($this->is_http($datacenter) && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === true) {
             $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
-        }
+        }*/
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info

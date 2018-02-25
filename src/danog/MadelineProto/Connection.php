@@ -250,10 +250,6 @@ class Connection
 
     public function read($length)
     {
-        if ($this->must_open) {
-            $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
-            $this->must_open = false;
-        }
         switch ($this->protocol) {
             case 'obfuscated2':
                 $packet = '';
