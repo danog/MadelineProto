@@ -143,7 +143,6 @@ class Connection
                 break;
             case 'http':
             case 'https':
-            case 'https_proxied':
                 $this->parsed = parse_url($ip);
                 if ($this->parsed['host'][0] === '[') {
                     $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
@@ -161,10 +160,6 @@ class Connection
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['socket_con_error']);
                 }
                 $this->sock->setBlocking(true);
-                if ($this->protocol === 'https_proxied') {
-                    $this->write("CONNECT {$this->parsed['host']}:$port HTTP/1.1\r\nHost: {$this->parsed['host']}:$port\r\n\r\n");
-                    $this->read_message();
-                }
                 break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
@@ -182,7 +177,6 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-            case 'https_proxied':
             case 'obfuscated2':
                 try {
                     unset($this->sock);
@@ -237,7 +231,6 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-            case 'https_proxied':
                 $wrote = 0;
                 if (($wrote += $this->sock->write($what)) !== $length) {
                     while (($wrote += $this->sock->write(substr($what, $wrote))) !== $length) {
@@ -282,7 +275,6 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-            case 'https_proxied':
                 $packet = '';
                 while (strlen($packet) < $length) {
                     $packet .= $this->sock->read($length - strlen($packet));
@@ -331,9 +323,9 @@ class Connection
                 return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3)."\0")[1] << 2);
             case 'http':
             case 'https':
-            case 'https_proxied':
                 $response = $this->read_http_payload();
                 if ($response['code'] !== 200) {
+                    Logger::log([$response['body']]);
                     throw new Exception($response['description'], $response['code']);
                 }
                 $close = $response['protocol'] === 'HTTP/1.0';
@@ -374,8 +366,7 @@ class Connection
                 break;
             case 'http':
             case 'https':
-            case 'https_proxied':
-                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host']."\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
+                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].":$port\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
                 break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);

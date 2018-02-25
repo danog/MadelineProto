@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL\Types;
 
-class Button extends \Volatile implements \JsonSerializable
+class Button implements \JsonSerializable, \ArrayAccess
 {
     use \danog\Serializable;
     private $info = [];
@@ -56,5 +56,21 @@ class Button extends \Volatile implements \JsonSerializable
     public function jsonSerialize()
     {
         return (array) $this->data;
+    }
+    public function offsetSet($name, $value) {
+        if ($name === null) {
+            $this->data []= $value;
+        } else {
+            $this->data[$name] = $value;
+        }
+    }
+    public function offsetGet($name) {
+        return $this->data[$name];
+    }
+    public function offsetUnset($name) {
+        unset($this->data[$name]);
+    }
+    public function offsetExists($name) {
+        return isset($this->data[$name]);
     }
 }

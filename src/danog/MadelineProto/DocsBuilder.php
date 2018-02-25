@@ -160,6 +160,7 @@ $result = $'.$type.'->click();
 * `false` - If the button is an unsupported button, like keyboardButtonRequestPhone, keyboardButtonRequestGeoLocation, keyboardButtonSwitchInlinekeyboardButtonBuy; you will have to parse data from these buttons manually
 
 
+You can also access the properties of the constructor as a normal array, for example $button[\'name\']
 ';
                 }
             }

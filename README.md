@@ -65,6 +65,7 @@ This library can also be used to create lua telegram bots (like bot API bots, on
 
 * PFS in secret chats
 
+* [Clickable inline buttons](#inline-buttons)!
 
 ## PHP Requirements
 
@@ -173,6 +174,27 @@ You can find examples for nearly every MadelineProto function in
 * [`userbots/pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
 * [`userbots/MadelineProto_bot.php`](https://github.com/danog/MadelineProto/blob/master/userbots/MadelineProto_bot.php) - More fun shiz
 * [`userbots/pwrtelegram_debug_bot`](https://github.com/danog/MadelineProto/blob/master/userbots/pwrtelegram_debug_bot.php) - More fun shiz
+
+### Inline buttons
+
+You can easily click inline buttons using MadelineProto, just access the correct button:
+
+```
+$button = $update['update']['message']['reply_markup']['rows'][0]['buttons'][0];
+```
+
+You can then access properties (they vary depending on the [type of button](https://docs.madelineproto.xyz/API_docs/types/KeyboardButton.html)):
+
+```
+$text = $button['text'];
+```
+
+And click them:
+
+```
+$button->click();
+```
+
 
 ### Storing sessions
 

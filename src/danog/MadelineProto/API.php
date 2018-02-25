@@ -72,8 +72,6 @@ class API extends APIFactory
                 $this->API = $unserialized->API;
                 $this->APIFactory();
             }
-            Serialization::$instances[spl_object_hash($unserialized)] = $unserialized;
-
             return;
         }
         $this->API = new MTProto($params);
@@ -85,13 +83,11 @@ class API extends APIFactory
         //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
         \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['madelineproto_ready']], Logger::NOTICE);
-        Serialization::$instances[spl_object_hash($this)] = $this;
     }
 
     public function __wakeup()
     {
         //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
-        Serialization::$instances[spl_object_hash($this)] = $this;
         $this->APIFactory();
     }
 
