@@ -72,6 +72,7 @@ class API extends APIFactory
                 $this->API = $unserialized->API;
                 $this->APIFactory();
             }
+
             return;
         }
         $this->API = new MTProto($params);

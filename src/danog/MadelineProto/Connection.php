@@ -326,6 +326,7 @@ class Connection
                 $response = $this->read_http_payload();
                 if ($response['code'] !== 200) {
                     Logger::log([$response['body']]);
+
                     throw new Exception($response['description'], $response['code']);
                 }
                 $close = $response['protocol'] === 'HTTP/1.0';

@@ -57,20 +57,28 @@ class Button implements \JsonSerializable, \ArrayAccess
     {
         return (array) $this->data;
     }
-    public function offsetSet($name, $value) {
+
+    public function offsetSet($name, $value)
+    {
         if ($name === null) {
-            $this->data []= $value;
+            $this->data[] = $value;
         } else {
             $this->data[$name] = $value;
         }
     }
-    public function offsetGet($name) {
+
+    public function offsetGet($name)
+    {
         return $this->data[$name];
     }
-    public function offsetUnset($name) {
+
+    public function offsetUnset($name)
+    {
         unset($this->data[$name]);
     }
-    public function offsetExists($name) {
+
+    public function offsetExists($name)
+    {
         return isset($this->data[$name]);
     }
 }
