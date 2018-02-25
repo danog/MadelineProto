@@ -71,6 +71,7 @@ trait MessageHandler
     public function recv_message($datacenter)
     {
         if ($this->datacenter->sockets[$datacenter]->must_open) {
+            \danog\MadelineProto\Logger::log(['Trying to write in closed socket, sending initial ping/http_wait']);
             if ($this->is_http($datacenter)) {
                 $this->method_call('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500], ['datacenter' => $datacenter]);
             } else {
