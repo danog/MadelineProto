@@ -361,7 +361,7 @@ trait ResponseHandler
 
                     throw new \danog\MadelineProto\Exception('Re-executing query...');
                 }
-                
+
             default:
                 throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
         }

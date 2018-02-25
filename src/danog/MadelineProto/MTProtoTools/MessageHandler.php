@@ -75,7 +75,7 @@ trait MessageHandler
                 $this->method_call('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500], ['datacenter' => $datacenter]);
             } else {
                 $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
-             }
+            }
         }
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
