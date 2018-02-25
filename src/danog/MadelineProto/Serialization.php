@@ -10,7 +10,6 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-
 namespace danog\MadelineProto;
 
 /**
@@ -20,8 +19,7 @@ class Serialization
 {
     public static function serialize_all($exception)
     {
-        echo $exception.PHP_EOL;
-
+        echo $exception . PHP_EOL;
         return;
         foreach (self::$instances as $instance) {
             if (isset($instance->session)) {
@@ -29,16 +27,14 @@ class Serialization
             }
         }
     }
-
     public static function realpaths($file)
     {
         if ($file[0] !== '/') {
-            $file = getcwd().'/'.$file;
+            $file = getcwd() . '/' . $file;
         }
-
-        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
+        var_dump(getcwd());
+        return ['file' => $file, 'lockfile' => $file . '.lock', 'tempfile' => $file . '.temp.session'];
     }
-
     /**
      * Serialize API class.
      *
@@ -63,7 +59,6 @@ class Serialization
         $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'w');
         \danog\MadelineProto\Logger::log(['Waiting for exclusive lock of serialization lockfile...']);
         flock($realpaths['lockfile'], LOCK_EX);
-
         try {
             $wrote = file_put_contents($realpaths['tempfile'], serialize($instance));
             rename($realpaths['tempfile'], $realpaths['file']);
@@ -71,10 +66,8 @@ class Serialization
             flock($realpaths['lockfile'], LOCK_UN);
             fclose($realpaths['lockfile']);
         }
-
         return $wrote;
     }
-
     /**
      * Deserialize API class.
      *
@@ -86,8 +79,8 @@ class Serialization
      */
     public static function deserialize($filename, $no_updates = false)
     {
-        if (file_exists($filename)) {
-            $realpaths = self::realpaths($filename);
+        $realpaths = self::realpaths($filename);
+        if (file_exists($realpaths['file'])) {
             if (!file_exists($realpaths['lockfile'])) {
                 touch($realpaths['lockfile']);
                 clearstatcache();
@@ -95,7 +88,6 @@ class Serialization
             $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
             \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
             flock($realpaths['lockfile'], LOCK_SH);
-
             try {
                 $unserialized = file_get_contents($realpaths['file']);
             } finally {
@@ -104,11 +96,10 @@ class Serialization
             }
             $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $unserialized);
             foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                class_exists('\\danog\\MadelineProto\\'.$class);
+                class_exists('\\danog\\MadelineProto\\' . $class);
             }
             class_exists('\\Volatile');
             \danog\MadelineProto\Logger::class_exists();
-
             try {
                 $unserialized = unserialize($tounserialize);
             } catch (\danog\MadelineProto\Bug74586Exception $e) {
@@ -132,7 +123,6 @@ class Serialization
         if ($unserialized instanceof \danog\MadelineProto\API) {
             $unserialized->session = $filename;
         }
-
         return $unserialized;
     }
 }
