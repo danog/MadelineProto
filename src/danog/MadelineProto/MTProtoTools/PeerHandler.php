@@ -208,7 +208,9 @@ trait PeerHandler
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true) {
                 $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    return $this->get_info('@'.$dbres['result']);
+                    $this->resolve_username('@'.$dbres['result']);
+                    
+                    return $this->get_info($id, false);
                 }
             }
 
