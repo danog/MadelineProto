@@ -47,7 +47,7 @@ class Connection
     public $object_queue = [];
     public $ack_queue = [];
     public $i = [];
-    private $must_open = false;
+    public $must_open = false;
 
     public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
@@ -330,8 +330,8 @@ class Connection
                     throw new Exception($response['description'], $response['code']);
                 }
                 $close = $response['protocol'] === 'HTTP/1.0';
-                if (isset($headers['connection'])) {
-                    $close = $headers['connection'] === 'close';
+                if (isset($response['headers']['connection'])) {
+                    $close = strtolower($response['headers']['connection']) === 'close';
                 }
                 if ($close) {
                     $this->close_and_reopen();
