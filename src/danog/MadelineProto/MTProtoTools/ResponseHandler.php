@@ -101,13 +101,14 @@ trait ResponseHandler
                     $only_updates = false;
                     $this->ack_outgoing_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id'], $datacenter);
                     // Acknowledge that the server received my request
-                    
+
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     unset($this->datacenter->sockets[$datacenter]->new_outgoing[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]);
 
                     switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['error_code']) {
                             case 48:
                                 $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['new_server_salt'];
+
                                 throw new \danog\MadelineProto\Exception('Got bad message notification');
                             case 16:
                             case 17:
@@ -117,6 +118,7 @@ trait ResponseHandler
                                 $this->reset_session();
                                 $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                                 $this->init_authorization();
+
                                 throw new \danog\MadelineProto\Exception('Got bad message notification');
                     }
                     $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id']]['response'] = $current_msg_id;
