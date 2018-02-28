@@ -172,7 +172,7 @@ trait CallHandler
                         continue;
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
-                        continue;
+                        continue 2;
                     }
                 }
                 if ($canunset) {
