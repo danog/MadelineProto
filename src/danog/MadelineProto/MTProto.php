@@ -47,7 +47,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 90;
+    const V = 91;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
