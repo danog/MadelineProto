@@ -33,7 +33,11 @@ class TLConstructor
 
     public function add($json_dict, $scheme_type)
     {
+        if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) return false;
+        
         $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
+        
+      
         $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
@@ -51,7 +55,6 @@ class TLConstructor
         foreach ($this->by_id as $id => $constructor) {
             if ($constructor['type'] === $type) {
                 $constructor['id'] = $id;
-                $constructor['params'] = $constructor['params'];
 
                 return $constructor;
             }
@@ -77,14 +80,12 @@ class TLConstructor
             }
             $constructor = $this->by_id[$chosenid];
             $constructor['id'] = $chosenid;
-            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }
         if (isset($this->by_predicate_and_layer[$predicate])) {
             $constructor = $this->by_id[$this->by_predicate_and_layer[$predicate]];
             $constructor['id'] = $this->by_predicate_and_layer[$predicate];
-            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }
@@ -97,7 +98,6 @@ class TLConstructor
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];
             $constructor['id'] = $id;
-            $constructor['params'] = $constructor['params'];
 
             return $constructor;
         }

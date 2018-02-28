@@ -417,7 +417,7 @@ description: List of constructors
 <br><br>[$documentAttributeSticker\_55](../constructors/documentAttributeSticker_55.md) = \['alt' => [string](../types/string.md), 'stickerset' => [InputStickerSet](../types/InputStickerSet.md), \];<a name="documentAttributeSticker_55"></a>  
 
 ***
-<br><br>[$documentAttributeVideo](../constructors/documentAttributeVideo.md) = \['round_message' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo"></a>  
+<br><br>[$documentAttributeVideo\_23](../constructors/documentAttributeVideo_23.md) = \['duration' => [int](../types/int.md), 'w' => [int](../types/int.md), 'h' => [int](../types/int.md), \];<a name="documentAttributeVideo_23"></a>  
 
 ***
 <br><br>[$documentEmpty](../constructors/documentEmpty.md) = \['id' => [long](../types/long.md), \];<a name="documentEmpty"></a>  

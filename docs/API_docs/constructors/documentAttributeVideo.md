@@ -12,6 +12,7 @@ description: documentAttributeVideo attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |round\_message|[Bool](../types/Bool.md) | Optional|
+|supports\_streaming|[Bool](../types/Bool.md) | Optional|
 |duration|[int](../types/int.md) | Yes|
 |w|[int](../types/int.md) | Yes|
 |h|[int](../types/int.md) | Yes|
@@ -24,13 +25,13 @@ description: documentAttributeVideo attributes, type and example
 ### Example:
 
 ```
-$documentAttributeVideo = ['_' => 'documentAttributeVideo', 'round_message' => Bool, 'duration' => int, 'w' => int, 'h' => int];
+$documentAttributeVideo = ['_' => 'documentAttributeVideo', 'round_message' => Bool, 'supports_streaming' => Bool, 'duration' => int, 'w' => int, 'h' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "documentAttributeVideo", "round_message": Bool, "duration": int, "w": int, "h": int}
+{"_": "documentAttributeVideo", "round_message": Bool, "supports_streaming": Bool, "duration": int, "w": int, "h": int}
 ```
 
 
@@ -38,7 +39,7 @@ Or, if you're into Lua:
 
 
 ```
-documentAttributeVideo={_='documentAttributeVideo', round_message=Bool, duration=int, w=int, h=int}
+documentAttributeVideo={_='documentAttributeVideo', round_message=Bool, supports_streaming=Bool, duration=int, w=int, h=int}
 
 ```
 

@@ -165,7 +165,7 @@ trait CallHandler
                         $only_updates = $this->handle_messages($aargs['datacenter']);
                         // This method receives data from the socket, and parses stuff
                     } catch (\danog\MadelineProto\Exception $e) {
-                        if ($e->getMessage() === 'I had to recreate the temporary authorization key' || $e->getCode() === 404) {
+                        if (in_array($e->getMessage(), ['I had to recreate the temporary authorization key', 'Got bad message notification']) || $e->getCode() === 404) {
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
@@ -191,23 +191,7 @@ trait CallHandler
                         break;
                     case 'bad_server_salt':
                     case 'bad_msg_notification':
-                        switch ($server_answer['error_code']) {
-                            case 48:
-                                $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['server_salt'] = $server_answer['new_server_salt'];
-                                continue 3;
-                            case 16:
-                            case 17:
-                                \danog\MadelineProto\Logger::log(['Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$server_answer['error_code']]], \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$aargs['datacenter']]->time_delta = (int) (new \phpseclib\Math\BigInteger(strrev($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString();
-                                \danog\MadelineProto\Logger::log(['Set time delta to '.$this->datacenter->sockets[$aargs['datacenter']]->time_delta], \danog\MadelineProto\Logger::WARNING);
-                                $this->reset_session();
-                                $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
-                                $this->init_authorization();
-                                continue 3;
-                        }
-
                         throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$server_answer['error_code']], $server_answer['error_code']);
-                        break;
                     case 'boolTrue':
                     case 'boolFalse':
                         $server_answer = $server_answer['_'] === 'boolTrue';
