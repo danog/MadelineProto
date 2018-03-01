@@ -132,6 +132,7 @@ if (!extension_loaded('pthreads')) {
             public function __destruct()
             {
                 socket_close($this->sock);
+                unset($this->sock);
             }
 
             public function setOption(int $level, int $name, $value)

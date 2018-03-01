@@ -194,6 +194,7 @@ class Connection
     public function close_and_reopen()
     {
         $this->__destruct();
+        \danog\MadelineProto\Logger::log(['Reopening...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->must_open = true;
     }
 
@@ -214,10 +215,6 @@ class Connection
 
     public function write($what, $length = null)
     {
-        if ($this->must_open) {
-            $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
-            $this->must_open = false;
-        }
         if ($length !== null) {
             $what = substr($what, 0, $length);
         } else {
@@ -260,11 +257,7 @@ class Connection
                         throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
                     }
                 }
-                if (strlen($packet) !== $length) {
-                    $this->close_and_reopen();
 
-                    throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['wrong_length_read'], $length, strlen($packet)));
-                }
 
                 return @$this->obfuscated['decryption']->encrypt($packet);
             case 'tcp_abridged':
@@ -278,11 +271,6 @@ class Connection
                     if ($packet === false || strlen($packet) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
                     }
-                }
-                if (strlen($packet) !== $length) {
-                    $this->close_and_reopen();
-
-                    throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['wrong_length_read'], $length, strlen($packet)));
                 }
 
                 return $packet;
@@ -342,6 +330,10 @@ class Connection
 
     public function send_message($message)
     {
+        if ($this->must_open) {
+            $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+            $this->must_open = false;
+        }
         switch ($this->protocol) {
             case 'tcp_full':
                 $this->out_seq_no++;
