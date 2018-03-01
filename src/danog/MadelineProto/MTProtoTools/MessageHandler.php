@@ -18,8 +18,9 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait MessageHandler
 {
-    public function send_unencrypted_message($message_data, $message_id, $datacenter)
+    public function send_unencrypted_message($type, $message_data, $message_id, $datacenter)
     {
+        \danog\MadelineProto\Logger::log(["Sending $type as unencrypted message"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $message_data = "\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($message_data)).$message_data;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['response' => -1];
         $this->datacenter->sockets[$datacenter]->send_message($message_data);
@@ -27,11 +28,17 @@ trait MessageHandler
 
     public function send_messages($datacenter)
     {
+        $has_ack = false;
+
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
             $messages = [];
+            \danog\MadelineProto\Logger::log(["Sending msg_container as encrypted message"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
             foreach ($this->datacenter->sockets[$datacenter]->object_queue as $message) {
                 $message['seqno'] = $this->generate_out_seq_no($datacenter, $message['content_related']);
                 $message['bytes'] = strlen($message['body']);
+                $has_ack = $has_ack || $message['_'] === 'msgs_ack';
+                \danog\MadelineProto\Logger::log(["Inside of msg_container, sending {$message['_']} as encrypted message"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message['_'] = 'MTmessage';
                 $messages[] = $message;
                 $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
@@ -41,6 +48,7 @@ trait MessageHandler
             $seq_no = $this->generate_out_seq_no($datacenter, false);
         } elseif (count($this->datacenter->sockets[$datacenter]->object_queue)) {
             $message = array_shift($this->datacenter->sockets[$datacenter]->object_queue);
+            \danog\MadelineProto\Logger::log(["Sending {$message['_']} as encrypted message"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $message_data = $message['body'];
             $message_id = $message['msg_id'];
             $seq_no = $this->generate_out_seq_no($datacenter, $message['content_related']);
@@ -59,10 +67,13 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = ['seq_no' => $seq_no, 'response' => -1];
         $this->datacenter->sockets[$datacenter]->send_message($message);
         $this->datacenter->sockets[$datacenter]->object_queue = [];
-        foreach ($this->datacenter->sockets[$datacenter]->ack_queue as $msg_id) {
-            $this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['ack'] = true;
+
+        if ($has_ack) {
+            foreach ($this->datacenter->sockets[$datacenter]->ack_queue as $msg_id) {
+                $this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['ack'] = true;
+            }
+            $this->datacenter->sockets[$datacenter]->ack_queue = [];
         }
-        $this->datacenter->sockets[$datacenter]->ack_queue = [];
     }
 
     /**

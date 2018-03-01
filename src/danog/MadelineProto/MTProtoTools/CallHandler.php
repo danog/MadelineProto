@@ -83,7 +83,7 @@ trait CallHandler
         }
         if ($this->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($serialized)) > $this->settings['requests']['gzip_encode_if_gt'] && ($g = strlen($gzipped = gzencode($serialized))) < $l) {
             $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
-            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%'], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(['Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         }
         $last_recv = $this->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
@@ -94,16 +94,22 @@ trait CallHandler
             try {
                 \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-                    $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $serialized, 'content_related' => $content_related, 'msg_id' => $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter'])];
+                    if (isset($message_id)) {
+                        \danog\MadelineProto\Logger::log(['Clearing old method call'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id])) unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
+                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id])) unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
+                    }
+
+                    $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $method, 'body' => $serialized, 'content_related' => $content_related, 'msg_id' => $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter'])];
                     if (count($this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
-                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
+                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
                     }
                     if ($this->is_http($aargs['datacenter']) && $method !== 'http_wait') {
-                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $this->serialize_method('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
+                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => 'http_wait', 'body' => $this->serialize_method('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
                     }
                     $this->send_messages($aargs['datacenter']);
                 } else {
-                    $this->send_unencrypted_message($serialized, $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter']), $aargs['datacenter']);
+                    $this->send_unencrypted_message($method, $serialized, $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter']), $aargs['datacenter']);
                     $aargs['message_id'] = $message_id;
                 }
 
@@ -273,6 +279,6 @@ trait CallHandler
             throw new \danog\MadelineProto\Exception('No datacenter provided');
         }
         $serialized = $this->serialize_object(['type' => $object], $args, $object);
-        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['body' => $serialized, 'content_related' => $this->content_related($object), 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
+        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $object, 'body' => $serialized, 'content_related' => $this->content_related($object), 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
     }
 }
