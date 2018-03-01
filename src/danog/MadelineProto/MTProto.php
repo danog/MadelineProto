@@ -226,6 +226,7 @@ class MTProto
             }
             foreach ($settings['connection_settings'] as $key => &$connection) {
                 if (!is_array($connection)) {
+                    unset($settings['connection_settings'][$key]);
                     continue;
                 }
                 if (!isset($connection['proxy'])) {
