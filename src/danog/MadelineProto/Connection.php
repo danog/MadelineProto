@@ -258,7 +258,6 @@ class Connection
                     }
                 }
 
-
                 return @$this->obfuscated['decryption']->encrypt($packet);
             case 'tcp_abridged':
             case 'tcp_intermediate':
