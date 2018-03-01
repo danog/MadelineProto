@@ -4,6 +4,7 @@ composer global require spatie/7to5
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
+
 rm -rf phar7 phar5 MadelineProtoPhar
 
 mkdir phar7
@@ -12,7 +13,7 @@ echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-master#'$TRAVIS_COMMIT'"
+        "danog/madelineproto": "dev-'$TRAVIS_BRANCH'#'$TRAVIS_COMMIT'"
     },
     "repositories": [
         {
@@ -32,7 +33,9 @@ cd ..
 
 $php7to5 convert --copy-all phar7 phar5 >/dev/null
 
-php makephar.php phar5 madeline.phar $TRAVIS_COMMIT
+[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
+
+php makephar.php phar5 "madeline$branch.phar" $TRAVIS_COMMIT
 
 eval "$(ssh-agent -s)"
 echo -e "$private_key" > madeline_rsa
@@ -40,7 +43,7 @@ chmod 600 madeline_rsa
 ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
-cp ../madeline.phar .
+cp "../madeline$branch.phar" .
 cp ../phar.php .
 echo -n $TRAVIS_COMMIT > release
 git add -A
@@ -56,6 +59,4 @@ for chat_id in $destinations;do
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
-	#echo "$TRAVIS_COMMIT_MESSAGE" | grep -q release_phar && curl -s https://api.telegram.org/bot$token/sendDocument -F caption="md5: $(md5sum madeline.phar | sed 's/\s.*//g')
-#commit: $TRAVIS_COMMIT" -F chat_id=$chat_id -F document=@madeline.phar -F reply_to_message_id=$ID
 done
