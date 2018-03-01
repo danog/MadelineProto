@@ -41,6 +41,7 @@ ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp ../madeline.phar .
+cp ../phar.php .
 echo -n $TRAVIS_COMMIT > release
 git add -A
 git commit -am "Release $TRAVIS_COMMIT"
