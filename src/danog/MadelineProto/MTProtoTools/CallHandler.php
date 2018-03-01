@@ -104,8 +104,8 @@ trait CallHandler
                     $this->send_messages($aargs['datacenter']);
                 } else {
                     $this->send_unencrypted_message($serialized, $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter']), $aargs['datacenter']);
-                    $aargs['message_id'] = $message_id;
                 }
+                $aargs['message_id'] = $message_id;
                 if ($this->is_http($aargs['datacenter']) && isset($aargs['reopen'])) {
                     \danog\MadelineProto\Logger::log(['Closing and reopening connection...'], \danog\MadelineProto\Logger::WARNING);
                     $this->close_and_reopen($aargs['datacenter']);
