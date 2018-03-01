@@ -32,7 +32,7 @@ trait MessageHandler
 
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
             $messages = [];
-            \danog\MadelineProto\Logger::log(["Sending msg_container as encrypted message"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(['Sending msg_container as encrypted message'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             foreach ($this->datacenter->sockets[$datacenter]->object_queue as $message) {
                 $message['seqno'] = $this->generate_out_seq_no($datacenter, $message['content_related']);

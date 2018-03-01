@@ -96,8 +96,12 @@ trait CallHandler
                 if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
                     if (isset($message_id)) {
                         \danog\MadelineProto\Logger::log(['Clearing old method call'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id])) unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
-                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id])) unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
+                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id])) {
+                            unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
+                        }
+                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id])) {
+                            unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
+                        }
                     }
 
                     $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $method, 'body' => $serialized, 'content_related' => $content_related, 'msg_id' => $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter'])];
