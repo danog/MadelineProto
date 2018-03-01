@@ -340,6 +340,7 @@ trait ResponseHandler
                     case 'USER_DEACTIVATED':
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
+                        \danog\MadelineProto\Logger::log([$server_answer['error_message']], \danog\MadelineProto\Logger::FATAL_ERROR);
                         foreach ($this->datacenter->sockets as $socket) {
                             $socket->temp_auth_key = null;
                             $socket->auth_key = null;
@@ -348,23 +349,38 @@ trait ResponseHandler
                         $this->authorized = self::NOT_LOGGED_IN;
                         $this->authorization = null;
                         $this->init_authorization();
-                        // idk
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->authorized !== self::LOGGED_IN) {
                             throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                         }
+                        \danog\MadelineProto\Logger::log(['Auth key not registered, resetting temporary and permanent auth keys...'], \danog\MadelineProto\Logger::ERROR);
+
                         $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                         $this->datacenter->sockets[$aargs['datacenter']]->auth_key = null;
                         $this->datacenter->sockets[$aargs['datacenter']]->authorized = false;
+                        if ($this->authorized_dc === $aargs['datacenter'] && $this->authorized === self::LOGGED_IN) {
+                            \danog\MadelineProto\Logger::log(['Permanent auth key was main authorized key, logging out...'], \danog\MadelineProto\Logger::FATAL_ERROR);
+                            foreach ($this->datacenter->sockets as $socket) {
+                                $socket->temp_auth_key = null;
+                                $socket->auth_key = null;
+                                $socket->authorized = false;
+                            }
+                            $this->authorized = self::NOT_LOGGED_IN;
+                            $this->authorization = null;
+                            $this->init_authorization();
+                            throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                        }
                         $this->init_authorization();
-                        // idk
+
                         throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                     case 'AUTH_KEY_PERM_EMPTY':
                         if ($this->authorized !== self::LOGGED_IN) {
                             throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                         }
+                        \danog\MadelineProto\Logger::log(['Temporary auth key not bound, resetting temporary auth key...'], \danog\MadelineProto\Logger::ERROR);
+
                         $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                         $this->init_authorization();
                         // idk

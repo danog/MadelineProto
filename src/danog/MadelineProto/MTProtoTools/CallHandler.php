@@ -215,7 +215,13 @@ trait CallHandler
                 }
             } catch (\danog\MadelineProto\Exception $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
-                \danog\MadelineProto\Logger::log(['An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...'], \danog\MadelineProto\Logger::WARNING);
+                if (strpos($e->getMessage(), 'Received request to switch to DC ') === 0) {
+                    if ($this->authorized_dc === -1 && $method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) {
+                        $this->authorized_dc = $this->datacenter->curdc;
+                    }
+                    \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                    continue;
+                }
                 $this->close_and_reopen($aargs['datacenter']);
                 if ($e->getMessage() === 'Re-executing query after server error...') {
                     return $this->method_call($method, $args, $aargs);

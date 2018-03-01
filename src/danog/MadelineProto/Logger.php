@@ -52,11 +52,6 @@ class Logger
             if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
                 throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
             }
-
-            try {
-                \Threaded::extend('\\danog\\MadelineProto\\VoIP');
-            } catch (\RuntimeException $e) {
-            }
         }
         self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
         self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
@@ -119,8 +114,6 @@ class Logger
                     break;
                 case 3:
                     echo self::$isatty ? "\33[".self::$colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
-                    break;
-                default:
                     break;
             }
         }
