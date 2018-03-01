@@ -47,7 +47,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 91;
+    const V = 92;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -233,6 +233,9 @@ class MTProto
                 }
                 if (!isset($connection['proxy_extra'])) {
                     $connection['proxy_extra'] = [];
+                }
+                if (!isset($connection['pfs'])) {
+                    $connection['pfs'] = true;
                 }
             }
             if (!isset($settings['authorization']['rsa_key'])) {
@@ -620,14 +623,14 @@ class MTProto
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
             if (isset($dc['static'])) {
-                //                $id .= $dc['static'] ? '_static' : '';
+                //$id .= $dc['static'] ? '_static' : '';
             }
             if (isset($dc['cdn'])) {
                 $id .= $dc['cdn'] ? '_cdn' : '';
             }
             $id .= $dc['media_only'] ? '_media' : '';
             $ipv6 = $dc['ipv6'] ? 'ipv6' : 'ipv4';
-            $id .= isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address'] ? '_bk' : '';
+            //$id .= isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address'] ? '_bk' : '';
             if (is_numeric($id)) {
                 $id = (int) $id;
             }

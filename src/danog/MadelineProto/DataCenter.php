@@ -69,7 +69,8 @@ class DataCenter
             if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                 unset($this->sockets[$dc_number]);
 
-                throw new \danog\MadelineProto\Exception("No info for DC $dc_number");
+                \danog\MadelineProto\Logger::log("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
+                return false;
             }
             $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
             $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
