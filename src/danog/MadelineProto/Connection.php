@@ -250,6 +250,7 @@ class Connection
 
     public function read($length)
     {
+        \danog\MadelineProto\Logger::log(["Asked to read $length"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         switch ($this->protocol) {
             case 'obfuscated2':
                 $packet = '';

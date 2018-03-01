@@ -69,7 +69,7 @@ class DataCenter
             if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                 unset($this->sockets[$dc_number]);
 
-                return false;
+                throw new \danog\MadelineProto\Exception("No info for DC $dc_number");
             }
             $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
             $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
@@ -126,11 +126,11 @@ class DataCenter
                     \danog\MadelineProto\Logger::log(['Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...'], \danog\MadelineProto\Logger::WARNING);
                     continue;
                 default:
-                    return false;
+                    throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
             }
         } while (++$x);
 
-        return false;
+        throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
     }
 
     public function get_dcs($all = true)
