@@ -104,8 +104,9 @@ trait CallHandler
                     $this->send_messages($aargs['datacenter']);
                 } else {
                     $this->send_unencrypted_message($serialized, $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter']), $aargs['datacenter']);
+                    $aargs['message_id'] = $message_id;
                 }
-                $aargs['message_id'] = $message_id;
+                
                 if ($this->is_http($aargs['datacenter']) && isset($aargs['reopen'])) {
                     \danog\MadelineProto\Logger::log(['Closing and reopening connection...'], \danog\MadelineProto\Logger::WARNING);
                     $this->close_and_reopen($aargs['datacenter']);
@@ -165,12 +166,14 @@ trait CallHandler
                         $only_updates = $this->handle_messages($aargs['datacenter']);
                         // This method receives data from the socket, and parses stuff
                     } catch (\danog\MadelineProto\Exception $e) {
+                        $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                         if (in_array($e->getMessage(), ['I had to recreate the temporary authorization key', 'Got bad message notification']) || $e->getCode() === 404) {
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
                         continue;
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                        $last_error = 'Nothing in the socket';
                         \danog\MadelineProto\Logger::log(['An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...'], \danog\MadelineProto\Logger::WARNING);
                         continue 2;
                     }
