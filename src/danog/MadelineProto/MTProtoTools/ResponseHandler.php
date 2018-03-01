@@ -349,6 +349,7 @@ trait ResponseHandler
                         $this->authorized = self::NOT_LOGGED_IN;
                         $this->authorization = null;
                         $this->init_authorization();
+
                         throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
@@ -370,6 +371,7 @@ trait ResponseHandler
                             $this->authorized = self::NOT_LOGGED_IN;
                             $this->authorization = null;
                             $this->init_authorization();
+
                             throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
                         }
                         $this->init_authorization();

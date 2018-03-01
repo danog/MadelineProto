@@ -93,6 +93,7 @@ trait MessageHandler
         if (strlen($payload) === 4) {
             $payload = $this->unpack_signed_int($payload);
             \danog\MadelineProto\Logger::log(["Received $payload"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
             return $payload;
         }
         $auth_key_id = substr($payload, 0, 8);
