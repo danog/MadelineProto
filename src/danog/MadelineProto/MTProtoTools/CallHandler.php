@@ -185,9 +185,8 @@ trait CallHandler
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                         $last_error = 'Nothing in the socket';
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                        if ($this->is_http($aargs['datacenter'])) {
-                            $this->close_and_reopen($aargs['datacenter']);
-                        }
+                        if ($res_count > 3) $this->close_and_reopen($aargs['datacenter']);
+var_dump($res_count);
                         continue; //2;
                     }
                 }
