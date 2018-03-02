@@ -127,6 +127,7 @@ class API extends APIFactory
                 \danog\MadelineProto\Logger::log('Detected fork');
                 $this->API->__wakeup();
             }
+
             return $this->API->__construct($value);
         }
 

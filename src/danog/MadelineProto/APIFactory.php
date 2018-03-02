@@ -123,7 +123,7 @@ class APIFactory
         if (Logger::is_fork()) {
             \danog\MadelineProto\Logger::log('Detected fork');
             $this->API->reset_session();
-            foreach ($this->API->datacenter->sockets as $datacenter) { 
+            foreach ($this->API->datacenter->sockets as $datacenter) {
                 $datacenter->close_and_reopen();
             }
         }

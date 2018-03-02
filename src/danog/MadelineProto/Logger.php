@@ -68,10 +68,12 @@ class Logger
         }
     }
 
-    public static function is_fork() {
+    public static function is_fork()
+    {
         if (self::$pid === null) {
             self::$pid = getmypid();
         }
+
         return self::$pid !== getmypid();
     }
 
