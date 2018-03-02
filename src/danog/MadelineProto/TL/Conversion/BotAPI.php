@@ -393,6 +393,7 @@ trait BotAPI
                 } else {
                     $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => mb_strlen($new_message), 'length' => mb_strlen($text), 'url' => $href];
                 }
+                
                 $new_message .= $text;
                 break;
             default:
@@ -413,7 +414,7 @@ trait BotAPI
         if (preg_match('/html/i', $arguments['parse_mode'])) {
             $new_message = '';
 
-            try {
+            
                 $arguments['message'] = $this->html_fixtags($arguments['message']);
                 $dom = new \DOMDocument();
                 $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
@@ -428,9 +429,6 @@ trait BotAPI
                     unset($arguments['entities']['buttons']);
                 }
                 unset($arguments['parse_mode']);
-            } catch (\DOMException $e) {
-            } catch (\danog\MadelineProto\Exception $e) {
-            }
             $arguments['message'] = $new_message;
         }
 
