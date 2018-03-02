@@ -45,9 +45,9 @@ git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp "../madeline$branch.phar" .
 cp ../phar.php .
-echo -n $TRAVIS_COMMIT > release
+[ "$TRAVIS_BRANCH" == "master" ] && echo -n $TRAVIS_COMMIT > release
 git add -A
-git commit -am "Release $TRAVIS_COMMIT"
+git commit -am "Release $TRAVIS_BRANCH $TRAVIS_COMMIT"
 git push origin master
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
