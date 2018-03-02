@@ -91,7 +91,7 @@ class Logger
     public static function log($param, $level = self::NOTICE)
     {
         if (self::$mode === 4) {
-            return call_user_func_array(self::$optional, [is_array($params) ? $params : [$params], $level]);
+            return call_user_func_array(self::$optional, [$param, $level]);
         }
         if ($level > self::$level) {
             return false;
