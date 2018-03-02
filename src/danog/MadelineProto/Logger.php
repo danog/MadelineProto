@@ -32,6 +32,8 @@ class Logger
     public static $bigint = true;
     public static $colors = [];
     public static $isatty = false;
+    private static $pid;
+
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
@@ -64,6 +66,13 @@ class Logger
             self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
         } catch (\danog\MadelineProto\Exception $e) {
         }
+    }
+
+    public static function is_fork() {
+        if (self::$pid === null) {
+            self::$pid = getmypid();
+        }
+        return self::$pid !== getmypid();
     }
 
     /*
@@ -100,10 +109,13 @@ class Logger
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
+        if (\danog\MadelineProto\Logger::is_fork()) {
+            $prefix .= ' (p)';
+        }
         if (!is_string($param)) {
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
-        $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
+        $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch (self::$mode) {
                 case 1:
                     error_log($param);

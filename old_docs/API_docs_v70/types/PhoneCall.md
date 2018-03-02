@@ -160,7 +160,7 @@ Easy as pie:
 
 ```
 $call->storage["pony"] = "fluttershy";
-var_dump($call->storage["pony"]); // fluttershy
+\danog\MadelineProto\Logger::log($call->storage["pony"]); // fluttershy
 ```
 
 Note: when modifying this property, *never* overwrite the previous values. Always either modify the values of the array separately like showed above, or use array_merge.

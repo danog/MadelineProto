@@ -16,7 +16,7 @@ require 'vendor/autoload.php';
 $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
 
 try {
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 } catch (\danog\MadelineProto\Exception $e) {
     \danog\MadelineProto\Logger::log($e->getMessage());
     $MadelineProto = new \danog\MadelineProto\API($settings);

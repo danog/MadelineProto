@@ -109,15 +109,25 @@ class APIFactory
     public $namespace = '';
     public $API;
     public $lua = false;
+    public $pid;
 
     public function __construct($namespace, $API)
     {
         $this->namespace = $namespace.'.';
         $this->API = $API;
+        $this->pid = getmypid();
     }
 
     public function __call($name, $arguments)
     {
+        if (Logger::is_fork()) {
+            \danog\MadelineProto\Logger::log('Detected fork');
+            $this->API->reset_session();
+            foreach ($this->API->datacenter->sockets as $datacenter) { 
+                $datacenter->close_and_reopen();
+            }
+        }
+
         if ($this->API->setdem) {
             $this->API->setdem = false;
             $this->API->__construct($this->API->settings);

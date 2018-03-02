@@ -194,6 +194,12 @@ class MTProto
         }
         $force = false;
         $this->reset_session();
+
+        $backtrace = debug_backtrace(0, 3);
+        if (isset($backtrace[2]['function']) && isset($backtrace[2]['class']) && isset($backtrace[2]['args']) && count($backtrace[2]['args']) === 2 && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__magic_construct') {
+            Logger::log('Updating settings on wakeup');
+            $this->parse_settings(array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
+        }
         if (!isset($this->v) || $this->v !== self::V) {
             \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {

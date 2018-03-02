@@ -220,6 +220,11 @@ To load a serialized session:
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 ```  
 
+To load a serialized session, replacing settings on deserialization:
+```
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);
+```
+
 If the scripts shutsdown normally (without ctrl+c or fatal errors/exceptions), the session will be serialized automatically.
 
 

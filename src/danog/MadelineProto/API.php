@@ -34,6 +34,7 @@ class API extends APIFactory
                 $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
                 \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
                 flock($realpaths['lockfile'], LOCK_SH);
+                \danog\MadelineProto\Logger::log('Shared lock acquired, deserializing...');
 
                 try {
                     $unserialized = file_get_contents($realpaths['file']);
@@ -94,7 +95,7 @@ class API extends APIFactory
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()) || Logger::is_fork()) {
             return;
         }
         if (!is_null($this->session)) {
@@ -122,6 +123,10 @@ class API extends APIFactory
     public function __set($name, $value)
     {
         if ($name === 'settings') {
+            if (Logger::is_fork()) {
+                \danog\MadelineProto\Logger::log('Detected fork');
+                $this->API->__wakeup();
+            }
             return $this->API->__construct($value);
         }
 

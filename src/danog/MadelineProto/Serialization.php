@@ -63,6 +63,7 @@ class Serialization
         $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'w');
         \danog\MadelineProto\Logger::log('Waiting for exclusive lock of serialization lockfile...');
         flock($realpaths['lockfile'], LOCK_EX);
+        \danog\MadelineProto\Logger::log('Lock acquired, serializing');
 
         try {
             $wrote = file_put_contents($realpaths['tempfile'], serialize($instance));
@@ -95,6 +96,7 @@ class Serialization
             $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
             \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
             flock($realpaths['lockfile'], LOCK_SH);
+            \danog\MadelineProto\Logger::log('Lock acquired, deserializing');
 
             try {
                 $unserialized = file_get_contents($realpaths['file']);
