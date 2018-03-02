@@ -53,7 +53,7 @@ class DocsBuilder
 
     public function mk_docs()
     {
-        \danog\MadelineProto\Logger::log(['Generating documentation index...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
         file_put_contents($this->index, '---
 title: '.$this->settings['title'].'
 description: '.$this->settings['description'].'
@@ -80,7 +80,7 @@ description: '.$this->settings['description'].'
         mkdir('types');
         ksort($this->types);
         $index = '';
-        \danog\MadelineProto\Logger::log(['Generating types documentation...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating types documentation...', \danog\MadelineProto\Logger::NOTICE);
         $last_namespace = '';
         foreach ($this->types as $otype => $keys) {
             $new_namespace = preg_replace('/_.*/', '', $otype);
@@ -331,7 +331,7 @@ Easy as pie:
 
 ```
 $call->storage["pony"] = "fluttershy";
-var_dump($call->storage["pony"]); // fluttershy
+\danog\MadelineProto\Logger::log($call->storage["pony"]); // fluttershy
 ```
 
 Note: when modifying this property, *never* overwrite the previous values. Always either modify the values of the array separately like showed above, or use array_merge.
@@ -359,12 +359,12 @@ After modifying it, you must always parse the new configuration with a call to `
                 }
             }
             if (file_exists('types/'.$type.'.md')) {
-                \danog\MadelineProto\Logger::log([$type]);
+                \danog\MadelineProto\Logger::log($type);
             }
             file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }
-        \danog\MadelineProto\Logger::log(['Generating types index...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
         file_put_contents('types/'.$this->index, '---
 title: Types
 description: List of types
@@ -374,7 +374,7 @@ description: List of types
 
 
 '.$index);
-        \danog\MadelineProto\Logger::log(['Generating additional types...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating additional types...', \danog\MadelineProto\Logger::NOTICE);
         file_put_contents('types/string.md', '---
 title: string
 description: A UTF8 string of variable length
@@ -519,6 +519,6 @@ description: Any json-encodable data
 
 Any json-encodable data.
 ');
-        \danog\MadelineProto\Logger::log(['Done!'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
 }

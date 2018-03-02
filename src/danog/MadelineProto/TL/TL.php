@@ -24,14 +24,14 @@ trait TL
 
     public function construct_tl($files)
     {
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_loading']], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->constructors = new TLConstructor();
         $this->methods = new TLMethod();
         $this->td_constructors = new TLConstructor();
         $this->td_methods = new TLMethod();
         $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], basename($file))], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], basename($file)), \danog\MadelineProto\Logger::VERBOSE);
             $filec = file_get_contents($file);
             $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
@@ -104,7 +104,7 @@ trait TL
                     if (preg_match('/^[^\\s]+#/', $line)) {
                         $nid = str_pad(preg_replace(['/^[^#]+#/', '/\\s.+/'], '', $line), 8, '0', \STR_PAD_LEFT);
                         if ($id !== $nid && $scheme_type !== 'botAPI') {
-                            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line)], \danog\MadelineProto\Logger::ERROR);
+                            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
                         }
                         $id = $nid;
                     }
@@ -144,14 +144,14 @@ trait TL
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
             }
             $orig = $this->encrypted_layer;
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['translating_obj']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
                 $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['translating_methods']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
@@ -350,7 +350,7 @@ trait TL
         $predicate = $object['_'];
         $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
         if ($constructorData === false) {
-            \danog\MadelineProto\Logger::log([$object], \danog\MadelineProto\Logger::FATAL_ERROR);
+            \danog\MadelineProto\Logger::log($object, \danog\MadelineProto\Logger::FATAL_ERROR);
 
             throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error'], $predicate));
         }
@@ -410,7 +410,7 @@ trait TL
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
                 if (isset($current_argument['pow']) && (in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
-                    //\danog\MadelineProto\Logger::log(['Skipping '.$current_argument['name'].' of type '.$current_argument['type']);
+                    //\danog\MadelineProto\Logger::log('Skipping '.$current_argument['name'].' of type '.$current_argument['type');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
@@ -454,7 +454,7 @@ trait TL
             if ($current_argument['type'] === 'DataJSON') {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
-            //\danog\MadelineProto\Logger::log(['Serializing '.$current_argument['name'].' of type '.$current_argument['type']);
+            //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }
 

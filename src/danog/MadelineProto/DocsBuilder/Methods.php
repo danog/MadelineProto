@@ -28,7 +28,7 @@ trait Methods
         }
         mkdir('methods');
         $this->docs_methods = [];
-        \danog\MadelineProto\Logger::log(['Generating methods documentation...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->methods->by_id as $id => $data) {
             $method = str_replace('.', '_', $data['method']);
             $php_method = str_replace('.', '->', $data['method']);
@@ -273,7 +273,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
             }
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
-        \danog\MadelineProto\Logger::log(['Generating methods index...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating methods index...', \danog\MadelineProto\Logger::NOTICE);
         ksort($this->docs_methods);
         $last_namespace = '';
         foreach ($this->docs_methods as $method => &$value) {

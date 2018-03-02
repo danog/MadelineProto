@@ -22,7 +22,7 @@ $MadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('s.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
 }
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
@@ -38,20 +38,20 @@ if ($MadelineProto === false) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
         $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
-        \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
         $authorization = $MadelineProto->complete_phone_login($code);
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
         if ($authorization['_'] === 'account.noPassword') {
             throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
         }
         if ($authorization['_'] === 'account.password') {
-            \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
         }
         if ($authorization['_'] === 'account.needSignup') {
-            \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('Registering new user', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
     } else {
@@ -68,7 +68,7 @@ $offset = 0;
 while (true) {
     try {
         $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-        //\danog\MadelineProto\Logger::log([$updates]);
+        //\danog\MadelineProto\Logger::log($updates);
         foreach ($updates as $update) {
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
@@ -82,7 +82,7 @@ while (true) {
                     }
                     break;*/
                 case 'updateNewEncryptedMessage':
-                    var_dump($MadelineProto->download_to_dir($update['update']['message'], '.'));
+                    \danog\MadelineProto\Logger::log($MadelineProto->download_to_dir($update['update']['message'], '.'));
                     if (isset($sent[$update['update']['message']['chat_id']])) {
                         continue;
                     }
@@ -107,7 +107,7 @@ while (true) {
     // Document, secrey chat
     $time = time();
     $inputEncryptedFile = $MadelineProto->upload_encrypted('tests/60', 'magic'); // This gets an inputFile object with file name magic
-    var_dump(time() - $time);
+    \danog\MadelineProto\Logger::log(time() - $time);
     $secret_media['document'] = ['peer' => $secret, 'file' => $inputEncryptedFile, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'key' => $inputEncryptedFile['key'], 'iv' => $inputEncryptedFile['iv'], 'file_name' => 'magic.magic', 'size' => filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
     // Video, secret chat
@@ -133,9 +133,9 @@ while (true) {
            }
         }
     } catch (\danog\MadelineProto\RPCErrorException $e) {
-        var_dump($e);
+        \danog\MadelineProto\Logger::log($e);
     } catch (\danog\MadelineProto\Exception $e) {
-        var_dump($e->getMessage());
+        \danog\MadelineProto\Logger::log($e->getMessage());
     }
     //sleep(1);
 }

@@ -23,7 +23,7 @@ $MadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
 }
 
 if (file_exists('.env')) {
@@ -42,20 +42,20 @@ if ($MadelineProto === false) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
         $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
-        \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
         $authorization = $MadelineProto->complete_phone_login($code);
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
         if ($authorization['_'] === 'account.noPassword') {
             throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
         }
         if ($authorization['_'] === 'account.password') {
-            \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
         }
         if ($authorization['_'] === 'account.needSignup') {
-            \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('Registering new user', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
 
@@ -65,12 +65,12 @@ if ($MadelineProto === false) {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::VERBOSE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::NOTICE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::WARNING);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ERROR);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 if (!isset($MadelineProto->programmed_call)) {
@@ -139,7 +139,7 @@ $MadelineProto->get_updates(['offset' => -1]);
             }
         }
         foreach ($updates as $update) {
-            \danog\MadelineProto\Logger::log([$update]);
+            \danog\MadelineProto\Logger::log($update);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updateNewEncryptedMessage':

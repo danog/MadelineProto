@@ -61,7 +61,7 @@ class Serialization
             clearstatcache();
         }
         $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'w');
-        \danog\MadelineProto\Logger::log(['Waiting for exclusive lock of serialization lockfile...']);
+        \danog\MadelineProto\Logger::log('Waiting for exclusive lock of serialization lockfile...');
         flock($realpaths['lockfile'], LOCK_EX);
 
         try {
@@ -93,7 +93,7 @@ class Serialization
                 clearstatcache();
             }
             $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
-            \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
+            \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
             flock($realpaths['lockfile'], LOCK_SH);
 
             try {
@@ -114,7 +114,7 @@ class Serialization
             } catch (\danog\MadelineProto\Bug74586Exception $e) {
                 $unserialized = \danog\Serialization::unserialize($tounserialize);
             } catch (\danog\MadelineProto\Exception $e) {
-                Logger::log([(string) $e], Logger::ERROR);
+                Logger::log((string) $e, Logger::ERROR);
                 if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
                     $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $unserialized);
                 }

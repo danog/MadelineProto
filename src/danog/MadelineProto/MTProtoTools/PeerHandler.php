@@ -35,9 +35,9 @@ trait PeerHandler
                         try {
                             $this->get_pwr_chat($user['id'], false, true);
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                 case 'userEmpty':
@@ -62,9 +62,9 @@ trait PeerHandler
                         try {
                             $this->get_pwr_chat(-$chat['id'], $this->settings['peer']['full_fetch'], true);
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                 case 'channelEmpty':
@@ -86,9 +86,9 @@ trait PeerHandler
                                 $this->get_pwr_chat($this->to_supergroup($chat['id']), $this->settings['peer']['full_fetch'], true);
                             }
                         } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::WARNING);
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                     break;
@@ -548,9 +548,9 @@ trait PeerHandler
             file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
             $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
-            \danog\MadelineProto\Logger::log([$result], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log($result, \danog\MadelineProto\Logger::VERBOSE);
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::VERBOSE);
         }
         $this->qres = [];
         $this->last_stored = time() + 10;

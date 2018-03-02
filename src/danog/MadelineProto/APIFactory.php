@@ -126,7 +126,7 @@ class APIFactory
         $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
         $aargs['datacenter'] = $this->API->datacenter->curdc;
         if ($name === 'get_updates' && isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
-            Logger::log(["Didn't serialize in a while, doing that now..."]);
+            Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
         }
         if ($this->lua === false) {

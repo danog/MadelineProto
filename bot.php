@@ -18,19 +18,19 @@ $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb
 try {
     $MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
-//var_dump($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
-//var_dump($MadelineProto->API->settings['connection']);
+//\danog\MadelineProto\Logger::log($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
+//\danog\MadelineProto\Logger::log($MadelineProto->API->settings['connection']);
 $MadelineProto->session = 'bot.madeline';
 echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-    \danog\MadelineProto\Logger::log([$updates]);
+    \danog\MadelineProto\Logger::log($updates);
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         switch ($update['update']['_']) {

@@ -194,7 +194,7 @@ class Connection
     public function close_and_reopen()
     {
         $this->__destruct();
-        \danog\MadelineProto\Logger::log(['Reopening...'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Reopening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->must_open = true;
     }
 
@@ -247,7 +247,7 @@ class Connection
 
     public function read($length)
     {
-        //\danog\MadelineProto\Logger::log(["Asked to read $length"], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        //\danog\MadelineProto\Logger::log("Asked to read $length", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         switch ($this->protocol) {
             case 'obfuscated2':
                 $packet = '';
@@ -309,7 +309,7 @@ class Connection
             case 'https':
                 $response = $this->read_http_payload();
                 if ($response['code'] !== 200) {
-                    Logger::log([$response['body']]);
+                    Logger::log($response['body']);
 
                     throw new Exception($response['description'], $response['code']);
                 }

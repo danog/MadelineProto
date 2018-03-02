@@ -38,11 +38,11 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
         }
         $user = $user['InputUser'];
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id'])], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['generating_a']], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['generating_a'], \danog\MadelineProto\Logger::VERBOSE);
         $a = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['generating_g_a']], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['generating_g_a'], \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->check_G($g_a, $dh_config['p']);
         $res = $this->method_call('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
@@ -65,13 +65,13 @@ trait AuthKeyHandler
             }
         });
         if ($this->call_status($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_1'], $call['id'])]);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_1'], $call['id']));
 
             return false;
         }
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID())], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['generating_b']], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['generating_b'], \danog\MadelineProto\Logger::VERBOSE);
         $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
@@ -80,12 +80,12 @@ trait AuthKeyHandler
             $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id'])]);
+                \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
 
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
-                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['call_already_declined']]);
+                \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
                 $this->discard_call($call['id'], 'phoneCallDiscardReasonHangup');
 
                 return false;
@@ -111,11 +111,11 @@ trait AuthKeyHandler
             }
         });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_2'], $params['id'])]);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_2'], $params['id']));
 
             return false;
         }
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID())], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
@@ -149,11 +149,11 @@ trait AuthKeyHandler
             }
         });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_3'], $params['id'])]);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_3'], $params['id']));
 
             return false;
         }
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID())], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         if (hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['invalid_g_a']);
@@ -218,7 +218,7 @@ trait AuthKeyHandler
         if (!isset($this->calls[$call['id']])) {
             return;
         }
-        \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_discarding'], $call['id'])], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_discarding'], $call['id']), \danog\MadelineProto\Logger::VERBOSE);
 
         try {
             $res = $this->method_call('phone.discardCall', ['peer' => $call, 'duration' => time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
@@ -228,12 +228,12 @@ trait AuthKeyHandler
             }
         }
         if (!empty($rating)) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_set_rating'], $call['id'])], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_set_rating'], $call['id']), \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('phone.setCallRating', ['peer' => $call, 'rating' => $rating['rating'], 'comment' => $rating['comment']], ['datacenter' => $this->datacenter->curdc]);
         }
         if ($need_debug) {
             //} && isset($this->calls[$call['id']]->storage['not_modified'])) {
-            \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['call_debug_saving'], $call['id'])], \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['call_debug_saving'], $call['id']), \danog\MadelineProto\Logger::VERBOSE);
             $this->method_call('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
         $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];

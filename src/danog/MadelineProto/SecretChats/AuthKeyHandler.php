@@ -25,20 +25,20 @@ trait AuthKeyHandler
 
     public function accept_secret_chat($params)
     {
-        //var_dump($params['id'],$this->secret_chat_status($params['id']));
+        //\danog\MadelineProto\Logger::log($params['id'],$this->secret_chat_status($params['id']));
         if ($this->secret_chat_status($params['id']) !== 0) {
-            //var_dump($this->secret_chat_status($params['id']));
-            \danog\MadelineProto\Logger::log(["I've already accepted secret chat ".$params['id']]);
+            //\danog\MadelineProto\Logger::log($this->secret_chat_status($params['id']));
+            \danog\MadelineProto\Logger::log("I've already accepted secret chat ".$params['id']);
 
             return false;
         }
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
-        //var_dump($key);
+        //\danog\MadelineProto\Logger::log($key);
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
@@ -48,7 +48,7 @@ trait AuthKeyHandler
         $this->method_call('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
-        \danog\MadelineProto\Logger::log(['Secret chat '.$params['id'].' accepted successfully!'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Secret chat '.$params['id'].' accepted successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
 
     public function request_secret_chat($user)
@@ -58,18 +58,18 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         $user = $user['InputUser'];
-        \danog\MadelineProto\Logger::log(['Creating secret chat with '.$user['user_id'].'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Creating secret chat with '.$user['user_id'].'...', \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
-        \danog\MadelineProto\Logger::log(['Generating g_a...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->check_G($g_a, $dh_config['p']);
         $res = $this->method_call('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
         $this->handle_pending_updates();
         $this->get_updates_difference();
-        \danog\MadelineProto\Logger::log(['Secret chat '.$res['id'].' requested successfully!'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Secret chat '.$res['id'].' requested successfully!', \danog\MadelineProto\Logger::NOTICE);
 
         return $res['id'];
     }
@@ -77,8 +77,8 @@ trait AuthKeyHandler
     public function complete_secret_chat($params)
     {
         if ($this->secret_chat_status($params['id']) !== 1) {
-            //var_dump($this->secret_chat_status($params['id']));
-            \danog\MadelineProto\Logger::log(['Could not find and complete secret chat '.$params['id']]);
+            //\danog\MadelineProto\Logger::log($this->secret_chat_status($params['id']));
+            \danog\MadelineProto\Logger::log('Could not find and complete secret chat '.$params['id']);
 
             return false;
         }
@@ -88,7 +88,7 @@ trait AuthKeyHandler
         $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         unset($this->temp_requested_secret_chats[$params['id']]);
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
-        //var_dump($key);
+        //\danog\MadelineProto\Logger::log($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
             $this->discard_secret_chat($params['id']);
 
@@ -99,7 +99,7 @@ trait AuthKeyHandler
         $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
         $this->notify_layer($params['id']);
         $this->handle_pending_updates();
-        \danog\MadelineProto\Logger::log(['Secret chat '.$params['id'].' completed successfully!'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Secret chat '.$params['id'].' completed successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
 
     public function notify_layer($chat)
@@ -114,11 +114,11 @@ trait AuthKeyHandler
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return;
         }
-        \danog\MadelineProto\Logger::log(['Rekeying secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Rekeying secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log(['Generating a...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
-        \danog\MadelineProto\Logger::log(['Generating g_a...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->check_G($g_a, $dh_config['p']);
         $e = $this->random(8);
@@ -136,7 +136,7 @@ trait AuthKeyHandler
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my_exchange_id = new \phpseclib\Math\BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
             $other_exchange_id = new \phpseclib\Math\BigInteger($params['exchange_id'], -256);
-            //var_dump($my, $params);
+            //\danog\MadelineProto\Logger::log($my, $params);
             if ($my_exchange_id > $other_exchange_id) {
                 return;
             }
@@ -146,9 +146,9 @@ trait AuthKeyHandler
                 return;
             }
         }
-        \danog\MadelineProto\Logger::log(['Accepting rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Accepting rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
-        \danog\MadelineProto\Logger::log(['Generating b...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
@@ -172,7 +172,7 @@ trait AuthKeyHandler
 
             return;
         }
-        \danog\MadelineProto\Logger::log(['Committing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Committing rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
@@ -206,7 +206,7 @@ trait AuthKeyHandler
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
-        \danog\MadelineProto\Logger::log(['Completing rekeying of secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Completing rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $this->secret_chats[$chat]['rekeying'] = [0];
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
         $this->secret_chats[$chat]['key'] = $this->temp_rekeyed_secret_chats[$chat];
@@ -214,7 +214,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['updated'] = time();
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]], ['datacenter' => $this->datacenter->curdc]);
-        \danog\MadelineProto\Logger::log(['Secret chat '.$chat.' rekeyed successfully!'], \danog\MadelineProto\Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log('Secret chat '.$chat.' rekeyed successfully!', \danog\MadelineProto\Logger::VERBOSE);
 
         return true;
     }
@@ -238,8 +238,8 @@ trait AuthKeyHandler
 
     public function discard_secret_chat($chat)
     {
-        \danog\MadelineProto\Logger::log(['Discarding secret chat '.$chat.'...'], \danog\MadelineProto\Logger::VERBOSE);
-        //var_dump(debug_backtrace(0)[0]);
+        \danog\MadelineProto\Logger::log('Discarding secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
+        //\danog\MadelineProto\Logger::log(debug_backtrace(0)[0]);
         if (isset($this->secret_chats[$chat])) {
             unset($this->secret_chats[$chat]);
         }

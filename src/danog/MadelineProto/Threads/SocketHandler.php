@@ -34,7 +34,7 @@ class SocketHandler extends \Threaded implements \Collectable
         if ($this->error !== true) {
             if ($this->error === -404) {
                 if ($this->API->datacenter->sockets[$this->current]->temp_auth_key !== null) {
-                    \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['resetting_auth_key']], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['resetting_auth_key'], \danog\MadelineProto\Logger::WARNING);
                     $this->API->datacenter->sockets[$this->current]->temp_auth_key = null;
                     $this->API->init_authorization();
 

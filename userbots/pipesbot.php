@@ -19,34 +19,34 @@ $uMadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('pipesbot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
 }
 
 try {
     $uMadelineProto = new \danog\MadelineProto\API('pwr.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
 }
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($pipes_token);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
 if ($uMadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $uMadelineProto = new \danog\MadelineProto\API(array_merge($settings, ['updates' => ['handle_updates' => false]]));
     $sentCode = $uMadelineProto->phone_login(readline());
-    \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
     echo 'Enter the code you received: ';
     $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
     $authorization = $uMadelineProto->complete_phone_login($code);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
     if ($authorization['_'] === 'account.noPassword') {
         throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
     }
     if ($authorization['_'] === 'account.password') {
-        \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
         $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
     }
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
@@ -199,36 +199,36 @@ while (true) {
                         $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     }
 
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
                     try {
                         $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['user_id'], 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     }
 
                     try {
                         $toset['switch_pm'] = $sswitch;
                         $MadelineProto->messages->setInlineBotResults($toset);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     } catch (\danog\MadelineProto\Exception $e) {
-                        var_dump($e->getMessage());
+                        \danog\MadelineProto\Logger::log($e->getMessage());
                     }
                 }
         }

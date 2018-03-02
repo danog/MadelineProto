@@ -19,7 +19,7 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($pwrtelegram_debug_token);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
 function base64url_decode($data)
 {

@@ -32,7 +32,7 @@ class API extends APIFactory
                     clearstatcache();
                 }
                 $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
-                \danog\MadelineProto\Logger::log(['Waiting for shared lock of serialization lockfile...']);
+                \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
                 flock($realpaths['lockfile'], LOCK_SH);
 
                 try {
@@ -53,7 +53,7 @@ class API extends APIFactory
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
-                    Logger::log([(string) $e], Logger::ERROR);
+                    Logger::log((string) $e, Logger::ERROR);
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
                         $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $unserialized);
                     }
@@ -76,14 +76,14 @@ class API extends APIFactory
             return;
         }
         $this->API = new MTProto($params);
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['apifactory_start']], Logger::VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
         $this->APIFactory();
-        \danog\MadelineProto\Logger::log(['Ping...'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
         $pong = $this->ping(['ping_id' => 3]);
-        \danog\MadelineProto\Logger::log(['Pong: '.$pong['ping_id']], Logger::ULTRA_VERBOSE);
-        //\danog\MadelineProto\Logger::log(['Getting future salts...'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+        //\danog\MadelineProto\Logger::log('Getting future salts...', Logger::ULTRA_VERBOSE);
         //$this->future_salts = $this->get_future_salts(['num' => 3]);
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['madelineproto_ready']], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
     public function __wakeup()
@@ -150,7 +150,7 @@ class API extends APIFactory
         if ($params === '') {
             $params = $this->session;
         }
-        Logger::log([\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']]);
+        Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
 
         return Serialization::serialize($params, $this);
     }

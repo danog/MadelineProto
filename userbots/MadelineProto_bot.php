@@ -21,14 +21,14 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
 
 if (file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($MadelineProto_token);
-    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
 $offset = 0;
 $reply_markup = ['inline_keyboard' => [

@@ -35,7 +35,7 @@ $MadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('testing.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
-    var_dump($e->getMessage());
+    \danog\MadelineProto\Logger::log($e->getMessage());
 }
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
@@ -46,43 +46,43 @@ if (getenv('TEST_SECRET_CHAT') == '') {
     die('TEST_SECRET_CHAT is not defined in .env, please define it.'.PHP_EOL);
 }
 echo 'Loading settings...'.PHP_EOL;
-var_dump(getenv('MTPROTO_SETTINGS'));
+\danog\MadelineProto\Logger::log(getenv('MTPROTO_SETTINGS'));
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 //$settings['connection_settings']['all']['proxy'] = '\SocksProxy';
 //$settings['connection_settings']['all']['proxy_extra'] = ['address' => '127.0.0.1', 'port' => 1080];
 
-var_dump($settings);
+\danog\MadelineProto\Logger::log($settings);
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
     if (getenv('TRAVIS_COMMIT') == '') {
         $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
-        \danog\MadelineProto\Logger::log([$sentCode], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
         echo 'Enter the code you received: ';
         $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
         $authorization = $MadelineProto->complete_phone_login($code);
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
         if ($authorization['_'] === 'account.noPassword') {
             throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
         }
         if ($authorization['_'] === 'account.password') {
-            \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
         }
         if ($authorization['_'] === 'account.needSignup') {
-            \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
+            \danog\MadelineProto\Logger::log('Registering new user', \danog\MadelineProto\Logger::NOTICE);
             $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
     } else {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::VERBOSE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::NOTICE);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::WARNING);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::ERROR);
-\danog\MadelineProto\Logger::log(['hey'], \danog\MadelineProto\Logger::FATAL_ERROR);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::VERBOSE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::NOTICE);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::WARNING);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ERROR);
+\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
 //$MadelineProto->phone->createGroupCall(['channel' => -1001333587884
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
@@ -98,7 +98,7 @@ if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
         $MadelineProto->get_updates();
     }
     //$MadelineProto->messages->sendMessage(['peer' => $controller->getOtherID(), 'message' => 'Emojis: '.implode('', $controller->getVisualization())]);
-    var_dump($controller->configuration);
+    \danog\MadelineProto\Logger::log($controller->configuration);
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
         $MadelineProto->get_updates();
     }
@@ -109,7 +109,7 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
     while ($howmany > 0) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($updates as $update) {
-            \danog\MadelineProto\Logger::log([$update]);
+            \danog\MadelineProto\Logger::log($update);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updatePhoneCall':
@@ -132,16 +132,16 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
 
     $InputEncryptedChat = $MadelineProto->get_secret_chat($secret)['InputEncryptedChat'];
     $sentMessage = $MadelineProto->messages->sendEncrypted(['peer' => $InputEncryptedChat, 'message' => ['_' => 'decryptedMessage', 'media' => ['_' => 'decryptedMessageMediaEmpty'], 'ttl' => 10, 'message' => $message, 'entities' => [['_' => 'messageEntityCode', 'offset' => 0, 'length' => mb_strlen($message)]]]]); // should work with all layers
-    \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
     /*
     while (true) {
         $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-        //\danog\MadelineProto\Logger::log([$updates]);
+        //\danog\MadelineProto\Logger::log($updates);
         foreach ($updates as $update) {
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updateNewEncryptedMessage':
-                var_dump($update);
+                \danog\MadelineProto\Logger::log($update);
            }
            echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
         }
@@ -167,7 +167,7 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
     // Document, secrey chat
     $time = time();
     $inputEncryptedFile = $MadelineProto->upload_encrypted('tests/60', 'magic'); // This gets an inputFile object with file name magic
-    var_dump(time() - $time);
+    \danog\MadelineProto\Logger::log(time() - $time);
     $secret_media['document'] = ['peer' => $secret, 'file' => $inputEncryptedFile, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'key' => $inputEncryptedFile['key'], 'iv' => $inputEncryptedFile['iv'], 'file_name' => 'magic.magic', 'size' => filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
     // Video, secret chat
@@ -191,7 +191,7 @@ $media = [];
 
 // Sticker
 $inputFile = $MadelineProto->upload('tests/lel.webp');
-var_dump($inputFile);
+\danog\MadelineProto\Logger::log($inputFile);
 $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => mime_content_type('tests/lel.webp'), 'caption' => 'test', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]];
 
 // Video
@@ -208,7 +208,7 @@ $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'm
 // Document
 $time = time();
 $inputFile = $MadelineProto->upload('tests/60', 'magic'); // This gets an inputFile object with file name magic
-var_dump(time() - $time);
+\danog\MadelineProto\Logger::log(time() - $time);
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => $inputFile, 'mime_type' => 'magic/magic', 'caption' => 'This file was uploaded using MadelineProto', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
 $message = 'yay';
@@ -217,7 +217,7 @@ $mention = $mention['user_id']; // Selects only the numeric user id
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
     foreach ($media as $type => $inputMedia) {
         $type = $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
@@ -226,5 +226,5 @@ foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log([$sentMessage], \danog\MadelineProto\Logger::NOTICE);
+    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 }

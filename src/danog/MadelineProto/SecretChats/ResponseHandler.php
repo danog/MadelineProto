@@ -60,7 +60,7 @@ trait ResponseHandler
                         $update['message']['decrypted_message']['action']['end_seq_no'] -= $this->secret_chats[$update['message']['chat_id']]['out_seq_no_x'];
                         $update['message']['decrypted_message']['action']['start_seq_no'] /= 2;
                         $update['message']['decrypted_message']['action']['end_seq_no'] /= 2;
-                        \danog\MadelineProto\Logger::log(['Resending messages for secret chat '.$update['message']['chat_id']], \danog\MadelineProto\Logger::WARNING);
+                        \danog\MadelineProto\Logger::log('Resending messages for secret chat '.$update['message']['chat_id'], \danog\MadelineProto\Logger::WARNING);
                         foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $message) {
                             if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
                                 //throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['resending_unsupported']);

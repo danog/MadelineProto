@@ -33,7 +33,7 @@ trait Files
         }
         if ($cb === null) {
             $cb = function ($percent) {
-                \danog\MadelineProto\Logger::log(['Upload status: '.$percent.'%'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $part_size = 512 * 1024;
@@ -236,7 +236,7 @@ trait Files
         $file = realpath($file);
         $message_media = $this->get_download_info($message_media);
         $stream = fopen($file, 'r+b');
-        \danog\MadelineProto\Logger::log(['Waiting for lock of file to download...']);
+        \danog\MadelineProto\Logger::log('Waiting for lock of file to download...');
         flock($stream, LOCK_EX);
 
         try {
@@ -254,7 +254,7 @@ trait Files
     {
         if ($cb === null) {
             $cb = function ($percent) {
-                \danog\MadelineProto\Logger::log(['Download status: '.$percent.'%'], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $message_media = $this->get_download_info($message_media);
@@ -309,11 +309,11 @@ trait Files
                     $this->config['expires'] = -1;
                     $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
                 }
-                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['stored_on_cdn']], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
                 continue;
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
-                \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['cdn_reupload']], \danog\MadelineProto\Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
                 $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
 
                 try {
@@ -360,7 +360,7 @@ trait Files
             }
             $offset += strlen($res['bytes']);
             $downloaded_size += strlen($res['bytes']);
-            \danog\MadelineProto\Logger::log([fwrite($stream, $res['bytes'])], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(fwrite($stream, $res['bytes']), \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             if ($theend) {
                 break;
             }

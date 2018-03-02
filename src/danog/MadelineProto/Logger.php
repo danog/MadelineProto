@@ -88,7 +88,7 @@ class Logger
         self::class_exists();
     }
 
-    public static function log($params, $level = self::NOTICE)
+    public static function log($param, $level = self::NOTICE)
     {
         if (self::$mode === 4) {
             return call_user_func_array(self::$optional, [is_array($params) ? $params : [$params], $level]);
@@ -100,10 +100,9 @@ class Logger
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
-        foreach (is_array($params) ? $params : [$params] as $param) {
-            if (!is_string($param)) {
-                $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            }
+        if (!is_string($param)) {
+            $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
             $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
             switch (self::$mode) {
                 case 1:
@@ -116,6 +115,6 @@ class Logger
                     echo self::$isatty ? "\33[".self::$colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
                     break;
             }
-        }
+        
     }
 }

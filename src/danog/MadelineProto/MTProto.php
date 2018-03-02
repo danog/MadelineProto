@@ -106,12 +106,12 @@ class MTProto
         $this->emojis = json_decode(self::JSON_EMOJIS);
         \danog\MadelineProto\Logger::class_exists();
         // Connect to servers
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['inst_dc']], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!isset($this->datacenter)) {
             $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
         }
         // Load rsa keys
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['load_rsa']], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = new RSA($key);
             $this->rsa_keys[$key->fp] = $key;
@@ -120,7 +120,7 @@ class MTProto
          * ***********************************************************************
          * Define some needed numbers for BigInteger
          */
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['dh_prime_check_0']], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['dh_prime_check_0'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->zero = new \phpseclib\Math\BigInteger(0);
         $this->one = new \phpseclib\Math\BigInteger(1);
         $this->two = new \phpseclib\Math\BigInteger(2);
@@ -129,14 +129,14 @@ class MTProto
         $this->twoe1984 = new \phpseclib\Math\BigInteger('1751908409537131537220509645351687597690304110853111572994449976845956819751541616602568796259317428464425605223064365804210081422215355425149431390635151955247955156636234741221447435733643262808668929902091770092492911737768377135426590363166295684370498604708288556044687341394398676292971255828404734517580702346564613427770683056761383955397564338690628093211465848244049196353703022640400205739093118270803778352768276670202698397214556629204420309965547056893233608758387329699097930255380715679250799950923553703740673620901978370802540218870279314810722790539899334271514365444369275682816');
         $this->twoe2047 = new \phpseclib\Math\BigInteger('16158503035655503650357438344334975980222051334857742016065172713762327569433945446598600705761456731844358980460949009747059779575245460547544076193224141560315438683650498045875098875194826053398028819192033784138396109321309878080919047169238085235290822926018152521443787945770532904303776199561965192760957166694834171210342487393282284747428088017663161029038902829665513096354230157075129296432088558362971801859230928678799175576150822952201848806616643615613562842355410104862578550863465661734839271290328348967522998634176499319107762583194718667771801067716614802322659239302476074096777926805529798115328');
         $this->twoe2048 = new \phpseclib\Math\BigInteger('32317006071311007300714876688669951960444102669715484032130345427524655138867890893197201411522913463688717960921898019494119559150490921095088152386448283120630877367300996091750197750389652106796057638384067568276792218642619756161838094338476170470581645852036305042887575891541065808607552399123930385521914333389668342420684974786564569494856176035326322058077805659331026192708460314150258592864177116725943603718461857357598351152301645904403697613233287231227125684710820209725157101726931323469678542580656697935045997268352998638215525166389437335543602135433229604645318478604952148193555853611059596230656');
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['TL_translation']], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src']);
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc'])], Logger::NOTICE);
+                \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings['connection_settings']['default_dc'] = $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
                 }
@@ -195,7 +195,7 @@ class MTProto
         $force = false;
         $this->reset_session();
         if (!isset($this->v) || $this->v !== self::V) {
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['serialization_ofd']], Logger::WARNING);
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
                 if ($this->authorized === self::LOGGED_IN && strpos($dc_id, '_') === false && $socket->auth_key !== null && $socket->temp_auth_key !== null) {
                     $socket->authorized = true;
@@ -283,7 +283,7 @@ class MTProto
             $this->get_dialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
-            \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization']], Logger::NOTICE);
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             $this->get_updates_difference();
         }
     }
@@ -539,7 +539,7 @@ class MTProto
         }
         foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
-                \danog\MadelineProto\Logger::log([sprintf(\danog\MadelineProto\Lang::$current_lang['reset_session_seqno'], $id)], Logger::VERBOSE);
+                \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['reset_session_seqno'], $id), Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
@@ -604,7 +604,7 @@ class MTProto
                 $this->rsa_keys[$tempkey->fp] = $tempkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
-            \danog\MadelineProto\Logger::log([$e->getMessage()], \danog\MadelineProto\Logger::FATAL_ERROR);
+            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);
         }
     }
 
@@ -614,7 +614,7 @@ class MTProto
             $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
-        \danog\MadelineProto\Logger::log([\danog\MadelineProto\Lang::$current_lang['config_updated'], $this->config], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['config_updated'], $this->config, Logger::NOTICE);
     }
 
     public function parse_dc_options($dc_options)
@@ -642,7 +642,7 @@ class MTProto
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $curdc = $this->datacenter->curdc;
-        \danog\MadelineProto\Logger::log(['Got new DC options, reconnecting']);
+        \danog\MadelineProto\Logger::log('Got new DC options, reconnecting');
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = $curdc;
     }

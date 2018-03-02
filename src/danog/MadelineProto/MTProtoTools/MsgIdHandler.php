@@ -25,7 +25,7 @@ trait MsgIdHandler
         }
         $min_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta - 300))->bitwise_leftShift(32);
         if ($min_message_id->compare($new_message_id) > 0) {
-            \danog\MadelineProto\Logger::log(['Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').'], \danog\MadelineProto\Logger::WARNING);
+            \danog\MadelineProto\Logger::log('Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').', \danog\MadelineProto\Logger::WARNING);
         }
         $max_message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$aargs['datacenter']]->time_delta + 30))->bitwise_leftShift(32);
         if ($max_message_id->compare($new_message_id) < 0) {
@@ -52,11 +52,11 @@ trait MsgIdHandler
             $key = $this->get_max_id($aargs['datacenter'], true);
             if ($aargs['container']) {
                 if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) >= 0) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
                 if ($new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], true)) <= 0) {
-                    \danog\MadelineProto\Logger::log(['WARNING: Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.'], \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log('WARNING: Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             }
             if (count($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {

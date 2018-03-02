@@ -25,7 +25,7 @@ trait Constructors
         }
         mkdir('constructors');
         $this->docs_constructors = [];
-        \danog\MadelineProto\Logger::log(['Generating constructors documentation...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating constructors documentation...', \danog\MadelineProto\Logger::NOTICE);
         $got = [];
         foreach ($this->constructors->by_predicate_and_layer as $predicate => $id) {
             $data = $this->constructors->by_id[$id];
@@ -230,7 +230,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
             }
             file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
-        \danog\MadelineProto\Logger::log(['Generating constructors index...'], \danog\MadelineProto\Logger::NOTICE);
+        \danog\MadelineProto\Logger::log('Generating constructors index...', \danog\MadelineProto\Logger::NOTICE);
         ksort($this->docs_constructors);
         $last_namespace = '';
         foreach ($this->docs_constructors as $constructor => &$value) {
