@@ -19,7 +19,9 @@ trait BotAPI
     {
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
-    public function mb_strlen($text) {
+
+    public function mb_strlen($text)
+    {
         $length = 0;
         foreach (str_split($text) as $char) {
             $char = ord($char);
@@ -27,8 +29,10 @@ trait BotAPI
                 $length += 1 + ($char >= 0xf0);
             }
         }
+
         return $length;
     }
+
     public function parse_buttons($rows)
     {
         $newrows = [];
