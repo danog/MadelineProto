@@ -939,13 +939,13 @@ description: List of constructors
 <br><br>[$replyMarkupForceReply](../constructors/replyMarkupForceReply.md) = \['personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupForceReply"></a>  
 
 ***
-<br><br>[$replyMarkupInlineKeyboard](../constructors/replyMarkupInlineKeyboard.md) = \['rows' => \[[inlineKeyboardButton](../constructors/inlineKeyboardButton.md)\], \];<a name="replyMarkupInlineKeyboard"></a>  
+<br><br>[$replyMarkupInlineKeyboard](../constructors/replyMarkupInlineKeyboard.md) = \['rows' => \[[vector<inlineKeyboardButton](../constructors/vector<inlineKeyboardButton.md)\], \];<a name="replyMarkupInlineKeyboard"></a>  
 
 ***
 <br><br>[$replyMarkupRemoveKeyboard](../constructors/replyMarkupRemoveKeyboard.md) = \['personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupRemoveKeyboard"></a>  
 
 ***
-<br><br>[$replyMarkupShowKeyboard](../constructors/replyMarkupShowKeyboard.md) = \['rows' => \[[keyboardButton](../constructors/keyboardButton.md)\], 'resize_keyboard' => [Bool](../types/Bool.md), 'one_time' => [Bool](../types/Bool.md), 'personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupShowKeyboard"></a>  
+<br><br>[$replyMarkupShowKeyboard](../constructors/replyMarkupShowKeyboard.md) = \['rows' => \[[vector<keyboardButton](../constructors/vector<keyboardButton.md)\], 'resize_keyboard' => [Bool](../types/Bool.md), 'one_time' => [Bool](../types/Bool.md), 'personal' => [Bool](../types/Bool.md), \];<a name="replyMarkupShowKeyboard"></a>  
 
 ***
 <br><br>[$richTextBold](../constructors/richTextBold.md) = \['text' => [RichText](../types/RichText.md), \];<a name="richTextBold"></a>  
