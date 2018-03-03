@@ -562,6 +562,7 @@ trait PeerHandler
             $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             \danog\MadelineProto\Logger::log('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+
             return false;
         }
         if ($res['_'] === 'contacts.resolvedPeer') {
