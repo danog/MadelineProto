@@ -18,20 +18,13 @@ trait TLParams
     public function parse_params($key, $mtproto = false)
     {
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
-            if (preg_match('/^flags\\.\\d*\\?/', $param['type'])) {
-                $flag = explode('?', explode('flags.', $param['type'])[1]);
-                $param['pow'] = pow(2, $flag[0]);
-                $param['type'] = $flag[1];
+            if (preg_match('/^flags\.(\d*)\?(.*)/', $param['type'], $matches)) {
+                $param['pow'] = pow(2, $matches[1]);
+                $param['type'] = $matches[2];
             }
-            if (preg_match('/vector<.*>/i', $param['type'])) {
-                if (preg_match('/vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'vector';
-                }
-                if (preg_match('/Vector/', $param['type'])) {
-                    $param['subtype'] = preg_replace(['/.*</', '/>$/'], '', $param['type']);
-                    $param['type'] = 'Vector t';
-                }
+            if (preg_match('/(v)ector<(.*)>/i', $param['type'], $matches)) {
+                $param['type'] = $matches[1] === 'v' ? 'vector': 'Vector t';
+                $param['subtype'] = $matches[2];
                 $param['subtype'] = ($mtproto && $param['subtype'] === 'Message' ? 'MT' : '').$param['subtype'];
                 $param['subtype'] = $mtproto && $param['subtype'] === '%Message' ? '%MTMessage' : $param['subtype'];
             }

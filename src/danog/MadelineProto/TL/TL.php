@@ -85,14 +85,14 @@ trait TL
                         $type = 'constructors';
                         continue;
                     }
-                    if (preg_match('|^===\\d*===|', $line)) {
-                        $layer = (int) preg_replace('|\\D*|', '', $line);
+                    if (preg_match('|^===(\d*)===|', $line, $matches)) {
+                        $layer = (int) $matches[1];
                         continue;
                     }
-                    if (preg_match('/^vector#/', $line)) {
+                    if (strpos($line, 'vector#') === 0) {
                         continue;
                     }
-                    if (preg_match('/ \\?= /', $line)) {
+                    if (strpos($line, ' ?= ') !== false) {
                         continue;
                     }
                     $name = preg_replace(['/#.*/', '/\\s.*/'], '', $line);
@@ -101,8 +101,8 @@ trait TL
                     }
                     $clean = preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
                     $id = hash('crc32b', $clean);
-                    if (preg_match('/^[^\\s]+#/', $line)) {
-                        $nid = str_pad(preg_replace(['/^[^#]+#/', '/\\s.+/'], '', $line), 8, '0', \STR_PAD_LEFT);
+                    if (preg_match('/^[^#]+#([a-f0-9]*)/i', $line, $matches)) {
+                        $nid = str_pad($matches[1], 8, '0', \STR_PAD_LEFT);
                         if ($id !== $nid && $scheme_type !== 'botAPI') {
                             \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
                         }

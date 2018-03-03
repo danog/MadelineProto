@@ -18,6 +18,16 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait PeerHandler
 {
+
+    public function to_supergroup($id)
+    {
+        return -($id + pow(10, (int) floor(log($id, 10) + 3)));
+    }
+    public function is_supergroup($id)
+    {
+        $log = log(-$id, 10);
+        return ($log-intval($log))*1000<10;
+    }
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
@@ -185,21 +195,21 @@ trait PeerHandler
             }
         }
         if (is_string($id) && strpos($id, '#') !== false) {
-            if (preg_match('/^channel#/', $id)) {
-                $id = $this->to_supergroup(preg_replace('|\\D+|', '', $id));
+            if (preg_match('/^channel#(\d*)/', $id, $matches)) {
+                $id = $this->to_supergroup($matches[1]);
             }
-            if (preg_match('/^chat#/', $id)) {
-                $id = preg_replace('|\\D+|', '-', $id);
+            if (preg_match('/^chat#(\d*)/', $id, $matches)) {
+                $id = '-'.$matches[1];
             }
-            if (preg_match('/^user#/', $id)) {
-                $id = preg_replace('|\\D+|', '', $id);
+            if (preg_match('/^user#(\d*)/', $id, $marches)) {
+                $id = $matches[1];
             }
         }
         if (is_numeric($id)) {
             if (is_string($id)) {
                 $id = \danog\MadelineProto\Logger::$bigint ? (float) $id : (int) $id;
             }
-            if (!isset($this->chats[$id]) && $id < 0 && !preg_match('/^-100/', $id)) {
+            if (!isset($this->chats[$id]) && $id < 0 && !$this->is_supergroup($id)) {
                 $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
             }
             if (isset($this->chats[$id])) {
@@ -572,8 +582,4 @@ trait PeerHandler
         return false;
     }
 
-    public function to_supergroup($id)
-    {
-        return -($id + pow(10, (int) floor(log($id, 10) + 3)));
-    }
 }

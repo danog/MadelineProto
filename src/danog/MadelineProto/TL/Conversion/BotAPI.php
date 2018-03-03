@@ -23,8 +23,9 @@ trait BotAPI
     public function mb_strlen($text)
     {
         $length = 0;
-        foreach (str_split($text) as $char) {
-            $char = ord($char);
+        $textlength = strlen($text);
+        for ($x = 0; $x < $textlength; $x++) {
+            $char = ord($text[$x]);
             if (($char & 0xC0) != 0x80) {
                 $length += 1 + ($char >= 0xf0);
             }
@@ -347,69 +348,91 @@ trait BotAPI
         return $arguments;
     }
 
-    public function parse_node($node, &$entities, &$new_message, $recursive = true)
+    public function parse_node($node, &$entities, &$new_message, &$offset)
     {
         switch ($node->nodeName) {
             case 'br':
                 $new_message .= "\n";
+                $offset++;
                 break;
             case 'b':
             case 'strong':
                 $text = $this->html_entity_decode($node->textContent);
-                $entities[] = ['_' => 'messageEntityBold', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text)];
+                
+                $length = $this->mb_strlen($text);
+                $entities[] = ['_' => 'messageEntityBold', 'offset' => $offset, 'length' => $length];
+                
                 $new_message .= $text;
+                $offset += $length;
                 break;
             case 'i':
             case 'em':
                 $text = $this->html_entity_decode($node->textContent);
-                $entities[] = ['_' => 'messageEntityItalic', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text)];
+                
+                $length = $this->mb_strlen($text);
+                $entities[] = ['_' => 'messageEntityItalic', 'offset' => $offset, 'length' => $length];
+                
                 $new_message .= $text;
+                $offset += $length;
                 break;
             case 'code':
                 $text = $this->html_entity_decode($node->textContent);
-                $entities[] = ['_' => 'messageEntityCode', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text)];
+                
+                $length = $this->mb_strlen($text);
+                $entities[] = ['_' => 'messageEntityCode', 'offset' => $offset, 'length' => $length];
+                
                 $new_message .= $text;
+                $offset += $length;
                 break;
             case 'pre':
                 $text = $this->html_entity_decode($node->textContent);
+                
+                $length = $this->mb_strlen($text);
+                
                 $language = $node->getAttribute('language');
                 if ($language === null) {
                     $language = '';
                 }
-                $entities[] = ['_' => 'messageEntityPre', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text), 'language' => $language];
+                $entities[] = ['_' => 'messageEntityPre', 'offset' => $offset, 'length' => $length, 'language' => $language];
                 $new_message .= $text;
+                $offset += $length;
                 break;
             case 'p':
                 foreach ($node->childNodes as $node) {
-                    $this->parse_node($node, $entities, $new_message);
+                    $this->parse_node($node, $entities, $new_message, $offset);
                 }
                 break;
             case 'a':
                 $text = $this->html_entity_decode($node->textContent);
+                $length = $this->mb_strlen($text);
                 $href = $node->getAttribute('href');
                 if (preg_match('|mention:(.*)|', $href, $matches) || preg_match('|tg://user\?id=(.*)|', $href, $matches)) {
                     $mention = $this->get_info($matches[1]);
                     if (!isset($mention['InputUser'])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                     }
-                    $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text), 'user_id' => $mention['InputUser']];
+                    $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => $offset, 'length' => $length, 'user_id' => $mention['InputUser']];
                 } elseif (preg_match('|buttonurl:(.*)|', $href)) {
                     if (!isset($entities['buttons'])) {
                         $entities['buttons'] = [];
                     }
-                    if (preg_match('|:new|', substr($href, -4))) {
-                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', str_replace(':new', '', $href)), 'new' => true];
+                    if (strpos(substr($href, -4), '|:new|') !== false) {
+                        $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace(['buttonurl:', ':new'], '', $href), 'new' => true];
                     } else {
                         $entities['buttons'][] = ['_' => 'keyboardButtonUrl', 'text' => $text, 'url' => str_replace('buttonurl:', '', $href)];
                     }
                     break;
                 } else {
-                    $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => $this->mb_strlen($new_message), 'length' => $this->mb_strlen($text), 'url' => $href];
+                    $entities[] = ['_' => 'messageEntityTextUrl', 'offset' => $offset, 'length' => $length, 'url' => $href];
                 }
                 $new_message .= $text;
+                $offset += $length;
                 break;
             default:
-                $new_message .= $this->html_entity_decode($node->nodeValue);
+                $text = $this->html_entity_decode($node->textContent);
+                $length = $this->mb_strlen($text);
+                $new_message .= $text;
+                $offset += $length;
                 break;
         }
     }
@@ -432,8 +455,9 @@ trait BotAPI
             if (!isset($arguments['entities'])) {
                 $arguments['entities'] = [];
             }
+            $offset = 0;
             foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
-                $this->parse_node($node, $arguments['entities'], $new_message);
+                $this->parse_node($node, $arguments['entities'], $new_message, $offset);
             }
             if (isset($arguments['entities']['buttons'])) {
                 $arguments['reply_markup'] = $this->build_rows($arguments['entities']['buttons']);
