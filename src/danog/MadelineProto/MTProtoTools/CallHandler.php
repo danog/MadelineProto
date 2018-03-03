@@ -222,7 +222,7 @@ trait CallHandler
                     if ($this->authorized_dc === -1 && $method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) {
                         $this->authorized_dc = $this->datacenter->curdc;
                     }
-                   $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
+                    $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
                     \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     continue;
                 }
