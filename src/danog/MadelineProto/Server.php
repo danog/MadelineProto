@@ -20,10 +20,14 @@ class Server
 {
     private $settings;
     private $pids = [];
-    public function __construct($settings) {
+
+    public function __construct($settings)
+    {
         $this->settings = $settings;
     }
-    public function start() {
+
+    public function start()
+    {
         pcntl_signal(SIGTERM, [$this, 'sig_handler']);
         pcntl_signal(SIGINT, [$this, 'sig_handler']);
         pcntl_signal(SIGCHLD, [$this, 'sig_handler']);
@@ -36,26 +40,30 @@ class Server
             $this->handle($this->sock->accept());
         }
     }
-    private function handle($socket) {
+
+    private function handle($socket)
+    {
         $pid = pcntl_fork();
         if ($pid == -1) {
-             die('could not fork');
-        } else if ($pid) {
+            die('could not fork');
+        } elseif ($pid) {
             return $this->pids[] = $pid;
         }
         $handler = new \danog\MadelineProto\Server\Handler($socket);
         $handler->loop();
         die;
     }
-    public function __destruct() {
+
+    public function __destruct()
+    {
         foreach ($this->pid as $pid) {
             pcntl_wait($pid);
         }
     }
+
     public function sig_handler($sig)
     {
-        switch($sig)
-        {
+        switch ($sig) {
             case SIGTERM:
             case SIGINT:
                 exit();

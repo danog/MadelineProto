@@ -19,16 +19,21 @@ namespace danog\MadelineProto\Server;
 class Handler
 {
     private $socket;
-    public function __construct($socket) {
+
+    public function __construct($socket)
+    {
         $this->socket = $socket;
     }
-    public function loop() {
 
+    public function loop()
+    {
     }
-    public function read_payload() {
-        
+
+    public function read_payload()
+    {
     }
-    public function write_payload($payload) {
-        
+
+    public function write_payload($payload)
+    {
     }
 }
