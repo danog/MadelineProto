@@ -85,7 +85,7 @@ trait CallHandler
             $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
             \danog\MadelineProto\Logger::log('Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         }
-        $last_recv = $this->last_recv;
+        $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             if ($canunset = !$this->updates_state['sync_loading']) {
                 $this->updates_state['sync_loading'] = true;
@@ -185,7 +185,7 @@ trait CallHandler
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                         $last_error = 'Nothing in the socket';
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                        if ($res_count > 3) {
+                        if ($res_count > 3 && $last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv) {
                             $this->close_and_reopen($aargs['datacenter']);
                         }
                         continue; //2;
@@ -222,6 +222,7 @@ trait CallHandler
                     if ($this->authorized_dc === -1 && $method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) {
                         $this->authorized_dc = $this->datacenter->curdc;
                     }
+                   $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
                     \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     continue;
                 }
@@ -251,7 +252,7 @@ trait CallHandler
                 }
             }
             if ($server_answer === null) {
-                if ($last_recv === $this->last_recv && $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
+                if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv && $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
                     \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
                     $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
                     $this->init_authorization();
