@@ -18,16 +18,18 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait PeerHandler
 {
-
     public function to_supergroup($id)
     {
         return -($id + pow(10, (int) floor(log($id, 10) + 3)));
     }
+
     public function is_supergroup($id)
     {
         $log = log(-$id, 10);
-        return ($log-intval($log))*1000<10;
+
+        return ($log - intval($log)) * 1000 < 10;
     }
+
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
@@ -581,5 +583,4 @@ trait PeerHandler
 
         return false;
     }
-
 }

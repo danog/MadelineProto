@@ -358,37 +358,37 @@ trait BotAPI
             case 'b':
             case 'strong':
                 $text = $this->html_entity_decode($node->textContent);
-                
+
                 $length = $this->mb_strlen($text);
                 $entities[] = ['_' => 'messageEntityBold', 'offset' => $offset, 'length' => $length];
-                
+
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'i':
             case 'em':
                 $text = $this->html_entity_decode($node->textContent);
-                
+
                 $length = $this->mb_strlen($text);
                 $entities[] = ['_' => 'messageEntityItalic', 'offset' => $offset, 'length' => $length];
-                
+
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'code':
                 $text = $this->html_entity_decode($node->textContent);
-                
+
                 $length = $this->mb_strlen($text);
                 $entities[] = ['_' => 'messageEntityCode', 'offset' => $offset, 'length' => $length];
-                
+
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'pre':
                 $text = $this->html_entity_decode($node->textContent);
-                
+
                 $length = $this->mb_strlen($text);
-                
+
                 $language = $node->getAttribute('language');
                 if ($language === null) {
                     $language = '';

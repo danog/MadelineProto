@@ -23,7 +23,7 @@ trait TLParams
                 $param['type'] = $matches[2];
             }
             if (preg_match('/^(v|V)ector\<(.*)\>$/', $param['type'], $matches)) {
-                $param['type'] = $matches[1] === 'v' ? 'vector': 'Vector t';
+                $param['type'] = $matches[1] === 'v' ? 'vector' : 'Vector t';
                 $param['subtype'] = $matches[2];
                 $param['subtype'] = ($mtproto && $param['subtype'] === 'Message' ? 'MT' : '').$param['subtype'];
                 $param['subtype'] = $mtproto && $param['subtype'] === '%Message' ? '%MTMessage' : $param['subtype'];
