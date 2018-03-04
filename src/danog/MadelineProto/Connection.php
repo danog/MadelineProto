@@ -236,13 +236,10 @@ class Connection
                 }
 
                 return $wrote;
-                break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
-                break;
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                break;
         }
     }
 

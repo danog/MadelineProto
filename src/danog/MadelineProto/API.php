@@ -22,7 +22,6 @@ class API extends APIFactory
     public function __magic_construct($params = [])
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        set_exception_handler(['\\danog\\MadelineProto\\Serialization', 'serialize_all']);
         if (is_string($params)) {
             $realpaths = Serialization::realpaths($params);
             if (file_exists($realpaths['file'])) {

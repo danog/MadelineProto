@@ -56,7 +56,7 @@ if (!is_object($Lua)) {
 
 $offset = 0;
 while (true) {
-    $updates = $Lua->MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+    $updates = $Lua->MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
         $Lua->tdcli_update_callback($update['update']);

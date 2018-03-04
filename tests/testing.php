@@ -113,7 +113,7 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
     $howmany = readline('How many calls would you like me to handle? ');
     $offset = 0;
     while ($howmany > 0) {
-        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($updates as $update) {
             \danog\MadelineProto\Logger::log($update);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
@@ -141,7 +141,7 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
     \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
     /*
     while (true) {
-        $updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         //\danog\MadelineProto\Logger::log($updates);
         foreach ($updates as $update) {
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id

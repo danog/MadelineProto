@@ -120,13 +120,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 if (!extension_loaded('pthreads')) {
     if (extension_loaded('sockets')) {
-        class Socket
+        class SocketBase
         {
             private $sock;
 
-            public function __construct(int $domain, int $type, int $protocol)
+            public function __construct($sock)
             {
-                $this->sock = socket_create($domain, $type, $protocol);
+                $this->sock = $sock;
             }
 
             public function __destruct()
@@ -170,7 +170,11 @@ if (!extension_loaded('pthreads')) {
 
             public function accept()
             {
-                return socket_accept($this->sock);
+                if ($socket = socket_accept($this->sock)) {
+                    return new SocketBase($socket);
+                } else {
+                    return $socket;
+                }
             }
 
             public function connect(string $address, int $port = 0)
@@ -220,6 +224,13 @@ if (!extension_loaded('pthreads')) {
                 $port ? socket_getsockname($this->sock, $address, $ip) : socket_getsockname($this->sock, $address);
 
                 return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
+            }
+        }
+        class Socket extends SocketBase
+        {
+            public function __construct(int $domain, int $type, int $protocol)
+            {
+                parent::__construct(socket_create($domain, $type, $protocol));
             }
         }
     } else {
