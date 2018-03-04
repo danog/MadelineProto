@@ -38,7 +38,7 @@ class Stream
         $opt = stream_context_get_options($this->context);
         if (!is_array($opt[self::WRAPPER_NAME]) ||
         !isset($opt[self::WRAPPER_NAME]['handler']) ||
-        !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler)
+        !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler) ||
         !isset($opt[self::WRAPPER_NAME]['stream_id']) ||
         !is_integer($opt[self::WRAPPER_NAME]['stream_id'])) return false;
         $this->_handler = $opt[self::WRAPPER_NAME]['handler'];
