@@ -54,6 +54,9 @@ class Serialization
             $instance->API->setdem = false;
             $instance->API->__construct($instance->API->settings);
         }
+        if ($instance->API === null) {
+            return false;
+        }
         $instance->serialized = time();
         $realpaths = self::realpaths($filename);
         if (!file_exists($realpaths['lockfile'])) {
