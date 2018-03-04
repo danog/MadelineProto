@@ -38,20 +38,22 @@ class Server
         $this->sock->bind($this->settings['address'], $this->settings['port']);
         $this->sock->listen();
         $this->sock->setBlocking(true);
-        
+
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
         while (true) {
             pcntl_signal_dispatch();
+
             try {
                 if ($sock = $this->sock->accept()) {
                     $this->handle($sock);
-                }    
+                }
             } catch (\danog\MadelineProto\Exception $e) {
             }
         }
     }
+
     private function handle($socket)
     {
         $pid = pcntl_fork();
@@ -72,6 +74,7 @@ class Server
             foreach ($this->pids as $pid) {
                 pcntl_wait($pid);
             }
+
             return;
         }
         \danog\MadelineProto\Logger::log('Shutting fork '.getmypid().' down');
