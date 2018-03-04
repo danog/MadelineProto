@@ -79,6 +79,7 @@ class Logger
         if (!self::$can_getmypid) {
             return false;
         }
+
         try {
             if (self::$pid === null) {
                 self::$pid = getmypid();

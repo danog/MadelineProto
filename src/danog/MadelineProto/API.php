@@ -131,7 +131,7 @@ class API extends APIFactory
                 }
                 Logger::$processed_fork = true;
             }
-            
+
             return $this->API->__construct($value);
         }
 
