@@ -32,6 +32,9 @@ class Logger
     public static $bigint = true;
     public static $colors = [];
     public static $isatty = false;
+    public static $is_fork = false;
+    public static $can_getmypid = true;
+    public static $processed_fork = false;
     private static $pid;
 
     const ULTRA_VERBOSE = 5;
@@ -70,14 +73,20 @@ class Logger
 
     public static function is_fork()
     {
+        if (self::$is_fork) {
+            return true;
+        }
+        if (!self::$can_getmypid) {
+            return false;
+        }
         try {
             if (self::$pid === null) {
                 self::$pid = getmypid();
             }
 
-            return self::$pid !== getmypid();
+            return self::$is_fork = self::$pid !== getmypid();
         } catch (\danog\MadelineProto\Exception $e) {
-            return false;
+            return self::$can_getmypid = false;
         }
     }
 
