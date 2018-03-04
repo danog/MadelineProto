@@ -115,7 +115,6 @@ class APIFactory
     {
         $this->namespace = $namespace.'.';
         $this->API = $API;
-        $this->pid = getmypid();
     }
 
     public function __call($name, $arguments)
