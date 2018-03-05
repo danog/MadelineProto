@@ -166,7 +166,6 @@ class Connection
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                break;
         }
     }
 
@@ -188,7 +187,6 @@ class Connection
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                break;
         }
     }
 
@@ -275,7 +273,6 @@ class Connection
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                break;
         }
     }
 
@@ -322,6 +319,8 @@ class Connection
                 return $response['body'];
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
+            default:
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
         }
     }
 
@@ -358,7 +357,7 @@ class Connection
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
-                break;
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
         }
     }
 

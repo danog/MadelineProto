@@ -26,10 +26,14 @@ class Handler extends \danog\MadelineProto\Connection
     {
         $this->sock = $socket;
         $this->sock->setBlocking(true);
-        $this->protocol = $protocol;
+        $timeout = 2;
+        $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
+        $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+        $this->protocol = $extra;
         $this->construct_TL(['socket' => __DIR__.'/../TL_socket.tl']);
     }
     public function __destruct() {
+        \danog\MadelineProto\Logger::log('Closing socket in fork '.getmypid());
         unset($this->sock);
         $this->destruct_madeline();
         exit();
@@ -46,13 +50,11 @@ class Handler extends \danog\MadelineProto\Connection
     public function loop()
     {
         while (true) {
+            pcntl_signal_dispatch();
             $request_id = 0;
             try {
                 $message = $this->read_message();
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                continue;
-            }
-            if ($message === null) {
                 continue;
             }
             try {

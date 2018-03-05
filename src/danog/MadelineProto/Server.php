@@ -20,12 +20,13 @@ class Server
 {
     private $settings;
     private $pids = [];
+    private $mypid;
 
     public function __construct($settings)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $this->settings = $settings;
-        $this->main = getmypid();
+        $this->mypid = getmypid();
     }
 
     public function start()
@@ -47,7 +48,7 @@ class Server
             try {
                 if ($sock = $this->sock->accept()) {
                     $this->handle($sock);
-                }    
+                }
             } catch (\danog\MadelineProto\Exception $e) {
             }
         }
@@ -67,14 +68,16 @@ class Server
 
     public function __destruct()
     {
-        if (!\danog\MadelineProto\Logger::$is_fork) {
-            \danog\MadelineProto\Logger::log('Shutting main process down');
+        if ($this->mypid === getmypid()) {
+            \danog\MadelineProto\Logger::log('Shutting main process '.$this->mypid.' down');
+            unset($this->sock);
             foreach ($this->pids as $pid) {
+                \danog\MadelineProto\Logger::log("Waiting for $pid");
                 pcntl_wait($pid);
             }
+            \danog\MadelineProto\Logger::log("Done, closing main process");
             return;
         }
-        \danog\MadelineProto\Logger::log('Shutting fork '.getmypid().' down');
     }
 
     public function sig_handler($sig)
@@ -82,7 +85,6 @@ class Server
         switch ($sig) {
             case SIGTERM:
             case SIGINT:
-                Logger::log('Got SIGTERM/SIGINT in '.getmypid());
                 exit();
 
             case SIGCHLD:
