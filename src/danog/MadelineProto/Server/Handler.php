@@ -89,7 +89,7 @@ class Handler extends \danog\MadelineProto\Connection
         }
     }
 
-    public function on_request($method, $args)
+    public function on_request($request_id, $method, $args)
     {
         if (count($method) === 0 || count($method) > 2) {
             throw new \danog\MadelineProto\Exception('Invalid method called');

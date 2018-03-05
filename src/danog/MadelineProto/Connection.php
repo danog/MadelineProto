@@ -305,8 +305,8 @@ class Connection
                 $response = $this->read_http_payload();
                 if ($response['code'] !== 200) {
                     Logger::log($response['body']);
-
-                    throw new Exception($response['description'], $response['code']);
+                    return $this->pack_signed_int(-$response['code']);
+                    //throw new Exception($response['description'], $response['code']);
                 }
                 $close = $response['protocol'] === 'HTTP/1.0';
                 if (isset($response['headers']['connection'])) {
