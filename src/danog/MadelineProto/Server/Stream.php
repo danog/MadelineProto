@@ -13,7 +13,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\Server;
 
-
 class Stream
 {
     const WRAPPER_NAME = 'madelineSocket';
@@ -30,7 +29,8 @@ class Stream
             stream_wrapper_register(self::WRAPPER_NAME, get_class());
             self::$_isRegistered = true;
         }
-        return stream_context_create(array(self::WRAPPER_NAME => ['handler' => $handler, $stream_id]));
+
+        return stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, $stream_id]]);
     }
 
     public function stream_open($path, $mode, $options, &$opened_path)
@@ -38,11 +38,14 @@ class Stream
         $opt = stream_context_get_options($this->context);
         if (!is_array($opt[self::WRAPPER_NAME]) ||
         !isset($opt[self::WRAPPER_NAME]['handler']) ||
-        !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler)
+        !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler) ||
         !isset($opt[self::WRAPPER_NAME]['stream_id']) ||
-        !is_integer($opt[self::WRAPPER_NAME]['stream_id'])) return false;
+        !is_int($opt[self::WRAPPER_NAME]['stream_id'])) {
+            return false;
+        }
         $this->_handler = $opt[self::WRAPPER_NAME]['handler'];
         $this->_stream_id = $opt[self::WRAPPER_NAME]['stream_id'];
+
         return true;
     }
 
@@ -51,7 +54,7 @@ class Stream
         $this->handler->send_data($this->_stream_id, $data);
     }
 
-    public function stream_lock($mode) {
-
+    public function stream_lock($mode)
+    {
     }
-} 
+}

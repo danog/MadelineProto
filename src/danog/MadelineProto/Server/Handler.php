@@ -38,20 +38,26 @@ class Handler extends \danog\MadelineProto\Connection
         $this->destruct_madeline();
         exit();
     }
-    public function destruct_madeline() {
+
+    public function destruct_madeline()
+    {
         if ($this->madeline !== null) {
             $this->madeline->settings['logger'] = ['logger' => 0];
             $this->madeline->serialize();
             unset($this->madeline);
+
             return true;
         }
+
         return false;
     }
+
     public function loop()
     {
         while (true) {
             pcntl_signal_dispatch();
             $request_id = 0;
+
             try {
                 $message = $this->read_message();
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
@@ -77,10 +83,11 @@ class Handler extends \danog\MadelineProto\Connection
                 $this->send_exception($request_id, $e);
                 continue;
             }
-
         }
     }
-    public function on_request($method, $args) {
+
+    public function on_request($method, $args)
+    {
         if (count($method) === 0 || count($method) > 2) {
             throw new \danog\MadelineProto\Exception('Invalid method called');
         }
@@ -88,11 +95,12 @@ class Handler extends \danog\MadelineProto\Connection
             if (count($args) === 1 && is_array($args[0])) {
                 $args[0]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
                 $args[0]['updates']['callback'] = [$this, 'update_handler'];
-            } else if (count($args) === 2 && is_array($args[1])) {
+            } elseif (count($args) === 2 && is_array($args[1])) {
                 $args[1]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
                 $args[1]['updates']['callback'] = [$this, 'update_handler'];
             }
             $this->madeline = new \danog\MadelineProto\API(...$args);
+
             return true;
         }
         if ($method[0] === '__destruct') {
@@ -102,12 +110,12 @@ class Handler extends \danog\MadelineProto\Connection
             throw new \danog\MadelineProto\Exception('__construct was not called');
         }
         foreach ($args as &$arg) {
-            if (is_array($arg) && isset($arg['_'])){
+            if (is_array($arg) && isset($arg['_'])) {
                 if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
                     $arg = [$this, $arg['callback']];
                 }
                 if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
-                    $arg = fopen('madelineSocket://', 'r+b', false, Handler::getContext($this, $arg['stream_id']));
+                    $arg = fopen('madelineSocket://', 'r+b', false, self::getContext($this, $arg['stream_id']));
                 }
             }
         }
@@ -118,23 +126,34 @@ class Handler extends \danog\MadelineProto\Connection
             return $this->madeline->{$method[0]}->{$method[1]}(...$args);
         }
     }
-    public function send_exception($request_id, $e) {
+
+    public function send_exception($request_id, $e)
+    {
         echo $e;
         //$this->send_message($this->serialize_object(['type' => 'socketMessageException'], ['request_id' => $request_id, 'exception' => $e]));
     }
-    public function send_response($request_id, $response) {
+
+    public function send_response($request_id, $response)
+    {
         $this->send_message($this->serialize_object(['type' => 'socketMessageResponse'], ['request_id' => $request_id, 'data' => $response]));
     }
-    public function send_data($stream_id, $data) {
+
+    public function send_data($stream_id, $data)
+    {
         $this->send_message($this->serialize_object(['type' => 'socketMessageRawData'], ['stream_id' => $stream_id, 'data' => $data]));
     }
-    public function logger($message, $level) {
 
+    public function logger($message, $level)
+    {
     }
-    public function update_handler($update) {
+
+    public function update_handler($update)
+    {
         $this->send_message($this->serialize_object(['type' => 'socketMessageUpdate'], ['data' => $update]));
     }
-    public function __call($method, $args) {
+
+    public function __call($method, $args)
+    {
         $this->send_message($this->serialize_object(['type' => 'socketMessageRequest'], ['request_id' => 0, 'method' => $method, 'args' => $args]));
     }
 }

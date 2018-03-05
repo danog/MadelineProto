@@ -171,7 +171,7 @@ if (!extension_loaded('pthreads')) {
             public function accept()
             {
                 if ($socket = socket_accept($this->sock)) {
-                    return new SocketBase($socket);
+                    return new self($socket);
                 } else {
                     return $socket;
                 }

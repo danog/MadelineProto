@@ -39,12 +39,13 @@ class Server
         $this->sock->bind($this->settings['address'], $this->settings['port']);
         $this->sock->listen();
         $this->sock->setBlocking(true);
-        
+
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
         while (true) {
             pcntl_signal_dispatch();
+
             try {
                 if ($sock = $this->sock->accept()) {
                     $this->handle($sock);
@@ -53,6 +54,7 @@ class Server
             }
         }
     }
+
     private function handle($socket)
     {
         $pid = pcntl_fork();
