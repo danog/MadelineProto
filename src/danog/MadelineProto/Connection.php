@@ -305,6 +305,7 @@ class Connection
                 $response = $this->read_http_payload();
                 if ($response['code'] !== 200) {
                     Logger::log($response['body']);
+
                     return $this->pack_signed_int(-$response['code']);
                     //throw new Exception($response['description'], $response['code']);
                 }
