@@ -77,7 +77,8 @@ class Server
                 \danog\MadelineProto\Logger::log("Waiting for $pid");
                 pcntl_wait($pid);
             }
-            \danog\MadelineProto\Logger::log("Done, closing main process");
+            \danog\MadelineProto\Logger::log('Done, closing main process');
+
             return;
         }
     }

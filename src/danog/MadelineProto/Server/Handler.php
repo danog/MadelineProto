@@ -32,7 +32,9 @@ class Handler extends \danog\MadelineProto\Connection
         $this->protocol = $extra;
         $this->construct_TL(['socket' => __DIR__.'/../TL_socket.tl']);
     }
-    public function __destruct() {
+
+    public function __destruct()
+    {
         \danog\MadelineProto\Logger::log('Closing socket in fork '.getmypid());
         unset($this->sock);
         $this->destruct_madeline();
@@ -63,6 +65,7 @@ class Handler extends \danog\MadelineProto\Connection
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 continue;
             }
+
             try {
                 $message = $this->deserialize($message, ['type' => '', 'datacenter' => '']);
                 if ($message['_'] !== 'socketMessageRequest') {
