@@ -47,7 +47,7 @@ class Connection
     public $object_queue = [];
     public $ack_queue = [];
     public $i = [];
-    public $must_open = false;
+    public $must_open = true;
     public $last_recv = 0;
 
     public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
