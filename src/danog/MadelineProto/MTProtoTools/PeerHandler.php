@@ -233,7 +233,7 @@ trait PeerHandler
                 $id = $matches[2];
             } else {
                 $invite = $this->method_call('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
-var_dumP($invite);
+                var_dump($invite);
                 if (isset($invite['chat'])) {
                     return $this->get_info($invite['chat']);
                 } else {
