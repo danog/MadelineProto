@@ -543,6 +543,7 @@ trait PeerHandler
     }
     public function gen_participants_hash($ids) {
         $hash = 0;
+        if (\danog\MadelineProto\Logger::$bigint) return $hash;
         foreach ($ids as $userID) {
             $hash = (($hash * 20261) + 0x80000000 + $userID) % 0x80000000;
         }
