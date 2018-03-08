@@ -228,6 +228,19 @@ trait PeerHandler
 
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
+        if (preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $id, $matches)) {
+            if ($matches[1] === '') {
+                $id = $matches[2];
+            } else {
+                $invite = $this->method_call('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
+                var_dump($invite);
+                if (isset($invite['chat'])) {
+                    return $this->get_info($invite['chat']);
+                } else {
+                    throw new \danog\MadelineProto\Exception('You have not joined this chat');
+                }
+            }
+        }
         $id = strtolower(str_replace('@', '', $id));
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {

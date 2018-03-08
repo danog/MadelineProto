@@ -266,7 +266,7 @@ class MTProto
             $this->channels_state = [];
             $this->got_state = false;
         }
-        $this->connect_to_all_dcs();
+        //$this->connect_to_all_dcs();
         //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
