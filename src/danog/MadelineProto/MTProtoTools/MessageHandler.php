@@ -87,6 +87,8 @@ trait MessageHandler
                 $this->method_call('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500], ['datacenter' => $datacenter]);
             } elseif (isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) {
                 $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
+            } else {
+                throw new \danog\MadelineProto\Exception('Resend query');
             }
         }
         $payload = $this->datacenter->sockets[$datacenter]->read_message();

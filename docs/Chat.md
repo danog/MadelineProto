@@ -28,7 +28,7 @@ description: chat attributes, type and example
 |phone\_calls\_available|[Bool](API_docs/types/Bool.md) | Optional|Are phone calls available for that user?|
 |phone\_calls\_private|[Bool](API_docs/types/Bool.md) | Optional||
 |common\_chats\_count|[int](API_docs/types/int.md) | Optional|Number of chats in common with that user|
-|photo|[string](API_docs/types/string.md) | Optional|bot API file id of the profile picture|
+|photo|[string](API_docs/types/string.md) | Optional|bot API file object the profile picture|
 |title|[string](API_docs/types/string.md) | Optional|Chat title|
 |participants\_count|[int](API_docs/types/int.md) | Optional|Number of participants in the chat.|
 |kicked\_count|[int](API_docs/types/int.md) | Optional|Number of users kicked from the chat.|

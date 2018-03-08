@@ -177,7 +177,7 @@ trait CallHandler
                         // This method receives data from the socket, and parses stuff
                     } catch (\danog\MadelineProto\Exception $e) {
                         $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
-                        if (in_array($e->getMessage(), ['I had to recreate the temporary authorization key', 'Got bad message notification']) || $e->getCode() === 404) {
+                        if (in_array($e->getMessage(), ['Resend query', 'I had to recreate the temporary authorization key', 'Got bad message notification']) || $e->getCode() === 404) {
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);

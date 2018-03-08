@@ -233,7 +233,6 @@ trait PeerHandler
                 $id = $matches[2];
             } else {
                 $invite = $this->method_call('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
-                var_dump($invite);
                 if (isset($invite['chat'])) {
                     return $this->get_info($invite['chat']);
                 } else {
@@ -466,12 +465,12 @@ trait PeerHandler
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants'] && $fullfetch) {
             $res['participants'] = [];
             $limit = 200;
-            $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
+            $filters = ['channelParticipantsRecent', 'channelParticipantsSearch', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
             foreach ($filters as $filter) {
-                $offset = -$limit;
+                $offset = 0;
 
                 try {
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => 0], ['datacenter' => $this->datacenter->curdc]);
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
                         continue;
@@ -479,7 +478,10 @@ trait PeerHandler
                         throw $e;
                     }
                 }
+
+
                 $count = $gres['count'];
+
                 while ($offset <= $count) {
                     foreach ($gres['participants'] as $participant) {
                         $newres = [];
@@ -521,7 +523,8 @@ trait PeerHandler
                         }
                         $res['participants'][$participant['user_id']] = $newres;
                     }
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => 0], ['datacenter' => $this->datacenter->curdc]);
+                    //$gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += count($gres['participants']), 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
                     if (empty($gres['participants'])) {
                         break;
                     }
@@ -538,7 +541,13 @@ trait PeerHandler
 
         return $res;
     }
-
+    public function gen_participants_hash($ids) {
+        $hash = 0;
+        foreach ($ids as $userID) {
+            $hash = (($hash * 20261) + 0x80000000 + $userID) % 0x80000000;
+        }
+        return $hash;
+    }
     public function store_db($res, $force = false)
     {
         $settings = isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'];
