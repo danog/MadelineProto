@@ -1,12 +1,14 @@
 #!/usr/bin/env php
 <?php
-if(!function_exists("readline")) {
-    function readline($prompt = null){
-        if($prompt){
+if (!function_exists('readline')) {
+    function readline($prompt = null)
+    {
+        if ($prompt) {
             echo $prompt;
         }
-        $fp = fopen("php://stdin","r");
+        $fp = fopen('php://stdin', 'r');
         $line = rtrim(fgets($fp, 1024));
+
         return $line;
     }
 }
@@ -32,7 +34,7 @@ while (true) {
         $pid = pcntl_fork();
         if ($pid === -1) {
             die('Forking failed'.PHP_EOL);
-        } else if ($pid) {
+        } elseif ($pid) {
             echo "Created child with PID $pid".PHP_EOL;
         } else {
             switch ($update['update']['_']) {
