@@ -479,7 +479,6 @@ trait PeerHandler
                     }
                 }
 
-
                 $count = $gres['count'];
 
                 while ($offset <= $count) {
@@ -541,14 +540,20 @@ trait PeerHandler
 
         return $res;
     }
-    public function gen_participants_hash($ids) {
+
+    public function gen_participants_hash($ids)
+    {
         $hash = 0;
-        if (\danog\MadelineProto\Logger::$bigint) return $hash;
+        if (\danog\MadelineProto\Logger::$bigint) {
+            return $hash;
+        }
         foreach ($ids as $userID) {
             $hash = (($hash * 20261) + 0x80000000 + $userID) % 0x80000000;
         }
+
         return $hash;
     }
+
     public function store_db($res, $force = false)
     {
         $settings = isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'];
