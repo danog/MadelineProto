@@ -15,6 +15,8 @@ $InputUser = '@username'; // Username
 $InputUser = 44700; // bot API id (users)
 $InputUser = -492772765; // bot API id (chats)
 $InputUser = -10038575794; // bot API id (channels)
+$InputUser = 'https://t.me/danogentili'; // t.me URLs
+$InputUser = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 
 $InputUser = 'user#44700'; // tg-cli style id (users)
 $InputUser = 'chat#492772765'; // tg-cli style id (chats)

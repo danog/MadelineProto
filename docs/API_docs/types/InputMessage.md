@@ -7,6 +7,13 @@ description: constructors and methods of type InputMessage
 
 
 
+The following syntax can also be used:
+
+```
+$InputMessage = 142; // Numeric message ID
+```
+
+
 ### Possible values (constructors):
 
 [inputMessageID](../constructors/inputMessageID.md)  

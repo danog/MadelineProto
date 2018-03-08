@@ -126,14 +126,31 @@ description: constructors and methods of type '.$type.'
 $'.$type." = '@username'; // Username\n\n\$".$type.' = 44700; // bot API id (users)
 $'.$type.' = -492772765; // bot API id (chats)
 $'.$type.' = -10038575794; // bot API id (channels)
+$'.$type." = 'https://t.me/danogentili'; // t.me URLs
+\$".$type." = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 
-$'.$type." = 'user#44700'; // tg-cli style id (users)\n\$".$type." = 'chat#492772765'; // tg-cli style id (chats)\n\$".$type." = 'channel#38575794'; // tg-cli style id (channels)\n```\n\nA [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
+\$".$type." = 'user#44700'; // tg-cli style id (users)
+\$".$type." = 'chat#492772765'; // tg-cli style id (chats)
+\$".$type." = 'channel#38575794'; // tg-cli style id (channels)
+```
+
+A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
 $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+```
+
+
+';
+                }
+                if (in_array($type, ['InputMessage'])) {
+                    $header .= 'The following syntax can also be used:
+
+```
+$'.$type.' = 142; // Numeric message ID
 ```
 
 

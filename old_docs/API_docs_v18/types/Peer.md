@@ -15,6 +15,8 @@ $Peer = '@username'; // Username
 $Peer = 44700; // bot API id (users)
 $Peer = -492772765; // bot API id (chats)
 $Peer = -10038575794; // bot API id (channels)
+$Peer = 'https://t.me/danogentili'; // t.me URLs
+$Peer = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 
 $Peer = 'user#44700'; // tg-cli style id (users)
 $Peer = 'chat#492772765'; // tg-cli style id (chats)
