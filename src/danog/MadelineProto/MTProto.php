@@ -496,7 +496,7 @@ class MTProto
             // Need info ?
             'requests' => true,
         ]];
-        if ($settings === false) {
+        if (!is_array($settings)) {
             $settings = [];
         }
         $settings = array_replace_recursive($this->array_cast_recursive($default_settings, true), $this->array_cast_recursive($settings, true));
@@ -667,7 +667,6 @@ class MTProto
         } catch (RPCErrorException $e) {
             return false;
         }
-
         return $this->authorization['user'];
     }
 
