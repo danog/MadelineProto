@@ -209,7 +209,6 @@ class Connection
             throw new Bug74586Exception();
         }
         $this->time_delta = 0;
-        //$this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
     }
 
     public function write($what, $length = null)

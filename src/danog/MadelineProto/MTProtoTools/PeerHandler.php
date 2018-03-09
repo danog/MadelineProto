@@ -115,9 +115,9 @@ trait PeerHandler
     {
         try {
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
-        } catch (\danog\MadelineProto\Exception $e) {
-            return $e->getMessage() === 'Chat forbidden';
         } catch (\danog\MadelineProto\RPCErrorException $e) {
+            if ($e->rpc === 'CHAT_FORBIDDEN') return true;
+            if ($e->rpc === 'CHANNEL_PRIVATE') return true;
             return false;
         }
     }
@@ -191,6 +191,10 @@ trait PeerHandler
                 case 'peerChannel':
                     $id = $this->to_supergroup($id['channel_id']);
                     break;
+                case 'chatForbidden':
+                case 'channelForbidden':
+                    throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
+
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
                     break;
@@ -215,7 +219,13 @@ trait PeerHandler
                 $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
             }
             if (isset($this->chats[$id])) {
-                return $this->gen_all($this->chats[$id]);
+                try {
+                    return $this->gen_all($this->chats[$id]);
+                } catch (\danog\MadelineProto\Exception $e) {
+                    if ($e->getMessage() === 'This peer is not present in the internal peer database') {
+                        unset($this->chats[$id]);
+                    } else throw $e;
+                }
             }
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
                 $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
@@ -294,7 +304,7 @@ trait PeerHandler
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':
-                throw new \danog\MadelineProto\Exception('Chat forbidden');
+                throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
@@ -479,6 +489,7 @@ trait PeerHandler
                     }
                 }
 
+                if ($gres['_'] === 'channels.channelParticipantsNotModified') continue;
                 $count = $gres['count'];
 
                 while ($offset <= $count) {
@@ -543,6 +554,7 @@ trait PeerHandler
 
     public function gen_participants_hash($ids)
     {
+        return 0;
         $hash = 0;
         if (\danog\MadelineProto\Logger::$bigint) {
             return $hash;

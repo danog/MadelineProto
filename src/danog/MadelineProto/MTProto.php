@@ -216,6 +216,9 @@ class MTProto
             if (isset($settings['authorization']['rsa_key'])) {
                 unset($settings['authorization']['rsa_key']);
             }
+            if (!isset($this->full_chats)) $this->full_chats = [];
+            if (!isset($this->secret_chats)) $this->secret_chats = [];
+
             foreach ($this->full_chats as $id => $full) {
                 $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
             }
@@ -266,7 +269,7 @@ class MTProto
             $this->channels_state = [];
             $this->got_state = false;
         }
-        //$this->connect_to_all_dcs();
+        $this->connect_to_all_dcs();
         //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
