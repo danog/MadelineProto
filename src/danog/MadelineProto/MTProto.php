@@ -667,6 +667,7 @@ class MTProto
         } catch (RPCErrorException $e) {
             return false;
         }
+
         return $this->authorization['user'];
     }
 
