@@ -479,26 +479,61 @@ trait PeerHandler
             }
         }
         if (!isset($res['participants']) && isset($res['can_view_participants']) && $res['can_view_participants'] && $fullfetch) {
+            $total_count = (isset($res['participants_count']) ? $res['participants_count'] : 0) + (isset($res['admins_count']) ? $res['admins_count'] : 0) + (isset($res['kicked_count']) ? $res['kicked_count'] : 0) + (isset($res['banned_count']) ? $res['banned_count'] : 0);
             $res['participants'] = [];
             $limit = 200;
-            $filters = ['channelParticipantsRecent', 'channelParticipantsSearch', 'channelParticipantsAdmins', 'channelParticipantsKicked', 'channelParticipantsBots', 'channelParticipantsBanned'];
+            $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsBots'];
             foreach ($filters as $filter) {
-                $offset = 0;
+                $this->fetch_participants($full['InputChannel'], $filter, '', $res);
+            }
+            $q = '';
+            
+            $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
+            foreach ($filters as $filter) {
+                $this->recurse_alphabet_search_participants($full['InputChannel'], $filter, $q, $total_count, $res);
+            }
+            
+                
+            $res['participants'] = array_values($res['participants']);
+        }
+        if (!$fullfetch) {
+            unset($res['participants']);
+        }
+        if ($fullfetch || $send) {
+            $this->store_db($res);
+        }
 
+        return $res;
+    }
+    public function recurse_alphabet_search_participants($channel, $filter, $q, $total_count, &$res) {
+        if (!$this->fetch_participants($channel, $filter, $q, $res)) return false;
+        
+        for ($x = 'a'; $x !== 'aa' && $total_count > count($res['participants']); $x++) {
+            
+            $this->recurse_alphabet_search_participants($channel, $filter, $q.$x, $total_count, $res);
+            
+        }
+    }
+    public function fetch_participants($channel, $filter, $q, &$res) {
+                $offset = 0;
+                $limit = 200;
+                $has_more = false;
+                
                 try {
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
-                        continue;
+                        return $has_more;
                     } else {
                         throw $e;
                     }
                 }
-
                 if ($gres['_'] === 'channels.channelParticipantsNotModified') {
-                    continue;
+                    return $has_more;
                 }
                 $count = $gres['count'];
+                $offset += count($gres['participants']);
+                $has_more = $count === $limit;
 
                 while ($offset <= $count) {
                     foreach ($gres['participants'] as $participant) {
@@ -542,27 +577,15 @@ trait PeerHandler
                         $res['participants'][$participant['user_id']] = $newres;
                     }
                     //$gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
-                    $gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += count($gres['participants']), 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
-                    if (empty($gres['participants'])) {
-                        break;
-                    }
+                    $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset += count($gres['participants']), 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
+                    
+                    if ($gres['_'] === 'channels.channelParticipantsNotModified' || empty($gres['participants'])) return $has_more;
                 }
-            }
-            $res['participants'] = array_values($res['participants']);
-        }
-        if (!$fullfetch) {
-            unset($res['participants']);
-        }
-        if ($fullfetch || $send) {
-            $this->store_db($res);
-        }
-
-        return $res;
+                return $has_more;
     }
-
     public function gen_participants_hash($ids)
     {
-        return 0;
+        //return 0;
         $hash = 0;
         if (\danog\MadelineProto\Logger::$bigint) {
             return $hash;
