@@ -131,7 +131,7 @@ class API extends APIFactory
                 Logger::$processed_fork = true;
             }
 
-            return $this->API->__construct($value);
+            return $this->API->__construct(array_replace_recursive($this->API->settings, $value));
         }
 
         return $this->API->storage[$name] = $value;

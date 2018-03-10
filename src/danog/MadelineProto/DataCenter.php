@@ -45,17 +45,6 @@ class DataCenter
         }
     }
 
-    public function dc_disconnect($dc_number)
-    {
-        if ($this->curdc === $dc_number) {
-            $this->curdc = 0;
-        }
-        if (isset($this->sockets[$dc_number])) {
-            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $dc_number), \danog\MadelineProto\Logger::VERBOSE);
-            unset($this->sockets[$dc_number]);
-        }
-    }
-
     public function dc_connect($dc_number)
     {
         if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
