@@ -26,6 +26,7 @@ trait PeerHandler
     public function is_supergroup($id)
     {
         $log = log(-$id, 10);
+
         return ($log - intval($log)) * 1000 < 10;
     }
 
@@ -491,7 +492,7 @@ trait PeerHandler
             foreach ($filters as $filter) {
                 $this->recurse_alphabet_search_participants($full['InputChannel'], $filter, $q, $total_count, $res);
             }
-            \danog\MadelineProto\Logger::log("Fetched ".count($res['participants'])." out of $total_count");
+            \danog\MadelineProto\Logger::log('Fetched '.count($res['participants'])." out of $total_count");
             $res['participants'] = array_values($res['participants']);
         }
         if (!$fullfetch) {
@@ -581,17 +582,20 @@ trait PeerHandler
                         }
                 $res['participants'][$participant['user_id']] = $newres;
             }
-            \danog\MadelineProto\Logger::log("Fetched channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.count($gres['participants'])." participants out of ".$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
+            \danog\MadelineProto\Logger::log("Fetched channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.count($gres['participants']).' participants out of '.$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
             $offset += count($gres['participants']);
         } while (count($gres['participants']));
 
         return $has_more;
     }
-    
-    public function fetch_participants_cache($channel, $filter, $q, $offset, $limit) {
+
+    public function fetch_participants_cache($channel, $filter, $q, $offset, $limit)
+    {
         return $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit];
     }
-    public function store_participants_cache($gres, $channel, $filter, $q, $offset, $limit) {
+
+    public function store_participants_cache($gres, $channel, $filter, $q, $offset, $limit)
+    {
         unset($gres['users']);
         if (\danog\MadelineProto\Logger::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
@@ -599,7 +603,7 @@ trait PeerHandler
                 $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($participant['user_id']))->divide($this->zeroeight)[1];
             }
             $gres['hash'] = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
-       } else {
+        } else {
             $hash = 0;
             foreach ($gres['participants'] as $participant) {
                 $hash = (($hash * 20261) + 0x80000000 + $participant['user_id']) % 0x80000000;

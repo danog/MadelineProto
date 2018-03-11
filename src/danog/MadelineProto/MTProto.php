@@ -98,7 +98,6 @@ class MTProto
     public $storage = [];
     private $emojis;
     private $postpone_updates = false;
-    
 
     public function __magic_construct($settings = [])
     {
