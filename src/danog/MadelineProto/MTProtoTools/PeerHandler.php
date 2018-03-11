@@ -35,7 +35,13 @@ trait PeerHandler
         foreach ($users as $key => $user) {
             if (!isset($user['access_hash'])) {
                 if (isset($user['username']) && !isset($this->chats[$user['id']])) {
-                    $this->get_pwr_chat($user['username'], false, true);
+                    try {
+                        $this->get_pwr_chat($user['username'], false, true);
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    }
                 }
                 continue;
             }
@@ -115,6 +121,8 @@ trait PeerHandler
     {
         try {
             return isset($this->chats[$this->get_info($id)['bot_api_id']]);
+        } catch (\danog\MadelineProto\Exception $e) {
+            return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CHAT_FORBIDDEN') {
                 return true;
@@ -656,7 +664,7 @@ trait PeerHandler
             $this->qres = [];
             $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log("======= COULD NOT STORE IN DB DUE TO ".$e->getMessage()." =============", \danog\MadelineProto\Logger::VERBOSE);
         }
     }
 

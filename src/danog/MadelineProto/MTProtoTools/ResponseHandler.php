@@ -326,10 +326,6 @@ trait ResponseHandler
         return $only_updates;
     }
 
-    public function handle_messages_threaded()
-    {
-    }
-
     public function handle_rpc_error($server_answer, &$aargs)
     {
         if (in_array($server_answer['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {

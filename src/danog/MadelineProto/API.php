@@ -18,6 +18,7 @@ class API extends APIFactory
     use \danog\Serializable;
     public $session;
     public $serialized = 0;
+    public $API;
 
     public function __magic_construct($params = [])
     {
@@ -25,7 +26,6 @@ class API extends APIFactory
         if (is_string($params)) {
             $realpaths = Serialization::realpaths($params);
             if (file_exists($realpaths['file'])) {
-                $this->session = $realpaths['file'];
                 if (!file_exists($realpaths['lockfile'])) {
                     touch($realpaths['lockfile']);
                     clearstatcache();
@@ -71,6 +71,7 @@ class API extends APIFactory
             if (isset($unserialized->API)) {
                 $this->API = $unserialized->API;
                 $this->APIFactory();
+                $this->session = $realpaths['file'];
             }
 
             return;
@@ -88,7 +89,6 @@ class API extends APIFactory
 
     public function __wakeup()
     {
-        //if (method_exists($this->API, 'wakeup')) $this->API = $this->API->wakeup();
         $this->APIFactory();
     }
 
