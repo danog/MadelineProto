@@ -32,7 +32,7 @@ class Serialization
 
     public static function realpaths($file)
     {
-        if ($file[0] !== '/') {
+        if (($file[0] !== '/') && ($file[1] !== ':')) {
             $file = getcwd().'/'.$file;
         }
 
