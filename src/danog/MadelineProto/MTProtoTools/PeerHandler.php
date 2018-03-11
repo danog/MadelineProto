@@ -26,7 +26,6 @@ trait PeerHandler
     public function is_supergroup($id)
     {
         $log = log(-$id, 10);
-
         return ($log - intval($log)) * 1000 < 10;
     }
 
@@ -439,15 +438,15 @@ trait PeerHandler
         if (isset($res['participants']) && $fullfetch) {
             foreach ($res['participants'] as $key => $participant) {
                 $newres = [];
-                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
+                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, true);
                 if (isset($participant['inviter_id'])) {
-                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, true);
                 }
                 if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, false);
+                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, true);
                 }
                 if (isset($participant['kicked_by'])) {
-                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, false);
+                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, true);
                 }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
@@ -482,9 +481,9 @@ trait PeerHandler
             $total_count = (isset($res['participants_count']) ? $res['participants_count'] : 0) + (isset($res['admins_count']) ? $res['admins_count'] : 0) + (isset($res['kicked_count']) ? $res['kicked_count'] : 0) + (isset($res['banned_count']) ? $res['banned_count'] : 0);
             $res['participants'] = [];
             $limit = 200;
-            $filters = ['channelParticipantsRecent', 'channelParticipantsAdmins', 'channelParticipantsBots'];
+            $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
             foreach ($filters as $filter) {
-                $this->fetch_participants($full['InputChannel'], $filter, '', $res);
+                $this->fetch_participants($full['InputChannel'], $filter, '', $total_count, $res);
             }
             $q = '';
 
@@ -492,7 +491,7 @@ trait PeerHandler
             foreach ($filters as $filter) {
                 $this->recurse_alphabet_search_participants($full['InputChannel'], $filter, $q, $total_count, $res);
             }
-
+            \danog\MadelineProto\Logger::log("Fetched ".count($res['participants'])." out of $total_count");
             $res['participants'] = array_values($res['participants']);
         }
         if (!$fullfetch) {
@@ -507,7 +506,7 @@ trait PeerHandler
 
     public function recurse_alphabet_search_participants($channel, $filter, $q, $total_count, &$res)
     {
-        if (!$this->fetch_participants($channel, $filter, $q, $res)) {
+        if (!$this->fetch_participants($channel, $filter, $q, $total_count, $res)) {
             return false;
         }
 
@@ -516,40 +515,43 @@ trait PeerHandler
         }
     }
 
-    public function fetch_participants($channel, $filter, $q, &$res)
+    public function fetch_participants($channel, $filter, $q, $total_count, &$res)
     {
         $offset = 0;
         $limit = 200;
         $has_more = false;
+        $cached = false;
 
-        try {
-            $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
-                return $has_more;
-            } else {
-                throw $e;
+        do {
+            try {
+                $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->get_participants_hash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
+                    return $has_more;
+                } else {
+                    throw $e;
+                }
             }
-        }
-        if ($gres['_'] === 'channels.channelParticipantsNotModified') {
-            return $has_more;
-        }
-        $count = $gres['count'];
-        $offset += count($gres['participants']);
-        $has_more = $count === $limit;
 
-        while ($offset <= $count) {
+            if ($cached = $gres['_'] === 'channels.channelParticipantsNotModified') {
+                $gres = $this->fetch_participants_cache($channel, $filter, $q, $offset, $limit);
+            } else {
+                $this->store_participants_cache($gres, $channel, $filter, $q, $offset, $limit);
+            }
+
+            $has_more = $gres['count'] === 10000;
+
             foreach ($gres['participants'] as $participant) {
                 $newres = [];
-                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, false);
+                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, true);
                 if (isset($participant['inviter_id'])) {
-                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, false);
+                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, true);
                 }
                 if (isset($participant['kicked_by'])) {
-                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, false);
+                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, true);
                 }
                 if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, false);
+                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, true);
                 }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
@@ -579,29 +581,37 @@ trait PeerHandler
                         }
                 $res['participants'][$participant['user_id']] = $newres;
             }
-            //$gres = $this->method_call('channels.getParticipants', ['channel' => $full['InputChannel'], 'filter' => ['_' => $filter, 'q' => ''], 'offset' => $offset += $limit, 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
-            $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset += count($gres['participants']), 'limit' => $limit, 'hash' => $this->gen_participants_hash(array_keys($res['participants']))], ['datacenter' => $this->datacenter->curdc]);
-
-            if ($gres['_'] === 'channels.channelParticipantsNotModified' || empty($gres['participants'])) {
-                return $has_more;
-            }
-        }
+            \danog\MadelineProto\Logger::log("Fetched channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.count($gres['participants'])." participants out of ".$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
+            $offset += count($gres['participants']);
+        } while (count($gres['participants']));
 
         return $has_more;
     }
-
-    public function gen_participants_hash($ids)
-    {
-        //return 0;
-        $hash = 0;
+    
+    public function fetch_participants_cache($channel, $filter, $q, $offset, $limit) {
+        return $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit];
+    }
+    public function store_participants_cache($gres, $channel, $filter, $q, $offset, $limit) {
+        unset($gres['users']);
         if (\danog\MadelineProto\Logger::$bigint) {
-            return $hash;
+            $hash = new \phpseclib\Math\BigInteger(0);
+            foreach ($gres['participants'] as $participant) {
+                $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($participant['user_id']))->divide($this->zeroeight)[1];
+            }
+            $gres['hash'] = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
+       } else {
+            $hash = 0;
+            foreach ($gres['participants'] as $participant) {
+                $hash = (($hash * 20261) + 0x80000000 + $participant['user_id']) % 0x80000000;
+            }
+            $gres['hash'] = $hash;
         }
-        foreach ($ids as $userID) {
-            $hash = (($hash * 20261) + 0x80000000 + $userID) % 0x80000000;
-        }
+        $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
+    }
 
-        return $hash;
+    public function get_participants_hash($channel, $filter, $q, $offset, $limit)
+    {
+        return isset($this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit]) ? $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit]['hash'] : 0;
     }
 
     public function store_db($res, $force = false)
@@ -639,11 +649,11 @@ trait PeerHandler
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
             $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s -o '.escapeshellarg($path.'.log').' >/dev/null 2>/dev/null & ');
             \danog\MadelineProto\Logger::log($result, \danog\MadelineProto\Logger::VERBOSE);
+            $this->qres = [];
+            $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
             \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::VERBOSE);
         }
-        $this->qres = [];
-        $this->last_stored = time() + 10;
     }
 
     public function resolve_username($username)
