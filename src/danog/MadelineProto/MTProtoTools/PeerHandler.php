@@ -664,7 +664,7 @@ trait PeerHandler
             $this->qres = [];
             $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log("======= COULD NOT STORE IN DB DUE TO ".$e->getMessage()." =============", \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
         }
     }
 
