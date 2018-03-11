@@ -639,7 +639,7 @@ trait PeerHandler
             }
             $this->qres[] = $res;
         }
-        if ($this->last_stored < time() && !$force) {
+        if ($this->last_stored > time() && !$force) {
             return false;
         }
         if (empty($this->qres)) {
@@ -656,7 +656,7 @@ trait PeerHandler
             $this->qres = [];
             $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log("======= COULD NOT STORE IN DB DUE TO ".$e->getMessage()." =============", \danog\MadelineProto\Logger::VERBOSE);
         }
     }
 
