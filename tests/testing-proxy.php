@@ -38,8 +38,6 @@ if (file_exists('web_data.php')) {
 /**
  * Set default context proxy for file_get_contents
  * 
- * It would be nice if 
- * 
  */
 
 $default_opts = array(
