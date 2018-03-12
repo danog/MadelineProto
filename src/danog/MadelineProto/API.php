@@ -20,7 +20,7 @@ class API extends APIFactory
     public $serialized = 0;
     public $API;
 
-    public function __magic_construct($params = [])
+    public function __magic_construct($params = [], $settings = [])
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (is_string($params)) {
@@ -62,19 +62,18 @@ class API extends APIFactory
                 if ($unserialized instanceof \danog\PlaceHolder) {
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 }
-            } else {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
+                if ($unserialized === false) {
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
+                }
+                if (isset($unserialized->API)) {
+                    $this->API = $unserialized->API;
+                    $this->APIFactory();
+                    $this->session = $realpaths['file'];
+                }
+                return;
             }
-            if ($unserialized === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
-            }
-            if (isset($unserialized->API)) {
-                $this->API = $unserialized->API;
-                $this->APIFactory();
-                $this->session = $realpaths['file'];
-            }
-
-            return;
+            $this->session = $realpaths['file'];
+            $params = $settings;
         }
         $this->API = new MTProto($params);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);

@@ -50,20 +50,6 @@ trait ResponseHandler
             $unset = false;
             \danog\MadelineProto\Logger::log((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             //\danog\MadelineProto\Logger::log($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
-                if (!$this->synchronized(function ($zis, $datacenter, $current_msg_id) {
-                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'])) {
-                        return false;
-                    }
-                    $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['handling'] = true;
-
-                    return true;
-                }, $this, $datacenter, $current_msg_id)) {
-                    \danog\MadelineProto\Logger::log(base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' is already being handled', \danog\MadelineProto\Logger::VERBOSE);
-                    continue;
-                }
-                \danog\MadelineProto\Logger::log('Handling '.base64_encode($current_msg_id).$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].'.', \danog\MadelineProto\Logger::VERBOSE);
-            }
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -271,6 +257,14 @@ trait ResponseHandler
                         case 'Updates':
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                             $unset = true;
+
+                            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users'])) {
+                                $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users']);
+                            }
+                            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats'])) {
+                                $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats']);
+                            }
+
                             if (strpos($datacenter, 'cdn') === false) {
                                 $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                             }
@@ -412,7 +406,7 @@ trait ResponseHandler
             return false;
         }
         if (count($this->pending_updates)) {
-            \danog\MadelineProto\Logger::log('Parsing pending updates...', \danog\MadelineProto\Logger::VERBOSE);
+            \danog\MadelineProto\Logger::log('Parsing pending updates...');
             foreach ($this->pending_updates as $key => $updates) {
                 unset($this->pending_updates[$key]);
                 $this->handle_updates($updates);
@@ -433,6 +427,9 @@ trait ResponseHandler
         }
         $this->handle_pending_updates();
         \danog\MadelineProto\Logger::log('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
+        try {
+        $this->postpone_updates = true;
+
         $opts = [];
         foreach (['date', 'seq', 'seq_start'] as $key) {
             if (isset($updates[$key])) {
@@ -473,6 +470,9 @@ trait ResponseHandler
             default:
                 throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
+        }
+        } finally {
+            $this->postpone_updates = false;
         }
     }
 }

@@ -98,6 +98,8 @@ class MTProto
     public $storage = [];
     private $emojis;
     private $postpone_updates = false;
+    private $postpone_pwrchat = false;
+    private $pending_pwrchat = [];
 
     public function __magic_construct($settings = [])
     {
@@ -159,7 +161,7 @@ class MTProto
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc', 'twozerotwosixone', 'zeroeight'];
+        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc', 'twozerotwosixone', 'zeroeight'];
     }
 
     public function __wakeup()
@@ -178,6 +180,10 @@ class MTProto
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
         $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
+            unset($this->settings['pwr']['update_handler']);
+            $this->updates = [];
+        }
         // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
         preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
@@ -197,6 +203,8 @@ class MTProto
         foreach ($this->channels_state as $key => $state) {
             $this->channels_state[$key]['sync_loading'] = false;
         }
+        $this->postpone_updates = false;
+        $this->postpone_pwrchat = false;
         $force = false;
         $this->reset_session();
 
@@ -404,7 +412,7 @@ class MTProto
             // connection settings
             'all' => [
                 // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                'protocol' => 'tcp_full',
+                'protocol' => 'tcp_abridged',
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)

@@ -23,11 +23,9 @@ try {
     $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
     \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
-//\danog\MadelineProto\Logger::log($MadelineProto->API->get_config([], ['datacenter' => $MadelineProto->API->datacenter->curdc]));
-//\danog\MadelineProto\Logger::log($MadelineProto->API->settings['connection']);
 $MadelineProto->session = 'bot.madeline';
-echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).' bytes'.PHP_EOL;
 $offset = 0;
+
 while (true) {
     $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     \danog\MadelineProto\Logger::log($updates);

@@ -16,7 +16,7 @@ if (!file_exists('vendor/autoload.php')) {
     die('You did not run composer update');
 }
 require_once 'vendor/autoload.php';
-//include 'SocksProxy.php';
+
 if (!function_exists('readline')) {
     function readline($prompt = null)
     {
@@ -30,33 +30,27 @@ if (!function_exists('readline')) {
     }
 }
 
-if (file_exists('web_data.php')) {
-    require_once 'web_data.php';
-}
-
 echo 'Deserializing MadelineProto from testing.madeline...'.PHP_EOL;
-$MadelineProto = false;
 
+$MadelineProto = false;
 try {
     $MadelineProto = new \danog\MadelineProto\API('testing.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     \danog\MadelineProto\Logger::log($e->getMessage());
 }
+
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
     $dotenv->load();
 }
 if (getenv('TEST_SECRET_CHAT') == '') {
-    die('TEST_SECRET_CHAT is not defined in .env, please define it.'.PHP_EOL);
+    die('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
 }
-echo 'Loading settings...'.PHP_EOL;
-\danog\MadelineProto\Logger::log(getenv('MTPROTO_SETTINGS'));
-$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
-//$settings['connection_settings']['all']['proxy'] = '\SocksProxy';
-//$settings['connection_settings']['all']['proxy_extra'] = ['address' => '127.0.0.1', 'port' => 1080];
 
-\danog\MadelineProto\Logger::log($settings);
+echo 'Loading settings...'.PHP_EOL;
+$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
+
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
     $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -82,28 +76,23 @@ if ($MadelineProto === false) {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
 }
+
 $MadelineProto->session = 'testing.madeline';
+
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::VERBOSE);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::NOTICE);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::WARNING);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ERROR);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
-//$MadelineProto->phone->createGroupCall(['channel' => -1001333587884
 
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-echo 'Serializing MadelineProto to testing.madeline...'.PHP_EOL; echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
-/*
-$m = new \danog\MadelineProto\API($settings);
-$m->import_authorization($MadelineProto->export_authorization());
-*/
 if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     $controller = $MadelineProto->request_call(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
         $MadelineProto->get_updates();
     }
-    //$MadelineProto->messages->sendMessage(['peer' => $controller->getOtherID(), 'message' => 'Emojis: '.implode('', $controller->getVisualization())]);
     \danog\MadelineProto\Logger::log($controller->configuration);
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
         $MadelineProto->get_updates();
@@ -125,7 +114,6 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
                 }
            }
         }
-        //echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
     }
 }
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
@@ -139,19 +127,6 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
     $InputEncryptedChat = $MadelineProto->get_secret_chat($secret)['InputEncryptedChat'];
     $sentMessage = $MadelineProto->messages->sendEncrypted(['peer' => $InputEncryptedChat, 'message' => ['_' => 'decryptedMessage', 'media' => ['_' => 'decryptedMessageMediaEmpty'], 'ttl' => 10, 'message' => $message, 'entities' => [['_' => 'messageEntityCode', 'offset' => 0, 'length' => mb_strlen($message)]]]]); // should work with all layers
     \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
-    /*
-    while (true) {
-        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-        //\danog\MadelineProto\Logger::log($updates);
-        foreach ($updates as $update) {
-            $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-            switch ($update['update']['_']) {
-                case 'updateNewEncryptedMessage':
-                \danog\MadelineProto\Logger::log($update);
-           }
-           echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('testing.madeline', $MadelineProto).' bytes'.PHP_EOL;
-        }
-    }*/
 
     $secret_media = [];
 

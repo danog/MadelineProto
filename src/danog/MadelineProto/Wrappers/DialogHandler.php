@@ -46,6 +46,7 @@ trait DialogHandler
         } finally {
             $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
+            $this->handle_pending_updates();
         }
 
         return $peers;

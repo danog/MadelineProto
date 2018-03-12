@@ -90,6 +90,12 @@ trait CallHandler
             if ($canunset = !$this->updates_state['sync_loading']) {
                 $this->updates_state['sync_loading'] = true;
             }
+            if ($canunsetpostponeupdates = !$this->postpone_updates) {
+                $this->postpone_updates = true;
+            }
+            if ($canunsetpostponepwrchat = !$this->postpone_pwrchat) {
+                $this->postpone_pwrchat = true;
+            }
 
             try {
                 \danog\MadelineProto\Logger::log('Calling method (try number '.$count.' for '.$method.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -194,6 +200,13 @@ trait CallHandler
                 }
                 if ($canunset) {
                     $this->updates_state['sync_loading'] = false;
+                }
+                if ($canunsetpostponepwrchat) {
+                    $this->postpone_pwrchat = false;
+                    $this->handle_pending_pwrchat();
+                }
+                if ($canunsetpostponeupdates) {
+                    $this->postpone_updates = false;
                     $this->handle_pending_updates();
                 }
                 if ($server_answer === null) {
@@ -249,6 +262,13 @@ trait CallHandler
                 }
                 if ($canunset) {
                     $this->updates_state['sync_loading'] = false;
+                }
+                if ($canunsetpostponepwrchat) {
+                    $this->postpone_pwrchat = false;
+                    $this->handle_pending_pwrchat();
+                }
+                if ($canunsetpostponeupdates) {
+                    $this->postpone_updates = false;
                     $this->handle_pending_updates();
                 }
             }
