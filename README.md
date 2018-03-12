@@ -24,7 +24,7 @@ include 'madeline.php';
 $api_id = 0;
 $api_hash = '';
 
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash']]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
 
 $MadelineProto->phone_login(readline('Enter your phone number: '));
 $authorization = $MadelineProto->complete_phone_login(readline('Enter the phone code: '));
