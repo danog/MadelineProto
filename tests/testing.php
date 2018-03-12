@@ -33,6 +33,7 @@ if (!function_exists('readline')) {
 echo 'Deserializing MadelineProto from testing.madeline...'.PHP_EOL;
 
 $MadelineProto = false;
+
 try {
     $MadelineProto = new \danog\MadelineProto\API('testing.madeline');
 } catch (\danog\MadelineProto\Exception $e) {

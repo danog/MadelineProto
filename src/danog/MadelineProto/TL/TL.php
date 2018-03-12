@@ -664,6 +664,7 @@ trait TL
                 }
             }
         }
+
         return $x;
     }
 }

@@ -427,16 +427,17 @@ trait ResponseHandler
         }
         $this->handle_pending_updates();
         \danog\MadelineProto\Logger::log('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
-        try {
-        $this->postpone_updates = true;
 
-        $opts = [];
-        foreach (['date', 'seq', 'seq_start'] as $key) {
-            if (isset($updates[$key])) {
-                $opts[$key] = $updates[$key];
+        try {
+            $this->postpone_updates = true;
+
+            $opts = [];
+            foreach (['date', 'seq', 'seq_start'] as $key) {
+                if (isset($updates[$key])) {
+                    $opts[$key] = $updates[$key];
+                }
             }
-        }
-        switch ($updates['_']) {
+            switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
                 foreach ($updates['updates'] as $update) {

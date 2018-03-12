@@ -70,6 +70,7 @@ class API extends APIFactory
                     $this->APIFactory();
                     $this->session = $realpaths['file'];
                 }
+
                 return;
             }
             $this->session = $realpaths['file'];

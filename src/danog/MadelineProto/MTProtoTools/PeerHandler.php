@@ -30,25 +30,31 @@ trait PeerHandler
         return ($log - intval($log)) * 1000 < 10;
     }
 
-    public function handle_pending_pwrchat() {
+    public function handle_pending_pwrchat()
+    {
         if ($this->postpone_pwrchat || empty($this->pending_pwrchat)) {
             return false;
         }
         $this->postpone_pwrchat = true;
+
         try {
-        \danog\MadelineProto\Logger::log("Handling pending pwrchat queries...", \danog\MadelineProto\Logger::VERBOSE);
-        foreach ($this->pending_pwrchat as $query => $params) {
-            unset($this->pending_pwrchat[$query]);
-            try {
-                $this->get_pwr_chat($query, ...$params);
-            } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+            \danog\MadelineProto\Logger::log('Handling pending pwrchat queries...', \danog\MadelineProto\Logger::VERBOSE);
+            foreach ($this->pending_pwrchat as $query => $params) {
+                unset($this->pending_pwrchat[$query]);
+
+                try {
+                    $this->get_pwr_chat($query, ...$params);
+                } catch (\danog\MadelineProto\Exception $e) {
+                    \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                }
             }
+        } finally {
+            $this->postpone_pwrchat = false;
         }
-        } finally { $this->postpone_pwrchat = false; }
     }
+
     public function add_users($users)
     {
         foreach ($users as $key => $user) {
@@ -73,18 +79,17 @@ trait PeerHandler
                     if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                         $this->chats[$user['id']] = $user;
 
-                    if ($this->postpone_pwrchat) {
-                        $this->pending_pwrchat[$user['id']] = [false, true];
-                    } else {
-                        try {
-                            $this->get_pwr_chat($user['id'], false, true);
-                        } catch (\danog\MadelineProto\Exception $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                        if ($this->postpone_pwrchat) {
+                            $this->pending_pwrchat[$user['id']] = [false, true];
+                        } else {
+                            try {
+                                $this->get_pwr_chat($user['id'], false, true);
+                            } catch (\danog\MadelineProto\Exception $e) {
+                                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            }
                         }
-                    }
-
                     }
                 case 'userEmpty':
                     break;
