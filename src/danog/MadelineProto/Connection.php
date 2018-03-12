@@ -73,7 +73,7 @@ class Connection
         }
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -86,7 +86,7 @@ class Connection
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -99,7 +99,7 @@ class Connection
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -113,7 +113,7 @@ class Connection
                 $this->in_seq_no = -1;
                 break;
             case 'obfuscated2':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -151,9 +151,18 @@ class Connection
                 if (strpos($this->protocol, 'https') === 0 && $proxy === '\\Socket') {
                     $proxy = '\\FSocket';
                 }
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : getprotobyname('tcp'));
-                if ($has_proxy && $this->extra !== []) {
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                if ($has_proxy ) {
+                    if ($this->extra !== []) {
                     $this->sock->setExtra($this->extra);
+                }
+                    if ($this->protocol === 'http') {
+                        $this->parsed['path'] = $this->parsed['scheme'] . '://' . $this->parsed['host'] .
+                        $this->parsed['path'];
+                        $port = 80;
+                    } elseif ($this->protocol === 'https') {
+                        $port = 443;
+                    }
                 }
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
@@ -352,7 +361,7 @@ class Connection
                 break;
             case 'http':
             case 'https':
-                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].':'.$this->port."\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
+                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].':'.$this->port."\r\n" . $this->sock->getProxyHeaders() . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
                 break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);

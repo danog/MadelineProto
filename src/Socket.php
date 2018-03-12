@@ -18,11 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
         private $domain;
         private $type;
 
-        public function __construct(int $domain, int $type, int $protocol)
+        public function __construct(int $domain, int $type, string $protocol)
         {
             $this->domain = $domain;
             $this->type = $type;
-            $this->protocol = $protocol === PHP_INT_MAX ? 'tls' : getprotobynumber($protocol);
+            $this->protocol = $protocol === 'https' ? 'tls' : 'tcp';
         }
 
         public function __destruct()
@@ -115,6 +115,16 @@ If not, see <http://www.gnu.org/licenses/>.
         public function getSockName(bool $port = true)
         {
             throw new \danog\MadelineProto\Exception('Not supported');
+        }
+        
+        public function setExtra(array $extra = [])
+        {
+            
+        }
+
+        public function getProxyHeaders() 
+        {
+            return '';
         }
     }
 
@@ -228,9 +238,9 @@ if (!extension_loaded('pthreads')) {
         }
         class Socket extends SocketBase
         {
-            public function __construct(int $domain, int $type, int $protocol)
+            public function __construct(int $domain, int $type, string $protocol)
             {
-                parent::__construct(socket_create($domain, $type, $protocol));
+                parent::__construct(socket_create($domain, $type, $type === \SOCK_DGRAM ? SOL_UDP : SOL_TCP));
             }
         }
     } else {
