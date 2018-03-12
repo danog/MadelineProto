@@ -181,6 +181,7 @@ trait CallHandler
                             continue 2;
                         }
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
+                        \danog\MadelineProto\Logger::log('Full trace '.$e, \danog\MadelineProto\Logger::WARNING);
                         continue;
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                         $last_error = 'Nothing in the socket';

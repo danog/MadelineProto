@@ -92,7 +92,13 @@ trait PeerHandler
                     $bot_api_id = $this->to_supergroup($chat['id']);
                     if (!isset($chat['access_hash'])) {
                         if (isset($chat['username']) && !isset($this->chats[$bot_api_id])) {
-                            $this->get_pwr_chat($chat['username'], $this->settings['peer']['full_fetch'], true);
+                            try {
+                                $this->get_pwr_chat($chat['username'], $this->settings['peer']['full_fetch'], true);
+                            } catch (\danog\MadelineProto\Exception $e) {
+                                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                            }
                         }
                         continue;
                     }
@@ -604,6 +610,7 @@ trait PeerHandler
 
     public function store_participants_cache($gres, $channel, $filter, $q, $offset, $limit)
     {
+        return;
         unset($gres['users']);
         if (\danog\MadelineProto\Logger::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
