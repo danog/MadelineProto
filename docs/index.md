@@ -46,18 +46,18 @@ $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 
 ## Documentation
 
-- [Features](docs.madelineproto.xyz/#features)
-- [Methods](docs.madelineproto.xyz/#methods)
-- [Clicking inline buttons](docs.madelineproto.xyz/#inline-buttons)
-- [Uploading and downloading files](docs.madelineproto.xyz/#uploading-and-downloading-files)
-- [Changing settings](docs.madelineproto.xyz/#settings)
-- [Update management (getting incoming messages)](docs.madelineproto.xyz/#handling-updates)
-- [Using a proxy](docs.madelineproto.xyz/#using-a-proxy)
-- [Calls](docs.madelineproto.xyz/#calls)
-- [Secret chats](docs.madelineproto.xyz/#secret-chats)
-- [Storing sessions](docs.madelineproto.xyz/#storing-sessions)
-- [Exceptions](docs.madelineproto.xyz/#exceptions)
-- [Lua binding](docs.madelineproto.xyz/#lua-binding)
+- [Features](https://docs.madelineproto.xyz/FULL_README.html#features)
+- [Methods](https://docs.madelineproto.xyz/FULL_README.html#methods)
+- [Clicking inline buttons](https://docs.madelineproto.xyz/FULL_README.html#inline-buttons)
+- [Uploading and downloading files](https://docs.madelineproto.xyz/FULL_README.html#uploading-and-downloading-files)
+- [Changing settings](https://docs.madelineproto.xyz/FULL_README.html#settings)
+- [Update management (getting incoming messages)](https://docs.madelineproto.xyz/FULL_README.html#handling-updates)
+- [Using a proxy](https://docs.madelineproto.xyz/FULL_README.html#using-a-proxy)
+- [Calls](https://docs.madelineproto.xyz/FULL_README.html#calls)
+- [Secret chats](https://docs.madelineproto.xyz/FULL_README.html#secret-chats)
+- [Storing sessions](https://docs.madelineproto.xyz/FULL_README.html#storing-sessions)
+- [Exceptions](https://docs.madelineproto.xyz/FULL_README.html#exceptions)
+- [Lua binding](https://docs.madelineproto.xyz/FULL_README.html#lua-binding)
 
 
 ## Very complex and complete examples
