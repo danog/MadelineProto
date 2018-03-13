@@ -180,10 +180,10 @@ class MTProto
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
         $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-        if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
+        /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
             unset($this->settings['pwr']['update_handler']);
             $this->updates = [];
-        }
+        }*/
         // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
         preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
