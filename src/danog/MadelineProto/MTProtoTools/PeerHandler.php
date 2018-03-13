@@ -270,7 +270,7 @@ trait PeerHandler
             if (preg_match('/^chat#(\d*)/', $id, $matches)) {
                 $id = '-'.$matches[1];
             }
-            if (preg_match('/^user#(\d*)/', $id, $marches)) {
+            if (preg_match('/^user#(\d*)/', $id, $matches)) {
                 $id = $matches[1];
             }
         }
