@@ -463,11 +463,11 @@ trait ResponseHandler
                     $message['to_id'] = $this->get_info($to_id)['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
                     \danog\MadelineProto\Logger::log('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                    $this->pending_updates[] = $updates;
+                    //$this->pending_updates[] = $updates;
                     break;
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     \danog\MadelineProto\Logger::log('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                    $this->pending_updates[] = $updates;
+                    //$this->pending_updates[] = $updates;
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
