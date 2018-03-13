@@ -47,7 +47,8 @@ $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 ## Documentation
 
 - [Features](https://docs.madelineproto.xyz/FULL_README.html#features)
-- [Methods](https://docs.madelineproto.xyz/FULL_README.html#methods)
+- [Full method list](https://docs.madelineproto.xyz/API_docs/methods)
+- [How to use these methods](https://docs.madelineproto.xyz/FULL_README.html#methods)
 - [Clicking inline buttons](https://docs.madelineproto.xyz/FULL_README.html#inline-buttons)
 - [Uploading and downloading files](https://docs.madelineproto.xyz/FULL_README.html#uploading-and-downloading-files)
 - [Changing settings](https://docs.madelineproto.xyz/FULL_README.html#settings)
