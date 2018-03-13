@@ -81,50 +81,50 @@ trait AuthKeyHandler
                     }
                 }
                 if (!$pq->equals($p->multiply($q))) {
-                    \danog\MadelineProto\Logger::log("Automatic factorization failed, trying native CPP module", \danog\MadelineProto\Logger::ERROR);
+                    \danog\MadelineProto\Logger::log('Automatic factorization failed, trying native CPP module', \danog\MadelineProto\Logger::ERROR);
                     $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::native_single_cpp($pq->__toString()));
                     if (!$p->equals($this->zero)) {
-                        $q = $pq->divide($p) [0];
+                        $q = $pq->divide($p)[0];
                         if ($p->compare($q) > 0) {
                             list($p, $q) = [$q, $p];
                         }
                     }
 
                     if (!$pq->equals($p->multiply($q))) {
-                        \danog\MadelineProto\Logger::log("Automatic factorization failed, trying alt py module", \danog\MadelineProto\Logger::ERROR);
+                        \danog\MadelineProto\Logger::log('Automatic factorization failed, trying alt py module', \danog\MadelineProto\Logger::ERROR);
                         $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
                         if (!$p->equals($this->zero)) {
-                            $q = $pq->divide($p) [0];
+                            $q = $pq->divide($p)[0];
                             if ($p->compare($q) > 0) {
                                 list($p, $q) = [$q, $p];
                             }
                         }
 
                         if (!$pq->equals($p->multiply($q))) {
-                            \danog\MadelineProto\Logger::log("Automatic factorization failed, trying py module", \danog\MadelineProto\Logger::ERROR);
+                            \danog\MadelineProto\Logger::log('Automatic factorization failed, trying py module', \danog\MadelineProto\Logger::ERROR);
                             $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
                             if (!$p->equals($this->zero)) {
-                                $q = $pq->divide($p) [0];
+                                $q = $pq->divide($p)[0];
                                 if ($p->compare($q) > 0) {
                                     list($p, $q) = [$q, $p];
                                 }
                             }
 
                             if (!$pq->equals($p->multiply($q))) {
-                                \danog\MadelineProto\Logger::log("Automatic factorization failed, trying native module", \danog\MadelineProto\Logger::ERROR);
+                                \danog\MadelineProto\Logger::log('Automatic factorization failed, trying native module', \danog\MadelineProto\Logger::ERROR);
                                 $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
                                 if (!$p->equals($this->zero)) {
-                                    $q = $pq->divide($p) [0];
+                                    $q = $pq->divide($p)[0];
                                     if ($p->compare($q) > 0) {
                                         list($p, $q) = [$q, $p];
                                     }
                                 }
 
                                 if (!$pq->equals($p->multiply($q))) {
-                                    \danog\MadelineProto\Logger::log("Automatic factorization failed, trying wolfram module", \danog\MadelineProto\Logger::ERROR);
+                                    \danog\MadelineProto\Logger::log('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
                                     $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::wolfram_single($pq->__toString()));
                                     if (!$p->equals($this->zero)) {
-                                        $q = $pq->divide($p) [0];
+                                        $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
                                             list($p, $q) = [$q, $p];
                                         }
@@ -133,13 +133,11 @@ trait AuthKeyHandler
                                     if (!$pq->equals($p->multiply($q))) {
                                         throw new \danog\MadelineProto\SecurityException("couldn't compute p and q. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p->multiply($q));
                                     }
-
                                 }
                             }
                         }
                     }
                 }
-
 
                 \danog\MadelineProto\Logger::log('Factorization '.$pq.' = '.$p.' * '.$q, \danog\MadelineProto\Logger::VERBOSE);
                 /*
