@@ -458,6 +458,7 @@ trait ResponseHandler
                 $message = $updates;
                 $message['_'] = 'message';
                 $message['from_id'] = $from_id;
+
                 try {
                     $message['to_id'] = $this->get_info($to_id)['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
