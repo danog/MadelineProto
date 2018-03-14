@@ -407,9 +407,12 @@ trait ResponseHandler
         }
         if (count($this->pending_updates)) {
             \danog\MadelineProto\Logger::log('Parsing pending updates...');
-            foreach ($this->pending_updates as $key => $updates) {
-                unset($this->pending_updates[$key]);
-                $this->handle_updates($updates);
+            foreach (array_keys($this->pending_updates) as $key) {
+                if (isset($this->pending_updates[$key])) {
+                    $updates = $this->pending_updates[$key];
+                    unset($this->pending_updates[$key]);
+                    $this->handle_updates($updates);
+                }
             }
         }
     }

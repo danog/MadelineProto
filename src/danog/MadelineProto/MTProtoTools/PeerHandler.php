@@ -146,18 +146,18 @@ trait PeerHandler
                     if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
                         $this->chats[$bot_api_id] = $chat;
 
-                        if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
-                            if ($this->postpone_pwrchat) {
-                                $this->pending_pwrchat[$this->to_supergroup($chat['id'])] = [$this->settings['peer']['full_fetch'], true];
-                            } else {
-                                try {
+                        try {
+                            if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
+                                if ($this->postpone_pwrchat) {
+                                    $this->pending_pwrchat[$this->to_supergroup($chat['id'])] = [$this->settings['peer']['full_fetch'], true];
+                                } else {
                                     $this->get_pwr_chat($this->to_supergroup($chat['id']), $this->settings['peer']['full_fetch'], true);
-                                } catch (\danog\MadelineProto\Exception $e) {
-                                    \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-                                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                    \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                                 }
                             }
+                        } catch (\danog\MadelineProto\Exception $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                            \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                         }
                     }
                     break;
