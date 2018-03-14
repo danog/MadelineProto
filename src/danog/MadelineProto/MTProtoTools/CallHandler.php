@@ -19,6 +19,7 @@ namespace danog\MadelineProto\MTProtoTools;
 trait CallHandler
 {
     public $wrapper;
+
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
         if (!is_array($args)) {

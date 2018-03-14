@@ -162,6 +162,7 @@ class API extends APIFactory
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
         $this->serialized = time();
+
         return Serialization::serialize($params, $this);
     }
 }
