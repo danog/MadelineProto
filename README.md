@@ -5,7 +5,9 @@ Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!
 
 ## What's this?
 
-This library can be used to easily interact with Telegram without the bot API, just like the official apps.
+This library can be used to easily interact with Telegram **without** the bot API, just like the official apps.
+
+It can login with a phone number (MTProto API), or with a bot token (MTProto API, **no bot API involved!**).
 
 
 ## Installation
