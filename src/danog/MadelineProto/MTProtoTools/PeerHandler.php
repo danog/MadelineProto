@@ -700,6 +700,7 @@ trait PeerHandler
             $this->qres[] = $res;
         }
         if ($this->last_stored > time() && !$force) {
+            //\danog\MadelineProto\Logger::log("========== WILL SERIALIZE IN ".($this->last_stored - time())." =============");
             return false;
         }
         if (empty($this->qres)) {
@@ -708,14 +709,23 @@ trait PeerHandler
 
         try {
             $payload = json_encode($this->qres);
-            $path = '/tmp/ids'.hash('sha256', $payload);
-            file_put_contents($path, $payload);
+            //$path = '/tmp/ids'.hash('sha256', $payload);
+            //file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
-            $result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s >/dev/null 2>/dev/null & ');
-            \danog\MadelineProto\Logger::log($result, \danog\MadelineProto\Logger::VERBOSE);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_URL, 'https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            //$result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s >/dev/null 2>/dev/null & ');
+            \danog\MadelineProto\Logger::log("============ $result =============", \danog\MadelineProto\Logger::VERBOSE);
             $this->qres = [];
             $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
+            if (file_exists($path)) unlink($path);
             \danog\MadelineProto\Logger::log('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
         }
     }

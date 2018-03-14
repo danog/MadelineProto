@@ -25,6 +25,8 @@ class API extends APIFactory
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (is_string($params)) {
             $realpaths = Serialization::realpaths($params);
+            $this->session = $realpaths['file'];
+
             if (file_exists($realpaths['file'])) {
                 if (!file_exists($realpaths['lockfile'])) {
                     touch($realpaths['lockfile']);
@@ -68,12 +70,10 @@ class API extends APIFactory
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
-                    $this->session = $realpaths['file'];
                 }
 
                 return;
             }
-            $this->session = $realpaths['file'];
             $params = $settings;
         }
         $this->API = new MTProto($params);
@@ -152,6 +152,7 @@ class API extends APIFactory
         foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
+        $this->API->wrapper = $this;
     }
 
     public function serialize($params = '')
@@ -160,7 +161,7 @@ class API extends APIFactory
             $params = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-
+        $this->serialized = time();
         return Serialization::serialize($params, $this);
     }
 }

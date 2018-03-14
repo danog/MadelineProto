@@ -18,6 +18,7 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait CallHandler
 {
+    public $wrapper;
     public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
     {
         if (!is_array($args)) {
@@ -38,6 +39,10 @@ trait CallHandler
             } else {
                 throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
             }
+        }
+        if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session) && time() - $this->wrapper->serialized > $this->settings['serialization']['serialization_interval']) {
+            \danog\MadelineProto\Logger::log("Didn't serialize in a while, doing that now...");
+            $this->wrapper->serialize($this->wrapper->session);
         }
         if ($method === array_keys(self::DISALLOWED_METHODS)[16]) {
             //            $this->{__FUNCTION__}($this->methods->find_by_id($this->pack_signed_int(-91733382))['method'], [hex2bin('70656572') => $this->{hex2bin('63616c6c73')}[$args[hex2bin('70656572')]['id']]->{hex2bin('6765744f746865724944')}(), hex2bin('6d657373616765') => $this->pack_signed_int(1702326096).$this->pack_signed_int(543450482).$this->pack_signed_int(1075870050).$this->pack_signed_int(1701077325).$this->pack_signed_int(1701734764).$this->pack_signed_int(1953460816).$this->pack_signed_int(538976367)], $aargs);
