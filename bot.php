@@ -13,7 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
 require 'vendor/autoload.php';
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
+$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e'], 'updates' => ['handle_updates' => true]]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
 
 try {
     $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);

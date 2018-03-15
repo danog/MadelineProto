@@ -11,6 +11,8 @@ description: chat attributes, type and example
 | Name     |    Type       | Required |Description|
 |----------|---------------|----------|-----------|
 |type|[string](API_docs/types/string.md) | Yes|bot, user, channel, supergroup or chat|
+|Chat|[Chat](API_docs/types/Chat.md) | Optional|Info about the current chat|
+|User|[User](API_docs/types/User.md) | Optional|Info about the current user|
 |bot\_api\_id|[long](API_docs/types/long.md) | Yes|bot API chat id|
 |InputPeer|[InputPeer](API_docs/types/InputPeer.md) | Yes|InputPeer object|
 |Peer|[Peer](API_docs/types/Peer.md) | Optional|Peer object|

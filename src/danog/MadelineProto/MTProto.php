@@ -44,6 +44,9 @@ class MTProto
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Login;
+    use \danog\MadelineProto\Wrappers\Start;
+    use \danog\MadelineProto\Wrappers\Templates;
+
     /*
         const V = 71;
     */
@@ -107,6 +110,9 @@ class MTProto
         $this->parse_settings($settings);
         if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
+        }
+        if (!extension_loaded('xml')) {
+            throw new Exception(['extension', 'xml']);
         }
         $this->emojis = json_decode(self::JSON_EMOJIS);
         \danog\MadelineProto\Logger::class_exists();
@@ -178,6 +184,9 @@ class MTProto
         }
         if (!defined('\\phpseclib\\Crypt\\AES::MODE_IGE')) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
+        }
+        if (!extension_loaded('xml')) {
+            throw new Exception(['extension', 'xml']);
         }
         $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
@@ -265,7 +274,7 @@ class MTProto
                     $connection['proxy_extra'] = [];
                 }
                 if (!isset($connection['pfs'])) {
-                    $connection['pfs'] = true;
+                    $connection['pfs'] = extension_loaded('gmp');
                 }
             }
             if (!isset($settings['authorization']['rsa_key'])) {
@@ -427,7 +436,7 @@ class MTProto
                 // The proxy class to use
                 'proxy_extra' => [],
                 // Extra parameters to pass to the proxy class using setExtra
-                'pfs' => true,
+                'pfs' => extension_loaded('gmp'),
             ],
         ], 'app_info' => [
             // obtained in https://my.telegram.org
@@ -466,10 +475,9 @@ class MTProto
              * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
              *     $message is an array containing the messages the log, $level, is the logging level
              */
-            'logger' => 1,
             // write to
             'logger_param' => '/tmp/MadelineProto.log',
-            'logger'       => 3,
+            'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.

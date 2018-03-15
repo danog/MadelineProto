@@ -22,9 +22,18 @@ class Exception extends \Exception
     {
         return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.'Revision: '.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.$this->getTLTrace();
     }
-
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
+        if (is_array($message) && $message[0] === 'extension') {
+            if ($message[1] === 'libtgvoip') {
+                $additional = 'Follow the instructions @ https://voip.madelineproto.xyz to install it.';
+            } else if ($message[1] === 'prime') {
+                $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
+            } else {
+                $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$message[1];
+            }
+            $message = 'MadelineProto requires the '.$message[1].' extension to run. '.$additional;
+        }
         $this->prettify_tl();
         if ($file !== null) {
             if (basename($file) === 'Threaded.php') {
