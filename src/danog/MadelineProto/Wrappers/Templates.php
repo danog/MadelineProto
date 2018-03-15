@@ -35,7 +35,9 @@ trait Templates
             break;
         }
     }
-    public function web_echo_template($message, $form) {
+
+    public function web_echo_template($message, $form)
+    {
         return '<!DOCTYPE html>
         <html>
         <head>
@@ -50,6 +52,5 @@ trait Templates
         <p>'.$message.'</p>
         </body>
         </html>';
-
     }
 }

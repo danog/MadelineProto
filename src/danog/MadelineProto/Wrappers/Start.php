@@ -18,7 +18,8 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait Start
 {
-    public function start() {
+    public function start()
+    {
         if ($this->authorized === self::LOGGED_IN) {
             return true;
         }
@@ -38,19 +39,19 @@ trait Start
                 } else {
                     $this->web_echo();
                 }
-            } else if ($this->authorized === self::WAITING_CODE) {
+            } elseif ($this->authorized === self::WAITING_CODE) {
                 if (isset($_POST['phone_code'])) {
                     $this->web_complete_phone_login();
                 } else {
                     $this->web_echo("You didn't provide a phone code!");
                 }
-            } else if ($this->authorized === self::WAITING_PASSWORD) {
+            } elseif ($this->authorized === self::WAITING_PASSWORD) {
                 if (isset($_POST['password'])) {
                     $this->web_complete_2fa_login();
                 } else {
                     $this->web_echo("You didn't provide the password!");
                 }
-            } else if ($this->authorized === self::WAITING_SIGNUP) {
+            } elseif ($this->authorized === self::WAITING_SIGNUP) {
                 if (isset($_POST['first_name'])) {
                     $this->web_complete_signup();
                 } else {
@@ -63,45 +64,51 @@ trait Start
         }
     }
 
-    public function web_phone_login() {
+    public function web_phone_login()
+    {
         try {
             $this->phone_login($_POST['phone_number']);
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
-    public function web_complete_phone_login() {
+
+    public function web_complete_phone_login()
+    {
         try {
             $this->complete_phone_login($_POST['phone_code']);
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
-    public function web_complete_2fa_login() {
+
+    public function web_complete_2fa_login()
+    {
         try {
             $this->complete_2fa_login($_POST['password']);
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
-    public function web_complete_signup() {
+
+    public function web_complete_signup()
+    {
         try {
             $this->complete_2fa_login($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_echo("ERROR: ".$e->getMessage().". Try again.");
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
-
 }
