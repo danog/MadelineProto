@@ -73,7 +73,7 @@ class Connection
         }
         switch ($this->protocol) {
             case 'tcp_abridged':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -86,7 +86,7 @@ class Connection
                 $this->write(chr(239));
                 break;
             case 'tcp_intermediate':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -99,7 +99,7 @@ class Connection
                 $this->write(str_repeat(chr(238), 4));
                 break;
             case 'tcp_full':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -113,7 +113,7 @@ class Connection
                 $this->in_seq_no = -1;
                 break;
             case 'obfuscated2':
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, getprotobyname('tcp'));
                 if ($has_proxy && $this->extra !== []) {
                     $this->sock->setExtra($this->extra);
                 }
@@ -151,11 +151,11 @@ class Connection
                 if (strpos($this->protocol, 'https') === 0 && $proxy === '\\Socket') {
                     $proxy = '\\FSocket';
                 }
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : ($has_proxy ? PHP_INT_MAX - 1 : getprotobyname('tcp')));
                 if ($has_proxy ) {
                     if ($this->extra !== []) {
-                    $this->sock->setExtra($this->extra);
-                }
+                        $this->sock->setExtra($this->extra);
+                    }
                     if ($this->protocol === 'http') {
                         $this->parsed['path'] = $this->parsed['scheme'] . '://' . $this->parsed['host'] .
                         $this->parsed['path'];

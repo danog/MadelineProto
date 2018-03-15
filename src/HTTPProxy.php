@@ -1,6 +1,7 @@
 <?php
 
-class HTTPProxy implements \danog\MadelineProto\Proxy {
+class HTTPProxy implements \danog\MadelineProto\Proxy
+{
 
     private $sock;
     private $protocol;
@@ -8,43 +9,48 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
     private $domain;
     private $type;
     private $options = [];
-    private $use_connect = FALSE;
-    private $use_ssl = FALSE;
+    private $use_connect = false;
+    private $use_ssl = false;
 
-    public function __construct($domain, $type, $protocol) {
+    public function __construct($domain, $type, $protocol)
+    {
         $this->domain = $domain;
         $this->type = $type;
-        $this->protocol = $protocol === 'https' ? 'tls' : 'tcp';
+        $this->protocol = $protocol === PHP_INT_MAX ? 'tls' : 'tcp';
 
-        if ($protocol !== 'http') {
-            $this->use_connect = TRUE;
-            if ($protocol === 'https') {
-                $this->use_ssl = TRUE;
-            }
+        if ($protocol === PHP_INT_MAX) { /* https */
+            $this->use_connect = $this->use_ssl = true;
+        } elseif ($protocol !== PHP_INT_MAX - 1) {  /* http */
+            $this->use_connect = true;
         }
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->sock !== null) {
             fclose($this->sock);
             $this->sock = NULL;
         }
     }
 
-    public function accept() {
+    public function accept()
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function bind($address, $port = 0) {
+    public function bind($address, $port = 0)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function close() {
+    public function close()
+    {
         fclose($this->sock);
         $this->sock = null;
     }
 
-    public function connect($address, $port = 0) {
+    public function connect($address, $port = 0)
+    {
         $errno = 0;
         $errstr = '';
 
@@ -56,7 +62,7 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
         stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
 
         if (isset($this->options['host']) && isset($this->options['port']) &&
-                TRUE === $this->use_connect) {
+                true === $this->use_connect) {
             if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
                 $address = '[' . $address . ']';
             }
@@ -68,7 +74,7 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
                     "\r\n");
 
             $response = '';
-            $status = FALSE;
+            $status = false;
             while ($line = @fgets($this->sock)) {
                 $status = $status || (strpos($line, 'HTTP') !== false);
                 if ($status) {
@@ -78,10 +84,10 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
                 }
             }
             if (substr($response, 0, 13) !== "HTTP/1.1 200 ")
-                return FALSE;
+                return false;
         }
 
-        if (TRUE === $this->use_ssl) {
+        if (true === $this->use_ssl) {
             $modes = array(
                 STREAM_CRYPTO_METHOD_TLS_CLIENT,
                 STREAM_CRYPTO_METHOD_SSLv3_CLIENT,
@@ -98,49 +104,59 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
             stream_context_set_option($this->sock, $contextOptions);
 
             $success = false;
-            foreach ($modes as $mode) {
+            foreach ($modes as $mode)
+            {
                 $success = stream_socket_enable_crypto($this->sock, true, $mode);
                 if ($success)
-                    return TRUE;
+                    return true;
             }
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
-    public function getOption($level, $name) {
+    public function getOption($level, $name)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function getPeerName($port = true) {
+    public function getPeerName($port = true)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function getSockName($port = true) {
+    public function getSockName($port = true)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function listen($backlog = 0) {
+    public function listen($backlog = 0)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function read($length, $flags = 0) {
+    public function read($length, $flags = 0)
+    {
         return stream_get_contents($this->sock, $length);
     }
 
-    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0) {
+    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0)
+    {
         return stream_select($read, $write, $except, $tv_sec, $tv_usec);
     }
 
-    public function send($data, $length, $flags) {
+    public function send($data, $length, $flags)
+    {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function setBlocking($blocking) {
+    public function setBlocking($blocking)
+    {
         return stream_set_blocking($this->sock, $blocking);
     }
 
-    public function setOption($level, $name, $value) {
+    public function setOption($level, $name, $value)
+    {
         if (in_array($name, [\SO_RCVTIMEO, \SO_SNDTIMEO])) {
             $this->timeout = ['sec' => (int) $value, 'usec' => (int) (($value - (int) $value) * 1000000)];
 
@@ -149,22 +165,26 @@ class HTTPProxy implements \danog\MadelineProto\Proxy {
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
-    public function write($buffer, $length = -1) {
+    public function write($buffer, $length = -1)
+    {
         return $length === -1 ? fwrite($this->sock, $buffer) : fwrite($this->sock, $buffer, $length);
     }
 
-    private function getProxyAuthHeader() {
+    private function getProxyAuthHeader()
+    {
         if (!isset($this->options['user']) || !isset($this->options['pass'])) {
             return '';
         }
         return "Proxy-Authorization: Basic " . base64_encode($this->options['user'] . ":" . $this->options['pass']) . "\r\n";
     }
 
-    public function getProxyHeaders() {
-        return ($this->use_connect === TRUE) ? '' : $this->getProxyAuthHeader();
+    public function getProxyHeaders()
+    {
+        return ($this->use_connect === true) ? '' : $this->getProxyAuthHeader();
     }
 
-    public function setExtra(array $extra = []) {
+    public function setExtra(array $extra = [])
+    {
         $this->options = $extra;
     }
 

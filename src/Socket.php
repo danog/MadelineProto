@@ -18,11 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
         private $domain;
         private $type;
 
-        public function __construct(int $domain, int $type, string $protocol)
+        public function __construct(int $domain, int $type, int $protocol)
         {
             $this->domain = $domain;
             $this->type = $type;
-            $this->protocol = $protocol === 'https' ? 'tls' : 'tcp';
+            $this->protocol = $protocol === PHP_INT_MAX ? 'tls' : ($protocol === PHP_INT_MAX - 1 ? 'tcp' : getprotobynumber($protocol));
         }
 
         public function __destruct()
@@ -235,12 +235,17 @@ if (!extension_loaded('pthreads')) {
 
                 return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
             }
+
+            public function getProxyHeaders() 
+            {
+                return '';
+            }
         }
         class Socket extends SocketBase
         {
-            public function __construct(int $domain, int $type, string $protocol)
+            public function __construct(int $domain, int $type, int $protocol)
             {
-                parent::__construct(socket_create($domain, $type, $type === \SOCK_DGRAM ? SOL_UDP : SOL_TCP));
+                parent::__construct(socket_create($domain, $type, $protocol));
             }
         }
     } else {
