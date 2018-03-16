@@ -22,7 +22,7 @@ If not, see <http://www.gnu.org/licenses/>.
         {
             $this->domain = $domain;
             $this->type = $type;
-            $this->protocol = $protocol === PHP_INT_MAX ? 'tls' : getprotobynumber($protocol);
+            $this->protocol = $protocol === PHP_INT_MAX ? 'tls' : ($protocol === PHP_INT_MAX - 1 ? 'tcp' : getprotobynumber($protocol));
         }
 
         public function __destruct()
@@ -115,6 +115,16 @@ If not, see <http://www.gnu.org/licenses/>.
         public function getSockName(bool $port = true)
         {
             throw new \danog\MadelineProto\Exception('Not supported');
+        }
+        
+        public function setExtra(array $extra = [])
+        {
+            
+        }
+
+        public function getProxyHeaders() 
+        {
+            return '';
         }
     }
 
@@ -224,6 +234,11 @@ if (!extension_loaded('pthreads')) {
                 $port ? socket_getsockname($this->sock, $address, $ip) : socket_getsockname($this->sock, $address);
 
                 return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
+            }
+
+            public function getProxyHeaders() 
+            {
+                return '';
             }
         }
         class Socket extends SocketBase
