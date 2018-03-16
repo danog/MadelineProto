@@ -36,7 +36,7 @@ class Exception extends \Exception
             $message = 'MadelineProto requires the '.$message[1].' extension to run. '.$additional;
             if (php_sapi_name() !== 'cli') {
                 echo $message.'<br>';
-            }    
+            }
             $file = 'MadelineProto';
             $line = 1;
         }

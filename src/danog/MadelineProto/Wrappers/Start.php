@@ -37,12 +37,13 @@ trait Start
                 }
             }
             $this->serialize();
+
             return $this->get_self();
         } else {
             if ($this->authorized === self::NOT_LOGGED_IN) {
                 if (isset($_POST['phone_number'])) {
                     $this->web_phone_login();
-                } else if (isset($_POST['token'])) {
+                } elseif (isset($_POST['token'])) {
                     $this->web_bot_login();
                 } else {
                     $this->web_echo();
@@ -65,9 +66,10 @@ trait Start
                 } else {
                     $this->web_echo("You didn't provide the first name!");
                 }
-            } 
+            }
             if ($this->authorized === self::LOGGED_IN) {
                 $this->serialize();
+
                 return $this->get_self();
             }
             exit;
@@ -121,6 +123,7 @@ trait Start
             $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
+
     public function web_bot_login()
     {
         try {

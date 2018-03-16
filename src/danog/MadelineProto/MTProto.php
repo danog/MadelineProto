@@ -338,7 +338,6 @@ class MTProto
         if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session)) {
             $this->wrapper->serialize($this->wrapper->session);
         }
-
     }
 
     public function parse_settings($settings)

@@ -399,6 +399,7 @@ trait TL
         if ($tl === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
+
         return $tl['id'].$this->serialize_params($tl, $arguments, $method);
     }
 
