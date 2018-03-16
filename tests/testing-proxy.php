@@ -34,41 +34,37 @@ if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
 
-
 /**
- * Set default context proxy for file_get_contents
- * 
+ * Set default context proxy for file_get_contents.
  */
-
-$default_opts = array(
-        'http' => array(
-            'proxy' => "tcp://host:port",
+$default_opts = [
+        'http' => [
+            'proxy'           => 'tcp://host:port',
             'request_fulluri' => true,
             /* Only if your proxy requires authentication */
-            'header' => array(
-                "Proxy-Authorization: Basic " . base64_encode("proxy_user:proxy_pass")
-            )
-        ),
-        'https' => array(
-            'proxy' => "tcp://host:port",
+            'header' => [
+                'Proxy-Authorization: Basic '.base64_encode('proxy_user:proxy_pass'),
+            ],
+        ],
+        'https' => [
+            'proxy'           => 'tcp://host:port',
             'request_fulluri' => true,
             /* Only if your proxy requires authentication */
-            'header' => array(
-                "Proxy-Authorization: Basic " . base64_encode("proxy_user:proxy_pass")
-            )
-        ),
-        'tls' => array(
-            'proxy' => "tcp://host:port",
+            'header' => [
+                'Proxy-Authorization: Basic '.base64_encode('proxy_user:proxy_pass'),
+            ],
+        ],
+        'tls' => [
+            'proxy'           => 'tcp://host:port',
             'request_fulluri' => true,
             /* Only if your proxy requires authentication */
-            'header' => array(
-                "Proxy-Authorization: Basic " . base64_encode("proxy_user:proxy_pass")
-            )
-        )
-);
+            'header' => [
+                'Proxy-Authorization: Basic '.base64_encode('proxy_user:proxy_pass'),
+            ],
+        ],
+];
 
 $default = stream_context_set_default($default_opts);
-
 
 echo 'Deserializing MadelineProto from testing.madeline...'.PHP_EOL;
 $MadelineProto = false;

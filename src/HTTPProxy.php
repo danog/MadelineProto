@@ -2,7 +2,6 @@
 
 class HTTPProxy implements \danog\MadelineProto\Proxy
 {
-
     private $sock;
     private $protocol;
     private $timeout = ['sec' => 0, 'usec' => 0];
@@ -29,7 +28,7 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
     {
         if ($this->sock !== null) {
             fclose($this->sock);
-            $this->sock = NULL;
+            $this->sock = null;
         }
     }
 
@@ -64,13 +63,13 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
         if (isset($this->options['host']) && isset($this->options['port']) &&
                 true === $this->use_connect) {
             if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
-                $address = '[' . $address . ']';
+                $address = '['.$address.']';
             }
-            fwrite($this->sock, "CONNECT " . $address . ":" . $port . " HTTP/1.1\r\n" .
-                    "Accept: */*\r\n" .
-                    "Host: " . $address . ":" . $port . "\r\n" .
-                    $this->getProxyAuthHeader() .
-                    "connection: keep-Alive\r\n" .
+            fwrite($this->sock, 'CONNECT '.$address.':'.$port." HTTP/1.1\r\n".
+                    "Accept: */*\r\n".
+                    'Host: '.$address.':'.$port."\r\n".
+                    $this->getProxyAuthHeader().
+                    "connection: keep-Alive\r\n".
                     "\r\n");
 
             $response = '';
@@ -79,39 +78,43 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
                 $status = $status || (strpos($line, 'HTTP') !== false);
                 if ($status) {
                     $response .= $line;
-                    if (!chop($line))
+                    if (!rtrim($line)) {
                         break;
+                    }
                 }
             }
-            if (substr($response, 0, 13) !== "HTTP/1.1 200 ")
+            if (substr($response, 0, 13) !== 'HTTP/1.1 200 ') {
                 return false;
+            }
         }
 
         if (true === $this->use_ssl) {
-            $modes = array(
+            $modes = [
                 STREAM_CRYPTO_METHOD_TLS_CLIENT,
                 STREAM_CRYPTO_METHOD_SSLv3_CLIENT,
                 STREAM_CRYPTO_METHOD_SSLv23_CLIENT,
-                STREAM_CRYPTO_METHOD_SSLv2_CLIENT
-            );
+                STREAM_CRYPTO_METHOD_SSLv2_CLIENT,
+            ];
 
-            $contextOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
+            $contextOptions = [
+                'ssl' => [
+                    'verify_peer'      => false,
                     'verify_peer_name' => false,
-                ),
-            );
+                ],
+            ];
             stream_context_set_option($this->sock, $contextOptions);
 
             $success = false;
-            foreach ($modes as $mode)
-            {
+            foreach ($modes as $mode) {
                 $success = stream_socket_enable_crypto($this->sock, true, $mode);
-                if ($success)
+                if ($success) {
                     return true;
+                }
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -162,6 +165,7 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
 
             return true;
         }
+
         throw new \danog\MadelineProto\Exception('Not supported');
     }
 
@@ -175,7 +179,8 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
         if (!isset($this->options['user']) || !isset($this->options['pass'])) {
             return '';
         }
-        return "Proxy-Authorization: Basic " . base64_encode($this->options['user'] . ":" . $this->options['pass']) . "\r\n";
+
+        return 'Proxy-Authorization: Basic '.base64_encode($this->options['user'].':'.$this->options['pass'])."\r\n";
     }
 
     public function getProxyHeaders()
@@ -187,5 +192,4 @@ class HTTPProxy implements \danog\MadelineProto\Proxy
     {
         $this->options = $extra;
     }
-
 }

@@ -44,7 +44,7 @@ interface Proxy
     public function getPeerName($port = true);
 
     public function getSockName($port = true);
-    
+
     public function getProxyHeaders();
 
     public function setExtra(array $extra = []);

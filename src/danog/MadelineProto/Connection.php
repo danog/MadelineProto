@@ -152,12 +152,12 @@ class Connection
                     $proxy = '\\FSocket';
                 }
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : ($has_proxy ? PHP_INT_MAX - 1 : getprotobyname('tcp')));
-                if ($has_proxy ) {
+                if ($has_proxy) {
                     if ($this->extra !== []) {
                         $this->sock->setExtra($this->extra);
                     }
                     if ($this->protocol === 'http') {
-                        $this->parsed['path'] = $this->parsed['scheme'] . '://' . $this->parsed['host'] .
+                        $this->parsed['path'] = $this->parsed['scheme'].'://'.$this->parsed['host'].
                         $this->parsed['path'];
                         $port = 80;
                     } elseif ($this->protocol === 'https') {
@@ -361,7 +361,7 @@ class Connection
                 break;
             case 'http':
             case 'https':
-                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].':'.$this->port."\r\n" . $this->sock->getProxyHeaders() . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
+                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].':'.$this->port."\r\n".$this->sock->getProxyHeaders()."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
                 break;
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);

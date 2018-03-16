@@ -116,13 +116,12 @@ If not, see <http://www.gnu.org/licenses/>.
         {
             throw new \danog\MadelineProto\Exception('Not supported');
         }
-        
+
         public function setExtra(array $extra = [])
         {
-            
         }
 
-        public function getProxyHeaders() 
+        public function getProxyHeaders()
         {
             return '';
         }
@@ -236,7 +235,7 @@ if (!extension_loaded('pthreads')) {
                 return $port ? ['host' => $address, 'port' => $port] : ['host' => $address];
             }
 
-            public function getProxyHeaders() 
+            public function getProxyHeaders()
             {
                 return '';
             }
