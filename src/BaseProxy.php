@@ -2,7 +2,6 @@
 
 class BaseProxy implements \danog\MadelineProto\Proxy
 {
-
     protected $sock;
     protected $protocol;
     protected $timeout = ['sec' => 5, 'usec' => 5000000];
@@ -58,15 +57,14 @@ class BaseProxy implements \danog\MadelineProto\Proxy
 
         $contextOptions = [
             'ssl' => [
-                'verify_peer' => false,
+                'verify_peer'      => false,
                 'verify_peer_name' => false,
             ],
         ];
         stream_context_set_option($this->sock, $contextOptions);
 
         $success = false;
-        foreach ($modes as $mode)
-        {
+        foreach ($modes as $mode) {
             $success = stream_socket_enable_crypto($this->sock, true, $mode);
             if ($success) {
                 return true;
@@ -77,7 +75,7 @@ class BaseProxy implements \danog\MadelineProto\Proxy
     }
 
     /**
-     * default: No proxy
+     * default: No proxy.
      */
     public function connect($address, $port = 0)
     {
@@ -86,11 +84,12 @@ class BaseProxy implements \danog\MadelineProto\Proxy
 
         $this->sock = @fsockopen($address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
 
-        if ($this->sock === FALSE) {
+        if ($this->sock === false) {
             return false;
         }
 
         stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
+
         return $this->changeContextSSL();
     }
 
@@ -159,5 +158,4 @@ class BaseProxy implements \danog\MadelineProto\Proxy
     {
         $this->options = $extra;
     }
-
 }

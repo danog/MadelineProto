@@ -2,7 +2,6 @@
 
 class HTTPProxy extends \BaseProxy
 {
-
     private $use_connect = true;
 
     public function __construct($domain, $type, $protocol)
@@ -25,7 +24,7 @@ class HTTPProxy extends \BaseProxy
             $this->sock = @fsockopen($address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
         }
 
-        if ($this->sock === FALSE) {
+        if ($this->sock === false) {
             return false;
         }
 
@@ -34,13 +33,13 @@ class HTTPProxy extends \BaseProxy
         if (isset($this->options['host']) && isset($this->options['port']) &&
                 true === $this->use_connect) {
             if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
-                $address = '[' . $address . ']';
+                $address = '['.$address.']';
             }
-            fwrite($this->sock, 'CONNECT ' . $address . ':' . $port . " HTTP/1.1\r\n" .
-                    "Accept: */*\r\n" .
-                    'Host: ' . $address . ':' . $port . "\r\n" .
-                    $this->getProxyAuthHeader() .
-                    "connection: keep-Alive\r\n" .
+            fwrite($this->sock, 'CONNECT '.$address.':'.$port." HTTP/1.1\r\n".
+                    "Accept: */*\r\n".
+                    'Host: '.$address.':'.$port."\r\n".
+                    $this->getProxyAuthHeader().
+                    "connection: keep-Alive\r\n".
                     "\r\n");
 
             $response = '';
@@ -58,6 +57,7 @@ class HTTPProxy extends \BaseProxy
                 return false;
             }
         }
+
         return $this->changeContextSSL();
     }
 
@@ -67,12 +67,11 @@ class HTTPProxy extends \BaseProxy
             return '';
         }
 
-        return 'Proxy-Authorization: Basic ' . base64_encode($this->options['user'] . ':' . $this->options['pass']) . "\r\n";
+        return 'Proxy-Authorization: Basic '.base64_encode($this->options['user'].':'.$this->options['pass'])."\r\n";
     }
 
     public function getProxyHeaders()
     {
         return ($this->use_connect === true) ? '' : $this->getProxyAuthHeader();
     }
-
 }

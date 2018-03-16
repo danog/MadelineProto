@@ -88,17 +88,17 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 $settings['connection_settings']['all']['proxy'] = '\HTTPProxy';
 $settings['connection_settings']['all']['proxy_extra'] = [
-    'host' => '127.0.0.1', 
+    'host' => '127.0.0.1',
     'port' => 3218,
     'user' => 'proxy_user', // Only if needed
-    'pass'=> 'proxy_pass' // Only if needed 
+    'pass' => 'proxy_pass', // Only if needed
     ];
 
 /* SOCKS Proxy */
 /*
 $settings['connection_settings']['all']['proxy'] = '\SOCKSProxy';
 $settings['connection_settings']['all']['proxy_extra'] = [
-    'host' => '127.0.0.1', 
+    'host' => '127.0.0.1',
     'port' => 1080,
     // 'user' => 'proxy_user', // Only if needed
     // 'pass'=> 'proxy_pass', // Only if needed
