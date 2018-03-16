@@ -1,5 +1,24 @@
 # Contributing
 
+You can contribute in various ways.  
+
+## Translation
+
+You can help by translating MadelineProto in your language.
+
+Fork github.com/danog/MadelineProto, then run
+
+```
+git clone https://github.com/youruser/MadelineProto
+php translate.php
+git commit -am 'Added yourlanguage'
+git push origin master:localization-yourlanguage
+```
+
+Then create a pull request from branch `localization-yourlanguage`
+
+## Contribution guide
+
 [Here](https://github.com/danog/MadelineProto/projects/1) you can find this project's roadmap.
 
 You can use this scheme of the structure of this project to help yourself:

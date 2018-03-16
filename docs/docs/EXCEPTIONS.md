@@ -14,14 +14,74 @@ try {
 
 MadelineProto can throw lots of different exceptions.  
 
-Every exception features a custom stack trace called `pretty TL trace`, that makes finding bugs **really** easy.
+Every exception features a custom stack trace called `pretty TL trace`, that makes finding bugs **really** easy:
 
 ```
+php > $MadelineProto->messages->sendMessage(['peer' => '@dd', 'message' => 'hi']);
+
+Uncaught \danog\MadelineProto\Exception: This peer is not present in the internal peer database in /home/pwrtelegram/cleanMadeline/src/danog/MadelineProto/MTProtoTools/PeerHandler.php:330
+Revision: 63823fc3cc5070bd8a1ebe91e60e1fd583a2f37f
+
+TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):
+
+PeerHandler.php(327):   get_info("dd",false)
+TL.php(339):            get_info("dd")
+['peer']
+While serializing:      messages.sendMessage
+CallHandler.php(79):    serialize_method("messages.sendMessage",{"peer":"@dd","message":"hi"})
+APIFactory.php(142):    method_call("messages.sendMessage",{"peer":"@dd","message":"hi"},{"datacenter":4})
+php shell code(1):      __call("sendMessage",[{"peer":"@dd","message":"hi"}])
+  thrown in /home/pwrtelegram/cleanMadeline/src/danog/MadelineProto/MTProtoTools/PeerHandler.php on line 330
+php >
 ```
+
+Explanation:  
+
+`Uncaught \danog\MadelineProto\Exception`: an exception of type \danog\MadelineProto\Exception was thrown and not caught using a `catch` block, like showed in the first example of this page.
+
+`This peer is not present in the internal peer database`: this error means you have tried sending a message to a peer that does not exist or is not present in MadelineProto's internal peer database: in fact, `@dd` is not a valid telegram username. 
+
+`in /home/pwrtelegram/cleanMadeline/src/danog/MadelineProto/MTProtoTools/PeerHandler.php:330`: this indicates the line where this error was thrown
+
+`Revision: 63823fc3cc5070bd8a1ebe91e60e1fd583a2f37f`: this indicates the MadelineProto version: **always** include this code when opening github issues or reporting errors in the group.
+
+```
+PeerHandler.php(327):   get_info("dd",false)
+TL.php(339):            get_info("dd")
+['peer']
+While serializing:      messages.sendMessage
+CallHandler.php(79):    serialize_method("messages.sendMessage",{"peer":"@dd","message":"hi"})
+APIFactory.php(142):    method_call("messages.sendMessage",{"peer":"@dd","message":"hi"},{"datacenter":4})
+php shell code(1):      __call("sendMessage",[{"peer":"@dd","message":"hi"}])
+```
+
+This part is supposed to be read from bottom to top, the most important parts are:
+
+`While serializing:      messages.sendMessage`: this means the error was thrown while serializing the method call for messages->sendMessage
+
+`['peer']`: this means the error was thrown while trying to serialize the `peer` parameter, so **you should fix that part of your code**:
+```
+$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'hi']);
+```
+
+## Getting the TL trace 
+
+To get the whole TL trace as string, cast the exception object to string:
+
+```
+try {
+    //
+} catch (\danog\MadelineProto\Exception $e) {
+    $estring = (string) $e;
+    $estring2 = 'This also works: '.$e;
+    $estring3 = "So does this: $e";
+}
+
+## List of exception types
 
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
 
-* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API)
+* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API): **note** that the error message of this exception is localized in English, and may vary: to fetch the original API error message use `$e->rpc`.
 
 * \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
 
