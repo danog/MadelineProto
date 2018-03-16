@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns all mentions, hashtags, bot commands, URLs and emails contained in the text. Offline method. Can be called before authorization. Can be called synchronously
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

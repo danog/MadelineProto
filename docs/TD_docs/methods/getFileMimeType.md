@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns file's mime type guessing only by its extension. Returns empty string on failure. Offline method. Can be called before authorization. Can be called synchronously
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
