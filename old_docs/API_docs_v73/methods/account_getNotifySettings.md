@@ -1,16 +1,18 @@
 ---
 title: account.getNotifySettings
-description: account.getNotifySettings parameters, return type and example
+description: Get notification settings
 ---
 ## Method: account.getNotifySettings  
 [Back to methods index](index.md)
 
 
+Get notification settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|Notification source |
 
 
 ### Return type: [PeerNotifySettings](../types/PeerNotifySettings.md)

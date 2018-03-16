@@ -1,18 +1,20 @@
 ---
 title: account.sendChangePhoneCode
-description: account.sendChangePhoneCode parameters, return type and example
+description: Change the phone number
 ---
 ## Method: account.sendChangePhoneCode  
 [Back to methods index](index.md)
 
 
+Change the phone number
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|phone\_number|[string](../types/string.md) | Yes|
-|current\_number|[Bool](../types/Bool.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|allow\_flashcall|[Bool](../types/Bool.md) | Optional|Can the code be sent using a flash call instead of an SMS?|
+|phone\_number|[string](../types/string.md) | Yes|New phone number|
+|current\_number|[Bool](../types/Bool.md) | Optional|Current phone number|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)

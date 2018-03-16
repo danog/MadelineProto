@@ -1,16 +1,18 @@
 ---
 title: account.updateStatus
-description: account.updateStatus parameters, return type and example
+description: Update online status
 ---
 ## Method: account.updateStatus  
 [Back to methods index](index.md)
 
 
+Update online status
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offline|[Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offline|[Bool](../types/Bool.md) | Yes|offline to set the status to offline|
 
 
 ### Return type: [Bool](../types/Bool.md)

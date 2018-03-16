@@ -1,16 +1,18 @@
 ---
 title: account.setAccountTTL
-description: account.setAccountTTL parameters, return type and example
+description: Set account TTL
 ---
 ## Method: account.setAccountTTL  
 [Back to methods index](index.md)
 
 
+Set account TTL
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|Time To Live of account|
 
 
 ### Return type: [Bool](../types/Bool.md)

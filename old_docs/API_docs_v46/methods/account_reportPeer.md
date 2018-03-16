@@ -1,17 +1,19 @@
 ---
 title: account.reportPeer
-description: account.reportPeer parameters, return type and example
+description: Report for spam
 ---
 ## Method: account.reportPeer  
 [Back to methods index](index.md)
 
 
+Report for spam
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
-|reason|[ReportReason](../types/ReportReason.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[InputPeer](../types/InputPeer.md) | Optional|The peer to report|
+|reason|[ReportReason](../types/ReportReason.md) | Yes|Why are you reporting this peer|
 
 
 ### Return type: [Bool](../types/Bool.md)

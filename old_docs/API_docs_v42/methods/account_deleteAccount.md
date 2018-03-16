@@ -1,16 +1,18 @@
 ---
 title: account.deleteAccount
-description: account.deleteAccount parameters, return type and example
+description: Delete this account
 ---
 ## Method: account.deleteAccount  
 [Back to methods index](index.md)
 
 
+Delete this account
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|reason|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|reason|[string](../types/string.md) | Yes|Why are you going away? :(|
 
 
 ### Return type: [Bool](../types/Bool.md)

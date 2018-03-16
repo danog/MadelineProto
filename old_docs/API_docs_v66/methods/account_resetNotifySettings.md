@@ -1,11 +1,17 @@
 ---
 title: account.resetNotifySettings
-description: account.resetNotifySettings parameters, return type and example
+description: Reset all notification settings
 ---
 ## Method: account.resetNotifySettings  
 [Back to methods index](index.md)
 
 
+Reset all notification settings
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

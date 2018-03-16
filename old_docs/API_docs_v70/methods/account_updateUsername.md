@@ -1,16 +1,18 @@
 ---
 title: account.updateUsername
-description: account.updateUsername parameters, return type and example
+description: Update this user's username
 ---
 ## Method: account.updateUsername  
 [Back to methods index](index.md)
 
 
+Update this user's username
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|username|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|username|[string](../types/string.md) | Yes|The new username|
 
 
 ### Return type: [User](../types/User.md)

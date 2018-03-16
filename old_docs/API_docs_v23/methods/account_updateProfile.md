@@ -1,17 +1,19 @@
 ---
 title: account.updateProfile
-description: account.updateProfile parameters, return type and example
+description: Update profile info
 ---
 ## Method: account.updateProfile  
 [Back to methods index](index.md)
 
 
+Update profile info
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|first\_name|[string](../types/string.md) | Yes|
-|last\_name|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|first\_name|[string](../types/string.md) | Yes|The first name|
+|last\_name|[string](../types/string.md) | Yes|The last name|
 
 
 ### Return type: [User](../types/User.md)

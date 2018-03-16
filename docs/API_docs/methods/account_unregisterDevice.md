@@ -1,18 +1,20 @@
 ---
 title: account.unregisterDevice
-description: account.unregisterDevice parameters, return type and example
+description: Stop sending PUSH notifications to app
 ---
 ## Method: account.unregisterDevice  
 [Back to methods index](index.md)
 
 
+Stop sending PUSH notifications to app
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|token\_type|[int](../types/int.md) | Yes|
-|token|[string](../types/string.md) | Yes|
-|other\_uids|Array of [int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|token\_type|[int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
+|token|[string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
+|other\_uids|Array of [int](../types/int.md) | Yes|Other UUIDs|
 
 
 ### Return type: [Bool](../types/Bool.md)

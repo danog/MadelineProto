@@ -1,17 +1,19 @@
 ---
 title: account.setPrivacy
-description: account.setPrivacy parameters, return type and example
+description: Set privacy settings
 ---
 ## Method: account.setPrivacy  
 [Back to methods index](index.md)
 
 
+Set privacy settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
-|rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting|
+|rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|Privacy settings|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)

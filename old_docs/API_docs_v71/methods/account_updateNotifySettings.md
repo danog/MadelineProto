@@ -1,17 +1,19 @@
 ---
 title: account.updateNotifySettings
-description: account.updateNotifySettings parameters, return type and example
+description: Change notification settings
 ---
 ## Method: account.updateNotifySettings  
 [Back to methods index](index.md)
 
 
+Change notification settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|
-|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
+|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
 
 
 ### Return type: [Bool](../types/Bool.md)

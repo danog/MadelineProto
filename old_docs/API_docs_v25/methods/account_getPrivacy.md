@@ -1,16 +1,18 @@
 ---
 title: account.getPrivacy
-description: account.getPrivacy parameters, return type and example
+description: Get privacy settings
 ---
 ## Method: account.getPrivacy  
 [Back to methods index](index.md)
 
 
+Get privacy settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting key|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)

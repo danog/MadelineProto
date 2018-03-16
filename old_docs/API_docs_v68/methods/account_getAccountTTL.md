@@ -1,11 +1,17 @@
 ---
 title: account.getAccountTTL
-description: account.getAccountTTL parameters, return type and example
+description: Get account TTL
 ---
 ## Method: account.getAccountTTL  
 [Back to methods index](index.md)
 
 
+Get account TTL
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [AccountDaysTTL](../types/AccountDaysTTL.md)

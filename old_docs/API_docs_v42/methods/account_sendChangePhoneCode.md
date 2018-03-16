@@ -1,16 +1,18 @@
 ---
 title: account.sendChangePhoneCode
-description: account.sendChangePhoneCode parameters, return type and example
+description: Change the phone number
 ---
 ## Method: account.sendChangePhoneCode  
 [Back to methods index](index.md)
 
 
+Change the phone number
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[string](../types/string.md) | Yes|New phone number|
 
 
 ### Return type: [account\_SentChangePhoneCode](../types/account_SentChangePhoneCode.md)

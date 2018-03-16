@@ -12,12 +12,12 @@ Register device for push notifications
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|token\_type|[int](../types/int.md) | Yes||
-|token|[string](../types/string.md) | Yes||
+|token\_type|[int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and other, see source code of official apps for more info|
+|token|[string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
 |device\_model|[string](../types/string.md) | Yes||
 |system\_version|[string](../types/string.md) | Yes||
 |app\_version|[string](../types/string.md) | Yes||
-|app\_sandbox|[Bool](../types/Bool.md) | Yes||
+|app\_sandbox|[Bool](../types/Bool.md) | Yes|Should the app run in a sandbox?|
 |lang\_code|[string](../types/string.md) | Yes||
 
 

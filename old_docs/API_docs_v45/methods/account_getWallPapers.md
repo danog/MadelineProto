@@ -1,11 +1,17 @@
 ---
 title: account.getWallPapers
-description: account.getWallPapers parameters, return type and example
+description: Returns a list of available wallpapers.
 ---
 ## Method: account.getWallPapers  
 [Back to methods index](index.md)
 
 
+Returns a list of available wallpapers.
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_WallPaper](../types/WallPaper.md)

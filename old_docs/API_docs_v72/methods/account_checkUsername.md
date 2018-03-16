@@ -1,16 +1,18 @@
 ---
 title: account.checkUsername
-description: account.checkUsername parameters, return type and example
+description: Check if this username is available
 ---
 ## Method: account.checkUsername  
 [Back to methods index](index.md)
 
 
+Check if this username is available
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|username|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|username|[string](../types/string.md) | Yes|The username to check|
 
 
 ### Return type: [Bool](../types/Bool.md)
