@@ -538,4 +538,33 @@ Any json-encodable data.
 ');
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
+    public $template = '<?php
+    /*
+    Copyright 2016-2018 Daniil Gentili
+    (https://daniil.it)
+    This file is part of MadelineProto.
+    MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Affero General Public License for more details.
+    You should have received a copy of the GNU General Public License along with MadelineProto.
+    If not, see <http://www.gnu.org/licenses/>.
+    */
+    
+namespace danog\MadelineProto;
+    
+class Lang
+{
+    public static $lang = %s;
+    
+    // THIS WILL BE OVERWRITTEN BY $lang["en"]
+    public static $current_lang = %s;
+}';
+    
+    public function add_to_lang($key) {
+        if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
+            \danog\MadelineProto\Lang::$lang['en'][$key] = '';
+            file_put_contents(__DIR__.'/Lang.php', sprintf($this->template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+        }
+
+    }
 }
