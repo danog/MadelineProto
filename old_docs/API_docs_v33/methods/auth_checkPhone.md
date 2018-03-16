@@ -1,16 +1,18 @@
 ---
 title: auth.checkPhone
-description: auth.checkPhone parameters, return type and example
+description: Check if this phone number is registered on telegram
 ---
 ## Method: auth.checkPhone  
 [Back to methods index](index.md)
 
 
+Check if this phone number is registered on telegram
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[string](../types/string.md) | Yes|The phone number to check|
 
 
 ### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)

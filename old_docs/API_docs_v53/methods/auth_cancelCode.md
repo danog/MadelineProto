@@ -1,17 +1,19 @@
 ---
 title: auth.cancelCode
-description: auth.cancelCode parameters, return type and example
+description: Invalidate sent phone code
 ---
 ## Method: auth.cancelCode  
 [Back to methods index](index.md)
 
 
+Invalidate sent phone code
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
-|phone\_code\_hash|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[string](../types/string.md) | Yes|Phone number|
+|phone\_code\_hash|[string](../types/string.md) | Yes|Phone code hash|
 
 
 ### Return type: [Bool](../types/Bool.md)

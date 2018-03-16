@@ -1,16 +1,18 @@
 ---
 title: auth.recoverPassword
-description: auth.recoverPassword parameters, return type and example
+description: Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account
 ---
 ## Method: auth.recoverPassword  
 [Back to methods index](index.md)
 
 
+Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|code|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|code|[string](../types/string.md) | Yes|The code that was emailed to you|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)

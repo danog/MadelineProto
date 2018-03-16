@@ -1,17 +1,19 @@
 ---
 title: invokeWithLayer
-description: invokeWithLayer parameters, return type and example
+description: Invoke this method with layer X
 ---
 ## Method: invokeWithLayer  
 [Back to methods index](index.md)
 
 
+Invoke this method with layer X
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|layer|[int](../types/int.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|layer|[int](../types/int.md) | Yes|The layer version|
+|query|[!X](../types/!X.md) | Yes|The query|
 
 
 ### Return type: [X](../types/X.md)

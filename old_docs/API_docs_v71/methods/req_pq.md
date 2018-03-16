@@ -1,16 +1,18 @@
 ---
 title: req_pq
-description: req_pq parameters, return type and example
+description: Requests PQ for factorization
 ---
 ## Method: req\_pq  
 [Back to methods index](index.md)
 
 
+Requests PQ for factorization
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
 
 
 ### Return type: [ResPQ](../types/ResPQ.md)

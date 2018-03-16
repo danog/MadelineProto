@@ -1,16 +1,18 @@
 ---
 title: invokeWithoutUpdates
-description: invokeWithoutUpdates parameters, return type and example
+description: Invoke with method without returning updates in the socket
 ---
 ## Method: invokeWithoutUpdates  
 [Back to methods index](index.md)
 
 
+Invoke with method without returning updates in the socket
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|query|[!X](../types/!X.md) | Yes|The query|
 
 
 ### Return type: [X](../types/X.md)

@@ -1,16 +1,18 @@
 ---
 title: get_future_salts
-description: get_future_salts parameters, return type and example
+description: Get future salts
 ---
 ## Method: get\_future\_salts  
 [Back to methods index](index.md)
 
 
+Get future salts
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|num|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|num|[int](../types/int.md) | Yes|How many salts should be fetched|
 
 
 ### Return type: [FutureSalts](../types/FutureSalts.md)

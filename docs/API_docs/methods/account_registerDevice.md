@@ -1,19 +1,21 @@
 ---
 title: account.registerDevice
-description: account.registerDevice parameters, return type and example
+description: Register device for push notifications
 ---
 ## Method: account.registerDevice  
 [Back to methods index](index.md)
 
 
+Register device for push notifications
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|token\_type|[int](../types/int.md) | Yes|
-|token|[string](../types/string.md) | Yes|
-|app\_sandbox|[Bool](../types/Bool.md) | Yes|
-|other\_uids|Array of [int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|token\_type|[int](../types/int.md) | Yes||
+|token|[string](../types/string.md) | Yes||
+|app\_sandbox|[Bool](../types/Bool.md) | Yes||
+|other\_uids|Array of [int](../types/int.md) | Yes||
 
 
 ### Return type: [Bool](../types/Bool.md)

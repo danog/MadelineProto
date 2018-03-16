@@ -1,6 +1,6 @@
 ---
 title: auth.sendCode
-description: auth.sendCode parameters, return type and example
+description: Use phone_login instead
 ---
 ## Method: auth.sendCode  
 [Back to methods index](index.md)

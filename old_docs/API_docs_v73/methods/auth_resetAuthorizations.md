@@ -1,11 +1,17 @@
 ---
 title: auth.resetAuthorizations
-description: auth.resetAuthorizations parameters, return type and example
+description: Delete all logged-in sessions.
 ---
 ## Method: auth.resetAuthorizations  
 [Back to methods index](index.md)
 
 
+Delete all logged-in sessions.
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

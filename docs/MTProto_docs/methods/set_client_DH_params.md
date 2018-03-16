@@ -1,18 +1,20 @@
 ---
 title: set_client_DH_params
-description: set_client_DH_params parameters, return type and example
+description: Sets client diffie-hellman parameters
 ---
 ## Method: set\_client\_DH\_params  
 [Back to methods index](index.md)
 
 
+Sets client diffie-hellman parameters
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
-|server\_nonce|[int128](../types/int128.md) | Yes|
-|encrypted\_data|[bytes](../types/bytes.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
+|server\_nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
+|encrypted\_data|[bytes](../types/bytes.md) | Yes|Encrypted key exchange message|
 
 
 ### Return type: [Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)

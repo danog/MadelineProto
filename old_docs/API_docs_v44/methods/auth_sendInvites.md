@@ -1,17 +1,19 @@
 ---
 title: auth.sendInvites
-description: auth.sendInvites parameters, return type and example
+description: Invite friends to telegram!
 ---
 ## Method: auth.sendInvites  
 [Back to methods index](index.md)
 
 
+Invite friends to telegram!
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_numbers|Array of [string](../types/string.md) | Yes|
-|message|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_numbers|Array of [string](../types/string.md) | Yes|Phone numbers to invite|
+|message|[string](../types/string.md) | Yes|The message to send|
 
 
 ### Return type: [Bool](../types/Bool.md)

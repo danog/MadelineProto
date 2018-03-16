@@ -1,23 +1,25 @@
 ---
 title: initConnection
-description: initConnection parameters, return type and example
+description: Initializes connection and save information on the user's device and application.
 ---
 ## Method: initConnection  
 [Back to methods index](index.md)
 
 
+Initializes connection and save information on the user's device and application.
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|api\_id|[int](../types/int.md) | Yes|
-|device\_model|[string](../types/string.md) | Yes|
-|system\_version|[string](../types/string.md) | Yes|
-|app\_version|[string](../types/string.md) | Yes|
-|system\_lang\_code|[string](../types/string.md) | Yes|
-|lang\_pack|[string](../types/string.md) | Yes|
-|lang\_code|[string](../types/string.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|api\_id|[int](../types/int.md) | Yes|Application identifier|
+|device\_model|[string](../types/string.md) | Yes|Device model|
+|system\_version|[string](../types/string.md) | Yes|System version|
+|app\_version|[string](../types/string.md) | Yes|App version|
+|system\_lang\_code|[string](../types/string.md) | Yes|Language code|
+|lang\_pack|[string](../types/string.md) | Yes|Language pack to use|
+|lang\_code|[string](../types/string.md) | Yes|Language code to set|
+|query|[!X](../types/!X.md) | Yes|Nested query|
 
 
 ### Return type: [X](../types/X.md)

@@ -1,16 +1,18 @@
 ---
 title: rpc_drop_answer
-description: rpc_drop_answer parameters, return type and example
+description: Do not send answer to provided request
 ---
 ## Method: rpc\_drop\_answer  
 [Back to methods index](index.md)
 
 
+Do not send answer to provided request
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|req\_msg\_id|[long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|req\_msg\_id|[long](../types/long.md) | Yes|The message ID of the request|
 
 
 ### Return type: [RpcDropAnswer](../types/RpcDropAnswer.md)

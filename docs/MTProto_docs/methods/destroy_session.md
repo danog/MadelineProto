@@ -1,16 +1,18 @@
 ---
 title: destroy_session
-description: destroy_session parameters, return type and example
+description: Destroy the current MTProto session
 ---
 ## Method: destroy\_session  
 [Back to methods index](index.md)
 
 
+Destroy the current MTProto session
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|session\_id|[long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|session\_id|[long](../types/long.md) | Yes|The session to destroy|
 
 
 ### Return type: [DestroySessionRes](../types/DestroySessionRes.md)

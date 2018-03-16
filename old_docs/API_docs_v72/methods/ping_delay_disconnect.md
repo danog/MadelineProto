@@ -1,17 +1,19 @@
 ---
 title: ping_delay_disconnect
-description: ping_delay_disconnect parameters, return type and example
+description: Pings the server and causes disconection if the same method is not called within ping_disconnect_delay
 ---
 ## Method: ping\_delay\_disconnect  
 [Back to methods index](index.md)
 
 
+Pings the server and causes disconection if the same method is not called within ping_disconnect_delay
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|ping\_id|[long](../types/long.md) | Yes|
-|disconnect\_delay|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|ping\_id|[long](../types/long.md) | Yes|Ping ID|
+|disconnect\_delay|[int](../types/int.md) | Yes|Disconection delay|
 
 
 ### Return type: [Pong](../types/Pong.md)

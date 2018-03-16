@@ -1,21 +1,23 @@
 ---
 title: req_DH_params
-description: req_DH_params parameters, return type and example
+description: Requests Diffie-hellman parameters for key exchange
 ---
 ## Method: req\_DH\_params  
 [Back to methods index](index.md)
 
 
+Requests Diffie-hellman parameters for key exchange
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
-|server\_nonce|[int128](../types/int128.md) | Yes|
-|p|[string](../types/string.md) | Yes|
-|q|[string](../types/string.md) | Yes|
-|public\_key\_fingerprint|[long](../types/long.md) | Yes|
-|encrypted\_data|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
+|server\_nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
+|p|[string](../types/string.md) | Yes||
+|q|[string](../types/string.md) | Yes||
+|public\_key\_fingerprint|[long](../types/long.md) | Yes|Server RSA fingerprint|
+|encrypted\_data|[string](../types/string.md) | Yes||
 
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)

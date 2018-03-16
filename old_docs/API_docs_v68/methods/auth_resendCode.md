@@ -1,17 +1,19 @@
 ---
 title: auth.resendCode
-description: auth.resendCode parameters, return type and example
+description: Resend the SMS verification code
 ---
 ## Method: auth.resendCode  
 [Back to methods index](index.md)
 
 
+Resend the SMS verification code
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
-|phone\_code\_hash|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[string](../types/string.md) | Yes|The phone number|
+|phone\_code\_hash|[string](../types/string.md) | Yes|The phone code hash|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)

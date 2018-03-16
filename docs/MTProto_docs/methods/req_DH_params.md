@@ -1,21 +1,23 @@
 ---
 title: req_DH_params
-description: req_DH_params parameters, return type and example
+description: Requests Diffie-hellman parameters for key exchange
 ---
 ## Method: req\_DH\_params  
 [Back to methods index](index.md)
 
 
+Requests Diffie-hellman parameters for key exchange
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
-|server\_nonce|[int128](../types/int128.md) | Yes|
-|p|[bytes](../types/bytes.md) | Yes|
-|q|[bytes](../types/bytes.md) | Yes|
-|public\_key\_fingerprint|[long](../types/long.md) | Yes|
-|encrypted\_data|[bytes](../types/bytes.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
+|server\_nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
+|p|[bytes](../types/bytes.md) | Yes|Factorized p from pq|
+|q|[bytes](../types/bytes.md) | Yes|Factorized q from pq|
+|public\_key\_fingerprint|[long](../types/long.md) | Yes|Server RSA fingerprint|
+|encrypted\_data|[bytes](../types/bytes.md) | Yes|Encrypted key exchange message|
 
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)

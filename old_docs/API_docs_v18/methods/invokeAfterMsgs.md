@@ -1,17 +1,19 @@
 ---
 title: invokeAfterMsgs
-description: invokeAfterMsgs parameters, return type and example
+description: Result type returned by a current query.
 ---
 ## Method: invokeAfterMsgs  
 [Back to methods index](index.md)
 
 
+Result type returned by a current query.
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_ids|Array of [long](../types/long.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_ids|Array of [long](../types/long.md) | Yes|List of messages on which a current query depends|
+|query|[!X](../types/!X.md) | Yes|The query itself|
 
 
 ### Return type: [X](../types/X.md)

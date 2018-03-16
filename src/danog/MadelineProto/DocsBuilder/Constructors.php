@@ -79,6 +79,13 @@ trait Constructors
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
+            if (!isset($this->td_descriptions['constructors'][$data['predicate']])) {
+                $this->add_to_lang('object_'.$data['predicate']);
+                if (\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']] !== '') {
+                    $this->td_descriptions['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
+                }
+            }
+
             if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
                 $table = '### Attributes:
 
@@ -119,6 +126,13 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+
+                if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
+                    $this->add_to_lang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
+                    if (isset($this->td_descriptions['constructors'][$data['predicate']]['description'])) {
+                        $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
+                    }
+                }
                 if (isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }

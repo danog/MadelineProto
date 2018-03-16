@@ -75,7 +75,7 @@ trait Methods
                 $this->add_to_lang('method_'.$data['method']);
                 
                 if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
-                    $this->td_descriptions['methods'][$data['method']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
+                    $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
                 }
             }
             if (isset($this->td_descriptions['methods'][$data['method']])) {
@@ -109,10 +109,11 @@ trait Methods
                 $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 if (!isset($this->td_descriptions['methods'][$data['method']]['params'][$param['name']])) {
                     $this->add_to_lang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
-                    if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']] !== '') {
+                    if (isset($this->td_descriptions['methods'][$data['method']]['description'])) {
                         $this->td_descriptions['methods'][$data['method']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
+                
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
                     $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }

@@ -1,16 +1,18 @@
 ---
 title: req_pq_multi
-description: req_pq_multi parameters, return type and example
+description: Requests PQ for factorization (new version)
 ---
 ## Method: req\_pq\_multi  
 [Back to methods index](index.md)
 
 
+Requests PQ for factorization (new version)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
 
 
 ### Return type: [ResPQ](../types/ResPQ.md)

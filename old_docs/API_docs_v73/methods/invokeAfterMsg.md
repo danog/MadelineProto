@@ -1,17 +1,19 @@
 ---
 title: invokeAfterMsg
-description: invokeAfterMsg parameters, return type and example
+description: Invokes a query after successfull completion of one of the previous queries.
 ---
 ## Method: invokeAfterMsg  
 [Back to methods index](index.md)
 
 
+Invokes a query after successfull completion of one of the previous queries.
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_id|[long](../types/long.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_id|[long](../types/long.md) | Yes|Message identifier on which a current query depends|
+|query|[!X](../types/!X.md) | Yes|The query itself|
 
 
 ### Return type: [X](../types/X.md)

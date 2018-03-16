@@ -1,11 +1,17 @@
 ---
 title: auth.requestPasswordRecovery
-description: auth.requestPasswordRecovery parameters, return type and example
+description: Send an email to recover the 2FA password
 ---
 ## Method: auth.requestPasswordRecovery  
 [Back to methods index](index.md)
 
 
+Send an email to recover the 2FA password
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)

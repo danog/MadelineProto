@@ -1,6 +1,6 @@
 ---
 title: auth.logOut
-description: auth.logOut parameters, return type and example
+description: You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)
 ---
 ## Method: auth.logOut  
 [Back to methods index](index.md)

@@ -1,16 +1,18 @@
 ---
 title: ping
-description: ping parameters, return type and example
+description: pings the server
 ---
 ## Method: ping  
 [Back to methods index](index.md)
 
 
+pings the server
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|ping\_id|[long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|ping\_id|[long](../types/long.md) | Yes|Ping ID|
 
 
 ### Return type: [Pong](../types/Pong.md)

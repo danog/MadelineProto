@@ -1,16 +1,18 @@
 ---
 title: auth.dropTempAuthKeys
-description: auth.dropTempAuthKeys parameters, return type and example
+description: Delete all temporary authorization keys except the ones provided
 ---
 ## Method: auth.dropTempAuthKeys  
 [Back to methods index](index.md)
 
 
+Delete all temporary authorization keys except the ones provided
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|except\_auth\_keys|Array of [long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|except\_auth\_keys|Array of [long](../types/long.md) | Yes|The temporary authorization keys to keep|
 
 
 ### Return type: [Bool](../types/Bool.md)
