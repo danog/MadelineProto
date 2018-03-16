@@ -13,16 +13,14 @@ This library can be used to easily interact with Telegram **without** the bot AP
 
 It can login with a phone number (MTProto API), or with a bot token (MTProto API, **no bot API involved!**).
 
-
-## Installation
-
-Simply download [madeline.php](https://phar.madelineproto.xyz/madeline.php).
-
 ## Getting started
 
 ```
 <?php
 
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+}
 include 'madeline.php';
 
 // !!! This API id/API hash combination will not work !!!
@@ -31,24 +29,13 @@ $api_id = 0;
 $api_hash = '';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();    
 
-$MadelineProto->phone_login(readline('Enter your phone number: '));
-$authorization = $MadelineProto->complete_phone_login(readline('Enter the phone code: '));
-if ($authorization['_'] === 'account.password') {
-    $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
-}
-if ($authorization['_'] === 'account.needSignup') {
-    $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
-}
-    
-```
-
-## Simple example
-
-```
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
 $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 ```
+
+Run this code in a browser or in a console.
 
 ## Documentation
 
