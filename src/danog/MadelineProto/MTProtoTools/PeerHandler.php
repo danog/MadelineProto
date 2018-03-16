@@ -316,6 +316,9 @@ trait PeerHandler
             }
         }
         $id = strtolower(str_replace('@', '', $id));
+        if ($id === 'me') {
+            return $this->gen_all($this->get_self());
+        }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
                 return $this->gen_all($chat);

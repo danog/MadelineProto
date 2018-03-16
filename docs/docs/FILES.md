@@ -1,6 +1,14 @@
-## Uploading and downloading files
+# Uploading and downloading files
 
 MadelineProto provides wrapper methods to upload and download files that support bot API file ids.
+
+## Uploading files
+
+To upload and send media, first you need to get an [InputFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) (for nornal chats) or an [InputEncryptedFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) (for secret chats):
+
+```
+$InputFile = $
+```
 
 Every method described in this section accepts a last optional paramater with a callable function that will be called during the upload/download using the first parameter to pass a floating point number indicating the upload/download status in percentage.  
 

@@ -2,9 +2,71 @@
 
 ## Simple
 
-Download [madeline.php](https://phar.madelineproto.xyz/madeline.php).
+```php
+<?php
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz', 'madeline.php');
+}
+require_once 'madeline.php';
+```
 
-## Composer
+This code will automatically download and include MadelineProto.
+
+
+## Simple (manual)
+
+Download [madeline.php](https://phar.madelineproto.xyz/madeline.php), put it in the same directory as your script, and then put the following code in your PHP file:
+```php
+<?php
+require_once 'madeline.php';
+```
+
+## Composer from scratch
+
+composer.json:
+```json
+{
+    "name": "pwrtelegram/pwrtelegram",
+    "description": "Boosted version of telegram's bot API",
+    "type": "project",
+    "require": {
+        "mhor/php-mediainfo": "^2.2",
+        "danog/madelineproto": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/danog/phpseclib"
+        }
+    ],
+    "minimum-stability": "dev",
+    "license": "AGPL-3.0-only",
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil.gentili.dg@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "PWRTelegram\\PWRTelegram\\": "src/"
+        }
+    }
+}
+```
+
+Then run:
+```bash
+composer update
+```
+
+Put the following code in your PHP file:
+```
+<?php
+require_once 'vendor/autoload.php';
+```
+
+## Composer from existing project
 
 Once you have all the requirements installed properly (on dev as well as production), add this to the ```composer.json``` file:
 
@@ -28,6 +90,8 @@ Then you can require the package by addding the following line to the require se
 ```
 "danog/madelineproto":"dev-master"
 ```
+
+
 
 ## git
 

@@ -19,7 +19,15 @@ trait Templates
     {
         switch ($this->authorized) {
             case self::NOT_LOGGED_IN:
-            echo $this->web_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>');
+            if (isset($_POST['type'])) {
+                if ($_POST['type'] === 'phone') {
+                    echo $this->web_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>');
+                } else {
+                    echo $this->web_echo_template('Enter your bot token<br><b>'.$message.'</b>', '<input type="text" name="token" placeholder="Bot token" required/>');                    
+                }
+            } else {
+                echo $this->web_echo_template('Do you want to login as user or bot?<br><b>'.$message.'</b>', '<select name="type"><option value="phone">User</option><option value="bot">Bot</option></select>'); 
+            }
             break;
 
             case self::WAITING_CODE:

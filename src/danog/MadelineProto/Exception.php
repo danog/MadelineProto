@@ -31,9 +31,14 @@ class Exception extends \Exception
             } elseif ($message[1] === 'prime') {
                 $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
             } else {
-                $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$message[1];
+                $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$message[1].'.';
             }
             $message = 'MadelineProto requires the '.$message[1].' extension to run. '.$additional;
+            if (php_sapi_name() !== 'cli') {
+                echo $message.'<br>';
+            }    
+            $file = 'MadelineProto';
+            $line = 1;
         }
         $this->prettify_tl();
         if ($file !== null) {

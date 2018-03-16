@@ -333,6 +333,14 @@ class MTProto
         }
     }
 
+    public function serialize()
+    {
+        if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session)) {
+            $this->wrapper->serialize($this->wrapper->session);
+        }
+
+    }
+
     public function parse_settings($settings)
     {
         // Detect device model
@@ -476,7 +484,7 @@ class MTProto
              *     $message is an array containing the messages the log, $level, is the logging level
              */
             // write to
-            'logger_param' => '/tmp/MadelineProto.log',
+            'logger_param' => 'MadelineProto.log',
             'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,

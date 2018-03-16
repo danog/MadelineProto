@@ -14,6 +14,24 @@ try {
 
 MadelineProto can throw lots of different exceptions.  
 
+## List of exception types
+
+* \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
+
+* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API): **note** that the error message of this exception is localized in English, and may vary: to fetch the original API error message use `$e->rpc`.
+
+* \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
+
+* \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
+
+* \danog\MadelineProto\PTSException - Thrown if the PTS is unrecoverably corrupted
+
+* \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
+
+* \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
+
+
+## Pretty TL trace
 Every exception features a custom stack trace called `pretty TL trace`, that makes finding bugs **really** easy:
 
 ```
@@ -75,21 +93,6 @@ try {
     $estring = (string) $e;
     $estring2 = 'This also works: '.$e;
     $estring3 = "So does this: $e";
+    // use $estring to report the error using sendMessage or log
 }
-
-## List of exception types
-
-* \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
-
-* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API): **note** that the error message of this exception is localized in English, and may vary: to fetch the original API error message use `$e->rpc`.
-
-* \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
-
-* \danog\MadelineProto\NothingInTheSocketException - Thrown if no data can be read from the TCP socket
-
-* \danog\MadelineProto\PTSException - Thrown if the PTS is unrecoverably corrupted
-
-* \danog\MadelineProto\SecurityException - Thrown on security problems (invalid params during generation of auth key or similar)
-
-* \danog\MadelineProto\TL\Conversion\Exception - Thrown if some param/object can't be converted to/from bot API/TD/TD-CLI format (this includes markdown/html parsing)
-
+```

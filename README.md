@@ -9,16 +9,14 @@ This library can be used to easily interact with Telegram **without** the bot AP
 
 It can login with a phone number (MTProto API), or with a bot token (MTProto API, **no bot API involved!**).
 
-
-## Installation
-
-Simply download [madeline.php](https://phar.madelineproto.xyz/madeline.php).
-
 ## Getting started
 
 ```
 <?php
 
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+}
 include 'madeline.php';
 
 // !!! This API id/API hash combination will not work !!!

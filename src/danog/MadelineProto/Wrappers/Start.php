@@ -21,21 +21,29 @@ trait Start
     public function start()
     {
         if ($this->authorized === self::LOGGED_IN) {
-            return true;
+            return $this->get_self();
         }
         if (php_sapi_name() === 'cli') {
-            $this->phone_login(readline('Enter your phone number: '));
-            $authorization = $this->complete_phone_login(readline('Enter the phone code: '));
-            if ($authorization['_'] === 'account.password') {
-                $authorization = $this->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+            if (strpos(readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+                $this->bot_login(readline('Enter your bot token: '));
+            } else {
+                $this->phone_login(readline('Enter your phone number: '));
+                $authorization = $this->complete_phone_login(readline('Enter the phone code: '));
+                if ($authorization['_'] === 'account.password') {
+                    $authorization = $this->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+                }
+                if ($authorization['_'] === 'account.needSignup') {
+                    $authorization = $this->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+                }
             }
-            if ($authorization['_'] === 'account.needSignup') {
-                $authorization = $this->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
-            }
+            $this->serialize();
+            return $this->get_self();
         } else {
             if ($this->authorized === self::NOT_LOGGED_IN) {
                 if (isset($_POST['phone_number'])) {
                     $this->web_phone_login();
+                } else if (isset($_POST['token'])) {
+                    $this->web_bot_login();
                 } else {
                     $this->web_echo();
                 }
@@ -57,8 +65,10 @@ trait Start
                 } else {
                     $this->web_echo("You didn't provide the first name!");
                 }
-            } else {
-                return true;
+            } 
+            if ($this->authorized === self::LOGGED_IN) {
+                $this->serialize();
+                return $this->get_self();
             }
             exit;
         }
@@ -104,6 +114,17 @@ trait Start
     {
         try {
             $this->complete_2fa_login($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
+            $this->web_echo();
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
+        } catch (\danog\MadelineProto\Exception $e) {
+            $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
+        }
+    }
+    public function web_bot_login()
+    {
+        try {
+            $this->bot_login($_POST['token']);
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
