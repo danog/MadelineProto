@@ -132,9 +132,9 @@ class Logger
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
-        if (self::$isatty) {
+        /*if (self::$isatty) {
             self::$mode = 3;
-        }
+        }*/
         switch (self::$mode) {
                 case 1:
                     error_log($param);

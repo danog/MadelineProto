@@ -26,14 +26,12 @@ $api_hash = '';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
 $MadelineProto->start();    
-```
 
-## Simple example
-
-```
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
 $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 ```
+
+Run this code in a browser or in a console.
 
 ## Documentation
 

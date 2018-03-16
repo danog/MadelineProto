@@ -658,7 +658,8 @@ class MTProto
             $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['config_updated'], $this->config, Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($this->config, Logger::NOTICE);
     }
 
     public function parse_dc_options($dc_options)
