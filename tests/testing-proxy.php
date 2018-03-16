@@ -85,9 +85,26 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 echo 'Loading settings...'.PHP_EOL;
 \danog\MadelineProto\Logger::log(getenv('MTPROTO_SETTINGS'));
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
-$settings['connection_settings']['all']['proxy'] = '\HTTPProxy';
-$settings['connection_settings']['all']['proxy_extra'] = ['host' => '127.0.0.1', 'port' => 3218 /* 'user' => 'proxy_user', 'pass'=> 'proxy_pass' */];
 
+$settings['connection_settings']['all']['proxy'] = '\HTTPProxy';
+$settings['connection_settings']['all']['proxy_extra'] = [
+    'host' => '127.0.0.1', 
+    'port' => 3218,
+    'user' => 'proxy_user', // Only if needed
+    'pass'=> 'proxy_pass' // Only if needed 
+    ];
+
+/* SOCKS Proxy */
+/*
+$settings['connection_settings']['all']['proxy'] = '\SOCKSProxy';
+$settings['connection_settings']['all']['proxy_extra'] = [
+    'host' => '127.0.0.1', 
+    'port' => 1080,
+    // 'user' => 'proxy_user', // Only if needed
+    // 'pass'=> 'proxy_pass', // Only if needed
+    // 'version' => 5  // Force use of SOCKS5 Protocol, default SOCKS 4 (+no auth)
+    ];
+/* */
 \danog\MadelineProto\Logger::log($settings);
 if ($MadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
