@@ -43,10 +43,7 @@ trait Templates
             break;
         }
     }
-
-    public function web_echo_template($message, $form)
-    {
-        return '<!DOCTYPE html>
+    private $web_template = '<!DOCTYPE html>
         <html>
         <head>
         <title>MadelineProto</title>
@@ -54,11 +51,21 @@ trait Templates
         <body>
         <h1>MadelineProto</h1>
         <form method="POST">
-        '.$form.'
+        %s
         <button type="submit"/>Go</button>
         </form>
-        <p>'.$message.'</p>
+        <p>%s</p>
         </body>
         </html>';
+
+    public function web_echo_template($message, $form)
+    {
+        return sprintf($this->web_template, $form, $message);
+    }
+    public function get_web_template() {
+        return $this->web_template;
+    }
+    public function set_web_template($template) {
+        $this->web_template = $template;
     }
 }
