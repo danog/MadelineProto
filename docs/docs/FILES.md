@@ -2,13 +2,78 @@
 
 MadelineProto provides wrapper methods to upload and download files that support bot API file ids.
 
+## Sending files
+
+To send photos and documents to someone, use the [$MadelineProto->messages->sendMedia](https://docs.madelineproto.xyz/API_docs/methods/messages_sendMedia.html) method, click on the link for more info.
+
+The required `message` parameter is the caption: it can contain URLs, mentions, bold and italic text, thanks to the `parse_mode` parameter, that enables markdown or HTML parsing.
+
+The `media` parameter contains the file path and other info about the file.
+
+It can contain [lots of various objects](https://docs.madelineproto.xyz/API_docs/types/InputMedia.html), here are the most important:
+
+### [inputMediaUploadedPhoto](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaUploadedPhoto.html)
+```
+$sentMessage = $MadelineProto->messages->sendMedia([
+    'peer' => '@danogentili',
+    'media' => [
+        '_' => 'inputMediaUploadedPhoto',
+        'file' => 'faust.jpg'
+    ],
+    'message' => '[This is the caption](https://t.me/MadelineProto)',
+    'parse_mode' => 'Markdown'
+]);
+```
+
+Can be used to upload photos: simply provide the photo's file path in the `file` field, and optionally provide a `ttl_seconds` field to set the self-destruction period of the photo, even for normal chats
+
+### [inputMediaUploadedDocument](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaUploadedDocument.html)
+```
+$sentMessage = $MadelineProto->messages->sendMedia([
+    'peer' => '@danogentili',
+    'media' => [
+        '_' => 'inputMediaUploadedDocument',
+        'file' => 'faust.jpg'
+        'attributes' => [
+            ['_' => 'documentAttributeVideo', 'round_message' => false, 'supports_streaming' => true, 'duration' => 45, 'w' => 1920, 'h' => 1080]
+        ]
+    ],
+    'message' => '[This is the caption](https://t.me/MadelineProto)',
+    'parse_mode' => 'Markdown'
+]);
+```
+
+Can be used to upload documents, videos, gifs, voice messages, round videos, round voice messages: simply provide the file's file path in the `file` field, and optionally provide a `ttl_seconds` field to set the self-destruction period of the photo, even for normal chats.  
+You must also provide the file's mime type in the `mime_type` field, generate it using `mime_content_type($file_path);` (tip: try using an unexpected mime type to make official clients crash ;).  
+Use the `nosound_video` field if the video does not have sound (gifs).  
+To actually set the document type, provide one or more [DocumentAttribute](https://docs.madelineproto.xyz/API_docs/types/DocumentAttribute.html) objects to the `attributes` field:  
+
+* [documentAttributeFilename](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeFilename.html) to send a document
+* [documentAttributeImageSize](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeImageSize.html) to send a photo as document
+* [documentAttributeAnimated](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeAnimated.html) to send a gif
+* [documentAttributeVideo](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeVideo.html) to send a video
+* [documentAttributeAudio](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeAudio.html) to send an audio file
+* [documentAttributeAudio](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeAudio.html) with voice = true to send a voice message
+
+You can set all of the w, h, duration parameters to 0, telegram should detect them automatically.
+
+### [inputMediaDocument](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaDocument.html)
+
+
 ## Uploading files
 
-To upload and send media, first you need to get an [InputFile](https://docs.madelineproto.xyz/API_docs/types/InputFile.html) (for nornal chats) or an [InputEncryptedFile](https://docs.madelineproto.xyz/API_docs/types/InputFile.html) (for secret chats):
+```
+$sentMessage = $MadelineProto->messages->uploadMedia([
+    'media' => [
+        '_' => 'inputMediaUploadedPhoto',
+        'file' => 'faust.jpg'
+    ],
+]);
+```
 
-```
-$InputFile = $MadelineProto->upload('Myfile.mp4');
-```
+You can also only upload a file, without actually sending it to anyone, storing only the file ID for later usage.
+The [$MadelineProto->messages->uploadMedia](https://docs.madelineproto.xyz/API_docs/methods/messages_uploadMedia.html) function is a reduced version of the [$MadelineProto->messages->sendMedia](https://docs.madelineproto.xyz/API_docs/methods/messages_sendMedia.html), that requires only a `media` parameter, with the media to upload.
+
 
 Every method described in this section accepts a last optional paramater with a callable function that will be called during the upload/download using the first parameter to pass a floating point number indicating the upload/download status in percentage.  
 

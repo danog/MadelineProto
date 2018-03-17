@@ -106,6 +106,10 @@ trait Constructors
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
                 }
+                if ($type === 'DecryptedMessageMedia' && in_array($param['name'], ['key', 'iv'])) {
+                    unset(\danog\MadelineProto\Logger::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
+                    continue;
+                }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
                 //$type_or_bare_type = 'types';
                 /*if (isset($param['subtype'])) {
@@ -136,6 +140,9 @@ trait Constructors
                     $human_ptype = 'Secret chat ID or '.$ptype;
                 }
                 if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedFile'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
                 $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';

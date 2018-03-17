@@ -397,6 +397,19 @@ trait TL
                 $arguments['hash'] = $matches[2];
             }
         }
+        if ($method === 'messages.sendEncryptedFile') {
+            if (isset($arguments['file'])) {
+                if (!is_array($arguments['file'])) {
+                    $arguments['file'] = $this->upload_encrypted($arguments['file']);
+                }
+                if (isset($arguments['file']['key'])) {
+                    $arguments['message']['media']['key'] = $arguments['file']['key'];
+                }
+                if (isset($arguments['file']['iv'])) {
+                    $arguments['message']['media']['iv'] = $arguments['file']['iv'];
+                }
+            }
+        }
 
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {

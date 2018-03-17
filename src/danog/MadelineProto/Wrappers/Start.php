@@ -24,6 +24,18 @@ trait Start
             return $this->get_self();
         }
         if (php_sapi_name() === 'cli') {
+            if (!function_exists('readline')) {
+                function readline($prompt = null)
+                {
+                    if ($prompt) {
+                        echo $prompt;
+                    }
+                    $fp = fopen('php://stdin', 'r');
+                    $line = rtrim(fgets($fp, 1024));
+            
+                    return $line;
+                }
+            }            
             if (strpos(readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
                 $this->bot_login(readline('Enter your bot token: '));
             } else {
