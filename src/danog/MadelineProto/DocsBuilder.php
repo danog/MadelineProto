@@ -165,6 +165,21 @@ $'.$type.' = \'filename.mp4\'; // The file path can also be used
 
 ';
                 }
+                if (in_array($type, ['InputPhoto'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Photo](Photo.md) here, MadelineProto will automatically convert it to the right type.
+
+';
+                }
+                if (in_array($type, ['InputDocument'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md) here, MadelineProto will automatically convert it to the right type.
+
+';
+                }
+                if (in_array($type, ['InputMedia'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md), [Photo](Photo.md), [InputDocument](InputDocument.md), [InputPhoto](InputPhoto.md) here, MadelineProto will automatically convert it to the right type.
+
+';
+                }
                 if (in_array($type, ['InputMessage'])) {
                     $header .= 'The following syntax can also be used:
 
