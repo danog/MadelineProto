@@ -660,19 +660,11 @@ trait PeerHandler
     {
         return;
         unset($gres['users']);
-        if (\danog\MadelineProto\Logger::$bigint) {
-            $hash = new \phpseclib\Math\BigInteger(0);
-            foreach ($gres['participants'] as $participant) {
-                $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($participant['user_id']))->divide($this->zeroeight)[1];
-            }
-            $gres['hash'] = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
-        } else {
-            $hash = 0;
-            foreach ($gres['participants'] as $participant) {
-                $hash = (($hash * 20261) + 0x80000000 + $participant['user_id']) % 0x80000000;
-            }
-            $gres['hash'] = $hash;
+        $ids = [];
+        foreach ($gres['participants'] as $participant) {
+            $ids[] = $participant['user_id'];
         }
+        $gres['hash'] = $this->gen_vector_hash($ids);
         $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
     }
 
