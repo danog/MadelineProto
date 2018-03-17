@@ -12,16 +12,16 @@ MadelineProto provides an easy wrapper to work with phone calls.
 
 The wrapper consists in the `\danog\MadelineProto\VoIP` class, that can be installed by compiling the [php-libtgvoip](https://voip.madelineproto.xyz) extension.
 
-Please read the whole [VoIP API documentation](https://daniil.it/MadelineProto/API_docs/types/PhoneCall.html) before proceeding.
+Please read the whole [VoIP API documentation](https://docs.madelineproto.xyz/API_docs/types/PhoneCall.html) before proceeding.
 
 ## Requesting a call
 ```
 $call = $MadelineProto->request_call('@danogentili');
 ```
 
-The request_call function accepts one parameter with the ID/username/Peer/User/InputPeer of the person to call, and returns a VoIP object that can be used to play audio files, set the hold files, change the configuration and set the output file (see the [VoIP API documentation](https://daniil.it/MadelineProto/API_docs/types/PhoneCall.html) for more info).
+The [request_call](https://docs.madelineproto.xyz/request_call.html) function accepts one parameter with the ID/username/Peer/User/InputPeer of the person to call, and returns a VoIP object that can be used to play audio files, set the hold files, change the configuration and set the output file (see the [VoIP API documentation](https://docs.madelineproto.xyz/API_docs/types/PhoneCall.html) for more info).
 
-MadelineProto works using raw signed PCM audio with the sample rate and the bit depth specified in the configuration (see [here](https://daniil.it/MadelineProto/API_docs/types/PhoneCall.html) for info on how to fetch it): usually it's 1 channel, sample rate of 48khz, codec PCM s16 little endian.
+MadelineProto works using raw signed PCM audio with the sample rate and the bit depth specified in the configuration (see [here](https://docs.madelineproto.xyz/API_docs/types/PhoneCall.html) for info on how to fetch it): usually it's 1 channel, sample rate of 48khz, codec PCM s16 little endian.
 
 
 ## Playing mp3 files
@@ -60,7 +60,7 @@ while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY
 ```
 
 
-Accepting calls is just as easy: you will receive an [updatePhoneCall](https://daniil.it/MadelineProto/API_docs/constructors/updatePhoneCall.html) object from your update source (see [update handling](#update-handling)).
+Accepting calls is just as easy: you will receive an [updatePhoneCall](https://docs.madelineproto.xyz/API_docs/constructors/updatePhoneCall.html) object from your update source (see [update handling](#update-handling)).
 
 This array will contain a VoIP object under the `phone_call` key.
 

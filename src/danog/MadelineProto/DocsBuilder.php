@@ -197,7 +197,7 @@ You can also access the properties of the constructor as a normal array, for exa
                     $constructors = '';
                     $header .= 'This is an object of type `\\danog\\MadelineProto\\VoIP`.
 
-It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
+It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://docs.madelineproto.xyz#calls) for an easy installation script.
 
 You MUST know [OOP](http://php.net/manual/en/language.oop5.php) to use this class.
 
@@ -271,8 +271,8 @@ Call states (these constants are incrementing integers, thus can be compared lik
 * `getVisualization()` - Gets the visualization of the encryption key, as an array of emojis, can be called only when the call state is bigger than or equal to `CALL_STATE_READY`. If called sooner, returns false.
 * `getStats()` Gets connection stats
 * `getOtherID()` - Gets the id of the other call participant, as a bot API ID
-* `getProtocol()` - Gets the protocol used by the current call, as a [PhoneCallProtocol](https://daniil.it/MadelineProto/API_docs/types/PhoneCallProtocol.html) object
-* `getCallID()` - Gets the call ID, as an [InputPhoneCall](https://daniil.it/MadelineProto/API_docs/types/InputPhoneCall.html) object
+* `getProtocol()` - Gets the protocol used by the current call, as a [PhoneCallProtocol](https://docs.madelineproto.xyz/API_docs/types/PhoneCallProtocol.html) object
+* `getCallID()` - Gets the call ID, as an [InputPhoneCall](https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html) object
 * `isCreator()` - Returns a boolean that indicates whether you are the creator of the call
 * `whenCreated()` - Returns the unix timestamp of when the call was started (when was the call state set to `CALL_STATE_READY`)
 * `getOutputState()` - Returns the state of the audio output module, as an audio state constant
@@ -290,7 +290,7 @@ Call states (these constants are incrementing integers, thus can be compared lik
 
 Accepts two optional parameters:
 
-`$reason` - can be a [PhoneCallDiscardReason](https://daniil.it/MadelineProto/API_docs/types/PhoneCallDiscardReason.html) object (defaults to a [phoneCallDiscardReasonDisconnect](https://daniil.it/MadelineProto/API_docs/constructors/phoneCallDiscardReasonDisconnect.html) object).
+`$reason` - can be a [PhoneCallDiscardReason](https://docs.madelineproto.xyz/API_docs/types/PhoneCallDiscardReason.html) object (defaults to a [phoneCallDiscardReasonDisconnect](https://docs.madelineproto.xyz/API_docs/constructors/phoneCallDiscardReasonDisconnect.html) object).
 
 `$rating` - Can be an array that must contain a rating, and a comment (`["rating" => 5, "comment" => "MadelineProto is very easy to use!"]). Defaults to an empty array.`
 

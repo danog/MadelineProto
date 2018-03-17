@@ -8,7 +8,7 @@ MadelineProto provides wrappers to work with secret chats.
 $secret_chat = $MadelineProto->request_secret_chat($InputUser);
 ```
 
-Use [`request_secret_chat`] requests a secret secret chat to the [InputUser](https://daniil.it/MadelineProto/API_docs/types/InputUser.html), ID, or username specified, and returns the secret chat ID.
+Use [`request_secret_chat`] requests a secret secret chat to the [InputUser](https://docs.madelineproto.xyz/API_docs/types/InputUser.html), ID, or username specified, and returns the secret chat ID.
 
 
 ## Accepting secret chats

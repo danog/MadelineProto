@@ -4,7 +4,7 @@ MadelineProto provides wrapper methods to upload and download files that support
 
 ## Uploading files
 
-To upload and send media, first you need to get an [InputFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) (for nornal chats) or an [InputEncryptedFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) (for secret chats):
+To upload and send media, first you need to get an [InputFile](https://docs.madelineproto.xyz/API_docs/types/InputFile.html) (for nornal chats) or an [InputEncryptedFile](https://docs.madelineproto.xyz/API_docs/types/InputFile.html) (for secret chats):
 
 ```
 $InputFile = $
@@ -12,9 +12,9 @@ $InputFile = $
 
 Every method described in this section accepts a last optional paramater with a callable function that will be called during the upload/download using the first parameter to pass a floating point number indicating the upload/download status in percentage.  
 
-The upload method returns an [InputFile](https://daniil.it/MadelineProto/API_docs/types/InputFile.html) object that must be used to generate an [InputMedia](https://daniil.it/MadelineProto/API_docs/types/InputMedia.html) object, that can be later sent using the [sendmedia method](https://daniil.it/MadelineProto/API_docs/methods/messages_sendMedia.html).  
+The upload method returns an [InputFile](https://docs.madelineproto.xyz/API_docs/types/InputFile.html) object that must be used to generate an [InputMedia](https://docs.madelineproto.xyz/API_docs/types/InputMedia.html) object, that can be later sent using the [sendmedia method](https://docs.madelineproto.xyz/API_docs/methods/messages_sendMedia.html).  
 
-The `upload_encrypted` method returns an [InputEncryptedFile](https://daniil.it/MadelineProto/API_docs/types/InputEncryptedFile.html) object that must be used to generate an [EncryptedMessage](https://daniil.it/MadelineProto/API_docs/types/EncryptedMessage.html) object, that can be later sent using the [sendEncryptedFile method](https://daniil.it/MadelineProto/API_docs/methods/messages_sendEncryptedFile.html).  
+The `upload_encrypted` method returns an [InputEncryptedFile](https://docs.madelineproto.xyz/API_docs/types/InputEncryptedFile.html) object that must be used to generate an [EncryptedMessage](https://docs.madelineproto.xyz/API_docs/types/EncryptedMessage.html) object, that can be later sent using the [sendEncryptedFile method](https://docs.madelineproto.xyz/API_docs/methods/messages_sendEncryptedFile.html).  
 
 
 ```
@@ -32,7 +32,7 @@ See tests/testing.php for more examples.
 
 
 There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
-The first parameter of these functions must always be either a [messageMediaPhoto](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://daniil.it/MadelineProto/API_docs/constructors/messageMediaDocument.html) object, an [EncryptedMessage](https://daniil.it/MadelineProto/API_docs/types/EncryptedMessage.html) or a bot API file id. These objects are usually received in updates, see `bot.php` for examples
+The first parameter of these functions must always be either a [messageMediaPhoto](https://docs.madelineproto.xyz/API_docs/constructors/messageMediaPhoto.html) or a [messageMediaDocument](https://docs.madelineproto.xyz/API_docs/constructors/messageMediaDocument.html) object, an [EncryptedMessage](https://docs.madelineproto.xyz/API_docs/types/EncryptedMessage.html) or a bot API file id. These objects are usually received in updates, see `bot.php` for examples
 
 
 ```

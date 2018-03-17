@@ -10,7 +10,7 @@ foreach ($dialogs as $peer) {
 }
 ```
 
-`get_dialogs` will return a full list of all chats you're member of, see [here for the parameters and the result](https://daniil.it/MadelineProto/get_dialogs.html)
+`get_dialogs` will return a full list of all chats you're member of, see [here for the parameters and the result](https://docs.madelineproto.xyz/get_dialogs.html)
 
 ## Bot: internal peer database
 ```

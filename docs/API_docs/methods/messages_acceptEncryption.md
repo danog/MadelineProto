@@ -6,7 +6,7 @@ description: messages.acceptEncryption parameters, return type and example
 [Back to methods index](index.md)
 
 
-**You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats**
+**You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats**
 
 
 
