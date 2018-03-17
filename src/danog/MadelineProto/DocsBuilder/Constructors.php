@@ -107,7 +107,7 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 if ($type === 'DecryptedMessageMedia' && in_array($param['name'], ['key', 'iv'])) {
-                    unset(\danog\MadelineProto\Logger::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
+                    unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
@@ -131,13 +131,13 @@ trait Constructors
                 }
                 $human_ptype = $ptype;
                 if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
-                    $human_ptype = 'Username, chat ID or '.$ptype;
+                    $human_ptype = 'Username, chat ID, [Update](../types/Update.md), [Message](../types/Message.md) or '.$ptype;
                 }
                 if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
                 if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
-                    $human_ptype = 'Secret chat ID or '.$ptype;
+                    $human_ptype = 'Secret chat ID, [Update](../types/Update.md), [EncryptedMessage](../types/EncryptedMessage.md) or '.$ptype;
                 }
                 if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;

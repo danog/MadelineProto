@@ -338,10 +338,27 @@ trait TL
         if (!is_array($object) && $type['type'] === 'InputFile') {
             $object = $this->upload($object);
         }
+        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && $type['type'] === 'InputEncryptedChat') {
+            if (is_array($object)) {
+                $object = $this->get_info($object)['InputEncryptedChat'];
+            } else {
+                if (!isset($this->secret_chats[$object])) {
+                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                }
+                $object = $this->secret_chats[$object]['InputEncryptedChat'];    
+            }
+        }
         if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
+            }
+            $object = $object[$type['type']];
+        }
+        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type']) !== $type['type'] && in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto'])) {
+            $object = $this->get_file_info($object);
+            if (!isset($object[$type['type']])) {
+                throw new \danog\MadelineProto\Exception('Could not convert media object');
             }
             $object = $object[$type['type']];
         }
@@ -482,12 +499,6 @@ trait TL
                 }
 
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
-            }
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputEncryptedChat') {
-                if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
-                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
-                }
-                $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
             }
             if ($current_argument['type'] === 'DataJSON') {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];

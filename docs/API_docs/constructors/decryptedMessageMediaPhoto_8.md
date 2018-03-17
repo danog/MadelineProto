@@ -17,8 +17,6 @@ description: decryptedMessageMediaPhoto attributes, type and example
 |w|[int](../types/int.md) | Yes|
 |h|[int](../types/int.md) | Yes|
 |size|[int](../types/int.md) | Yes|
-|key|[bytes](../types/bytes.md) | Yes|
-|iv|[bytes](../types/bytes.md) | Yes|
 
 
 
@@ -28,13 +26,13 @@ description: decryptedMessageMediaPhoto attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageMediaPhoto_8 = ['_' => 'decryptedMessageMediaPhoto', 'thumb' => 'bytes', 'thumb_w' => int, 'thumb_h' => int, 'w' => int, 'h' => int, 'size' => int, 'key' => 'bytes', 'iv' => 'bytes'];
+$decryptedMessageMediaPhoto_8 = ['_' => 'decryptedMessageMediaPhoto', 'thumb' => 'bytes', 'thumb_w' => int, 'thumb_h' => int, 'w' => int, 'h' => int, 'size' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "decryptedMessageMediaPhoto", "thumb": "bytes", "thumb_w": int, "thumb_h": int, "w": int, "h": int, "size": int, "key": "bytes", "iv": "bytes"}
+{"_": "decryptedMessageMediaPhoto", "thumb": "bytes", "thumb_w": int, "thumb_h": int, "w": int, "h": int, "size": int}
 ```
 
 
@@ -42,7 +40,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageMediaPhoto_8={_='decryptedMessageMediaPhoto', thumb='bytes', thumb_w=int, thumb_h=int, w=int, h=int, size=int, key='bytes', iv='bytes'}
+decryptedMessageMediaPhoto_8={_='decryptedMessageMediaPhoto', thumb='bytes', thumb_w=int, thumb_h=int, w=int, h=int, size=int}
 
 ```
 

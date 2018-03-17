@@ -58,7 +58,17 @@ To actually set the document type, provide one or more [DocumentAttribute](https
 You can set all of the w, h, duration parameters to 0, telegram should detect them automatically.
 
 ### [inputMediaDocument](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaDocument.html)
-
+```
+$sentMessage = $MadelineProto->messages->sendMedia([
+    'peer' => '@danogentili',
+    'media' => [
+        '_' => 'inputMediaDocument',
+        'id'   => ['_' => 'inputDocument', 'id' => 10294124, 'access_hash' => 14924819248]
+    ],
+    'message' => '[This is the caption](https://t.me/MadelineProto)',
+    'parse_mode' => 'Markdown'
+]);
+```
 
 ## Uploading files
 

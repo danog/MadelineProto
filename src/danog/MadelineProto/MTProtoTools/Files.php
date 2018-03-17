@@ -82,7 +82,67 @@ trait Files
     {
         return $this->upload($file, $file_name, $cb, true);
     }
+    public function gen_all_file($media) {
+        $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
+        switch ($media['_']) {
+            case 'messageMediaPhoto':
+                if (!isset($media['photo']['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['Photo'] = $media['photo'];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
+                if (isset($media['ttl_seconds'])) {
+                    $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
+                }
+                break;
+            case 'messageMediaDocument':
+                if (!isset($media['document']['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['Document'] = $media['document'];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['photo']['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                if (isset($media['ttl_seconds'])) {
+                    $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
+                }
+                break;
+            case 'document':
+                if (!isset($media['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $media];
+                break;
+            case 'photo':
+                if (!isset($media['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
+                break;
+            default:
+                throw new \danog\MadelineProto\Exception('Could not convert media object');
+        }
+        return $res;
 
+    }
+    public function get_file_info($constructor) {
+        if (is_string($constructor)) {
+            $constructor = $this->unpack_file_id($constructor)['MessageMedia'];
+        }
+        switch ($constructor['_']) {
+            case 'updateNewMessage':
+            case 'updateNewChannelMessage':
+            $constructor = $constructor['message'];
+
+            case 'message':
+            $constructor = $constructor['media'];
+        }
+        return $this->gen_all_file($constructor);
+    }
     public function get_download_info($message_media)
     {
         if (is_string($message_media)) {

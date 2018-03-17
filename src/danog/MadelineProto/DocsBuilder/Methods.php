@@ -107,13 +107,13 @@ trait Methods
                 }
                 $human_ptype = $ptype;
                 if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
-                    $human_ptype = 'Username, chat ID or '.$ptype;
+                    $human_ptype = 'Username, chat ID, [Update](../types/Update.md), [Message](../types/Message.md) or '.$ptype;
                 }
                 if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
                 if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
-                    $human_ptype = 'Secret chat ID or '.$ptype;
+                    $human_ptype = 'Secret chat ID, [Update](../types/Update.md), [EncryptedMessage](../types/EncryptedMessage.md) or '.$ptype;
                 }
                 if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;

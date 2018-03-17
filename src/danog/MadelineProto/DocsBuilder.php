@@ -120,12 +120,19 @@ description: constructors and methods of type '.$type.'
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-                    $header .= 'The following syntaxes can also be used:
+                    $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
+                    
+The following syntaxes can also be used:
 
 ```
-$'.$type." = '@username'; // Username\n\n\$".$type.' = 44700; // bot API id (users)
+$'.$type." = '@username'; // Username
+
+$".$type." = 'me'; // The logged-in user
+
+$'.$type.' = 44700; // bot API id (users)
 $'.$type.' = -492772765; // bot API id (chats)
 $'.$type.' = -10038575794; // bot API id (channels)
+
 $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 \$".$type." = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 
@@ -137,7 +144,9 @@ $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
-                    $header .= 'The following syntax can also be used:
+                    $header .= 'You can directly provide the [Update](Update.md) or [EncryptedMessage](EncryptedMessage.md) object here, MadelineProto will automatically extract the destination chat id.
+
+The following syntax can also be used:
 
 ```
 $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be positive or negative
@@ -146,7 +155,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 
 ';
                 }
-                if (in_array($type, ['InputFile'])) {
+                if (in_array($type, ['InputFile', 'InputEncryptedFile'])) {
                     $header .= 'The following syntax can also be used:
 
 ```

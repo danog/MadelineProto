@@ -255,6 +255,23 @@ trait PeerHandler
                 case 'peerChannel':
                     $id = $this->to_supergroup($id['channel_id']);
                     break;
+                case 'message':
+                    if (!isset($id['from_id']) || $id['to_id']['_'] !== 'peerUser' || $id['to_id']['user_id'] !== $this->authorization['user']['id']) {
+                        return $this->get_info($id['to_id']);
+                    }
+                    $id = $id['to_id']['user_id'];
+                    break;
+                case 'encryptedMessage':
+                case 'encryptedMessageService':
+                    $id = $id['chat_id'];
+                    if (!isset($this->secret_chats[$id])) {
+                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                    }
+                    return $this->secret_chats[$id];
+                case 'updateNewMessage':
+                case 'updateNewChannelMessage':
+                case 'updateNewEncryptedMessage':
+                    return $this->get_info($id['message']);
                 case 'chatForbidden':
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
@@ -317,7 +334,7 @@ trait PeerHandler
         }
         $id = strtolower(str_replace('@', '', $id));
         if ($id === 'me') {
-            return $this->gen_all($this->get_self());
+            return $this->get_info($this->authorization['user']['id']);
         }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
