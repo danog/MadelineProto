@@ -12,7 +12,7 @@ description: messages.setInlineGameScore parameters, return type and example
 |----------|---------------|----------|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Optional|
+|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |score|[int](../types/int.md) | Yes|
 
 

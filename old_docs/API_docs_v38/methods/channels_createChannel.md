@@ -12,7 +12,7 @@ description: channels.createChannel parameters, return type and example
 |----------|---------------|----------|
 |title|[string](../types/string.md) | Yes|
 |about|[string](../types/string.md) | Yes|
-|users|Array of [InputUser](../types/InputUser.md) | Yes|
+|users|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -140,7 +140,17 @@ A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUse
                     $header .= 'The following syntax can also be used:
 
 ```
-$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be positive or negative
+```
+
+
+';
+                }
+                if (in_array($type, ['InputFile'])) {
+                    $header .= 'The following syntax can also be used:
+
+```
+$'.$type.' = \'filename.mp4\'; // The file path can also be used
 ```
 
 

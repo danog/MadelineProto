@@ -1,16 +1,18 @@
 ---
 title: account.resetWebAuthorization
-description: account.resetWebAuthorization parameters, return type and example
+description: Delete a certain telegram web login authorization
 ---
 ## Method: account.resetWebAuthorization  
 [Back to methods index](index.md)
 
 
+Delete a certain telegram web login authorization
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[long](../types/long.md) | Yes|The authorization's hash|
 
 
 ### Return type: [Bool](../types/Bool.md)

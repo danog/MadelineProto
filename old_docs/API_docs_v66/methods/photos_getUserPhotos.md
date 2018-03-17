@@ -10,7 +10,7 @@ description: photos.getUserPhotos parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|user\_id|[InputUser](../types/InputUser.md) | Optional|
+|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |offset|[int](../types/int.md) | Yes|
 |max\_id|[long](../types/long.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

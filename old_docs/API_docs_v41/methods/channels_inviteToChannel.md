@@ -10,8 +10,8 @@ description: channels.inviteToChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
-|users|Array of [InputUser](../types/InputUser.md) | Yes|
+|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
+|users|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

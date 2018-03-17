@@ -10,7 +10,7 @@ description: messages.setTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 

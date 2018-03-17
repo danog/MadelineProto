@@ -10,7 +10,7 @@ description: messages.getUnreadMentions parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |offset\_id|[int](../types/int.md) | Yes|
 |add\_offset|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

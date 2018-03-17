@@ -10,7 +10,7 @@ description: channels.editTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
 |title|[string](../types/string.md) | Yes|
 
 

@@ -10,8 +10,8 @@ description: messages.addChatUser parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Optional|
-|user\_id|[InputUser](../types/InputUser.md) | Optional|
+|chat\_id|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |fwd\_limit|[int](../types/int.md) | Yes|
 
 

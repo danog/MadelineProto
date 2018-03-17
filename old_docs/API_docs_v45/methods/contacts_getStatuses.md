@@ -1,11 +1,17 @@
 ---
 title: contacts.getStatuses
-description: contacts.getStatuses parameters, return type and example
+description: Get online status of all users
 ---
 ## Method: contacts.getStatuses  
 [Back to methods index](index.md)
 
 
+Get online status of all users
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_ContactStatus](../types/ContactStatus.md)

@@ -11,8 +11,8 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
-|thumb|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
+|thumb|[File path or InputFile](../types/InputFile.md) | Yes|
 |mime\_type|[string](../types/string.md) | Yes|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 |caption|[string](../types/string.md) | Yes|

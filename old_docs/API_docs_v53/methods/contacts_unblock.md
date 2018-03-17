@@ -1,16 +1,18 @@
 ---
 title: contacts.unblock
-description: contacts.unblock parameters, return type and example
+description: Unblock a user
 ---
 ## Method: contacts.unblock  
 [Back to methods index](index.md)
 
 
+Unblock a user
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|The user to unblock|
 
 
 ### Return type: [Bool](../types/Bool.md)

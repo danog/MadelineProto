@@ -1,18 +1,20 @@
 ---
 title: account.changePhone
-description: account.changePhone parameters, return type and example
+description: Change the phone number associated to this account
 ---
 ## Method: account.changePhone  
 [Back to methods index](index.md)
 
 
+Change the phone number associated to this account
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
-|phone\_code\_hash|[string](../types/string.md) | Yes|
-|phone\_code|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[string](../types/string.md) | Yes|Phone number|
+|phone\_code\_hash|[string](../types/string.md) | Yes|Phone code hash returned by account.sendChangePhoneCode|
+|phone\_code|[string](../types/string.md) | Yes|The phone code sent by account.sendChangePhoneCode|
 
 
 ### Return type: [User](../types/User.md)

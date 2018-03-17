@@ -1,24 +1,26 @@
 ---
 title: contacts.getTopPeers
-description: contacts.getTopPeers parameters, return type and example
+description: Get most used chats
 ---
 ## Method: contacts.getTopPeers  
 [Back to methods index](index.md)
 
 
+Get most used chats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|correspondents|[Bool](../types/Bool.md) | Optional|
-|bots\_pm|[Bool](../types/Bool.md) | Optional|
-|bots\_inline|[Bool](../types/Bool.md) | Optional|
-|phone\_calls|[Bool](../types/Bool.md) | Optional|
-|groups|[Bool](../types/Bool.md) | Optional|
-|channels|[Bool](../types/Bool.md) | Optional|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
-|hash|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|correspondents|[Bool](../types/Bool.md) | Optional||
+|bots\_pm|[Bool](../types/Bool.md) | Optional||
+|bots\_inline|[Bool](../types/Bool.md) | Optional||
+|phone\_calls|[Bool](../types/Bool.md) | Optional||
+|groups|[Bool](../types/Bool.md) | Optional||
+|channels|[Bool](../types/Bool.md) | Optional||
+|offset|[int](../types/int.md) | Yes||
+|limit|[int](../types/int.md) | Yes||
+|hash|[int](../types/int.md) | Yes||
 
 
 ### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)

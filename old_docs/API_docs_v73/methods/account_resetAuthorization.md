@@ -1,16 +1,18 @@
 ---
 title: account.resetAuthorization
-description: account.resetAuthorization parameters, return type and example
+description: Delete a certain session
 ---
 ## Method: account.resetAuthorization  
 [Back to methods index](index.md)
 
 
+Delete a certain session
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[long](../types/long.md) | Yes|The session hash, obtained from $MadelineProto->account->getAuthorizations|
 
 
 ### Return type: [Bool](../types/Bool.md)

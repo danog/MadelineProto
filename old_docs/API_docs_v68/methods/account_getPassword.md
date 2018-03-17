@@ -1,11 +1,17 @@
 ---
 title: account.getPassword
-description: account.getPassword parameters, return type and example
+description: Get the current password
 ---
 ## Method: account.getPassword  
 [Back to methods index](index.md)
 
 
+Get the current password
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [account\_Password](../types/account_Password.md)

@@ -11,7 +11,7 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |game|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |msg\_id|[int](../types/int.md) | Yes|
 |data|[bytes](../types/bytes.md) | Optional|
 

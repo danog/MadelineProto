@@ -1,16 +1,18 @@
 ---
 title: contacts.importCard
-description: contacts.importCard parameters, return type and example
+description: Import card as contact
 ---
 ## Method: contacts.importCard  
 [Back to methods index](index.md)
 
 
+Import card as contact
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|export\_card|Array of [int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|export\_card|Array of [int](../types/int.md) | Yes|The card|
 
 
 ### Return type: [User](../types/User.md)

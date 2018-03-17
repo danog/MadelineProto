@@ -12,7 +12,7 @@ Report for spam
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|The peer to report|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|The peer to report|
 |reason|[ReportReason](../types/ReportReason.md) | Yes|Why are you reporting this peer|
 
 

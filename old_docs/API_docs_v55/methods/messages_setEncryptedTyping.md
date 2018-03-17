@@ -10,7 +10,7 @@ description: messages.setEncryptedTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|peer|[Secret chat ID or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 |typing|[Bool](../types/Bool.md) | Yes|
 
 

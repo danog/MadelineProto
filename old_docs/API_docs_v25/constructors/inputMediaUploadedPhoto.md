@@ -11,7 +11,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
 
 
 

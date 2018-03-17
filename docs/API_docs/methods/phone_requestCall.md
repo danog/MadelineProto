@@ -1,6 +1,6 @@
 ---
 title: phone.requestCall
-description: phone.requestCall parameters, return type and example
+description: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
 ---
 ## Method: phone.requestCall  
 [Back to methods index](index.md)

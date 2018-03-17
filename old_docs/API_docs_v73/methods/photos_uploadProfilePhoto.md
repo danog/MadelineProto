@@ -10,7 +10,7 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
 
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)

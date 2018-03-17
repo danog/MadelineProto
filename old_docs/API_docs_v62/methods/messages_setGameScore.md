@@ -12,9 +12,9 @@ description: messages.setGameScore parameters, return type and example
 |----------|---------------|----------|
 |edit\_message|[Bool](../types/Bool.md) | Optional|
 |force|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |id|[int](../types/int.md) | Yes|
-|user\_id|[InputUser](../types/InputUser.md) | Optional|
+|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |score|[int](../types/int.md) | Yes|
 
 

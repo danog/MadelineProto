@@ -10,7 +10,7 @@ description: messages.reportSpam parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

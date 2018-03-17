@@ -11,7 +11,7 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |force|[Bool](../types/Bool.md) | Optional|
-|order|Array of [InputPeer](../types/InputPeer.md) | Yes|
+|order|Array of [Username, chat ID or InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

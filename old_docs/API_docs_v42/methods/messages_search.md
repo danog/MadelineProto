@@ -11,7 +11,7 @@ description: messages.search parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |important\_only|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |q|[string](../types/string.md) | Yes|
 |filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
 |min\_date|[int](../types/int.md) | Yes|

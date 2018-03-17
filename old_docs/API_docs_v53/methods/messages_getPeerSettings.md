@@ -10,7 +10,7 @@ description: messages.getPeerSettings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [PeerSettings](../types/PeerSettings.md)

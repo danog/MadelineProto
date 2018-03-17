@@ -10,7 +10,7 @@ description: channels.getParticipants parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
 |filter|[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|
 |offset|[int](../types/int.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

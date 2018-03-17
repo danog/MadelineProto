@@ -335,6 +335,9 @@ trait TL
         if (!is_array($object) && $type['type'] === 'InputMessage') {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         }
+        if (!is_array($object) && $type['type'] === 'InputFile') {
+            $object = $this->upload($object);
+        }
         if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {

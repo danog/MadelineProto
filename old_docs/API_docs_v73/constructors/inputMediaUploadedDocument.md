@@ -12,8 +12,8 @@ description: inputMediaUploadedDocument attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |nosound\_video|[Bool](../types/Bool.md) | Optional|
-|file|[InputFile](../types/InputFile.md) | Yes|
-|thumb|[InputFile](../types/InputFile.md) | Optional|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
+|thumb|[File path or InputFile](../types/InputFile.md) | Optional|
 |mime\_type|[string](../types/string.md) | Yes|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 |caption|[string](../types/string.md) | Yes|

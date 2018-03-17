@@ -1,11 +1,17 @@
 ---
 title: account.getAuthorizations
-description: account.getAuthorizations parameters, return type and example
+description: Get all logged-in authorizations
 ---
 ## Method: account.getAuthorizations  
 [Back to methods index](index.md)
 
 
+Get all logged-in authorizations
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [account\_Authorizations](../types/account_Authorizations.md)

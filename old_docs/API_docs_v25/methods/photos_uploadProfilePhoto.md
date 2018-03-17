@@ -10,7 +10,7 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|

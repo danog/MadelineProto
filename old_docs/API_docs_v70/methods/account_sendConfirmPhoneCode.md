@@ -1,18 +1,20 @@
 ---
 title: account.sendConfirmPhoneCode
-description: account.sendConfirmPhoneCode parameters, return type and example
+description: Send confirmation phone code
 ---
 ## Method: account.sendConfirmPhoneCode  
 [Back to methods index](index.md)
 
 
+Send confirmation phone code
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|hash|[string](../types/string.md) | Yes|
-|current\_number|[Bool](../types/Bool.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|allow\_flashcall|[Bool](../types/Bool.md) | Optional|Can telegram call you instead of sending an SMS?|
+|hash|[string](../types/string.md) | Yes|The hash|
+|current\_number|[Bool](../types/Bool.md) | Optional|The current phone number|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)

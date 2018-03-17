@@ -10,8 +10,8 @@ description: channels.getMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [InputMessage](../types/InputMessage.md) | Yes|
+|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
+|id|Array of [Message ID or InputMessage](../types/InputMessage.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

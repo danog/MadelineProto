@@ -125,7 +125,20 @@ trait Constructors
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+                $human_ptype = $ptype;
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Username, chat ID or '.$ptype;
+                }
+                if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Message ID or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Secret chat ID or '.$ptype;
+                }
+                if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
+                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
 
                 if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $this->add_to_lang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);

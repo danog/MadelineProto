@@ -10,7 +10,7 @@ description: messages.editChatPhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[InputPeer](../types/InputPeer.md) | Optional|
+|chat\_id|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |photo|[InputChatPhoto](../types/InputChatPhoto.md) | Optional|
 
 

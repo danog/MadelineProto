@@ -1,12 +1,12 @@
 ---
 title: phone.acceptCall
-description: phone.acceptCall parameters, return type and example
+description: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
 ---
 ## Method: phone.acceptCall  
 [Back to methods index](index.md)
 
 
-**You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls**
+**You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls**
 
 
 

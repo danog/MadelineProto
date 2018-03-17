@@ -1,16 +1,18 @@
 ---
 title: contacts.deleteContacts
-description: contacts.deleteContacts parameters, return type and example
+description: Delete multiple contacts
 ---
 ## Method: contacts.deleteContacts  
 [Back to methods index](index.md)
 
 
+Delete multiple contacts
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [InputUser](../types/InputUser.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|The contacts to delete|
 
 
 ### Return type: [Bool](../types/Bool.md)

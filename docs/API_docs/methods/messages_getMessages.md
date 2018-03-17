@@ -10,7 +10,7 @@ description: messages.getMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [InputMessage](../types/InputMessage.md) | Yes|
+|id|Array of [Message ID or InputMessage](../types/InputMessage.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

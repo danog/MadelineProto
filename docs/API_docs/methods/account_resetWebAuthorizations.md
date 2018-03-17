@@ -1,11 +1,17 @@
 ---
 title: account.resetWebAuthorizations
-description: account.resetWebAuthorizations parameters, return type and example
+description: Reset all telegram web login authorizations
 ---
 ## Method: account.resetWebAuthorizations  
 [Back to methods index](index.md)
 
 
+Reset all telegram web login authorizations
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

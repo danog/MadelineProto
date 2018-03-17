@@ -13,9 +13,9 @@ description: messages.forwardMessages parameters, return type and example
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
 |with\_my\_score|[Bool](../types/Bool.md) | Optional|
-|from\_peer|[InputPeer](../types/InputPeer.md) | Optional|
+|from\_peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |id|Array of [int](../types/int.md) | Yes|
-|to\_peer|[InputPeer](../types/InputPeer.md) | Optional|
+|to\_peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

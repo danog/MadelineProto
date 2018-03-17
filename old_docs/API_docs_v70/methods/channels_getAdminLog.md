@@ -10,10 +10,10 @@ description: channels.getAdminLog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
 |q|[string](../types/string.md) | Yes|
 |events\_filter|[ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
-|admins|Array of [InputUser](../types/InputUser.md) | Optional|
+|admins|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |max\_id|[long](../types/long.md) | Yes|
 |min\_id|[long](../types/long.md) | Yes|
 |limit|[int](../types/int.md) | Yes|

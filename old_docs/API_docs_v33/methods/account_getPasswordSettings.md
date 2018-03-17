@@ -1,16 +1,18 @@
 ---
 title: account.getPasswordSettings
-description: account.getPasswordSettings parameters, return type and example
+description: Get the current 2FA settings
 ---
 ## Method: account.getPasswordSettings  
 [Back to methods index](index.md)
 
 
+Get the current 2FA settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|current\_password\_hash|[bytes](../types/bytes.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|current\_password\_hash|[bytes](../types/bytes.md) | Yes|$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt);|
 
 
 ### Return type: [account\_PasswordSettings](../types/account_PasswordSettings.md)

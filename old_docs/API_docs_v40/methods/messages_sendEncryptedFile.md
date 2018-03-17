@@ -10,7 +10,7 @@ description: messages.sendEncryptedFile parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|peer|[Secret chat ID or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 |message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
 |file|[InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|
 

@@ -1,16 +1,18 @@
 ---
 title: contacts.importContacts
-description: contacts.importContacts parameters, return type and example
+description: Add phone number as contact
 ---
 ## Method: contacts.importContacts  
 [Back to methods index](index.md)
 
 
+Add phone number as contact
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|contacts|Array of [InputContact](../types/InputContact.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|contacts|Array of [InputContact](../types/InputContact.md) | Yes|The numbers to import|
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)

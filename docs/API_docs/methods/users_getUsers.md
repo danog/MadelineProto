@@ -1,16 +1,18 @@
 ---
 title: users.getUsers
-description: users.getUsers parameters, return type and example
+description: Get info about users
 ---
 ## Method: users.getUsers  
 [Back to methods index](index.md)
 
 
+Get info about users
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [InputUser](../types/InputUser.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|The ids of the users|
 
 
 ### Return type: [Vector\_of\_User](../types/User.md)

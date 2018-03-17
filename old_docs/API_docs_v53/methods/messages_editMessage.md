@@ -11,7 +11,7 @@ description: messages.editMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |id|[int](../types/int.md) | Yes|
 |message|[string](../types/string.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|

@@ -1,17 +1,19 @@
 ---
 title: account.confirmPhone
-description: account.confirmPhone parameters, return type and example
+description: Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode
 ---
 ## Method: account.confirmPhone  
 [Back to methods index](index.md)
 
 
+Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_code\_hash|[string](../types/string.md) | Yes|
-|phone\_code|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_code\_hash|[string](../types/string.md) | Yes|obtain phone_code_hash from sendConfirmPhoneCode|
+|phone\_code|[string](../types/string.md) | Yes|The code sent by sendConfirmPhoneCode|
 
 
 ### Return type: [Bool](../types/Bool.md)

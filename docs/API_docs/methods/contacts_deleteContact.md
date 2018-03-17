@@ -1,16 +1,18 @@
 ---
 title: contacts.deleteContact
-description: contacts.deleteContact parameters, return type and example
+description: Delete a contact
 ---
 ## Method: contacts.deleteContact  
 [Back to methods index](index.md)
 
 
+Delete a contact
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|The contact to delete|
 
 
 ### Return type: [contacts\_Link](../types/contacts_Link.md)

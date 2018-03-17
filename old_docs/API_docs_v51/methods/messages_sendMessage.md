@@ -14,7 +14,7 @@ description: messages.sendMessage parameters, return type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
 |message|[string](../types/string.md) | Yes|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|

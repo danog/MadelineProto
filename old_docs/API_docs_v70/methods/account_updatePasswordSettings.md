@@ -1,17 +1,19 @@
 ---
 title: account.updatePasswordSettings
-description: account.updatePasswordSettings parameters, return type and example
+description: Update the 2FA password settings
 ---
 ## Method: account.updatePasswordSettings  
 [Back to methods index](index.md)
 
 
+Update the 2FA password settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|current\_password\_hash|[bytes](../types/bytes.md) | Yes|
-|new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|current\_password\_hash|[bytes](../types/bytes.md) | Yes|$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt);|
+|new\_settings|[account\_PasswordInputSettings](../types/account_PasswordInputSettings.md) | Yes|New 2FA settings|
 
 
 ### Return type: [Bool](../types/Bool.md)

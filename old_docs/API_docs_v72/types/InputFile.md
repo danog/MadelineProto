@@ -7,6 +7,13 @@ description: constructors and methods of type InputFile
 
 
 
+The following syntax can also be used:
+
+```
+$InputFile = 'filename.mp4'; // The file path can also be used
+```
+
+
 ### Possible values (constructors):
 
 [inputFile](../constructors/inputFile.md)  

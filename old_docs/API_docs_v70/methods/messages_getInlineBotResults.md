@@ -10,8 +10,8 @@ description: messages.getInlineBotResults parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|bot|[InputUser](../types/InputUser.md) | Optional|
-|peer|[InputPeer](../types/InputPeer.md) | Optional|
+|bot|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |query|[string](../types/string.md) | Yes|
 |offset|[string](../types/string.md) | Yes|

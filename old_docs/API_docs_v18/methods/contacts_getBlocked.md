@@ -1,17 +1,19 @@
 ---
 title: contacts.getBlocked
-description: contacts.getBlocked parameters, return type and example
+description: Get blocked users
 ---
 ## Method: contacts.getBlocked  
 [Back to methods index](index.md)
 
 
+Get blocked users
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offset|[int](../types/int.md) | Yes|Initially 0, then set to the number of blocked contacts previously fetched|
+|limit|[int](../types/int.md) | Yes|How many blocked contacts to fetch|
 
 
 ### Return type: [contacts\_Blocked](../types/contacts_Blocked.md)

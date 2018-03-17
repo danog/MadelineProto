@@ -1,16 +1,18 @@
 ---
 title: contacts.getContacts
-description: contacts.getContacts parameters, return type and example
+description: Get info about a certain contact
 ---
 ## Method: contacts.getContacts  
 [Back to methods index](index.md)
 
 
+Get info about a certain contact
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[string](../types/string.md) | Yes||
 
 
 ### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)

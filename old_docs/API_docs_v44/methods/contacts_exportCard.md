@@ -1,11 +1,17 @@
 ---
 title: contacts.exportCard
-description: contacts.exportCard parameters, return type and example
+description: Export contact as card
 ---
 ## Method: contacts.exportCard  
 [Back to methods index](index.md)
 
 
+Export contact as card
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

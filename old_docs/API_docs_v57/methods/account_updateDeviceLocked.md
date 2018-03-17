@@ -1,16 +1,18 @@
 ---
 title: account.updateDeviceLocked
-description: account.updateDeviceLocked parameters, return type and example
+description: Disable all notifications for a certain period
 ---
 ## Method: account.updateDeviceLocked  
 [Back to methods index](index.md)
 
 
+Disable all notifications for a certain period
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|period|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|period|[int](../types/int.md) | Yes|For how long should notifications be disabled|
 
 
 ### Return type: [Bool](../types/Bool.md)

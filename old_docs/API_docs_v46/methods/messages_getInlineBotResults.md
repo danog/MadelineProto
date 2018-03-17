@@ -10,7 +10,7 @@ description: messages.getInlineBotResults parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|bot|[InputUser](../types/InputUser.md) | Optional|
+|bot|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
 |query|[string](../types/string.md) | Yes|
 |offset|[string](../types/string.md) | Yes|
 

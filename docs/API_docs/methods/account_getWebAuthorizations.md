@@ -1,11 +1,17 @@
 ---
 title: account.getWebAuthorizations
-description: account.getWebAuthorizations parameters, return type and example
+description: Get telegram web login authorizations
 ---
 ## Method: account.getWebAuthorizations  
 [Back to methods index](index.md)
 
 
+Get telegram web login authorizations
+
+### Parameters:
+
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
 
 
 ### Return type: [account\_WebAuthorizations](../types/account_WebAuthorizations.md)
