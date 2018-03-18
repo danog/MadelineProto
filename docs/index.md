@@ -4,7 +4,7 @@ description: PHP implementation of telegram's MTProto protocol
 ---
 # MadelineProto, a PHP MTProto telegram client
 
-Do join the official channel, [@MadelineProto](https://t.me/MadelineProto)!
+Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
 
 
 ## What's this?
