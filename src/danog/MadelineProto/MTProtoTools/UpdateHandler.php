@@ -108,11 +108,7 @@ trait UpdateHandler
             $this->connect_to_all_dcs();
         }
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
-        foreach ($default_params as $key => $default) {
-            if (!isset($params[$key])) {
-                $params[$key] = $default;
-            }
-        }
+        $params = array_merge($default_params, $params);
         $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
         usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
         if (empty($this->updates)) {
@@ -628,7 +624,7 @@ trait UpdateHandler
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
         } else {
-            in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
+            $this->get_updates_update_handler($update);
         }
     }
 
