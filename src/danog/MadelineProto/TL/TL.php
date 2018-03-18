@@ -335,9 +335,6 @@ trait TL
         if (!is_array($object) && $type['type'] === 'InputMessage') {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         }
-        if (!is_array($object) && $type['type'] === 'InputFile') {
-            $object = $this->upload($object);
-        }
         if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && $type['type'] === 'InputEncryptedChat') {
             if (is_array($object)) {
                 $object = $this->get_info($object)['InputEncryptedChat'];
@@ -355,7 +352,7 @@ trait TL
             }
             $object = $object[$type['type']];
         }
-        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type']) !== $type['type'] && in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto'])) {
+        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto'])) {
             $object = $this->get_file_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('Could not convert media object');
@@ -493,6 +490,14 @@ trait TL
                             }
                     }
                 }
+                if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
+                    $serialized .= $this->serialize_object($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);
+                    continue;
+                }
+                if ($tl['type'] === 'DocumentAttribute' && in_array($current_argument['name'], ['w', 'h', 'duration'])) {
+                    $serialized .= pack('@4');
+                    continue;
+                }
                 if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty')) {
                     $serialized .= $id['id'];
                     continue;
@@ -503,6 +508,10 @@ trait TL
             if ($current_argument['type'] === 'DataJSON') {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
+            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile') {
+                $arguments[$current_argument['name']] = $this->upload($arguments[$current_argument['name']]);
+            }
+
             //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }

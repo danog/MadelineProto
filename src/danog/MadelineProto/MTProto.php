@@ -43,6 +43,7 @@ class MTProto
     use \danog\MadelineProto\Tools;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
+    use \danog\MadelineProto\Wrappers\Events;
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;

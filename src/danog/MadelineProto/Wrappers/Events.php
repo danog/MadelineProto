@@ -26,7 +26,7 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
     }
 
-    public event_update_handler($update) {
+    public function event_update_handler($update) {
         if (!class_exists($this->event_handler) || !is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
         }
