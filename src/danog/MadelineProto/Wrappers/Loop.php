@@ -30,6 +30,7 @@ trait Loop
                 $offset = $update['update_id'] + 1;
                 $this->settings['updates']['callback']($update);
             }
+
         }
     }
 }
