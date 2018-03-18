@@ -23,7 +23,8 @@ trait Events
 
     public function setEventHandler($event_handler) {
         $this->event_handler = $event_handler;
-        $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
+        $this->settings['updates']['callback'] = 'event_update_handler';
+        $this->settings['updates']['handle_updates'] = true;
     }
 
     public function event_update_handler($update) {

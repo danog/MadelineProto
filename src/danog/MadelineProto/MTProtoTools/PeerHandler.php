@@ -259,7 +259,7 @@ trait PeerHandler
                     if (!isset($id['from_id']) || $id['to_id']['_'] !== 'peerUser' || $id['to_id']['user_id'] !== $this->authorization['user']['id']) {
                         return $this->get_info($id['to_id']);
                     }
-                    $id = $id['to_id']['user_id'];
+                    $id = $id['from_id'];
                     break;
                 case 'encryptedMessage':
                 case 'encryptedMessageService':

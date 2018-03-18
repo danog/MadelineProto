@@ -13,13 +13,13 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-class EventHandler
+class EventHandler extends APIFactory
 {
     protected $MadelineProto;
     public function __construct($MadelineProto) {
-        $this->MadelineProto = $MadelineProto;
-        foreach ($this->MadelineProto->API->get_method_namespaces() as $namespace) {
-            $this->{$namespace} = new APIFactory($namespace, $this->MadelineProto->API);
+        $this->API = $MadelineProto;
+        foreach ($this->API->get_method_namespaces() as $namespace) {
+            $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }
 }

@@ -23,12 +23,13 @@ trait Loop
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             return true;
         }
+        \danog\MadelineProto\Logger::log("Started update loop", \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
         while (true) {
             $updates = $this->get_updates(['offset' => $offset]);
             foreach ($updates as $update) {
                 $offset = $update['update_id'] + 1;
-                $this->settings['updates']['callback']($update);
+                $this->settings['updates']['callback'] === 'event_update_handler' ? $this->event_update_handler($update['update']) : $this->settings['updates']['callback']($update['update']);
             }
 
         }

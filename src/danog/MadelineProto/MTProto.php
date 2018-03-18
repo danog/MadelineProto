@@ -45,6 +45,7 @@ class MTProto
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Events;
     use \danog\MadelineProto\Wrappers\Login;
+    use \danog\MadelineProto\Wrappers\Loop;
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
 
@@ -698,6 +699,7 @@ class MTProto
         try {
             $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
         } catch (RPCErrorException $e) {
+            \danog\MadelineProto\Logger::log($e->getMessage());
             return false;
         }
 
