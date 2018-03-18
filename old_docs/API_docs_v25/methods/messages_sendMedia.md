@@ -10,9 +10,9 @@ description: messages.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Yes|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

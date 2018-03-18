@@ -10,7 +10,7 @@ description: messages.readMentions parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

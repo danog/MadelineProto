@@ -10,8 +10,8 @@ description: channels.kickFromChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |kicked|[Bool](../types/Bool.md) | Yes|
 
 

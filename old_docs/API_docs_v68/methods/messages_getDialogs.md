@@ -13,7 +13,7 @@ description: messages.getDialogs parameters, return type and example
 |exclude\_pinned|[Bool](../types/Bool.md) | Optional|
 |offset\_date|[int](../types/int.md) | Yes|
 |offset\_id|[int](../types/int.md) | Yes|
-|offset\_peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |limit|[int](../types/int.md) | Yes|
 
 

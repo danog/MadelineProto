@@ -10,7 +10,7 @@ description: messages.getPeerDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peers|Array of [Username, chat ID or InputPeer](../types/InputPeer.md) | Yes|
+|peers|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [messages\_PeerDialogs](../types/messages_PeerDialogs.md)

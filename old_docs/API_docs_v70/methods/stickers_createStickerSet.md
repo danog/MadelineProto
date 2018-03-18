@@ -11,7 +11,7 @@ description: stickers.createStickerSet parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |masks|[Bool](../types/Bool.md) | Optional|
-|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |title|[string](../types/string.md) | Yes|
 |short\_name|[string](../types/string.md) | Yes|
 |stickers|Array of [InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|

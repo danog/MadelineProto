@@ -10,8 +10,8 @@ description: messages.uploadMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

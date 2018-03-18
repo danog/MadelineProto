@@ -15,7 +15,7 @@ description: inputMediaUploadedVideo attributes, type and example
 |duration|[int](../types/int.md) | Yes|
 |w|[int](../types/int.md) | Yes|
 |h|[int](../types/int.md) | Yes|
-|mime\_type|[string](../types/string.md) | Yes|
+|mime\_type|[string](../types/string.md) | Optional|
 
 
 

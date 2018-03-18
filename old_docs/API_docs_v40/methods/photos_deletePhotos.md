@@ -10,7 +10,7 @@ description: photos.deletePhotos parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [InputPhoto](../types/InputPhoto.md) | Yes|
+|id|Array of [MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Yes|
 
 
 ### Return type: [Vector\_of\_long](../types/long.md)

@@ -10,7 +10,7 @@ description: stickers.changeStickerPosition parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|sticker|[InputDocument](../types/InputDocument.md) | Optional|
+|sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
 |position|[int](../types/int.md) | Yes|
 
 

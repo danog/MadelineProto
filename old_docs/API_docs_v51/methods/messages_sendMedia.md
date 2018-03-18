@@ -13,9 +13,9 @@ description: messages.sendMedia parameters, return type and example
 |broadcast|[Bool](../types/Bool.md) | Optional|
 |silent|[Bool](../types/Bool.md) | Optional|
 |background|[Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 |reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 

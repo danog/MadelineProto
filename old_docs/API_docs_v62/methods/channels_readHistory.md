@@ -10,7 +10,7 @@ description: channels.readHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |max\_id|[int](../types/int.md) | Yes|
 
 

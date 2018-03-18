@@ -10,7 +10,7 @@ description: messages.saveRecentSticker parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputDocument](../types/InputDocument.md) | Optional|
+|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
 |unsave|[Bool](../types/Bool.md) | Yes|
 
 

@@ -10,7 +10,7 @@ description: photos.updateProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputPhoto](../types/InputPhoto.md) | Optional|
+|id|[MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Optional|
 |crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
 
 

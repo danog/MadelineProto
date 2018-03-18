@@ -11,7 +11,7 @@ description: inputMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputDocument](../types/InputDocument.md) | Optional|
+|id|[MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 |caption|[string](../types/string.md) | Yes|
 
 

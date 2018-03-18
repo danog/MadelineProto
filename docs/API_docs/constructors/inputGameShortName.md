@@ -11,7 +11,7 @@ description: inputGameShortName attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|bot\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|bot\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |short\_name|[string](../types/string.md) | Yes|
 
 

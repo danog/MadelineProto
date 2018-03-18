@@ -12,7 +12,7 @@ Get info about users
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|The ids of the users|
+|id|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The ids of the users|
 
 
 ### Return type: [Vector\_of\_User](../types/User.md)

@@ -12,10 +12,10 @@ description: inputMediaUploadedDocument attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |file|[File path or InputFile](../types/InputFile.md) | Yes|
-|mime\_type|[string](../types/string.md) | Yes|
+|mime\_type|[string](../types/string.md) | Optional|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
-|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+|stickers|Array of [MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 
 
 

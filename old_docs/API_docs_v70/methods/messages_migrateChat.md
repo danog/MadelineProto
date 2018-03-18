@@ -10,7 +10,7 @@ description: messages.migrateChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

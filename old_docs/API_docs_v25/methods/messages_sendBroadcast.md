@@ -10,9 +10,9 @@ description: messages.sendBroadcast parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|contacts|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|
+|contacts|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
 |message|[string](../types/string.md) | Yes|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 
 ### Return type: [messages\_StatedMessages](../types/messages_StatedMessages.md)

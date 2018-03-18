@@ -12,7 +12,7 @@ Block a user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|The user to block|
+|id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to block|
 
 
 ### Return type: [Bool](../types/Bool.md)

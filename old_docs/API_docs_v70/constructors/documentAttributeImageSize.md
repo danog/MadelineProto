@@ -11,8 +11,8 @@ description: documentAttributeImageSize attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|w|[int](../types/int.md) | Yes|
-|h|[int](../types/int.md) | Yes|
+|w|[int](../types/int.md) | Optional|
+|h|[int](../types/int.md) | Optional|
 
 
 

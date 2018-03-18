@@ -12,7 +12,7 @@ Delete multiple contacts
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|The contacts to delete|
+|id|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The contacts to delete|
 
 
 ### Return type: [Bool](../types/Bool.md)

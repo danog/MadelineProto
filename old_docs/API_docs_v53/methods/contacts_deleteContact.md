@@ -12,7 +12,7 @@ Delete a contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|The contact to delete|
+|id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The contact to delete|
 
 
 ### Return type: [contacts\_Link](../types/contacts_Link.md)

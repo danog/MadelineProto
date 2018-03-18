@@ -11,7 +11,7 @@ description: inputStickerSetItem attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|document|[InputDocument](../types/InputDocument.md) | Optional|
+|document|[MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 |emoji|[string](../types/string.md) | Yes|
 |mask\_coords|[MaskCoords](../types/MaskCoords.md) | Optional|
 

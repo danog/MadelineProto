@@ -11,7 +11,7 @@ description: documentAttributeAudio attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|duration|[int](../types/int.md) | Yes|
+|duration|[int](../types/int.md) | Optional|
 
 
 

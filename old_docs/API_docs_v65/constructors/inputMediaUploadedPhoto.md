@@ -13,7 +13,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 |----------|---------------|----------|
 |file|[File path or InputFile](../types/InputFile.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
-|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+|stickers|Array of [MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 
 
 

@@ -12,7 +12,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |file|[File path or InputFile](../types/InputFile.md) | Yes|
-|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+|stickers|Array of [MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 |ttl\_seconds|[int](../types/int.md) | Optional|
 
 

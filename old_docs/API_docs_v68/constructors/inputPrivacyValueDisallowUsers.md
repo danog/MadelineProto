@@ -11,7 +11,7 @@ description: inputPrivacyValueDisallowUsers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|users|Array of [Username, chat ID or InputUser](../types/InputUser.md) | Yes|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
 
 
 

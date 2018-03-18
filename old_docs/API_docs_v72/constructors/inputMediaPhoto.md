@@ -11,7 +11,7 @@ description: inputMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputPhoto](../types/InputPhoto.md) | Optional|
+|id|[MessageMedia, Message, Update or InputPhoto](../types/InputPhoto.md) | Optional|
 |caption|[string](../types/string.md) | Yes|
 |ttl\_seconds|[int](../types/int.md) | Optional|
 

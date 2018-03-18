@@ -12,7 +12,7 @@ description: messages.saveDraft parameters, return type and example
 |----------|---------------|----------|
 |no\_webpage|[Bool](../types/Bool.md) | Optional|
 |reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |

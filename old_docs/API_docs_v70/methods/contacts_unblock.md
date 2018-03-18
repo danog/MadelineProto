@@ -12,7 +12,7 @@ Unblock a user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|The user to unblock|
+|id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to unblock|
 
 
 ### Return type: [Bool](../types/Bool.md)

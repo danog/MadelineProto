@@ -11,7 +11,7 @@ description: messages.getInlineGameHighScores parameters, return type and exampl
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)

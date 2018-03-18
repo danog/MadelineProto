@@ -10,7 +10,7 @@ description: channels.setStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[Username, chat ID or InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 

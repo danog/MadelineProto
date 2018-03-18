@@ -10,7 +10,7 @@ description: messages.sendEncryptedService parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[Secret chat ID or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
 |message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|
 
 

@@ -11,7 +11,7 @@ description: inputSingleMedia attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|media|[MessageMedia, Message, Update or InputMedia](../types/InputMedia.md) | Optional|
 |message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 

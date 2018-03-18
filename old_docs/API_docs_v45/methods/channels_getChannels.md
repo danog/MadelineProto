@@ -10,7 +10,7 @@ description: channels.getChannels parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [Username, chat ID or InputChannel](../types/InputChannel.md) | Yes|
+|id|Array of [Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

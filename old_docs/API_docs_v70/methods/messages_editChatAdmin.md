@@ -10,8 +10,8 @@ description: messages.editChatAdmin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|chat\_id|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
-|user\_id|[Username, chat ID or InputUser](../types/InputUser.md) | Optional|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |is\_admin|[Bool](../types/Bool.md) | Yes|
 
 

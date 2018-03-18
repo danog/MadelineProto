@@ -121,15 +121,15 @@ description: constructors and methods of type '.$type.'
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
-                    
+
 The following syntaxes can also be used:
 
 ```
 $'.$type." = '@username'; // Username
 
-$".$type." = 'me'; // The logged-in user
+\$".$type." = 'me'; // The currently logged-in user
 
-$'.$type.' = 44700; // bot API id (users)
+\$".$type.' = 44700; // bot API id (users)
 $'.$type.' = -492772765; // bot API id (chats)
 $'.$type.' = -10038575794; // bot API id (channels)
 

@@ -10,7 +10,7 @@ description: messages.deleteHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[Username, chat ID or InputPeer](../types/InputPeer.md) | Optional|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |max\_id|[int](../types/int.md) | Yes|
 
 
