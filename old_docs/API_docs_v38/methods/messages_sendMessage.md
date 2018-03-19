@@ -46,6 +46,7 @@ description: messages.sendMessage parameters, return type and example
 |YOU_BLOCKED_USER|You blocked this user|
 |RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|tanti SALUTI da peppe lg .|Ciao da un pony|
 |Timeout|A timeout occurred while fetching data from the bot|
 
 

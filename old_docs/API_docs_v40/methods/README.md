@@ -28,6 +28,10 @@ $MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.htm
 $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 
+$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
+
+$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
+
 ***
 <br><br>$MadelineProto->[account->changePhone](account_changePhone.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="account_changePhone"></a>  
 
