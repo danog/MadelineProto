@@ -15,11 +15,48 @@ namespace danog\MadelineProto;
 
 class EventHandler extends APIFactory
 {
-    protected $MadelineProto;
     public function __construct($MadelineProto) {
         $this->API = $MadelineProto;
         foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
+    }
+    public function &__get($name)
+    {
+        if ($name === 'settings') {
+            $this->API->setdem = true;
+
+            return $this->API->settings;
+        }
+
+        return $this->API->storage[$name];
+    }
+
+    public function __set($name, $value)
+    {
+        if ($name === 'settings') {
+            if (Logger::is_fork() && !Logger::$processed_fork) {
+                \danog\MadelineProto\Logger::log('Detected fork');
+                $this->API->reset_session();
+                foreach ($this->API->datacenter->sockets as $datacenter) {
+                    $datacenter->close_and_reopen();
+                }
+                Logger::$processed_fork = true;
+            }
+
+            return $this->API->__construct(array_replace_recursive($this->API->settings, $value));
+        }
+
+        return $this->API->storage[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->API->storage[$name]);
+    }
+
+    public function __unset($name)
+    {
+        unset($this->API->storage[$name]);
     }
 }

@@ -649,7 +649,7 @@ trait UpdateHandler
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
                 curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
             } else {
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             }
         }
         $result = curl_exec($ch);

@@ -23,7 +23,7 @@ trait Events
 
     public function setEventHandler($event_handler) {
         $this->event_handler = $event_handler;
-        $this->settings['updates']['callback'] = 'event_update_handler';
+        $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
     }
 
@@ -38,6 +38,8 @@ trait Events
         $method_name = 'on'.ucfirst($update['_']);
         if (method_exists($this->event_handler_instance, $method_name)) {
             $this->event_handler_instance->$method_name($update);
+        } else if (method_exists($this->event_handler_instance, 'onAny')) {
+            $this->event_handler_instance->onAny($update);
         }
     }
 }

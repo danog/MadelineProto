@@ -18,20 +18,32 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait Loop
 {
-    public function loop()
+    public function loop($max_forks = 0)
     {
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             return true;
         }
         \danog\MadelineProto\Logger::log("Started update loop", \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
-        while (true) {
-            $updates = $this->get_updates(['offset' => $offset]);
-            foreach ($updates as $update) {
-                $offset = $update['update_id'] + 1;
-                $this->settings['updates']['callback'] === 'event_update_handler' ? $this->event_update_handler($update['update']) : $this->settings['updates']['callback']($update['update']);
+        if ($max_forks === -1) {
+            while (true) {
+                $updates = $this->get_updates(['offset' => $offset]);
+                foreach ($updates as $update) {
+                    $offset = $update['update_id'] + 1;
+                    if (!pcntl_fork()) {
+                        $this->settings['updates']['callback']($update['update']);
+                        die;
+                    }
+                }
             }
-
+        } else {
+            while (true) {
+                $updates = $this->get_updates(['offset' => $offset]);
+                foreach ($updates as $update) {
+                    $offset = $update['update_id'] + 1;
+                    $this->settings['updates']['callback']($update['update']);
+                }
+            }
         }
     }
 }
