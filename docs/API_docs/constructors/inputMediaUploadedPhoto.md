@@ -23,7 +23,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'stickers' => [InputDocument], 'ttl_seconds' => int];
+$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'stickers' => [InputDocument, InputDocument], 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

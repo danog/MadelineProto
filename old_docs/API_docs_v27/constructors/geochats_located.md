@@ -24,7 +24,7 @@ description: geochats_located attributes, type and example
 ### Example:
 
 ```
-$geochats_located = ['_' => 'geochats.located', 'results' => [ChatLocated], 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User]];
+$geochats_located = ['_' => 'geochats.located', 'results' => [ChatLocated, ChatLocated], 'messages' => [GeoChatMessage, GeoChatMessage], 'chats' => [Chat, Chat], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

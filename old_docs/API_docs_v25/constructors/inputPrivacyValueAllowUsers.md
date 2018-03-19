@@ -21,7 +21,7 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser]];
+$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser, InputUser]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

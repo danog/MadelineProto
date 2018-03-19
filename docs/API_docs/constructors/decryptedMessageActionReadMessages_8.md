@@ -21,7 +21,7 @@ description: decryptedMessageActionReadMessages attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageActionReadMessages_8 = ['_' => 'decryptedMessageActionReadMessages', 'random_ids' => [long]];
+$decryptedMessageActionReadMessages_8 = ['_' => 'decryptedMessageActionReadMessages', 'random_ids' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -23,7 +23,7 @@ description: contacts_blockedSlice attributes, type and example
 ### Example:
 
 ```
-$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [ContactBlocked], 'users' => [User]];
+$contacts_blockedSlice = ['_' => 'contacts.blockedSlice', 'count' => int, 'blocked' => [ContactBlocked, ContactBlocked], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

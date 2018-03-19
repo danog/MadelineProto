@@ -24,7 +24,7 @@ description: inputWebDocument attributes, type and example
 ### Example:
 
 ```
-$inputWebDocument = ['_' => 'inputWebDocument', 'url' => 'string', 'size' => int, 'mime_type' => 'string', 'attributes' => [DocumentAttribute]];
+$inputWebDocument = ['_' => 'inputWebDocument', 'url' => 'string', 'size' => int, 'mime_type' => 'string', 'attributes' => [DocumentAttribute, DocumentAttribute]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

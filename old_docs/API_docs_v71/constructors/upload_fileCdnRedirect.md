@@ -25,7 +25,7 @@ description: upload_fileCdnRedirect attributes, type and example
 ### Example:
 
 ```
-$upload_fileCdnRedirect = ['_' => 'upload.fileCdnRedirect', 'dc_id' => int, 'file_token' => 'bytes', 'encryption_key' => 'bytes', 'encryption_iv' => 'bytes', 'cdn_file_hashes' => [CdnFileHash]];
+$upload_fileCdnRedirect = ['_' => 'upload.fileCdnRedirect', 'dc_id' => int, 'file_token' => 'bytes', 'encryption_key' => 'bytes', 'encryption_iv' => 'bytes', 'cdn_file_hashes' => [CdnFileHash, CdnFileHash]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -24,7 +24,7 @@ description: contacts_importedContacts attributes, type and example
 ### Example:
 
 ```
-$contacts_importedContacts = ['_' => 'contacts.importedContacts', 'imported' => [ImportedContact], 'popular_invites' => [PopularContact], 'retry_contacts' => [long], 'users' => [User]];
+$contacts_importedContacts = ['_' => 'contacts.importedContacts', 'imported' => [ImportedContact, ImportedContact], 'popular_invites' => [PopularContact, PopularContact], 'retry_contacts' => [long, long], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

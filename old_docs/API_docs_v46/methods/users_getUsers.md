@@ -47,7 +47,7 @@ $api_hash = '';
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
 $MadelineProto->start();
 
-$Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser], ]);
+$Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser, InputUser], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

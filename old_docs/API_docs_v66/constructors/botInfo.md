@@ -23,7 +23,7 @@ description: botInfo attributes, type and example
 ### Example:
 
 ```
-$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => 'string', 'commands' => [BotCommand]];
+$botInfo = ['_' => 'botInfo', 'user_id' => int, 'description' => 'string', 'commands' => [BotCommand, BotCommand]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

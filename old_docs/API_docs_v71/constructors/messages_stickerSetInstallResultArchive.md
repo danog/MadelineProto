@@ -21,7 +21,7 @@ description: messages_stickerSetInstallResultArchive attributes, type and exampl
 ### Example:
 
 ```
-$messages_stickerSetInstallResultArchive = ['_' => 'messages.stickerSetInstallResultArchive', 'sets' => [StickerSetCovered]];
+$messages_stickerSetInstallResultArchive = ['_' => 'messages.stickerSetInstallResultArchive', 'sets' => [StickerSetCovered, StickerSetCovered]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

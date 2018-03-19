@@ -21,7 +21,7 @@ description: channelMessagesFilter attributes, type and example
 ### Example:
 
 ```
-$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange]];
+$channelMessagesFilter = ['_' => 'channelMessagesFilter', 'ranges' => [MessageRange, MessageRange]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -21,7 +21,7 @@ description: msg_resend_req attributes, type and example
 ### Example:
 
 ```
-$msg_resend_req = ['_' => 'msg_resend_req', 'msg_ids' => [long]];
+$msg_resend_req = ['_' => 'msg_resend_req', 'msg_ids' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

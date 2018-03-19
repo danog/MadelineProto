@@ -26,7 +26,7 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute], 'caption' => 'string', 'stickers' => [InputDocument]];
+$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute, DocumentAttribute], 'caption' => 'string', 'stickers' => [InputDocument, InputDocument]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

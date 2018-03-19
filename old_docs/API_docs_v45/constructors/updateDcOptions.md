@@ -21,7 +21,7 @@ description: updateDcOptions attributes, type and example
 ### Example:
 
 ```
-$updateDcOptions = ['_' => 'updateDcOptions', 'dc_options' => [DcOption]];
+$updateDcOptions = ['_' => 'updateDcOptions', 'dc_options' => [DcOption, DcOption]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

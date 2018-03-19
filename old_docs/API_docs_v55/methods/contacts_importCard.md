@@ -45,7 +45,7 @@ $api_hash = '';
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
 $MadelineProto->start();
 
-$User = $MadelineProto->contacts->importCard(['export_card' => [int], ]);
+$User = $MadelineProto->contacts->importCard(['export_card' => [int, int], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

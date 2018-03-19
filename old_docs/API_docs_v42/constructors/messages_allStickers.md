@@ -22,7 +22,7 @@ description: messages_allStickers attributes, type and example
 ### Example:
 
 ```
-$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => 'string', 'sets' => [StickerSet]];
+$messages_allStickers = ['_' => 'messages.allStickers', 'hash' => 'string', 'sets' => [StickerSet, StickerSet]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

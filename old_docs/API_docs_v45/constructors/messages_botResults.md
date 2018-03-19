@@ -24,7 +24,7 @@ description: messages_botResults attributes, type and example
 ### Example:
 
 ```
-$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => 'string', 'results' => [BotInlineResult]];
+$messages_botResults = ['_' => 'messages.botResults', 'gallery' => Bool, 'query_id' => long, 'next_offset' => 'string', 'results' => [BotInlineResult, BotInlineResult]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

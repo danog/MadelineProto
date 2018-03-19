@@ -22,7 +22,7 @@ description: pageBlockCollage attributes, type and example
 ### Example:
 
 ```
-$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock], 'caption' => RichText];
+$pageBlockCollage = ['_' => 'pageBlockCollage', 'items' => [PageBlock, PageBlock], 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -21,7 +21,7 @@ description: updatePinnedDialogs attributes, type and example
 ### Example:
 
 ```
-$updatePinnedDialogs = ['_' => 'updatePinnedDialogs', 'order' => [Peer]];
+$updatePinnedDialogs = ['_' => 'updatePinnedDialogs', 'order' => [Peer, Peer]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

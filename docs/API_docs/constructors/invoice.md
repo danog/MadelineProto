@@ -30,7 +30,7 @@ description: invoice attributes, type and example
 ### Example:
 
 ```
-$invoice = ['_' => 'invoice', 'test' => Bool, 'name_requested' => Bool, 'phone_requested' => Bool, 'email_requested' => Bool, 'shipping_address_requested' => Bool, 'flexible' => Bool, 'phone_to_provider' => Bool, 'email_to_provider' => Bool, 'currency' => 'string', 'prices' => [LabeledPrice]];
+$invoice = ['_' => 'invoice', 'test' => Bool, 'name_requested' => Bool, 'phone_requested' => Bool, 'email_requested' => Bool, 'shipping_address_requested' => Bool, 'flexible' => Bool, 'phone_to_provider' => Bool, 'email_to_provider' => Bool, 'currency' => 'string', 'prices' => [LabeledPrice, LabeledPrice]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

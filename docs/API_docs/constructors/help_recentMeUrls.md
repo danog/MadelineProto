@@ -23,7 +23,7 @@ description: help_recentMeUrls attributes, type and example
 ### Example:
 
 ```
-$help_recentMeUrls = ['_' => 'help.recentMeUrls', 'urls' => [RecentMeUrl], 'chats' => [Chat], 'users' => [User]];
+$help_recentMeUrls = ['_' => 'help.recentMeUrls', 'urls' => [RecentMeUrl, RecentMeUrl], 'chats' => [Chat, Chat], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

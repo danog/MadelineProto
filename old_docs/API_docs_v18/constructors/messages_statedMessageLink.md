@@ -26,7 +26,7 @@ description: messages_statedMessageLink attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Chat], 'users' => [User], 'links' => [contacts_Link], 'pts' => int, 'seq' => int];
+$messages_statedMessageLink = ['_' => 'messages.statedMessageLink', 'message' => Message, 'chats' => [Chat, Chat], 'users' => [User, User], 'links' => [contacts_Link, contacts_Link], 'pts' => int, 'seq' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

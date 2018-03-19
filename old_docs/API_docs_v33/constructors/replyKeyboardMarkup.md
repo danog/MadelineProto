@@ -21,7 +21,7 @@ description: replyKeyboardMarkup attributes, type and example
 ### Example:
 
 ```
-$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'rows' => [KeyboardButtonRow]];
+$replyKeyboardMarkup = ['_' => 'replyKeyboardMarkup', 'rows' => [KeyboardButtonRow, KeyboardButtonRow]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

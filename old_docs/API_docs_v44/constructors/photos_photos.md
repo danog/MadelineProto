@@ -22,7 +22,7 @@ description: photos_photos attributes, type and example
 ### Example:
 
 ```
-$photos_photos = ['_' => 'photos.photos', 'photos' => [Photo], 'users' => [User]];
+$photos_photos = ['_' => 'photos.photos', 'photos' => [Photo, Photo], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

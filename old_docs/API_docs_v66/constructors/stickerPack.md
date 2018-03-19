@@ -22,7 +22,7 @@ description: stickerPack attributes, type and example
 ### Example:
 
 ```
-$stickerPack = ['_' => 'stickerPack', 'emoticon' => 'string', 'documents' => [long]];
+$stickerPack = ['_' => 'stickerPack', 'emoticon' => 'string', 'documents' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

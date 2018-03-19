@@ -23,7 +23,7 @@ description: shippingOption attributes, type and example
 ### Example:
 
 ```
-$shippingOption = ['_' => 'shippingOption', 'id' => 'string', 'title' => 'string', 'prices' => [LabeledPrice]];
+$shippingOption = ['_' => 'shippingOption', 'id' => 'string', 'title' => 'string', 'prices' => [LabeledPrice, LabeledPrice]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -163,7 +163,7 @@ trait Constructors
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
                 $params .= ", '".$param['name']."' => ";
-                $params .= isset($param['subtype']) ? '['.$pptype.']' : $pptype;
+                $params .= isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype;
                 $lua_params .= ', '.$param['name'].'=';
                 $lua_params .= isset($param['subtype']) ? '{'.$pptype.'}' : $pptype;
                 $pwr_params .= ', "'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype);

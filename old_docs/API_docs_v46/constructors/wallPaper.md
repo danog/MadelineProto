@@ -24,7 +24,7 @@ description: wallPaper attributes, type and example
 ### Example:
 
 ```
-$wallPaper = ['_' => 'wallPaper', 'id' => int, 'title' => 'string', 'sizes' => [PhotoSize], 'color' => int];
+$wallPaper = ['_' => 'wallPaper', 'id' => int, 'title' => 'string', 'sizes' => [PhotoSize, PhotoSize], 'color' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

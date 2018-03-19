@@ -22,7 +22,7 @@ description: updateDeleteMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int], 'pts' => int];
+$updateDeleteMessages = ['_' => 'updateDeleteMessages', 'messages' => [int, int], 'pts' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

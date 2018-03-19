@@ -24,7 +24,7 @@ description: resPQ attributes, type and example
 ### Example:
 
 ```
-$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => 'string', 'server_public_key_fingerprints' => [long]];
+$resPQ = ['_' => 'resPQ', 'nonce' => int128, 'server_nonce' => int128, 'pq' => 'string', 'server_public_key_fingerprints' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -140,7 +140,7 @@ trait Methods
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
                 $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
+                $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
                 $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";
                 $lua_params .= $param['name'].'=';

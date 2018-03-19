@@ -23,7 +23,7 @@ description: chatParticipants attributes, type and example
 ### Example:
 
 ```
-$chatParticipants = ['_' => 'chatParticipants', 'chat_id' => int, 'participants' => [ChatParticipant], 'version' => int];
+$chatParticipants = ['_' => 'chatParticipants', 'chat_id' => int, 'participants' => [ChatParticipant, ChatParticipant], 'version' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

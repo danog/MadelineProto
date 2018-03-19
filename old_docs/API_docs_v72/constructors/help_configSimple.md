@@ -24,7 +24,7 @@ description: help_configSimple attributes, type and example
 ### Example:
 
 ```
-$help_configSimple = ['_' => 'help.configSimple', 'date' => int, 'expires' => int, 'dc_id' => int, 'ip_port_list' => [ipPort]];
+$help_configSimple = ['_' => 'help.configSimple', 'date' => int, 'expires' => int, 'dc_id' => int, 'ip_port_list' => [ipPort, ipPort]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

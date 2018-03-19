@@ -22,7 +22,7 @@ description: updateChannelReadMessagesContents attributes, type and example
 ### Example:
 
 ```
-$updateChannelReadMessagesContents = ['_' => 'updateChannelReadMessagesContents', 'channel_id' => int, 'messages' => [int]];
+$updateChannelReadMessagesContents = ['_' => 'updateChannelReadMessagesContents', 'channel_id' => int, 'messages' => [int, int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

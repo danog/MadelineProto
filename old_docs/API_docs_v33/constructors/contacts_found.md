@@ -22,7 +22,7 @@ description: contacts_found attributes, type and example
 ### Example:
 
 ```
-$contacts_found = ['_' => 'contacts.found', 'results' => [ContactFound], 'users' => [User]];
+$contacts_found = ['_' => 'contacts.found', 'results' => [ContactFound, ContactFound], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

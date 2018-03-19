@@ -21,7 +21,7 @@ description: msgs_state_req attributes, type and example
 ### Example:
 
 ```
-$msgs_state_req = ['_' => 'msgs_state_req', 'msg_ids' => [long]];
+$msgs_state_req = ['_' => 'msgs_state_req', 'msg_ids' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

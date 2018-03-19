@@ -21,7 +21,7 @@ description: keyboardButtonRow attributes, type and example
 ### Example:
 
 ```
-$keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [KeyboardButton]];
+$keyboardButtonRow = ['_' => 'keyboardButtonRow', 'buttons' => [KeyboardButton, KeyboardButton]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -21,7 +21,7 @@ description: messageActionChatAddUser attributes, type and example
 ### Example:
 
 ```
-$messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [int]];
+$messageActionChatAddUser = ['_' => 'messageActionChatAddUser', 'users' => [int, int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

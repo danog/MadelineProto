@@ -21,7 +21,7 @@ description: account_authorizations attributes, type and example
 ### Example:
 
 ```
-$account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Authorization]];
+$account_authorizations = ['_' => 'account.authorizations', 'authorizations' => [Authorization, Authorization]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -25,7 +25,7 @@ description: messages_statedMessage attributes, type and example
 ### Example:
 
 ```
-$messages_statedMessage = ['_' => 'messages.statedMessage', 'message' => Message, 'chats' => [Chat], 'users' => [User], 'pts' => int, 'seq' => int];
+$messages_statedMessage = ['_' => 'messages.statedMessage', 'message' => Message, 'chats' => [Chat, Chat], 'users' => [User, User], 'pts' => int, 'seq' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

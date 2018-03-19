@@ -24,7 +24,7 @@ description: updateDeleteChannelMessages attributes, type and example
 ### Example:
 
 ```
-$updateDeleteChannelMessages = ['_' => 'updateDeleteChannelMessages', 'peer' => Peer, 'messages' => [int], 'pts' => int, 'pts_count' => int];
+$updateDeleteChannelMessages = ['_' => 'updateDeleteChannelMessages', 'peer' => Peer, 'messages' => [int, int], 'pts' => int, 'pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

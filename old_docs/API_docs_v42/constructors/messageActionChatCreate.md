@@ -22,7 +22,7 @@ description: messageActionChatCreate attributes, type and example
 ### Example:
 
 ```
-$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => 'string', 'users' => [int]];
+$messageActionChatCreate = ['_' => 'messageActionChatCreate', 'title' => 'string', 'users' => [int, int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

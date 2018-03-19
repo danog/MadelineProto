@@ -22,7 +22,7 @@ description: payments_validatedRequestedInfo attributes, type and example
 ### Example:
 
 ```
-$payments_validatedRequestedInfo = ['_' => 'payments.validatedRequestedInfo', 'id' => 'string', 'shipping_options' => [ShippingOption]];
+$payments_validatedRequestedInfo = ['_' => 'payments.validatedRequestedInfo', 'id' => 'string', 'shipping_options' => [ShippingOption, ShippingOption]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

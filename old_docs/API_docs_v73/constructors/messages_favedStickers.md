@@ -23,7 +23,7 @@ description: messages_favedStickers attributes, type and example
 ### Example:
 
 ```
-$messages_favedStickers = ['_' => 'messages.favedStickers', 'hash' => int, 'packs' => [StickerPack], 'stickers' => [Document]];
+$messages_favedStickers = ['_' => 'messages.favedStickers', 'hash' => int, 'packs' => [StickerPack, StickerPack], 'stickers' => [Document, Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

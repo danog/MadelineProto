@@ -27,7 +27,7 @@ description: inputMediaUploadedDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'nosound_video' => Bool, 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute], 'stickers' => [InputDocument], 'ttl_seconds' => int];
+$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'nosound_video' => Bool, 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute, DocumentAttribute], 'stickers' => [InputDocument, InputDocument], 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

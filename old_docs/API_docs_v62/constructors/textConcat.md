@@ -21,7 +21,7 @@ description: textConcat attributes, type and example
 ### Example:
 
 ```
-$textConcat = ['_' => 'textConcat', 'texts' => [RichText]];
+$textConcat = ['_' => 'textConcat', 'texts' => [RichText, RichText]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
