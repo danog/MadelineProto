@@ -332,27 +332,17 @@ trait TL
                 }
         }
         $auto = false;
-        if (!is_array($object) && $type['type'] === 'InputMessage') {
+        if ($type['type'] === 'InputMessage' && !is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         }
-        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && $type['type'] === 'InputEncryptedChat') {
-            if (is_array($object)) {
-                $object = $this->get_info($object)['InputEncryptedChat'];
-            } else {
-                if (!isset($this->secret_chats[$object])) {
-                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
-                }
-                $object = $this->secret_chats[$object]['InputEncryptedChat'];    
-            }
-        }
-        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+        if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
             }
             $object = $object[$type['type']];
         }
-        if ((!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type']) && in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto'])) {
+        if (in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->get_file_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('Could not convert media object');
@@ -405,7 +395,6 @@ trait TL
             $arguments['hash'] = $matches[1];
         }
         if ($method === 'channels.joinChannel' && isset($arguments['channel']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
-            var_dump($matches);
             if ($matches[1] !== '') {
                 $method = 'messages.importChatInvite';
                 $arguments['hash'] = $matches[2];
@@ -512,6 +501,16 @@ trait TL
                 $arguments[$current_argument['name']] = $this->upload($arguments[$current_argument['name']]);
             }
 
+            if ($current_argument['type'] === 'InputEncryptedChat' && (!is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
+                if (is_array($arguments[$current_argument['name']])) {
+                    $arguments[$current_argument['name']] = $this->get_info($arguments[$current_argument['name']])['InputEncryptedChat'];
+                } else {
+                    if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
+                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                    }
+                    $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];    
+                }
+            }
             //\danog\MadelineProto\Logger::log('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
             $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }

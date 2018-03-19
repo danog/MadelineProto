@@ -162,6 +162,8 @@ trait Files
                $message_media = $message_media['message'];
             case 'message':
                 return $this->get_download_info($message_media['media']);
+            case 'updateNewEncryptedMessage':
+               $message_media = $message_media['message'];
             case 'encryptedMessage':
                 if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
                     return $this->get_download_info($message_media['decrypted_message']['media']);

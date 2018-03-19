@@ -20,8 +20,9 @@ if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
+} else {
+    require_once 'vendor/autoload.php';
 }
-require_once 'vendor/autoload.php';
 
 /**
  * Load .env for settings
