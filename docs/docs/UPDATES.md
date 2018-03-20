@@ -196,7 +196,8 @@ Note that multiprocessing is not the same as multithreading, and should be avoid
 
 
 
-<button href="https://docs.madelineproto.xyz/docs/SETTINGS.html">Next section</button>
+
+
 
 
 <form action="https://docs.madelineproto.xyz/docs/SETTINGS.html"><input type="submit" value="Next section" /></form>

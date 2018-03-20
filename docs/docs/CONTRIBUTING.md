@@ -89,3 +89,5 @@ While writing this client, I looked at many projects for inspiration and help. H
 Thanks to the devs that contributed to these projects, MadelineProto is now an easy, well-written and complete MTProto client.  
 
 
+
+<form action="https://docs.madelineproto.xyz/#very-complex-and-complete-examples"><input type="submit" value="Next section" /></form>

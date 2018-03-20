@@ -23,7 +23,7 @@ MadelineProto can throw lots of different exceptions.
 
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases
 
-* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the mtproto API): **note** that the error message of this exception is localized in English, and may vary: to fetch the original API error message use `$e->rpc`.
+* \danog\MadelineProto\RPCErrorException - Thrown when an RPC error occurres (an error received via the MTProto API): **note** that the error message of this exception is localized in English, and may vary: to fetch the original API error message use `$e->rpc`.
 
 * \danog\MadelineProto\TL\Exception - Thrown on TL serialization/deserialization errors
 
@@ -101,5 +101,10 @@ try {
     // use $estring to report the error using sendMessage or log
 }
 ```
+
+<form action="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html"><input type="submit" value="Next section" /></form>
+
+
+
 
 <form action="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html"><input type="submit" value="Next section" /></form>

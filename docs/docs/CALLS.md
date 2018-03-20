@@ -68,12 +68,12 @@ $controller->parseConfig();
 
 Do this before accepting a call or right after requesting one.  
 It is best to set an initial bitrate not much smaller than the maximum bitrate, since libtgvoip tends to always increase it, initially, and when it does that, slight sound distortions occur.  
-The maximum bitrate can be set to any value, really, as long as it's smaller than 110*1000 (temporary limit that I'm trying to work around).  
-It is best to set the minumum bitrate to a value smaller than or equal to 20*1000.  
+The maximum bitrate can be set to any value, really, as long as it's smaller than `110*1000` (temporary limit that I'm trying to work around).  
+It is best to set the minumum bitrate to a value smaller than or equal to `20*1000`.  
 Of course, you can't set the initial bitrate to a value higher than the maximum bitrate or lower than the minimum bitrate, and you can't set the minimum bitrate to a value higher than the maximum bitrate, or the maximum bitrate to a value lower than the minimum bitrate.  
 You can also tweak the steps to speed up/slow down automatic increasing/decreasing of the bitrates, or stop it altogether by settings both steps to 0 (in this case, the bitrate will always be equal to the initial bitrate).  
 Try to find out what works best for you.  
-If you manually set the network type to NET_TYPE_GPRS, NET_TYPE_EDGE, or enabled data saving mode, you must append a _gprs, _edge, _saving to the audio_init/max/min bitrate keys.  
+If you manually set the network type to `NET_TYPE_GPRS`, `NET_TYPE_EDGE`, or enabled data saving mode, you must append a `_gprs`, `_edge`, `_saving` to the audio_init/max/min bitrate keys.  
 
 
 ## Putting it all together
@@ -110,6 +110,9 @@ foreach ($updates as $update) {
     }
 }
 ```
+
+
+
 
 
 

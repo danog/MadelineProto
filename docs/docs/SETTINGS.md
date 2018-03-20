@@ -109,64 +109,63 @@ Cons:
 * obfuscated2: Like tcp_abridged, but obfuscated 
 Overhead: Medium-high
 Pros:
-- All Telegram DCs support it
-- Minimum envelope length: 1 byte (length)
-- Maximum envelope length: 4 bytes (length)
-- Obfuscation to prevent ISP blocks
+  * All Telegram DCs support it
+  * Minimum envelope length: 1 byte (length)
+  * Maximum envelope length: 4 bytes (length)
+  * Obfuscation to prevent ISP blocks
 
 Cons: 
-- Initial payload of 64 bytes must be sent on every connection
-- Additional round of encryption is required  
-- No initial integrity check
-- No transport sequence number
+  * Initial payload of 64 bytes must be sent on every connection
+  * Additional round of encryption is required  
+  * No initial integrity check
+  * No transport sequence number
 
 * tcp_intermediate: I guess they like having multiple protocols
-Overhead: small
-Pros:
-- Minimum envelope length: 4 bytes (length)
-- Maximum envelope length: 4 bytes (length)
+  * Overhead: small
+  * Pros:
+    * Minimum envelope length: 4 bytes (length)
+    * Maximum envelope length: 4 bytes (length)
 
-Cons:
-- No obfuscation
-- No initial integrity check
-- Not all Telegram DCs support it
-- No transport sequence number
+  * Cons:
+    * No obfuscation
+    * No initial integrity check
+    * Not all Telegram DCs support it
+    * No transport sequence number
 
 * tcp_full: The basic MTProto transport protocol, supported by all clients
-Overhead: medium
-Pros:
-- All Telegram DCs support it
-- Initial integrity check with crc32
-- Transport sequence number check
+  * Overhead: medium
+  * Pros:
+    * All Telegram DCs support it
+    * Initial integrity check with crc32
+    * Transport sequence number check
 
-Cons:
-- Minimum envelope length: 12 bytes (length+seqno+crc)
-- Maximum envelope length: 12 bytes (length+seqno+crc)
-- Initial integrity check with crc32 is not that useful since the TCP protocol already uses it internally
-- Transport sequence number check is also not that useful since transport sequence numbers are not encrypted and thus cannot be used to avoid replay attacks, and MadelineProto already uses MTProto sequence numbers and message ids for that
+  * Cons:
+    * Minimum envelope length: 12 bytes (length+seqno+crc)
+    * Maximum envelope length: 12 bytes (length+seqno+crc)
+    * Initial integrity check with crc32 is not that useful since the TCP protocol already uses it internally
+    * Transport sequence number check is also not that useful since transport sequence numbers are not encrypted and thus cannot be used to avoid replay attacks, and MadelineProto already uses MTProto sequence numbers and message ids for that
 
 * http: MTProto over HTTP for browsers and webhosts
-Overhead: medium
-Pros:
-- Can be used on restricted webhosts or browsers
+  * Overhead: medium
+  * Pros:
+    * Can be used on restricted webhosts or browsers
 
-Cons: 
-- Not all telegram DCs support it
-- Very big envelope length
-- No Initial integrity check
-- No transport sequence number check
+  * Cons: 
+    * Very big envelope length
+    * No Initial integrity check
+    * No transport sequence number check
 
 * https: MTProto over HTTPS for browsers and webhosts, very secure
-Overhead: high
-Pros:
-- Can be used on restricted webhosts or browsers
-- Provides an additional layer of security by trasmitting data over TLS
-- Integrity checks with HMAC built into TLS
-- Sequence number checks built into TLS
-
-Cons: 
-- Very big envelope length
-- Requires an additional round of encryption
+  * Overhead: high
+  * Pros:
+    * Can be used on restricted webhosts or browsers
+    * Provides an additional layer of security by trasmitting data over TLS
+    * Integrity checks with HMAC built into TLS
+    * Sequence number checks built into TLS
+ 
+  * Cons: 
+    * Very big envelope length
+    * Requires an additional round of encryption
 
 ### `$settings['connection_settings']['all']['test_mode']`
 Default: false  
@@ -277,7 +276,7 @@ Description: How many times should I try to call a method or send an object befo
 
 ### `$settings['max_tries']['query']`
 Default: 5  
-Description: How many times should I try to generate an authorizatio key before throwing an exception?
+Description: How many times should I try to generate an authorization key before throwing an exception?
 
 ### `$settings['max_tries']['response']`
 Default: 5  
@@ -396,5 +395,8 @@ The settings array can be accessed and modified in the instantiated class by acc
 ```php
 $MadelineProto->settings['updates']['handle_updates'] = true; // reenable update fetching
 ```
+
+
+
 
 <form action="https://docs.madelineproto.xyz/docs/SELF.html"><input type="submit" value="Next section" /></form>

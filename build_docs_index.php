@@ -53,13 +53,17 @@ foreach ($files as $file) {
 ksort($orderedfiles);
 foreach ($orderedfiles as $key => $filename) {
     $lines = explode("\n", file_get_contents($filename));
+    while (end($lines) === '') {
+        unset($lines[count($lines)-1]);
+    }
     if (strpos(end($lines), "Next")) {
         unset($lines[count($lines)-1]);
-        unset($lines[count($lines)-2]);
     }
     if (isset($orderedfiles[$key+1])) {
         $nextfile = "https://docs.madelineproto.xyz/docs/".basename($orderedfiles[$key+1], '.md').".html";
         $lines[count($lines)] = "\n<form action=\"$nextfile\"><input type=\"submit\" value=\"Next section\" /></form>";
+    } else {
+        $lines[count($lines)] = "\n<form action=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\"><input type=\"submit\" value=\"Next section\" /></form>";
     }
     file_put_contents($filename, implode("\n", $lines));
 
