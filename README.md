@@ -31,7 +31,10 @@ $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "H
 $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 ```
 
-Run this code in a browser or in a console.
+Run this code in a browser or in a console.  
+
+
+Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `Madeline.log` file that was created in the same directory (if running from a browser).  
 
 ## Documentation
 
