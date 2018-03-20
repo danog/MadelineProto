@@ -118,4 +118,6 @@ foreach ($updates as $update) {
 
 
 
+
+
 <form action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Next section" /></form>

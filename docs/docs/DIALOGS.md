@@ -32,4 +32,6 @@ Since bots cannot run `get_dialogs`, you must make use of the internal MadelineP
 
 
 
+
+
 <form action="https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html"><input type="submit" value="Next section" /></form>

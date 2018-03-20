@@ -19,4 +19,6 @@ By default, `$level` is `\danog\MadelineProto\Logger:NOTICE`.
 
 
 
+
+
 <form action="https://docs.madelineproto.xyz/docs/USING_METHODS.html"><input type="submit" value="Next section" /></form>

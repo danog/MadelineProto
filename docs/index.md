@@ -43,7 +43,7 @@ $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K
 echo 'OK, done!'.PHP_EOL;
 ```
 
-Run this code in a browser or in a console.  
+Run this code in a browser or in a console. 
 
 
 Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `MadelineProto.log` file that was created in the same directory (if running from a browser).  
@@ -111,7 +111,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_pwr_chat)
   * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_full_info)
   * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_info)
-* [Getting all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
+* [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html)
   * [As user](https://docs.madelineproto.xyz/docs/DIALOGS.html#user-get_dialogs)
   * [As bot](https://docs.madelineproto.xyz/docs/DIALOGS.html#bot-internal-peer-database)
 * [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html)
@@ -133,6 +133,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#credits)
+* [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
 
 
 ## Very complex and complete examples

@@ -45,8 +45,8 @@ foreach ($files as $file) {
         $orderedfiles[19] = $file;
     } else if ($base === 'CONTRIBUTING') {
         $orderedfiles[20] = $file;
-    } else {
-        $orderedfiles[] = $file;
+    } else if ($base === 'TEMPLATES') {
+        $orderedfiles[21] = $file;
     }
     ksort($orderedfiles);
 }

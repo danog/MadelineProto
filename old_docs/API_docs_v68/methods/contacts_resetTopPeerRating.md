@@ -1,17 +1,19 @@
 ---
 title: contacts.resetTopPeerRating
-description: contacts.resetTopPeerRating parameters, return type and example
+description: Reset top peer rating for a certain category/peer
 ---
 ## Method: contacts.resetTopPeerRating  
 [Back to methods index](index.md)
 
 
+Reset top peer rating for a certain category/peer
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|category|[CLICK ME TopPeerCategory](../types/TopPeerCategory.md) | Yes|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|category|[CLICK ME TopPeerCategory](../types/TopPeerCategory.md) | Yes|The category |
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -27,7 +27,7 @@ Then create a pull request from branch `localization-yourlanguage`
 
 You can use this scheme of the structure of this project to help yourself:
 
-```php
+```
 build_docs.php - Builds API docs from TL scheme file
 src/danog/MadelineProto/
     MTProtoTools/
@@ -90,4 +90,6 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 
 
-<form action="https://docs.madelineproto.xyz/#very-complex-and-complete-examples"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/TEMPLATES.html"><input type="submit" value="Next section" /></form>

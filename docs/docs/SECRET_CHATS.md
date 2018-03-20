@@ -70,4 +70,6 @@ This method gets info about a certain chat.
 
 
 
+
+
 <form action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Next section" /></form>

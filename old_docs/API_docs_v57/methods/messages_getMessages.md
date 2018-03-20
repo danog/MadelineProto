@@ -1,16 +1,18 @@
 ---
 title: messages.getMessages
-description: messages.getMessages parameters, return type and example
+description: Get messages
 ---
 ## Method: messages.getMessages  
 [Back to methods index](index.md)
 
 
+Get messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to fetch (only for users and normal groups)|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

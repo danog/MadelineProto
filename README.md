@@ -129,6 +129,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#credits)
+* [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
 
 
 ## Very complex and complete examples

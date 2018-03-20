@@ -122,4 +122,6 @@ Can return additional HTTP headers to use when the HTTP protocol is being used.
 
 
 
+
+
 <form action="https://docs.madelineproto.xyz/docs/CONTRIBUTING.html"><input type="submit" value="Next section" /></form>

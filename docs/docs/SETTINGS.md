@@ -365,7 +365,7 @@ Description: Should I handle old updates on startup?
 Default: -1  
 Description: If positive and bigger than zero, no requests will be sent to the socket to request updates in N seconds, passive update listening will be used instead
 
-### `$settings['updates']['calback']`
+### `$settings['updates']['callback']`
 Default: `'get_updates_update_handler'`  
 Description: A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter.  
 
@@ -395,6 +395,8 @@ The settings array can be accessed and modified in the instantiated class by acc
 ```php
 $MadelineProto->settings['updates']['handle_updates'] = true; // reenable update fetching
 ```
+
+
 
 
 
