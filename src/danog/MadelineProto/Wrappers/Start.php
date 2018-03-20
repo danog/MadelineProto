@@ -127,7 +127,7 @@ trait Start
     public function web_complete_signup()
     {
         try {
-            $this->complete_2fa_login($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
+            $this->complete_signup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
             $this->web_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
