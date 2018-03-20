@@ -122,7 +122,7 @@ trait AuthKeyHandler
 
                                 if (!$pq->equals($p->multiply($q))) {
                                     \danog\MadelineProto\Logger::log('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
-                                    if (!extension_loaded('xml')) {
+                                    if (!extension_loaded('curl')) {
                                         throw new Exception(['extension', 'curl']);
                                     }
 
