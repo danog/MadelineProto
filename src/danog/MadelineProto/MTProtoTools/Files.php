@@ -24,6 +24,7 @@ trait Files
             $cb = $file;
             $file = $file->getFile();
         }
+        $file = \danog\MadelineProto\Absolute::absolute($file);
         if (!file_exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
@@ -309,7 +310,7 @@ trait Files
             $cb = $file;
             $file = $file->getFile();
         }
-        $file = preg_replace('|/+|', '/', $file);
+        $file = \danog\MadelineProto\Absolute::absolute(preg_replace('|/+|', '/', $file));
         if (!file_exists($file)) {
             touch($file);
         }

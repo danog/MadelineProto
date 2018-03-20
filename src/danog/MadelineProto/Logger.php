@@ -107,7 +107,7 @@ class Logger
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
         }
         self::$mode = $mode;
-        self::$optional = $optional;
+        self::$optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
         self::$prefix = $prefix === '' ? '' : ', '.$prefix;
         self::$level = $level;
         self::class_exists();

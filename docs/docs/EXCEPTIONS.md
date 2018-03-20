@@ -14,6 +14,11 @@ try {
 
 MadelineProto can throw lots of different exceptions.  
 
+* [List of exception types](#list-of-exception-types)
+* [Pretty TL trace](#pretty-tl-trace)
+* [Getting the TL trace](#getting-the-tl-trace)
+
+
 ## List of exception types
 
 * \danog\MadelineProto\Exception - Default exception, thrown when a php error occures and in a lot of other cases

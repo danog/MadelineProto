@@ -45,6 +45,7 @@ class MTProto
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Events;
     use \danog\MadelineProto\Wrappers\Webhook;
+    use \danog\MadelineProto\Wrappers\Callback;
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\Loop;
     use \danog\MadelineProto\Wrappers\Start;
@@ -53,7 +54,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 96;
+    const V = 97;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -510,7 +511,7 @@ class MTProto
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
         ], 'requests' => ['gzip_encode_if_gt' => 500], 'updates' => [
-            'handle_updates' => true,
+            'handle_updates' => false,
             // Should I handle updates?
             'handle_old_updates' => true,
             // Should I handle old updates on startup?
@@ -521,6 +522,8 @@ class MTProto
             'allow_threading' => false,
             // Should I use threading, if it is enabled?
             'handler_workers' => 10,
+        ], 'upload' => [
+            'allow_automatic_upload' => true
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
@@ -564,6 +567,7 @@ class MTProto
                 break;
         }
         $this->settings = $settings;
+        if (!$this->settings['updates']['handle_updates']) $this->updates = [];
         // Setup logger
         $this->setup_logger();
     }

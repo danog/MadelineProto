@@ -147,7 +147,7 @@ trait PeerHandler
                         $this->chats[$bot_api_id] = $chat;
 
                         try {
-                            if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
+                            if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count'])) {
                                 if ($this->postpone_pwrchat) {
                                     $this->pending_pwrchat[$this->to_supergroup($chat['id'])] = [$this->settings['peer']['full_fetch'], true];
                                 } else {

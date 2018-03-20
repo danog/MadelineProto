@@ -2,6 +2,9 @@
 
 There are various methods that can be used to fetch info about chats, based on bot API id, tg-cli ID, Peer, User, Chat objects.
 
+* [Full chat info with full list of participants](#get_pwr_chat)
+* [Full chat info](#get_full_info)
+* [Reduced chat info (very fast)](#get_info)
 
 ## get_pwr_chat
 ```

@@ -115,3 +115,7 @@ Works like [socket_getpeername](http://php.net/manual/en/function.socket-getpeer
 
 Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsockname.php): the difference is that it returns an array with the `host` and the `port`.
 
+
+`public function getProxyHeaders();`
+
+Can return additional HTTP headers to use when the HTTP protocol is being used.

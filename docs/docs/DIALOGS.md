@@ -2,6 +2,9 @@
 
 There are two ways to get a list of all chats, depending if you logged in as a user, or as a bot.
 
+* [As user](#user-get_dialogs)
+* [As bot](#bot-internal-peer-database)
+
 ## User: get_dialogs
 ```
 $dialogs = $MadelineProto->get_dialogs();

@@ -1,5 +1,14 @@
 # Installation
 
+There are various ways to install MadelineProto:
+
+* [Simple](#simple)
+* [Simple (manual)](#simple-manual)
+* [Composer from scratch](#composer-from-scratch)
+* [Composer from existing project](#composer-from-existing-project)
+* [Git](#git)
+
+
 ## Simple
 
 ```php
@@ -10,7 +19,7 @@ if (!file_exists('madeline.php')) {
 require_once 'madeline.php';
 ```
 
-This code will automatically download and include MadelineProto.
+This code will automatically download, auto-update and include MadelineProto.
 
 
 ## Simple (manual)

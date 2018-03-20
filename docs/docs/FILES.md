@@ -5,6 +5,7 @@ MadelineProto provides wrapper methods to upload and download files that support
 Maximum file size is of 1.5 GB.
 
 * [Uploading & sending files](#sending-files)
+  * [Security notice](#security-notice)
   * [Photos](#inputmediauploadedphoto)
   * [Documents](#inputmediauploadeddocument)
     * [Documents](#documentattributefilename-to-send-a-document)
@@ -31,6 +32,12 @@ The required `message` parameter is the caption: it can contain URLs, mentions, 
 The `media` parameter contains the file path and other info about the file.
 
 It can contain [lots of various objects](https://docs.madelineproto.xyz/API_docs/types/InputMedia.html), here are the most important:
+
+### Security notice
+
+Be careful when calling methods with user-provided parameters: the upload function may be used to access and send any file.  
+To disable automatic uploads by file name, set `$MadelineProto->settings['upload']['allow_automatic_upload'] = false` and upload files [manually](#reusing-uploaded-files).
+
 
 ### [inputMediaUploadedPhoto](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaUploadedPhoto.html)
 ```

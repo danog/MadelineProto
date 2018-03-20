@@ -12,7 +12,14 @@ MadelineProto provides an easy wrapper to work with phone calls.
 
 The wrapper consists in the `\danog\MadelineProto\VoIP` class, that can be installed by compiling the [php-libtgvoip](https://voip.madelineproto.xyz) extension.
 
-Please read the whole [VoIP API documentation](https://docs.madelineproto.xyz/API_docs/types/PhoneCall.html) before proceeding.
+* Please read the whole [VoIP API documentation](https://docs.madelineproto.xyz/API_docs/types/PhoneCall.html) before proceeding.
+* [Requesting a call](#requesting-a-call)
+  * [Playing mp3 files](#playing-mp3-files)
+  * [Playing streams](#playing-streams)
+  * [Changing audio quality](#changing-audio-quality)
+* [Putting it all together](#putting-it-all-together)
+* [Accepting calls](#accepting-calls)
+
 
 ## Requesting a call
 ```
@@ -84,6 +91,7 @@ while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY
 
 ```
 
+## Accepting calls
 
 Accepting calls is just as easy: you will receive an [updatePhoneCall](https://docs.madelineproto.xyz/API_docs/constructors/updatePhoneCall.html) object from your update source (see [update handling](#update-handling)).
 
@@ -91,7 +99,7 @@ This array will contain a VoIP object under the `phone_call` key.
 
 ```
 
-$updates = $MadelineProto->API->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+$updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
 foreach ($updates as $update) {
     \danog\MadelineProto\Logger::log([$update]);
     $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id

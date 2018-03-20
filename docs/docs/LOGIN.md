@@ -1,9 +1,23 @@
 # Logging in
 
-MadelineProto can login as a bot, or as a user.
+There are many ways you can login with MadelineProto.
+
+* [Automatic](#automatic)
+* [Manual (user)](#manual-user)
+* [Manual (bot)](#manual-bot)
+* [Logout](#logout)
+
+## Automatic
+
+```
+$MadelineProto->start();
+```
+
+This will start an interactive login prompt via console (if running via CLI), or a login web UI (if running in the browser).  
+You will get to choose if login as user, or as bot.
 
 
-## User 
+## Manual (user)
 
 ```
 MadelineProto->phone_login(readline('Enter your phone number: '));
@@ -24,7 +38,7 @@ Use `complete_2FA_login` to complete the login to an account with 2FA enabled, s
 If the account does not have an account, use `complete_signup` to signup, see [here for the parameters and the result](https://docs.madelineproto.xyz/complete_signup.html).  
 
 
-## Bot
+## Manual (bot)
 
 ```
 $MadelineProto->bot_login('34298141894:aflknsaflknLKNFS');

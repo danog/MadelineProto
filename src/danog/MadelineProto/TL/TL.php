@@ -32,7 +32,7 @@ trait TL
         $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
             \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], basename($file)), \danog\MadelineProto\Logger::VERBOSE);
-            $filec = file_get_contents($file);
+            $filec = file_get_contents(\danog\MadelineProto\Absolute::absolute($file));
             $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
                 $TL_dict = ['methods' => [], 'constructors' => []];
@@ -402,7 +402,7 @@ trait TL
         }
         if ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
-                if (!is_array($arguments['file'])) {
+                if (!is_array($arguments['file']) && $this->settings['upload']['allow_automatic_upload']) {
                     $arguments['file'] = $this->upload_encrypted($arguments['file']);
                 }
                 if (isset($arguments['file']['key'])) {
@@ -497,7 +497,7 @@ trait TL
             if ($current_argument['type'] === 'DataJSON') {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile') {
+            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile' && $this->settings['upload']['allow_automatic_upload']) {
                 $arguments[$current_argument['name']] = $this->upload($arguments[$current_argument['name']]);
             }
 

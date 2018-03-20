@@ -2,6 +2,10 @@
 
 You can contribute in various ways.  
 
+* [Translation](#translation)
+* [Contribution guide](#contribution-guide)
+* [Credits](#credits)
+
 ## Translation
 
 You can help by translating MadelineProto in your language.

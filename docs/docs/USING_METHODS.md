@@ -56,3 +56,11 @@ $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'l
 ```
 
 
+## Call queues
+Method calls may be executed at diferent times server-side: to avoid this, method calls can be queued:
+
+```
+$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['queue' => 'queue_name']);
+```
+
+If the queue if the specified queue name does not exist, it will be created.
