@@ -1,6 +1,6 @@
 # Exceptions
 
-```
+```php
 try {
     $MadelineProto->get_dialogs();
 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -39,7 +39,7 @@ MadelineProto can throw lots of different exceptions.
 ## Pretty TL trace
 Every exception features a custom stack trace called `pretty TL trace`, that makes finding bugs **really** easy:
 
-```
+```php
 php > $MadelineProto->messages->sendMessage(['peer' => '@dd', 'message' => 'hi']);
 
 Uncaught \danog\MadelineProto\Exception: This peer is not present in the internal peer database in /home/pwrtelegram/cleanMadeline/src/danog/MadelineProto/MTProtoTools/PeerHandler.php:330
@@ -83,7 +83,7 @@ This part is supposed to be read from bottom to top, the most important parts ar
 `While serializing:      messages.sendMessage`: this means the error was thrown while serializing the method call for messages->sendMessage
 
 `['peer']`: this means the error was thrown while trying to serialize the `peer` parameter, so **you should fix that part of your code**:
-```
+```php
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'hi']);
 ```
 
@@ -91,7 +91,7 @@ $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'h
 
 To get the whole TL trace as string, cast the exception object to string:
 
-```
+```php
 try {
     //
 } catch (\danog\MadelineProto\Exception $e) {

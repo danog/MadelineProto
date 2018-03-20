@@ -1,6 +1,6 @@
 # Settings
 
-```
+```php
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);
 $MadelineProto->settings = $settings;
 ```
@@ -374,7 +374,7 @@ Description: Serialization will be made automatically every N seconds
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
 
-```
+```php
 $MadelineProto->settings = [
     'authorization' => [ // Authorization settings
         'default_temp_auth_key_expires_in' => 86400, // a day
@@ -384,6 +384,6 @@ $MadelineProto->settings = [
 
 The settings array can be accessed and modified in the instantiated class by accessing the `settings` attribute of the API class:
 
-```
+```php
 $MadelineProto->settings['updates']['handle_updates'] = true; // reenable update fetching
 ```

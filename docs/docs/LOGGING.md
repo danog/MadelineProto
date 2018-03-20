@@ -2,7 +2,7 @@
 
 MadelineProto provides a unified class for logging messages to the logging destination defined in [settings](SETTINGS.md).  
 
-```
+```php
 \danog\MadelineProto\Logger::log($message, $level);
 ```
 

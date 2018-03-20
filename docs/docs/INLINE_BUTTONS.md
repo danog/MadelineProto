@@ -2,7 +2,7 @@
 
 You can easily click inline buttons using MadelineProto, just access the correct button:
 
-```
+```php
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     public function onUpdateNewChannelMessage($update)
@@ -40,13 +40,13 @@ This peice of code will automatically click all buttons in all keyboards sent in
 
 You can then access properties of `$button` (they vary depending on the [type of button](https://docs.madelineproto.xyz/API_docs/types/KeyboardButton.html)):
 
-```
+```php
 $text = $button['text'];
 ```
 
 And click them:
 
-```
+```php
 $button->click();
 ```
 

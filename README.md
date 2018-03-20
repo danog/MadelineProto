@@ -11,7 +11,7 @@ It can login with a phone number (MTProto API), or with a bot token (MTProto API
 
 ## Getting started
 
-```
+```php
 <?php
 
 if (!file_exists('madeline.php')) {
@@ -50,13 +50,13 @@ Run this code in a browser or in a console.
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
   * [Git](https://docs.madelineproto.xyz/docs/INSTALLATION.html#git)
 * [Handling updates](https://docs.madelineproto.xyz/docs/UPDATES.html)
-  * [Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#event-handler)
-    * [Event driven multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#multithreaded-event-handler)
+  * [Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven)
+    * [Event driven multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven-multithreaded)
   * [Webhook](https://docs.madelineproto.xyz/docs/UPDATES.html#webhook)
-    * [Webhook multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#multithreaded-webhook)
-  * [Long polling (getupdates)](https://docs.madelineproto.xyz/docs/UPDATES.html#getupdates)
+    * [Webhook multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#webhook-multithreaded)
+  * [Long polling (getupdates)](https://docs.madelineproto.xyz/docs/UPDATES.html#long-polling)
   * [Callback](https://docs.madelineproto.xyz/docs/UPDATES.html#callback)
-    * [Callback multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#multithreaded-callback)
+    * [Callback multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#callback-multithreaded)
 * [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html)
 * [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html)
 * [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html)

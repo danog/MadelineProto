@@ -6,7 +6,7 @@ There are two ways to get a list of all chats, depending if you logged in as a u
 * [As bot](#bot-internal-peer-database)
 
 ## User: get_dialogs
-```
+```php
 $dialogs = $MadelineProto->get_dialogs();
 foreach ($dialogs as $peer) {
     $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => 'Hi! Testing MadelineProto broadcasting!']);
@@ -16,7 +16,7 @@ foreach ($dialogs as $peer) {
 `get_dialogs` will return a full list of all chats you're member of, see [here for the parameters and the result](https://docs.madelineproto.xyz/get_dialogs.html)
 
 ## Bot: internal peer database
-```
+```php
 foreach ($MadelineProto->API->chats as $bot_api_id => $chat) {
     try {
         $MadelineProto->messages->sendMessage(['peer' => $chat, 'message' => "Hi $bot_api_id! Testing MadelineProto broadcasting!"]);

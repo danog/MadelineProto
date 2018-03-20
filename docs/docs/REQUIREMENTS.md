@@ -4,7 +4,7 @@ MadelineProto requires the `xml`, `gmp` extensions to function properly.
 
 To install MadelineProto dependencies on `Ubuntu`, `Debian`, `Devuan`, or any other `Debian-based` distro, run the following command in your command line:
 
-```
+```bash
 sudo apt-get install python-software-properties software-properties-common
 sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt-get update

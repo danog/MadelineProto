@@ -12,7 +12,7 @@ You can help by translating MadelineProto in your language.
 
 Fork github.com/danog/MadelineProto, then run
 
-```
+```php
 git clone https://github.com/youruser/MadelineProto
 php translate.php
 git commit -am 'Added yourlanguage'
@@ -27,7 +27,7 @@ Then create a pull request from branch `localization-yourlanguage`
 
 You can use this scheme of the structure of this project to help yourself:
 
-```
+```php
 build_docs.php - Builds API docs from TL scheme file
 src/danog/MadelineProto/
     MTProtoTools/

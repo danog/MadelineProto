@@ -9,7 +9,7 @@ There are many ways you can login with MadelineProto.
 
 ## Automatic
 
-```
+```php
 $MadelineProto->start();
 ```
 
@@ -19,7 +19,7 @@ You will get to choose if login as user, or as bot.
 
 ## Manual (user)
 
-```
+```php
 MadelineProto->phone_login(readline('Enter your phone number: '));
 $authorization = $MadelineProto->complete_phone_login(readline('Enter the phone code: '));
 if ($authorization['_'] === 'account.password') {
@@ -40,7 +40,7 @@ If the account does not have an account, use `complete_signup` to signup, see [h
 
 ## Manual (bot)
 
-```
+```php
 $MadelineProto->bot_login('34298141894:aflknsaflknLKNFS');
 ```
 
@@ -51,7 +51,7 @@ Note that when you login as a bot, MadelineProto also logins using the [PWRTeleg
 
 ## Logout
 
-```
+```php
 $MadelineProto->logout();
 ```
 

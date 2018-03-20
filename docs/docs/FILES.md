@@ -40,7 +40,7 @@ To disable automatic uploads by file name, set `$MadelineProto->settings['upload
 
 
 ### [inputMediaUploadedPhoto](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaUploadedPhoto.html)
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -55,7 +55,7 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 Can be used to upload photos: simply provide the photo's file path in the `file` field, and optionally provide a `ttl_seconds` field to set the self-destruction period of the photo, even for normal chats
 
 ### [inputMediaUploadedDocument](https://docs.madelineproto.xyz/API_docs/constructors/inputMediaUploadedDocument.html)
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -77,7 +77,7 @@ To actually set the document type, provide one or more [DocumentAttribute](https
 
 ### [documentAttributeFilename](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeFilename.html) to send a document
 
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -94,7 +94,7 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 
 ### [documentAttributeImageSize](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeImageSize.html) to send a photo as document
 
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -111,7 +111,7 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 ```
 
 ### [documentAttributeAnimated](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeAnimated.html) to send a gif
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -127,7 +127,7 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 ```
 
 ### [documentAttributeVideo](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeVideo.html) to send a video
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -148,7 +148,7 @@ You might want to manually provide square `w` (width) and `h` (height) parameter
 
 ### [documentAttributeAudio](https://docs.madelineproto.xyz/API_docs/constructors/documentAttributeAudio.html) to send an audio file
 
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -168,7 +168,7 @@ Set the `voice` parameter to true to send a voice message.
 
 ## Uploading files
 
-```
+```php
 $MessageMedia = $MadelineProto->messages->uploadMedia([
     'media' => [
         '_' => 'inputMediaUploadedPhoto',
@@ -183,7 +183,7 @@ The [$MadelineProto->messages->uploadMedia](https://docs.madelineproto.xyz/API_d
 
 The returned [MessageMedia](https://docs.madelineproto.xyz/API_docs/types/MessageMedia.html) object can then be reused to resend the document using sendMedia.
 
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => $MessageMedia,
@@ -200,13 +200,13 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 
 Actual MessageMedia objects can also be converted to bot API file IDs like this:
 
-```
+```php
 $botAPI_file = $MadelineProto->MTProto_to_botAPI($MessageMedia);
 ```
 
 `$botAPI_file` now contains a [bot API message](https://core.telegram.org/bots/api#message), to extract the file ID from it use the following code:
 
-```
+```php
 foreach (['audio', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note'] as $type) {
     if (isset($botAPI_file[$type]) && is_array($botAPI_file[$type])) {
         $method = $type;
@@ -249,13 +249,13 @@ if (!isset($result['file_name'])) {
 
 `$MadelineProto->messages->uploadMedia` and bot API file IDs do not allow you to modify the type of the file to send: however, MadelineProto provides a method that can generate a file object that can be resent with multiple file types.
 
-```
+```php
 $inputFile = $MadelineProto->upload('filename.mp4');
 ```
 
 The generated `$inputFile` can later be reused thusly:
 
-```
+```php
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => '@danogentili',
     'media' => [
@@ -292,7 +292,7 @@ The concept is easy: where you would usually provide a file path, simply provide
 There are multiple download methods that allow you to download a file to a directory, to a file or to a stream.  
 
 ### Extracting download info
-```
+```php
 $info = $MadelineProto->get_download_info($MessageMedia);
 ```
 
@@ -304,7 +304,7 @@ $info = $MadelineProto->get_download_info($MessageMedia);
 * `$info['size']` - The file size
 
 ### Download to directory
-```
+```php
 $output_file_name = $MadelineProto->download_to_dir($MessageMedia, '/tmp/');
 ```
 
@@ -313,7 +313,7 @@ This downloads the given file to `/tmp`, and returns the full generated file pat
 `$MessageMedia` can be either a [Message](https://docs.madelineproto.xyz/API_docs/types/Message.html), an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html), a [MessageMedia](https://docs.madelineproto.xyz/API_docs/types/MessageMedia.html) object, or a bot API file ID.
 
 ### Download to file
-```
+```php
 $output_file_name = $MadelineProto->download_to_file($MessageMedia, '/tmp/myname.mp4');
 ```
 
@@ -323,7 +323,7 @@ This downloads the given file to `/tmp/myname.mp4`, and returns the full file pa
 
 
 ### Download to browser with streams
-```
+```php
 $info = $MadelineProto->get_download_info($MessageMedia);
 header('Content-Length: '.$info['size']);
 header('Content-Type: '.$info['mime']);
@@ -349,7 +349,7 @@ This downloads the given file to the browser, sending also information about the
 
 To get the upload/download progress in real-time, use the `\danog\MadelineProto\FileCallback` class:
 
-```
+```php
 $peer = '@danogentili';
 $sentMessage = $MadelineProto->messages->sendMedia([
     'peer' => $peer,
@@ -385,7 +385,7 @@ This will send the file `video.mp4` to [@danogentili](https://t.me/danogentili):
 A FileCallback object can be provided to `uploadMedia`, `sendMedia`, `uploadProfilePicture`, `upload`, `upload_encrypted`, `download_to_*`: the first parameter to its constructor must be the file path/object that is usually accepted by the function, the second must be a callable function or object.
 
 You can also write your own callback class, just implement `\danog\MadelineProto\FileCallbackInterface`:  
-```
+```php
 class MyCallback implements \danog\MadelineProto\FileCallbackInterface
 {
     private $file;

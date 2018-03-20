@@ -1,6 +1,6 @@
 # Calls
 
-```
+```php
 if (!file_exists('input.raw')) {
     echo 'Downloading example song'.PHP_EOL;
     copy('https://github.com/danog/MadelineProto/raw/master/input.raw', 'input.raw');
@@ -22,7 +22,7 @@ The wrapper consists in the `\danog\MadelineProto\VoIP` class, that can be insta
 
 
 ## Requesting a call
-```
+```php
 $call = $MadelineProto->request_call('@danogentili');
 ```
 
@@ -35,7 +35,7 @@ MadelineProto works using raw signed PCM audio with the sample rate and the bit 
 
 Input/output audio can be converted from/to any audio/video file using ffmpeg:
 
-```
+```bash
 ffmpeg -i anyaudioorvideo.mp3 -f s16le -ac 1 -ar 48000 -acodec pcm_s16le mysong.raw
 ```
 
@@ -43,7 +43,7 @@ ffmpeg -i anyaudioorvideo.mp3 -f s16le -ac 1 -ar 48000 -acodec pcm_s16le mysong.
 
 You can also play streams:
 
-```
+```bash
 mkfifo mystream.raw
 ffmpeg -i http://icestreaming.rai.it/1.mp3 -f s16le -ac 1 -ar 48000 -acodec pcm_s16le pipe:1 > mystream.raw
 ```
@@ -57,7 +57,7 @@ The best way to raise the bitrate is to let libtgvoip do it automatically, based
 However, the usual outgoing bitrate used by telegram for ethernet networks is around 20kbps. That is clearly not enough.  
 To increase it, you must modify the shared settings:  
 
-```
+```php
 $controller->configuration['shared_config']['audio_init_bitrate'] = 60 * 1000; // Audio bitrate set when the call is started
 $controller->configuration['shared_config']['audio_max_bitrate']  => 70 * 1000; // Maximum audio bitrate
 $controller->configuration['shared_config']['audio_min_bitrate']  => 15 * 1000; // Minimum audio bitrate
@@ -80,7 +80,7 @@ If you manually set the network type to NET_TYPE_GPRS, NET_TYPE_EDGE, or enabled
 
 Requesting calls is easy, just run the `request_call` method.
 
-```
+```php
 $controller = $MadelineProto->request_call('@danogentili')->play('input.raw')->then('inputb.raw')->playOhHold(['hold.raw'])->setOutputFile('output.raw');
 $controller->configuration['log_file_path'] = $controller->getOtherID().'.log';
 
@@ -97,8 +97,7 @@ Accepting calls is just as easy: you will receive an [updatePhoneCall](https://d
 
 This array will contain a VoIP object under the `phone_call` key.
 
-```
-
+```php
 $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
 foreach ($updates as $update) {
     \danog\MadelineProto\Logger::log([$update]);
