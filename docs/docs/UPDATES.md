@@ -69,7 +69,7 @@ try {
 $MadelineProto->start();
 $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
-```php
+```
 
 This will create an event handler class `EventHandler`, create a MadelineProto session, and set the event handler class to our newly created event handler.
 
@@ -197,3 +197,6 @@ Note that multiprocessing is not the same as multithreading, and should be avoid
 
 
 <button href="https://docs.madelineproto.xyz/docs/SETTINGS.html">Next section</button>
+
+
+<form action="https://docs.madelineproto.xyz/docs/SETTINGS.html"><input type="submit" value="Next section" /></form>

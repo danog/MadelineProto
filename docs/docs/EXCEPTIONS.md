@@ -102,5 +102,4 @@ try {
 }
 ```
 
-
-<button href="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html"><input type="submit" value="Next section" /></form>

@@ -59,7 +59,7 @@ foreach ($orderedfiles as $key => $filename) {
     }
     if (isset($orderedfiles[$key+1])) {
         $nextfile = "https://docs.madelineproto.xyz/docs/".basename($orderedfiles[$key+1], '.md').".html";
-        $lines[count($lines)] = "\n<button href=\"$nextfile\">Next section</button>";
+        $lines[count($lines)] = "\n<form action=\"$nextfile\"><input type=\"submit\" value=\"Next section\" /></form>";
     }
     file_put_contents($filename, implode("\n", $lines));
 

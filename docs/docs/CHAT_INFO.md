@@ -42,5 +42,4 @@ You can also use `get_info` to get chat info, see [here for the parameters and t
 * Speed: very fast
 * Caching: full
 
-
-<button href="https://docs.madelineproto.xyz/docs/DIALOGS.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/DIALOGS.html"><input type="submit" value="Next section" /></form>

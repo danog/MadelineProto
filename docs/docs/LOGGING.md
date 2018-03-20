@@ -16,5 +16,4 @@ MadelineProto provides a unified class for logging messages to the logging desti
 
 By default, `$level` is `\danog\MadelineProto\Logger:NOTICE`.
 
-
-<button href="https://docs.madelineproto.xyz/docs/USING_METHODS.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/USING_METHODS.html"><input type="submit" value="Next section" /></form>

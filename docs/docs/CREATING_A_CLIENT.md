@@ -20,5 +20,4 @@ To change the session file after starting MadelineProto, do the following:
 $MadelineProto->session = 'newsession.madeline';
 ```  
 
-
-<button href="https://docs.madelineproto.xyz/docs/LOGIN.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/LOGIN.html"><input type="submit" value="Next section" /></form>

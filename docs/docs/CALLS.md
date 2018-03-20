@@ -115,5 +115,4 @@ foreach ($updates as $update) {
 
 
 
-
-<button href="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Next section" /></form>

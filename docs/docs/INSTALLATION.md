@@ -121,5 +121,4 @@ Now open `.env` and edit its values as needed.
 
 
 
-
-<button href="https://docs.madelineproto.xyz/docs/UPDATES.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/UPDATES.html"><input type="submit" value="Next section" /></form>

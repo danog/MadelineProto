@@ -426,5 +426,4 @@ $output_file_name = $MadelineProto->download_to_file(
 );
 ```
 
-
-<button href="https://docs.madelineproto.xyz/docs/CHAT_INFO.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/CHAT_INFO.html"><input type="submit" value="Next section" /></form>

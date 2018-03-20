@@ -59,5 +59,4 @@ Use `logout` to logout, see [here for the parameters and the result](https://doc
 
 
 
-
-<button href="https://docs.madelineproto.xyz/docs/FEATURES.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/FEATURES.html"><input type="submit" value="Next section" /></form>

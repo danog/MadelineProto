@@ -397,5 +397,4 @@ The settings array can be accessed and modified in the instantiated class by acc
 $MadelineProto->settings['updates']['handle_updates'] = true; // reenable update fetching
 ```
 
-
-<button href="https://docs.madelineproto.xyz/docs/SELF.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/SELF.html"><input type="submit" value="Next section" /></form>

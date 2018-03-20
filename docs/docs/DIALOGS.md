@@ -29,5 +29,4 @@ foreach ($MadelineProto->API->chats as $bot_api_id => $chat) {
 Since bots cannot run `get_dialogs`, you must make use of the internal MadelineProto database to get a list of all users, chats and channels MadelineProto has seen.
 `$MadelineProto->API->chats` contains a list of [Chat](../API_docs/types/Chat.md) and [User](../API_docs/types/User.md) objects, indexed by bot API id.
 
-
-<button href="https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html">Next section</button>
+<form action="https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html"><input type="submit" value="Next section" /></form>
