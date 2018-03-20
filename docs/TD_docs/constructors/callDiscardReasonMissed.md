@@ -9,10 +9,6 @@ description: Call has ended before conversation begins. It was cancelled by the 
 
 Call has ended before conversation begins. It was cancelled by the caller or was missed by the callee
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

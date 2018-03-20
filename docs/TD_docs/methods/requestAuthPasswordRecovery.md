@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Requests to send password recovery code to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateWaitPassword on success
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

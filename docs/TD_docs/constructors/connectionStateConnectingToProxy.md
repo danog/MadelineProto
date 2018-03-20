@@ -9,10 +9,6 @@ description: Establishing connection to set up proxy server
 
 Establishing connection to set up proxy server
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

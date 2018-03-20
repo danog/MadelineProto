@@ -8,10 +8,6 @@ description: Returns a list of available wallpapers.
 
 Returns a list of available wallpapers.
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_WallPaper](../types/WallPaper.md)

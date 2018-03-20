@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Deletes saved credentials for all payments provider bots
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

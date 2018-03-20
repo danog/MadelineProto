@@ -9,10 +9,6 @@ description: Other user's phone number is known but user not in contacts list
 
 Other user's phone number is known but user not in contacts list
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

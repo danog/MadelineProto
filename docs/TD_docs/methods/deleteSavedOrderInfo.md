@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Deletes saved order info
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

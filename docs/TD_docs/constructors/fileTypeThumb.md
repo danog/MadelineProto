@@ -9,10 +9,6 @@ description: File is a thumbnail of another file
 
 File is a thumbnail of another file
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Test request. Does nothing, ensures that the Update object is used
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Update](../types/Update.md)

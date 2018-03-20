@@ -9,10 +9,6 @@ description: File is an audio
 
 File is an audio
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

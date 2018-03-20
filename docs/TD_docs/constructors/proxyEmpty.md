@@ -9,10 +9,6 @@ description: An empty proxy
 
 An empty proxy
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: User is a member of the chat, but have no any additional privileges
 
 User is a member of the chat, but have no any additional privileges or restrictions
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

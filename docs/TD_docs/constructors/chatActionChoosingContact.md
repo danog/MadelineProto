@@ -9,10 +9,6 @@ description: User chooses contact to send
 
 User chooses contact to send
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

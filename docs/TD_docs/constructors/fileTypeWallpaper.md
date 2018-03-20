@@ -9,10 +9,6 @@ description: File is a wallpaper
 
 File is a wallpaper
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

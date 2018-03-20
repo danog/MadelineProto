@@ -9,10 +9,6 @@ description: Call wasn't discarded or the reason is unknown
 
 Call wasn't discarded or the reason is unknown
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

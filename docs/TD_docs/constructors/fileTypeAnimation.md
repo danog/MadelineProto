@@ -9,10 +9,6 @@ description: File is an animation
 
 File is an animation
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

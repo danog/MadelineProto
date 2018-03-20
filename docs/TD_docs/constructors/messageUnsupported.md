@@ -9,10 +9,6 @@ description: Unsupported message content
 
 Unsupported message content
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

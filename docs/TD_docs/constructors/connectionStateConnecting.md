@@ -9,10 +9,6 @@ description: Establishing connection to Telegram servers
 
 Establishing connection to Telegram servers
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

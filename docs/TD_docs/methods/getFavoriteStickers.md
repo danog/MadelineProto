@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns favorite stickers
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Stickers](../types/Stickers.md)

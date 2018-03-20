@@ -9,10 +9,6 @@ description: File is a thumbnail of a file from a secret chat
 
 File is a thumbnail of a file from a secret chat
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

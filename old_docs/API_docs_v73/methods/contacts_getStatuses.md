@@ -8,10 +8,6 @@ description: Get online status of all users
 
 Get online status of all users
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_ContactStatus](../types/ContactStatus.md)

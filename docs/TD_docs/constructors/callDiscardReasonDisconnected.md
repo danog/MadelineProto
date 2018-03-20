@@ -9,10 +9,6 @@ description: Call has ended during conversation because users was disconnected
 
 Call has ended during conversation because users was disconnected
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

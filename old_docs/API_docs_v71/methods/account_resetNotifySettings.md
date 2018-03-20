@@ -8,10 +8,6 @@ description: Reset all notification settings
 
 Reset all notification settings
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -9,10 +9,6 @@ description: File is a photo
 
 File is a photo
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

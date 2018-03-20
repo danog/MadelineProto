@@ -9,10 +9,6 @@ description: User was online recently
 
 User was online recently
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: Message is failed to send
 
 Message is failed to send
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

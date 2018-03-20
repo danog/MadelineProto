@@ -9,10 +9,6 @@ description: Video message expired by TTL
 
 Video message expired by TTL
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

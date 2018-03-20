@@ -9,10 +9,6 @@ description: The chat contains spam messages
 
 The chat contains spam messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

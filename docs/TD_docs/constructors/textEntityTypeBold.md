@@ -9,10 +9,6 @@ description: Bold text
 
 Bold text
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

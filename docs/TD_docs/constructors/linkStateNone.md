@@ -9,10 +9,6 @@ description: Other user's phone number doesn't known
 
 Other user's phone number doesn't known
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

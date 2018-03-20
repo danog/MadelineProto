@@ -9,10 +9,6 @@ description: Rule to disallow all users
 
 Rule to disallow all users
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

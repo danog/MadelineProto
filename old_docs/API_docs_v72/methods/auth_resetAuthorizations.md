@@ -8,10 +8,6 @@ description: Delete all logged-in sessions.
 
 Delete all logged-in sessions.
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

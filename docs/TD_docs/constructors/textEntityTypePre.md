@@ -9,10 +9,6 @@ description: Text needs to be formatted as inside of pre HTML tag
 
 Text needs to be formatted as inside of pre HTML tag
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

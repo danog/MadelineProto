@@ -9,10 +9,6 @@ description: User is currently logging out
 
 User is currently logging out
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

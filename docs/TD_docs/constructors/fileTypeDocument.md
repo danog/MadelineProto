@@ -9,10 +9,6 @@ description: File is a document
 
 File is a document
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

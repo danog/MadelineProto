@@ -9,10 +9,6 @@ description: Return bot members of the channel
 
 Return bot members of the channel
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

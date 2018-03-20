@@ -9,10 +9,6 @@ description: Chat member joined by invite link
 
 Chat member joined by invite link
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

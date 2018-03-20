@@ -9,10 +9,6 @@ description: Message is incoming
 
 Message is incoming
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: File is a profile photo
 
 File is a profile photo
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

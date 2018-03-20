@@ -9,10 +9,6 @@ description: Return only call messages
 
 Return only call messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

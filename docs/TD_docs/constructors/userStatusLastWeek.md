@@ -9,10 +9,6 @@ description: User is offline, but was online last week
 
 User is offline, but was online last week
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

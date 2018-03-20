@@ -11,10 +11,6 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Resets all notification settings to the default value. By default the only muted chats are supergroups, sound is set to 'default' and message previews are showed
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Ok](../types/Ok.md)

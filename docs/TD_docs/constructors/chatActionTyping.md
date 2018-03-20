@@ -9,10 +9,6 @@ description: User typing a message
 
 User typing a message
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: A message was unpinned
 
 A message was unpinned
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

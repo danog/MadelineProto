@@ -9,10 +9,6 @@ description: Mobile network
 
 Mobile network
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

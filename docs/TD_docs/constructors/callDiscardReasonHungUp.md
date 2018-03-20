@@ -9,10 +9,6 @@ description: Call was hung up by the caller or by the callee
 
 Call was hung up by the caller or by the callee
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: Other user is in contacts list, particularly its phone number is kn
 
 Other user is in contacts list, particularly its phone number is known
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

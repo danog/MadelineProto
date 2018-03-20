@@ -9,10 +9,6 @@ description: The chat contains violent messages
 
 The chat contains violent messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

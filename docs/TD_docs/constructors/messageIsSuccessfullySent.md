@@ -9,10 +9,6 @@ description: Message was synchronized with the server
 
 Message was synchronized with the server
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

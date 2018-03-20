@@ -9,10 +9,6 @@ description: Return creator and administrators
 
 Return creator and administrators
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

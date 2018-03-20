@@ -8,10 +8,6 @@ description: Reset all telegram web login authorizations
 
 Reset all telegram web login authorizations
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Bool](../types/Bool.md)

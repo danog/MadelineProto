@@ -9,10 +9,6 @@ description: File type is yet unknown
 
 File type is yet unknown
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

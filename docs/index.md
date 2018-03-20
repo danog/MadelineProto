@@ -46,7 +46,7 @@ echo 'OK, done!'.PHP_EOL;
 Run this code in a browser or in a console.  
 
 
-Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `Madeline.log` file that was created in the same directory (if running from a browser).  
+Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `MadelineProto.log` file that was created in the same directory (if running from a browser).  
 
 ## Documentation
 

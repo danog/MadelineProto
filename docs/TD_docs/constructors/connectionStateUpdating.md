@@ -9,10 +9,6 @@ description: Downloading date received, while client was offline
 
 Downloading date received, while client was offline
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

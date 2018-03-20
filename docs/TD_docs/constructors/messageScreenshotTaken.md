@@ -9,10 +9,6 @@ description: Screenshot of messages in the chat was taken
 
 Screenshot of messages in the chat was taken
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

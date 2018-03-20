@@ -12,7 +12,7 @@ Get the current 2FA settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|current\_password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt);|
+|current\_password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|Use only if you have set a 2FA password: `$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt, true);`|
 
 
 ### Return type: [account\_PasswordSettings](../types/account_PasswordSettings.md)

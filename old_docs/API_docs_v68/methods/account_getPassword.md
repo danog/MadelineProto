@@ -8,10 +8,6 @@ description: Get the current password
 
 Get the current password
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [account\_Password](../types/account_Password.md)

@@ -9,10 +9,6 @@ description: Text needs to be formatted as inside of code HTML tag
 
 Text needs to be formatted as inside of code HTML tag
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

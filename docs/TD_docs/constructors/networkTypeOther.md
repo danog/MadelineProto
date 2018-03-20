@@ -9,10 +9,6 @@ description: Other network type, for example, Ethernet network
 
 Other network type, for example, Ethernet network
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

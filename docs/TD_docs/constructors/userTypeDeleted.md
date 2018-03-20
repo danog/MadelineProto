@@ -9,10 +9,6 @@ description: Deleted user or deleted bot. There is no any information about it e
 
 Deleted user or deleted bot. There is no any information about it except user_id. None of active action can be performed with deleted user
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

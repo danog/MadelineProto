@@ -8,10 +8,6 @@ description: Get account TTL
 
 Get account TTL
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [AccountDaysTTL](../types/AccountDaysTTL.md)

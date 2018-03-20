@@ -9,10 +9,6 @@ description: File sent to a secret chat
 
 File sent to a secret chat
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

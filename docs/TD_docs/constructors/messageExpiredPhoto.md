@@ -9,10 +9,6 @@ description: Photo message expired by TTL
 
 Photo message expired by TTL
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

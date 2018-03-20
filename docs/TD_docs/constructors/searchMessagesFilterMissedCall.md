@@ -9,10 +9,6 @@ description: Return only incoming call messages with missed/declined discard rea
 
 Return only incoming call messages with missed/declined discard reason
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

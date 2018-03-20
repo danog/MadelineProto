@@ -9,10 +9,6 @@ description: A button which sends user's phone number when pressed, available on
 
 A button which sends user's phone number when pressed, available only in private chats
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

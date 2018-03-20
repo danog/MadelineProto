@@ -9,10 +9,6 @@ description: Italic text
 
 Italic text
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

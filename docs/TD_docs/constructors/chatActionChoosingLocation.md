@@ -9,10 +9,6 @@ description: User chooses location or venue to send
 
 User chooses location or venue to send
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: A chat member left
 
 A chat member left
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

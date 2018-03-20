@@ -9,10 +9,6 @@ description: User is not a chat member
 
 User is not a chat member
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

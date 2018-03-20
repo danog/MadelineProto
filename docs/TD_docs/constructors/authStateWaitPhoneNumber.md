@@ -9,10 +9,6 @@ description: TDLib needs user's phone number to authorize
 
 TDLib needs user's phone number to authorize
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

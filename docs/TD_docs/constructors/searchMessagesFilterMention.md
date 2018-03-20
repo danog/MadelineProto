@@ -9,10 +9,6 @@ description: Return only messages with mentions of current logged in user or whi
 
 Return only messages with mentions of current logged in user or which are replies to his messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

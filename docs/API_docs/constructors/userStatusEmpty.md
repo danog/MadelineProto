@@ -9,10 +9,6 @@ description: User status was newer changed
 
 User status was newer changed
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -8,10 +8,6 @@ description: Get all logged-in authorizations
 
 Get all logged-in authorizations
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [account\_Authorizations](../types/account_Authorizations.md)

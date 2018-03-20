@@ -9,10 +9,6 @@ description: Return only photo messages
 
 Return only photo messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

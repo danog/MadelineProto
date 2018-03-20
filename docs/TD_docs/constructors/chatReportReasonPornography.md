@@ -9,10 +9,6 @@ description: The chat contains pornography messages
 
 The chat contains pornography messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

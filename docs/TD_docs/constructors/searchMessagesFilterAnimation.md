@@ -9,10 +9,6 @@ description: Return only animation messages
 
 Return only animation messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: User records voice message
 
 User records voice message
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

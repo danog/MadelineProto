@@ -9,10 +9,6 @@ description: The category containing private chats with bot users
 
 The category containing private chats with bot users
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

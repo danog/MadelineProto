@@ -9,10 +9,6 @@ description: Contact has registered
 
 Contact has registered
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: User is creator of the chat which has all administrator priviledges
 
 User is creator of the chat which has all administrator priviledges
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

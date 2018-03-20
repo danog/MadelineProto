@@ -9,10 +9,6 @@ description: Return only document messages
 
 Return only document messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

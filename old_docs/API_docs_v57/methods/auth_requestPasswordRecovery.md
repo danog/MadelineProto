@@ -8,10 +8,6 @@ description: Send an email to recover the 2FA password
 
 Send an email to recover the 2FA password
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)

@@ -9,10 +9,6 @@ description: File is a video note
 
 File is a video note
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: Rule to allow all users
 
 Rule to allow all users
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: The category containing group chats and supergroup channel chats
 
 The category containing group chats and supergroup channel chats
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

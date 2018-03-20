@@ -9,10 +9,6 @@ description: User starts to play a game
 
 User starts to play a game
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

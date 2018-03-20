@@ -9,10 +9,6 @@ description: Return all found messages
 
 Return all found messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: Privacy key for managing ability to call the user
 
 Privacy key for managing ability to call the user
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

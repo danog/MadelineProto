@@ -9,10 +9,6 @@ description: The category containing broadcast channel chats
 
 The category containing broadcast channel chats
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

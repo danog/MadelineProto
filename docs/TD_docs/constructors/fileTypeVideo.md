@@ -9,10 +9,6 @@ description: File is a video
 
 File is a video
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

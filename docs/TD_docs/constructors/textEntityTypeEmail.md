@@ -9,10 +9,6 @@ description: Email
 
 Email
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

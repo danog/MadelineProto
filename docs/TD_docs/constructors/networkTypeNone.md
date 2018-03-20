@@ -9,10 +9,6 @@ description: Network is not available
 
 Network is not available
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

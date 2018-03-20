@@ -9,10 +9,6 @@ description: Return only voice messages
 
 Return only voice messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

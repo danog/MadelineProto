@@ -9,10 +9,6 @@ description: Unknown option or option having default value
 
 Unknown option or option having default value
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

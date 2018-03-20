@@ -9,10 +9,6 @@ description: Wi-Fi network
 
 Wi-Fi network
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

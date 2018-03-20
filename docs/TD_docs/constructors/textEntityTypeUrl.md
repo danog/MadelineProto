@@ -9,10 +9,6 @@ description: Url beginning with http
 
 Url beginning with http
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

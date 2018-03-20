@@ -9,10 +9,6 @@ description: User records video note
 
 User records video note
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

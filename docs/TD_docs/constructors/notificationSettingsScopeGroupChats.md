@@ -9,10 +9,6 @@ description: Notification settings applied to all group and broadcast channel ch
 
 Notification settings applied to all group and broadcast channel chats (supergroup channels have no common settings)
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

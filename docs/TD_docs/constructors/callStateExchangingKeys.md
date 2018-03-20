@@ -9,10 +9,6 @@ description: Call is answered and encryption keys are exchanged
 
 Call is answered and encryption keys are exchanged
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

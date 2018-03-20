@@ -9,10 +9,6 @@ description: A button for buying, must be in the first column and row of the key
 
 A button for buying, must be in the first column and row of the keyboard, can be attached only to a message with content of the type messageInvoice
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

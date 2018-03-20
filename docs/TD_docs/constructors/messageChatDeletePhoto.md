@@ -9,10 +9,6 @@ description: Chat photo deleted
 
 Chat photo deleted
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

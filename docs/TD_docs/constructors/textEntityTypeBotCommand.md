@@ -9,10 +9,6 @@ description: Bot command beginning with /. It shouldn't be highlighted if there 
 
 Bot command beginning with /. It shouldn't be highlighted if there is no bots in the chat
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

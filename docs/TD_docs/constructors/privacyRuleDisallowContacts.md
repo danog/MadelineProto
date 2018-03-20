@@ -9,10 +9,6 @@ description: Rule to disallow all user contacts
 
 Rule to disallow all user contacts
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

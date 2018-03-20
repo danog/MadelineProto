@@ -9,10 +9,6 @@ description: The category containing chats frequently used for calls
 
 The category containing chats frequently used for calls
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

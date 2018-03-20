@@ -9,10 +9,6 @@ description: User cancels previous action
 
 User cancels previous action
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

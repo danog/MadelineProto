@@ -78,7 +78,7 @@ trait Methods
                     $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
                 }
             }
-            if (isset($this->td_descriptions['methods'][$data['method']])) {
+            if (isset($this->td_descriptions['methods'][$data['method']]) && !empty($data['params'])) {
                 $table = '### Parameters:
 
 | Name     |    Type       | Required | Description |

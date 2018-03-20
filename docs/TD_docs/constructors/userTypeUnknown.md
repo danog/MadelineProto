@@ -9,10 +9,6 @@ description: Currently there is no any information about the user except user_id
 
 Currently there is no any information about the user except user_id. It can happens very-very rarely. None of active action can be performed with unknown user
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

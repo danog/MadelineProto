@@ -9,10 +9,6 @@ description: User records a video
 
 User records a video
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

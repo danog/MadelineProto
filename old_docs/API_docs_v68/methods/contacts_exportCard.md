@@ -8,10 +8,6 @@ description: Export contact as card
 
 Export contact as card
 
-### Parameters:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

@@ -9,10 +9,6 @@ description: The category containing chats with inline bots sorted by their usag
 
 The category containing chats with inline bots sorted by their usage in the inline mode
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

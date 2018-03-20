@@ -9,10 +9,6 @@ description: Waiting for network to be available. Use SetNetworkType to change a
 
 Waiting for network to be available. Use SetNetworkType to change available network type
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

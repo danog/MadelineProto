@@ -9,10 +9,6 @@ description: Text should be parsed in markdown-style way
 
 Text should be parsed in markdown-style way
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

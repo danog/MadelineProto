@@ -86,7 +86,7 @@ trait Constructors
                 }
             }
 
-            if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
+            if (isset($this->td_descriptions['constructors'][$data['predicate']]) && !empty($data['params'])) {
                 $table = '### Attributes:
 
 | Name     |    Type       | Required | Description |

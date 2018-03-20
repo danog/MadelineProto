@@ -9,10 +9,6 @@ description: Text should be parsed in the HTML-style way
 
 Text should be parsed in the HTML-style way
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

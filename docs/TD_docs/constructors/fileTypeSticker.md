@@ -9,10 +9,6 @@ description: File is a sticker
 
 File is a sticker
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

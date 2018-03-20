@@ -9,10 +9,6 @@ description: An empty block separating parts of a page
 
 An empty block separating parts of a page
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

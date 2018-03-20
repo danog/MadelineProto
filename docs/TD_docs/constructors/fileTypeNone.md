@@ -9,10 +9,6 @@ description: Data is not a file
 
 Data is not a file
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

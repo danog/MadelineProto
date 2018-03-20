@@ -9,10 +9,6 @@ description: Hashtag beginning with #
 
 Hashtag beginning with #
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

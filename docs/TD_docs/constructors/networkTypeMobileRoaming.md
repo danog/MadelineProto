@@ -9,10 +9,6 @@ description: Mobile roaming network
 
 Mobile roaming network
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

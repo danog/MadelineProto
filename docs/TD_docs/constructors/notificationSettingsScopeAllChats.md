@@ -9,10 +9,6 @@ description: Notification settings applied to all chats
 
 Notification settings applied to all chats
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

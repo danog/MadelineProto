@@ -9,10 +9,6 @@ description: Return only video messages
 
 Return only video messages
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

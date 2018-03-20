@@ -9,10 +9,6 @@ description: File is a voice audio
 
 File is a voice audio
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

@@ -9,10 +9,6 @@ description: General user
 
 General user
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

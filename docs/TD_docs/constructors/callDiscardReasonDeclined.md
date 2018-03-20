@@ -9,10 +9,6 @@ description: Call has ended before conversation begins. It was declined by the c
 
 Call has ended before conversation begins. It was declined by the callee
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

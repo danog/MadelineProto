@@ -9,10 +9,6 @@ description: There is a working connection to the Telegram servers
 
 There is a working connection to the Telegram servers
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

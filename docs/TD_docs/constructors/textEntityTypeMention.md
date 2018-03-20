@@ -9,10 +9,6 @@ description: Mention of the user by his username
 
 Mention of the user by his username
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 

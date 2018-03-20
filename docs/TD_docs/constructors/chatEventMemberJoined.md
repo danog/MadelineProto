@@ -9,10 +9,6 @@ description: New chat member joined
 
 New chat member joined
 
-### Attributes:
-
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
 
 
 
