@@ -96,4 +96,7 @@ Method calls may be executed at diferent times server-side: to avoid this, metho
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['queue' => 'queue_name']);
 ```
 
+If the queue if the specified queue name does not exist, it will be created.
+
+
 <button href="https://docs.madelineproto.xyz/docs/FILES.html">Next section</button>

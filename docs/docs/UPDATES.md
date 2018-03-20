@@ -193,4 +193,7 @@ $MadelineProto->loop(-1);
 This way, each update will be managed in its own fork.  
 Note that multiprocessing is not the same as multithreading, and should be avoided unless lengthy operations are made in the update handler.
 
+
+
+
 <button href="https://docs.madelineproto.xyz/docs/SETTINGS.html">Next section</button>

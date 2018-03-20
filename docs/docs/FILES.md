@@ -423,5 +423,8 @@ $sentMessage = $MadelineProto->messages->sendMedia([
 $output_file_name = $MadelineProto->download_to_file(
     new MyCallback($sentMessage, $peer, $MadelineProto),
     '/tmp/myname.mp4'
+);
+```
+
 
 <button href="https://docs.madelineproto.xyz/docs/CHAT_INFO.html">Next section</button>

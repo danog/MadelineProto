@@ -394,5 +394,8 @@ $MadelineProto->settings = [
 The settings array can be accessed and modified in the instantiated class by accessing the `settings` attribute of the API class:
 
 ```php
+$MadelineProto->settings['updates']['handle_updates'] = true; // reenable update fetching
+```
+
 
 <button href="https://docs.madelineproto.xyz/docs/SELF.html">Next section</button>

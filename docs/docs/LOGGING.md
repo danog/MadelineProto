@@ -14,4 +14,7 @@ MadelineProto provides a unified class for logging messages to the logging desti
 * `\danog\MadelineProto\Logger:VERBOSE` - Indicates a verbose info message
 * `\danog\MadelineProto\Logger:ULTRA_VERBOSE` - Indicates an ultra verbose
 
+By default, `$level` is `\danog\MadelineProto\Logger:NOTICE`.
+
+
 <button href="https://docs.madelineproto.xyz/docs/USING_METHODS.html">Next section</button>
