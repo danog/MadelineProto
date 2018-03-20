@@ -1,4 +1,4 @@
-### Lua binding
+# Lua binding
 
 [Examples](https://github.com/danog/MadelineProto/tree/master/lua)  
 
