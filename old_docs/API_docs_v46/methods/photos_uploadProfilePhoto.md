@@ -31,7 +31,7 @@ description: photos.uploadProfilePhoto parameters, return type and example
 |PHOTO_EXT_INVALID|The extension of the photo is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -51,7 +51,7 @@ $MadelineProto->start();
 $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, 'caption' => 'string', 'geo_point' => InputGeoPoint, 'crop' => InputPhotoCrop, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

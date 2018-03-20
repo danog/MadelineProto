@@ -22,7 +22,7 @@ Send an email to recover the 2FA password
 |PASSWORD_EMPTY|The provided password is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -42,7 +42,7 @@ $MadelineProto->start();
 $auth_PasswordRecovery = $MadelineProto->auth->requestPasswordRecovery();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

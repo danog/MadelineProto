@@ -30,7 +30,7 @@ description: messages.startBot parameters, return type and example
 |START_PARAM_INVALID|Start parameter invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -50,7 +50,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->startBot(['bot' => InputUser, 'peer' => InputPeer, 'start_param' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

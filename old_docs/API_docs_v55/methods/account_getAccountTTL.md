@@ -15,7 +15,7 @@ Get account TTL
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -35,7 +35,7 @@ $MadelineProto->start();
 $AccountDaysTTL = $MadelineProto->account->getAccountTTL();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

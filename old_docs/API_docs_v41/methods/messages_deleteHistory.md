@@ -26,7 +26,7 @@ description: messages.deleteHistory parameters, return type and example
 |PEER_ID_INVALID|The provided peer id is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $messages_AffectedHistory = $MadelineProto->messages->deleteHistory(['peer' => InputPeer, 'max_id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -30,7 +30,7 @@ description: messages.editChatPhoto parameters, return type and example
 |PHOTO_EXT_INVALID|The extension of the photo is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -50,7 +50,7 @@ $MadelineProto->start();
 $messages_StatedMessage = $MadelineProto->messages->editChatPhoto(['chat_id' => InputPeer, 'photo' => InputChatPhoto, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

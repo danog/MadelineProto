@@ -37,7 +37,7 @@ description: stickers.createStickerSet parameters, return type and example
 |USER_ID_INVALID|The provided user ID is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -57,7 +57,7 @@ $MadelineProto->start();
 $messages_StickerSet = $MadelineProto->stickers->createStickerSet(['masks' => Bool, 'user_id' => InputUser, 'title' => 'string', 'short_name' => 'string', 'stickers' => [InputStickerSetItem, InputStickerSetItem], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

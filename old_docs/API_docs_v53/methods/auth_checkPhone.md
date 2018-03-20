@@ -29,7 +29,7 @@ Check if this phone number is registered on telegram
 |PHONE_NUMBER_INVALID|The phone number is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $auth_CheckedPhone = $MadelineProto->auth->checkPhone(['phone_number' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

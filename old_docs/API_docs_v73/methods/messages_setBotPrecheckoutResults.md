@@ -27,7 +27,7 @@ description: messages.setBotPrecheckoutResults parameters, return type and examp
 |ERROR_TEXT_EMPTY|The provided error message is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->setBotPrecheckoutResults(['success' => Bool, 'query_id' => long, 'error' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

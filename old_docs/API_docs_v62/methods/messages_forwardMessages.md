@@ -51,7 +51,7 @@ description: messages.forwardMessages parameters, return type and example
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -71,7 +71,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->forwardMessages(['silent' => Bool, 'background' => Bool, 'with_my_score' => Bool, 'from_peer' => InputPeer, 'id' => [int, int], 'to_peer' => InputPeer, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

@@ -27,7 +27,7 @@ description: messages.sendEncryptedFile parameters, return type and example
 |MSG_WAIT_FAILED|A waiting call returned an error|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $messages_SentEncryptedMessage = $MadelineProto->messages->sendEncryptedFile(['peer' => InputEncryptedChat, 'message' => DecryptedMessage, 'file' => InputEncryptedFile, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

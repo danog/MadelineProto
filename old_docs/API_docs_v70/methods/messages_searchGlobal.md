@@ -29,7 +29,7 @@ description: messages.searchGlobal parameters, return type and example
 |SEARCH_QUERY_EMPTY|The search query is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $messages_Messages = $MadelineProto->messages->searchGlobal(['q' => 'string', 'offset_date' => int, 'offset_peer' => InputPeer, 'offset_id' => int, 'limit' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

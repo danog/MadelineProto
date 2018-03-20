@@ -15,7 +15,7 @@ Get all logged-in authorizations
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -35,7 +35,7 @@ $MadelineProto->start();
 $account_Authorizations = $MadelineProto->account->getAuthorizations();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

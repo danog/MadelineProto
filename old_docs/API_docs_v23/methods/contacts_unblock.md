@@ -27,7 +27,7 @@ Unblock a user
 |CONTACT_ID_INVALID|The provided contact ID is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->contacts->unblock(['id' => InputUser, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -21,7 +21,7 @@ Get blocked users
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -41,7 +41,7 @@ $MadelineProto->start();
 $contacts_Blocked = $MadelineProto->contacts->getBlocked(['offset' => int, 'limit' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

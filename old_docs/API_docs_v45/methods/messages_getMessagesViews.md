@@ -29,7 +29,7 @@ description: messages.getMessagesViews parameters, return type and example
 |PEER_ID_INVALID|The provided peer id is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $Vector_of_int = $MadelineProto->messages->getMessagesViews(['peer' => InputPeer, 'id' => [int, int], 'increment' => Bool, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

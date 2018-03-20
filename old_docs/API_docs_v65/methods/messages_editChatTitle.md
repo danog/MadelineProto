@@ -27,7 +27,7 @@ description: messages.editChatTitle parameters, return type and example
 |NEED_CHAT_INVALID|The provided chat is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->editChatTitle(['chat_id' => InputPeer, 'title' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

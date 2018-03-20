@@ -36,7 +36,7 @@ description: messages.sendInlineBotResult parameters, return type and example
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -56,7 +56,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->sendInlineBotResult(['broadcast' => Bool, 'silent' => Bool, 'background' => Bool, 'peer' => InputPeer, 'reply_to_msg_id' => int, 'query_id' => long, 'id' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

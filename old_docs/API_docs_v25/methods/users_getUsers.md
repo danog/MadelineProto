@@ -30,7 +30,7 @@ Get info about users
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -50,7 +50,7 @@ $MadelineProto->start();
 $Vector_of_User = $MadelineProto->users->getUsers(['id' => [InputUser, InputUser], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

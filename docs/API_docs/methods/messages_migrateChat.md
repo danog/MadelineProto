@@ -27,7 +27,7 @@ description: messages.migrateChat parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->migrateChat(['chat_id' => InputPeer, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

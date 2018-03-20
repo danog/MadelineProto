@@ -26,7 +26,7 @@ description: stickers.removeStickerFromSet parameters, return type and example
 |STICKER_INVALID|The provided sticker is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->stickers->removeStickerFromSet(['sticker' => InputDocument, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

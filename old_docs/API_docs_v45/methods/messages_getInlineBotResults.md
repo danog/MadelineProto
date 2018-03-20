@@ -30,7 +30,7 @@ description: messages.getInlineBotResults parameters, return type and example
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -50,7 +50,7 @@ $MadelineProto->start();
 $messages_BotResults = $MadelineProto->messages->getInlineBotResults(['bot' => InputUser, 'query' => 'string', 'offset' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

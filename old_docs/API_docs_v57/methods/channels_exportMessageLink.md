@@ -26,7 +26,7 @@ description: channels.exportMessageLink parameters, return type and example
 |CHANNEL_INVALID|The provided channel is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $ExportedMessageLink = $MadelineProto->channels->exportMessageLink(['channel' => InputChannel, 'id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -30,7 +30,7 @@ description: messages.saveDraft parameters, return type and example
 |PEER_ID_INVALID|The provided peer id is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -50,7 +50,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->saveDraft(['no_webpage' => Bool, 'reply_to_msg_id' => int, 'peer' => InputPeer, 'message' => 'string', 'entities' => [MessageEntity, MessageEntity], 'parse_mode' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

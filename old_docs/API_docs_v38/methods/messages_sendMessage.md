@@ -50,7 +50,7 @@ description: messages.sendMessage parameters, return type and example
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -70,7 +70,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->sendMessage(['peer' => InputPeer, 'reply_to_msg_id' => int, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity, MessageEntity], 'parse_mode' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

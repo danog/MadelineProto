@@ -28,7 +28,7 @@ description: channels.editTitle parameters, return type and example
 |CHAT_NOT_MODIFIED|The pinned message wasn't modified|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->channels->editTitle(['channel' => InputChannel, 'title' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

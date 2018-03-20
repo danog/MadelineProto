@@ -29,7 +29,7 @@ description: messages.getDialogs parameters, return type and example
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $messages_Dialogs = $MadelineProto->messages->getDialogs(['offset' => int, 'limit' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

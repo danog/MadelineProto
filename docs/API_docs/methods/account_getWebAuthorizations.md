@@ -15,7 +15,7 @@ Get telegram web login authorizations
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -35,7 +35,7 @@ $MadelineProto->start();
 $account_WebAuthorizations = $MadelineProto->account->getWebAuthorizations();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

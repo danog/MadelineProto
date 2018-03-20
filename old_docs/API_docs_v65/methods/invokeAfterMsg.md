@@ -21,7 +21,7 @@ Invokes a query after successfull completion of one of the previous queries.
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -41,7 +41,7 @@ $MadelineProto->start();
 $X = $MadelineProto->invokeAfterMsg(['msg_id' => long, 'query' => !X, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

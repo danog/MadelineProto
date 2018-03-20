@@ -20,7 +20,7 @@ Invoke with method without returning updates in the socket
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -40,7 +40,7 @@ $MadelineProto->start();
 $X = $MadelineProto->invokeWithoutUpdates(['query' => !X, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

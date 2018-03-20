@@ -15,7 +15,7 @@ Returns a list of available wallpapers.
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -35,7 +35,7 @@ $MadelineProto->start();
 $Vector_of_WallPaper = $MadelineProto->account->getWallPapers();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

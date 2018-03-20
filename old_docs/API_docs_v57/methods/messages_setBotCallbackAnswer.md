@@ -28,7 +28,7 @@ description: messages.setBotCallbackAnswer parameters, return type and example
 |QUERY_ID_INVALID|The query ID is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->setBotCallbackAnswer(['alert' => Bool, 'query_id' => long, 'message' => 'string', 'url' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

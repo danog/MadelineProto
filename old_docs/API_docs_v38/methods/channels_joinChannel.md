@@ -27,7 +27,7 @@ description: channels.joinChannel parameters, return type and example
 |CHANNELS_TOO_MUCH|You have joined too many channels/supergroups|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->channels->joinChannel(['channel' => InputChannel, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

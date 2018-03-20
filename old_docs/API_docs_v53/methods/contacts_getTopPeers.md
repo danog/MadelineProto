@@ -12,13 +12,13 @@ Get most used chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|correspondents|[CLICK ME Bool](../types/Bool.md) | Optional||
-|bots\_pm|[CLICK ME Bool](../types/Bool.md) | Optional||
-|bots\_inline|[CLICK ME Bool](../types/Bool.md) | Optional||
-|groups|[CLICK ME Bool](../types/Bool.md) | Optional||
-|channels|[CLICK ME Bool](../types/Bool.md) | Optional||
-|offset|[CLICK ME int](../types/int.md) | Yes||
-|limit|[CLICK ME int](../types/int.md) | Yes||
+|correspondents|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch users?|
+|bots\_pm|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch bots?|
+|bots\_inline|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch inline bots?|
+|groups|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch groups?|
+|channels|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch channels and supergroups?|
+|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`|
+|limit|[CLICK ME int](../types/int.md) | Yes|How many results to fetch|
 |hash|[CLICK ME int](../types/int.md) | Yes||
 
 
@@ -34,7 +34,7 @@ Get most used chats
 |TYPES_EMPTY|The types field is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -54,7 +54,7 @@ $MadelineProto->start();
 $contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

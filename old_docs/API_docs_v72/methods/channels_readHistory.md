@@ -27,7 +27,7 @@ description: channels.readHistory parameters, return type and example
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->channels->readHistory(['channel' => InputChannel, 'max_id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

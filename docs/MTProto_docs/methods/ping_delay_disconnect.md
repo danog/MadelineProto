@@ -21,7 +21,7 @@ Pings the server and causes disconection if the same method is not called within
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -41,7 +41,7 @@ $MadelineProto->start();
 $Pong = $MadelineProto->ping_delay_disconnect(['ping_id' => long, 'disconnect_delay' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

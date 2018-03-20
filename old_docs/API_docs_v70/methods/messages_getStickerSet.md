@@ -25,7 +25,7 @@ description: messages.getStickerSet parameters, return type and example
 |STICKERSET_INVALID|The provided sticker set is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -45,7 +45,7 @@ $MadelineProto->start();
 $messages_StickerSet = $MadelineProto->messages->getStickerSet(['stickerset' => InputStickerSet, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

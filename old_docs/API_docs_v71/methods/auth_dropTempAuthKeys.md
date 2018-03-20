@@ -20,7 +20,7 @@ Delete all temporary authorization keys except the ones provided
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -40,7 +40,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->auth->dropTempAuthKeys(['except_auth_keys' => [long, long], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

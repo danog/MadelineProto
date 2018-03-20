@@ -27,7 +27,7 @@ description: channels.exportInvite parameters, return type and example
 |INVITE_HASH_EXPIRED|The invite link has expired|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $ExportedChatInvite = $MadelineProto->channels->exportInvite(['channel' => InputChannel, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

@@ -20,7 +20,7 @@ Destroy the current MTProto session
 ### Can bots use this method: **YES**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -40,7 +40,7 @@ $MadelineProto->start();
 $DestroySessionRes = $MadelineProto->destroy_session(['session_id' => long, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

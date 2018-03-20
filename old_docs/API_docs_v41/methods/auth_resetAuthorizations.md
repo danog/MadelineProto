@@ -22,7 +22,7 @@ Delete all logged-in sessions.
 |Timeout|A timeout occurred while fetching data from the bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -42,7 +42,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->auth->resetAuthorizations();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

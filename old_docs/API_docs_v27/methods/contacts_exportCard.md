@@ -15,7 +15,7 @@ Export contact as card
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -35,7 +35,7 @@ $MadelineProto->start();
 $Vector_of_int = $MadelineProto->contacts->exportCard();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

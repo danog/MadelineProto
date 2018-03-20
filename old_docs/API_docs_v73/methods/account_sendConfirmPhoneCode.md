@@ -29,7 +29,7 @@ Send confirmation phone code
 |HASH_INVALID|The provided hash is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $auth_SentCode = $MadelineProto->account->sendConfirmPhoneCode(['allow_flashcall' => Bool, 'hash' => 'string', 'current_number' => Bool, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

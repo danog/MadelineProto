@@ -20,7 +20,7 @@ Get info about a certain contact
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -40,7 +40,7 @@ $MadelineProto->start();
 $contacts_Contacts = $MadelineProto->contacts->getContacts(['hash' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -27,7 +27,7 @@ description: messages.createChat parameters, return type and example
 |USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $messages_StatedMessage = $MadelineProto->messages->createChat(['users' => [InputUser, InputUser], 'title' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

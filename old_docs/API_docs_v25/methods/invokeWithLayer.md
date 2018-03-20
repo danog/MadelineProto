@@ -38,7 +38,7 @@ Invoke this method with layer X
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -58,7 +58,7 @@ $MadelineProto->start();
 $X = $MadelineProto->invokeWithLayer(['layer' => int, 'query' => !X, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

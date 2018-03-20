@@ -28,7 +28,7 @@ description: messages.deleteChatUser parameters, return type and example
 |USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->deleteChatUser(['chat_id' => InputPeer, 'user_id' => InputUser, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

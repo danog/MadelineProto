@@ -28,7 +28,7 @@ Invalidate sent phone code
 |PHONE_NUMBER_INVALID|The phone number is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->auth->cancelCode(['phone_number' => 'string', 'phone_code_hash' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

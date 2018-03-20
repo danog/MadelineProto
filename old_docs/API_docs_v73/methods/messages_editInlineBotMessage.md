@@ -33,7 +33,7 @@ description: messages.editInlineBotMessage parameters, return type and example
 |MESSAGE_NOT_MODIFIED|The message text has not changed|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -53,7 +53,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->editInlineBotMessage(['no_webpage' => Bool, 'stop_geo_live' => Bool, 'id' => InputBotInlineMessageID, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity, MessageEntity], 'parse_mode' => 'string', 'geo_point' => InputGeoPoint, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

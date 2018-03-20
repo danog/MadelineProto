@@ -27,7 +27,7 @@ description: channels.getChannels parameters, return type and example
 |NEED_CHAT_INVALID|The provided chat is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $messages_Chats = $MadelineProto->channels->getChannels(['id' => [InputChannel, InputChannel], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

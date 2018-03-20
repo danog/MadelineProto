@@ -25,7 +25,7 @@ description: langpack.getDifference parameters, return type and example
 |LANG_PACK_INVALID|The provided language pack is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -45,7 +45,7 @@ $MadelineProto->start();
 $LangPackDifference = $MadelineProto->langpack->getDifference(['from_version' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -18,7 +18,7 @@ description: messages.getMaskStickers parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -38,7 +38,7 @@ $MadelineProto->start();
 $messages_AllStickers = $MadelineProto->messages->getMaskStickers(['hash' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -28,7 +28,7 @@ Stop sending PUSH notifications to app
 |TOKEN_INVALID|The provided token is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->account->unregisterDevice(['token_type' => int, 'token' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

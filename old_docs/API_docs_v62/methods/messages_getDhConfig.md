@@ -26,7 +26,7 @@ description: messages.getDhConfig parameters, return type and example
 |RANDOM_LENGTH_INVALID|Random length invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $messages_DhConfig = $MadelineProto->messages->getDhConfig(['version' => int, 'random_length' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

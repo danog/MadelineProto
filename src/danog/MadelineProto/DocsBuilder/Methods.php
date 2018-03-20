@@ -204,7 +204,7 @@ description: '.$description.'
                     }
                     $example .= "\n\n";
                 }
-                $example .= str_replace('[]', '', '### Example:
+                $example .= str_replace('[]', '', '### MadelineProto Example:
 
 
 ```
@@ -224,7 +224,7 @@ $MadelineProto->start();
 $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 ```
 
-Or, if you\'re using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 '.($bot ? '### As a bot:
 

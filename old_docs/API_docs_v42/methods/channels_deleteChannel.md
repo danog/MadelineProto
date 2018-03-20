@@ -26,7 +26,7 @@ description: channels.deleteChannel parameters, return type and example
 |CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->channels->deleteChannel(['channel' => InputChannel, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -13,7 +13,7 @@ description: help.getInviteText parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -33,7 +33,7 @@ $MadelineProto->start();
 $help_InviteText = $MadelineProto->help->getInviteText();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

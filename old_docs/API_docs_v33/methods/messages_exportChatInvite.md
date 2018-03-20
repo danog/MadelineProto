@@ -25,7 +25,7 @@ description: messages.exportChatInvite parameters, return type and example
 |CHAT_ID_INVALID|The provided chat id is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -45,7 +45,7 @@ $MadelineProto->start();
 $ExportedChatInvite = $MadelineProto->messages->exportChatInvite(['chat_id' => InputPeer, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

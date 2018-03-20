@@ -27,7 +27,7 @@ Delete a contact
 |CONTACT_ID_INVALID|The provided contact ID is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $contacts_Link = $MadelineProto->contacts->deleteContact(['id' => InputUser, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

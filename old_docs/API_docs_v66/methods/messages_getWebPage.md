@@ -26,7 +26,7 @@ description: messages.getWebPage parameters, return type and example
 |WC_CONVERT_URL_INVALID|WC convert URL invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $WebPage = $MadelineProto->messages->getWebPage(['url' => 'string', 'hash' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

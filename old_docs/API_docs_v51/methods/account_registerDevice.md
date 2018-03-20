@@ -33,7 +33,7 @@ Register device for push notifications
 |TOKEN_INVALID|The provided token is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -53,7 +53,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->account->registerDevice(['token_type' => int, 'token' => 'string', 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'app_sandbox' => Bool, 'lang_code' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

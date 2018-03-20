@@ -29,7 +29,7 @@ description: channels.leaveChannel parameters, return type and example
 |CHANNEL_PUBLIC_GROUP_NA|channel/supergroup not available|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->channels->leaveChannel(['channel' => InputChannel, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

@@ -35,7 +35,7 @@ Initializes connection and save information on the user's device and application
 |INPUT_FETCH_FAIL|Failed deserializing TL payload|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -55,7 +55,7 @@ $MadelineProto->start();
 $X = $MadelineProto->initConnection(['api_id' => int, 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'system_lang_code' => 'string', 'lang_pack' => 'string', 'lang_code' => 'string', 'query' => !X, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

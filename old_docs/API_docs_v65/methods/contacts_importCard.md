@@ -28,7 +28,7 @@ Import card as contact
 |NEED_MEMBER_INVALID|The provided member is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $User = $MadelineProto->contacts->importCard(['export_card' => [int, int], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

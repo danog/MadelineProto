@@ -26,7 +26,7 @@ description: phone.receivedCall parameters, return type and example
 |CALL_PEER_INVALID|The provided call peer object is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -46,7 +46,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->phone->receivedCall(['peer' => InputPhoneCall, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

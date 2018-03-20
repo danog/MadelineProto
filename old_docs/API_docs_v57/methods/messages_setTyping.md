@@ -33,7 +33,7 @@ description: messages.setTyping parameters, return type and example
 |CHAT_WRITE_FORBIDDEN|You can't write in this chat|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -53,7 +53,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->setTyping(['peer' => InputPeer, 'action' => SendMessageAction, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

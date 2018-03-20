@@ -42,7 +42,7 @@ description: messages.editMessage parameters, return type and example
 |MESSAGE_AUTHOR_REQUIRED|Message author required|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -62,7 +62,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->editMessage(['no_webpage' => Bool, 'stop_geo_live' => Bool, 'peer' => InputPeer, 'id' => int, 'message' => 'string', 'reply_markup' => ReplyMarkup, 'entities' => [MessageEntity, MessageEntity], 'parse_mode' => 'string', 'geo_point' => InputGeoPoint, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

@@ -13,7 +13,7 @@ description: help.getNearestDc parameters, return type and example
 ### Can bots use this method: **NO**
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -33,7 +33,7 @@ $MadelineProto->start();
 $NearestDc = $MadelineProto->help->getNearestDc();
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

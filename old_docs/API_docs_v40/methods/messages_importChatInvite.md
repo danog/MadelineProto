@@ -31,7 +31,7 @@ description: messages.importChatInvite parameters, return type and example
 |SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -51,7 +51,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->importChatInvite(['hash' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

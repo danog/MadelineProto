@@ -25,7 +25,7 @@ description: messages.deleteMessages parameters, return type and example
 |MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -45,7 +45,7 @@ $MadelineProto->start();
 $messages_AffectedMessages = $MadelineProto->messages->deleteMessages(['id' => [int, int], ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

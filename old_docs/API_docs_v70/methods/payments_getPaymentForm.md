@@ -25,7 +25,7 @@ description: payments.getPaymentForm parameters, return type and example
 |MESSAGE_ID_INVALID|The provided message id is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -45,7 +45,7 @@ $MadelineProto->start();
 $payments_PaymentForm = $MadelineProto->payments->getPaymentForm(['msg_id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

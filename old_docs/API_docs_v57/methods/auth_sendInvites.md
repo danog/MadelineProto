@@ -28,7 +28,7 @@ Invite friends to telegram!
 |MESSAGE_EMPTY|The provided message is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -48,7 +48,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->auth->sendInvites(['phone_numbers' => ['string', 'string'], 'message' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

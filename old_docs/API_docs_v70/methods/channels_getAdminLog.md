@@ -33,7 +33,7 @@ description: channels.getAdminLog parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -53,7 +53,7 @@ $MadelineProto->start();
 $channels_AdminLogResults = $MadelineProto->channels->getAdminLog(['channel' => InputChannel, 'q' => 'string', 'events_filter' => ChannelAdminLogEventsFilter, 'admins' => [InputUser, InputUser], 'max_id' => long, 'min_id' => long, 'limit' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

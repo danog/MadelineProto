@@ -36,7 +36,7 @@ description: channels.editAdmin parameters, return type and example
 |USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -56,7 +56,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->channels->editAdmin(['channel' => InputChannel, 'user_id' => InputUser, 'role' => ChannelParticipantRole, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

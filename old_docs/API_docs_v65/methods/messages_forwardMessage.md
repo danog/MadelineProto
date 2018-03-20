@@ -29,7 +29,7 @@ description: messages.forwardMessage parameters, return type and example
 |YOU_BLOCKED_USER|You blocked this user|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $Updates = $MadelineProto->messages->forwardMessage(['peer' => InputPeer, 'id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

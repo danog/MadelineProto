@@ -29,7 +29,7 @@ Update profile info
 |FIRSTNAME_INVALID|The first name is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $User = $MadelineProto->account->updateProfile(['first_name' => 'string', 'last_name' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

@@ -40,7 +40,7 @@ description: messages.setInlineBotResults parameters, return type and example
 |USER_BOT_INVALID|This method can only be called by a bot|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -60,7 +60,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->messages->setInlineBotResults(['gallery' => Bool, 'private' => Bool, 'query_id' => long, 'results' => [InputBotInlineResult, InputBotInlineResult], 'cache_time' => int, 'next_offset' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

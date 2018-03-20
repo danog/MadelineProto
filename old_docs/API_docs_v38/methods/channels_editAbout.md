@@ -29,7 +29,7 @@ description: channels.editAbout parameters, return type and example
 |CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -49,7 +49,7 @@ $MadelineProto->start();
 $Bool = $MadelineProto->channels->editAbout(['channel' => InputChannel, 'about' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 ### As a bot:
 

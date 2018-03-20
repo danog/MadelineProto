@@ -27,7 +27,7 @@ Use the code that was emailed to you after running $MadelineProto->auth->request
 |CODE_EMPTY|The provided code is empty|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -47,7 +47,7 @@ $MadelineProto->start();
 $auth_Authorization = $MadelineProto->auth->recoverPassword(['code' => 'string', ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 

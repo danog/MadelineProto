@@ -41,7 +41,7 @@ description: messages.search parameters, return type and example
 |USER_ID_INVALID|The provided user ID is invalid|
 
 
-### Example:
+### MadelineProto Example:
 
 
 ```
@@ -61,7 +61,7 @@ $MadelineProto->start();
 $messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => 'string', 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset_id' => int, 'add_offset' => int, 'limit' => int, 'max_id' => int, 'min_id' => int, ]);
 ```
 
-Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):
+### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
 
 
 
