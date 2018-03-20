@@ -2,6 +2,11 @@
 
 MadelineProto provides wrappers to work with secret chats.
 
+* [Requesting secret chats](#requesting-secret-chats)
+* [Accepting secret chats](#accepting-secret-chats)
+* [Checking secret chat status](#checking-secret-chat-status)
+* [Sending secret messages](#sending-secret-messages)
+
 ## Requesting secret chats
 
 ```
@@ -26,6 +31,8 @@ $status = $MadelineProto->secret_chat_status($chat);
 $status is 0 if the chat cannot be found in the local database, 1 if the chat was requested but not yet accepted, and 2 if it is a valid accepted secret chat.
 
 ## Sending secret messages
+
+[Full example](https://github.com/danog/MadelineProto/blob/master/secret_bot.php)
 
 To send messages/files/service messages, simply use the sendEncrypted methods with objects that use the same layer used by the other client (specified by the number after the underscore in decryptedMessage object names, to obtain the layer that must be used for a secret chat use the following wrapper method).  
 
