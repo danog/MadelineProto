@@ -64,5 +64,5 @@ $secret_chat = $MadelineProto->get_secret_chat($chat);
 */
 ```
 
-This method gets info about a certain chat.
 
+<button href="https://docs.madelineproto.xyz/docs/LUA.html">Next section</button>

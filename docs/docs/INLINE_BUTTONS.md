@@ -48,5 +48,5 @@ And click them:
 
 ```php
 $button->click();
-```
 
+<button href="https://docs.madelineproto.xyz/docs/CALLS.html">Next section</button>

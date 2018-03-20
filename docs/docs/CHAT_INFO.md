@@ -39,5 +39,5 @@ $chat = $MadelineProto->get_info(-10028941842);
 You can also use `get_info` to get chat info, see [here for the parameters and the result](https://docs.madelineproto.xyz/get_info.html)
 
 * Completeness: small
-* Speed: very fast
-* Caching: full
+
+<button href="https://docs.madelineproto.xyz/docs/DIALOGS.html">Next section</button>

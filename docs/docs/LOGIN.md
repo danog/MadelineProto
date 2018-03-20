@@ -57,4 +57,4 @@ $MadelineProto->logout();
 
 Use `logout` to logout, see [here for the parameters and the result](https://docs.madelineproto.xyz/logout.html).  
 
-
+<button href="https://docs.madelineproto.xyz/docs/FEATURES.html">Next section</button>

@@ -99,5 +99,5 @@ try {
     $estring2 = 'This also works: '.$e;
     $estring3 = "So does this: $e";
     // use $estring to report the error using sendMessage or log
-}
-```
+
+<button href="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html">Next section</button>

@@ -14,4 +14,4 @@ Passing lua callables to a parameter of a PHP callable will throw an exception d
 
 All MadelineProto wrapper methods (for example upload, download, upload_encrypted, get_self, and others) are imported in the Lua environment, as well as all MTProto wrappers (see the API docs for more info).  
 
-td-cli wrappers are also present: you can use the tdcli_function in lua and pass mtproto updates to the tdcli_update_callback via PHP, they will be automatically converted to/from td objects. Please note that the object conversion is not complete, feel free to contribute to the conversion module in [`src/danog/MadelineProto/Conversion/TD.php`](https://github.com/danog/MadelineProto/raw/master/src/danog/MadelineProto/TL/Conversion/TD.php).  
+<button href="https://docs.madelineproto.xyz/docs/PROXY.html">Next section</button>

@@ -51,9 +51,17 @@ foreach ($files as $file) {
     ksort($orderedfiles);
 }
 ksort($orderedfiles);
-foreach ($orderedfiles as $filename) {
+foreach ($orderedfiles as $key => $filename) {
     $lines = explode("\n", file_get_contents($filename));
-    if (strpos(end($lines), "Next")) unset($lines[count($lines)-1]);
+    if (strpos(end($lines), "Next")) {
+        unset($lines[count($lines)-1]);
+        unset($lines[count($lines)-2]);
+    }
+    if (isset($orderedfiles[$key+1])) {
+        $nextfile = "https://docs.madelineproto.xyz/docs/".basename($orderedfiles[$key+1], '.md').".html";
+        $lines[count($lines)] = "\n<button href=\"$nextfile\">Next section</button>";
+    }
+    file_put_contents($filename, implode("\n", $lines));
 
     preg_match('|^# (.*)|', $file = file_get_contents($filename), $matches);
     $title = $matches[1];

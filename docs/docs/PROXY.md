@@ -118,4 +118,4 @@ Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsock
 
 `public function getProxyHeaders();`
 
-Can return additional HTTP headers to use when the HTTP protocol is being used.
+<button href="https://docs.madelineproto.xyz/docs/CONTRIBUTING.html">Next section</button>

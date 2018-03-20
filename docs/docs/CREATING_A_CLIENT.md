@@ -17,5 +17,5 @@ $MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);  /
 
 To change the session file after starting MadelineProto, do the following:
 ```php
-$MadelineProto->session = 'newsession.madeline';
-```  
+
+<button href="https://docs.madelineproto.xyz/docs/LOGIN.html">Next section</button>
