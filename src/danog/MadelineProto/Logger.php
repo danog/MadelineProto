@@ -23,7 +23,7 @@ class Logger
     const set = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
     const reset = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
     public static $storage = [];
-    public static $mode = 1;
+    public static $mode = 0;
     public static $optional = null;
     public static $prefix = '';
     public static $level = 3;
