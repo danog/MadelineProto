@@ -14,12 +14,12 @@ Authorization settings
 
 ### `$settings['authorization']['default_temp_auth_key_expires_in']`
 
-Default: `31557600`
+Default: `31557600`  
 Description: Validity of temporary keys and the binding of the temporary and permanent keys  
 
 ### `$settings['authorization']['rsa_keys'] = [...]`
 
-Default: `["-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6\nlyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS\nan9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw\nEfzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+\n8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n\nSlv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAxq7aeLAqJR20tkQQMfRn+ocfrtMlJsQ2Uksfs7Xcoo77jAid0bRt\nksiVmT2HEIJUlRxfABoPBV8wY9zRTUMaMA654pUX41mhyVN+XoerGxFvrs9dF1Ru\nvCHbI02dM2ppPvyytvvMoefRoL5BTcpAihFgm5xCaakgsJ/tH5oVl74CdhQw8J5L\nxI/K++KJBUyZ26Uba1632cOiq05JBUW0Z2vWIOk4BLysk7+U9z+SxynKiZR3/xdi\nXvFKk01R3BHV+GUKM2RYazpS/P8v7eyKhAbKxOdRcFpHLlVwfjyM1VlDQrEZxsMp\nNTLYXb6Sce1Uov0YtNx5wEowlREH1WOTlwIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAsQZnSWVZNfClk29RcDTJQ76n8zZaiTGuUsi8sUhW8AS4PSbPKDm+\nDyJgdHDWdIF3HBzl7DHeFrILuqTs0vfS7Pa2NW8nUBwiaYQmPtwEa4n7bTmBVGsB\n1700/tz8wQWOLUlL2nMv+BPlDhxq4kmJCyJfgrIrHlX8sGPcPA4Y6Rwo0MSqYn3s\ng1Pu5gOKlaT9HKmE6wn5Sut6IiBjWozrRQ6n5h2RXNtO7O2qCDqjgB2vBxhV7B+z\nhRbLbCmW0tYMDsvPpX5M8fsO05svN+lKtCAuz1leFns8piZpptpSCFn7bWxiA9/f\nx5x17D7pfah3Sy2pA+NDXyzSlGcKdaUmwQIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwqjFW0pi4reKGbkc9pK83Eunwj/k0G8ZTioMMPbZmW99GivMibwa\nxDM9RDWabEMyUtGoQC2ZcDeLWRK3W8jMP6dnEKAlvLkDLfC4fXYHzFO5KHEqF06i\nqAqBdmI1iBGdQv/OQCBcbXIWCGDY2AsiqLhlGQfPOI7/vvKc188rTriocgUtoTUc\n/n/sIUzkgwTqRyvWYynWARWzQg0I9olLBBC2q5RQJJlnYXZwyTL3y9tdb7zOHkks\nWV9IMQmZmyZh/N7sMbGWQpt4NMchGpPGeJ2e5gHBjDnlIf2p1yZOYeUYrdbwcS0t\nUiggS4UeE8TzIuXFQxw7fzEIlmhIaq3FnwIDAQAB\n-----END RSA PUBLIC KEY-----"]`
+Default: `["-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwVACPi9w23mF3tBkdZz+zwrzKOaaQdr01vAbU4E1pvkfj4sqDsm6\nlyDONS789sVoD/xCS9Y0hkkC3gtL1tSfTlgCMOOul9lcixlEKzwKENj1Yz/s7daS\nan9tqw3bfUV/nqgbhGX81v/+7RFAEd+RwFnK7a+XYl9sluzHRyVVaTTveB2GazTw\nEfzk2DWgkBluml8OREmvfraX3bkHZJTKX4EQSjBbbdJ2ZXIsRrYOXfaA+xayEGB+\n8hdlLmAjbCVfaigxX0CDqWeR1yFL9kwd9P0NsZRPsmoqVwMbMu7mStFai6aIhc3n\nSlv8kg9qv1m6XHVQY3PnEw+QQtqSIXklHwIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAxq7aeLAqJR20tkQQMfRn+ocfrtMlJsQ2Uksfs7Xcoo77jAid0bRt\nksiVmT2HEIJUlRxfABoPBV8wY9zRTUMaMA654pUX41mhyVN+XoerGxFvrs9dF1Ru\nvCHbI02dM2ppPvyytvvMoefRoL5BTcpAihFgm5xCaakgsJ/tH5oVl74CdhQw8J5L\nxI/K++KJBUyZ26Uba1632cOiq05JBUW0Z2vWIOk4BLysk7+U9z+SxynKiZR3/xdi\nXvFKk01R3BHV+GUKM2RYazpS/P8v7eyKhAbKxOdRcFpHLlVwfjyM1VlDQrEZxsMp\nNTLYXb6Sce1Uov0YtNx5wEowlREH1WOTlwIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAsQZnSWVZNfClk29RcDTJQ76n8zZaiTGuUsi8sUhW8AS4PSbPKDm+\nDyJgdHDWdIF3HBzl7DHeFrILuqTs0vfS7Pa2NW8nUBwiaYQmPtwEa4n7bTmBVGsB\n1700/tz8wQWOLUlL2nMv+BPlDhxq4kmJCyJfgrIrHlX8sGPcPA4Y6Rwo0MSqYn3s\ng1Pu5gOKlaT9HKmE6wn5Sut6IiBjWozrRQ6n5h2RXNtO7O2qCDqjgB2vBxhV7B+z\nhRbLbCmW0tYMDsvPpX5M8fsO05svN+lKtCAuz1leFns8piZpptpSCFn7bWxiA9/f\nx5x17D7pfah3Sy2pA+NDXyzSlGcKdaUmwQIDAQAB\n-----END RSA PUBLIC KEY-----", "-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwqjFW0pi4reKGbkc9pK83Eunwj/k0G8ZTioMMPbZmW99GivMibwa\nxDM9RDWabEMyUtGoQC2ZcDeLWRK3W8jMP6dnEKAlvLkDLfC4fXYHzFO5KHEqF06i\nqAqBdmI1iBGdQv/OQCBcbXIWCGDY2AsiqLhlGQfPOI7/vvKc188rTriocgUtoTUc\n/n/sIUzkgwTqRyvWYynWARWzQg0I9olLBBC2q5RQJJlnYXZwyTL3y9tdb7zOHkks\nWV9IMQmZmyZh/N7sMbGWQpt4NMchGpPGeJ2e5gHBjDnlIf2p1yZOYeUYrdbwcS0t\nUiggS4UeE8TzIuXFQxw7fzEIlmhIaq3FnwIDAQAB\n-----END RSA PUBLIC KEY-----"]`  
 Description: Array of RSA keys to use during key exchange.  
 *WARNING*: be _very_ careful while modifying the default value of this setting, the security of telegram's MTProto protocol depends on it.
 
@@ -35,7 +35,7 @@ Default: `[
     3 => 'aurora',
     4 => 'vesta',
     5 => 'flora', // musa oh wait no :(
-]`
+]`  
 Description: Subdomains of web.telegram.org for https protocol
 
 ### `$settings['connection']['test']`
@@ -56,7 +56,7 @@ Default: `[
             'tcpo_only' => false,
         ],
     ],
-]`
+]`  
 Description: test datacenter IPs
 
 ### `$settings['connection']['main']`
@@ -77,7 +77,7 @@ Default: `[
             'tcpo_only' => false,
         ],
     ],
-]`
+]`  
 Description: main datacenter IPs
 
 ## `$settings['connection_settings']`
@@ -89,7 +89,7 @@ Connection settings
 Connection settings that will be applied to all datacenters
 
 ### `$settings['connection_settings']['all']['protocol']`
-Default: `'tcp_abridged'`
+Default: `'tcp_abridged'`  
 Description: MTProto transport protocol to use  
 Available MTProto transport protocols (smaller overhead is better):
 
@@ -173,23 +173,23 @@ Default: false
 Description: Whether to connect to the main telegram servers or to the testing servers (deep telegram)
 
 ### `$settings['connection_settings']['all']['ipv6']`
-Default: auto-detected
+Default: auto-detected  
 Description: Whether to use ipv6 while connecting to the telegram servers
 
 ### `$settings['connection_settings']['all']['timeout']`
-Default: 2
+Default: 2  
 Description: Connection, read and write timeout for sockets
 
 ### `$settings['connection_settings']['all']['proxy']`
-Default: `\Socket`
+Default: `\Socket`  
 Description: The [proxy class](PROXY.md) to use.
 
 ### `$settings['connection_settings']['all']['proxy_extra']`
-Default: `[]`
+Default: `[]`  
 Description: Extra parameters to pass to the proxy class using setExtra
 
 ### `$settings['connection_settings']['all']['pfs']`
-Default: `true` if `php-gmp` is installed, `false` otherwise
+Default: `true` if `php-gmp` is installed, `false` otherwise  
 Description: Whether to use PFS (better security, slower key exchange)
 
 ## `$settings['app_info']`
@@ -203,23 +203,23 @@ No default value, get your own API ID at my.telegram.org
 No default value, get your own API hash at my.telegram.org
 
 ### `$settings['app_info']['device_model']`
-Default: auto-detected
+Default: auto-detected  
 Description: device model
 
 ### `$settings['app_info']['device_model']`
-Default: auto-detected
+Default: auto-detected  
 Description: device model
 
 ### `$settings['app_info']['system_version']`
-Default: auto-detected
+Default: auto-detected  
 Description: system version
 
 ### `$settings['app_info']['app_version']`
-Default: `Unicorn`
+Default: `Unicorn`  
 Description: App version
 
 ### `$settings['app_info']['lang_code']`
-Default: auto-detected
+Default: auto-detected  
 Description: Language code
 
 ## `$settings['tl_schema']`
@@ -227,7 +227,7 @@ Description: Language code
 TL scheme files
 
 ### `$settings['tl_schema']['layer']`
-Default: 75
+Default: 75  
 Description: layer version
 
 ### `$settings['tl_schema']['src']`
@@ -237,7 +237,7 @@ Default: `[
     'secret' => __DIR__.'/TL_secret.tl', // secret chats TL scheme
     'calls' => __DIR__.'/TL_calls.tl', // calls TL scheme
     'botAPI' => __DIR__.'/TL_botAPI.tl', // bot API TL scheme for file ids
-]`
+]`  
 Description: scheme files to use
 
 
@@ -246,7 +246,7 @@ Description: scheme files to use
 Logger settings
 
 ### `$settings['logger']['logger']`
-Default: 3 if running from CLI, 2 if running from browser
+Default: 3 if running from CLI, 2 if running from browser  
 Description: logger mode, available logger modes:
 
 * 0 - No logger
@@ -256,11 +256,11 @@ Description: logger mode, available logger modes:
 * 4 - Call callable provided in `$settings['logger']['logger_param']`. logger_param must accept two parameters: array $message, int $level
 
 ### `$settings['logger']['param']`
-Default: `''`
+Default: `__DIR__.'/Madeline.log'`  
 Description: optional logger parameter, for modes that require it
 
 ### `$settings['logger']['logger_level']`
-Default: `\danog\MadelineProto\Logger::VERBOSE`
+Default: `\danog\MadelineProto\Logger::VERBOSE`  
 Description: What logger messages to show
 
 ### `$settings['logger']['rollbar_token']`
@@ -272,15 +272,15 @@ Description: You can provide a token for the rollbar log management system
 Max try settings
 
 ### `$settings['max_tries']['query']`
-Default: 5
+Default: 5  
 Description: How many times should I try to call a method or send an object before throwing an exception?
 
 ### `$settings['max_tries']['query']`
-Default: 5
+Default: 5  
 Description: How many times should I try to generate an authorizatio key before throwing an exception?
 
 ### `$settings['max_tries']['response']`
-Default: 5
+Default: 5  
 Description: How many times should I try to get a response to a query before throwing an exception?
 
 ## `$settings['flood_timeout']`
@@ -288,15 +288,24 @@ Description: How many times should I try to get a response to a query before thr
 Flood timeout settings
 
 ### `$settings['flood_timeout']['wait_if_lt']`
-Default: 20
+Default: 20  
 Description: Sleeps if a `FLOOD_WAIT_` error is received with duration lower than this value
+
+
+## `$settings['secret_chats']`
+
+Secret chat settings
+
+### `$settings['secret_chats']['accept_chats']`
+Default: `true`  
+Description: Can be true to accept all secret chats, false to not accept any secret chat, or an array of user IDs from which to accepts secret chats
 
 ## `$settings['upload']`
 
 Upload settings
 
 ### `$settings['upload']['allow_automatic_uploads']`
-Default: true
+Default: `true`  
 Description: If false, [disables automatic upload from file path in constructors](FILES.md)
 
 ## `$settings['msg_array_limit']`
@@ -304,15 +313,15 @@ Description: If false, [disables automatic upload from file path in constructors
 How big should be the arrays containing the incoming and outgoing messages?
 
 ### `$settings['msg_array_limit']['incoming']`
-Default: 200
+Default: 200  
 Description: maximum number of allowed MTProto messages in the incoming message array
 
 ### `$settings['msg_array_limit']['outgoing']`
-Default: 200
+Default: 200  
 Description: maximum number of allowed MTProto messages in the outgoing message array
 
 ### `$settings['msg_array_limit']['call_queue']`
-Default: 200
+Default: 200  
 Description: maximum number of allowed MTProto messages in any [call queue](USING_METHOD.md#call-queues)
 
 ## `$settings['peer']`
@@ -320,15 +329,15 @@ Description: maximum number of allowed MTProto messages in any [call queue](USIN
 Peer caching settings
 
 ### `$settings['peer']['full_info_cache_time']`
-Default: 3600
+Default: 3600  
 Description: Cache validity of full peer info (obtained with [get_full_info](CHAT_INFO.md#get_full_info)) 
 
 ### `$settings['peer']['full_fetch']`
-Default: false
+Default: false  
 Description: Should madeline fetch the full member list of every group it meets?
 
 ### `$settings['peer']['cache_all_peers_on_startup']`
-Default: false
+Default: false  
 Description: Should madeline fetch the full chat list on startup?
 
 
@@ -337,7 +346,7 @@ Description: Should madeline fetch the full chat list on startup?
 Flood timeout settings
 
 ### `$settings['requests']['gzip_encode_if_gt']`
-Default: 500
+Default: 500  
 Description: Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
 
 
@@ -346,19 +355,19 @@ Description: Should I try using gzip encoding for requests bigger than N bytes? 
 Update handling settings
 
 ### `$settings['updates']['handle_updates']`
-Default: false
+Default: false  
 Description: Should I handle updates?
 
 ### `$settings['updates']['handle_old_updates']`
-Default: true
+Default: true  
 Description: Should I handle old updates on startup?
 
 ### `$settings['updates']['getdifference_interval']`
-Default: -1
+Default: -1  
 Description: If positive and bigger than zero, no requests will be sent to the socket to request updates in N seconds, passive update listening will be used instead
 
 ### `$settings['updates']['calback']`
-Default: `'get_updates_update_handler'`
+Default: `'get_updates_update_handler'`  
 Description: A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter.  
 
 ## `$settings['serialization']`
@@ -366,7 +375,7 @@ Description: A callable function that will be called every time an update is rec
 Serialization settings
 
 ### `$settings['serialization']['serialization_interval']`
-Default: 30
+Default: 30  
 Description: Serialization will be made automatically every N seconds
 
 
