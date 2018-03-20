@@ -18,7 +18,7 @@ Use [`request_secret_chat`] requests a secret secret chat to the [InputUser](htt
 
 ## Accepting secret chats
 
-Secret chats are accepted or refused automatically, based on a value in the [settings](SETTINGS.md) (by default MadelineProto is set to accept all secret chats).
+Secret chats are accepted or refused automatically, based on a value in the [settings](SETTINGS.md#settingssecret_chatsaccept_chats) (by default MadelineProto is set to accept all secret chats).
 
 Before sending any message, you must check if the secret chat was accepted by the other client with the following method:
 
