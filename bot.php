@@ -27,6 +27,10 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
 
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
+    public function onAny($update)
+    {
+        \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);
+    }
     public function onUpdateNewChannelMessage($update)
     {
         $this->onUpdateNewMessage($update);

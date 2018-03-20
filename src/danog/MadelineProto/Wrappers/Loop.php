@@ -23,6 +23,17 @@ trait Loop
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             return true;
         }
+        if (php_sapi_name() !== "cli") {
+            try {
+                set_time_limit(-1);
+            } catch (\danog\MadelineProto\Exception $e) {
+                register_shutdown_function(function() {
+                    \danog\MadelineProto\Logger::log(['Restarting script...']);
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n"."Host: ".$_SERVER['SERVER_NAME']."\r\n\r\n");
+                });
+            }
+        }
         \danog\MadelineProto\Logger::log("Started update loop", \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
         if ($max_forks === -1) {

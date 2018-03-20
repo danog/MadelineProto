@@ -3,9 +3,12 @@
 Update handling can be done in different ways: 
 
 * [Event driven](#event-handler)
+  * [Event driven multithreaded](#multithreaded-event-handler)
 * [Webhook](#webhook)
+  * [Webhook multithreaded](#multithreaded-webhook)
 * [Long polling (getupdates)](#getupdates)
-* [callback](#callback)
+* [Callback](#callback)
+  * [Callback multithreaded](#multithreaded-callback)
 
 IMPORTANT: Note that you should turn off update handling if you don't plan to use it because the default get_updates update handling stores updates in an array inside the MadelineProto object, without deleting old ones unless they are read using get_updates.  
 ```
@@ -17,6 +20,10 @@ $MadelineProto->settings['updates']['handle_updates'] = false;
 ```
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
+    public function onAny($update)
+    {
+        \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);
+    }
     public function onUpdateNewChannelMessage($update)
     {
         $this->onUpdateNewMessage($update);
@@ -64,15 +71,64 @@ $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
 ```
 
-This will create an event 
+This will create an event handler class `EventHandler`, create a MadelineProto session, and set the event handler class to our newly created event handler.
 
-When an update is received, if the `handle_updates` [setting](SETTINGS.md) is equal to true, the update callback function passed in the `callback` [setting](SETTINGS.md) is called.
+When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, the corresponding `onUpdateType` event handler method is called. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/types/Update.html). 
+If such a method does not exist, the `onAny` event handler method is called.  
+If the `onAny` event handler method does not exist, the update is ignored.
 
-The callback function accepts one parameter with an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html) object.
+To access the `$MadelineProto` instance inside of the event handler, simply access `$this`:
+```
+$this->messages->sendMessage(['peer' => '@danogentili', 'message' => 'hi']);
+```
 
-To force internal update fetching, the `get_updates_difference` function (or any other MadelineProto function) should be called.
+If you intend to use your own constructor in the event handler, make sure to call the parent construtor with the only parameter provided to your constructor.
 
-For greater stability, long polling is recommended instead of callbacks.
+The update handling loop is started by the `$MadelineProto->loop()` method, and it will automatically restart the script if execution time runs out.
+
+## Event driven multithreaded
+
+To enable multithreaded update handling, pass `-1` to the `$MadelineProto->loop` method:
+```
+$MadelineProto->loop(-1);
+```
+
+This way, each update will be managed in its own fork.  
+Note that multiprocessing is not the same as multithreading, and should be avoided unless lengthy operations are made in the update handler.
+
+
+## Webhook
+```
+$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+
+try {
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+} catch (\danog\MadelineProto\Exception $e) {
+    \danog\MadelineProto\Logger::log($e->getMessage());
+    unlink('bot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+}
+$MadelineProto->start();
+$MadelineProto->setWebhook('http://mybot.eu.org/madelinehook.php');
+$MadelineProto->loop();
+```
+
+When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, a POST request is made to the provided webhook URL, with json-encoded payload containing the Update. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/types/Update.html).  
+The webhook can also respond with a JSON payload containing the name of a method to call and the arguments:
+```
+{"method":"messages->sendMessage", "peer":"@danogentili", "message":"hi"}
+```
+
+The loop method will automatically restart the script if execution time runs out.
+
+## Event driven multithreaded
+
+To enable multithreaded update handling, pass `-1` to the `$MadelineProto->loop` method:
+```
+$MadelineProto->loop(-1);
+```
+
+This way, each update could be managed faster.
 
 
 ## Long polling
@@ -107,4 +163,34 @@ The get_updates function accepts an array of options as the first parameter, and
 
 
 
-This will eventually fill up the RAM of your server if you don't disable updates or read them using get_updates.  
+## Callback
+
+```
+$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+
+try {
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+} catch (\danog\MadelineProto\Exception $e) {
+    \danog\MadelineProto\Logger::log($e->getMessage());
+    unlink('bot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+}
+$MadelineProto->start();
+$MadelineProto->setCallback(function ($update) use ($MadelineProto) { \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']); });
+$MadelineProto->loop();
+```
+When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, the provided callback function is called.
+
+The update handling loop is started by the `$MadelineProto->loop()` method, and it will automatically restart the script if execution time runs out.
+
+## Callback multithreaded
+
+To enable multithreaded update handling, pass `-1` to the `$MadelineProto->loop` method:
+```
+$MadelineProto->loop(-1);
+```
+
+This way, each update will be managed in its own fork.  
+Note that multiprocessing is not the same as multithreading, and should be avoided unless lengthy operations are made in the update handler.
+
+
