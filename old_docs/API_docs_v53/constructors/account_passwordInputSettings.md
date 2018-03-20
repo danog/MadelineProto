@@ -1,20 +1,22 @@
 ---
 title: account.passwordInputSettings
-description: account_passwordInputSettings attributes, type and example
+description: 2FA password settings
 ---
 ## Constructor: account.passwordInputSettings  
 [Back to constructors index](index.md)
 
 
 
+2FA password settings
+
 ### Attributes:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|new\_salt|[bytes](../types/bytes.md) | Optional|
-|new\_password\_hash|[bytes](../types/bytes.md) | Optional|
-|hint|[string](../types/string.md) | Optional|
-|email|[string](../types/string.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|new\_salt|[bytes](../types/bytes.md) | Optional|`$new_salt = $MadelineProto->account->getPassword()['new_salt'].$MadelineProto->random(8);`|
+|new\_password\_hash|[bytes](../types/bytes.md) | Optional|`hash('sha256', $new_salt.$new_password.$new_salt, true)`|
+|hint|[string](../types/string.md) | Optional||
+|email|[string](../types/string.md) | Optional||
 
 
 
