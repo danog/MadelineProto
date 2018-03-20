@@ -36,6 +36,7 @@ try {
 }
 
 $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
+echo 'OK, done!'.PHP_EOL;
 ```
 
 Run this code in a browser or in a console.  
