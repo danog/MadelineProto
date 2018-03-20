@@ -1,6 +1,6 @@
 # Requirements
 
-MadelineProto requires the `xml`, `gmp` extensions to function properly.
+MadelineProto requires the `xml`, `gmp`, `curl` extensions to function properly.
 
 To install MadelineProto dependencies on `Ubuntu`, `Debian`, `Devuan`, or any other `Debian-based` distro, run the following command in your command line:
 

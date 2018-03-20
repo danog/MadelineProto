@@ -29,6 +29,13 @@ $MadelineProto->start();
 
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
 $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+
+try {
+    $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
+} catch (\danog\MadelineProto\RPCErrorException $e) {
+}
+
+$MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
 ```
 
 Run this code in a browser or in a console.  
@@ -66,6 +73,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [List of exception types](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#list-of-exception-types)
   * [Pretty TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#pretty-tl-trace)
   * [Getting the TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#getting-the-tl-trace)
+* [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html)
 * [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
@@ -116,6 +124,10 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Sending secret messages](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#sending-secret-messages)
 * [Lua binding](https://docs.madelineproto.xyz/docs/LUA.html)
 * [Using a proxy](https://docs.madelineproto.xyz/docs/PROXY.html)
+* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html)
+  * [Translation](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#translation)
+  * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#contribution-guide)
+  * [Credits](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#credits)
 
 
 ## Very complex and complete examples

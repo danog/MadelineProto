@@ -122,6 +122,10 @@ trait AuthKeyHandler
 
                                 if (!$pq->equals($p->multiply($q))) {
                                     \danog\MadelineProto\Logger::log('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
+                                    if (!extension_loaded('xml')) {
+                                        throw new Exception(['extension', 'curl']);
+                                    }
+
                                     $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::wolfram_single($pq->__toString()));
                                     if (!$p->equals($this->zero)) {
                                         $q = $pq->divide($p)[0];

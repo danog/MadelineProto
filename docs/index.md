@@ -33,9 +33,19 @@ $MadelineProto->start();
 
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
 $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+
+try {
+    $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
+} catch (\danog\MadelineProto\RPCErrorException $e) {
+}
+
+$MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
 ```
 
-Run this code in a browser or in a console.
+Run this code in a browser or in a console.  
+
+
+Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `Madeline.log` file that was created in the same directory (if running from a browser).  
 
 ## Documentation
 
