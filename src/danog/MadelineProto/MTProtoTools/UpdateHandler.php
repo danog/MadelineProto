@@ -70,7 +70,7 @@ trait UpdateHandler
     public function get_updates($params = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
-            return;
+            $this->settings['updates']['handle_updates'] = true;
         }
         array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
@@ -108,11 +108,7 @@ trait UpdateHandler
             $this->connect_to_all_dcs();
         }
         $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
-        foreach ($default_params as $key => $default) {
-            if (!isset($params[$key])) {
-                $params[$key] = $default;
-            }
-        }
+        $params = array_merge($default_params, $params);
         $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
         usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
         if (empty($this->updates)) {
@@ -628,7 +624,7 @@ trait UpdateHandler
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
         } else {
-            in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
+            $this->get_updates_update_handler($update);
         }
     }
 
@@ -653,7 +649,7 @@ trait UpdateHandler
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
                 curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
             } else {
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             }
         }
         $result = curl_exec($ch);

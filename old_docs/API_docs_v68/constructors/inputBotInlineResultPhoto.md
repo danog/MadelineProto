@@ -13,7 +13,7 @@ description: inputBotInlineResultPhoto attributes, type and example
 |----------|---------------|----------|
 |id|[string](../types/string.md) | Yes|
 |type|[string](../types/string.md) | Yes|
-|photo|[InputPhoto](../types/InputPhoto.md) | Optional|
+|photo|[MessageMedia, Message, Update or InputPhoto](../types/InputPhoto.md) | Optional|
 |send\_message|[InputBotInlineMessage](../types/InputBotInlineMessage.md) | Yes|
 
 

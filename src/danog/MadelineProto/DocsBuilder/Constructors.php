@@ -79,6 +79,13 @@ trait Constructors
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
+            if (!isset($this->td_descriptions['constructors'][$data['predicate']])) {
+                $this->add_to_lang('object_'.$data['predicate']);
+                if (\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']] !== '') {
+                    $this->td_descriptions['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
+                }
+            }
+
             if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
                 $table = '### Attributes:
 
@@ -99,6 +106,10 @@ trait Constructors
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
                 }
+                if ($type === 'DecryptedMessageMedia' && in_array($param['name'], ['key', 'iv'])) {
+                    unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
+                    continue;
+                }
                 $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
                 //$type_or_bare_type = 'types';
                 /*if (isset($param['subtype'])) {
@@ -118,7 +129,33 @@ trait Constructors
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+                $human_ptype = $ptype;
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
+                }
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
+                }
+                if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Message ID or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
+                }
+                if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedFile'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
+                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
+
+                if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
+                    $this->add_to_lang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
+                    if (isset($this->td_descriptions['constructors'][$data['predicate']]['description'])) {
+                        $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
+                    }
+                }
                 if (isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }
@@ -126,7 +163,7 @@ trait Constructors
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
                 $params .= ", '".$param['name']."' => ";
-                $params .= isset($param['subtype']) ? '['.$pptype.']' : $pptype;
+                $params .= isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype;
                 $lua_params .= ', '.$param['name'].'=';
                 $lua_params .= isset($param['subtype']) ? '{'.$pptype.'}' : $pptype;
                 $pwr_params .= ', "'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype);

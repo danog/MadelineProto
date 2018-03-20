@@ -1,17 +1,19 @@
 ---
 title: account.getTmpPassword
-description: account.getTmpPassword parameters, return type and example
+description: Get temporary password for buying products through bots
 ---
 ## Method: account.getTmpPassword  
 [Back to methods index](index.md)
 
 
+Get temporary password for buying products through bots
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|password\_hash|[bytes](../types/bytes.md) | Yes|
-|period|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|password\_hash|[bytes](../types/bytes.md) | Yes|The password hash|
+|period|[int](../types/int.md) | Yes|The validity period|
 
 
 ### Return type: [account\_TmpPassword](../types/account_TmpPassword.md)
@@ -31,13 +33,18 @@ description: account.getTmpPassword parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $account_TmpPassword = $MadelineProto->account->getTmpPassword(['password_hash' => 'bytes', 'period' => int, ]);
 ```

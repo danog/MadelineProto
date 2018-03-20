@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Searches for the specified query in the first name, last name and username among members of the specified chat. Requires administrator rights in broadcast channels
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

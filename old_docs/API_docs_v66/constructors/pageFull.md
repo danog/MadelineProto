@@ -23,7 +23,7 @@ description: pageFull attributes, type and example
 ### Example:
 
 ```
-$pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock], 'photos' => [Photo], 'videos' => [Document]];
+$pageFull = ['_' => 'pageFull', 'blocks' => [PageBlock, PageBlock], 'photos' => [Photo, Photo], 'videos' => [Document, Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -7,14 +7,19 @@ description: constructors and methods of type User
 
 
 
+You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
+
 The following syntaxes can also be used:
 
 ```
 $User = '@username'; // Username
 
+$User = 'me'; // The currently logged-in user
+
 $User = 44700; // bot API id (users)
 $User = -492772765; // bot API id (chats)
 $User = -10038575794; // bot API id (channels)
+
 $User = 'https://t.me/danogentili'; // t.me URLs
 $User = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 

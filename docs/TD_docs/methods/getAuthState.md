@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns current authorization state, offline request
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

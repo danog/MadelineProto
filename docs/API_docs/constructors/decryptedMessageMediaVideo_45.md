@@ -19,8 +19,6 @@ description: decryptedMessageMediaVideo attributes, type and example
 |w|[int](../types/int.md) | Yes|
 |h|[int](../types/int.md) | Yes|
 |size|[int](../types/int.md) | Yes|
-|key|[bytes](../types/bytes.md) | Yes|
-|iv|[bytes](../types/bytes.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 
 
@@ -31,13 +29,13 @@ description: decryptedMessageMediaVideo attributes, type and example
 ### Example:
 
 ```
-$decryptedMessageMediaVideo_45 = ['_' => 'decryptedMessageMediaVideo', 'thumb' => 'bytes', 'thumb_w' => int, 'thumb_h' => int, 'duration' => int, 'mime_type' => 'string', 'w' => int, 'h' => int, 'size' => int, 'key' => 'bytes', 'iv' => 'bytes', 'caption' => 'string'];
+$decryptedMessageMediaVideo_45 = ['_' => 'decryptedMessageMediaVideo', 'thumb' => 'bytes', 'thumb_w' => int, 'thumb_h' => int, 'duration' => int, 'mime_type' => 'string', 'w' => int, 'h' => int, 'size' => int, 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
 
 ```
-{"_": "decryptedMessageMediaVideo", "thumb": "bytes", "thumb_w": int, "thumb_h": int, "duration": int, "mime_type": "string", "w": int, "h": int, "size": int, "key": "bytes", "iv": "bytes", "caption": "string"}
+{"_": "decryptedMessageMediaVideo", "thumb": "bytes", "thumb_w": int, "thumb_h": int, "duration": int, "mime_type": "string", "w": int, "h": int, "size": int, "caption": "string"}
 ```
 
 
@@ -45,7 +43,7 @@ Or, if you're into Lua:
 
 
 ```
-decryptedMessageMediaVideo_45={_='decryptedMessageMediaVideo', thumb='bytes', thumb_w=int, thumb_h=int, duration=int, mime_type='string', w=int, h=int, size=int, key='bytes', iv='bytes', caption='string'}
+decryptedMessageMediaVideo_45={_='decryptedMessageMediaVideo', thumb='bytes', thumb_w=int, thumb_h=int, duration=int, mime_type='string', w=int, h=int, size=int, caption='string'}
 
 ```
 

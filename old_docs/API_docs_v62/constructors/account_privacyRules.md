@@ -22,7 +22,7 @@ description: account_privacyRules attributes, type and example
 ### Example:
 
 ```
-$account_privacyRules = ['_' => 'account.privacyRules', 'rules' => [PrivacyRule], 'users' => [User]];
+$account_privacyRules = ['_' => 'account.privacyRules', 'rules' => [PrivacyRule, PrivacyRule], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

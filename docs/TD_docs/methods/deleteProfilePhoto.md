@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Deletes profile photo. If something changes, updateUser will be sent
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

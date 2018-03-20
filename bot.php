@@ -12,51 +12,67 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
-require 'vendor/autoload.php';
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
+/**
+ * Various ways to load MadelineProto
+ */
+if (!file_exists(__DIR__.'/vendor/autoload.php')) {
+    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    }
+    include 'madeline.php';
+} else {
+    require_once 'vendor/autoload.php';
+}
+
+class EventHandler extends \danog\MadelineProto\EventHandler
+{
+    public function onAny($update)
+    {
+        \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);
+    }
+    public function onUpdateNewChannelMessage($update)
+    {
+        $this->onUpdateNewMessage($update);
+    }
+    public function onUpdateNewMessage($update)
+    {
+        if (isset($update['message']['out']) && $update['message']['out']) {
+            return;
+        }
+        $res = json_encode($update, JSON_PRETTY_PRINT);
+        if ($res == '') {
+            $res = var_export($update, true);
+        }
+
+        try {
+            $this->messages->sendMessage(['peer' => $update, 'message' => $res, 'reply_to_msg_id' => $update['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            $this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+        }
+
+        try {
+            if (isset($update['message']['media']) && ($update['message']['media']['_'] == 'messageMediaPhoto' || $update['message']['media']['_'] == 'messageMediaDocument')) {
+                $time = microtime(true);
+                $file = $this->download_to_dir($update, '/tmp');
+                $this->messages->sendMessage(['peer' => $update, 'message' => 'Downloaded to '.$file.' in '.(microtime(true) - $time).' seconds', 'reply_to_msg_id' => $update['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            }
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            $this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+        }
+    }
+}
+
+
+$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e'], 'updates' => ['handle_updates' => true]]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
 
 try {
     $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 } catch (\danog\MadelineProto\Exception $e) {
     \danog\MadelineProto\Logger::log($e->getMessage());
-    $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
-    \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
+    unlink('bot.madeline');
+    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 }
-$MadelineProto->session = 'bot.madeline';
-$offset = 0;
-
-while (true) {
-    $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-    \danog\MadelineProto\Logger::log($updates);
-    foreach ($updates as $update) {
-        $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-        switch ($update['update']['_']) {
-            case 'updateNewMessage':
-            case 'updateNewChannelMessage':
-                if (isset($update['update']['message']['out']) && $update['update']['message']['out']) {
-                    continue;
-                }
-                $res = json_encode($update, JSON_PRETTY_PRINT);
-                if ($res == '') {
-                    $res = var_export($update, true);
-                }
-
-                try {
-                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['_'] === 'updateNewMessage' ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
-                }
-
-                try {
-                    if (isset($update['update']['message']['media']) && ($update['update']['message']['media']['_'] == 'messageMediaPhoto' || $update['update']['message']['media']['_'] == 'messageMediaDocument')) {
-                        $time = microtime(true);
-                        $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
-                        $MadelineProto->messages->sendMessage(['peer' => isset($update['update']['message']['from_id']) ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => 'Downloaded to '.$file.' in '.(microtime(true) - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
-                    }
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
-                }
-        }
-    }
-}
+$MadelineProto->start();
+$MadelineProto->setEventHandler('\EventHandler');
+$MadelineProto->loop();

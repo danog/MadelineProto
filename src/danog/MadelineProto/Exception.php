@@ -25,6 +25,21 @@ class Exception extends \Exception
 
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
+        if (is_array($message) && $message[0] === 'extension') {
+            if ($message[1] === 'libtgvoip') {
+                $additional = 'Follow the instructions @ https://voip.madelineproto.xyz to install it.';
+            } elseif ($message[1] === 'prime') {
+                $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
+            } else {
+                $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$message[1].'.';
+            }
+            $message = 'MadelineProto requires the '.$message[1].' extension to run. '.$additional;
+            if (php_sapi_name() !== 'cli') {
+                echo $message.'<br>';
+            }
+            $file = 'MadelineProto';
+            $line = 1;
+        }
         $this->prettify_tl();
         if ($file !== null) {
             if (basename($file) === 'Threaded.php') {

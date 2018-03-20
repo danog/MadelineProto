@@ -22,7 +22,7 @@ description: messages_stickers attributes, type and example
 ### Example:
 
 ```
-$messages_stickers = ['_' => 'messages.stickers', 'hash' => 'string', 'stickers' => [Document]];
+$messages_stickers = ['_' => 'messages.stickers', 'hash' => 'string', 'stickers' => [Document, Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -24,7 +24,7 @@ description: messages_messagesSlice attributes, type and example
 ### Example:
 
 ```
-$messages_messagesSlice = ['_' => 'messages.messagesSlice', 'count' => int, 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
+$messages_messagesSlice = ['_' => 'messages.messagesSlice', 'count' => int, 'messages' => [Message, Message], 'chats' => [Chat, Chat], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

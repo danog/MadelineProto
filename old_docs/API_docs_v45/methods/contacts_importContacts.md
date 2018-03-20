@@ -1,17 +1,19 @@
 ---
 title: contacts.importContacts
-description: contacts.importContacts parameters, return type and example
+description: Add phone number as contact
 ---
 ## Method: contacts.importContacts  
 [Back to methods index](index.md)
 
 
+Add phone number as contact
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|contacts|Array of [InputContact](../types/InputContact.md) | Yes|
-|replace|[Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|contacts|Array of [InputContact](../types/InputContact.md) | Yes|The numbers to import|
+|replace|[Bool](../types/Bool.md) | Yes||
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)
@@ -23,15 +25,20 @@ description: contacts.importContacts parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
 
-$contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact], 'replace' => Bool, ]);
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
+
+$contacts_ImportedContacts = $MadelineProto->contacts->importContacts(['contacts' => [InputContact, InputContact], 'replace' => Bool, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

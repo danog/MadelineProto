@@ -21,7 +21,7 @@ description: cdnConfig attributes, type and example
 ### Example:
 
 ```
-$cdnConfig = ['_' => 'cdnConfig', 'public_keys' => [CdnPublicKey]];
+$cdnConfig = ['_' => 'cdnConfig', 'public_keys' => [CdnPublicKey, CdnPublicKey]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

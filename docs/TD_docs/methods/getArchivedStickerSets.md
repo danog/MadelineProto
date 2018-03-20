@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns list of archived sticker sets
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

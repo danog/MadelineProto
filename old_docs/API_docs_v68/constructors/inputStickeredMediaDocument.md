@@ -11,7 +11,7 @@ description: inputStickeredMediaDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputDocument](../types/InputDocument.md) | Optional|
+|id|[MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 
 
 

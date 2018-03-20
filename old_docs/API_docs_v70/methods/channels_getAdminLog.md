@@ -10,10 +10,10 @@ description: channels.getAdminLog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|channel|[InputChannel](../types/InputChannel.md) | Optional|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |q|[string](../types/string.md) | Yes|
 |events\_filter|[ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
-|admins|Array of [InputUser](../types/InputUser.md) | Optional|
+|admins|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |max\_id|[long](../types/long.md) | Yes|
 |min\_id|[long](../types/long.md) | Yes|
 |limit|[int](../types/int.md) | Yes|
@@ -37,15 +37,20 @@ description: channels.getAdminLog parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
 
-$channels_AdminLogResults = $MadelineProto->channels->getAdminLog(['channel' => InputChannel, 'q' => 'string', 'events_filter' => ChannelAdminLogEventsFilter, 'admins' => [InputUser], 'max_id' => long, 'min_id' => long, 'limit' => int, ]);
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
+
+$channels_AdminLogResults = $MadelineProto->channels->getAdminLog(['channel' => InputChannel, 'q' => 'string', 'events_filter' => ChannelAdminLogEventsFilter, 'admins' => [InputUser, InputUser], 'max_id' => long, 'min_id' => long, 'limit' => int, ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

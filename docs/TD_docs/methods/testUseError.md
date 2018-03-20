@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Test request. Does nothing, ensures that the Error object is used
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

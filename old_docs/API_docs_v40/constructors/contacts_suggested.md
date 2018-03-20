@@ -22,7 +22,7 @@ description: contacts_suggested attributes, type and example
 ### Example:
 
 ```
-$contacts_suggested = ['_' => 'contacts.suggested', 'results' => [ContactSuggested], 'users' => [User]];
+$contacts_suggested = ['_' => 'contacts.suggested', 'results' => [ContactSuggested, ContactSuggested], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -4,6 +4,9 @@ description: get_self parameters, return type and example
 ---
 ## Method: get_self  
 
+Gets info about the currently logged-in user.
+
+No parameters
 
 ### Return type: [User object](API_docs/types/User.md)
 
@@ -12,18 +15,7 @@ description: get_self parameters, return type and example
 
 ```
 $MadelineProto = new \danog\MadelineProto\API();
-if (isset($token)) {
-    $this->bot_login($token);
-}
-if (isset($number)) {
-    $sentCode = $MadelineProto->phone_login($number);
-    echo 'Enter the code you received: ';
-    $code = '';
-    for ($x = 0; $x < $sentCode['type']['length']; $x++) {
-        $code .= fgetc(STDIN);
-    }
-    $MadelineProto->complete_phone_login($code);
-}
+$MadelineProto->start();
 
 $User = $MadelineProto->get_self();
 ```

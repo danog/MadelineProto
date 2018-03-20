@@ -60,9 +60,9 @@ trait BotAPI
                 } elseif (isset($button['callback_game'])) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonGame';
                     $newrows[$key]['buttons'][$button_key]['text'] = $button['callback_game'];
-                } elseif (isset($button['request_contact'])) {
+                } elseif (isset($button['request_contact']) && $button['request_contact']) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestPhone';
-                } elseif (isset($button['request_location'])) {
+                } elseif (isset($button['request_location']) && $button['request_location']) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestGeoLocation';
                 }
                 $button_key++;

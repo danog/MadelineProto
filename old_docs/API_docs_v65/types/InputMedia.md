@@ -7,6 +7,8 @@ description: constructors and methods of type InputMedia
 
 
 
+You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md), [Photo](Photo.md), [InputDocument](InputDocument.md), [InputPhoto](InputPhoto.md) here, MadelineProto will automatically convert it to the right type.
+
 ### Possible values (constructors):
 
 [inputMediaEmpty](../constructors/inputMediaEmpty.md)  

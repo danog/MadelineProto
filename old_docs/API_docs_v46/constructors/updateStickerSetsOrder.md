@@ -21,7 +21,7 @@ description: updateStickerSetsOrder attributes, type and example
 ### Example:
 
 ```
-$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'order' => [long]];
+$updateStickerSetsOrder = ['_' => 'updateStickerSetsOrder', 'order' => [long, long]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

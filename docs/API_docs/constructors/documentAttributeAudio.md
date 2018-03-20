@@ -12,7 +12,7 @@ description: documentAttributeAudio attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |voice|[Bool](../types/Bool.md) | Optional|
-|duration|[int](../types/int.md) | Yes|
+|duration|[int](../types/int.md) | Optional|
 |title|[string](../types/string.md) | Optional|
 |performer|[string](../types/string.md) | Optional|
 |waveform|[bytes](../types/bytes.md) | Optional|

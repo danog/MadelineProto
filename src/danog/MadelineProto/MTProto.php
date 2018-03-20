@@ -43,17 +43,24 @@ class MTProto
     use \danog\MadelineProto\Tools;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
+    use \danog\MadelineProto\Wrappers\Events;
+    use \danog\MadelineProto\Wrappers\Webhook;
+    use \danog\MadelineProto\Wrappers\Callback;
     use \danog\MadelineProto\Wrappers\Login;
+    use \danog\MadelineProto\Wrappers\Loop;
+    use \danog\MadelineProto\Wrappers\Start;
+    use \danog\MadelineProto\Wrappers\Templates;
+
     /*
         const V = 71;
     */
-    const V = 96;
+    const V = 97;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
     const WAITING_PASSWORD = 2;
     const LOGGED_IN = 3;
-    const DISALLOWED_METHODS = ['auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://daniil.it/MadelineProto for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://daniil.it/MadelineProto for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://daniil.it/MadelineProto for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://daniil.it/MadelineProto for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://daniil.it/MadelineProto for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://daniil.it/MadelineProto for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://daniil.it/MadelineProto#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://daniil.it/MadelineProto for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://daniil.it/MadelineProto for more info'];
+    const DISALLOWED_METHODS = ['auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)','auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
     const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container.'];
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
     const REQUESTED = 0;
@@ -108,6 +115,9 @@ class MTProto
         if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
+        if (!extension_loaded('xml')) {
+            throw new Exception(['extension', 'xml']);
+        }
         $this->emojis = json_decode(self::JSON_EMOJIS);
         \danog\MadelineProto\Logger::class_exists();
         // Connect to servers
@@ -161,7 +171,7 @@ class MTProto
 
     public function __sleep()
     {
-        return ['encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc', 'twozerotwosixone', 'zeroeight'];
+        return ['event_handler', 'event_handler_instance', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'twoe1984', 'twoe2047', 'twoe2048', 'zero', 'one', 'two', 'three', 'four', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'emojis', 'authorized_dc', 'twozerotwosixone', 'zeroeight'];
     }
 
     public function __wakeup()
@@ -178,6 +188,9 @@ class MTProto
         }
         if (!defined('\\phpseclib\\Crypt\\AES::MODE_IGE')) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
+        }
+        if (!extension_loaded('xml')) {
+            throw new Exception(['extension', 'xml']);
         }
         $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
@@ -265,7 +278,7 @@ class MTProto
                     $connection['proxy_extra'] = [];
                 }
                 if (!isset($connection['pfs'])) {
-                    $connection['pfs'] = true;
+                    $connection['pfs'] = extension_loaded('gmp');
                 }
             }
             if (!isset($settings['authorization']['rsa_key'])) {
@@ -321,6 +334,13 @@ class MTProto
     {
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
+        }
+    }
+
+    public function serialize()
+    {
+        if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session)) {
+            $this->wrapper->serialize($this->wrapper->session);
         }
     }
 
@@ -427,7 +447,7 @@ class MTProto
                 // The proxy class to use
                 'proxy_extra' => [],
                 // Extra parameters to pass to the proxy class using setExtra
-                'pfs' => true,
+                'pfs' => extension_loaded('gmp'),
             ],
         ], 'app_info' => [
             // obtained in https://my.telegram.org
@@ -466,10 +486,9 @@ class MTProto
              * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
              *     $message is an array containing the messages the log, $level, is the logging level
              */
-            'logger' => 1,
             // write to
-            'logger_param' => '/tmp/MadelineProto.log',
-            'logger'       => 3,
+            'logger_param' => getcwd().'/MadelineProto.log',
+            'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
@@ -492,7 +511,7 @@ class MTProto
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
         ], 'requests' => ['gzip_encode_if_gt' => 500], 'updates' => [
-            'handle_updates' => true,
+            'handle_updates' => false,
             // Should I handle updates?
             'handle_old_updates' => true,
             // Should I handle old updates on startup?
@@ -503,6 +522,8 @@ class MTProto
             'allow_threading' => false,
             // Should I use threading, if it is enabled?
             'handler_workers' => 10,
+        ], 'upload' => [
+            'allow_automatic_upload' => true
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
@@ -546,6 +567,7 @@ class MTProto
                 break;
         }
         $this->settings = $settings;
+        if (!$this->settings['updates']['handle_updates']) $this->updates = [];
         // Setup logger
         $this->setup_logger();
     }
@@ -643,7 +665,8 @@ class MTProto
             $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['config_updated'], $this->config, Logger::NOTICE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
+        \danog\MadelineProto\Logger::log($this->config, Logger::NOTICE);
     }
 
     public function parse_dc_options($dc_options)
@@ -681,6 +704,7 @@ class MTProto
         try {
             $this->authorization = ['user' => $this->method_call('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc])[0]];
         } catch (RPCErrorException $e) {
+            \danog\MadelineProto\Logger::log($e->getMessage());
             return false;
         }
 

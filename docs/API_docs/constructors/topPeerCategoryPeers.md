@@ -23,7 +23,7 @@ description: topPeerCategoryPeers attributes, type and example
 ### Example:
 
 ```
-$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer]];
+$topPeerCategoryPeers = ['_' => 'topPeerCategoryPeers', 'category' => TopPeerCategory, 'count' => int, 'peers' => [TopPeer, TopPeer]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

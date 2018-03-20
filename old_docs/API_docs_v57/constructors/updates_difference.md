@@ -26,7 +26,7 @@ description: updates_difference attributes, type and example
 ### Example:
 
 ```
-$updates_difference = ['_' => 'updates.difference', 'new_messages' => [Message], 'new_encrypted_messages' => [EncryptedMessage], 'other_updates' => [Update], 'chats' => [Chat], 'users' => [User], 'state' => updates_State];
+$updates_difference = ['_' => 'updates.difference', 'new_messages' => [Message, Message], 'new_encrypted_messages' => [EncryptedMessage, EncryptedMessage], 'other_updates' => [Update, Update], 'chats' => [Chat, Chat], 'users' => [User, User], 'state' => updates_State];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -10,7 +10,7 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 |geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 |crop|[InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
@@ -35,13 +35,18 @@ description: photos.uploadProfilePhoto parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $photos_Photo = $MadelineProto->photos->uploadProfilePhoto(['file' => InputFile, 'caption' => 'string', 'geo_point' => InputGeoPoint, 'crop' => InputPhotoCrop, ]);
 ```

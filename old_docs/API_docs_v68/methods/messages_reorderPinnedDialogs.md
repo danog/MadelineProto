@@ -11,7 +11,7 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |force|[Bool](../types/Bool.md) | Optional|
-|order|Array of [InputPeer](../types/InputPeer.md) | Yes|
+|order|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -30,15 +30,20 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
 
-$Bool = $MadelineProto->messages->reorderPinnedDialogs(['force' => Bool, 'order' => [InputPeer], ]);
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
+
+$Bool = $MadelineProto->messages->reorderPinnedDialogs(['force' => Bool, 'order' => [InputPeer, InputPeer], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

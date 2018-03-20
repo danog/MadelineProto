@@ -1,17 +1,19 @@
 ---
 title: invokeAfterMsg
-description: invokeAfterMsg parameters, return type and example
+description: Invokes a query after successfull completion of one of the previous queries.
 ---
 ## Method: invokeAfterMsg  
 [Back to methods index](index.md)
 
 
+Invokes a query after successfull completion of one of the previous queries.
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_id|[long](../types/long.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_id|[long](../types/long.md) | Yes|Message identifier on which a current query depends|
+|query|[!X](../types/!X.md) | Yes|The query itself|
 
 
 ### Return type: [X](../types/X.md)
@@ -23,16 +25,18 @@ description: invokeAfterMsg parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
-}
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $X = $MadelineProto->invokeAfterMsg(['msg_id' => long, 'query' => !X, ]);
 ```

@@ -1,16 +1,18 @@
 ---
 title: account.deleteAccount
-description: account.deleteAccount parameters, return type and example
+description: Delete this account
 ---
 ## Method: account.deleteAccount  
 [Back to methods index](index.md)
 
 
+Delete this account
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|reason|[string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|reason|[string](../types/string.md) | Yes|Why are you going away? :(|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -22,13 +24,18 @@ description: account.deleteAccount parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $Bool = $MadelineProto->account->deleteAccount(['reason' => 'string', ]);
 ```

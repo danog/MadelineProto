@@ -11,9 +11,9 @@ description: inputMediaUploadedPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
-|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+|stickers|Array of [MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 
 
 
@@ -23,7 +23,7 @@ description: inputMediaUploadedPhoto attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => 'string', 'stickers' => [InputDocument]];
+$inputMediaUploadedPhoto = ['_' => 'inputMediaUploadedPhoto', 'file' => InputFile, 'caption' => 'string', 'stickers' => [InputDocument, InputDocument]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

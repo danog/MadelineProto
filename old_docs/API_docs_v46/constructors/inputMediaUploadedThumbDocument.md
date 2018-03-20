@@ -11,9 +11,9 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|file|[InputFile](../types/InputFile.md) | Yes|
-|thumb|[InputFile](../types/InputFile.md) | Yes|
-|mime\_type|[string](../types/string.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
+|thumb|[File path or InputFile](../types/InputFile.md) | Yes|
+|mime\_type|[string](../types/string.md) | Optional|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
 
@@ -25,7 +25,7 @@ description: inputMediaUploadedThumbDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute], 'caption' => 'string'];
+$inputMediaUploadedThumbDocument = ['_' => 'inputMediaUploadedThumbDocument', 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute, DocumentAttribute], 'caption' => 'string'];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

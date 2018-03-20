@@ -32,9 +32,7 @@ class Serialization
 
     public static function realpaths($file)
     {
-        if (($file[0] !== '/') && ($file[1] !== ':')) {
-            $file = getcwd().'/'.$file;
-        }
+        $file = Absolute::absolute($file);
 
         return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
     }

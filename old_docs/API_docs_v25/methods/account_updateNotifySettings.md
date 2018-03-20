@@ -1,17 +1,19 @@
 ---
 title: account.updateNotifySettings
-description: account.updateNotifySettings parameters, return type and example
+description: Change notification settings
 ---
 ## Method: account.updateNotifySettings  
 [Back to methods index](index.md)
 
 
+Change notification settings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|
-|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
+|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -30,13 +32,18 @@ description: account.updateNotifySettings parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $Bool = $MadelineProto->account->updateNotifySettings(['peer' => InputNotifyPeer, 'settings' => InputPeerNotifySettings, ]);
 ```

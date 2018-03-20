@@ -11,7 +11,7 @@ YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
 Returns stickers from installed ordinary sticker sets corresponding to the given emoji. If emoji is not empty, elso favorite and recently used stickers may be returned
 
-### Params:
+### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|

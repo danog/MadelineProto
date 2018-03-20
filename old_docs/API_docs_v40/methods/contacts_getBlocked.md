@@ -1,17 +1,19 @@
 ---
 title: contacts.getBlocked
-description: contacts.getBlocked parameters, return type and example
+description: Get blocked users
 ---
 ## Method: contacts.getBlocked  
 [Back to methods index](index.md)
 
 
+Get blocked users
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offset|[int](../types/int.md) | Yes|Initially 0, then set to the number of blocked contacts previously fetched|
+|limit|[int](../types/int.md) | Yes|How many blocked contacts to fetch|
 
 
 ### Return type: [contacts\_Blocked](../types/contacts_Blocked.md)
@@ -23,13 +25,18 @@ description: contacts.getBlocked parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $contacts_Blocked = $MadelineProto->contacts->getBlocked(['offset' => int, 'limit' => int, ]);
 ```

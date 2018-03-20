@@ -11,7 +11,7 @@ description: inputSingleMedia attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|media|[InputMedia](../types/InputMedia.md) | Optional|
+|media|[MessageMedia, Message, Update or InputMedia](../types/InputMedia.md) | Optional|
 |message|[string](../types/string.md) | Yes|
 |entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
 
@@ -23,7 +23,7 @@ description: inputSingleMedia attributes, type and example
 ### Example:
 
 ```
-$inputSingleMedia = ['_' => 'inputSingleMedia', 'media' => InputMedia, 'message' => 'string', 'entities' => [MessageEntity]];
+$inputSingleMedia = ['_' => 'inputSingleMedia', 'media' => InputMedia, 'message' => 'string', 'entities' => [MessageEntity, MessageEntity]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

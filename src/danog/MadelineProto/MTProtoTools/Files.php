@@ -20,6 +20,11 @@ trait Files
 {
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
+        if (is_object($file) && class_implements($file)['\danog\MadelineProto\FileCallbackInterface']) {
+            $cb = $file;
+            $file = $file->getFile();
+        }
+        $file = \danog\MadelineProto\Absolute::absolute($file);
         if (!file_exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
@@ -67,7 +72,7 @@ trait Files
             $cb(ftell($f) * 100 / $file_size);
         }
         fclose($f);
-        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => hash_final($ctx)];
+        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'md5_checksum' => hash_final($ctx), 'mime_type' => mime_content_type($file)];
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
@@ -82,7 +87,67 @@ trait Files
     {
         return $this->upload($file, $file_name, $cb, true);
     }
+    public function gen_all_file($media) {
+        $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
+        switch ($media['_']) {
+            case 'messageMediaPhoto':
+                if (!isset($media['photo']['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['Photo'] = $media['photo'];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
+                if (isset($media['ttl_seconds'])) {
+                    $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
+                }
+                break;
+            case 'messageMediaDocument':
+                if (!isset($media['document']['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['Document'] = $media['document'];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['photo']['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                if (isset($media['ttl_seconds'])) {
+                    $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
+                }
+                break;
+            case 'document':
+                if (!isset($media['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $media];
+                break;
+            case 'photo':
+                if (!isset($media['access_hash'])) {
+                    throw new \danog\MadelineProto\Exception('No access hash');
+                }
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash']];
+                $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
+                $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
+                break;
+            default:
+                throw new \danog\MadelineProto\Exception('Could not convert media object');
+        }
+        return $res;
 
+    }
+    public function get_file_info($constructor) {
+        if (is_string($constructor)) {
+            $constructor = $this->unpack_file_id($constructor)['MessageMedia'];
+        }
+        switch ($constructor['_']) {
+            case 'updateNewMessage':
+            case 'updateNewChannelMessage':
+            $constructor = $constructor['message'];
+
+            case 'message':
+            $constructor = $constructor['media'];
+        }
+        return $this->gen_all_file($constructor);
+    }
     public function get_download_info($message_media)
     {
         if (is_string($message_media)) {
@@ -93,6 +158,13 @@ trait Files
         }
         $res = [];
         switch ($message_media['_']) {
+            case 'updateNewMessage':
+            case 'updateNewChannelMessage':
+               $message_media = $message_media['message'];
+            case 'message':
+                return $this->get_download_info($message_media['media']);
+            case 'updateNewEncryptedMessage':
+               $message_media = $message_media['message'];
             case 'encryptedMessage':
                 if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
                     return $this->get_download_info($message_media['decrypted_message']['media']);
@@ -222,6 +294,11 @@ trait Files
 
     public function download_to_dir($message_media, $dir, $cb = null)
     {
+        if (is_object($dir) && class_implements($dir)['\danog\MadelineProto\FileCallbackInterface']) {
+            $cb = $dir;
+            $dir = $dir->getFile();
+        }
+
         $message_media = $this->get_download_info($message_media);
 
         return $this->download_to_file($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
@@ -229,7 +306,11 @@ trait Files
 
     public function download_to_file($message_media, $file, $cb = null)
     {
-        $file = preg_replace('|/+|', '/', $file);
+        if (is_object($file) && class_implements($file)['\danog\MadelineProto\FileCallbackInterface']) {
+            $cb = $file;
+            $file = $file->getFile();
+        }
+        $file = \danog\MadelineProto\Absolute::absolute(preg_replace('|/+|', '/', $file));
         if (!file_exists($file)) {
             touch($file);
         }
@@ -252,6 +333,11 @@ trait Files
 
     public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
+        if (is_object($stream) && class_implements($stream)['\danog\MadelineProto\FileCallbackInterface']) {
+            $cb = $stream;
+            $stream = $stream->getFile();
+        }
+
         if ($cb === null) {
             $cb = function ($percent) {
                 \danog\MadelineProto\Logger::log('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);

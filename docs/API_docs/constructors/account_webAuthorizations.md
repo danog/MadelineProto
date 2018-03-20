@@ -22,7 +22,7 @@ description: account_webAuthorizations attributes, type and example
 ### Example:
 
 ```
-$account_webAuthorizations = ['_' => 'account.webAuthorizations', 'authorizations' => [WebAuthorization], 'users' => [User]];
+$account_webAuthorizations = ['_' => 'account.webAuthorizations', 'authorizations' => [WebAuthorization, WebAuthorization], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

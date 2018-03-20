@@ -23,7 +23,7 @@ description: updateReadMessagesContents attributes, type and example
 ### Example:
 
 ```
-$updateReadMessagesContents = ['_' => 'updateReadMessagesContents', 'messages' => [int], 'pts' => int, 'pts_count' => int];
+$updateReadMessagesContents = ['_' => 'updateReadMessagesContents', 'messages' => [int, int], 'pts' => int, 'pts_count' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -7,6 +7,13 @@ description: constructors and methods of type InputEncryptedFile
 
 
 
+The following syntax can also be used:
+
+```
+$InputEncryptedFile = 'filename.mp4'; // The file path can also be used
+```
+
+
 ### Possible values (constructors):
 
 [inputEncryptedFileEmpty](../constructors/inputEncryptedFileEmpty.md)  

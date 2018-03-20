@@ -13,9 +13,9 @@ description: documentAttributeVideo attributes, type and example
 |----------|---------------|----------|
 |round\_message|[Bool](../types/Bool.md) | Optional|
 |supports\_streaming|[Bool](../types/Bool.md) | Optional|
-|duration|[int](../types/int.md) | Yes|
-|w|[int](../types/int.md) | Yes|
-|h|[int](../types/int.md) | Yes|
+|duration|[int](../types/int.md) | Optional|
+|w|[int](../types/int.md) | Optional|
+|h|[int](../types/int.md) | Optional|
 
 
 

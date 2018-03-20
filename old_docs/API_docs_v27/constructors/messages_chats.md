@@ -21,7 +21,7 @@ description: messages_chats attributes, type and example
 ### Example:
 
 ```
-$messages_chats = ['_' => 'messages.chats', 'chats' => [Chat]];
+$messages_chats = ['_' => 'messages.chats', 'chats' => [Chat, Chat]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

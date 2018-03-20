@@ -120,12 +120,19 @@ description: constructors and methods of type '.$type.'
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (!isset($this->settings['td'])) {
                 if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
-                    $header .= 'The following syntaxes can also be used:
+                    $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
+
+The following syntaxes can also be used:
 
 ```
-$'.$type." = '@username'; // Username\n\n\$".$type.' = 44700; // bot API id (users)
+$'.$type." = '@username'; // Username
+
+\$".$type." = 'me'; // The currently logged-in user
+
+\$".$type.' = 44700; // bot API id (users)
 $'.$type.' = -492772765; // bot API id (chats)
 $'.$type.' = -10038575794; // bot API id (channels)
+
 $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 \$".$type." = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 
@@ -137,12 +144,39 @@ $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
+                    $header .= 'You can directly provide the [Update](Update.md) or [EncryptedMessage](EncryptedMessage.md) object here, MadelineProto will automatically extract the destination chat id.
+
+The following syntax can also be used:
+
+```
+$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be positive or negative
+```
+
+
+';
+                }
+                if (in_array($type, ['InputFile', 'InputEncryptedFile'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
-$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be  positive or negative
+$'.$type.' = \'filename.mp4\'; // The file path can also be used
 ```
 
+
+';
+                }
+                if (in_array($type, ['InputPhoto'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Photo](Photo.md) here, MadelineProto will automatically convert it to the right type.
+
+';
+                }
+                if (in_array($type, ['InputDocument'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md) here, MadelineProto will automatically convert it to the right type.
+
+';
+                }
+                if (in_array($type, ['InputMedia'])) {
+                    $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md), [Photo](Photo.md), [InputDocument](InputDocument.md), [InputPhoto](InputPhoto.md) here, MadelineProto will automatically convert it to the right type.
 
 ';
                 }
@@ -197,7 +231,7 @@ You can also access the properties of the constructor as a normal array, for exa
                     $constructors = '';
                     $header .= 'This is an object of type `\\danog\\MadelineProto\\VoIP`.
 
-It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://daniil.it/MadelineProto#calls) for an easy installation script.
+It will only be available if the [php-libtgvoip](https://github.com/danog/php-libtgvoip) extension is installed, see [the main docs](https://docs.madelineproto.xyz#calls) for an easy installation script.
 
 You MUST know [OOP](http://php.net/manual/en/language.oop5.php) to use this class.
 
@@ -271,8 +305,8 @@ Call states (these constants are incrementing integers, thus can be compared lik
 * `getVisualization()` - Gets the visualization of the encryption key, as an array of emojis, can be called only when the call state is bigger than or equal to `CALL_STATE_READY`. If called sooner, returns false.
 * `getStats()` Gets connection stats
 * `getOtherID()` - Gets the id of the other call participant, as a bot API ID
-* `getProtocol()` - Gets the protocol used by the current call, as a [PhoneCallProtocol](https://daniil.it/MadelineProto/API_docs/types/PhoneCallProtocol.html) object
-* `getCallID()` - Gets the call ID, as an [InputPhoneCall](https://daniil.it/MadelineProto/API_docs/types/InputPhoneCall.html) object
+* `getProtocol()` - Gets the protocol used by the current call, as a [PhoneCallProtocol](https://docs.madelineproto.xyz/API_docs/types/PhoneCallProtocol.html) object
+* `getCallID()` - Gets the call ID, as an [InputPhoneCall](https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html) object
 * `isCreator()` - Returns a boolean that indicates whether you are the creator of the call
 * `whenCreated()` - Returns the unix timestamp of when the call was started (when was the call state set to `CALL_STATE_READY`)
 * `getOutputState()` - Returns the state of the audio output module, as an audio state constant
@@ -290,7 +324,7 @@ Call states (these constants are incrementing integers, thus can be compared lik
 
 Accepts two optional parameters:
 
-`$reason` - can be a [PhoneCallDiscardReason](https://daniil.it/MadelineProto/API_docs/types/PhoneCallDiscardReason.html) object (defaults to a [phoneCallDiscardReasonDisconnect](https://daniil.it/MadelineProto/API_docs/constructors/phoneCallDiscardReasonDisconnect.html) object).
+`$reason` - can be a [PhoneCallDiscardReason](https://docs.madelineproto.xyz/API_docs/types/PhoneCallDiscardReason.html) object (defaults to a [phoneCallDiscardReasonDisconnect](https://docs.madelineproto.xyz/API_docs/constructors/phoneCallDiscardReasonDisconnect.html) object).
 
 `$rating` - Can be an array that must contain a rating, and a comment (`["rating" => 5, "comment" => "MadelineProto is very easy to use!"]). Defaults to an empty array.`
 
@@ -537,5 +571,34 @@ description: Any json-encodable data
 Any json-encodable data.
 ');
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
+    }
+    public $template = '<?php
+    /*
+    Copyright 2016-2018 Daniil Gentili
+    (https://daniil.it)
+    This file is part of MadelineProto.
+    MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Affero General Public License for more details.
+    You should have received a copy of the GNU General Public License along with MadelineProto.
+    If not, see <http://www.gnu.org/licenses/>.
+    */
+    
+namespace danog\MadelineProto;
+    
+class Lang
+{
+    public static $lang = %s;
+    
+    // THIS WILL BE OVERWRITTEN BY $lang["en"]
+    public static $current_lang = %s;
+}';
+    
+    public function add_to_lang($key) {
+        if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
+            \danog\MadelineProto\Lang::$lang['en'][$key] = '';
+            file_put_contents(__DIR__.'/Lang.php', sprintf($this->template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+        }
+
     }
 }

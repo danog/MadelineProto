@@ -23,7 +23,7 @@ description: pagePart attributes, type and example
 ### Example:
 
 ```
-$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock], 'photos' => [Photo], 'documents' => [Document]];
+$pagePart = ['_' => 'pagePart', 'blocks' => [PageBlock, PageBlock], 'photos' => [Photo, Photo], 'documents' => [Document, Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

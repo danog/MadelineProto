@@ -10,7 +10,7 @@ description: messages.createChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|users|Array of [InputUser](../types/InputUser.md) | Yes|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
 |title|[string](../types/string.md) | Yes|
 
 
@@ -31,15 +31,20 @@ description: messages.createChat parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
 
-$messages_StatedMessage = $MadelineProto->messages->createChat(['users' => [InputUser], 'title' => 'string', ]);
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
+
+$messages_StatedMessage = $MadelineProto->messages->createChat(['users' => [InputUser, InputUser], 'title' => 'string', ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

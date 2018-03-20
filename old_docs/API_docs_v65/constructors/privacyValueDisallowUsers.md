@@ -21,7 +21,7 @@ description: privacyValueDisallowUsers attributes, type and example
 ### Example:
 
 ```
-$privacyValueDisallowUsers = ['_' => 'privacyValueDisallowUsers', 'users' => [int]];
+$privacyValueDisallowUsers = ['_' => 'privacyValueDisallowUsers', 'users' => [int, int]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

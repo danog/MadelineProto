@@ -23,7 +23,7 @@ description: messages_messages attributes, type and example
 ### Example:
 
 ```
-$messages_messages = ['_' => 'messages.messages', 'messages' => [Message], 'chats' => [Chat], 'users' => [User]];
+$messages_messages = ['_' => 'messages.messages', 'messages' => [Message, Message], 'chats' => [Chat, Chat], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -22,7 +22,7 @@ description: messages_archivedStickers attributes, type and example
 ### Example:
 
 ```
-$messages_archivedStickers = ['_' => 'messages.archivedStickers', 'count' => int, 'sets' => [StickerSetCovered]];
+$messages_archivedStickers = ['_' => 'messages.archivedStickers', 'count' => int, 'sets' => [StickerSetCovered, StickerSetCovered]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

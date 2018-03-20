@@ -1,16 +1,18 @@
 ---
 title: contacts.deleteContacts
-description: contacts.deleteContacts parameters, return type and example
+description: Delete multiple contacts
 ---
 ## Method: contacts.deleteContacts  
 [Back to methods index](index.md)
 
 
+Delete multiple contacts
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [InputUser](../types/InputUser.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The contacts to delete|
 
 
 ### Return type: [Bool](../types/Bool.md)
@@ -30,15 +32,20 @@ description: contacts.deleteContacts parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
 
-$Bool = $MadelineProto->contacts->deleteContacts(['id' => [InputUser], ]);
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
+
+$Bool = $MadelineProto->contacts->deleteContacts(['id' => [InputUser, InputUser], ]);
 ```
 
 Or, if you're using the [PWRTelegram HTTP API](https://pwrtelegram.xyz):

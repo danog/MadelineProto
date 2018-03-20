@@ -22,7 +22,7 @@ description: pageBlockList attributes, type and example
 ### Example:
 
 ```
-$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [RichText]];
+$pageBlockList = ['_' => 'pageBlockList', 'ordered' => Bool, 'items' => [RichText, RichText]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

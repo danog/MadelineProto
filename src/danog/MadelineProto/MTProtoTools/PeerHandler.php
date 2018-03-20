@@ -147,7 +147,7 @@ trait PeerHandler
                         $this->chats[$bot_api_id] = $chat;
 
                         try {
-                            if (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count']) {
+                            if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count'])) {
                                 if ($this->postpone_pwrchat) {
                                     $this->pending_pwrchat[$this->to_supergroup($chat['id'])] = [$this->settings['peer']['full_fetch'], true];
                                 } else {
@@ -255,6 +255,23 @@ trait PeerHandler
                 case 'peerChannel':
                     $id = $this->to_supergroup($id['channel_id']);
                     break;
+                case 'message':
+                    if (!isset($id['from_id']) || $id['to_id']['_'] !== 'peerUser' || $id['to_id']['user_id'] !== $this->authorization['user']['id']) {
+                        return $this->get_info($id['to_id']);
+                    }
+                    $id = $id['from_id'];
+                    break;
+                case 'encryptedMessage':
+                case 'encryptedMessageService':
+                    $id = $id['chat_id'];
+                    if (!isset($this->secret_chats[$id])) {
+                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                    }
+                    return $this->secret_chats[$id];
+                case 'updateNewMessage':
+                case 'updateNewChannelMessage':
+                case 'updateNewEncryptedMessage':
+                    return $this->get_info($id['message']);
                 case 'chatForbidden':
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
@@ -316,6 +333,9 @@ trait PeerHandler
             }
         }
         $id = strtolower(str_replace('@', '', $id));
+        if ($id === 'me') {
+            return $this->get_info($this->authorization['user']['id']);
+        }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
                 return $this->gen_all($chat);
@@ -657,19 +677,11 @@ trait PeerHandler
     {
         return;
         unset($gres['users']);
-        if (\danog\MadelineProto\Logger::$bigint) {
-            $hash = new \phpseclib\Math\BigInteger(0);
-            foreach ($gres['participants'] as $participant) {
-                $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($participant['user_id']))->divide($this->zeroeight)[1];
-            }
-            $gres['hash'] = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
-        } else {
-            $hash = 0;
-            foreach ($gres['participants'] as $participant) {
-                $hash = (($hash * 20261) + 0x80000000 + $participant['user_id']) % 0x80000000;
-            }
-            $gres['hash'] = $hash;
+        $ids = [];
+        foreach ($gres['participants'] as $participant) {
+            $ids[] = $participant['user_id'];
         }
+        $gres['hash'] = $this->gen_vector_hash($ids);
         $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
     }
 

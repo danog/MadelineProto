@@ -201,6 +201,7 @@ trait CallHandler
                         if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv || ($this->datacenter->sockets[$aargs['datacenter']]->last_recv < time() - 1 && $this->is_http($aargs['datacenter']))) {
                             $this->close_and_reopen($aargs['datacenter']);
                         }
+                        $only_updates = false;
                         continue; //2;
                     }
                 }

@@ -28,6 +28,10 @@ $MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.htm
 $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
 
+$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
+
+$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
+
 ***
 <br><br>$MadelineProto->[destroy_session](destroy_session.md)(\['session_id' => [long](../types/long.md), \]) === [$DestroySessionRes](../types/DestroySessionRes.md)<a name="destroy_session"></a>  
 

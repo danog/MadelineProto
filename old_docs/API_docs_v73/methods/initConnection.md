@@ -1,23 +1,25 @@
 ---
 title: initConnection
-description: initConnection parameters, return type and example
+description: Initializes connection and save information on the user's device and application.
 ---
 ## Method: initConnection  
 [Back to methods index](index.md)
 
 
+Initializes connection and save information on the user's device and application.
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|api\_id|[int](../types/int.md) | Yes|
-|device\_model|[string](../types/string.md) | Yes|
-|system\_version|[string](../types/string.md) | Yes|
-|app\_version|[string](../types/string.md) | Yes|
-|system\_lang\_code|[string](../types/string.md) | Yes|
-|lang\_pack|[string](../types/string.md) | Yes|
-|lang\_code|[string](../types/string.md) | Yes|
-|query|[!X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|api\_id|[int](../types/int.md) | Yes|Application identifier|
+|device\_model|[string](../types/string.md) | Yes|Device model|
+|system\_version|[string](../types/string.md) | Yes|System version|
+|app\_version|[string](../types/string.md) | Yes|App version|
+|system\_lang\_code|[string](../types/string.md) | Yes|Language code|
+|lang\_pack|[string](../types/string.md) | Yes|Language pack to use|
+|lang\_code|[string](../types/string.md) | Yes|Language code to set|
+|query|[!X](../types/!X.md) | Yes|Nested query|
 
 
 ### Return type: [X](../types/X.md)
@@ -37,16 +39,18 @@ description: initConnection parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
-}
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $X = $MadelineProto->initConnection(['api_id' => int, 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'system_lang_code' => 'string', 'lang_pack' => 'string', 'lang_code' => 'string', 'query' => !X, ]);
 ```

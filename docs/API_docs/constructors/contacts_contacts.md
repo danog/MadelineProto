@@ -23,7 +23,7 @@ description: contacts_contacts attributes, type and example
 ### Example:
 
 ```
-$contacts_contacts = ['_' => 'contacts.contacts', 'contacts' => [Contact], 'saved_count' => int, 'users' => [User]];
+$contacts_contacts = ['_' => 'contacts.contacts', 'contacts' => [Contact, Contact], 'saved_count' => int, 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

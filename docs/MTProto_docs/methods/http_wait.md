@@ -1,18 +1,20 @@
 ---
 title: http_wait
-description: http_wait parameters, return type and example
+description: Makes the server send messages waiting in the buffer
 ---
 ## Method: http\_wait  
 [Back to methods index](index.md)
 
 
+Makes the server send messages waiting in the buffer
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|max\_delay|[int](../types/int.md) | Yes|
-|wait\_after|[int](../types/int.md) | Yes|
-|max\_wait|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|max\_delay|[int](../types/int.md) | Yes|Denotes the maximum number of milliseconds that has elapsed between the first message for this session and the transmission of an HTTP response|
+|wait\_after|[int](../types/int.md) | Yes|after the receipt of the latest message for a particular session, the server waits another wait_after milliseconds in case there are more messages. If there are no additional messages, the result is transmitted (a container with all the messages).|
+|max\_wait|[int](../types/int.md) | Yes|If more messages appear, the wait_after timer is reset.|
 
 
 ### Return type: [HttpWait](../types/HttpWait.md)
@@ -24,16 +26,18 @@ description: http_wait parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
-}
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $HttpWait = $MadelineProto->http_wait(['max_delay' => int, 'wait_after' => int, 'max_wait' => int, ]);
 ```

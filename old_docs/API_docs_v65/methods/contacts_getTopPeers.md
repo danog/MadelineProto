@@ -1,23 +1,25 @@
 ---
 title: contacts.getTopPeers
-description: contacts.getTopPeers parameters, return type and example
+description: Get most used chats
 ---
 ## Method: contacts.getTopPeers  
 [Back to methods index](index.md)
 
 
+Get most used chats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|correspondents|[Bool](../types/Bool.md) | Optional|
-|bots\_pm|[Bool](../types/Bool.md) | Optional|
-|bots\_inline|[Bool](../types/Bool.md) | Optional|
-|groups|[Bool](../types/Bool.md) | Optional|
-|channels|[Bool](../types/Bool.md) | Optional|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
-|hash|[int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|correspondents|[Bool](../types/Bool.md) | Optional||
+|bots\_pm|[Bool](../types/Bool.md) | Optional||
+|bots\_inline|[Bool](../types/Bool.md) | Optional||
+|groups|[Bool](../types/Bool.md) | Optional||
+|channels|[Bool](../types/Bool.md) | Optional||
+|offset|[int](../types/int.md) | Yes||
+|limit|[int](../types/int.md) | Yes||
+|hash|[int](../types/int.md) | Yes||
 
 
 ### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
@@ -36,13 +38,18 @@ description: contacts.getTopPeers parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $contacts_TopPeers = $MadelineProto->contacts->getTopPeers(['correspondents' => Bool, 'bots_pm' => Bool, 'bots_inline' => Bool, 'groups' => Bool, 'channels' => Bool, 'offset' => int, 'limit' => int, 'hash' => int, ]);
 ```

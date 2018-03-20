@@ -7,14 +7,19 @@ description: constructors and methods of type Peer
 
 
 
+You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
+
 The following syntaxes can also be used:
 
 ```
 $Peer = '@username'; // Username
 
+$Peer = 'me'; // The currently logged-in user
+
 $Peer = 44700; // bot API id (users)
 $Peer = -492772765; // bot API id (chats)
 $Peer = -10038575794; // bot API id (channels)
+
 $Peer = 'https://t.me/danogentili'; // t.me URLs
 $Peer = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 

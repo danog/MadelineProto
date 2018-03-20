@@ -22,7 +22,7 @@ description: messages_chatsSlice attributes, type and example
 ### Example:
 
 ```
-$messages_chatsSlice = ['_' => 'messages.chatsSlice', 'count' => int, 'chats' => [Chat]];
+$messages_chatsSlice = ['_' => 'messages.chatsSlice', 'count' => int, 'chats' => [Chat, Chat]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

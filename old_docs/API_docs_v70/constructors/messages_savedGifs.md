@@ -22,7 +22,7 @@ description: messages_savedGifs attributes, type and example
 ### Example:
 
 ```
-$messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Document]];
+$messages_savedGifs = ['_' => 'messages.savedGifs', 'hash' => int, 'gifs' => [Document, Document]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

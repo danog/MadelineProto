@@ -21,7 +21,7 @@ description: replyInlineMarkup attributes, type and example
 ### Example:
 
 ```
-$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [KeyboardButtonRow]];
+$replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [KeyboardButtonRow, KeyboardButtonRow]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

@@ -11,7 +11,7 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|users|Array of [InputUser](../types/InputUser.md) | Yes|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
 
 
 
@@ -21,7 +21,7 @@ description: inputPrivacyValueAllowUsers attributes, type and example
 ### Example:
 
 ```
-$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser]];
+$inputPrivacyValueAllowUsers = ['_' => 'inputPrivacyValueAllowUsers', 'users' => [InputUser, InputUser]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

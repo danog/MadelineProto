@@ -22,7 +22,7 @@ description: messages_highScores attributes, type and example
 ### Example:
 
 ```
-$messages_highScores = ['_' => 'messages.highScores', 'scores' => [HighScore], 'users' => [User]];
+$messages_highScores = ['_' => 'messages.highScores', 'scores' => [HighScore, HighScore], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

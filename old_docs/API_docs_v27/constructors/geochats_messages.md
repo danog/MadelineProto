@@ -23,7 +23,7 @@ description: geochats_messages attributes, type and example
 ### Example:
 
 ```
-$geochats_messages = ['_' => 'geochats.messages', 'messages' => [GeoChatMessage], 'chats' => [Chat], 'users' => [User]];
+$geochats_messages = ['_' => 'geochats.messages', 'messages' => [GeoChatMessage, GeoChatMessage], 'chats' => [Chat, Chat], 'users' => [User, User]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

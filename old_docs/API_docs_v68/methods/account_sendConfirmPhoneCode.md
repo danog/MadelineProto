@@ -1,18 +1,20 @@
 ---
 title: account.sendConfirmPhoneCode
-description: account.sendConfirmPhoneCode parameters, return type and example
+description: Send confirmation phone code
 ---
 ## Method: account.sendConfirmPhoneCode  
 [Back to methods index](index.md)
 
 
+Send confirmation phone code
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|allow\_flashcall|[Bool](../types/Bool.md) | Optional|
-|hash|[string](../types/string.md) | Yes|
-|current\_number|[Bool](../types/Bool.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|allow\_flashcall|[Bool](../types/Bool.md) | Optional|Can telegram call you instead of sending an SMS?|
+|hash|[string](../types/string.md) | Yes|The hash|
+|current\_number|[Bool](../types/Bool.md) | Optional|The current phone number|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
@@ -31,13 +33,18 @@ description: account.sendConfirmPhoneCode parameters, return type and example
 
 
 ```
-$MadelineProto = new \danog\MadelineProto\API();
-$MadelineProto->session = 'mySession.madeline';
-if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline('Enter the code you received: '); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
+include 'madeline.php';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = '';
+
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto->start();
 
 $auth_SentCode = $MadelineProto->account->sendConfirmPhoneCode(['allow_flashcall' => Bool, 'hash' => 'string', 'current_number' => Bool, ]);
 ```

@@ -25,7 +25,7 @@ description: messages_peerDialogs attributes, type and example
 ### Example:
 
 ```
-$messages_peerDialogs = ['_' => 'messages.peerDialogs', 'dialogs' => [Dialog], 'messages' => [Message], 'chats' => [Chat], 'users' => [User], 'state' => updates_State];
+$messages_peerDialogs = ['_' => 'messages.peerDialogs', 'dialogs' => [Dialog, Dialog], 'messages' => [Message, Message], 'chats' => [Chat, Chat], 'users' => [User, User], 'state' => updates_State];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

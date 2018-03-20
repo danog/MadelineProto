@@ -22,7 +22,7 @@ description: messages_foundGifs attributes, type and example
 ### Example:
 
 ```
-$messages_foundGifs = ['_' => 'messages.foundGifs', 'next_offset' => int, 'results' => [FoundGif]];
+$messages_foundGifs = ['_' => 'messages.foundGifs', 'next_offset' => int, 'results' => [FoundGif, FoundGif]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

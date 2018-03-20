@@ -7,14 +7,19 @@ description: constructors and methods of type InputChannel
 
 
 
+You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
+
 The following syntaxes can also be used:
 
 ```
 $InputChannel = '@username'; // Username
 
+$InputChannel = 'me'; // The currently logged-in user
+
 $InputChannel = 44700; // bot API id (users)
 $InputChannel = -492772765; // bot API id (chats)
 $InputChannel = -10038575794; // bot API id (channels)
+
 $InputChannel = 'https://t.me/danogentili'; // t.me URLs
 $InputChannel = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
 

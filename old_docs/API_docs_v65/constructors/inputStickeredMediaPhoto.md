@@ -11,7 +11,7 @@ description: inputStickeredMediaPhoto attributes, type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputPhoto](../types/InputPhoto.md) | Optional|
+|id|[MessageMedia, Message, Update or InputPhoto](../types/InputPhoto.md) | Optional|
 
 
 

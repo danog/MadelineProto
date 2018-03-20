@@ -21,7 +21,7 @@ description: msg_container attributes, type and example
 ### Example:
 
 ```
-$msg_container = ['_' => 'msg_container', 'messages' => [MTmessage]];
+$msg_container = ['_' => 'msg_container', 'messages' => [MTmessage, MTmessage]];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

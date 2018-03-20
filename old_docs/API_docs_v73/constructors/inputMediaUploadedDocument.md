@@ -12,12 +12,12 @@ description: inputMediaUploadedDocument attributes, type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |nosound\_video|[Bool](../types/Bool.md) | Optional|
-|file|[InputFile](../types/InputFile.md) | Yes|
-|thumb|[InputFile](../types/InputFile.md) | Optional|
-|mime\_type|[string](../types/string.md) | Yes|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|
+|thumb|[File path or InputFile](../types/InputFile.md) | Optional|
+|mime\_type|[string](../types/string.md) | Optional|
 |attributes|Array of [DocumentAttribute](../types/DocumentAttribute.md) | Yes|
 |caption|[string](../types/string.md) | Yes|
-|stickers|Array of [InputDocument](../types/InputDocument.md) | Optional|
+|stickers|Array of [MessageMedia, Message, Update or InputDocument](../types/InputDocument.md) | Optional|
 |ttl\_seconds|[int](../types/int.md) | Optional|
 
 
@@ -28,7 +28,7 @@ description: inputMediaUploadedDocument attributes, type and example
 ### Example:
 
 ```
-$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'nosound_video' => Bool, 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute], 'caption' => 'string', 'stickers' => [InputDocument], 'ttl_seconds' => int];
+$inputMediaUploadedDocument = ['_' => 'inputMediaUploadedDocument', 'nosound_video' => Bool, 'file' => InputFile, 'thumb' => InputFile, 'mime_type' => 'string', 'attributes' => [DocumentAttribute, DocumentAttribute], 'caption' => 'string', 'stickers' => [InputDocument, InputDocument], 'ttl_seconds' => int];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:

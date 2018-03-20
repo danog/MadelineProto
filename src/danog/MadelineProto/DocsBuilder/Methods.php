@@ -71,8 +71,15 @@ trait Methods
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
+            if (!isset($this->td_descriptions['methods'][$data['method']])) {
+                $this->add_to_lang('method_'.$data['method']);
+                
+                if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
+                    $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
+                }
+            }
             if (isset($this->td_descriptions['methods'][$data['method']])) {
-                $table = '### Params:
+                $table = '### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
@@ -98,8 +105,34 @@ trait Methods
                     case 'false':
                         $ptype = 'Bool';
                 }
+                $human_ptype = $ptype;
+                if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
+                }
+                if (in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'MessageMedia, Update, Message or '.$ptype;
+                }
+                if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Message ID or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
+                }
+                if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
+                if (in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
+                    $human_ptype = 'File path or '.$ptype;
+                }
                 $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+                if (!isset($this->td_descriptions['methods'][$data['method']]['params'][$param['name']])) {
+                    $this->add_to_lang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
+                    if (isset($this->td_descriptions['methods'][$data['method']]['description'])) {
+                        $this->td_descriptions['methods'][$data['method']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']];
+                    }
+                }
+                
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
                     $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }
@@ -107,7 +140,7 @@ trait Methods
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
                 $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
                 $params .= "'".$param['name']."' => ";
-                $params .= (isset($param['subtype']) ? '['.$pptype.']' : $pptype).', ';
+                $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
                 $json_params .= '"'.$param['name'].'": '.(isset($param['subtype']) ? '['.$ppptype.']' : $ppptype).', ';
                 $pwr_params .= $param['name'].' - Json encoded '.(isset($param['subtype']) ? ' array of '.$ptype : $ptype)."\n\n";
                 $lua_params .= $param['name'].'=';
@@ -175,16 +208,18 @@ description: '.$description.'
 
 
 ```
-$MadelineProto = new \\danog\\MadelineProto\\API();
-$MadelineProto->session = \'mySession.madeline\';
-'.($bot ? 'if (isset($token)) { // Login as a bot
-    $MadelineProto->bot_login($token);
+if (!file_exists(\'madeline.php\')) {
+    copy(\'https://phar.madelineproto.xyz/madeline.php\', \'madeline.php\');
 }
-' : '').'if (isset($number)) { // Login as a user
-    $MadelineProto->phone_login($number);
-    $code = readline(\'Enter the code you received: \'); // Or do this in two separate steps in an HTTP API
-    $MadelineProto->complete_phone_login($code);
-}
+include \'madeline.php\';
+
+// !!! This API id/API hash combination will not work !!!
+// !!! You must get your own @ my.telegram.org !!!
+$api_id = 0;
+$api_hash = \'\';
+
+$MadelineProto = new \danog\MadelineProto\API(\'session.madeline\', [\'app_info\' => [\'api_id\' => $api_id, \'api_hash\' => $api_hash]]);
+$MadelineProto->start();
 
 $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 ```
@@ -312,6 +347,10 @@ $MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.htm
 
 $MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
 
+
+$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
+
+$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
 
 '.implode('', $this->docs_methods));
     }

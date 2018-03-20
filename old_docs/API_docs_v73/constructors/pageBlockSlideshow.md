@@ -22,7 +22,7 @@ description: pageBlockSlideshow attributes, type and example
 ### Example:
 
 ```
-$pageBlockSlideshow = ['_' => 'pageBlockSlideshow', 'items' => [PageBlock], 'caption' => RichText];
+$pageBlockSlideshow = ['_' => 'pageBlockSlideshow', 'items' => [PageBlock, PageBlock], 'caption' => RichText];
 ```  
 
 [PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
