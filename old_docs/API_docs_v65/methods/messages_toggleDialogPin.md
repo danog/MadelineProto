@@ -10,7 +10,7 @@ description: messages.toggleDialogPin parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|pinned|[Bool](../types/Bool.md) | Optional|
+|pinned|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 

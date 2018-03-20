@@ -15,9 +15,9 @@ Sends call rating
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|call\_id|[int](../types/int.md) | Yes|Call identifier|
-|rating|[int](../types/int.md) | Yes|Call rating, 1-5|
-|comment|[string](../types/string.md) | Yes|Optional user comment if rating is less than 5|
+|call\_id|[CLICK ME int](../types/int.md) | Yes|Call identifier|
+|rating|[CLICK ME int](../types/int.md) | Yes|Call rating, 1-5|
+|comment|[CLICK ME string](../types/string.md) | Yes|Optional user comment if rating is less than 5|
 
 
 ### Return type: [Ok](../types/Ok.md)

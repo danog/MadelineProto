@@ -10,7 +10,7 @@ description: invokeWithLayer18 parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|query|[!X](../types/!X.md) | Yes|
+|query|[CLICK ME !X](../types/!X.md) | Yes|
 
 
 ### Return type: [X](../types/X.md)

@@ -11,7 +11,7 @@ description: messages.faveSticker parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unfave|[Bool](../types/Bool.md) | Yes|
+|unfave|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

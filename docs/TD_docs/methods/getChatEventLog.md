@@ -15,12 +15,12 @@ Returns list of service actions taken by chat members and administrators in the 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|query|[string](../types/string.md) | Yes|Search query to filter events|
-|from\_event\_id|[int64](../constructors/int64.md) | Yes|Identifier of an event from which to return result, you can use 0 to get results from the latest events|
-|limit|[int](../types/int.md) | Yes|Maximum number of events to return, can't be greater than 100|
-|filters|[chatEventLogFilters](../constructors/chatEventLogFilters.md) | Yes|Types of events to return, defaults to all|
-|user\_ids|Array of [int](../types/int.md) | Yes|User identifiers, which events to return, defaults to all users|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|query|[CLICK ME string](../types/string.md) | Yes|Search query to filter events|
+|from\_event\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of an event from which to return result, you can use 0 to get results from the latest events|
+|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of events to return, can't be greater than 100|
+|filters|[CLICK ME chatEventLogFilters](../constructors/chatEventLogFilters.md) | Yes|Types of events to return, defaults to all|
+|user\_ids|Array of [CLICK ME int](../types/int.md) | Yes|User identifiers, which events to return, defaults to all users|
 
 
 ### Return type: [ChatEvents](../types/ChatEvents.md)

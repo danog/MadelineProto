@@ -11,7 +11,7 @@ description: messages.getMessageEditData parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[int](../types/int.md) | Yes|
+|id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_MessageEditData](../types/messages_MessageEditData.md)

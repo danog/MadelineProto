@@ -10,7 +10,7 @@ description: messages.uninstallStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

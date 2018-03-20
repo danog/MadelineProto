@@ -15,7 +15,7 @@ Deletes channel along with all messages in corresponding chat. Releases channel 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
+|channel\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the channel|
 
 
 ### Return type: [Ok](../types/Ok.md)

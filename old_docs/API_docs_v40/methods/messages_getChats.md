@@ -10,7 +10,7 @@ description: messages.getChats parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [InputChat](../types/InputChat.md) | Yes|
+|id|Array of [CLICK ME InputChat](../types/InputChat.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

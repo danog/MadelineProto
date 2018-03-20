@@ -10,7 +10,7 @@ description: messages.importChatInvite parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|hash|[string](../types/string.md) | Yes|
+|hash|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

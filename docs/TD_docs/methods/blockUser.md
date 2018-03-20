@@ -15,7 +15,7 @@ Adds user to black list
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[int](../types/int.md) | Yes|User identifier|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)

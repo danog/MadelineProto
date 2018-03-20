@@ -10,9 +10,9 @@ description: messages.setBotCallbackAnswer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|alert|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Yes|
-|message|[string](../types/string.md) | Optional|
+|alert|[CLICK ME Bool](../types/Bool.md) | Optional|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

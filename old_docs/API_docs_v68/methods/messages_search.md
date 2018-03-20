@@ -11,14 +11,14 @@ description: messages.search parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|q|[string](../types/string.md) | Yes|
+|q|[CLICK ME string](../types/string.md) | Yes|
 |from\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
-|min\_date|[int](../types/int.md) | Yes|
-|max\_date|[int](../types/int.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
-|max\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|
+|min\_date|[CLICK ME int](../types/int.md) | Yes|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

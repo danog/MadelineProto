@@ -15,7 +15,7 @@ Bots only. Deletes a sticker from the set it belongs to. Sticker set should be c
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker|[InputFile](../types/InputFile.md) | Yes|The sticker|
+|sticker|[CLICK ME InputFile](../types/InputFile.md) | Yes|The sticker|
 
 
 ### Return type: [Ok](../types/Ok.md)

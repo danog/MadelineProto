@@ -12,7 +12,7 @@ Check if this username is available
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|username|[string](../types/string.md) | Yes|The username to check|
+|username|[CLICK ME string](../types/string.md) | Yes|The username to check|
 
 
 ### Return type: [Bool](../types/Bool.md)

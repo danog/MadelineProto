@@ -10,8 +10,8 @@ description: stickers.addStickerToSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
-|sticker|[InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
+|sticker|[CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

@@ -105,7 +105,7 @@ trait Methods
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $human_ptype = $ptype;
+                $human_ptype = 'CLICK ME '.$ptype;
                 if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }

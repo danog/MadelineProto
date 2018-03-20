@@ -15,8 +15,8 @@ Bots only. Edits reply markup of an inline message sent via bot
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|inline\_message\_id|[string](../types/string.md) | Yes|Inline message identifier|
-|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup|
+|inline\_message\_id|[CLICK ME string](../types/string.md) | Yes|Inline message identifier|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup|
 
 
 ### Return type: [Ok](../types/Ok.md)

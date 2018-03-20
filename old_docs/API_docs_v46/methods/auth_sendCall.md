@@ -10,8 +10,8 @@ description: auth.sendCall parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|phone\_number|[string](../types/string.md) | Yes|
-|phone\_code\_hash|[string](../types/string.md) | Yes|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|
+|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

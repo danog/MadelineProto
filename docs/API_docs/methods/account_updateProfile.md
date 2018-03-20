@@ -12,9 +12,9 @@ Update profile info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|first\_name|[string](../types/string.md) | Optional|The first name|
-|last\_name|[string](../types/string.md) | Optional|The last name|
-|about|[string](../types/string.md) | Optional|The bio/about field|
+|first\_name|[CLICK ME string](../types/string.md) | Optional|The first name|
+|last\_name|[CLICK ME string](../types/string.md) | Optional|The last name|
+|about|[CLICK ME string](../types/string.md) | Optional|The bio/about field|
 
 
 ### Return type: [User](../types/User.md)

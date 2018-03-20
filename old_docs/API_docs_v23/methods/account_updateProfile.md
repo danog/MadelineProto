@@ -12,8 +12,8 @@ Update profile info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|first\_name|[string](../types/string.md) | Yes|The first name|
-|last\_name|[string](../types/string.md) | Yes|The last name|
+|first\_name|[CLICK ME string](../types/string.md) | Yes|The first name|
+|last\_name|[CLICK ME string](../types/string.md) | Yes|The last name|
 
 
 ### Return type: [User](../types/User.md)

@@ -10,7 +10,7 @@ description: messages.receivedMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|max\_id|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)

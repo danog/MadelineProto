@@ -15,8 +15,8 @@ Changes chat draft message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|draft\_message|[draftMessage](../constructors/draftMessage.md) | Yes|New draft message, nullable|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|draft\_message|[CLICK ME draftMessage](../constructors/draftMessage.md) | Yes|New draft message, nullable|
 
 
 ### Return type: [Ok](../types/Ok.md)

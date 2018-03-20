@@ -11,7 +11,7 @@ description: channels.editTitle parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|title|[string](../types/string.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

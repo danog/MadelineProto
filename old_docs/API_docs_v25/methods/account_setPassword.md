@@ -10,10 +10,10 @@ description: account.setPassword parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|current\_password\_hash|[bytes](../types/bytes.md) | Yes|
-|new\_salt|[bytes](../types/bytes.md) | Yes|
-|new\_password\_hash|[bytes](../types/bytes.md) | Yes|
-|hint|[string](../types/string.md) | Yes|
+|current\_password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|
+|new\_salt|[CLICK ME bytes](../types/bytes.md) | Yes|
+|new\_password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|
+|hint|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

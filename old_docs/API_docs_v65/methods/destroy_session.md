@@ -12,7 +12,7 @@ Destroy the current MTProto session
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|session\_id|[long](../types/long.md) | Yes|The session to destroy|
+|session\_id|[CLICK ME long](../types/long.md) | Yes|The session to destroy|
 
 
 ### Return type: [DestroySessionRes](../types/DestroySessionRes.md)

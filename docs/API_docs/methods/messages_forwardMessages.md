@@ -10,12 +10,12 @@ description: messages.forwardMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|silent|[Bool](../types/Bool.md) | Optional|
-|background|[Bool](../types/Bool.md) | Optional|
-|with\_my\_score|[Bool](../types/Bool.md) | Optional|
-|grouped|[Bool](../types/Bool.md) | Optional|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|
+|with\_my\_score|[CLICK ME Bool](../types/Bool.md) | Optional|
+|grouped|[CLICK ME Bool](../types/Bool.md) | Optional|
 |from\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 |to\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 

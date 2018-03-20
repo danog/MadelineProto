@@ -10,9 +10,9 @@ description: payments.validateRequestedInfo parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|save|[Bool](../types/Bool.md) | Optional|
-|msg\_id|[int](../types/int.md) | Yes|
-|info|[PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|
+|save|[CLICK ME Bool](../types/Bool.md) | Optional|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+|info|[CLICK ME PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|
 
 
 ### Return type: [payments\_ValidatedRequestedInfo](../types/payments_ValidatedRequestedInfo.md)

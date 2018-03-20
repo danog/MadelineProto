@@ -11,9 +11,9 @@ description: channels.getParticipants parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|filter|[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|filter|[CLICK ME ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)

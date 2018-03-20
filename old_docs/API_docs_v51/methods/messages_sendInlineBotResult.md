@@ -10,13 +10,13 @@ description: messages.sendInlineBotResult parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|broadcast|[Bool](../types/Bool.md) | Optional|
-|silent|[Bool](../types/Bool.md) | Optional|
-|background|[Bool](../types/Bool.md) | Optional|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|query\_id|[long](../types/long.md) | Yes|
-|id|[string](../types/string.md) | Yes|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|id|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

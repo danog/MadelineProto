@@ -10,7 +10,7 @@ description: geochats.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 

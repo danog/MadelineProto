@@ -10,10 +10,10 @@ description: channels.createChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|broadcast|[Bool](../types/Bool.md) | Optional|
-|megagroup|[Bool](../types/Bool.md) | Optional|
-|title|[string](../types/string.md) | Yes|
-|about|[string](../types/string.md) | Yes|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
+|megagroup|[CLICK ME Bool](../types/Bool.md) | Optional|
+|title|[CLICK ME string](../types/string.md) | Yes|
+|about|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

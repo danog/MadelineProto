@@ -10,7 +10,7 @@ description: messages.getFavedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|hash|[int](../types/int.md) | Yes|
+|hash|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_FavedStickers](../types/messages_FavedStickers.md)

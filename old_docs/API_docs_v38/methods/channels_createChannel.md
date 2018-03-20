@@ -10,8 +10,8 @@ description: channels.createChannel parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|title|[string](../types/string.md) | Yes|
-|about|[string](../types/string.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
+|about|[CLICK ME string](../types/string.md) | Yes|
 |users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
 
 

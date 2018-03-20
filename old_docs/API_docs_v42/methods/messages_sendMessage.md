@@ -10,13 +10,13 @@ description: messages.sendMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|no\_webpage|[Bool](../types/Bool.md) | Optional|
-|broadcast|[Bool](../types/Bool.md) | Optional|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|message|[string](../types/string.md) | Yes|
-|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
+|message|[CLICK ME string](../types/string.md) | Yes|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
 
 

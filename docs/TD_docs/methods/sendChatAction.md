@@ -15,8 +15,8 @@ Sends notification about user activity in a chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|action|[ChatAction](../types/ChatAction.md) | Yes|Action description|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|action|[CLICK ME ChatAction](../types/ChatAction.md) | Yes|Action description|
 
 
 ### Return type: [Ok](../types/Ok.md)

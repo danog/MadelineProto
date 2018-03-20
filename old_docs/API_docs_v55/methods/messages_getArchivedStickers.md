@@ -10,8 +10,8 @@ description: messages.getArchivedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|offset\_id|[long](../types/long.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|offset\_id|[CLICK ME long](../types/long.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)

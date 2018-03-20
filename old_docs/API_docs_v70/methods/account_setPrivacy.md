@@ -12,8 +12,8 @@ Set privacy settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting|
-|rules|Array of [InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|Privacy settings|
+|key|[CLICK ME InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting|
+|rules|Array of [CLICK ME InputPrivacyRule](../types/InputPrivacyRule.md) | Yes|Privacy settings|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)

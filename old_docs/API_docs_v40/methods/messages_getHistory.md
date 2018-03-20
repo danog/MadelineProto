@@ -11,10 +11,10 @@ description: messages.getHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|offset|[int](../types/int.md) | Yes|
-|max\_id|[int](../types/int.md) | Yes|
-|min\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
+|min\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

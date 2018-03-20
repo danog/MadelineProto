@@ -15,7 +15,7 @@ Informs that some trending sticker sets are viewed by the user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker\_set\_ids|Array of [int64](../constructors/int64.md) | Yes|Identifiers of viewed trending sticker sets|
+|sticker\_set\_ids|Array of [CLICK ME int64](../constructors/int64.md) | Yes|Identifiers of viewed trending sticker sets|
 
 
 ### Return type: [Ok](../types/Ok.md)

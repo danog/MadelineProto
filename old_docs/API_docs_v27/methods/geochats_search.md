@@ -10,14 +10,14 @@ description: geochats.search parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|q|[string](../types/string.md) | Yes|
-|filter|[MessagesFilter](../types/MessagesFilter.md) | Yes|
-|min\_date|[int](../types/int.md) | Yes|
-|max\_date|[int](../types/int.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
-|max\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+|q|[CLICK ME string](../types/string.md) | Yes|
+|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|
+|min\_date|[CLICK ME int](../types/int.md) | Yes|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

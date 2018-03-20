@@ -12,7 +12,7 @@ Set account TTL
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|Time To Live of account|
+|ttl|[CLICK ME AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|Time To Live of account|
 
 
 ### Return type: [Bool](../types/Bool.md)

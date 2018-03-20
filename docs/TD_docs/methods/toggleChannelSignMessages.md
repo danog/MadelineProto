@@ -15,8 +15,8 @@ Enables or disables sender signature on sent messages in the channel. Needs appr
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
-|sign\_messages|[Bool](../types/Bool.md) | Yes|New value of sign_messages|
+|channel\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the channel|
+|sign\_messages|[CLICK ME Bool](../types/Bool.md) | Yes|New value of sign_messages|
 
 
 ### Return type: [Ok](../types/Ok.md)

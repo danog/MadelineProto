@@ -12,7 +12,7 @@ description: messages.startBot parameters, return type and example
 |----------|---------------|----------|
 |bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|start\_param|[string](../types/string.md) | Yes|
+|start\_param|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

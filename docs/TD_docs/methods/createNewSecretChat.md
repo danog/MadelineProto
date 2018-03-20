@@ -15,7 +15,7 @@ Creates new secret chat, returns created chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[int](../types/int.md) | Yes|Identifier of a user to create secret chat with|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of a user to create secret chat with|
 
 
 ### Return type: [Chat](../types/Chat.md)

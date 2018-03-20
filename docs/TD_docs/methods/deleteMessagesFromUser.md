@@ -15,8 +15,8 @@ Deletes all messages in the chat sent by the specified user. Works only in super
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|user\_id|[int](../types/int.md) | Yes|User identifier|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -11,8 +11,8 @@ description: messages.getCommonChats parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|max\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

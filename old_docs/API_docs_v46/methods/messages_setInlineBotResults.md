@@ -10,12 +10,12 @@ description: messages.setInlineBotResults parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|gallery|[Bool](../types/Bool.md) | Optional|
-|private|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Yes|
-|results|Array of [InputBotInlineResult](../types/InputBotInlineResult.md) | Yes|
-|cache\_time|[int](../types/int.md) | Yes|
-|next\_offset|[string](../types/string.md) | Optional|
+|gallery|[CLICK ME Bool](../types/Bool.md) | Optional|
+|private|[CLICK ME Bool](../types/Bool.md) | Optional|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|results|Array of [CLICK ME InputBotInlineResult](../types/InputBotInlineResult.md) | Yes|
+|cache\_time|[CLICK ME int](../types/int.md) | Yes|
+|next\_offset|[CLICK ME string](../types/string.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

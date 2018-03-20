@@ -10,12 +10,12 @@ description: messages.sendMultiMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|silent|[Bool](../types/Bool.md) | Optional|
-|background|[Bool](../types/Bool.md) | Optional|
-|clear\_draft|[Bool](../types/Bool.md) | Optional|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|
+|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
-|multi\_media|Array of [InputSingleMedia](../types/InputSingleMedia.md) | Yes|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
+|multi\_media|Array of [CLICK ME InputSingleMedia](../types/InputSingleMedia.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

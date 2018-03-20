@@ -10,8 +10,8 @@ description: messages.reorderStickerSets parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|masks|[Bool](../types/Bool.md) | Optional|
-|order|Array of [long](../types/long.md) | Yes|
+|masks|[CLICK ME Bool](../types/Bool.md) | Optional|
+|order|Array of [CLICK ME long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

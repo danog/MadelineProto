@@ -10,8 +10,8 @@ description: messages.getStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|emoticon|[string](../types/string.md) | Yes|
-|hash|[string](../types/string.md) | Yes|
+|emoticon|[CLICK ME string](../types/string.md) | Yes|
+|hash|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_Stickers](../types/messages_Stickers.md)

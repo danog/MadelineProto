@@ -10,7 +10,7 @@ description: messages.getInlineGameHighScores parameters, return type and exampl
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 
 

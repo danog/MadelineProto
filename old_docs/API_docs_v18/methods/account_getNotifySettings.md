@@ -12,7 +12,7 @@ Get notification settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|Notification source |
+|peer|[CLICK ME InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|Notification source |
 
 
 ### Return type: [PeerNotifySettings](../types/PeerNotifySettings.md)

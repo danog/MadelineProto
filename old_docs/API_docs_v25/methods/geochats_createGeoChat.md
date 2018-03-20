@@ -10,10 +10,10 @@ description: geochats.createGeoChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|title|[string](../types/string.md) | Yes|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|address|[string](../types/string.md) | Yes|
-|venue|[string](../types/string.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
+|address|[CLICK ME string](../types/string.md) | Yes|
+|venue|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

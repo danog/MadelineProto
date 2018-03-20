@@ -10,8 +10,8 @@ description: messages.installStickerSet parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|
-|disabled|[Bool](../types/Bool.md) | Yes|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
+|disabled|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

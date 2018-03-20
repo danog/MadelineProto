@@ -10,8 +10,8 @@ description: payments.clearSavedInfo parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|credentials|[Bool](../types/Bool.md) | Optional|
-|info|[Bool](../types/Bool.md) | Optional|
+|credentials|[CLICK ME Bool](../types/Bool.md) | Optional|
+|info|[CLICK ME Bool](../types/Bool.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

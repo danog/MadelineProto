@@ -15,8 +15,8 @@ Returns web page instant view if available. Returns error 404 if web page has no
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|url|[string](../types/string.md) | Yes|Web page URL|
-|force\_full|[Bool](../types/Bool.md) | Yes|If true, full web page instant view will be returned|
+|url|[CLICK ME string](../types/string.md) | Yes|Web page URL|
+|force\_full|[CLICK ME Bool](../types/Bool.md) | Yes|If true, full web page instant view will be returned|
 
 
 ### Return type: [WebPageInstantView](../types/WebPageInstantView.md)

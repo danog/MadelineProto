@@ -12,8 +12,8 @@ Change notification settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
-|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
+|peer|[CLICK ME InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
+|settings|[CLICK ME InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -12,9 +12,9 @@ description: messages.getInlineBotResults parameters, return type and example
 |----------|---------------|----------|
 |bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|query|[string](../types/string.md) | Yes|
-|offset|[string](../types/string.md) | Yes|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
+|query|[CLICK ME string](../types/string.md) | Yes|
+|offset|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_BotResults](../types/messages_BotResults.md)

@@ -15,7 +15,7 @@ Returns list of installed sticker sets
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|is\_masks|[Bool](../types/Bool.md) | Yes|Pass true to return mask sticker sets, pass false to return ordinary sticker sets|
+|is\_masks|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true to return mask sticker sets, pass false to return ordinary sticker sets|
 
 
 ### Return type: [StickerSets](../types/StickerSets.md)

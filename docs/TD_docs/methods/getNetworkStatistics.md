@@ -15,7 +15,7 @@ Returns network data usage statistics. Can be called before authorization
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|only\_current|[Bool](../types/Bool.md) | Yes|If true, returns only data for the current library launch|
+|only\_current|[CLICK ME Bool](../types/Bool.md) | Yes|If true, returns only data for the current library launch|
 
 
 ### Return type: [NetworkStatistics](../types/NetworkStatistics.md)

@@ -11,8 +11,8 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|msg\_id|[int](../types/int.md) | Yes|
-|data|[bytes](../types/bytes.md) | Yes|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+|data|[CLICK ME bytes](../types/bytes.md) | Yes|
 
 
 ### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)

@@ -15,7 +15,7 @@ Test request. Returns squared received number
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|x|[int](../types/int.md) | Yes|Number to square|
+|x|[CLICK ME int](../types/int.md) | Yes|Number to square|
 
 
 ### Return type: [TestInt](../types/TestInt.md)

@@ -12,7 +12,7 @@ description: channels.editBanned parameters, return type and example
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|banned\_rights|[ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|
+|banned\_rights|[CLICK ME ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -11,7 +11,7 @@ description: messages.editChatTitle parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|title|[string](../types/string.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

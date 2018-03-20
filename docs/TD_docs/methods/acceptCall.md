@@ -15,8 +15,8 @@ Accepts incoming call
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|call\_id|[int](../types/int.md) | Yes|Call identifier|
-|protocol|[callProtocol](../constructors/callProtocol.md) | Yes|Description of supported by the client call protocols|
+|call\_id|[CLICK ME int](../types/int.md) | Yes|Call identifier|
+|protocol|[CLICK ME callProtocol](../constructors/callProtocol.md) | Yes|Description of supported by the client call protocols|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -15,7 +15,7 @@ Returns existing chat corresponding to the known secret chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|secret\_chat\_id|[int](../types/int.md) | Yes|SecretChat identifier|
+|secret\_chat\_id|[CLICK ME int](../types/int.md) | Yes|SecretChat identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)

@@ -15,7 +15,7 @@ Returns all mentions, hashtags, bot commands, URLs and emails contained in the t
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|text|[string](../types/string.md) | Yes|Text to find entites in|
+|text|[CLICK ME string](../types/string.md) | Yes|Text to find entites in|
 
 
 ### Return type: [TextEntities](../types/TextEntities.md)

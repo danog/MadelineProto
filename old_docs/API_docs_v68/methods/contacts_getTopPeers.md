@@ -12,15 +12,15 @@ Get most used chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|correspondents|[Bool](../types/Bool.md) | Optional||
-|bots\_pm|[Bool](../types/Bool.md) | Optional||
-|bots\_inline|[Bool](../types/Bool.md) | Optional||
-|phone\_calls|[Bool](../types/Bool.md) | Optional||
-|groups|[Bool](../types/Bool.md) | Optional||
-|channels|[Bool](../types/Bool.md) | Optional||
-|offset|[int](../types/int.md) | Yes||
-|limit|[int](../types/int.md) | Yes||
-|hash|[int](../types/int.md) | Yes||
+|correspondents|[CLICK ME Bool](../types/Bool.md) | Optional||
+|bots\_pm|[CLICK ME Bool](../types/Bool.md) | Optional||
+|bots\_inline|[CLICK ME Bool](../types/Bool.md) | Optional||
+|phone\_calls|[CLICK ME Bool](../types/Bool.md) | Optional||
+|groups|[CLICK ME Bool](../types/Bool.md) | Optional||
+|channels|[CLICK ME Bool](../types/Bool.md) | Optional||
+|offset|[CLICK ME int](../types/int.md) | Yes||
+|limit|[CLICK ME int](../types/int.md) | Yes||
+|hash|[CLICK ME int](../types/int.md) | Yes||
 
 
 ### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)

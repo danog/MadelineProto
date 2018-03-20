@@ -15,8 +15,8 @@ Bots only. Sends custom request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|method|[string](../types/string.md) | Yes|Method name|
-|parameters|[string](../types/string.md) | Yes|JSON-serialized method parameters|
+|method|[CLICK ME string](../types/string.md) | Yes|Method name|
+|parameters|[CLICK ME string](../types/string.md) | Yes|JSON-serialized method parameters|
 
 
 ### Return type: [CustomRequestResult](../types/CustomRequestResult.md)

@@ -11,7 +11,7 @@ description: stickers.changeStickerPosition parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|position|[int](../types/int.md) | Yes|
+|position|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

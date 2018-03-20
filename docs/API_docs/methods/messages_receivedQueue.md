@@ -10,7 +10,7 @@ description: messages.receivedQueue parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|max\_qts|[int](../types/int.md) | Yes|
+|max\_qts|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_long](../types/long.md)

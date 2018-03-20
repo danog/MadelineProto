@@ -11,7 +11,7 @@ description: messages.sendBroadcast parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |contacts|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
-|message|[string](../types/string.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Yes|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 

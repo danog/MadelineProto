@@ -15,7 +15,7 @@ Changes about information of logged in user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|about|[string](../types/string.md) | Yes|New value of userFull.about, 0-70 characters without line feeds|
+|about|[CLICK ME string](../types/string.md) | Yes|New value of userFull.about, 0-70 characters without line feeds|
 
 
 ### Return type: [Ok](../types/Ok.md)

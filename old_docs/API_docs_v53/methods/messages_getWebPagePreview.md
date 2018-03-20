@@ -10,7 +10,7 @@ description: messages.getWebPagePreview parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[string](../types/string.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

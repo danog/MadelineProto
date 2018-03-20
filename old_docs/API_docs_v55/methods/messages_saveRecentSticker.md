@@ -11,7 +11,7 @@ description: messages.saveRecentSticker parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unsave|[Bool](../types/Bool.md) | Yes|
+|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

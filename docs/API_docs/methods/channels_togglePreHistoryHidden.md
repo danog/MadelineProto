@@ -11,7 +11,7 @@ description: channels.togglePreHistoryHidden parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|enabled|[Bool](../types/Bool.md) | Yes|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

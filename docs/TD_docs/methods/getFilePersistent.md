@@ -15,8 +15,8 @@ Returns information about a file by its persistent id, offline request. May be u
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|persistent\_file\_id|[string](../types/string.md) | Yes|Persistent identifier of the file to get|
-|file\_type|[FileType](../types/FileType.md) | Yes|File type, if known|
+|persistent\_file\_id|[CLICK ME string](../types/string.md) | Yes|Persistent identifier of the file to get|
+|file\_type|[CLICK ME FileType](../types/FileType.md) | Yes|File type, if known|
 
 
 ### Return type: [File](../types/File.md)

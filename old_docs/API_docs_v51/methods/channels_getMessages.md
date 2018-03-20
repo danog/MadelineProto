@@ -11,7 +11,7 @@ description: channels.getMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

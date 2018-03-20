@@ -12,7 +12,7 @@ Update online status
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offline|[Bool](../types/Bool.md) | Yes|offline to set the status to offline|
+|offline|[CLICK ME Bool](../types/Bool.md) | Yes|offline to set the status to offline|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -10,7 +10,7 @@ description: messages.readMessageContents parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

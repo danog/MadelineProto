@@ -10,11 +10,11 @@ description: messages.searchGlobal parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|q|[string](../types/string.md) | Yes|
-|offset\_date|[int](../types/int.md) | Yes|
+|q|[CLICK ME string](../types/string.md) | Yes|
+|offset\_date|[CLICK ME int](../types/int.md) | Yes|
 |offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|offset\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

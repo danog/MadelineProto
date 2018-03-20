@@ -15,8 +15,8 @@ Deletes default reply markup from chat. This method needs to be called after one
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|message\_id|[int53](../types/int53.md) | Yes|Message identifier of used keyboard|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|message\_id|[CLICK ME int53](../types/int53.md) | Yes|Message identifier of used keyboard|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -10,9 +10,9 @@ description: messages.saveRecentSticker parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|attached|[Bool](../types/Bool.md) | Optional|
+|attached|[CLICK ME Bool](../types/Bool.md) | Optional|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unsave|[Bool](../types/Bool.md) | Yes|
+|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

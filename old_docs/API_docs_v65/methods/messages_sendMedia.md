@@ -10,13 +10,13 @@ description: messages.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|silent|[Bool](../types/Bool.md) | Optional|
-|background|[Bool](../types/Bool.md) | Optional|
-|clear\_draft|[Bool](../types/Bool.md) | Optional|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|
+|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
-|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

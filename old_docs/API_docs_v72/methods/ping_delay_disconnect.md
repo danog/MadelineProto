@@ -12,8 +12,8 @@ Pings the server and causes disconection if the same method is not called within
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|ping\_id|[long](../types/long.md) | Yes|Ping ID|
-|disconnect\_delay|[int](../types/int.md) | Yes|Disconection delay|
+|ping\_id|[CLICK ME long](../types/long.md) | Yes|Ping ID|
+|disconnect\_delay|[CLICK ME int](../types/int.md) | Yes|Disconection delay|
 
 
 ### Return type: [Pong](../types/Pong.md)

@@ -10,9 +10,9 @@ description: phone.setCallRating parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
-|rating|[int](../types/int.md) | Yes|
-|comment|[string](../types/string.md) | Yes|
+|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|
+|rating|[CLICK ME int](../types/int.md) | Yes|
+|comment|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

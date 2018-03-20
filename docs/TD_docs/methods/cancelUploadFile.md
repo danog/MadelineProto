@@ -15,7 +15,7 @@ Stops file uploading. Works only for files uploaded using uploadFile. For other 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file\_id|[int](../types/int.md) | Yes|Identifier of file to cancel upload|
+|file\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of file to cancel upload|
 
 
 ### Return type: [Ok](../types/Ok.md)

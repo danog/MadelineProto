@@ -10,7 +10,7 @@ description: phone.receivedCall parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|
+|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

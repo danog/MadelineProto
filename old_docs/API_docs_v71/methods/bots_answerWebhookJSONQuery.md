@@ -10,8 +10,8 @@ description: bots.answerWebhookJSONQuery parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|query\_id|[long](../types/long.md) | Yes|
-|data|[DataJSON](../types/DataJSON.md) | Yes|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|data|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

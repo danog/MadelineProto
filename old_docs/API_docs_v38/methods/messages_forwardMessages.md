@@ -11,7 +11,7 @@ description: messages.forwardMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |from\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 |to\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 

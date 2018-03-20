@@ -10,7 +10,7 @@ description: messages.getUnusedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|limit|[int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

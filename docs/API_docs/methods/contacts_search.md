@@ -12,8 +12,8 @@ Search contacts
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|q|[string](../types/string.md) | Yes|The search query|
-|limit|[int](../types/int.md) | Yes|How many results should be returned|
+|q|[CLICK ME string](../types/string.md) | Yes|The search query|
+|limit|[CLICK ME int](../types/int.md) | Yes|How many results should be returned|
 
 
 ### Return type: [contacts\_Found](../types/contacts_Found.md)

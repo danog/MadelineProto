@@ -15,8 +15,8 @@ Adds many new members to the chat. Currently, available only for channels. Can't
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|user\_ids|Array of [int](../types/int.md) | Yes|Identifiers of the users to add|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|user\_ids|Array of [CLICK ME int](../types/int.md) | Yes|Identifiers of the users to add|
 
 
 ### Return type: [Ok](../types/Ok.md)

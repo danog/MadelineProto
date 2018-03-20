@@ -11,7 +11,7 @@ description: channels.updateUsername parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|username|[string](../types/string.md) | Yes|
+|username|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

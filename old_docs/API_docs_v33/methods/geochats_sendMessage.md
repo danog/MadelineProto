@@ -10,8 +10,8 @@ description: geochats.sendMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|message|[string](../types/string.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

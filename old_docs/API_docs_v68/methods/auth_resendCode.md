@@ -12,8 +12,8 @@ Resend the SMS verification code
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[string](../types/string.md) | Yes|The phone number|
-|phone\_code\_hash|[string](../types/string.md) | Yes|The phone code hash|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|The phone number|
+|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|The phone code hash|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)

@@ -10,9 +10,9 @@ description: geochats.getLocated parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|radius|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
+|radius|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Located](../types/geochats_Located.md)

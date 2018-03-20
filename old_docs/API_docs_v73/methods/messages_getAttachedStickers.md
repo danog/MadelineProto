@@ -10,7 +10,7 @@ description: messages.getAttachedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|media|[InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|
+|media|[CLICK ME InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

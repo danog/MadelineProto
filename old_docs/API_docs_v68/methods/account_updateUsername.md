@@ -12,7 +12,7 @@ Update this user's username
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|username|[string](../types/string.md) | Yes|The new username|
+|username|[CLICK ME string](../types/string.md) | Yes|The new username|
 
 
 ### Return type: [User](../types/User.md)

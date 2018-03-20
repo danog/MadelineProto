@@ -12,9 +12,9 @@ Stop sending PUSH notifications to app
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|token\_type|[int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
-|token|[string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
-|other\_uids|Array of [int](../types/int.md) | Yes|Other UUIDs|
+|token\_type|[CLICK ME int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
+|token|[CLICK ME string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
+|other\_uids|Array of [CLICK ME int](../types/int.md) | Yes|Other UUIDs|
 
 
 ### Return type: [Bool](../types/Bool.md)

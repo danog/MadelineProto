@@ -10,11 +10,11 @@ description: messages.setInlineGameScore parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|edit\_message|[Bool](../types/Bool.md) | Optional|
-|force|[Bool](../types/Bool.md) | Optional|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|
+|force|[CLICK ME Bool](../types/Bool.md) | Optional|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|score|[int](../types/int.md) | Yes|
+|score|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

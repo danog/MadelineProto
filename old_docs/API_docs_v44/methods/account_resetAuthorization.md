@@ -12,7 +12,7 @@ Delete a certain session
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[long](../types/long.md) | Yes|The session hash, obtained from $MadelineProto->account->getAuthorizations|
+|hash|[CLICK ME long](../types/long.md) | Yes|The session hash, obtained from $MadelineProto->account->getAuthorizations|
 
 
 ### Return type: [Bool](../types/Bool.md)

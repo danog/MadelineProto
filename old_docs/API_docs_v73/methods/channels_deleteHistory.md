@@ -11,7 +11,7 @@ description: channels.deleteHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|max\_id|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

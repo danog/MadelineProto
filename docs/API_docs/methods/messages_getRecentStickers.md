@@ -10,8 +10,8 @@ description: messages.getRecentStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|attached|[Bool](../types/Bool.md) | Optional|
-|hash|[int](../types/int.md) | Yes|
+|attached|[CLICK ME Bool](../types/Bool.md) | Optional|
+|hash|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_RecentStickers](../types/messages_RecentStickers.md)

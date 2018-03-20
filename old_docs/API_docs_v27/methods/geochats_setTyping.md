@@ -10,8 +10,8 @@ description: geochats.setTyping parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|typing|[Bool](../types/Bool.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+|typing|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -10,7 +10,7 @@ description: langpack.getDifference parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|from\_version|[int](../types/int.md) | Yes|
+|from\_version|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)

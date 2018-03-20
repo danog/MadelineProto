@@ -15,7 +15,7 @@ Returns web page preview by text of the message. Do not call this function to of
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message\_text|[string](../types/string.md) | Yes|Message text|
+|message\_text|[CLICK ME string](../types/string.md) | Yes|Message text|
 
 
 ### Return type: [WebPage](../types/WebPage.md)

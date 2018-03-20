@@ -12,7 +12,7 @@ Delete a certain telegram web login authorization
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[long](../types/long.md) | Yes|The authorization's hash|
+|hash|[CLICK ME long](../types/long.md) | Yes|The authorization's hash|
 
 
 ### Return type: [Bool](../types/Bool.md)

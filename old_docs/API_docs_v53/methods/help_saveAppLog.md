@@ -10,7 +10,7 @@ description: help.saveAppLog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|events|Array of [InputAppEvent](../types/InputAppEvent.md) | Yes|
+|events|Array of [CLICK ME InputAppEvent](../types/InputAppEvent.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

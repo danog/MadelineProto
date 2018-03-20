@@ -10,8 +10,8 @@ description: messages.searchGifs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|q|[string](../types/string.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
+|q|[CLICK ME string](../types/string.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_FoundGifs](../types/messages_FoundGifs.md)

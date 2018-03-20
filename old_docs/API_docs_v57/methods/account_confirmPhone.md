@@ -12,8 +12,8 @@ Confirm this phone number is associated to this account, obtain phone_code_hash 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_code\_hash|[string](../types/string.md) | Yes|obtain phone_code_hash from sendConfirmPhoneCode|
-|phone\_code|[string](../types/string.md) | Yes|The code sent by sendConfirmPhoneCode|
+|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|obtain phone_code_hash from sendConfirmPhoneCode|
+|phone\_code|[CLICK ME string](../types/string.md) | Yes|The code sent by sendConfirmPhoneCode|
 
 
 ### Return type: [Bool](../types/Bool.md)

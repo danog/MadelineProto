@@ -10,9 +10,9 @@ description: geochats.editChatTitle parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|title|[string](../types/string.md) | Yes|
-|address|[string](../types/string.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
+|address|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

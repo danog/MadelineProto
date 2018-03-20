@@ -10,9 +10,9 @@ description: upload.getWebFile parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|location|[InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|location|[CLICK ME InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [upload\_WebFile](../types/upload_WebFile.md)

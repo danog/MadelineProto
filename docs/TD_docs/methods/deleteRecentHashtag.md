@@ -15,7 +15,7 @@ Deletes a hashtag from the list of recently used hashtags
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hashtag|[string](../types/string.md) | Yes|The hashtag to delete|
+|hashtag|[CLICK ME string](../types/string.md) | Yes|The hashtag to delete|
 
 
 ### Return type: [Ok](../types/Ok.md)

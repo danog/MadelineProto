@@ -12,7 +12,7 @@ description: messages.editChatAdmin parameters, return type and example
 |----------|---------------|----------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|is\_admin|[Bool](../types/Bool.md) | Yes|
+|is\_admin|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

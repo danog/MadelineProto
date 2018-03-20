@@ -10,9 +10,9 @@ description: messages.setBotPrecheckoutResults parameters, return type and examp
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|success|[Bool](../types/Bool.md) | Optional|
-|query\_id|[long](../types/long.md) | Yes|
-|error|[string](../types/string.md) | Optional|
+|success|[CLICK ME Bool](../types/Bool.md) | Optional|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|error|[CLICK ME string](../types/string.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

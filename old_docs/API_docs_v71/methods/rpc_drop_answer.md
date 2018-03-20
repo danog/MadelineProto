@@ -12,7 +12,7 @@ Do not send answer to provided request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|req\_msg\_id|[long](../types/long.md) | Yes|The message ID of the request|
+|req\_msg\_id|[CLICK ME long](../types/long.md) | Yes|The message ID of the request|
 
 
 ### Return type: [RpcDropAnswer](../types/RpcDropAnswer.md)

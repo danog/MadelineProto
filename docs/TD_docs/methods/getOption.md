@@ -15,7 +15,7 @@ Returns value of an option by its name. See list of available options on https: 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|name|[string](../types/string.md) | Yes|Name of the option|
+|name|[CLICK ME string](../types/string.md) | Yes|Name of the option|
 
 
 ### Return type: [OptionValue](../types/OptionValue.md)

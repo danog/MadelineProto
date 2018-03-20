@@ -12,8 +12,8 @@ Invite friends to telegram!
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_numbers|Array of [string](../types/string.md) | Yes|Phone numbers to invite|
-|message|[string](../types/string.md) | Yes|The message to send|
+|phone\_numbers|Array of [CLICK ME string](../types/string.md) | Yes|Phone numbers to invite|
+|message|[CLICK ME string](../types/string.md) | Yes|The message to send|
 
 
 ### Return type: [Bool](../types/Bool.md)

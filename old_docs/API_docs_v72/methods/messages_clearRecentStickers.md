@@ -10,7 +10,7 @@ description: messages.clearRecentStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|attached|[Bool](../types/Bool.md) | Optional|
+|attached|[CLICK ME Bool](../types/Bool.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

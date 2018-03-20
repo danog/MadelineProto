@@ -15,7 +15,7 @@ Returns information about a secret chat by its identifier, offline request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|secret\_chat\_id|[int](../types/int.md) | Yes|Secret chat identifier|
+|secret\_chat\_id|[CLICK ME int](../types/int.md) | Yes|Secret chat identifier|
 
 
 ### Return type: [SecretChat](../types/SecretChat.md)

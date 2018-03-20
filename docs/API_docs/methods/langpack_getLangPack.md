@@ -10,7 +10,7 @@ description: langpack.getLangPack parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|lang\_code|[string](../types/string.md) | Yes|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)

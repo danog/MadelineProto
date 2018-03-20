@@ -12,8 +12,8 @@ Get temporary password for buying products through bots
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|password\_hash|[bytes](../types/bytes.md) | Yes|The password hash|
-|period|[int](../types/int.md) | Yes|The validity period|
+|password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|The password hash|
+|period|[CLICK ME int](../types/int.md) | Yes|The validity period|
 
 
 ### Return type: [account\_TmpPassword](../types/account_TmpPassword.md)

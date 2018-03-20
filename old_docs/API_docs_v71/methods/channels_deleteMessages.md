@@ -11,7 +11,7 @@ description: channels.deleteMessages parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

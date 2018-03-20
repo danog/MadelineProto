@@ -12,7 +12,7 @@ Disable all notifications for a certain period
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|period|[int](../types/int.md) | Yes|For how long should notifications be disabled|
+|period|[CLICK ME int](../types/int.md) | Yes|For how long should notifications be disabled|
 
 
 ### Return type: [Bool](../types/Bool.md)

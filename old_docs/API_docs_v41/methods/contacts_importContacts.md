@@ -12,8 +12,8 @@ Add phone number as contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|contacts|Array of [InputContact](../types/InputContact.md) | Yes|The numbers to import|
-|replace|[Bool](../types/Bool.md) | Yes||
+|contacts|Array of [CLICK ME InputContact](../types/InputContact.md) | Yes|The numbers to import|
+|replace|[CLICK ME Bool](../types/Bool.md) | Yes||
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)

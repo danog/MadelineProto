@@ -10,11 +10,11 @@ description: messages.saveDraft parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|no\_webpage|[Bool](../types/Bool.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|message|[string](../types/string.md) | Yes|
-|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+|message|[CLICK ME string](../types/string.md) | Yes|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
 
 

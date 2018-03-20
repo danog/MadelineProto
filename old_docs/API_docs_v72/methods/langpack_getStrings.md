@@ -10,8 +10,8 @@ description: langpack.getStrings parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|lang\_code|[string](../types/string.md) | Yes|
-|keys|Array of [string](../types/string.md) | Yes|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+|keys|Array of [CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Vector\_of\_LangPackString](../types/LangPackString.md)

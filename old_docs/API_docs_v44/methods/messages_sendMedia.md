@@ -10,11 +10,11 @@ description: messages.sendMedia parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|broadcast|[Bool](../types/Bool.md) | Optional|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Optional|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
-|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 
 
 ### Return type: [Updates](../types/Updates.md)

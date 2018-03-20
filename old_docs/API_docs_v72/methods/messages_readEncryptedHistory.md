@@ -11,7 +11,7 @@ description: messages.readEncryptedHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|max\_date|[int](../types/int.md) | Yes|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

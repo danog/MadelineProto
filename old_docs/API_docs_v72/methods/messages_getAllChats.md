@@ -10,7 +10,7 @@ description: messages.getAllChats parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|except\_ids|Array of [int](../types/int.md) | Yes|
+|except\_ids|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

@@ -13,7 +13,7 @@ Report for spam
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer to report|
-|reason|[ReportReason](../types/ReportReason.md) | Yes|Why are you reporting this peer|
+|reason|[CLICK ME ReportReason](../types/ReportReason.md) | Yes|Why are you reporting this peer|
 
 
 ### Return type: [Bool](../types/Bool.md)

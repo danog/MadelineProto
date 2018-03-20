@@ -10,11 +10,11 @@ description: messages.setGameScore parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|edit\_message|[Bool](../types/Bool.md) | Optional|
+|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[int](../types/int.md) | Yes|
+|id|[CLICK ME int](../types/int.md) | Yes|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|score|[int](../types/int.md) | Yes|
+|score|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

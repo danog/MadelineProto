@@ -10,8 +10,8 @@ description: bots.sendCustomRequest parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|custom\_method|[string](../types/string.md) | Yes|
-|params|[DataJSON](../types/DataJSON.md) | Yes|
+|custom\_method|[CLICK ME string](../types/string.md) | Yes|
+|params|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|
 
 
 ### Return type: [DataJSON](../types/DataJSON.md)

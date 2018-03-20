@@ -10,10 +10,10 @@ description: payments.sendPaymentForm parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|msg\_id|[int](../types/int.md) | Yes|
-|requested\_info\_id|[string](../types/string.md) | Optional|
-|shipping\_option\_id|[string](../types/string.md) | Optional|
-|credentials|[InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+|requested\_info\_id|[CLICK ME string](../types/string.md) | Optional|
+|shipping\_option\_id|[CLICK ME string](../types/string.md) | Optional|
+|credentials|[CLICK ME InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|
 
 
 ### Return type: [payments\_PaymentResult](../types/payments_PaymentResult.md)

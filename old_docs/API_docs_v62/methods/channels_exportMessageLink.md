@@ -11,7 +11,7 @@ description: channels.exportMessageLink parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|[int](../types/int.md) | Yes|
+|id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [ExportedMessageLink](../types/ExportedMessageLink.md)

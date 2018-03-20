@@ -10,10 +10,10 @@ description: help.getAppUpdate parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|device\_model|[string](../types/string.md) | Yes|
-|system\_version|[string](../types/string.md) | Yes|
-|app\_version|[string](../types/string.md) | Yes|
-|lang\_code|[string](../types/string.md) | Yes|
+|device\_model|[CLICK ME string](../types/string.md) | Yes|
+|system\_version|[CLICK ME string](../types/string.md) | Yes|
+|app\_version|[CLICK ME string](../types/string.md) | Yes|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_AppUpdate](../types/help_AppUpdate.md)

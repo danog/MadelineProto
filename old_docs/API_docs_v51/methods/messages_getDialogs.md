@@ -10,10 +10,10 @@ description: messages.getDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|offset\_date|[int](../types/int.md) | Yes|
-|offset\_id|[int](../types/int.md) | Yes|
+|offset\_date|[CLICK ME int](../types/int.md) | Yes|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|
 |offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|limit|[int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)

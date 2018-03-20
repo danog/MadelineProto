@@ -11,7 +11,7 @@ description: channels.editAbout parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|about|[string](../types/string.md) | Yes|
+|about|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

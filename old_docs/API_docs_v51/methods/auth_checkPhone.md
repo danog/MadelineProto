@@ -12,7 +12,7 @@ Check if this phone number is registered on telegram
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[string](../types/string.md) | Yes|The phone number to check|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|The phone number to check|
 
 
 ### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)

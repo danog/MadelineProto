@@ -10,10 +10,10 @@ description: geochats.getHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
-|offset|[int](../types/int.md) | Yes|
-|max\_id|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

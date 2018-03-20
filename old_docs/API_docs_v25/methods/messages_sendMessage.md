@@ -11,8 +11,8 @@ description: messages.sendMessage parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Yes|
-|message|[string](../types/string.md) | Yes|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_SentMessage](../types/messages_SentMessage.md)

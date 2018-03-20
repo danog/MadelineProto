@@ -10,9 +10,9 @@ description: channels.updatePinnedMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|silent|[Bool](../types/Bool.md) | Optional|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|[int](../types/int.md) | Yes|
+|id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

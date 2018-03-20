@@ -15,9 +15,9 @@ Asynchronously uploads file to the cloud without sending it in a message. Update
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file|[InputFile](../types/InputFile.md) | Yes|File to upload|
-|file\_type|[FileType](../types/FileType.md) | Yes|File type|
-|priority|[int](../types/int.md) | Yes|Priority of upload, 1-32. The higher priority, the earlier file will be uploaded. If priorities of two files are equal then the first one for which uploadFile is called will be uploaded first|
+|file|[CLICK ME InputFile](../types/InputFile.md) | Yes|File to upload|
+|file\_type|[CLICK ME FileType](../types/FileType.md) | Yes|File type|
+|priority|[CLICK ME int](../types/int.md) | Yes|Priority of upload, 1-32. The higher priority, the earlier file will be uploaded. If priorities of two files are equal then the first one for which uploadFile is called will be uploaded first|
 
 
 ### Return type: [File](../types/File.md)

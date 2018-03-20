@@ -12,9 +12,9 @@ Change the phone number
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|allow\_flashcall|[Bool](../types/Bool.md) | Optional|Can the code be sent using a flash call instead of an SMS?|
-|phone\_number|[string](../types/string.md) | Yes|New phone number|
-|current\_number|[Bool](../types/Bool.md) | Optional|Current phone number|
+|allow\_flashcall|[CLICK ME Bool](../types/Bool.md) | Optional|Can the code be sent using a flash call instead of an SMS?|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|New phone number|
+|current\_number|[CLICK ME Bool](../types/Bool.md) | Optional|Current phone number|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)

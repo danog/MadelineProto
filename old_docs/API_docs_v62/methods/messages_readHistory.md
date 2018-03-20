@@ -11,7 +11,7 @@ description: messages.readHistory parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|max\_id|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

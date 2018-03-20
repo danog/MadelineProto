@@ -15,7 +15,7 @@ Returns information about a user by its identifier, offline request if current u
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[int](../types/int.md) | Yes|User identifier|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [User](../types/User.md)

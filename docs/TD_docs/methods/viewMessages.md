@@ -15,8 +15,8 @@ Messages are viewed by the user. Many useful activities depends on message being
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|message\_ids|Array of [int53](../types/int53.md) | Yes|Identifiers of viewed messages|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|message\_ids|Array of [CLICK ME int53](../types/int53.md) | Yes|Identifiers of viewed messages|
 
 
 ### Return type: [Ok](../types/Ok.md)

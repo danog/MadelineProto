@@ -10,7 +10,7 @@ description: contacts.resetTopPeerRating parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|
+|category|[CLICK ME TopPeerCategory](../types/TopPeerCategory.md) | Yes|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 
 

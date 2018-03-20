@@ -11,7 +11,7 @@ description: messages.createChat parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
-|title|[string](../types/string.md) | Yes|
+|title|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

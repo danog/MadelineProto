@@ -15,7 +15,7 @@ Logs out user. If force == false, begins to perform soft log out, returns authSt
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|force|[Bool](../types/Bool.md) | Yes|If true, just delete all local data. Session will remain in list of active sessions|
+|force|[CLICK ME Bool](../types/Bool.md) | Yes|If true, just delete all local data. Session will remain in list of active sessions|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

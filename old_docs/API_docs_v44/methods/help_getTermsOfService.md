@@ -10,7 +10,7 @@ description: help.getTermsOfService parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|lang\_code|[string](../types/string.md) | Yes|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_TermsOfService](../types/help_TermsOfService.md)

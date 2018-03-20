@@ -15,9 +15,9 @@ Reports some supergroup channel messages from a user as spam messages
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel\_id|[int](../types/int.md) | Yes|Channel identifier|
-|user\_id|[int](../types/int.md) | Yes|User identifier|
-|message\_ids|Array of [int53](../types/int53.md) | Yes|Identifiers of messages sent in the supergroup by the user, the list should be non-empty|
+|channel\_id|[CLICK ME int](../types/int.md) | Yes|Channel identifier|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
+|message\_ids|Array of [CLICK ME int53](../types/int53.md) | Yes|Identifiers of messages sent in the supergroup by the user, the list should be non-empty|
 
 
 ### Return type: [Ok](../types/Ok.md)

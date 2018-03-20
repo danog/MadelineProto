@@ -10,7 +10,7 @@ description: help.getAppChangelog parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|prev\_app\_version|[string](../types/string.md) | Yes|
+|prev\_app\_version|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

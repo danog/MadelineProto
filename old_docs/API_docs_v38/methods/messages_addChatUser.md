@@ -12,7 +12,7 @@ description: messages.addChatUser parameters, return type and example
 |----------|---------------|----------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|fwd\_limit|[int](../types/int.md) | Yes|
+|fwd\_limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -11,8 +11,8 @@ description: messages.getMessagesViews parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
-|increment|[Bool](../types/Bool.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
+|increment|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

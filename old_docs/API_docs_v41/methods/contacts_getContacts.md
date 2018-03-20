@@ -12,7 +12,7 @@ Get info about a certain contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[string](../types/string.md) | Yes||
+|hash|[CLICK ME string](../types/string.md) | Yes||
 
 
 ### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)

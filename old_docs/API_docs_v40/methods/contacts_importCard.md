@@ -12,7 +12,7 @@ Import card as contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|export\_card|Array of [int](../types/int.md) | Yes|The card|
+|export\_card|Array of [CLICK ME int](../types/int.md) | Yes|The card|
 
 
 ### Return type: [User](../types/User.md)

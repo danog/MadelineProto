@@ -11,7 +11,7 @@ description: messages.setTyping parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|action|[SendMessageAction](../types/SendMessageAction.md) | Yes|
+|action|[CLICK ME SendMessageAction](../types/SendMessageAction.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

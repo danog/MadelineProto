@@ -15,7 +15,7 @@ Removes an animation from the list of saved animations
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|animation|[InputFile](../types/InputFile.md) | Yes|Animation file to delete|
+|animation|[CLICK ME InputFile](../types/InputFile.md) | Yes|Animation file to delete|
 
 
 ### Return type: [Ok](../types/Ok.md)

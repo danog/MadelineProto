@@ -15,7 +15,7 @@ Stops file downloading. If file is already downloaded, does nothing
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file\_id|[int](../types/int.md) | Yes|Identifier of file to cancel download|
+|file\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of file to cancel download|
 
 
 ### Return type: [Ok](../types/Ok.md)

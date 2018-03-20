@@ -12,7 +12,7 @@ description: channels.editAdmin parameters, return type and example
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|admin\_rights|[ChannelAdminRights](../types/ChannelAdminRights.md) | Yes|
+|admin\_rights|[CLICK ME ChannelAdminRights](../types/ChannelAdminRights.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

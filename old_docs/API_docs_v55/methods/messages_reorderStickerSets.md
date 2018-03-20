@@ -10,7 +10,7 @@ description: messages.reorderStickerSets parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|order|Array of [long](../types/long.md) | Yes|
+|order|Array of [CLICK ME long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

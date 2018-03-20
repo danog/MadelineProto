@@ -10,9 +10,9 @@ description: messages.setBotShippingResults parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|query\_id|[long](../types/long.md) | Yes|
-|error|[string](../types/string.md) | Optional|
-|shipping\_options|Array of [ShippingOption](../types/ShippingOption.md) | Optional|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|
+|error|[CLICK ME string](../types/string.md) | Optional|
+|shipping\_options|Array of [CLICK ME ShippingOption](../types/ShippingOption.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

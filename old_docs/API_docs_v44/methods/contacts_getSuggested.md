@@ -10,7 +10,7 @@ description: contacts.getSuggested parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|limit|[int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [contacts\_Suggested](../types/contacts_Suggested.md)

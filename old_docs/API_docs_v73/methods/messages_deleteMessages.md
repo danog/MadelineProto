@@ -10,8 +10,8 @@ description: messages.deleteMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|revoke|[Bool](../types/Bool.md) | Optional|
-|id|Array of [int](../types/int.md) | Yes|
+|revoke|[CLICK ME Bool](../types/Bool.md) | Optional|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

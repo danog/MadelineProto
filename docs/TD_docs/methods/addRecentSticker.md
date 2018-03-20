@@ -15,8 +15,8 @@ Manually adds new sticker to the list of recently used stickers. New sticker is 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|is\_attached|[Bool](../types/Bool.md) | Yes|Pass true to add the sticker to the list of stickers recently attached to photo or video files, pass false to add the sticker to the list of recently sent stickers|
-|sticker|[InputFile](../types/InputFile.md) | Yes|Sticker file to add|
+|is\_attached|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true to add the sticker to the list of stickers recently attached to photo or video files, pass false to add the sticker to the list of recently sent stickers|
+|sticker|[CLICK ME InputFile](../types/InputFile.md) | Yes|Sticker file to add|
 
 
 ### Return type: [Stickers](../types/Stickers.md)

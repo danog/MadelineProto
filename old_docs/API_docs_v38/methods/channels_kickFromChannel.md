@@ -12,7 +12,7 @@ description: channels.kickFromChannel parameters, return type and example
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|kicked|[Bool](../types/Bool.md) | Yes|
+|kicked|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

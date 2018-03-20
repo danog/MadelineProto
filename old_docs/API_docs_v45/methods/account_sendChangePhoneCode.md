@@ -12,7 +12,7 @@ Change the phone number
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[string](../types/string.md) | Yes|New phone number|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|New phone number|
 
 
 ### Return type: [account\_SentChangePhoneCode](../types/account_SentChangePhoneCode.md)

@@ -12,8 +12,8 @@ Invoke this method with layer X
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|layer|[int](../types/int.md) | Yes|The layer version|
-|query|[!X](../types/!X.md) | Yes|The query|
+|layer|[CLICK ME int](../types/int.md) | Yes|The layer version|
+|query|[CLICK ME !X](../types/!X.md) | Yes|The query|
 
 
 ### Return type: [X](../types/X.md)

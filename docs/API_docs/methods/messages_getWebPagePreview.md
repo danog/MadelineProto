@@ -10,8 +10,8 @@ description: messages.getWebPagePreview parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|message|[string](../types/string.md) | Yes|
-|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+|message|[CLICK ME string](../types/string.md) | Yes|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
 
 

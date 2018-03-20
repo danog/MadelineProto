@@ -10,7 +10,7 @@ description: messages.deleteMessages parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [int](../types/int.md) | Yes|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

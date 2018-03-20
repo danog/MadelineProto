@@ -15,7 +15,7 @@ Searches sticker set by its short name
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|name|[string](../types/string.md) | Yes|Name of the sticker set|
+|name|[CLICK ME string](../types/string.md) | Yes|Name of the sticker set|
 
 
 ### Return type: [StickerSet](../types/StickerSet.md)

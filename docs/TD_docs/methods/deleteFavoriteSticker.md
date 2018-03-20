@@ -15,7 +15,7 @@ Removes a sticker from the list of favorite stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker|[InputFile](../types/InputFile.md) | Yes|Sticker file to delete from the list|
+|sticker|[CLICK ME InputFile](../types/InputFile.md) | Yes|Sticker file to delete from the list|
 
 
 ### Return type: [Ok](../types/Ok.md)

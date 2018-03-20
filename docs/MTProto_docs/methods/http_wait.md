@@ -12,9 +12,9 @@ Makes the server send messages waiting in the buffer
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|max\_delay|[int](../types/int.md) | Yes|Denotes the maximum number of milliseconds that has elapsed between the first message for this session and the transmission of an HTTP response|
-|wait\_after|[int](../types/int.md) | Yes|after the receipt of the latest message for a particular session, the server waits another wait_after milliseconds in case there are more messages. If there are no additional messages, the result is transmitted (a container with all the messages).|
-|max\_wait|[int](../types/int.md) | Yes|If more messages appear, the wait_after timer is reset.|
+|max\_delay|[CLICK ME int](../types/int.md) | Yes|Denotes the maximum number of milliseconds that has elapsed between the first message for this session and the transmission of an HTTP response|
+|wait\_after|[CLICK ME int](../types/int.md) | Yes|after the receipt of the latest message for a particular session, the server waits another wait_after milliseconds in case there are more messages. If there are no additional messages, the result is transmitted (a container with all the messages).|
+|max\_wait|[CLICK ME int](../types/int.md) | Yes|If more messages appear, the wait_after timer is reset.|
 
 
 ### Return type: [HttpWait](../types/HttpWait.md)

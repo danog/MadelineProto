@@ -11,12 +11,12 @@ description: channels.getAdminLog parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|q|[string](../types/string.md) | Yes|
-|events\_filter|[ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
+|q|[CLICK ME string](../types/string.md) | Yes|
+|events\_filter|[CLICK ME ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
 |admins|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|max\_id|[long](../types/long.md) | Yes|
-|min\_id|[long](../types/long.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME long](../types/long.md) | Yes|
+|min\_id|[CLICK ME long](../types/long.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [channels\_AdminLogResults](../types/channels_AdminLogResults.md)

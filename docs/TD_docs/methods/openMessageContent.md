@@ -15,8 +15,8 @@ Message content is opened, for example the user has opened a photo, a video, a d
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier of the message|
-|message\_id|[int53](../types/int53.md) | Yes|Identifier of the message with opened content|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier of the message|
+|message\_id|[CLICK ME int53](../types/int53.md) | Yes|Identifier of the message with opened content|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -15,8 +15,8 @@ Reports chat as a spam chat or as not a spam chat. Can be used only if ChatRepor
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|is\_spam\_chat|[Bool](../types/Bool.md) | Yes|If true, chat will be reported as a spam chat, otherwise it will be marked as not a spam chat|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|is\_spam\_chat|[CLICK ME Bool](../types/Bool.md) | Yes|If true, chat will be reported as a spam chat, otherwise it will be marked as not a spam chat|
 
 
 ### Return type: [Ok](../types/Ok.md)

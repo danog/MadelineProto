@@ -10,14 +10,14 @@ description: messages.editInlineBotMessage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|no\_webpage|[Bool](../types/Bool.md) | Optional|
-|stop\_geo\_live|[Bool](../types/Bool.md) | Optional|
-|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|message|[string](../types/string.md) | Optional|
-|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
+|stop\_geo\_live|[CLICK ME Bool](../types/Bool.md) | Optional|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Optional|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
 |parse\_mode| [string](../types/string.md) | Optional |
-|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 
 
 ### Return type: [Bool](../types/Bool.md)

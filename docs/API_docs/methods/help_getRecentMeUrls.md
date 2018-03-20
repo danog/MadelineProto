@@ -10,7 +10,7 @@ description: help.getRecentMeUrls parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|referer|[string](../types/string.md) | Yes|
+|referer|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_RecentMeUrls](../types/help_RecentMeUrls.md)

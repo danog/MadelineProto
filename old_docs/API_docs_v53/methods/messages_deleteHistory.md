@@ -10,9 +10,9 @@ description: messages.deleteHistory parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|just\_clear|[Bool](../types/Bool.md) | Optional|
+|just\_clear|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|max\_id|[int](../types/int.md) | Yes|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

@@ -15,8 +15,8 @@ Creates new call
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[int](../types/int.md) | Yes|Identifier of user to call|
-|protocol|[callProtocol](../constructors/callProtocol.md) | Yes|Description of supported by the client call protocols|
+|user\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of user to call|
+|protocol|[CLICK ME callProtocol](../constructors/callProtocol.md) | Yes|Description of supported by the client call protocols|
 
 
 ### Return type: [CallId](../types/CallId.md)

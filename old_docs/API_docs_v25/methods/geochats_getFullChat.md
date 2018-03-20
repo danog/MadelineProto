@@ -10,7 +10,7 @@ description: geochats.getFullChat parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)

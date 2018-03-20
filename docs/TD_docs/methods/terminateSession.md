@@ -15,7 +15,7 @@ Terminates another session of logged in user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|session\_id|[int64](../constructors/int64.md) | Yes|Session identifier|
+|session\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Session identifier|
 
 
 ### Return type: [Ok](../types/Ok.md)

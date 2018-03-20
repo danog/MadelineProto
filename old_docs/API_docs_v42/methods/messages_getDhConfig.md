@@ -10,8 +10,8 @@ description: messages.getDhConfig parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|version|[int](../types/int.md) | Yes|
-|random\_length|[int](../types/int.md) | Yes|
+|version|[CLICK ME int](../types/int.md) | Yes|
+|random\_length|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [messages\_DhConfig](../types/messages_DhConfig.md)

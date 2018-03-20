@@ -12,7 +12,7 @@ Use the code that was emailed to you after running $MadelineProto->auth->request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|code|[string](../types/string.md) | Yes|The code that was emailed to you|
+|code|[CLICK ME string](../types/string.md) | Yes|The code that was emailed to you|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)

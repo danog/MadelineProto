@@ -10,7 +10,7 @@ description: payments.getPaymentReceipt parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|msg\_id|[int](../types/int.md) | Yes|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [payments\_PaymentReceipt](../types/payments_PaymentReceipt.md)

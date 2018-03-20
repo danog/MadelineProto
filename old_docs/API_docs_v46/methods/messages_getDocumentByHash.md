@@ -10,9 +10,9 @@ description: messages.getDocumentByHash parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|sha256|[bytes](../types/bytes.md) | Yes|
-|size|[int](../types/int.md) | Yes|
-|mime\_type|[string](../types/string.md) | Yes|
+|sha256|[CLICK ME bytes](../types/bytes.md) | Yes|
+|size|[CLICK ME int](../types/int.md) | Yes|
+|mime\_type|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Document](../types/Document.md)

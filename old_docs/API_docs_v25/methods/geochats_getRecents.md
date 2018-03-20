@@ -10,8 +10,8 @@ description: geochats.getRecents parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|offset|[int](../types/int.md) | Yes|
-|limit|[int](../types/int.md) | Yes|
+|offset|[CLICK ME int](../types/int.md) | Yes|
+|limit|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

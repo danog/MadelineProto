@@ -10,8 +10,8 @@ description: messages.getWebPage parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|url|[string](../types/string.md) | Yes|
-|hash|[int](../types/int.md) | Yes|
+|url|[CLICK ME string](../types/string.md) | Yes|
+|hash|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [WebPage](../types/WebPage.md)

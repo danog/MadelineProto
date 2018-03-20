@@ -11,7 +11,7 @@ description: messages.deactivateChat parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|enabled|[Bool](../types/Bool.md) | Yes|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
 
 
 ### Return type: [Updates](../types/Updates.md)

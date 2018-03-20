@@ -15,7 +15,7 @@ Returns full information about a group by its identifier
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|group\_id|[int](../types/int.md) | Yes|Group identifier|
+|group\_id|[CLICK ME int](../types/int.md) | Yes|Group identifier|
 
 
 ### Return type: [GroupFull](../types/GroupFull.md)

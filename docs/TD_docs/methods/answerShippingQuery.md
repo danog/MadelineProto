@@ -15,9 +15,9 @@ Bots only. Sets result of a shipping query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|shipping\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of the shipping query|
-|shipping\_options|Array of [shippingOption](../constructors/shippingOption.md) | Yes|Available shipping options|
-|error\_message|[string](../types/string.md) | Yes|Error message, empty on success|
+|shipping\_query\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of the shipping query|
+|shipping\_options|Array of [CLICK ME shippingOption](../constructors/shippingOption.md) | Yes|Available shipping options|
+|error\_message|[CLICK ME string](../types/string.md) | Yes|Error message, empty on success|
 
 
 ### Return type: [Ok](../types/Ok.md)

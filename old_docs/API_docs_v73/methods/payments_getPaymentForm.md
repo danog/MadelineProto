@@ -10,7 +10,7 @@ description: payments.getPaymentForm parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|msg\_id|[int](../types/int.md) | Yes|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
 
 
 ### Return type: [payments\_PaymentForm](../types/payments_PaymentForm.md)

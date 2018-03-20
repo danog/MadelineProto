@@ -12,7 +12,7 @@ Get privacy settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting key|
+|key|[CLICK ME InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting key|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)

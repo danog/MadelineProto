@@ -10,7 +10,7 @@ description: messages.reorderPinnedDialogs parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|force|[Bool](../types/Bool.md) | Optional|
+|force|[CLICK ME Bool](../types/Bool.md) | Optional|
 |order|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|
 
 

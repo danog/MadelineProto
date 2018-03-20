@@ -10,7 +10,7 @@ description: messages.readFeaturedStickers parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|id|Array of [long](../types/long.md) | Yes|
+|id|Array of [CLICK ME long](../types/long.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

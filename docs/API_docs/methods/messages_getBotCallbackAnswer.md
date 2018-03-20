@@ -10,10 +10,10 @@ description: messages.getBotCallbackAnswer parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|game|[Bool](../types/Bool.md) | Optional|
+|game|[CLICK ME Bool](../types/Bool.md) | Optional|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|msg\_id|[int](../types/int.md) | Yes|
-|data|[bytes](../types/bytes.md) | Optional|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+|data|[CLICK ME bytes](../types/bytes.md) | Optional|
 
 
 ### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)

@@ -15,8 +15,8 @@ Changes chat photo. Works only for group and channel chats. Requires administrat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
-|photo|[InputFile](../types/InputFile.md) | Yes|New chat photo. You can use zero InputFileId to delete chat photo. Files accessible only by HTTP URL are not acceptable|
+|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
+|photo|[CLICK ME InputFile](../types/InputFile.md) | Yes|New chat photo. You can use zero InputFileId to delete chat photo. Files accessible only by HTTP URL are not acceptable|
 
 
 ### Return type: [Ok](../types/Ok.md)

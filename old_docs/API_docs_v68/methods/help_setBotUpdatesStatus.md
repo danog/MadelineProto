@@ -10,8 +10,8 @@ description: help.setBotUpdatesStatus parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|pending\_updates\_count|[int](../types/int.md) | Yes|
-|message|[string](../types/string.md) | Yes|
+|pending\_updates\_count|[CLICK ME int](../types/int.md) | Yes|
+|message|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)

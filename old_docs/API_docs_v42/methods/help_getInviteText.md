@@ -10,7 +10,7 @@ description: help.getInviteText parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|lang\_code|[string](../types/string.md) | Yes|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [help\_InviteText](../types/help_InviteText.md)

@@ -11,7 +11,7 @@ description: messages.sendMedia parameters, return type and example
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[int](../types/int.md) | Yes|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Yes|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
 
 

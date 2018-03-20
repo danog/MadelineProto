@@ -10,11 +10,11 @@ description: contest.saveDeveloperInfo parameters, return type and example
 
 | Name     |    Type       | Required |
 |----------|---------------|----------|
-|vk\_id|[int](../types/int.md) | Yes|
-|name|[string](../types/string.md) | Yes|
-|phone\_number|[string](../types/string.md) | Yes|
-|age|[int](../types/int.md) | Yes|
-|city|[string](../types/string.md) | Yes|
+|vk\_id|[CLICK ME int](../types/int.md) | Yes|
+|name|[CLICK ME string](../types/string.md) | Yes|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|
+|age|[CLICK ME int](../types/int.md) | Yes|
+|city|[CLICK ME string](../types/string.md) | Yes|
 
 
 ### Return type: [Bool](../types/Bool.md)
