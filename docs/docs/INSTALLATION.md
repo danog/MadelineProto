@@ -35,7 +35,7 @@ require_once 'madeline.php';
 composer.json:
 ```json
 {
-    "name": "yourname/yourprojecr",
+    "name": "yourname/yourproject",
     "description": "Project description",
     "type": "project",
     "require": {
