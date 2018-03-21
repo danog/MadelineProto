@@ -10,7 +10,7 @@ Update handling can be done in different ways:
 * [Callback](#callback)
   * [Callback multithreaded](#callback-multithreaded)
 
-IMPORTANT: Note that you should turn off update handling if you don't plan to use it because the default get_updates update handling stores updates in an array inside the MadelineProto object, without deleting old ones unless they are read using get_updates.  
+IMPORTANT: Note that you should turn off update handling if you don't want to use it anymore because the default get_updates update handling stores updates in an array inside the MadelineProto object, without deleting old ones unless they are read using get_updates.  
 ```php
 $MadelineProto->settings['updates']['handle_updates'] = false;
 ```
@@ -20,6 +20,10 @@ $MadelineProto->settings['updates']['handle_updates'] = false;
 ```php
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
+    public function __construct($MadelineProto)
+    {
+        parent::__construct($MadelineProto);
+    }
     public function onAny($update)
     {
         \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);

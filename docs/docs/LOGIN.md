@@ -20,7 +20,7 @@ You will get to choose if login as user, or as bot.
 ## Manual (user)
 
 ```php
-MadelineProto->phone_login(readline('Enter your phone number: '));
+$MadelineProto->phone_login(readline('Enter your phone number: '));
 $authorization = $MadelineProto->complete_phone_login(readline('Enter the phone code: '));
 if ($authorization['_'] === 'account.password') {
     $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));

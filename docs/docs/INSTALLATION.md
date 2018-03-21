@@ -35,11 +35,10 @@ require_once 'madeline.php';
 composer.json:
 ```json
 {
-    "name": "pwrtelegram/pwrtelegram",
-    "description": "Boosted version of telegram's bot API",
+    "name": "yourname/yourprojecr",
+    "description": "Project description",
     "type": "project",
     "require": {
-        "mhor/php-mediainfo": "^2.2",
         "danog/madelineproto": "dev-master"
     },
     "repositories": [
@@ -58,7 +57,7 @@ composer.json:
     ],
     "autoload": {
         "psr-0": {
-            "PWRTelegram\\PWRTelegram\\": "src/"
+            "Your\\Project\\": "src/"
         }
     }
 }

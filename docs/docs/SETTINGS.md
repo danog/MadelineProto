@@ -8,6 +8,7 @@ $MadelineProto->settings = $settings;
 `$settings` - an array that contains some other arrays, which are the settings for a specific MadelineProto function.  
 Here are the default values for the settings arrays and explanations for every setting:  
 
+<hr>
 ## `$settings['authorization']`
 
 Authorization settings  
@@ -24,6 +25,7 @@ Description: Array of RSA keys to use during key exchange.
 *WARNING*: be _very_ careful while modifying the default value of this setting, the security of telegram's MTProto protocol depends on it.
 
 
+<hr>
 ## `$settings['connection']`
 
 IP addresses and subdomains of the MTProto datacenters
@@ -80,6 +82,7 @@ Default: `[
 ]`  
 Description: main datacenter IPs
 
+<hr>
 ## `$settings['connection_settings']`
 
 Connection settings
@@ -94,31 +97,31 @@ Description: MTProto transport protocol to use
 Available MTProto transport protocols (smaller overhead is better):
 
 * tcp_abridged: Lightest protocol available
-Overhead: Very small 
-Pros:
-- Minimum envelope length: 1 byte (length)
-- Maximum envelope length: 4 bytes (length)
+  * Overhead: Very small 
+  * Pros:
+    * Minimum envelope length: 1 byte (length)
+    * Maximum envelope length: 4 bytes (length)
 
-Cons:
-- Not all Telegram DCs support it
-- No obfuscation
-- No initial integrity check
-- No transport sequence number
+  * Cons:
+    * Not all Telegram DCs support it
+    * No obfuscation
+    * No initial integrity check
+    * No transport sequence number
 
 
 * obfuscated2: Like tcp_abridged, but obfuscated 
-Overhead: Medium-high
-Pros:
-  * All Telegram DCs support it
-  * Minimum envelope length: 1 byte (length)
-  * Maximum envelope length: 4 bytes (length)
-  * Obfuscation to prevent ISP blocks
+  * Overhead: Medium-high
+  * Pros:
+    * All Telegram DCs support it
+    * Minimum envelope length: 1 byte (length)
+    * Maximum envelope length: 4 bytes (length)
+    * Obfuscation to prevent ISP blocks
 
-Cons: 
-  * Initial payload of 64 bytes must be sent on every connection
-  * Additional round of encryption is required  
-  * No initial integrity check
-  * No transport sequence number
+  * Cons: 
+    * Initial payload of 64 bytes must be sent on every connection
+    * Additional round of encryption is required  
+    * No initial integrity check
+    * No transport sequence number
 
 * tcp_intermediate: I guess they like having multiple protocols
   * Overhead: small
@@ -191,6 +194,8 @@ Description: Extra parameters to pass to the proxy class using setExtra
 Default: `true` if `php-gmp` is installed, `false` otherwise  
 Description: Whether to use PFS (better security, slower key exchange)
 
+
+<hr>
 ## `$settings['app_info']`
 
 Application info
@@ -221,6 +226,8 @@ Description: App version
 Default: auto-detected  
 Description: Language code
 
+
+<hr>
 ## `$settings['tl_schema']`
 
 TL scheme files
@@ -240,6 +247,7 @@ Default: `[
 Description: scheme files to use
 
 
+<hr>
 ## `$settings['logger']` 
 
 Logger settings
@@ -266,6 +274,7 @@ Description: What logger messages to show
 Description: You can provide a token for the rollbar log management system
 
 
+<hr>
 ## `$settings['max_tries']`
 
 Max try settings
@@ -282,6 +291,7 @@ Description: How many times should I try to generate an authorization key before
 Default: 5  
 Description: How many times should I try to get a response to a query before throwing an exception?
 
+<hr>
 ## `$settings['flood_timeout']`
 
 Flood timeout settings
@@ -290,7 +300,7 @@ Flood timeout settings
 Default: 20  
 Description: Sleeps if a `FLOOD_WAIT_` error is received with duration lower than this value
 
-
+<hr>
 ## `$settings['secret_chats']`
 
 Secret chat settings
@@ -299,6 +309,7 @@ Secret chat settings
 Default: `true`  
 Description: Can be true to accept all secret chats, false to not accept any secret chat, or an array of user IDs from which to accepts secret chats
 
+<hr>
 ## `$settings['upload']`
 
 Upload settings
@@ -307,6 +318,7 @@ Upload settings
 Default: `true`  
 Description: If false, [disables automatic upload from file path in constructors](FILES.md)
 
+<hr>
 ## `$settings['msg_array_limit']`
 
 How big should be the arrays containing the incoming and outgoing messages?
@@ -323,6 +335,8 @@ Description: maximum number of allowed MTProto messages in the outgoing message 
 Default: 200  
 Description: maximum number of allowed MTProto messages in any [call queue](USING_METHOD.md#call-queues)
 
+
+<hr>
 ## `$settings['peer']`
 
 Peer caching settings
@@ -340,6 +354,7 @@ Default: false
 Description: Should madeline fetch the full chat list on startup?
 
 
+<hr>
 ## `$settings['requests']`
 
 Flood timeout settings
@@ -349,6 +364,7 @@ Default: 500
 Description: Should I try using gzip encoding for requests bigger than N bytes? Set to -1 to disable.
 
 
+<hr>
 ## `$settings['updates']`
 
 Update handling settings
@@ -369,6 +385,7 @@ Description: If positive and bigger than zero, no requests will be sent to the s
 Default: `'get_updates_update_handler'`  
 Description: A callable function that will be called every time an update is received, must accept an array (for the update) as the only parameter.  
 
+<hr>
 ## `$settings['serialization']`
 
 Serialization settings
@@ -378,6 +395,7 @@ Default: 30
 Description: Serialization will be made automatically every N seconds
 
 
+<hr>
 
 You can provide part of any subsetting array, that way the remaining arrays will be automagically set to default and undefined values of specified subsetting arrays will be set to the default values.   
 Example:  
