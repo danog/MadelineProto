@@ -13,10 +13,4 @@ sudo apt-get install php7.2 php7.2-dev php7.2-fpm php7.2-curl php7.2-xml php7.2-
 
 Next, follow the instructions on voip.madelineproto.xyz and prime.madelineproto.xyz to install libtgvoip and PrimeModule.
 
-
-
-
-
-
-
 <form action="https://docs.madelineproto.xyz/docs/FEATURES.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/INSTALLATION.html"><input type="submit" value="Next section" /></form>

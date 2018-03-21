@@ -53,10 +53,7 @@ foreach ($files as $file) {
 ksort($orderedfiles);
 foreach ($orderedfiles as $key => $filename) {
     $lines = explode("\n", file_get_contents($filename));
-    while (end($lines) === '') {
-        unset($lines[count($lines)-1]);
-    }
-    if (strpos(end($lines), "Next")) {
+    while (end($lines) === '' || strpos(end($lines), "Next")) {
         unset($lines[count($lines)-1]);
     }
     if (isset($orderedfiles[$key+1])) {

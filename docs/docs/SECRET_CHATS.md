@@ -66,12 +66,4 @@ $secret_chat = $MadelineProto->get_secret_chat($chat);
 
 This method gets info about a certain chat.
 
-
-
-
-
-
-
-
-
 <form action="https://docs.madelineproto.xyz/docs/CALLS.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Next section" /></form>

@@ -57,11 +57,4 @@ $MadelineProto->logout();
 
 Use `logout` to logout, see [here for the parameters and the result](https://docs.madelineproto.xyz/logout.html).  
 
-
-
-
-
-
-
-
 <form action="https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/FEATURES.html"><input type="submit" value="Next section" /></form>

@@ -120,10 +120,4 @@ Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsock
 
 Can return additional HTTP headers to use when the HTTP protocol is being used.
 
-
-
-
-
-
-
 <form action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/CONTRIB.html"><input type="submit" value="Next section" /></form>

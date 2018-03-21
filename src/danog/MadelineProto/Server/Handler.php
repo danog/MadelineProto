@@ -89,12 +89,10 @@ class Handler extends \danog\MadelineProto\Connection
                 if ($buffer) {
                     $message = $buffer;
                     $buffer = '';
-                    var_dump("using buffer");
                 } else {
                     $message = $this->read_message();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                var_dump("nothing in the socket");
                 continue;
             }
 
@@ -103,7 +101,6 @@ class Handler extends \danog\MadelineProto\Connection
                 if ($message['_'] !== 'socketMessageRequest') {
                     throw new \danog\MadelineProto\Exception('Invalid object received');
                 }
-                var_dump($message);
                 $request_id = $message['request_id'];
                 $this->send_response($request_id, $this->on_request($request_id, $message['method'], $message['args']));
             } catch (\danog\MadelineProto\TL\Exception $e) {
