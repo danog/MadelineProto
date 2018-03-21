@@ -151,7 +151,7 @@ class Connection
                 if (strpos($this->protocol, 'https') === 0 && $proxy === '\\Socket') {
                     $proxy = '\\FSocket';
                 }
-                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : ($has_proxy ? PHP_INT_MAX - 1 : getprotobyname('tcp')));
+                $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : getprotobyname('tcp'));
                 if ($has_proxy) {
                     if ($this->extra !== []) {
                         $this->sock->setExtra($this->extra);

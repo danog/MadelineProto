@@ -54,7 +54,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 97;
+    const V = 98;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -369,6 +369,7 @@ class MTProto
         if (isset(Lang::$lang[$lang_code])) {
             Lang::$current_lang = &Lang::$lang[$lang_code];
         }
+        $altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         // Set default settings
         $default_settings = ['authorization' => [
             // Authorization settings
@@ -443,9 +444,9 @@ class MTProto
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets
-                'proxy' => '\\Socket',
+                'proxy' => $altervista ? '\\HttpProxy' : '\\Socket',
                 // The proxy class to use
-                'proxy_extra' => [],
+                'proxy_extra' => $altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'pfs' => extension_loaded('gmp'),
             ],
