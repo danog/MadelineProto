@@ -1,6 +1,6 @@
 <?php
 
-class HTTPProxy implements \danog\MadelineProto\Proxy
+class CustomHTTPProxy implements \danog\MadelineProto\Proxy
 {
     private $sock;
     private $protocol;
