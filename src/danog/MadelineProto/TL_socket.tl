@@ -5,7 +5,7 @@ socketMessageRequest request_id:int method:vector<string> args:vector<%DataJSON>
 socketMessageResponse request_id:int data:%DataJSON = SocketMessage;
 socketMessageException request_id:int exception:SocketException = SocketMessage;
 socketMessageUpdate data:%DataJSON = SocketMessage;
-socketMessageLog flags:# thread:flags.0?true process:flags.1?true additional:flags.2?string file:flags.3?string level:int data:string = SocketMessage;
+socketMessageLog flags:# thread:flags.0?true process:flags.1?true file:flags.2?string level:int data:string = SocketMessage;
 socketMessageRawData stream_id:int data:bytes = SocketMessage;
 
 socketException message:string code:int trace:%SocketTLTrace = SocketException;

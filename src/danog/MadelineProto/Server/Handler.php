@@ -29,7 +29,6 @@ class Handler extends \danog\MadelineProto\Connection
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-        $this->protocol = $extra;
         $this->construct_TL(['socket' => __DIR__.'/../TL_socket.tl']);
     }
 
@@ -56,13 +55,46 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function loop()
     {
+        $buffer = '';
+
+        $first_byte = $this->sock->read(1);
+        if ($first_byte === chr(239)) {
+            $this->protocol = 'tcp_abridged';
+        } else {
+            $first_byte .= $this->sock->read(3);
+            if ($first_byte === str_repeat(chr(238), 4)) {
+                $this->protocol = 'tcp_intermediate';
+            } else {
+                $this->protocol = 'tcp_full';
+
+                $packet_length = unpack('V', $first_byte)[1];
+                $packet = $this->read($packet_length - 4);
+                if (strrev(hash('crc32b', $first_byte.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
+                    throw new Exception('CRC32 was not correct!');
+                }
+                $this->in_seq_no++;
+                $in_seq_no = unpack('V', substr($packet, 0, 4))[1];
+                if ($in_seq_no != $this->in_seq_no) {
+                    throw new Exception('Incoming seq_no mismatch');
+                }
+
+                $buffer = substr($packet, 4, $packet_length - 12);
+            }
+        }
         while (true) {
             pcntl_signal_dispatch();
             $request_id = 0;
 
             try {
-                $message = $this->read_message();
+                if ($buffer) {
+                    $message = $buffer;
+                    $buffer = '';
+                    var_dump("using buffer");
+                } else {
+                    $message = $this->read_message();
+                }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                var_dump("nothing in the socket");
                 continue;
             }
 
@@ -71,6 +103,7 @@ class Handler extends \danog\MadelineProto\Connection
                 if ($message['_'] !== 'socketMessageRequest') {
                     throw new \danog\MadelineProto\Exception('Invalid object received');
                 }
+                var_dump($message);
                 $request_id = $message['request_id'];
                 $this->send_response($request_id, $this->on_request($request_id, $message['method'], $message['args']));
             } catch (\danog\MadelineProto\TL\Exception $e) {
@@ -132,8 +165,50 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function send_exception($request_id, $e)
     {
-        echo $e;
-        //$this->send_message($this->serialize_object(['type' => 'socketMessageException'], ['request_id' => $request_id, 'exception' => $e]));
+        if ($e instanceof \danog\MadelineProto\RPCErrorException) {
+            $exception = ['_' => 'socketRPCErrorException'];
+            if ($e->getMessage() === $e->rpc) {
+                $exception['rpc_message'] = $e->rpc;
+            } else {
+                $exception['rpc_message'] = $e->rpc;
+                $exception['message'] = $e->getMessage();
+            }
+        } else if ($e instanceof \danog\MadelineProto\TL\Exception) {
+            $exception = ['_' => 'socketTLException', 'message' => $e->getMessage()];
+        } else if ($e instanceof \DOMException) {
+            $exception = ['_' => 'socketDOMException', 'message' => $e->getMessage()];
+        } else {
+            $exception = ['_' => 'socketException', 'message' => $e->getMessage()];
+        }
+        $exception['code'] = $e->getCode();
+        $exception['trace'] = ['_' => 'socketTLTrace', 'frames' => []];
+        $tl = false;
+        foreach (array_reverse($e->getTrace()) as $k => $frame) {
+            $tl_frame = ['_' => 'socketTLFrame'];
+            if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
+                if ($frame['args'][2] !== '') {
+                    $tl_frame['tl_param'] = $frame['args'][2];
+                    $tl = true;
+                }
+            } else {
+                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
+                    continue;
+                }
+                if (isset($frame['file'])) {
+                    $tl_frame['file'] = $frame['file'];
+                    $tl_frame['line'] = $frame['line'];
+                }
+                if (isset($frame['function'])) {
+                    $tl_frame['function'] = $frame['function'];
+                }
+                if (isset($frame['args'])) {
+                    $tl_frame['args'] = json_encode($frame['args']);
+                }
+                $tl = false;
+            }
+            $exception['trace']['frames'][] = $tl_frame;
+        }
+        $this->send_message($this->serialize_object(['type' => 'socketMessageException'], ['request_id' => $request_id, 'exception' => $exception]));
     }
 
     public function send_response($request_id, $response)
@@ -148,6 +223,8 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function logger($message, $level)
     {
+        $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Logger::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php')];
+        $this->send_message($this->serialize_object(['type' => 'socketMessageLog'], $message));
     }
 
     public function update_handler($update)
