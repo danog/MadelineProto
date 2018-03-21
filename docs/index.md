@@ -43,7 +43,7 @@ $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K
 echo 'OK, done!'.PHP_EOL;
 ```
 
-Run this code in a browser or in a console. 
+[Try this code now!](https://try.madelineproto.xyz) or run this code in a browser or in a console. 
 
 
 Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `MadelineProto.log` file that was created in the same directory (if running from a browser).  
@@ -129,10 +129,10 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Sending secret messages](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#sending-secret-messages)
 * [Lua binding](https://docs.madelineproto.xyz/docs/LUA.html)
 * [Using a proxy](https://docs.madelineproto.xyz/docs/PROXY.html)
-* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html)
-  * [Translation](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#translation)
-  * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#contribution-guide)
-  * [Credits](https://docs.madelineproto.xyz/docs/CONTRIBUTING.html#credits)
+* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html)
+  * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
+  * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
+  * [Credits](https://docs.madelineproto.xyz/docs/CONTRIB.html#credits)
 * [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
 
 

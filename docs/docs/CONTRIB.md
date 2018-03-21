@@ -92,4 +92,6 @@ Thanks to the devs that contributed to these projects, MadelineProto is now an e
 
 
 
-<form action="https://docs.madelineproto.xyz/docs/TEMPLATES.html"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/PROXY.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/TEMPLATES.html"><input type="submit" value="Next section" /></form>

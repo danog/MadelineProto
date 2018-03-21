@@ -120,4 +120,6 @@ foreach ($updates as $update) {
 
 
 
-<form action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Next section" /></form>

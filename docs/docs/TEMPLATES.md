@@ -32,4 +32,6 @@ $MadelineProto->set_web_template($new_template);
 The new template must have a structure similar the the default template.
 
 
+
+
 <form action="https://docs.madelineproto.xyz/#very-complex-and-complete-examples"><input type="submit" value="Next section" /></form>

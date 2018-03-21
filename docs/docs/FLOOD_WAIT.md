@@ -16,4 +16,6 @@ Use sleep to execute max N calls in `floodwaitrate` seconds, this way you won't 
 
 
 
-<form action="https://docs.madelineproto.xyz/docs/LOGGING.html"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/EXCEPTIONS.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/LOGGING.html"><input type="submit" value="Next section" /></form>

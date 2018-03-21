@@ -12,4 +12,6 @@ $me = $MadelineProto->get_self();
 
 
 
-<form action="https://docs.madelineproto.xyz/docs/EXCEPTIONS.html"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/SETTINGS.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/EXCEPTIONS.html"><input type="submit" value="Next section" /></form>

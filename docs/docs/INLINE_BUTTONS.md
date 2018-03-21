@@ -55,4 +55,6 @@ $button->click();
 
 
 
-<form action="https://docs.madelineproto.xyz/docs/CALLS.html"><input type="submit" value="Next section" /></form>
+
+
+<form action="https://docs.madelineproto.xyz/docs/DIALOGS.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/CALLS.html"><input type="submit" value="Next section" /></form>

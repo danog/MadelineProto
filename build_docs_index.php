@@ -43,7 +43,7 @@ foreach ($files as $file) {
         $orderedfiles[18] = $file;
     } else if ($base === 'PROXY') {
         $orderedfiles[19] = $file;
-    } else if ($base === 'CONTRIBUTING') {
+    } else if ($base === 'CONTRIB') {
         $orderedfiles[20] = $file;
     } else if ($base === 'TEMPLATES') {
         $orderedfiles[21] = $file;
@@ -61,7 +61,8 @@ foreach ($orderedfiles as $key => $filename) {
     }
     if (isset($orderedfiles[$key+1])) {
         $nextfile = "https://docs.madelineproto.xyz/docs/".basename($orderedfiles[$key+1], '.md').".html";
-        $lines[count($lines)] = "\n<form action=\"$nextfile\"><input type=\"submit\" value=\"Next section\" /></form>";
+        $prevfile = $key === 0 ? "https://docs.madelineproto.xyz" : "https://docs.madelineproto.xyz/docs/".basename($orderedfiles[$key-1], '.md').".html";
+        $lines[count($lines)] = "\n<form action=\"$prevfile\"><input type=\"submit\" value=\"Previous section\" /></form><form action=\"$nextfile\"><input type=\"submit\" value=\"Next section\" /></form>";
     } else {
         $lines[count($lines)] = "\n<form action=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\"><input type=\"submit\" value=\"Next section\" /></form>";
     }
