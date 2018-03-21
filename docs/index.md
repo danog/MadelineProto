@@ -31,15 +31,21 @@ $api_hash = '';
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
 $MadelineProto->start();    
 
-$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
-$MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+$me = $MadelineProto->get_self();
 
-try {
-    $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
-} catch (\danog\MadelineProto\RPCErrorException $e) {
+\danog\MadelineProto\Logger::log($me);
+
+if (!$me['bot']) {
+    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
+    $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+
+    try {
+        $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
+    } catch (\danog\MadelineProto\RPCErrorException $e) {
+    }
+
+    $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
 }
-
-$MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
 echo 'OK, done!'.PHP_EOL;
 ```
 
