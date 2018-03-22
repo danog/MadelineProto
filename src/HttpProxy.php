@@ -34,7 +34,8 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     }
     public function setExtra(array $extra = []) {
         $this->extra = $extra;
-        $this->sock = new \Socket(strlen(@inet_pton($this->extra['address'])) !== 4 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
+        $name = $this->protocol === PHP_INT_MAX ? '\\FSocket' : '\\Socket';
+        $this->sock = new $name(strlen(@inet_pton($this->extra['address'])) !== 4 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
     }
     public function setOption($level, $name, $value) {
         return $this->sock->setOption($level, $name, $value);
@@ -157,4 +158,4 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     public function getProxyHeaders() {
     
     }
-}
+}

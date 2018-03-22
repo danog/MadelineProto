@@ -91,6 +91,7 @@ trait CallHandler
             $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
             \danog\MadelineProto\Logger::log('Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         }
+        $to_ack = [];
         $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
             if ($canunset = !$this->updates_state['sync_loading']) {
@@ -117,7 +118,7 @@ trait CallHandler
                     }
 
                     $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $method, 'body' => $serialized, 'content_related' => $content_related, 'msg_id' => $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter'])];
-                    if (count($this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
+                    if (count($to_ack = $this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
                         $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
                     }
                     if ($this->is_http($aargs['datacenter']) && $method !== 'http_wait') {
@@ -129,10 +130,6 @@ trait CallHandler
                     $aargs['message_id'] = $message_id;
                 }
 
-                if ($this->is_http($aargs['datacenter']) && isset($aargs['reopen'])) {
-                    \danog\MadelineProto\Logger::log('Closing and reopening connection...', \danog\MadelineProto\Logger::WARNING);
-                    $this->close_and_reopen($aargs['datacenter']);
-                }
                 if (isset($queue)) {
                     $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][] = $message_id;
                     if (count($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]) > $this->settings['msg_array_limit']['call_queue']) {
@@ -198,10 +195,15 @@ trait CallHandler
                     } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                         $last_error = 'Nothing in the socket';
                         \danog\MadelineProto\Logger::log('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                        if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv || ($this->datacenter->sockets[$aargs['datacenter']]->last_recv < time() - 1 && $this->is_http($aargs['datacenter']))) {
-                            $this->close_and_reopen($aargs['datacenter']);
-                        }
                         $only_updates = false;
+                        if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv) { // the socket is dead, resend request
+                            $this->close_and_reopen($aargs['datacenter']);
+                            continue 2;
+                        }
+                        //if ($this->datacenter->sockets[$aargs['datacenter']]->last_recv < time() - 1 && $this->is_http($aargs['datacenter'])) {
+                        //    $this->close_and_reopen($aargs['datacenter']);
+                        //    continue 2;
+                        //}
                         continue; //2;
                     }
                 }
@@ -215,6 +217,12 @@ trait CallHandler
                 if ($canunsetpostponeupdates) {
                     $this->postpone_updates = false;
                     $this->handle_pending_updates();
+                }
+                foreach ($to_ack as $msg_id) {
+                    $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$msg_id]['ack'] = true;
+                    if (isset($this->datacenter->sockets[$aargs['datacenter']]->ack_queue[$msg_id])) {
+                        unset($this->datacenter->sockets[$aargs['datacenter']]->ack_queue[$msg_id]);
+                    }
                 }
                 if ($server_answer === null) {
                     throw new \danog\MadelineProto\Exception("Couldn't get response");

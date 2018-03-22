@@ -155,14 +155,14 @@ class Connection
                 if ($has_proxy) {
                     if ($this->extra !== []) {
                         $this->sock->setExtra($this->extra);
-                    }
+                    }/*
                     if ($this->protocol === 'http') {
                         $this->parsed['path'] = $this->parsed['scheme'].'://'.$this->parsed['host'].
                         $this->parsed['path'];
                         $port = 80;
                     } elseif ($this->protocol === 'https') {
                         $port = 443;
-                    }
+                    }*/
                 }
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);

@@ -28,7 +28,7 @@ trait MessageHandler
 
     public function send_messages($datacenter)
     {
-        $has_ack = false;
+        //$has_ack = false;
 
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
             $messages = [];
@@ -37,11 +37,11 @@ trait MessageHandler
             foreach ($this->datacenter->sockets[$datacenter]->object_queue as $message) {
                 $message['seqno'] = $this->generate_out_seq_no($datacenter, $message['content_related']);
                 $message['bytes'] = strlen($message['body']);
-                $has_ack = $has_ack || $message['_'] === 'msgs_ack';
+                //$has_ack = $has_ack || $message['_'] === 'msgs_ack';
                 \danog\MadelineProto\Logger::log("Inside of msg_container, sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message['_'] = 'MTmessage';
                 $messages[] = $message;
-                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1];//, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
             }
             $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
             $message_id = $this->generate_message_id($datacenter);
@@ -68,12 +68,12 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->send_message($message);
         $this->datacenter->sockets[$datacenter]->object_queue = [];
 
-        if ($has_ack) {
+        /*if ($has_ack) {
             foreach ($this->datacenter->sockets[$datacenter]->ack_queue as $msg_id) {
                 $this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['ack'] = true;
             }
             $this->datacenter->sockets[$datacenter]->ack_queue = [];
-        }
+        }*/
     }
 
     /**
