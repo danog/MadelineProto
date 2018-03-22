@@ -16,9 +16,13 @@ namespace danog\MadelineProto;
 class API extends APIFactory
 {
     use \danog\Serializable;
+    use \danog\MadelineProto\Wrappers\ApiStart;
+    use \danog\MadelineProto\Wrappers\ApiTemplates;
     public $session;
     public $serialized = 0;
     public $API;
+    public $getting_api_id = false;
+    public $my_telegram_org_wrapper;
 
     public function __magic_construct($params = [], $settings = [])
     {
@@ -43,18 +47,22 @@ class API extends APIFactory
                     flock($realpaths['lockfile'], LOCK_UN);
                     fclose($realpaths['lockfile']);
                 }
-                $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $unserialized);
-                foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                    class_exists('\\danog\\MadelineProto\\'.$class);
-                }
                 class_exists('\\Volatile');
                 \danog\MadelineProto\Logger::class_exists();
 
                 try {
                     $unserialized = unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                    $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $unserialized);
+                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                        class_exists('\\danog\\MadelineProto\\'.$class);
+                    }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
+                    $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $unserialized);
+                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                        class_exists('\\danog\\MadelineProto\\'.$class);
+                    }
                     Logger::log((string) $e, Logger::ERROR);
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
                         $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $unserialized);
@@ -67,14 +75,22 @@ class API extends APIFactory
                 if ($unserialized === false) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
                 }
+                $this->web_api_template = $unserialized->web_api_template;
+                $this->my_telegram_org_wrapper = $unserialized->my_telegram_org_wrapper;
+                $this->getting_api_id = $unserialized->getting_api_id;
+
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
+                    return;
                 }
-
-                return;
             }
             $params = $settings;
+        }
+        if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
+            $app = $this->api_start();
+            $params['app_info']['api_id'] = $app['api_id'];
+            $params['app_info']['api_hash'] = $app['api_hash'];
         }
         $this->API = new MTProto($params);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
@@ -82,8 +98,6 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
         $pong = $this->ping(['ping_id' => 3]);
         \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
-        //\danog\MadelineProto\Logger::log('Getting future salts...', Logger::ULTRA_VERBOSE);
-        //$this->future_salts = $this->get_future_salts(['num' => 3]);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
@@ -97,15 +111,13 @@ class API extends APIFactory
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()) || Logger::is_fork()) {
             return;
         }
-        if (!is_null($this->session)) {
-            $this->serialize($this->session);
-        }
+        $this->serialize();
         restore_error_handler();
     }
 
     public function __sleep()
     {
-        return ['API'];
+        return ['API', 'web_api_template', 'getting_api_id', 'my_telegram_org_wrapper'];
     }
 
     public function &__get($name)
@@ -149,10 +161,12 @@ class API extends APIFactory
 
     public function APIFactory()
     {
-        foreach ($this->API->get_method_namespaces() as $namespace) {
-            $this->{$namespace} = new APIFactory($namespace, $this->API);
+        if ($this->API) {
+            foreach ($this->API->get_method_namespaces() as $namespace) {
+                $this->{$namespace} = new APIFactory($namespace, $this->API);
+            }
+            $this->API->wrapper = $this;
         }
-        $this->API->wrapper = $this;
     }
 
     public function serialize($params = '')
@@ -161,8 +175,9 @@ class API extends APIFactory
             $params = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-        $this->serialized = time();
-
+        if (is_null($this->session)) {
+            return;
+        }
         return Serialization::serialize($params, $this);
     }
 }

@@ -48,11 +48,15 @@ class Serialization
      */
     public static function serialize($filename, $instance, $force = false)
     {
+        if ($filename == '') {
+            throw new \danog\MadelineProto\Exception('Empty filename');
+        }
+
         if (isset($instance->API->setdem) && $instance->API->setdem) {
             $instance->API->setdem = false;
             $instance->API->__construct($instance->API->settings);
         }
-        if ($instance->API === null) {
+        if ($instance->API === null && !$instance->getting_api_id) {
             return false;
         }
         $instance->serialized = time();
@@ -86,6 +90,7 @@ class Serialization
      *
      * @return API
      */
+    /*
     public static function deserialize($filename, $no_updates = false)
     {
         $realpaths = self::realpaths($filename);
@@ -142,5 +147,5 @@ class Serialization
         }
 
         return $unserialized;
-    }
+    }*/
 }

@@ -25,7 +25,7 @@ $p->addFromString('.git/refs/heads/master', $argv[3]);
 
 $p->setStub('<?php
 $backtrace = debug_backtrace();
-if (basename($backtrace[0]["file"]) === "phar.php") {
+if (in_array(basename($backtrace[0]["file"]), ["madeline.php", "phar.php"])) {
     chdir(dirname($backtrace[1]["file"]));
     if (!isset($phar_debug)) file_put_contents($backtrace[0]["file"], file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new"));
 }

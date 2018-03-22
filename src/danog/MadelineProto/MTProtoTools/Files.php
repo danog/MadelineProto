@@ -88,7 +88,7 @@ trait Files
         return $this->upload($file, $file_name, $cb, true);
     }
     public function gen_all_file($media) {
-        $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
+        $res = [$this->constructors->find_by_predicate($media['_'])['type'] => $media];
         switch ($media['_']) {
             case 'messageMediaPhoto':
                 if (!isset($media['photo']['access_hash'])) {

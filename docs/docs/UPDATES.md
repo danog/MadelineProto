@@ -77,7 +77,7 @@ $MadelineProto->loop();
 
 This will create an event handler class `EventHandler`, create a MadelineProto session, and set the event handler class to our newly created event handler.
 
-When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, the corresponding `onUpdateType` event handler method is called. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/types/Update.html). 
+When an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html) is received, the corresponding `onUpdateType` event handler method is called. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/API_docs/types/Update.html). 
 If such a method does not exist, the `onAny` event handler method is called.  
 If the `onAny` event handler method does not exist, the update is ignored.
 
@@ -89,6 +89,9 @@ $this->messages->sendMessage(['peer' => '@danogentili', 'message' => 'hi']);
 If you intend to use your own constructor in the event handler, make sure to call the parent construtor with the only parameter provided to your constructor.
 
 The update handling loop is started by the `$MadelineProto->loop()` method, and it will automatically restart the script if execution time runs out.
+
+To break out of the loop just call `die();`
+
 
 ## Event driven multithreaded
 
@@ -117,7 +120,7 @@ $MadelineProto->setWebhook('http://mybot.eu.org/madelinehook.php');
 $MadelineProto->loop();
 ```
 
-When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, a POST request is made to the provided webhook URL, with json-encoded payload containing the Update. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/types/Update.html).  
+When an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html) is received, a POST request is made to the provided webhook URL, with json-encoded payload containing the Update. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/API_docs/types/Update.html).  
 The webhook can also respond with a JSON payload containing the name of a method to call and the arguments:
 ```json
 {"method":"messages->sendMessage", "peer":"@danogentili", "message":"hi"}
@@ -183,9 +186,11 @@ $MadelineProto->start();
 $MadelineProto->setCallback(function ($update) use ($MadelineProto) { \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']); });
 $MadelineProto->loop();
 ```
-When an [Update](https://docs.madelineproto.xyz/types/Update.html) is received, the provided callback function is called.
+When an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html) is received, the provided callback function is called.
 
-The update handling loop is started by the `$MadelineProto->loop()` method, and it will automatically restart the script if execution time runs out.
+The update handling loop is started by the `$MadelineProto->loop()` method, and it will automatically restart the script if execution time runs out.  
+
+To break out of the loop just call `die();`
 
 ## Callback multithreaded
 

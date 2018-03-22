@@ -543,9 +543,6 @@ class MTProto
         if (isset(Lang::$lang[$settings['app_info']['lang_code']])) {
             Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
         }
-        if (!isset($settings['app_info']['api_id'])) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
-        }
         /*if ($settings['app_info']['api_id'] < 20) {
               $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
           }*/
@@ -571,6 +568,9 @@ class MTProto
         }
         $this->settings = $settings;
         if (!$this->settings['updates']['handle_updates']) $this->updates = [];
+        if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+        }
         // Setup logger
         $this->setup_logger();
     }
