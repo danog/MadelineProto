@@ -107,7 +107,7 @@ class MTProto
     private $postpone_updates = false;
     private $postpone_pwrchat = false;
     private $pending_pwrchat = [];
-
+    private $altervista = false;
     public function __magic_construct($settings = [])
     {
         // Parse settings
@@ -192,6 +192,8 @@ class MTProto
         if (!extension_loaded('xml')) {
             throw new Exception(['extension', 'xml']);
         }
+        $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
+
         $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
             unset($this->settings['pwr']['update_handler']);
@@ -369,7 +371,7 @@ class MTProto
         if (isset(Lang::$lang[$lang_code])) {
             Lang::$current_lang = &Lang::$lang[$lang_code];
         }
-        $altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
+        $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         // Set default settings
         $default_settings = ['authorization' => [
             // Authorization settings
@@ -444,9 +446,9 @@ class MTProto
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets
-                'proxy' => $altervista ? '\\HttpProxy' : '\\Socket',
+                'proxy' => $this->altervista ? '\\HttpProxy' : '\\Socket',
                 // The proxy class to use
-                'proxy_extra' => $altervista ? ['address' => 'localhost', 'port' => 80] : [],
+                'proxy_extra' => $this->altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'pfs' => extension_loaded('gmp'),
             ],
