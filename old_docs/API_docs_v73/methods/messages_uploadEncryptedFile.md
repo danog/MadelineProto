@@ -12,7 +12,7 @@ Upload a secret chat file without sending it to anyone
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|Ignore this|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat where to upload the media|
 |file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|The file|
 
 

@@ -861,7 +861,7 @@ class Lang
     'method_messages.sendMultiMedia_param_reply_to_msg_id_type_int' => 'Reply to message by ID',
     'method_messages.sendMultiMedia_param_multi_media_type_Vector t' => 'The album',
     'method_messages.uploadEncryptedFile' => 'Upload a secret chat file without sending it to anyone',
-    'method_messages.uploadEncryptedFile_param_peer_type_InputEncryptedChat' => 'Ignore this',
+    'method_messages.uploadEncryptedFile_param_peer_type_InputEncryptedChat' => 'The chat where to upload the media',
     'method_messages.uploadEncryptedFile_param_file_type_InputEncryptedFile' => 'The file',
     'method_updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates',
     'method_updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates',
