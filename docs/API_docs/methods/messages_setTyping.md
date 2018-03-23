@@ -1,17 +1,19 @@
 ---
 title: messages.setTyping
-description: messages.setTyping parameters, return type and example
+description: Change typing status
 ---
 ## Method: messages.setTyping  
 [Back to methods index](index.md)
 
 
+Change typing status
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|action|[CLICK ME SendMessageAction](../types/SendMessageAction.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to change typing status|
+|action|[CLICK ME SendMessageAction](../types/SendMessageAction.md) | Yes|Typing status|
 
 
 ### Return type: [Bool](../types/Bool.md)

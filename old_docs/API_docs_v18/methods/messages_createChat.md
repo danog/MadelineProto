@@ -1,17 +1,19 @@
 ---
 title: messages.createChat
-description: messages.createChat parameters, return type and example
+description: Create a chat (not supergroup)
 ---
 ## Method: messages.createChat  
 [Back to methods index](index.md)
 
 
+Create a chat (not supergroup)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
-|title|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The users to add to the chat|
+|title|[CLICK ME string](../types/string.md) | Yes|The new chat's title|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

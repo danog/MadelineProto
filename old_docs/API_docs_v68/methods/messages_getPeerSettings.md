@@ -1,16 +1,18 @@
 ---
 title: messages.getPeerSettings
-description: messages.getPeerSettings parameters, return type and example
+description: Get the settings of  apeer
 ---
 ## Method: messages.getPeerSettings  
 [Back to methods index](index.md)
 
 
+Get the settings of  apeer
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer|
 
 
 ### Return type: [PeerSettings](../types/PeerSettings.md)

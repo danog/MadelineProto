@@ -1,10 +1,12 @@
 ---
 title: contacts.resetSaved
-description: contacts.resetSaved parameters, return type and example
+description: Reset saved contacts
 ---
 ## Method: contacts.resetSaved  
 [Back to methods index](index.md)
 
+
+Reset saved contacts
 
 
 

@@ -1,18 +1,20 @@
 ---
 title: messages.addChatUser
-description: messages.addChatUser parameters, return type and example
+description: Add a user to a normal chat (use channels->inviteToChannel for supergroups)
 ---
 ## Method: messages.addChatUser  
 [Back to methods index](index.md)
 
 
+Add a user to a normal chat (use channels->inviteToChannel for supergroups)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|fwd\_limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to invite users|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to invite|
+|fwd\_limit|[CLICK ME int](../types/int.md) | Yes|Number of old messages the user will see|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

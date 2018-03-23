@@ -1,16 +1,18 @@
 ---
 title: messages.getChats
-description: messages.getChats parameters, return type and example
+description: Get info about chats
 ---
 ## Method: messages.getChats  
 [Back to methods index](index.md)
 
 
+Get info about chats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The MTProto IDs of chats to fetch info about|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

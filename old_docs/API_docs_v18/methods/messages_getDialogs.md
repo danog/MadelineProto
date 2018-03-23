@@ -1,18 +1,20 @@
 ---
 title: messages.getDialogs
-description: messages.getDialogs parameters, return type and example
+description: Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
 ---
 ## Method: messages.getDialogs  
 [Back to methods index](index.md)
 
 
+Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offset|[CLICK ME int](../types/int.md) | Yes||
+|max\_id|[CLICK ME int](../types/int.md) | Yes||
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of dialogs to fetch|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)

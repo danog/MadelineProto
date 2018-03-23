@@ -12,7 +12,7 @@ description: messages.getWebPagePreview parameters, return type and example
 |----------|---------------|----------|
 |message|[CLICK ME string](../types/string.md) | Yes|
 |entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
-|parse\_mode| [string](../types/string.md) | Optional |
+|parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

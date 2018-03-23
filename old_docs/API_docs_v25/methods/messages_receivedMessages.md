@@ -1,16 +1,18 @@
 ---
 title: messages.receivedMessages
-description: messages.receivedMessages parameters, return type and example
+description: Mark messages as read
 ---
 ## Method: messages.receivedMessages  
 [Back to methods index](index.md)
 
 
+Mark messages as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id of messages to mark as read|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

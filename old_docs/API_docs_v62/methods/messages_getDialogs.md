@@ -1,20 +1,22 @@
 ---
 title: messages.getDialogs
-description: messages.getDialogs parameters, return type and example
+description: Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
 ---
 ## Method: messages.getDialogs  
 [Back to methods index](index.md)
 
 
+Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|exclude\_pinned|[CLICK ME Bool](../types/Bool.md) | Optional|
-|offset\_date|[CLICK ME int](../types/int.md) | Yes|
-|offset\_id|[CLICK ME int](../types/int.md) | Yes|
-|offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|exclude\_pinned|[CLICK ME Bool](../types/Bool.md) | Optional|Do not fetch pinned chats|
+|offset\_date|[CLICK ME int](../types/int.md) | Yes|end($res['messages'])['date'];|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|end($res['messages'])['id'];|
+|offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|end($res['dialogs'])['peer'];|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of dialogs to fetch|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)

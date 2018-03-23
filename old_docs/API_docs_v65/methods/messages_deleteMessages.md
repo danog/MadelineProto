@@ -1,17 +1,19 @@
 ---
 title: messages.deleteMessages
-description: messages.deleteMessages parameters, return type and example
+description: Delete messages
 ---
 ## Method: messages.deleteMessages  
 [Back to methods index](index.md)
 
 
+Delete messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|revoke|[CLICK ME Bool](../types/Bool.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|revoke|[CLICK ME Bool](../types/Bool.md) | Optional|Delete the messages for everyone?|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|IDs of messages to delete, use channels->deleteMessages for supergroups|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

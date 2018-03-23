@@ -1,25 +1,27 @@
 ---
 title: messages.sendMedia
-description: messages.sendMedia parameters, return type and example
+description: Send a media
 ---
 ## Method: messages.sendMedia  
 [Back to methods index](index.md)
 
 
+Send a media
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
-|background|[CLICK ME Bool](../types/Bool.md) | Optional|
-|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
-|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
-|message|[CLICK ME string](../types/string.md) | Yes|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
-|parse\_mode| [string](../types/string.md) | Optional |
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|Disable notifications?|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|Disable background notifications?|
+|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|Clear the message draft of this chat?|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the media|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media to send|
+|message|[CLICK ME string](../types/string.md) | Yes|The caption|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|Keyboards to send|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|Entities for styled text|
+|parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Updates](../types/Updates.md)

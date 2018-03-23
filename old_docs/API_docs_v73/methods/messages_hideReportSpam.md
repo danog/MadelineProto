@@ -1,16 +1,18 @@
 ---
 title: messages.hideReportSpam
-description: messages.hideReportSpam parameters, return type and example
+description: Hide report spam popup
 ---
 ## Method: messages.hideReportSpam  
 [Back to methods index](index.md)
 
 
+Hide report spam popup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to hide the popup|
 
 
 ### Return type: [Bool](../types/Bool.md)

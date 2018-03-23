@@ -1,26 +1,28 @@
 ---
 title: messages.search
-description: messages.search parameters, return type and example
+description: Search peers or messages
 ---
 ## Method: messages.search  
 [Back to methods index](index.md)
 
 
+Search peers or messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|q|[CLICK ME string](../types/string.md) | Yes|
-|from\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|
-|min\_date|[CLICK ME int](../types/int.md) | Yes|
-|max\_date|[CLICK ME int](../types/int.md) | Yes|
-|offset\_id|[CLICK ME int](../types/int.md) | Yes|
-|add\_offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|min\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to search|
+|q|[CLICK ME string](../types/string.md) | Yes|What to search|
+|from\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|Show only messages from a certain user?|
+|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|Message filter|
+|min\_date|[CLICK ME int](../types/int.md) | Yes|Minumum date of results to fetch|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of results to fetch|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|Offset |
+|add\_offset|[CLICK ME int](../types/int.md) | Yes|Additional offset, can be 0|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id to return|
+|min\_id|[CLICK ME int](../types/int.md) | Yes|Minumum message id to return|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

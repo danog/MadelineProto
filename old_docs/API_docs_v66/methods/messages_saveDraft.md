@@ -15,7 +15,7 @@ description: messages.saveDraft parameters, return type and example
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
 |message|[CLICK ME string](../types/string.md) | Yes|
 |entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
-|parse\_mode| [string](../types/string.md) | Optional |
+|parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Bool](../types/Bool.md)

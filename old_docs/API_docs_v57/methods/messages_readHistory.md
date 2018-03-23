@@ -1,17 +1,19 @@
 ---
 title: messages.readHistory
-description: messages.readHistory parameters, return type and example
+description: Mark messages as read
 ---
 ## Method: messages.readHistory  
 [Back to methods index](index.md)
 
 
+Mark messages as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to mark messages as read|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to mark as read|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

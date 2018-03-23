@@ -153,7 +153,7 @@ trait Methods
                 }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
-                    $table .= '|parse\\_mode| [string](../types/string.md) | Optional |
+                    $table .= '|parse\\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 ';
                     $params .= "'parse_mode' => 'string', ";
                     $lua_params .= "parse_mode='string', ";

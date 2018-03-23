@@ -1,23 +1,25 @@
 ---
 title: messages.search
-description: messages.search parameters, return type and example
+description: Search peers or messages
 ---
 ## Method: messages.search  
 [Back to methods index](index.md)
 
 
+Search peers or messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|q|[CLICK ME string](../types/string.md) | Yes|
-|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|
-|min\_date|[CLICK ME int](../types/int.md) | Yes|
-|max\_date|[CLICK ME int](../types/int.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to search|
+|q|[CLICK ME string](../types/string.md) | Yes|What to search|
+|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|Message filter|
+|min\_date|[CLICK ME int](../types/int.md) | Yes|Minumum date of results to fetch|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of results to fetch|
+|offset|[CLICK ME int](../types/int.md) | Yes||
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id to return|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

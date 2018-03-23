@@ -1,19 +1,21 @@
 ---
 title: messages.getHistory
-description: messages.getHistory parameters, return type and example
+description: Get previous messages of a group
 ---
 ## Method: messages.getHistory  
 [Back to methods index](index.md)
 
 
+Get previous messages of a group
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|offset|[CLICK ME int](../types/int.md) | Yes||
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to fetch|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of messages to fetch|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

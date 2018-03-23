@@ -1,16 +1,18 @@
 ---
 title: messages.reportSpam
-description: messages.reportSpam parameters, return type and example
+description: Report a peer for spam
 ---
 ## Method: messages.reportSpam  
 [Back to methods index](index.md)
 
 
+Report a peer for spam
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer to report|
 
 
 ### Return type: [Bool](../types/Bool.md)

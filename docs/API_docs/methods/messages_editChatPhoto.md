@@ -1,17 +1,19 @@
 ---
 title: messages.editChatPhoto
-description: messages.editChatPhoto parameters, return type and example
+description: Edit the photo of a normal chat (not supergroup)
 ---
 ## Method: messages.editChatPhoto  
 [Back to methods index](index.md)
 
 
+Edit the photo of a normal chat (not supergroup)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The MTProto ID of the chat|
+|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new phto|
 
 
 ### Return type: [Updates](../types/Updates.md)

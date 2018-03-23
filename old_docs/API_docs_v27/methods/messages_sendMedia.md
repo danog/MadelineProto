@@ -1,18 +1,20 @@
 ---
 title: messages.sendMedia
-description: messages.sendMedia parameters, return type and example
+description: Send a media
 ---
 ## Method: messages.sendMedia  
 [Back to methods index](index.md)
 
 
+Send a media
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
-|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the media|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media to send|
 
 
 ### Return type: [Updates](../types/Updates.md)

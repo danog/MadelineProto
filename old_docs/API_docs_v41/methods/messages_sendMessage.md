@@ -1,23 +1,25 @@
 ---
 title: messages.sendMessage
-description: messages.sendMessage parameters, return type and example
+description: Send a message
 ---
 ## Method: messages.sendMessage  
 [Back to methods index](index.md)
 
 
+Send a message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
-|message|[CLICK ME string](../types/string.md) | Yes|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
-|parse\_mode| [string](../types/string.md) | Optional |
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview?|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional||
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to send this message|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|message|[CLICK ME string](../types/string.md) | Yes|The message to send|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|Keyboards to send|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|Entities to send (for styled text)|
+|parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Updates](../types/Updates.md)

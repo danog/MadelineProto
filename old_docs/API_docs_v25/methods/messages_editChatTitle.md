@@ -1,17 +1,19 @@
 ---
 title: messages.editChatTitle
-description: messages.editChatTitle parameters, return type and example
+description: Edit the title of a normal chat (not supergroup)
 ---
 ## Method: messages.editChatTitle  
 [Back to methods index](index.md)
 
 
+Edit the title of a normal chat (not supergroup)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|title|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The MTProto ID of the chat|
+|title|[CLICK ME string](../types/string.md) | Yes|The new title|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

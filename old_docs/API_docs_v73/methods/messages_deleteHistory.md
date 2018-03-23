@@ -1,18 +1,20 @@
 ---
 title: messages.deleteHistory
-description: messages.deleteHistory parameters, return type and example
+description: Delete chat history
 ---
 ## Method: messages.deleteHistory  
 [Back to methods index](index.md)
 
 
+Delete chat history
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|just\_clear|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|just\_clear|[CLICK ME Bool](../types/Bool.md) | Optional|Only clear it from your side|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to clear it|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id of messages to delete|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

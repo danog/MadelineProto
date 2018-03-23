@@ -1,17 +1,19 @@
 ---
 title: messages.deleteChatUser
-description: messages.deleteChatUser parameters, return type and example
+description: Delete a user from a chat (not supergroup)
 ---
 ## Method: messages.deleteChatUser  
 [Back to methods index](index.md)
 
 
+Delete a user from a chat (not supergroup)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The MTProto ID of the chat|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to delete (pass @me to leave the chat)|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

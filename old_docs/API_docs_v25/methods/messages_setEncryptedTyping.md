@@ -1,17 +1,19 @@
 ---
 title: messages.setEncryptedTyping
-description: messages.setEncryptedTyping parameters, return type and example
+description: Send typing notification to secret chat
 ---
 ## Method: messages.setEncryptedTyping  
 [Back to methods index](index.md)
 
 
+Send typing notification to secret chat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|typing|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes||
+|typing|[CLICK ME Bool](../types/Bool.md) | Yes||
 
 
 ### Return type: [Bool](../types/Bool.md)

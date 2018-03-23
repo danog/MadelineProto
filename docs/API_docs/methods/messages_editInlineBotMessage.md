@@ -16,7 +16,7 @@ description: messages.editInlineBotMessage parameters, return type and example
 |message|[CLICK ME string](../types/string.md) | Optional|
 |reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
 |entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
-|parse\_mode| [string](../types/string.md) | Optional |
+|parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 |geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
 
 
