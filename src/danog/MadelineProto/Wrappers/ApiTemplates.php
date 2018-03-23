@@ -50,7 +50,19 @@ trait ApiTemplates
         if (!isset($this->my_telegram_org_wrapper)) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'manual') {
-                    echo $this->web_api_echo_template('Enter your API ID and API hash<br><b>'.$message.'</b>', '<input type="string" name="api_id" placeholder="API ID" required/><input type="string" name="api_hash" placeholder="API hash" required/>');
+                    echo $this->web_api_echo_template('Enter your API ID and API hash<br><b>'.$message.'</b><ol>
+<li>Login to my.telegram.org</li>
+<li>Go to API development tools</li>
+<li>
+  <ul>
+    <li>App title: your app&apos;s name, can be anything</li>
+    <li>Short name: your app&apos;s short name, only numbers and letters</li>
+    <li>Platform: Web</li>
+    <li>Description: describe your app here</li>
+  </ul>
+</li>
+<li>Click on create application</li>
+</ol>', '<input type="string" name="api_id" placeholder="API ID" required/><input type="string" name="api_hash" placeholder="API hash" required/>');
                 } else {
                     echo $this->web_api_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>');
                 }
