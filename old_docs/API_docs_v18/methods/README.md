@@ -27,141 +27,141 @@ description: What do you want to do?
 
 * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
-* <a href="account_checkUsername.html" name="account_checkUsername">Check if this username is available</a>  
+* <a href="account_checkUsername.html" name="account_checkUsername">Check if this username is available: account.checkUsername</a>  
 
-* <a href="account_getNotifySettings.html" name="account_getNotifySettings">Get notification settings</a>  
+* <a href="account_getNotifySettings.html" name="account_getNotifySettings">Get notification settings: account.getNotifySettings</a>  
 
-* <a href="account_getWallPapers.html" name="account_getWallPapers">Returns a list of available wallpapers.</a>  
+* <a href="account_getWallPapers.html" name="account_getWallPapers">Returns a list of available wallpapers.: account.getWallPapers</a>  
 
-* <a href="account_registerDevice.html" name="account_registerDevice">Register device for push notifications</a>  
+* <a href="account_registerDevice.html" name="account_registerDevice">Register device for push notifications: account.registerDevice</a>  
 
-* <a href="account_resetNotifySettings.html" name="account_resetNotifySettings">Reset all notification settings</a>  
+* <a href="account_resetNotifySettings.html" name="account_resetNotifySettings">Reset all notification settings: account.resetNotifySettings</a>  
 
-* <a href="account_unregisterDevice.html" name="account_unregisterDevice">Stop sending PUSH notifications to app</a>  
+* <a href="account_unregisterDevice.html" name="account_unregisterDevice">Stop sending PUSH notifications to app: account.unregisterDevice</a>  
 
-* <a href="account_updateNotifySettings.html" name="account_updateNotifySettings">Change notification settings</a>  
+* <a href="account_updateNotifySettings.html" name="account_updateNotifySettings">Change notification settings: account.updateNotifySettings</a>  
 
-* <a href="account_updateProfile.html" name="account_updateProfile">Update profile info</a>  
+* <a href="account_updateProfile.html" name="account_updateProfile">Update profile info: account.updateProfile</a>  
 
-* <a href="account_updateStatus.html" name="account_updateStatus">Update online status</a>  
+* <a href="account_updateStatus.html" name="account_updateStatus">Update online status: account.updateStatus</a>  
 
-* <a href="account_updateUsername.html" name="account_updateUsername">Update this user's username</a>  
+* <a href="account_updateUsername.html" name="account_updateUsername">Update this user's username: account.updateUsername</a>  
 
-* <a href="auth_checkPhone.html" name="auth_checkPhone">Check if this phone number is registered on telegram</a>  
+* <a href="auth_checkPhone.html" name="auth_checkPhone">Check if this phone number is registered on telegram: auth.checkPhone</a>  
 
-* <a href="auth_resetAuthorizations.html" name="auth_resetAuthorizations">Delete all logged-in sessions.</a>  
+* <a href="auth_resetAuthorizations.html" name="auth_resetAuthorizations">Delete all logged-in sessions.: auth.resetAuthorizations</a>  
 
-* <a href="auth_sendCall.html" name="auth_sendCall">Send verification phone call</a>  
+* <a href="auth_sendCall.html" name="auth_sendCall">Send verification phone call: auth.sendCall</a>  
 
-* <a href="auth_sendInvites.html" name="auth_sendInvites">Invite friends to telegram!</a>  
+* <a href="auth_sendInvites.html" name="auth_sendInvites">Invite friends to telegram!: auth.sendInvites</a>  
 
-* <a href="auth_sendSms.html" name="auth_sendSms">Send SMS verification code</a>  
+* <a href="auth_sendSms.html" name="auth_sendSms">Send SMS verification code: auth.sendSms</a>  
 
-* <a href="contacts_block.html" name="contacts_block">Block a user</a>  
+* <a href="contacts_block.html" name="contacts_block">Block a user: contacts.block</a>  
 
-* <a href="contacts_deleteContact.html" name="contacts_deleteContact">Delete a contact</a>  
+* <a href="contacts_deleteContact.html" name="contacts_deleteContact">Delete a contact: contacts.deleteContact</a>  
 
-* <a href="contacts_deleteContacts.html" name="contacts_deleteContacts">Delete multiple contacts</a>  
+* <a href="contacts_deleteContacts.html" name="contacts_deleteContacts">Delete multiple contacts: contacts.deleteContacts</a>  
 
-* <a href="contacts_exportCard.html" name="contacts_exportCard">Export contact as card</a>  
+* <a href="contacts_exportCard.html" name="contacts_exportCard">Export contact as card: contacts.exportCard</a>  
 
-* <a href="contacts_getBlocked.html" name="contacts_getBlocked">Get blocked users</a>  
+* <a href="contacts_getBlocked.html" name="contacts_getBlocked">Get blocked users: contacts.getBlocked</a>  
 
-* <a href="contacts_getContacts.html" name="contacts_getContacts">Get info about a certain contact</a>  
+* <a href="contacts_getContacts.html" name="contacts_getContacts">Get info about a certain contact: contacts.getContacts</a>  
 
-* <a href="contacts_getStatuses.html" name="contacts_getStatuses">Get online status of all users</a>  
+* <a href="contacts_getStatuses.html" name="contacts_getStatuses">Get online status of all users: contacts.getStatuses</a>  
 
-* <a href="contacts_getSuggested.html" name="contacts_getSuggested">Get suggested contacts</a>  
+* <a href="contacts_getSuggested.html" name="contacts_getSuggested">Get suggested contacts: contacts.getSuggested</a>  
 
-* <a href="contacts_importCard.html" name="contacts_importCard">Import card as contact</a>  
+* <a href="contacts_importCard.html" name="contacts_importCard">Import card as contact: contacts.importCard</a>  
 
-* <a href="contacts_importContacts.html" name="contacts_importContacts">Add phone number as contact</a>  
+* <a href="contacts_importContacts.html" name="contacts_importContacts">Add phone number as contact: contacts.importContacts</a>  
 
-* <a href="contacts_search.html" name="contacts_search">Search contacts</a>  
+* <a href="contacts_search.html" name="contacts_search">Search contacts: contacts.search</a>  
 
-* <a href="contacts_unblock.html" name="contacts_unblock">Unblock a user</a>  
+* <a href="contacts_unblock.html" name="contacts_unblock">Unblock a user: contacts.unblock</a>  
 
-* <a href="help_getAppUpdate.html" name="help_getAppUpdate">Get info about app updates</a>  
+* <a href="help_getAppUpdate.html" name="help_getAppUpdate">Get info about app updates: help.getAppUpdate</a>  
 
-* <a href="help_getConfig.html" name="help_getConfig">Get server configuration</a>  
+* <a href="help_getConfig.html" name="help_getConfig">Get server configuration: help.getConfig</a>  
 
-* <a href="help_getInviteText.html" name="help_getInviteText">Get invitation text</a>  
+* <a href="help_getInviteText.html" name="help_getInviteText">Get invitation text: help.getInviteText</a>  
 
-* <a href="help_getNearestDc.html" name="help_getNearestDc">Get nearest datacenter</a>  
+* <a href="help_getNearestDc.html" name="help_getNearestDc">Get nearest datacenter: help.getNearestDc</a>  
 
-* <a href="help_getSupport.html" name="help_getSupport">Get info of support user</a>  
+* <a href="help_getSupport.html" name="help_getSupport">Get info of support user: help.getSupport</a>  
 
-* <a href="help_saveAppLog.html" name="help_saveAppLog">Log data for developer of this app</a>  
+* <a href="help_saveAppLog.html" name="help_saveAppLog">Log data for developer of this app: help.saveAppLog</a>  
 
-* <a href="initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.</a>  
+* <a href="initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.: initConnection</a>  
 
-* <a href="invokeAfterMsg.html" name="invokeAfterMsg">Invokes a query after successfull completion of one of the previous queries.</a>  
+* <a href="invokeAfterMsg.html" name="invokeAfterMsg">Invokes a query after successfull completion of one of the previous queries.: invokeAfterMsg</a>  
 
-* <a href="invokeAfterMsgs.html" name="invokeAfterMsgs">Result type returned by a current query.</a>  
+* <a href="invokeAfterMsgs.html" name="invokeAfterMsgs">Result type returned by a current query.: invokeAfterMsgs</a>  
 
-* <a href="invokeWithLayer18.html" name="invokeWithLayer18">Invoke this method with layer 18</a>  
+* <a href="invokeWithLayer18.html" name="invokeWithLayer18">Invoke this method with layer 18: invokeWithLayer18</a>  
 
-* <a href="messages_addChatUser.html" name="messages_addChatUser">Add a user to a normal chat (use channels->inviteToChannel for supergroups)</a>  
+* <a href="messages_addChatUser.html" name="messages_addChatUser">Add a user to a normal chat (use channels->inviteToChannel for supergroups): messages.addChatUser</a>  
 
-* <a href="messages_createChat.html" name="messages_createChat">Create a chat (not supergroup)</a>  
+* <a href="messages_createChat.html" name="messages_createChat">Create a chat (not supergroup): messages.createChat</a>  
 
-* <a href="messages_deleteChatUser.html" name="messages_deleteChatUser">Delete a user from a chat (not supergroup)</a>  
+* <a href="messages_deleteChatUser.html" name="messages_deleteChatUser">Delete a user from a chat (not supergroup): messages.deleteChatUser</a>  
 
-* <a href="messages_deleteHistory.html" name="messages_deleteHistory">Delete chat history</a>  
+* <a href="messages_deleteHistory.html" name="messages_deleteHistory">Delete chat history: messages.deleteHistory</a>  
 
-* <a href="messages_deleteMessages.html" name="messages_deleteMessages">Delete messages</a>  
+* <a href="messages_deleteMessages.html" name="messages_deleteMessages">Delete messages: messages.deleteMessages</a>  
 
-* <a href="messages_editChatPhoto.html" name="messages_editChatPhoto">Edit the photo of a normal chat (not supergroup)</a>  
+* <a href="messages_editChatPhoto.html" name="messages_editChatPhoto">Edit the photo of a normal chat (not supergroup): messages.editChatPhoto</a>  
 
-* <a href="messages_editChatTitle.html" name="messages_editChatTitle">Edit the title of a normal chat (not supergroup)</a>  
+* <a href="messages_editChatTitle.html" name="messages_editChatTitle">Edit the title of a normal chat (not supergroup): messages.editChatTitle</a>  
 
-* <a href="messages_forwardMessage.html" name="messages_forwardMessage">Forward message</a>  
+* <a href="messages_forwardMessage.html" name="messages_forwardMessage">Forward message: messages.forwardMessage</a>  
 
-* <a href="messages_forwardMessages.html" name="messages_forwardMessages">Forward messages</a>  
+* <a href="messages_forwardMessages.html" name="messages_forwardMessages">Forward messages: messages.forwardMessages</a>  
 
-* <a href="messages_getChats.html" name="messages_getChats">Get info about chats</a>  
+* <a href="messages_getChats.html" name="messages_getChats">Get info about chats: messages.getChats</a>  
 
-* <a href="messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html</a>  
+* <a href="messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html: messages.getDialogs</a>  
 
-* <a href="messages_getHistory.html" name="messages_getHistory">Get previous messages of a group</a>  
+* <a href="messages_getHistory.html" name="messages_getHistory">Get previous messages of a group: messages.getHistory</a>  
 
-* <a href="messages_getMessages.html" name="messages_getMessages">Get messages</a>  
+* <a href="messages_getMessages.html" name="messages_getMessages">Get messages: messages.getMessages</a>  
 
-* <a href="messages_readEncryptedHistory.html" name="messages_readEncryptedHistory">Mark messages as read in secret chats</a>  
+* <a href="messages_readEncryptedHistory.html" name="messages_readEncryptedHistory">Mark messages as read in secret chats: messages.readEncryptedHistory</a>  
 
-* <a href="messages_readHistory.html" name="messages_readHistory">Mark messages as read</a>  
+* <a href="messages_readHistory.html" name="messages_readHistory">Mark messages as read: messages.readHistory</a>  
 
-* <a href="messages_readMessageContents.html" name="messages_readMessageContents">Mark message as read</a>  
+* <a href="messages_readMessageContents.html" name="messages_readMessageContents">Mark message as read: messages.readMessageContents</a>  
 
-* <a href="messages_receivedMessages.html" name="messages_receivedMessages">Mark messages as read</a>  
+* <a href="messages_receivedMessages.html" name="messages_receivedMessages">Mark messages as read: messages.receivedMessages</a>  
 
-* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam</a>  
+* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
 
-* <a href="messages_search.html" name="messages_search">Search peers or messages</a>  
+* <a href="messages_search.html" name="messages_search">Search peers or messages: messages.search</a>  
 
-* <a href="messages_sendBroadcast.html" name="messages_sendBroadcast">Send a message to all users in the chat list</a>  
+* <a href="messages_sendBroadcast.html" name="messages_sendBroadcast">Send a message to all users in the chat list: messages.sendBroadcast</a>  
 
-* <a href="messages_sendEncrypted.html" name="messages_sendEncrypted">Send message to secret chat</a>  
+* <a href="messages_sendEncrypted.html" name="messages_sendEncrypted">Send message to secret chat: messages.sendEncrypted</a>  
 
-* <a href="messages_sendEncryptedFile.html" name="messages_sendEncryptedFile">Send a file to a secret chat</a>  
+* <a href="messages_sendEncryptedFile.html" name="messages_sendEncryptedFile">Send a file to a secret chat: messages.sendEncryptedFile</a>  
 
-* <a href="messages_sendEncryptedService.html" name="messages_sendEncryptedService">Send a service message to a secret chat</a>  
+* <a href="messages_sendEncryptedService.html" name="messages_sendEncryptedService">Send a service message to a secret chat: messages.sendEncryptedService</a>  
 
-* <a href="messages_sendMedia.html" name="messages_sendMedia">Send a media</a>  
+* <a href="messages_sendMedia.html" name="messages_sendMedia">Send a media: messages.sendMedia</a>  
 
-* <a href="messages_sendMessage.html" name="messages_sendMessage">Send a message</a>  
+* <a href="messages_sendMessage.html" name="messages_sendMessage">Send a message: messages.sendMessage</a>  
 
-* <a href="messages_setEncryptedTyping.html" name="messages_setEncryptedTyping">Send typing notification to secret chat</a>  
+* <a href="messages_setEncryptedTyping.html" name="messages_setEncryptedTyping">Send typing notification to secret chat: messages.setEncryptedTyping</a>  
 
-* <a href="messages_setTyping.html" name="messages_setTyping">Change typing status</a>  
+* <a href="messages_setTyping.html" name="messages_setTyping">Change typing status: messages.setTyping</a>  
 
-* <a href="photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos</a>  
+* <a href="photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos: photos.deletePhotos</a>  
 
-* <a href="photos_getUserPhotos.html" name="photos_getUserPhotos">Get the profile photos of a user</a>  
+* <a href="photos_getUserPhotos.html" name="photos_getUserPhotos">Get the profile photos of a user: photos.getUserPhotos</a>  
 
-* <a href="photos_updateProfilePhoto.html" name="photos_updateProfilePhoto">Update the profile photo (use photos->uploadProfilePhoto to upload the photo)</a>  
+* <a href="photos_updateProfilePhoto.html" name="photos_updateProfilePhoto">Update the profile photo (use photos->uploadProfilePhoto to upload the photo): photos.updateProfilePhoto</a>  
 
-* <a href="photos_uploadProfilePhoto.html" name="photos_uploadProfilePhoto">Upload profile photo</a>  
+* <a href="photos_uploadProfilePhoto.html" name="photos_uploadProfilePhoto">Upload profile photo: photos.uploadProfilePhoto</a>  
 
-* <a href="users_getUsers.html" name="users_getUsers">Get info about users</a>  
+* <a href="users_getUsers.html" name="users_getUsers">Get info about users: users.getUsers</a>  
 

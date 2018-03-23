@@ -71,7 +71,7 @@ trait Methods
 
 ';
             if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
-                $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].'</a>  
+                $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>  
 
 ';
             }
