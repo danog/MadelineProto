@@ -5,7 +5,7 @@ description: List of methods
 # Methods  
 [Back to API documentation index](..)
 
-[Go to the new description-version method index](index.html)
+[Go to the new description-version method index](index.md)
 
 $MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
 

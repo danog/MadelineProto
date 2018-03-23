@@ -333,7 +333,7 @@ description: List of methods
 # Methods  
 [Back to API documentation index](..)
 
-[Go to the new description-version method index](index.html)
+[Go to the new description-version method index]('.$this->index.')
 
 $MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
 
@@ -370,7 +370,7 @@ description: What do you want to do?
 # What do you want to do?  
 [Go back to API documentation index](..)  
 
-[Go to the old code-version method index](api_index.html)  
+[Go to the old code-version method index](api_'.$this->index.')  
 
 * [Logout](https://docs.madelineproto.xyz/logout.html)
 

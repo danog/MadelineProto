@@ -5,7 +5,7 @@ description: What do you want to do?
 # What do you want to do?  
 [Go back to API documentation index](..)  
 
-[Go to the old code-version method index](api_index.html)  
+[Go to the old code-version method index](api_index.md)  
 
 * [Logout](https://docs.madelineproto.xyz/logout.html)
 
