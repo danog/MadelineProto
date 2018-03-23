@@ -1,18 +1,20 @@
 ---
 title: phone.setCallRating
-description: phone.setCallRating parameters, return type and example
+description: Set phone call rating
 ---
 ## Method: phone.setCallRating  
 [Back to methods index](index.md)
 
 
+Set phone call rating
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|
-|rating|[CLICK ME int](../types/int.md) | Yes|
-|comment|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call|
+|rating|[CLICK ME int](../types/int.md) | Yes|Rating (1-5 stars)|
+|comment|[CLICK ME string](../types/string.md) | Yes|An optional comment|
 
 
 ### Return type: [Updates](../types/Updates.md)

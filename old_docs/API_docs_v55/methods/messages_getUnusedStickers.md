@@ -1,16 +1,18 @@
 ---
 title: messages.getUnusedStickers
-description: messages.getUnusedStickers parameters, return type and example
+description: Get unused stickers
 ---
 ## Method: messages.getUnusedStickers  
 [Back to methods index](index.md)
 
 
+Get unused stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

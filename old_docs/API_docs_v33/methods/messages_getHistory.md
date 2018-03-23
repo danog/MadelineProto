@@ -13,7 +13,7 @@ Get previous messages of a group
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
-|offset|[CLICK ME int](../types/int.md) | Yes||
+|offset|[CLICK ME int](../types/int.md) | Yes|Message ID offset|
 |max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to fetch|
 |limit|[CLICK ME int](../types/int.md) | Yes|Number of messages to fetch|
 

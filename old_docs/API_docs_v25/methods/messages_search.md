@@ -17,7 +17,7 @@ Search peers or messages
 |filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|Message filter|
 |min\_date|[CLICK ME int](../types/int.md) | Yes|Minumum date of results to fetch|
 |max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of results to fetch|
-|offset|[CLICK ME int](../types/int.md) | Yes||
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset |
 |max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id to return|
 |limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 

@@ -1,16 +1,18 @@
 ---
 title: invokeWithLayer18
-description: invokeWithLayer18 parameters, return type and example
+description: Invoke this method with layer 18
 ---
 ## Method: invokeWithLayer18  
 [Back to methods index](index.md)
 
 
+Invoke this method with layer 18
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|query|[CLICK ME !X](../types/!X.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|query|[CLICK ME !X](../types/!X.md) | Yes|The method call|
 
 
 ### Return type: [X](../types/X.md)

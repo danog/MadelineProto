@@ -1,20 +1,22 @@
 ---
 title: contest.saveDeveloperInfo
-description: contest.saveDeveloperInfo parameters, return type and example
+description: Save developer info for telegram contest
 ---
 ## Method: contest.saveDeveloperInfo  
 [Back to methods index](index.md)
 
 
+Save developer info for telegram contest
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|vk\_id|[CLICK ME int](../types/int.md) | Yes|
-|name|[CLICK ME string](../types/string.md) | Yes|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|
-|age|[CLICK ME int](../types/int.md) | Yes|
-|city|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|vk\_id|[CLICK ME int](../types/int.md) | Yes|VK user ID|
+|name|[CLICK ME string](../types/string.md) | Yes|Name|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|Phone number|
+|age|[CLICK ME int](../types/int.md) | Yes|Age|
+|city|[CLICK ME string](../types/string.md) | Yes|City|
 
 
 ### Return type: [Bool](../types/Bool.md)

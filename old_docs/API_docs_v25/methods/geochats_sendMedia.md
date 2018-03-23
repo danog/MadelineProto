@@ -1,17 +1,19 @@
 ---
 title: geochats.sendMedia
-description: geochats.sendMedia parameters, return type and example
+description: Send media to geochat
 ---
 ## Method: geochats.sendMedia  
 [Back to methods index](index.md)
 
 
+Send media to geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

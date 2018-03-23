@@ -14,10 +14,10 @@ Requests Diffie-hellman parameters for key exchange
 |----------|---------------|----------|-------------|
 |nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security|
 |server\_nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
-|p|[CLICK ME string](../types/string.md) | Yes||
-|q|[CLICK ME string](../types/string.md) | Yes||
+|p|[CLICK ME string](../types/string.md) | Yes|factorized p from pq|
+|q|[CLICK ME string](../types/string.md) | Yes|factorized q from pq|
 |public\_key\_fingerprint|[CLICK ME long](../types/long.md) | Yes|Server RSA fingerprint|
-|encrypted\_data|[CLICK ME string](../types/string.md) | Yes||
+|encrypted\_data|[CLICK ME string](../types/string.md) | Yes|Encrypted message|
 
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)

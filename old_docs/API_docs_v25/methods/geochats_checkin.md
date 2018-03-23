@@ -1,16 +1,18 @@
 ---
 title: geochats.checkin
-description: geochats.checkin parameters, return type and example
+description: Join a geochat
 ---
 ## Method: geochats.checkin  
 [Back to methods index](index.md)
 
 
+Join a geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

@@ -14,7 +14,7 @@ Create channel/supergroup
 |----------|---------------|----------|-------------|
 |title|[CLICK ME string](../types/string.md) | Yes|Supergroup/channel title|
 |about|[CLICK ME string](../types/string.md) | Yes|About text|
-|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes||
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|Users to add to channel|
 
 
 ### Return type: [Updates](../types/Updates.md)

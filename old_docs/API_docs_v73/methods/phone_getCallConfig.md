@@ -1,10 +1,12 @@
 ---
 title: phone.getCallConfig
-description: phone.getCallConfig parameters, return type and example
+description: Get call configuration
 ---
 ## Method: phone.getCallConfig  
 [Back to methods index](index.md)
 
+
+Get call configuration
 
 
 

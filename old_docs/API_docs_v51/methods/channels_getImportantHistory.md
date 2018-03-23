@@ -1,22 +1,24 @@
 ---
 title: channels.getImportantHistory
-description: channels.getImportantHistory parameters, return type and example
+description: Get important channel/supergroup history
 ---
 ## Method: channels.getImportantHistory  
 [Back to methods index](index.md)
 
 
+Get important channel/supergroup history
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|offset\_id|[CLICK ME int](../types/int.md) | Yes|
-|offset\_date|[CLICK ME int](../types/int.md) | Yes|
-|add\_offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|min\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The supergroup/channel|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|Message ID offset|
+|offset\_date|[CLICK ME int](../types/int.md) | Yes|Date offset|
+|add\_offset|[CLICK ME int](../types/int.md) | Yes|Additional offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID|
+|min\_id|[CLICK ME int](../types/int.md) | Yes|Minumum message ID|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

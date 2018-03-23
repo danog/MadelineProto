@@ -1,19 +1,21 @@
 ---
 title: messages.getImportantHistory
-description: messages.getImportantHistory parameters, return type and example
+description: Get important message history
 ---
 ## Method: messages.getImportantHistory  
 [Back to methods index](index.md)
 
 
+Get important message history
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|min\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Peer|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to fetch|
+|min\_id|[CLICK ME int](../types/int.md) | Yes|Minumum message ID to fetch|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to fetch|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

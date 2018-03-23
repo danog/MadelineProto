@@ -1,17 +1,19 @@
 ---
 title: geochats.sendMessage
-description: geochats.sendMessage parameters, return type and example
+description: Send message to geochat
 ---
 ## Method: geochats.sendMessage  
 [Back to methods index](index.md)
 
 
+Send message to geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|message|[CLICK ME string](../types/string.md) | Yes|The message|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

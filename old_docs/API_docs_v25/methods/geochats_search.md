@@ -1,23 +1,25 @@
 ---
 title: geochats.search
-description: geochats.search parameters, return type and example
+description: Search messages in geocha
 ---
 ## Method: geochats.search  
 [Back to methods index](index.md)
 
 
+Search messages in geocha
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|q|[CLICK ME string](../types/string.md) | Yes|
-|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|
-|min\_date|[CLICK ME int](../types/int.md) | Yes|
-|max\_date|[CLICK ME int](../types/int.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|q|[CLICK ME string](../types/string.md) | Yes|The search query|
+|filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|Search filter|
+|min\_date|[CLICK ME int](../types/int.md) | Yes|Minumum date|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date|
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

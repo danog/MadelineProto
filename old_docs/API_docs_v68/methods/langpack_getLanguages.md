@@ -1,10 +1,12 @@
 ---
 title: langpack.getLanguages
-description: langpack.getLanguages parameters, return type and example
+description: Get available languages
 ---
 ## Method: langpack.getLanguages  
 [Back to methods index](index.md)
 
+
+Get available languages
 
 
 

@@ -12,7 +12,7 @@ Forward messages
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional||
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Broadcast this message|
 |from\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|From where to forward the messages|
 |id|Array of [CLICK ME int](../types/int.md) | Yes|The message IDs|
 |to\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to forward the messages|

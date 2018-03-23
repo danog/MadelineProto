@@ -12,7 +12,7 @@ Send a media
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional||
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Broadcast this message|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the media|
 |reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media to send|

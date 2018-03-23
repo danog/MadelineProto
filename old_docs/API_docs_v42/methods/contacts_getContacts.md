@@ -12,7 +12,7 @@ Get info about a certain contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME string](../types/string.md) | Yes||
+|hash|[CLICK ME string](../types/string.md) | Yes|$MadelineProto->gen_vector_hash(previously fetched user IDs);|
 
 
 ### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)

@@ -14,7 +14,7 @@ Sets client diffie-hellman parameters
 |----------|---------------|----------|-------------|
 |nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security|
 |server\_nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
-|encrypted\_data|[CLICK ME string](../types/string.md) | Yes||
+|encrypted\_data|[CLICK ME string](../types/string.md) | Yes|Encrypted message|
 
 
 ### Return type: [Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)

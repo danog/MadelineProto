@@ -1,17 +1,19 @@
 ---
 title: channels.toggleComments
-description: channels.toggleComments parameters, return type and example
+description: Enable channel comments
 ---
 ## Method: channels.toggleComments  
 [Back to methods index](index.md)
 
 
+Enable channel comments
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel |
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable comments|
 
 
 ### Return type: [Updates](../types/Updates.md)

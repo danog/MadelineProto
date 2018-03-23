@@ -1,17 +1,19 @@
 ---
 title: messages.forwardMessage
-description: messages.forwardMessage parameters, return type and example
+description: Forward message
 ---
 ## Method: messages.forwardMessage  
 [Back to methods index](index.md)
 
 
+Forward message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|From where to forward the message|
+|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
 
 
 ### Return type: [messages\_StatedMessage](../types/messages_StatedMessage.md)

@@ -12,7 +12,7 @@ Send a received bot result to the chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional||
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Broadcast this message?|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the message|
 |reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
 |query\_id|[CLICK ME long](../types/long.md) | Yes|The inline query ID|

@@ -1,19 +1,21 @@
 ---
 title: geochats.getHistory
-description: geochats.getHistory parameters, return type and example
+description: Get geochat history
 ---
 ## Method: geochats.getHistory  
 [Back to methods index](index.md)
 
 
+Get geochat history
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

@@ -1,16 +1,18 @@
 ---
 title: messages.createChannel
-description: messages.createChannel parameters, return type and example
+description: Create channel
 ---
 ## Method: messages.createChannel  
 [Back to methods index](index.md)
 
 
+Create channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|title|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|title|[CLICK ME string](../types/string.md) | Yes|Channel/supergroup title|
 
 
 ### Return type: [Updates](../types/Updates.md)

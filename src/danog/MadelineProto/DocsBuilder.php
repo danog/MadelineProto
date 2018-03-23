@@ -60,15 +60,14 @@ description: '.$this->settings['description'].'
 ---
 # '.$this->settings['description'].'  
 
+[Back to main documentation](..)  
+
+
 [Methods](methods/)
 
 [Constructors](constructors/)
 
-[Types](types/)
-
-
-[Back to main documentation](..)
-');
+[Types](types/)');
         $this->mk_methodS();
         $this->mk_constructors();
         foreach (glob('types/*') as $unlink) {

@@ -1,17 +1,19 @@
 ---
 title: messages.getChannelDialogs
-description: messages.getChannelDialogs parameters, return type and example
+description: Get channel/supergruop dialogs
 ---
 ## Method: messages.getChannelDialogs  
 [Back to methods index](index.md)
 
 
+Get channel/supergruop dialogs
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)

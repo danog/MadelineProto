@@ -1,17 +1,19 @@
 ---
 title: auth.sendCall
-description: auth.sendCall parameters, return type and example
+description: Send verification phone call
 ---
 ## Method: auth.sendCall  
 [Back to methods index](index.md)
 
 
+Send verification phone call
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|
-|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|The phone number|
+|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|The phone code hash|
 
 
 ### Return type: [Bool](../types/Bool.md)

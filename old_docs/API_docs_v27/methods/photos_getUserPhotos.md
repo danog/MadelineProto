@@ -14,7 +14,7 @@ Get the profile photos of a user
 |----------|---------------|----------|-------------|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
 |offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|max\_id|[CLICK ME int](../types/int.md) | Yes||
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum ID of photo to return|
 |limit|[CLICK ME int](../types/int.md) | Yes|Number of photos to return|
 
 

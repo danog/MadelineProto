@@ -1,16 +1,18 @@
 ---
 title: geochats.getFullChat
-description: geochats.getFullChat parameters, return type and example
+description: Get full info about a geochat
 ---
 ## Method: geochats.getFullChat  
 [Back to methods index](index.md)
 
 
+Get full info about a geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)

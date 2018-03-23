@@ -12,7 +12,7 @@ Get invitation text
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes||
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language|
 
 
 ### Return type: [help\_InviteText](../types/help_InviteText.md)

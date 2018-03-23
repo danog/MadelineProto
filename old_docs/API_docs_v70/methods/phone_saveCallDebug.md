@@ -1,17 +1,19 @@
 ---
 title: phone.saveCallDebug
-description: phone.saveCallDebug parameters, return type and example
+description: Save call debugging info
 ---
 ## Method: phone.saveCallDebug  
 [Back to methods index](index.md)
 
 
+Save call debugging info
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|
-|debug|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The call|
+|debug|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|Debugging info|
 
 
 ### Return type: [Bool](../types/Bool.md)

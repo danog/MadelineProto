@@ -13,7 +13,7 @@ Start a bot
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The bot's ID or username|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional||
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Chat ID|
 |start\_param|[CLICK ME string](../types/string.md) | Yes|The bot's start parameter|
 
 

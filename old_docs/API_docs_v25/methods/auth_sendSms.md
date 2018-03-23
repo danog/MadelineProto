@@ -1,17 +1,19 @@
 ---
 title: auth.sendSms
-description: auth.sendSms parameters, return type and example
+description: Send SMS verification code
 ---
 ## Method: auth.sendSms  
 [Back to methods index](index.md)
 
 
+Send SMS verification code
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|
-|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|phone\_number|[CLICK ME string](../types/string.md) | Yes|Phone number|
+|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|Phone code ash|
 
 
 ### Return type: [Bool](../types/Bool.md)

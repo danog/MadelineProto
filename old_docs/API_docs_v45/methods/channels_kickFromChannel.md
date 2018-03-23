@@ -1,18 +1,20 @@
 ---
 title: channels.kickFromChannel
-description: channels.kickFromChannel parameters, return type and example
+description: Kick user from channel
 ---
 ## Method: channels.kickFromChannel  
 [Back to methods index](index.md)
 
 
+Kick user from channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|kicked|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to kick|
+|kicked|[CLICK ME Bool](../types/Bool.md) | Yes|Kick or unkick?|
 
 
 ### Return type: [Updates](../types/Updates.md)

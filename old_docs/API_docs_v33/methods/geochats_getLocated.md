@@ -1,18 +1,20 @@
 ---
 title: geochats.getLocated
-description: geochats.getLocated parameters, return type and example
+description: Get nearby geochats
 ---
 ## Method: geochats.getLocated  
 [Back to methods index](index.md)
 
 
+Get nearby geochats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|radius|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|Current location|
+|radius|[CLICK ME int](../types/int.md) | Yes|Radius|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Located](../types/geochats_Located.md)

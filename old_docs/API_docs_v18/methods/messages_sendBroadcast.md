@@ -1,18 +1,20 @@
 ---
 title: messages.sendBroadcast
-description: messages.sendBroadcast parameters, return type and example
+description: Send a message to all users in the chat list
 ---
 ## Method: messages.sendBroadcast  
 [Back to methods index](index.md)
 
 
+Send a message to all users in the chat list
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|contacts|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Yes|
-|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|contacts|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The users to which send the message|
+|message|[CLICK ME string](../types/string.md) | Yes|The message|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media|
 
 
 ### Return type: [messages\_StatedMessages](../types/messages_StatedMessages.md)

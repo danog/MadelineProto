@@ -1,10 +1,12 @@
 ---
 title: destroy_auth_key
-description: destroy_auth_key parameters, return type and example
+description: Destroy current authorization key
 ---
 ## Method: destroy\_auth\_key  
 [Back to methods index](index.md)
 
+
+Destroy current authorization key
 
 
 

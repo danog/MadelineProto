@@ -13,7 +13,7 @@ Send a message
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview?|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional||
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Broadcast this message|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to send this message|
 |reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
 |message|[CLICK ME string](../types/string.md) | Yes|The message to send|

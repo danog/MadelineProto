@@ -28,6 +28,7 @@ trait Methods
         }
         mkdir('methods');
         $this->docs_methods = [];
+        $this->human_docs_methods = [];
         \danog\MadelineProto\Logger::log('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->methods->by_id as $id => $data) {
             $method = str_replace('.', '_', $data['method']);
@@ -60,6 +61,9 @@ trait Methods
             }
             $md_method = '['.$php_method.']('.$method.'.md)';
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
+
+';
+            $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']].'</a>  
 
 ';
             $params = '';
@@ -213,12 +217,7 @@ if (!file_exists(\'madeline.php\')) {
 }
 include \'madeline.php\';
 
-// !!! This API id/API hash combination will not work !!!
-// !!! You must get your own @ my.telegram.org !!!
-$api_id = 0;
-$api_hash = \'\';
-
-$MadelineProto = new \danog\MadelineProto\API(\'session.madeline\', [\'app_info\' => [\'api_id\' => $api_id, \'api_hash\' => $api_hash]]);
+$MadelineProto = new \danog\MadelineProto\API(\'session.madeline\');
 $MadelineProto->start();
 
 $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
@@ -310,6 +309,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
         }
         \danog\MadelineProto\Logger::log('Generating methods index...', \danog\MadelineProto\Logger::NOTICE);
         ksort($this->docs_methods);
+        ksort($this->human_docs_methods);
         $last_namespace = '';
         foreach ($this->docs_methods as $method => &$value) {
             $new_namespace = preg_replace('/_.*/', '', $method);
@@ -318,7 +318,15 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('methods/'.$this->index, '---
+        $last_namespace = '';
+        foreach ($this->human_docs_methods as $method => &$value) {
+            $new_namespace = preg_replace('/_.*/', '', $method);
+            $br = $new_namespace != $last_namespace ? '***
+<br><br>' : '';
+            $value = $br.$value;
+            $last_namespace = $new_namespace;
+        }
+        file_put_contents('methods/api_'.$this->index, '---
 title: Methods
 description: List of methods
 ---
@@ -353,5 +361,34 @@ $MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)
 $MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
 
 '.implode('', $this->docs_methods));
+
+        file_put_contents('methods/'.$this->index, '---
+title: Methods
+description: What do you want to do?
+---
+# What do you want to do?  
+[Go back to API documentation index](..)
+
+* [Logout](https://docs.madelineproto.xyz/logout.html)
+
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
+
+* [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
+
+* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
+
+* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
+
+* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
+
+* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
+
+* [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
+
+* [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
+
+* [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
+
+'.implode('', $this->human_docs_methods));
     }
 }

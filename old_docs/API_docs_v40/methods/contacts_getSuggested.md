@@ -1,16 +1,18 @@
 ---
 title: contacts.getSuggested
-description: contacts.getSuggested parameters, return type and example
+description: Get suggested contacts
 ---
 ## Method: contacts.getSuggested  
 [Back to methods index](index.md)
 
 
+Get suggested contacts
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [contacts\_Suggested](../types/contacts_Suggested.md)

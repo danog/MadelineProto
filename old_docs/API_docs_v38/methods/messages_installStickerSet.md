@@ -13,7 +13,7 @@ Add a sticker set
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to add|
-|disabled|[CLICK ME Bool](../types/Bool.md) | Yes||
+|disabled|[CLICK ME Bool](../types/Bool.md) | Yes|Disable stickerset?|
 
 
 ### Return type: [Bool](../types/Bool.md)

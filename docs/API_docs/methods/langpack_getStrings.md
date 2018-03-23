@@ -1,17 +1,19 @@
 ---
 title: langpack.getStrings
-description: langpack.getStrings parameters, return type and example
+description: Get language pack strings
 ---
 ## Method: langpack.getStrings  
 [Back to methods index](index.md)
 
 
+Get language pack strings
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
-|keys|Array of [CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
+|keys|Array of [CLICK ME string](../types/string.md) | Yes|Keys|
 
 
 ### Return type: [Vector\_of\_LangPackString](../types/LangPackString.md)

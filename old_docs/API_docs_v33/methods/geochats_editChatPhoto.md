@@ -1,17 +1,19 @@
 ---
 title: geochats.editChatPhoto
-description: geochats.editChatPhoto parameters, return type and example
+description: Edit geochat photo
 ---
 ## Method: geochats.editChatPhoto  
 [Back to methods index](index.md)
 
 
+Edit geochat photo
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new photo|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

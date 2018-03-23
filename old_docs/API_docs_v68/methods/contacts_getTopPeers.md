@@ -18,7 +18,7 @@ Get most used chats
 |phone\_calls|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch phone calls?|
 |groups|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch groups?|
 |channels|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch channels and supergroups?|
-|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, Then `$offset += $contacts_TopPeers['categories']['count'];`|
+|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`|
 |limit|[CLICK ME int](../types/int.md) | Yes|How many results to fetch|
 |hash|[CLICK ME int](../types/int.md) | Yes|$MadelineProto->gen_vector_hash(previously fetched peer ids);|
 

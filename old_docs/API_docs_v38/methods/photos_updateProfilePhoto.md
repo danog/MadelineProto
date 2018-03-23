@@ -13,7 +13,7 @@ Update the profile photo (use photos->uploadProfilePhoto to upload the photo)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Optional|The photo to use|
-|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes||
+|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|Cropping info|
 
 
 ### Return type: [UserProfilePhoto](../types/UserProfilePhoto.md)

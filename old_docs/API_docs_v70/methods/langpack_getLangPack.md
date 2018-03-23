@@ -1,16 +1,18 @@
 ---
 title: langpack.getLangPack
-description: langpack.getLangPack parameters, return type and example
+description: Get language pack
 ---
 ## Method: langpack.getLangPack  
 [Back to methods index](index.md)
 
 
+Get language pack
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)

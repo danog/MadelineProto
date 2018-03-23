@@ -14,7 +14,7 @@ Edit admin permissions of a user in a channel/supergroup
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
-|role|[CLICK ME ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes||
+|role|[CLICK ME ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes|User role|
 
 
 ### Return type: [Updates](../types/Updates.md)

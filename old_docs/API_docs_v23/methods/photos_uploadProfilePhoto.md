@@ -13,9 +13,9 @@ Upload profile photo
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |file|[File path or InputFile](../types/InputFile.md) | Yes|The photo|
-|caption|[CLICK ME string](../types/string.md) | Yes||
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional||
-|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes||
+|caption|[CLICK ME string](../types/string.md) | Yes|Caption type|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|Location|
+|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|Cropping info|
 
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)

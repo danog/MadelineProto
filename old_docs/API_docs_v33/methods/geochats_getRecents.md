@@ -1,17 +1,19 @@
 ---
 title: geochats.getRecents
-description: geochats.getRecents parameters, return type and example
+description: Get recent geochats
 ---
 ## Method: geochats.getRecents  
 [Back to methods index](index.md)
 
 
+Get recent geochats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|offset|[CLICK ME int](../types/int.md) | Yes|offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

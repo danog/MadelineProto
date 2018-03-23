@@ -1,12 +1,12 @@
 ---
 title: channels.getAdminLog
-description: Get admin log of a channel/supergruop
+description: Get admin log of a channel/supergroup
 ---
 ## Method: channels.getAdminLog  
 [Back to methods index](index.md)
 
 
-Get admin log of a channel/supergruop
+Get admin log of a channel/supergroup
 
 ### Parameters:
 

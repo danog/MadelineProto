@@ -1,18 +1,20 @@
 ---
 title: geochats.editChatTitle
-description: geochats.editChatTitle parameters, return type and example
+description: Edit geochat title
 ---
 ## Method: geochats.editChatTitle  
 [Back to methods index](index.md)
 
 
+Edit geochat title
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|title|[CLICK ME string](../types/string.md) | Yes|
-|address|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|title|[CLICK ME string](../types/string.md) | Yes|The new title|
+|address|[CLICK ME string](../types/string.md) | Yes|The new address|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

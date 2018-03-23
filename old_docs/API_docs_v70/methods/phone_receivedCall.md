@@ -1,16 +1,18 @@
 ---
 title: phone.receivedCall
-description: phone.receivedCall parameters, return type and example
+description: Notify server that you received a call (server will refuse all incoming calls until the current call is over)
 ---
 ## Method: phone.receivedCall  
 [Back to methods index](index.md)
 
 
+Notify server that you received a call (server will refuse all incoming calls until the current call is over)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call you received|
 
 
 ### Return type: [Bool](../types/Bool.md)

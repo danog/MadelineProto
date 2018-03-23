@@ -1,16 +1,18 @@
 ---
 title: langpack.getDifference
-description: langpack.getDifference parameters, return type and example
+description: Get language pack updates
 ---
 ## Method: langpack.getDifference  
 [Back to methods index](index.md)
 
 
+Get language pack updates
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|from\_version|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|from\_version|[CLICK ME int](../types/int.md) | Yes|Previous version|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)

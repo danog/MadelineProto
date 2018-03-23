@@ -1,19 +1,21 @@
 ---
 title: geochats.createGeoChat
-description: geochats.createGeoChat parameters, return type and example
+description: Create geochat
 ---
 ## Method: geochats.createGeoChat  
 [Back to methods index](index.md)
 
 
+Create geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|title|[CLICK ME string](../types/string.md) | Yes|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|address|[CLICK ME string](../types/string.md) | Yes|
-|venue|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|title|[CLICK ME string](../types/string.md) | Yes|Geochat title|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|Geochat location|
+|address|[CLICK ME string](../types/string.md) | Yes|Geochat address|
+|venue|[CLICK ME string](../types/string.md) | Yes|Geochat venue |
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

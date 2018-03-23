@@ -13,7 +13,7 @@ Delete chat history
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to clear it|
-|offset|[CLICK ME int](../types/int.md) | Yes||
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

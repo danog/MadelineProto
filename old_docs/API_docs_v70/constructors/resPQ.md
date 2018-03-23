@@ -1,20 +1,22 @@
 ---
 title: resPQ
-description: resPQ attributes, type and example
+description: Contains pq to factorize
 ---
 ## Constructor: resPQ  
 [Back to constructors index](index.md)
 
 
 
+Contains pq to factorize
+
 ### Attributes:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|nonce|[int128](../types/int128.md) | Yes|
-|server\_nonce|[int128](../types/int128.md) | Yes|
-|pq|[string](../types/string.md) | Yes|
-|server\_public\_key\_fingerprints|Array of [long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|nonce|[int128](../types/int128.md) | Yes|Nonce|
+|server\_nonce|[int128](../types/int128.md) | Yes|Server nonce|
+|pq|[string](../types/string.md) | Yes||
+|server\_public\_key\_fingerprints|Array of [long](../types/long.md) | Yes||
 
 
 

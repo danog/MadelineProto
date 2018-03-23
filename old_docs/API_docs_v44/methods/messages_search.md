@@ -12,13 +12,13 @@ Search peers or messages
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|important\_only|[CLICK ME Bool](../types/Bool.md) | Optional||
+|important\_only|[CLICK ME Bool](../types/Bool.md) | Optional|Show only important messages|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to search|
 |q|[CLICK ME string](../types/string.md) | Yes|What to search|
 |filter|[CLICK ME MessagesFilter](../types/MessagesFilter.md) | Yes|Message filter|
 |min\_date|[CLICK ME int](../types/int.md) | Yes|Minumum date of results to fetch|
 |max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of results to fetch|
-|offset|[CLICK ME int](../types/int.md) | Yes||
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset |
 |max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id to return|
 |limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
 

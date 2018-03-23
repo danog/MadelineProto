@@ -1,17 +1,19 @@
 ---
 title: geochats.setTyping
-description: geochats.setTyping parameters, return type and example
+description: Send typing notification to geochat
 ---
 ## Method: geochats.setTyping  
 [Back to methods index](index.md)
 
 
+Send typing notification to geochat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|
-|typing|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|typing|[CLICK ME Bool](../types/Bool.md) | Yes|Typing or not typing|
 
 
 ### Return type: [Bool](../types/Bool.md)

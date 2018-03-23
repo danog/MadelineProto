@@ -14,8 +14,8 @@ Mark messages as read
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to mark messages as read|
 |max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to mark as read|
-|offset|[CLICK ME int](../types/int.md) | Yes||
-|read\_contents|[CLICK ME Bool](../types/Bool.md) | Yes||
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|read\_contents|[CLICK ME Bool](../types/Bool.md) | Yes|Mark messages as read?|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

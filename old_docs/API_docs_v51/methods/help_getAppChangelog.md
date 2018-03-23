@@ -12,10 +12,10 @@ Get the changelog of this app
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|device\_model|[CLICK ME string](../types/string.md) | Yes||
-|system\_version|[CLICK ME string](../types/string.md) | Yes||
-|app\_version|[CLICK ME string](../types/string.md) | Yes||
-|lang\_code|[CLICK ME string](../types/string.md) | Yes||
+|device\_model|[CLICK ME string](../types/string.md) | Yes|Device model|
+|system\_version|[CLICK ME string](../types/string.md) | Yes|System version|
+|app\_version|[CLICK ME string](../types/string.md) | Yes|App version|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
 
 
 ### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)

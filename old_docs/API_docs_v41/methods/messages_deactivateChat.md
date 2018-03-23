@@ -1,17 +1,19 @@
 ---
 title: messages.deactivateChat
-description: messages.deactivateChat parameters, return type and example
+description: Deactivate chat
 ---
 ## Method: messages.deactivateChat  
 [Back to methods index](index.md)
 
 
+Deactivate chat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat to deactivate|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Activate or deactivate?|
 
 
 ### Return type: [Updates](../types/Updates.md)

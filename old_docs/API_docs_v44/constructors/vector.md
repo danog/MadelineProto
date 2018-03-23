@@ -1,11 +1,13 @@
 ---
 title: vector
-description: vector attributes, type and example
+description: Array
 ---
 ## Constructor: vector  
 [Back to constructors index](index.md)
 
 
+
+Array
 
 
 
